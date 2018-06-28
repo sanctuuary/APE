@@ -1,2 +1,2 @@
-# UU_APE
+# APE
 Automated Pipeline Program Synthesis and Execution
