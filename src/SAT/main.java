@@ -45,14 +45,14 @@ public class main {
 	}
 
 	/**
-	 * Return the CNF representation of the input type constraints for
-	 * all @modules regarding @typeAutomaton, for the synthesis
-	 * concerning @moduleAutomaton and the Pipeline Approach.
+	 * Return the CNF representation of the input type constraints for all @modules
+	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
+	 * the Pipeline Approach.
 	 * 
 	 * @param modules
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
-	 * @return
+	 * @return String representation of constraints
 	 */
 	public static String inputPipelineCons(AllModules modules, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton) {
@@ -61,7 +61,7 @@ public class main {
 		// setting up input constraints (Pipeline)
 
 		// for each module
-		for (Module module : modules.getModules()) {
+		for (AbstractModule module : modules.getModules()) {
 			// iterate through all the states
 			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
 				int moduleNo = moduleState.getStateNumber();
@@ -86,14 +86,14 @@ public class main {
 	}
 
 	/**
-	 * Return the CNF representation of the input type constraints for
-	 * all @modules regarding @typeAutomaton, for the synthesis
-	 * concerning @moduleAutomaton and the General Memory Approach.
+	 * Return the CNF representation of the input type constraints for all @modules
+	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
+	 * the General Memory Approach.
 	 * 
 	 * @param modules
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
-	 * @return
+	 * @return String representation of constraints
 	 */
 	public static String inputGenMemoryCons(AllModules modules, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton) {
@@ -102,7 +102,7 @@ public class main {
 		// setting up input constraints (General Memory)
 
 		// for each module
-		for (Module module : modules.getModules()) {
+		for (AbstractModule module : modules.getModules()) {
 			// iterate through all the states
 			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
 				int moduleNo = moduleState.getStateNumber();
@@ -129,21 +129,20 @@ public class main {
 	}
 
 	/**
-	 * Return the CNF representation of the output type constraints for
-	 * all @modules regarding @typeAutomaton, for the synthesis
-	 * concerning @moduleAutomaton.
+	 * Return the CNF representation of the output type constraints for all @modules
+	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.
 	 * 
 	 * @param modules
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
-	 * @return
+	 * @return String representation of constraints
 	 */
 	public static String outputCons(AllModules modules, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
 
 		String constraints = "";
 
 		// for each module
-		for (Module module : modules.getModules()) {
+		for (AbstractModule module : modules.getModules()) {
 			// iterate through all the states
 			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
 				int moduleNo = moduleState.getStateNumber();
@@ -181,32 +180,33 @@ public class main {
 	}
 
 	/**
-	 * Generating the mutual exclusion for each pair of @modules in each state of @moduleAutomaton.
+	 * Generating the mutual exclusion for each pair of tools from @modules (excluding abstract modules from the taxonomy) in each state of @moduleAutomaton.
 	 * @param modules
 	 * @param moduleAutomaton
-	 * @return
+	 * @return String representation of constraints
 	 */
 	public static String moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton) {
 
 		String constraints = "";
-
-//		THIS ITERATOR NEEDS TO BE FIXED. IT IS NOT POSSIBLE TO ITERATE THROUGH A SET USING INDEXES.
 		
-		for(int i=0; i < allModules.size()- 1; i++)
-			for(int j=i+1; j < allModules.size(); i++){
+		
+		for(Pair pair : allModules.getToolPairs()){
 				for(ModuleState moduleState : moduleAutomaton.getModuleStates()){
-					constraints += allModules..getAtom() + "(" + moduleAutomaton.get(i).getStateName() + ") ";
+					constraints += "-" + pair.getFirst().getAtom() + "(" + moduleState.getStateName() + ") ";
+					constraints += "-" + pair.getSecond().getAtom() + "(" + moduleState.getStateName() + ") 0\n";
 				}
-			}
+		}
 		
 		return constraints;
 	}
 
 	/**
-	 * Generating the mutual exclusion for each pair of types in each state of typeAutomaton.
+	 * Generating the mutual exclusion for each pair of types in each state of
+	 * typeAutomaton.
+	 * 
 	 * @param types
 	 * @param typeAutomaton
-	 * @return
+	 * @return String representation of constraints
 	 */
 	public static String typeMutualExclusion(AllTypes allTypes, TypeAutomaton typeAutomaton) {
 
@@ -248,42 +248,41 @@ public class main {
 
 		// TODO create constraints for module.csv
 		AllModules annotated_modules = new AllModules(
-				readCSV("C:\\Users\\VedranPC\\Dropbox\\PhD\\GEO_project\\UseCase_Paper\\modules.csv"));
-		
+				readCSV("/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/modules.csv"));
+
 		cnf += modulesConstraints(annotated_modules, moduleAutomaton, typeAutomaton, pipeline);
 
 		// TODO encode the taxonomies - generate the list of all types / modules
-		
-		AllModules allModules = new AllModules();
+
+		AllModules allModules = new AllModules(annotated_modules.getModules());
 		AllTypes allTypes = new AllTypes();
-		
-		
-		
+
 		// TODO create constraints on the mutual exclusion of the tools - from taxonomy
-		cnf += moduleMutualExclusion(allModules, moduleAutomaton);
-		
+		System.out.println(moduleMutualExclusion(allModules, moduleAutomaton));
+
 		// TODO create constraints on the mutual exclusion of the types
 		// TODO generate list of all Types
 		cnf += typeMutualExclusion(allTypes, typeAutomaton);
 
 		// TODO encode the constraints from the paper manualy
-		
-		//use module/type in the synthesis
-		AbstractModule draw_water = new AbstractModule("draw_water", "draw_water");
-		SLTL_formula_F e0_1 = new SLTL_formula_F(draw_water);
-//		System.out.println(e0_1.getCNF(moduleAutomaton, typeAutomaton));
 
-		//don't use module/type in the synthesis
-		AbstractModule _3d_surfaces = new AbstractModule("3d_surfaces", "3d_surfaces");
+		// use module/type in the synthesis
+		AbstractModule draw_water = new AbstractModule("draw_water", "draw_water", true);
+		SLTL_formula_F e0_1 = new SLTL_formula_F(draw_water);
+		// System.out.println(e0_1.getCNF(moduleAutomaton, typeAutomaton));
+
+		// don't use module/type in the synthesis
+		AbstractModule _3d_surfaces = new AbstractModule("3d_surfaces", "3d_surfaces", true);
 		SLTL_formula_G g5 = new SLTL_formula_G(_3d_surfaces, true);
-//		System.out.println(g5.getCNF(moduleAutomaton, typeAutomaton));
-		
-		//TODO if using module X use module Y subsequently
-		AbstractModule modules_with_xyz_input = new AbstractModule("Modules_with_xyz_input", "Modules_with_xyz_input");
-		AbstractModule modules_with_xyz_output = new AbstractModule("Modules_with_xyz_output", "Modules_with_xyz_output");
-		System.out.println(SLTL_formula.ite(modules_with_xyz_input, modules_with_xyz_output, moduleAutomaton, typeAutomaton));
-		
-		
+		// System.out.println(g5.getCNF(moduleAutomaton, typeAutomaton));
+
+		// TODO if using module X use module Y subsequently
+		AbstractModule modules_with_xyz_input = new AbstractModule("Modules_with_xyz_input", "Modules_with_xyz_input", true);
+		AbstractModule modules_with_xyz_output = new AbstractModule("Modules_with_xyz_output",
+				"Modules_with_xyz_output", true);
+		System.out.println(
+				SLTL_formula.ite(modules_with_xyz_input, modules_with_xyz_output, moduleAutomaton, typeAutomaton));
+
 		// TODO implement SAT
 
 		List<SLTL_formula> constraints;

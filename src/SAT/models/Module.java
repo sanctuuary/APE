@@ -9,11 +9,16 @@ public class Module extends AbstractModule {
 	private List<Type> moduleOutput;
 
 	public Module(String moduleName, String moduleID, List<Type> moduleInput, List<Type> moduleOutput) {
-		super(moduleName, moduleID);
+		super(moduleName, moduleID, true);
 		this.moduleInput = new ArrayList<Type>(moduleInput);
 		this.moduleOutput = new ArrayList<Type>(moduleOutput);
 	}
 
+	/**
+	 * Returns the list (possibly empty) of required input types for the module. Returns null in the case of abstract classes, as they do not have input types.
+	 * @return List of input types (tool modules) or null (non-tool/abstract modules)
+	 */
+	@Override
 	public List<Type> getModuleInput() {
 		return moduleInput;
 	}
@@ -22,6 +27,11 @@ public class Module extends AbstractModule {
 		this.moduleInput = moduleInput;
 	}
 
+	/**
+	 * Returns the list (possibly empty) of required output types for the module. Returns null in the case of abstract classes, as they do not have output types.
+	 * @return List of output types (tool modules) or null (non-tool/abstract modules)
+	 */
+	@Override
 	public List<Type> getModuleOutput() {
 		return moduleOutput;
 	}
