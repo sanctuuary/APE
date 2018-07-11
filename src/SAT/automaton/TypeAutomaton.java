@@ -16,7 +16,7 @@ public class TypeAutomaton {
 		this.typeAutomaton = typeAutomaton;
 	}
 
-	public List<TypeBlock> getTypeAutomaton() {
+	public List<TypeBlock> getTypeBlocks() {
 		return typeAutomaton;
 	}
 

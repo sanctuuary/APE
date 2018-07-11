@@ -2,18 +2,18 @@ package SAT.models;
 
 public class Pair {
 
-	private Atom first, second;
+	private Predicate first, second;
 	
-	public Pair(Atom first,Atom second) {
+	public Pair(Predicate first,Predicate second) {
 		this.first = first;
 		this.second = second;
 	}
 	
-	public Atom getFirst() {
+	public Predicate getFirst() {
 		return first;
 	}
 	
-	public Atom getSecond() {
+	public Predicate getSecond() {
 		return second;
 	}
 }

@@ -22,10 +22,28 @@ public class AtomMapping {
 	/**
 	 * Function is returning the mapping number of the @atom (>1). If the Atom did not occur before,
 	 * it is added to the mapping set and then mapping value is returned.
-	 * @param atom
-	 * @return
+	 * @param atom - atom that is being mapped
+	 * @return Mapping number of the atom (>1)
 	 */
 	public Integer add(String atom) {
+		Integer id;
+		if ((id = mappings.get(atom)) == null) {
+			mappings.put(atom, size++);
+			return size;
+		}
+		return id;
+	}
+	
+	
+	/**
+	 * Function is returning the mapping number of the @predicate ( @argument). If the Atom did not occur before,
+	 * it is added to the mapping set and then mapping value is returned.
+	 * @param predicate - predicate of the mapped atom
+	 * @param argument - argument of the mapped atom
+	 * @return Mapping number of the atom (>1)
+	 */
+	public Integer add(String predicate, String argument) {
+		String atom = predicate + "(" + argument + ")";
 		Integer id;
 		if ((id = mappings.get(atom)) == null) {
 			mappings.put(atom, size++);

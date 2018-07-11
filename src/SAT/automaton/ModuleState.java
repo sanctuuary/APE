@@ -26,7 +26,7 @@ public class ModuleState implements State {
 		this.stateName = stateName;
 	}
 
-
+	@Override
 	public int getStateNumber() {
 		return stateNumber;
 	}

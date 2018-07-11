@@ -1,5 +1,6 @@
 package SAT.models;
 
+import SAT.automaton.AtomMapping;
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
@@ -14,11 +15,11 @@ import SAT.automaton.TypeAutomaton;
  */
 public abstract class SLTL_formula {
 
-	private Atom atom;
+	private Predicate predicate;
 	private boolean negated;
 
-	public SLTL_formula(Atom atom) {
-		this.atom = atom;
+	public SLTL_formula(Predicate predicate) {
+		this.predicate = predicate;
 		negated = false;
 	}
 
@@ -26,16 +27,16 @@ public abstract class SLTL_formula {
 	 * Modal operator is performed over @formula. In case of value of @negated
 	 * being true, @formula
 	 * 
-	 * @param atom
+	 * @param predicate
 	 * @param negated
 	 */
-	public SLTL_formula(Atom atom, boolean negated) {
-		this.atom = atom;
+	public SLTL_formula(Predicate predicate, boolean negated) {
+		this.predicate = predicate;
 		this.negated = negated;
 	}
 
 	/**
-	 * Setting whether the atom is negated or not. If @negation is true the atom
+	 * Setting whether the predicate is negated or not. If @negation is true the predicate
 	 * will be negated.
 	 * 
 	 * @param negation
@@ -45,7 +46,7 @@ public abstract class SLTL_formula {
 	}
 
 	/**
-	 * Returns true if atom is negated, false otherwise.
+	 * Returns true if predicate is negated, false otherwise.
 	 * 
 	 * @return
 	 */
@@ -55,12 +56,12 @@ public abstract class SLTL_formula {
 
 	/**
 	 * Function returns the formula that was specified under the SLTL operator.
-	 * Currently only atoms.
+	 * Currently only predicates.
 	 * 
 	 * @return
 	 */
-	public Atom getSubFormula() {
-		return atom;
+	public Predicate getSubFormula() {
+		return predicate;
 	}
 
 	/**
@@ -78,20 +79,20 @@ public abstract class SLTL_formula {
 	 * @param typeAutomaton
 	 * @return
 	 */
-	public abstract String getCNF(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton);
+	public abstract String getCNF(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings);
 
-	public static String ite(Atom if_atom, Atom then_atom, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton) {
+	public static String ite(Predicate if_predicate, Predicate then_predicate, ModuleAutomaton moduleAutomaton,
+			TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String constraints = "";
 
-		if (if_atom.getType().matches("type")) {
+		if (if_predicate.getType().matches("type")) {
 
 		} else {
 			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
 				if (!moduleState.isLast()) {
-					constraints += "-" + if_atom.getAtom() + "(" + moduleState.getStateName() + ") ";
+					constraints += "-" + mappings.add(if_predicate.getPredicate(), moduleState.getStateName()) + " ";
 					for (int i = moduleState.getStateNumber() + 1; i < moduleAutomaton.size(); i++) {
-						constraints += then_atom.getAtom() + "(" + moduleAutomaton.get(i).getStateName() + ") ";
+						constraints += mappings.add(then_predicate.getPredicate(), moduleAutomaton.get(i).getStateName()) + " ";
 					}
 					constraints += "0\n";
 				}

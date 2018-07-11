@@ -1,5 +1,6 @@
 package SAT.models;
 
+import SAT.automaton.AtomMapping;
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
@@ -8,20 +9,20 @@ import SAT.automaton.TypeState;
 
 public class SLTL_formula_G extends SLTL_formula {
 
-	public SLTL_formula_G(Atom atom) {
-		super(atom);
+	public SLTL_formula_G(Predicate predicate) {
+		super(predicate);
 	}
 	
-	public SLTL_formula_G(Atom atom, boolean negated) {
-		super(atom, negated);
+	public SLTL_formula_G(Predicate predicate, boolean negated) {
+		super(predicate, negated);
 	}
 
 	@Override
-	public String getCNF(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
+	public String getCNF(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 
 		String constraints = "";
 		String negSign;
-//		chech whether the subformula is expected to be negated or not
+//		check whether the subformula is expected to be negated or not
 		if (super.getNegated()){
 			negSign = "-";
 		} else {
@@ -30,14 +31,14 @@ public class SLTL_formula_G extends SLTL_formula {
 		// Distinguishing whether the formula under the modal operator is type
 		// or module.
 		if (super.getSubFormula().getType().matches("type")) {
-			for (TypeBlock typeBlock : typeAutomaton.getTypeAutomaton()) {
+			for (TypeBlock typeBlock : typeAutomaton.getTypeBlocks()) {
 				for (TypeState typeState : typeBlock.getTypeStates()) {
-					constraints += negSign + super.getSubFormula().getAtom() + "(" + typeState.getStateName() + ") 0\n";
+					constraints += negSign + mappings.add(super.getSubFormula().getPredicate(), typeState.getStateName()) + " 0\n";
 				}
 			}
 		} else {
 			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
-				constraints += negSign + super.getSubFormula().getAtom() + "(" + moduleState.getStateName() + ") 0\n";
+				constraints += negSign + mappings.add(super.getSubFormula().getPredicate(), moduleState.getStateName()) + " 0\n";
 			}
 		}
 		return constraints;

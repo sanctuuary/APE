@@ -15,21 +15,64 @@ public class Module extends AbstractModule {
 	}
 
 	/**
-	 * Returns the list (possibly empty) of required input types for the module. Returns null in the case of abstract classes, as they do not have input types.
-	 * @return List of input types (tool modules) or null (non-tool/abstract modules)
+	 * 
+	 * @param moduleName
+	 *            - module name
+	 * @param moduleID
+	 *            - unique module identifier
+	 */
+	public Module(String moduleName, String moduleID) {
+		super(moduleName, moduleID, true);
+		this.moduleInput = new ArrayList<Type>();
+		this.moduleOutput = new ArrayList<Type>();
+	}
+
+	/**
+	 * Constructor used to create the Module base on an AbstractModule
+	 * @param module
+	 * @param abstractModule
+	 */
+	public Module(Module module, AbstractModule abstractModule) {
+		super(abstractModule, true);
+		this.moduleInput = module.getModuleInput();
+		this.moduleOutput = module.getModuleOutput();
+	}
+
+	/**
+	 * Returns the list (possibly empty) of required input types for the module.
+	 * Returns null in the case of abstract classes, as they do not have input
+	 * types.
+	 * 
+	 * @return List of input types (tool modules) or null (non-tool/abstract
+	 *         modules)
 	 */
 	@Override
 	public List<Type> getModuleInput() {
 		return moduleInput;
 	}
 
-	public void setModuleInput(List<Type> moduleInput) {
-		this.moduleInput = moduleInput;
+	public void setModuleInput(List<Type> moduleInputs) {
+		this.moduleInput = moduleInputs;
 	}
 
 	/**
-	 * Returns the list (possibly empty) of required output types for the module. Returns null in the case of abstract classes, as they do not have output types.
-	 * @return List of output types (tool modules) or null (non-tool/abstract modules)
+	 * Appends the specified element to the end of the input list (optional
+	 * operation).
+	 * 
+	 * @param moduleInput
+	 *            - element to be appended to this list
+	 */
+	public void addModuleInput(Type moduleInput) {
+		this.moduleInput.add(moduleInput);
+	}
+
+	/**
+	 * Returns the list (possibly empty) of required output types for the module.
+	 * Returns null in the case of abstract classes, as they do not have output
+	 * types.
+	 * 
+	 * @return List of output types (tool modules) or null (non-tool/abstract
+	 *         modules)
 	 */
 	@Override
 	public List<Type> getModuleOutput() {
@@ -39,16 +82,19 @@ public class Module extends AbstractModule {
 	public void setModuleOutput(List<Type> moduleOutput) {
 		this.moduleOutput = moduleOutput;
 	}
-	
-	public static AbstractModule generateModule(String moduleName, String moduleID){
-//			TODO The class should use already generated method in the super class in order
-//				to check weather a new item is required to be generated or there is an existing
-//				one in the memory.
-		return null;
-			
+
+	/**
+	 * Appends the specified element to the end of the output list (optional
+	 * operation).
+	 * 
+	 * @param moduleInput
+	 *            - element to be appended to this list
+	 */
+	public void addModuleOutput(Type moduleOutput) {
+		this.moduleOutput.add(moduleOutput);
 	}
 
-	public static Module moduleFromString(String[] stringModule) {
+	public static Module moduleFromString(String[] stringModule, AllModules allModules, AllTypes allTypes) {
 
 		String moduleName = stringModule[0];
 		String moduleID = stringModule[1];
@@ -59,20 +105,28 @@ public class Module extends AbstractModule {
 		List<Type> outputs = new ArrayList<Type>();
 
 		for (String input : stringModuleInputTypes) {
-			if(!input.matches("")){
-				inputs.add(Type.generateType(input, input));
+			if (!input.matches("")) {
+				inputs.add(Type.generateType(input, input, true, allTypes));
 			}
 		}
 
 		for (String output : stringModuleOutputTypes) {
-			if(!output.matches("")){
-				outputs.add(Type.generateType(output, output));
+			if (!output.matches("")) {
+				outputs.add(Type.generateType(output, output, true, allTypes));
 			}
 		}
 
-		return new Module(moduleName, moduleID, inputs, outputs);
+		Module newModule = Module.generateModule(moduleName, moduleID, allModules);
+		newModule.setModuleInput(inputs);
+		newModule.setModuleOutput(outputs);
+		return newModule;
 	}
 
+	/**
+	 * Return a printable String version of the module.
+	 * 
+	 * @return module as printable String
+	 */
 	@Override
 	public String print() {
 		String inputs = "";
@@ -88,20 +142,50 @@ public class Module extends AbstractModule {
 				+ "\n|________________________|";
 	}
 	
+	/**
+	 * Print the ID of the Module with a label [T] in the end (denoting Tool)
+	 * 
+	 * @return Module ID
+	 */
+	@Override
+	public String printShort() {
+		return super.printShort() + "[T]";
+	}
+
 	@Override
 	public String getType() {
 		return "module";
 	}
 
 	@Override
-	 public boolean equals(Object obj) {
-		Module other=(Module) obj;
-	   return this.getModuleID().matches(other.getModuleID());
-	 }
+	public boolean equals(Object obj) {
+		Module other = (Module) obj;
+		return this.getModuleID().matches(other.getModuleID());
+	}
 
-	 @Override
-	 public int hashCode() {
-	    return getModuleID().hashCode();
-	 }
-	 
+	@Override
+	public int hashCode() {
+		return getModuleID().hashCode();
+	}
+
+	/**
+	 * The class is used to check weather the Module with @moduleID was already
+	 * introduced earlier on in @allModules. In case it was defined as
+	 * {@literalModule} it returns the item, in case of it being introduced as an
+	 * AbstractModule, it is extended to a Module and returned, otherwise the new
+	 * element is generated and returned.
+	 * 
+	 * @param moduleName
+	 *            - module name
+	 * @param moduleID
+	 *            - unique module identifier
+	 * @param allModules
+	 *            - set of all the modules created so far
+	 * @return the Module representing the item.
+	 */
+	public static Module generateModule(String moduleName, String moduleID, AllModules allModules) {
+		
+		return (Module) allModules.addModule(new Module(moduleName, moduleID));
+	}
+	
 }

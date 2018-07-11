@@ -23,6 +23,7 @@ public class TypeState implements State {
 	}
 
 
+	@Override
 	public int getStateNumber() {
 		return stateNumber;
 	}
