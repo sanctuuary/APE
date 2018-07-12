@@ -20,9 +20,14 @@ public class SLTL_formula_ITE extends SLTL_formula {
 		return null;
 	}
 
+	/**
+	 * Returns the type of the SLTL formula [F, G or X].
+	 * 
+	 * @return [F, G or X] depending on the type of SLTL formula
+	 */
 	@Override
 	public String getType() {
-		return "X";
+		return "iT";
 	}
 
 }

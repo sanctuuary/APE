@@ -301,8 +301,8 @@ public class AllModules {
 		} else {
 			constraints += inputGenMemoryCons(moduleAutomaton, typeAutomaton, mappings);
 		}
+		
 		constraints += outputCons(moduleAutomaton, typeAutomaton, mappings);
-
 		return constraints;
 	}
 
@@ -330,7 +330,7 @@ public class AllModules {
 	}
 
 	/**
-	 * Generating the mandatory usage constraints of root module @rootModule in each state of @moduleAutomaton. 
+	 * Generating the mandatory usage constraints of root module @rootModule in each state of @moduleAutomaton.  
 	 * 
 	 * @param rootModule - represent the ID of the root module in the module taxonomy
 	 * @param moduleAutomaton - module automaton
@@ -346,6 +346,40 @@ public class AllModules {
 		}
 
 		return constraints;
+	}
+
+	/**
+	 * Generating the mandatory usage of a submodules in case of the parent module being used, with respect to the Module Taxonomy. The rule starts from the @rootModule and it's valid in each state of @moduleAutomaton.  
+	 * 
+	 * @param rootModule - represent the ID of the root module in the module taxonomy
+	 * @param moduleAutomaton - module automaton
+	 * @param mappings 
+	 * @return String representation of constraints enforcing taxonomy classifications
+	 */
+	public String moduleEnforceTaxonomyStructure(String rootModule, ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
+		
+		String constraints = "";
+		for(ModuleState moduleState :moduleAutomaton.getModuleStates()) {
+			constraints += moduleEnforceTaxonomyStructureForState(rootModule, moduleAutomaton, mappings, moduleState);
+		}
+		return constraints;
+	}
+	
+	private String moduleEnforceTaxonomyStructureForState(String rootModule, ModuleAutomaton moduleAutomaton, AtomMapping mappings, ModuleState moduleState){
+		AbstractModule currModule = modules.get(rootModule);
+		String constraints = "";
+		String currConstraint = "-" + mappings.add(currModule.getPredicate(), moduleState.getStateName()) + " ";
+		if(currModule.getSubModules()!=null) {
+			for(String subModuleID : currModule.getSubModules()) {
+				AbstractModule subModule = modules.get(subModuleID);
+				currConstraint += mappings.add(subModule.getPredicate(), moduleState.getStateName()) + " ";
+				constraints +=moduleEnforceTaxonomyStructureForState(subModuleID, moduleAutomaton, mappings, moduleState);
+			}
+			currConstraint += "0\n";
+			return currConstraint + constraints;
+		}else {
+			return "";
+		}
 	}
 
 }

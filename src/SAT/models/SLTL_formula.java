@@ -24,8 +24,8 @@ public abstract class SLTL_formula {
 	}
 
 	/**
-	 * Modal operator is performed over @formula. In case of value of @negated
-	 * being true, @formula
+	 * Modal operator is performed over @formula. In case of value of @negated being
+	 * true, @formula
 	 * 
 	 * @param predicate
 	 * @param negated
@@ -36,8 +36,8 @@ public abstract class SLTL_formula {
 	}
 
 	/**
-	 * Setting whether the predicate is negated or not. If @negation is true the predicate
-	 * will be negated.
+	 * Setting whether the predicate is negated or not. If @negation is true the
+	 * predicate will be negated.
 	 * 
 	 * @param negation
 	 */
@@ -67,7 +67,7 @@ public abstract class SLTL_formula {
 	/**
 	 * Returns the type of the SLTL formula [F, G or X].
 	 * 
-	 * @return
+	 * @return [F, G or X] depending on the type of SLTL formula
 	 */
 	public abstract String getType();
 
@@ -76,11 +76,22 @@ public abstract class SLTL_formula {
 	 * defined @moduleAutomaton and @typeAutomaton.
 	 * 
 	 * @param moduleAutomaton
+	 *            - automaton of all the module states
 	 * @param typeAutomaton
-	 * @return
+	 *            - automaton od all the type states
+	 * @return CNF representation of the SLTL formula
 	 */
 	public abstract String getCNF(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings);
 
+	/**
+	 * Creates a CNF representation of the Constraint: If @if_predicate is used,
+	 * tool @then_predicate has to be used subsequently
+	 * 
+	 * @param moduleAutomaton
+	 * @param typeAutomaton
+	 * @param mappings
+	 * @return CNF representation of the SLTL formula
+	 */
 	public static String ite(Predicate if_predicate, Predicate then_predicate, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String constraints = "";
@@ -92,9 +103,37 @@ public abstract class SLTL_formula {
 				if (!moduleState.isLast()) {
 					constraints += "-" + mappings.add(if_predicate.getPredicate(), moduleState.getStateName()) + " ";
 					for (int i = moduleState.getStateNumber() + 1; i < moduleAutomaton.size(); i++) {
-						constraints += mappings.add(then_predicate.getPredicate(), moduleAutomaton.get(i).getStateName()) + " ";
+						constraints += mappings.add(then_predicate.getPredicate(),
+								moduleAutomaton.get(i).getStateName()) + " ";
 					}
 					constraints += "0\n";
+				}
+			}
+		}
+
+		return constraints;
+	}
+
+	/**
+	 * Creates a CNF representation of the Constraint: Use @last_module as last
+	 * module in the solution
+	 * 
+	 * @param last_module - the module that will 
+	 * @param moduleAutomaton
+	 * @param typeAutomaton
+	 * @param mappings
+	 * @return CNF representation of the SLTL formula
+	 */
+	public static String useAsLastModule(AbstractModule last_module, ModuleAutomaton moduleAutomaton,
+			TypeAutomaton typeAutomaton, AtomMapping mappings) {
+		String constraints = "";
+		
+		if (last_module.getType().matches("type")) {
+
+		} else {
+			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
+				if (moduleState.isLast()) {
+					constraints += mappings.add(last_module.getPredicate(), moduleState.getStateName()) + " 0\n";
 				}
 			}
 		}

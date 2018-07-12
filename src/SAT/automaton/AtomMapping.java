@@ -12,11 +12,13 @@ import java.util.Map;
 public class AtomMapping {
 
 	private Map<String, Integer> mappings;
+	private Map<Integer, String> reverseMapping;
 	private int size;
 
 	public AtomMapping() {
 		mappings = new HashMap<>();
-		size = 0;
+		reverseMapping = new HashMap<>();
+		size = 1;
 	}
 
 	/**
@@ -29,6 +31,7 @@ public class AtomMapping {
 		Integer id;
 		if ((id = mappings.get(atom)) == null) {
 			mappings.put(atom, size++);
+			reverseMapping.put(size, atom);
 			return size;
 		}
 		return id;
@@ -47,6 +50,7 @@ public class AtomMapping {
 		Integer id;
 		if ((id = mappings.get(atom)) == null) {
 			mappings.put(atom, size++);
+			reverseMapping.put(size, atom);
 			return size;
 		}
 		return id;
@@ -54,11 +58,21 @@ public class AtomMapping {
 
 	/**
 	 * Return the mapping value (Integer) for the @atom. If the @atom was not mapped it returns null.
-	 * @param atom
-	 * @return
+	 * @param atom - string representation of the atom
+	 * @return mapping of the atom
 	 */
-	public Integer find(String atom) {
+	public Integer findMapping(String atom) {
 		return mappings.get(atom);
+	}
+	
+	/**
+	 * Return the mapping value (Integer) for the @atom. If the @atom was not mapped it returns null.
+	 * @param mapping - Integer mapping of the atom
+	 * @return original atom
+	 */
+	public String findOriginal(Integer mapping) {
+		return reverseMapping.get(mapping);
+		
 	}
 
 	/**
@@ -68,5 +82,7 @@ public class AtomMapping {
 	public int getSize(){
 		return size;
 	}
+	
+	
 	
 }

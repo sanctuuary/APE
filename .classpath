@@ -92,5 +92,6 @@
 	<classpathentry kind="lib" path="/home/vedran/Documents/jABC/lib/log4j-1.2.14.jar"/>
 	<classpathentry kind="lib" path="/home/vedran/Documents/jABC/lib/relaxngDatatype-X.jar"/>
 	<classpathentry kind="lib" path="/home/vedran/Documents/jABC/lib/jdom-1.0.jar"/>
+	<classpathentry kind="lib" path="jar/org-apache-commons-lang.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

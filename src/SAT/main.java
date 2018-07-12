@@ -1,12 +1,19 @@
 package SAT;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import SAT.automaton.AtomMapping;
 import SAT.automaton.ModuleAutomaton;
@@ -17,6 +24,7 @@ import SAT.automaton.TypeState;
 import SAT.models.*;
 import de.jabc.plugin.ontEDAPI.Exceptions.OntEDException;
 import de.jabc.plugin.ontEDAPI.Exceptions.OntEDMissingImportException;
+import java_cup.sym;
 
 public class main {
 
@@ -65,23 +73,140 @@ public class main {
 	}
 
 	/**
-	 * Generating the mutual exclusion for each pair of types in each state of
-	 * typeAutomaton.
+	 * Returns the CNF representation of the SLTL constraints in our project
 	 * 
-	 * @param types
+	 * @param allModules
+	 *            - list of all modukles
+	 * @param moduleAutomaton
 	 * @param typeAutomaton
-	 * @return String representation of constraints
+	 * @return A string representing SLTL constraints into CNF
 	 */
-	public static String typeMutualExclusion(AllTypes allTypes, TypeAutomaton typeAutomaton) {
+	private static String generateSLTLConstraints(AllModules allModules, AllTypes allTypes,
+			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
 
-		String constraints = "";
+		String cnf_SLTL = "";
+		List<SLTL_formula> constraints = new ArrayList<>();
+		/*
+		 * Constraint G1: If Modules_with_xyz_file_input then use
+		 * Modules_with_xyz_file_output
+		 */
 
-		return constraints;
+		AbstractModule modules_with_xyz_input = allModules.get("Modules_with_xyz_file_input");
+		AbstractModule modules_with_xyz_output = allModules.get("Modules_with_xyz_file_output");
+		// constraints.add(???);
+		cnf_SLTL += SLTL_formula.ite(modules_with_xyz_input, modules_with_xyz_output, moduleAutomaton, typeAutomaton,
+				mappings);
+
+		/*
+		 * Constraint G2: If Modules_with_grid_file_input then use
+		 * Modules_with_grid_file_output
+		 */
+		AbstractModule modules_with_grid_input = allModules.get("Modules_with_grid_file_input");
+		AbstractModule modules_with_grid_output = allModules.get("Modules_with_grid_file_output");
+		cnf_SLTL += SLTL_formula.ite(modules_with_grid_input, modules_with_grid_output, moduleAutomaton, typeAutomaton,
+				mappings);
+
+		/*
+		 * Constraint G3: If Modules_with_color_palette_input then use
+		 * Modules_with_color_palette_output
+		 */
+		AbstractModule modules_with_color_palette_input = allModules.get("Modules_with_color_palette_input");
+		AbstractModule modules_with_color_palette_output = allModules.get("Modules_with_color_palette_output");
+		cnf_SLTL += SLTL_formula.ite(modules_with_color_palette_input, modules_with_color_palette_output,
+				moduleAutomaton, typeAutomaton, mappings);
+
+		/*
+		 * Constraint G4: Do not use module 3D_surfaces
+		 */
+
+		AbstractModule _3d_surfaces = allModules.get("3D_surfaces");
+		SLTL_formula_G g4 = new SLTL_formula_G(_3d_surfaces, true);
+		constraints.add(g4);
+		cnf_SLTL += g4.getCNF(moduleAutomaton, typeAutomaton, mappings);
+
+		/*
+		 * Constraint G5: Use the data type Plots
+		 */
+
+		Type plots = allTypes.get("Plots");
+		SLTL_formula_F g5 = new SLTL_formula_F(plots);
+		constraints.add(g5);
+		cnf_SLTL += g5.getCNF(moduleAutomaton, typeAutomaton, mappings);
+
+		/*
+		 * Constraint E0.1: Use Draw_water in the synthesis
+		 */
+		AbstractModule draw_water = allModules.get("Draw_water");
+		SLTL_formula_F e0_1 = new SLTL_formula_F(draw_water);
+		constraints.add(e0_1);
+		cnf_SLTL += e0_1.getCNF(moduleAutomaton, typeAutomaton, mappings);
+
+		/*
+		 * Constraint E0.2: Use Draw_land in the synthesis
+		 */
+		AbstractModule draw_land = allModules.get("Draw_land");
+		SLTL_formula_F e0_2 = new SLTL_formula_F(draw_land);
+		constraints.add(e0_2);
+		cnf_SLTL += e0_2.getCNF(moduleAutomaton, typeAutomaton, mappings);
+
+		/*
+		 * Constraint E0.3: Use Draw_political_bourders in the synthesis
+		 */
+		AbstractModule draw_political_bourders = allModules.get("Draw_political_borders");
+		SLTL_formula_F e0_3 = new SLTL_formula_F(draw_political_bourders);
+		constraints.add(e0_3);
+		cnf_SLTL += e0_3.getCNF(moduleAutomaton, typeAutomaton, mappings);
+
+		/*
+		 * Constraint E0.4: Use Display_PostScript as last module in the solution
+		 */
+		AbstractModule display_PostScript = allModules.get("Display_PostScript_files");
+		cnf_SLTL += SLTL_formula.useAsLastModule(display_PostScript, moduleAutomaton, typeAutomaton, mappings);
+
+		return cnf_SLTL;
+	}
+
+	public static String readSATsolution(String file, AtomMapping mappings) {
+
+		String line = "";
+		String cvsSplitBy = " ";
+		BufferedReader csvReader;
+		String solution = "";
+
+		try {
+			csvReader = new BufferedReader(new FileReader(file));
+			/*
+			 * check whether it is SAT or UNSAT
+			 */
+			if (csvReader.readLine().matches("SAT")) {
+
+				while ((line = csvReader.readLine()) != null) {
+					String[] terms = line.split(cvsSplitBy, -1);
+					for (String term : terms) {
+						if (term.startsWith("-")) {
+							// solution += "-";
+							// solution += mappings.findOriginal(Integer.parseInt(term.substring(1)));
+						} else if (!term.matches("0")) {
+							solution += mappings.findOriginal(Integer.parseInt(term)) + "\n";
+						}
+					}
+				}
+			} else {
+				solution = "The problem is Unsatisfiable";
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return solution;
 	}
 
 	public static void main(String[] args) {
 
-		int automata_bound = 10;
+		int automata_bound = 6;
 		int branching = 2;
 		boolean pipeline = false;
 		String cnf = "";
@@ -113,7 +238,6 @@ public class main {
 			}
 			typeAutomaton.addBlock(tmpTypeBlock);
 		}
-
 		/*
 		 * encode the taxonomies as objects - generate the list of all types / modules
 		 */
@@ -128,7 +252,6 @@ public class main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		/*
 		 * create constraints for module.csv
 		 */
@@ -139,53 +262,60 @@ public class main {
 		/*
 		 * printing the Module and Taxonomy Tree
 		 */
-		// allModules.get("ModulesTaxonomy").printTree(" ",allModules);
+		// allModules.get("ModulesTaxonomy").printTree(" ", allModules);
 		// allTypes.get("TypesTaxonomy").printTree(" ", allTypes);
 
+		
 		/*
-		 * create constraints on the mutual exclusion and mandatory usage of the tools - from taxonomy
+		 * create constraints on the mutual exclusion and mandatory usage of the tools -
+		 * from taxonomy. Adding the constraints about the taxonomy structure.
 		 */
 		cnf += allModules.moduleMutualExclusion(moduleAutomaton, mappings);
-		cnf += allModules.moduleMandatoryUsage("ModulesTaxonomy",moduleAutomaton, mappings);
-
+		cnf += allModules.moduleMandatoryUsage("ModulesTaxonomy", moduleAutomaton, mappings);
+		cnf += allModules.moduleEnforceTaxonomyStructure("ModulesTaxonomy", moduleAutomaton, mappings);
 		/*
 		 * create constraints on the mutual exclusion of the types, mandatory usage of
 		 * the types is not required (they can be empty)
 		 */
 		cnf += allTypes.typeMutualExclusion(typeAutomaton, mappings);
-		
-//		System.out.println(cnf);
+
 		/*
 		 * TODO encode the constraints from the paper manually
 		 */
-		List<SLTL_formula> constraints = new ArrayList<>();
-		// use module/type in the synthesis
-		AbstractModule draw_water = new AbstractModule("draw_water", "draw_water", true);
-		SLTL_formula_F e0_1 = new SLTL_formula_F(draw_water);
-		constraints.add(e0_1);
-		 System.out.println(e0_1.getCNF(moduleAutomaton, typeAutomaton,mappings));
 
-		// don't use module/type in the synthesis
-		AbstractModule _3d_surfaces = new AbstractModule("3d_surfaces", "3d_surfaces", true);
-		SLTL_formula_G g5 = new SLTL_formula_G(_3d_surfaces, true);
-		constraints.add(g5);
-		 System.out.println(g5.getCNF(moduleAutomaton, typeAutomaton, mappings));
+		cnf += generateSLTLConstraints(allModules, allTypes, moduleAutomaton, typeAutomaton);
 
-		/*
-		 * TODO if using module X use module Y subsequently
-		 */
-		AbstractModule modules_with_xyz_input = new AbstractModule("Modules_with_xyz_input", "Modules_with_xyz_input",
-				false);
-		AbstractModule modules_with_xyz_output = new AbstractModule("Modules_with_xyz_output",
-				"Modules_with_xyz_output", false);
-		// constraints.add(???);
-		System.out.println(
-				SLTL_formula.ite(modules_with_xyz_input, modules_with_xyz_output, moduleAutomaton, typeAutomaton,mappings));
+		int variables = mappings.getSize();
+		int clauses = StringUtils.countMatches(cnf, " 0");
+		String description = "p cnf " + variables + " " + clauses + "\n";
 
-		/*
-		 *  TODO use the mapping to encode and implement SAT
-		 */
+		try (Writer writer = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream("/home/vedran/Desktop/cnf.txt"), "utf-8"))) {
+			writer.write(description);
+			writer.write(cnf);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
+		Runtime rt = Runtime.getRuntime();
+		try {
+			Process pr = rt.exec(
+					"/home/vedran/Documents/minisat/core/minisat /home/vedran/Desktop/cnf.txt /home/vedran/Desktop/cnf-sol.txt");
+			pr.waitFor();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		String solution_file = "/home/vedran/Desktop/cnf-sol.txt";
+		System.out.println(readSATsolution(solution_file, mappings));
+
+		// System.out.println(cnf);
 	}
 
 }
