@@ -175,20 +175,29 @@ public class main {
 
 		try {
 			csvReader = new BufferedReader(new FileReader(file));
+			String sat = csvReader.readLine();
 			/*
 			 * check whether it is SAT or UNSAT
 			 */
-			if (csvReader.readLine().matches("SAT")) {
+			if (!sat.matches("UNSAT")) {
 
 				while ((line = csvReader.readLine()) != null) {
 					String[] terms = line.split(cvsSplitBy, -1);
 					for (String term : terms) {
 						if (term.startsWith("-")) {
-							// solution += "-";
-							// solution += mappings.findOriginal(Integer.parseInt(term.substring(1)));
+							if (!sat.matches("SAT")) {
+								solution += "-";
+								solution += mappings.findOriginal(Integer.parseInt(term.substring(1))) + " ";
+							}
 						} else if (!term.matches("0")) {
-							solution += mappings.findOriginal(Integer.parseInt(term)) + "\n";
+							solution += mappings.findOriginal(Integer.parseInt(term)) + " ";
+							if (sat.matches("SAT")) {
+								solution += "\n";
+							}
+						} else {
+							solution += "\n";
 						}
+
 					}
 				}
 			} else {
@@ -206,7 +215,7 @@ public class main {
 
 	public static void main(String[] args) {
 
-		int automata_bound = 6;
+		int automata_bound = 5;
 		int branching = 2;
 		boolean pipeline = false;
 		String cnf = "";
@@ -265,34 +274,34 @@ public class main {
 		// allModules.get("ModulesTaxonomy").printTree(" ", allModules);
 		// allTypes.get("TypesTaxonomy").printTree(" ", allTypes);
 
-		
 		/*
 		 * create constraints on the mutual exclusion and mandatory usage of the tools -
 		 * from taxonomy. Adding the constraints about the taxonomy structure.
 		 */
+		
+		
 		cnf += allModules.moduleMutualExclusion(moduleAutomaton, mappings);
 		cnf += allModules.moduleMandatoryUsage("ModulesTaxonomy", moduleAutomaton, mappings);
 		cnf += allModules.moduleEnforceTaxonomyStructure("ModulesTaxonomy", moduleAutomaton, mappings);
 		/*
 		 * create constraints on the mutual exclusion of the types, mandatory usage of
 		 * the types is not required (they can be empty)
-		 */
 		cnf += allTypes.typeMutualExclusion(typeAutomaton, mappings);
 
 		/*
 		 * TODO encode the constraints from the paper manually
 		 */
-
 		cnf += generateSLTLConstraints(allModules, allTypes, moduleAutomaton, typeAutomaton);
 
 		int variables = mappings.getSize();
 		int clauses = StringUtils.countMatches(cnf, " 0");
 		String description = "p cnf " + variables + " " + clauses + "\n";
 
-		try (Writer writer = new BufferedWriter(
-				new OutputStreamWriter(new FileOutputStream("/home/vedran/Desktop/cnf.txt"), "utf-8"))) {
+		String cnf_file = "/home/vedran/Desktop/cnf.txt";
+		try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cnf_file), "utf-8"))) {
 			writer.write(description);
 			writer.write(cnf);
+			writer.close();
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
@@ -312,8 +321,46 @@ public class main {
 			e.printStackTrace();
 		}
 
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		String cnf_file_translated = "/home/vedran/Desktop/cnf-translated.txt";
+
+		try (Writer writer = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(cnf_file_translated), "utf-8"))) {
+			writer.write(readSATsolution(cnf_file, mappings));
+			writer.close();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 		String solution_file = "/home/vedran/Desktop/cnf-sol.txt";
-		System.out.println(readSATsolution(solution_file, mappings));
+		String solution_file_translated = "/home/vedran/Desktop/cnf-sol-translated.txt";
+
+		try (Writer writer = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(solution_file_translated), "utf-8"))) {
+			writer.write(readSATsolution(solution_file, mappings));
+			writer.close();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		// System.out.println(cnf);
 	}
