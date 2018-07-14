@@ -1,15 +1,17 @@
 package SAT.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AbstractModule implements Predicate {
 
 	private String moduleName;
 	private String moduleID;
-	// list of all the modules that are subsumed by the abstract module (null if the
+	// set of all the modules that are subsumed by the abstract module (null if the
 	// module is a tool)
-	private List<String> subModules;
+	private Set<String> subModules;
 	// represents whether the module is a tool/leaf or simply an abstract module
 	private boolean isTool;
 
@@ -30,23 +32,29 @@ public class AbstractModule implements Predicate {
 		this.moduleID = moduleID;
 		this.isTool = isTool;
 		if (!isTool)
-			subModules = new ArrayList<>();
+			this.subModules = new HashSet<String>();
 	}
 
 	/**
 	 * Generate an AbstractModule from an existing one. In order to provide means
 	 * for combining Module and AbstractModule objects
 	 * 
-	 * @param abstractModule - abstract module that is being coppied
-	 * @param isTool - determines whether the module represents a tool
+	 * @param abstractModule
+	 *            - abstract module that is being coppied
+	 * @param isTool
+	 *            - determines whether the module represents a tool
 	 */
 	public AbstractModule(AbstractModule abstractModule, boolean isTool) {
 		super();
 		this.moduleName = abstractModule.getModuleName();
 		this.moduleID = abstractModule.getModuleID();
 		this.isTool = isTool;
-		if (!isTool)
-			subModules = abstractModule.getSubModules();
+		if (!isTool) {
+			this.subModules = abstractModule.getSubModules();
+			if (this.subModules == null) {
+				this.subModules = new HashSet<String>();
+			}
+		}
 	}
 
 	public String getModuleID() {
@@ -105,9 +113,10 @@ public class AbstractModule implements Predicate {
 
 		return getModuleID() + ", " + getModuleName();
 	}
-	
+
 	/**
 	 * Print the ID of the AbstractModule
+	 * 
 	 * @return module ID
 	 */
 	public String printShort() {
@@ -125,9 +134,11 @@ public class AbstractModule implements Predicate {
 	}
 
 	/**
-	 * Adds a submodule to an abstract/non-tool module.
+	 * Adds a submodule to an abstract/non-tool module, if it was not added present
+	 * already.
 	 * 
-	 * @param module -  module that will be added as a subclass
+	 * @param module
+	 *            - module that will be added as a subclass
 	 * @return True if submodule was added, false otherwise.
 	 */
 	public boolean addSubModule(AbstractModule module) {
@@ -141,28 +152,27 @@ public class AbstractModule implements Predicate {
 	}
 
 	/**
-	 * Adds a submodule to an abstract/non-tool module.
+	 * Adds a submodule to an abstract/non-tool module, if not present already.
 	 * 
-	 * @param moduleID - ID of the module that will be added as a subclass
+	 * @param moduleID
+	 *            - ID of the module that will be added as a subclass
 	 * @return True if submodule was added, false otherwise.
 	 */
 	public boolean addSubModule(String moduleID) {
 		if (!isTool) {
-			subModules.add(moduleID);
-			return true;
+			return subModules.add(moduleID);
 		} else {
 			System.err.println("Cannot add submodules to a tool/leaf module!");
 			return false;
 		}
 	}
-	
-	
+
 	/**
 	 * Returns the list of the modules that are directly subsumed by the modules.
 	 * 
 	 * @return List of the submodules or null in case of a tool/leaf module
 	 */
-	public List<String> getSubModules() {
+	public Set<String> getSubModules() {
 		return subModules;
 	}
 
@@ -199,14 +209,15 @@ public class AbstractModule implements Predicate {
 
 	/**
 	 * Print the tree shaped representation of the module taxonomy
+	 * 
 	 * @param str
 	 */
 	public void printTree(String str, AllModules allModules) {
 		System.out.println(str + printShort());
 		if (subModules != null)
 			for (String moduleID : subModules) {
-				allModules.get(moduleID).printTree(str + " > ",allModules);
+				allModules.get(moduleID).printTree(str + " > ", allModules);
 			}
 	}
-	
+
 }

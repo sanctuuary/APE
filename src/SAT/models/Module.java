@@ -29,6 +29,7 @@ public class Module extends AbstractModule {
 
 	/**
 	 * Constructor used to create the Module base on an AbstractModule
+	 * 
 	 * @param module
 	 * @param abstractModule
 	 */
@@ -96,7 +97,8 @@ public class Module extends AbstractModule {
 
 	public static Module moduleFromString(String[] stringModule, AllModules allModules, AllTypes allTypes) {
 
-		String moduleName = stringModule[0];
+		String superModuleID = stringModule[0];
+		String moduleName = stringModule[1];
 		String moduleID = stringModule[1];
 		String[] stringModuleInputTypes = stringModule[2].split("#");
 		String[] stringModuleOutputTypes = stringModule[3].split("#");
@@ -116,10 +118,27 @@ public class Module extends AbstractModule {
 			}
 		}
 
-		Module newModule = Module.generateModule(moduleName, moduleID, allModules);
-		newModule.setModuleInput(inputs);
-		newModule.setModuleOutput(outputs);
-		return newModule;
+		
+		Module currModule = Module.generateModule(moduleName, moduleID, allModules);
+		currModule.setModuleInput(inputs);
+		currModule.setModuleOutput(outputs);
+
+		// in case of the tool being instance of the superModule, add it as a sub module
+		if (!superModuleID.matches(moduleID)) {
+			AbstractModule superModule = AbstractModule.generateModule(superModuleID, superModuleID, false, allModules);
+			// if the super module is represented as a tool, convert it to abstract module
+			if (superModule instanceof Module) {
+				System.out.println("Module type is: " + superModuleID);
+				AbstractModule newSuperModule = new AbstractModule(superModule, false);
+				newSuperModule.addSubModule(currModule);
+				allModules.swapAbstractModule2Module(newSuperModule, superModule);
+			} else {
+				superModule.setIsTool(false);
+				superModule.addSubModule(currModule);
+			}
+		}
+
+		return currModule;
 	}
 
 	/**
@@ -141,7 +160,7 @@ public class Module extends AbstractModule {
 		return "\n________________________\n|" + super.print() + ",\n|" + inputs + ",\n|" + outputs
 				+ "\n|________________________|";
 	}
-	
+
 	/**
 	 * Print the ID of the Module with a label [T] in the end (denoting Tool)
 	 * 
@@ -184,8 +203,8 @@ public class Module extends AbstractModule {
 	 * @return the Module representing the item.
 	 */
 	public static Module generateModule(String moduleName, String moduleID, AllModules allModules) {
-		
+
 		return (Module) allModules.addModule(new Module(moduleName, moduleID));
 	}
-	
+
 }

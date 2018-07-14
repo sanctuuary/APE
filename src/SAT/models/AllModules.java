@@ -11,6 +11,7 @@ import SAT.automaton.AtomMapping;
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
+import SAT.automaton.TypeBlock;
 import SAT.automaton.TypeState;
 
 public class AllModules {
@@ -78,16 +79,16 @@ public class AllModules {
 
 	/**
 	 * Removes the AbstractModule from the set of all modules and adds the Module
-	 * element. Swaps the objects in the set of all modules.
+	 * element (or vice versa). Swaps the objects in the set of all modules.
 	 * 
-	 * @param module
+	 * @param newModule
 	 *            - object that will be added
-	 * @param abstractModule
+	 * @param oldModule
 	 *            - object that will be removed
 	 */
-	public void swapAbstractModule2Module(Module module, AbstractModule abstractModule) {
-		this.modules.remove(abstractModule.getModuleID());
-		this.modules.put(abstractModule.getModuleID(), module);
+	public void swapAbstractModule2Module(AbstractModule newModule, AbstractModule oldModule) {
+		this.modules.remove(oldModule.getModuleID());
+		this.modules.put(newModule.getModuleID(), newModule);
 	}
 
 	/**
@@ -153,10 +154,11 @@ public class AllModules {
 	 * 
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
-	 * @param mappings 
+	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String inputPipelineCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+	private String inputPipelineCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
+			AtomMapping mappings) {
 
 		String constraints = "";
 		// setting up input constraints (Pipeline)
@@ -174,7 +176,7 @@ public class AllModules {
 						// and for each input type of that module
 						for (Type type : module.getModuleInput()) {
 							// if module was used in the state
-							constraints += "-" + mappings.add(module.getPredicate(),moduleState.getStateName()) + " ";
+							constraints += "-" + mappings.add(module.getPredicate(), moduleState.getStateName()) + " ";
 							// require the type to be used in at least one of the
 							// directly preceding input states
 							for (TypeState typeState : typeAutomaton.getBlock(moduleNo - 1).getTypeStates()) {
@@ -182,6 +184,9 @@ public class AllModules {
 							}
 							constraints += "0\n";
 						}
+					} else {
+						// tools that require INPUT cannot be in the first module state
+						constraints += "-" + mappings.add(module.getPredicate(), moduleState.getStateName()) + " 0\n";
 					}
 				}
 			}
@@ -197,10 +202,11 @@ public class AllModules {
 	 * 
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
-	 * @param mappings 
+	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String inputGenMemoryCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+	private String inputGenMemoryCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
+			AtomMapping mappings) {
 
 		String constraints = "";
 		// setting up input constraints (General Memory)
@@ -218,7 +224,7 @@ public class AllModules {
 						// and for each input type of that module
 						for (Type type : module.getModuleInput()) {
 							// if module was used in the state
-							constraints += "-" + mappings.add(module.getPredicate(),moduleState.getStateName()) + " ";
+							constraints += "-" + mappings.add(module.getPredicate(), moduleState.getStateName()) + " ";
 							// require the type to be used in at least one of the
 							// preceding input states
 							for (int i = 0; i < moduleNo; i++) {
@@ -228,6 +234,9 @@ public class AllModules {
 							}
 							constraints += "0\n";
 						}
+					} else {
+						// tools that require INPUT cannot be in the first module state
+						constraints += "-" + mappings.add(module.getPredicate(), moduleState.getStateName()) + " 0\n";
 					}
 				}
 			}
@@ -242,32 +251,36 @@ public class AllModules {
 	 * 
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
-	 * @param mappings 
+	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String outputCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+	private String outputCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, Type emptyType,
+			AtomMapping mappings) {
 
 		String constraints = "";
 
 		// for each module
 		for (Entry<String, AbstractModule> mapModule : modules.entrySet()) {
 			AbstractModule module = mapModule.getValue();
-			// that is a Tool and has output
-			if ((module instanceof Module) && !module.getModuleOutput().isEmpty()) {
+			// that is a Tool
+			if ((module instanceof Module)) {
 				// iterate through all the states
 				for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
 					int moduleNo = moduleState.getStateNumber();
-					// that are not the last state (no output state)
-					if (!moduleState.isLast()) {
-						// and for each output type of that module
-						int i = 0;
-						for (Type type : module.getModuleOutput()) {
-							// if module was used in the state
-							constraints += "-" + mappings.add(module.getPredicate(),moduleState.getStateName()) + " ";
-							// require type to be used in one of the directly
-							// proceeding output states
-							TypeState typeState = typeAutomaton.getBlock(moduleNo).getTypeStates().get(++i);
-							constraints += mappings.add(type.getPredicate(), typeState.getStateName()) + " 0\n";
+					// and for each state and output state of that module state
+					List<TypeState> currOutputStates = typeAutomaton.getBlock(moduleNo).getTypeStates();
+					List<Type> moduleOutputs = module.getModuleOutput();
+					for (int i = 0; i < currOutputStates.size(); i++) {
+						// if module was used in the module state
+						constraints += "-" + mappings.add(module.getPredicate(), moduleState.getStateName()) + " ";
+						// require type to be used in one of the directly
+						// proceeding output states if it exists, otherwise use empty type
+						if (i < moduleOutputs.size()) {
+							constraints += mappings.add(moduleOutputs.get(i).getPredicate(),
+									currOutputStates.get(i).getStateName()) + " 0\n";
+						} else {
+							constraints += mappings.add(emptyType.getPredicate(),
+									currOutputStates.get(i).getStateName()) + " 0\n";
 						}
 					}
 				}
@@ -289,11 +302,12 @@ public class AllModules {
 	 * @param pipeline
 	 *            - if true pipeline approach, otherwise the general memory approach
 	 *            is used
-	 * @param mappings 
+	 * @param mappings
 	 * @return String representation of constraints regarding the required INPUT and
 	 *         OUTPUT types of the modules
 	 */
-	public String modulesConstraints(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, boolean pipeline, AtomMapping mappings) {
+	public String modulesConstraints(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, boolean pipeline,
+			Type emptyType, AtomMapping mappings) {
 
 		String constraints = "";
 		if (pipeline) {
@@ -301,8 +315,8 @@ public class AllModules {
 		} else {
 			constraints += inputGenMemoryCons(moduleAutomaton, typeAutomaton, mappings);
 		}
-		
-		constraints += outputCons(moduleAutomaton, typeAutomaton, mappings);
+
+		constraints += outputCons(moduleAutomaton, typeAutomaton, emptyType, mappings);
 		return constraints;
 	}
 
@@ -312,7 +326,7 @@ public class AllModules {
 	 * of @moduleAutomaton.
 	 * 
 	 * @param moduleAutomaton
-	 * @param mappings 
+	 * @param mappings
 	 * @return String representation of constraints
 	 */
 	public String moduleMutualExclusion(ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
@@ -321,7 +335,7 @@ public class AllModules {
 
 		for (Pair pair : getToolPairs()) {
 			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
-				constraints += "-" + mappings.add(pair.getFirst().getPredicate(),moduleState.getStateName()) + " ";
+				constraints += "-" + mappings.add(pair.getFirst().getPredicate(), moduleState.getStateName()) + " ";
 				constraints += "-" + mappings.add(pair.getSecond().getPredicate(), moduleState.getStateName()) + " 0\n";
 			}
 		}
@@ -330,17 +344,20 @@ public class AllModules {
 	}
 
 	/**
-	 * Generating the mandatory usage constraints of root module @rootModule in each state of @moduleAutomaton.  
+	 * Generating the mandatory usage constraints of root module @rootModule in each
+	 * state of @moduleAutomaton.
 	 * 
-	 * @param rootModule - represent the ID of the root module in the module taxonomy
-	 * @param moduleAutomaton - module automaton
-	 * @param mappings 
+	 * @param rootModuleID
+	 *            - represent the ID of the root module in the module taxonomy
+	 * @param moduleAutomaton
+	 *            - module automaton
+	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	public String moduleMandatoryUsage(String rootModule, ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
+	public String moduleMandatoryUsage(String rootModuleID, ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
 		String constraints = "";
 
-		AbstractModule module = modules.get(rootModule);
+		AbstractModule module = modules.get(rootModuleID);
 		for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
 			constraints += mappings.add(module.getPredicate(), moduleState.getStateName()) + " 0\n";
 		}
@@ -349,35 +366,53 @@ public class AllModules {
 	}
 
 	/**
-	 * Generating the mandatory usage of a submodules in case of the parent module being used, with respect to the Module Taxonomy. The rule starts from the @rootModule and it's valid in each state of @moduleAutomaton.  
+	 * Generating the mandatory usage of a submodules in case of the parent module
+	 * being used, with respect to the Module Taxonomy. The rule starts from
+	 * the @rootModule and it's valid in each state of @moduleAutomaton.
 	 * 
-	 * @param rootModule - represent the ID of the root module in the module taxonomy
-	 * @param moduleAutomaton - module automaton
-	 * @param mappings 
-	 * @return String representation of constraints enforcing taxonomy classifications
+	 * @param rootModuleID
+	 *            - represent the ID of the root module in the module taxonomy
+	 * @param moduleAutomaton
+	 *            - module automaton
+	 * @param mappings
+	 * @return String representation of constraints enforcing taxonomy
+	 *         classifications
 	 */
-	public String moduleEnforceTaxonomyStructure(String rootModule, ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
-		
+	public String moduleEnforceTaxonomyStructure(String rootModuleID, ModuleAutomaton moduleAutomaton,
+			AtomMapping mappings) {
+
 		String constraints = "";
-		for(ModuleState moduleState :moduleAutomaton.getModuleStates()) {
-			constraints += moduleEnforceTaxonomyStructureForState(rootModule, moduleAutomaton, mappings, moduleState);
+		for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
+			constraints += moduleEnforceTaxonomyStructureForState(rootModuleID, moduleAutomaton, mappings, moduleState);
 		}
 		return constraints;
 	}
-	
-	private String moduleEnforceTaxonomyStructureForState(String rootModule, ModuleAutomaton moduleAutomaton, AtomMapping mappings, ModuleState moduleState){
-		AbstractModule currModule = modules.get(rootModule);
+
+	/**
+	 * SUpporting recursive method for @moduleEnforceTaxonomyStructure.
+	 */
+	private String moduleEnforceTaxonomyStructureForState(String rootModuleID, ModuleAutomaton moduleAutomaton,
+			AtomMapping mappings, ModuleState moduleState) {
+		AbstractModule currModule = modules.get(rootModuleID);
 		String constraints = "";
-		String currConstraint = "-" + mappings.add(currModule.getPredicate(), moduleState.getStateName()) + " ";
-		if(currModule.getSubModules()!=null) {
-			for(String subModuleID : currModule.getSubModules()) {
+		String superModule_state = mappings.add(currModule.getPredicate(), moduleState.getStateName()).toString();
+		String currConstraint = "-" + superModule_state + " ";
+		List<String> subModules_States = new ArrayList<>();
+		if (!(currModule.getSubModules() == null || currModule.getSubModules().isEmpty())) {
+			for (String subModuleID : currModule.getSubModules()) {
 				AbstractModule subModule = modules.get(subModuleID);
-				currConstraint += mappings.add(subModule.getPredicate(), moduleState.getStateName()) + " ";
-				constraints +=moduleEnforceTaxonomyStructureForState(subModuleID, moduleAutomaton, mappings, moduleState);
+				String subModule_State = mappings.add(subModule.getPredicate(), moduleState.getStateName()).toString();
+				currConstraint += subModule_State + " ";
+				subModules_States.add(subModule_State);
+				constraints += moduleEnforceTaxonomyStructureForState(subModuleID, moduleAutomaton, mappings,
+						moduleState);
 			}
 			currConstraint += "0\n";
+			for (String subModule_State : subModules_States) {
+				currConstraint += "-" + subModule_State + " " + superModule_state + " 0\n";
+			}
 			return currConstraint + constraints;
-		}else {
+		} else {
 			return "";
 		}
 	}

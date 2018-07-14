@@ -7,7 +7,7 @@ public class TypeBlock {
 
 	private List<TypeState> typeStates;
 	private int blockNumber;
-	
+	private int blockSize;
 	
 	
 	public TypeBlock() {

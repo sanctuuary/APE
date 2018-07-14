@@ -117,7 +117,7 @@ public class AllTypes {
 	 * 
 	 * @param modules
 	 * @param typeAutomaton
-	 * @param mappings 
+	 * @param mappings
 	 * @return String representation of constraints
 	 */
 	public String typeMutualExclusion(TypeAutomaton typeAutomaton, AtomMapping mappings) {
@@ -128,7 +128,8 @@ public class AllTypes {
 			for (TypeBlock typeBlock : typeAutomaton.getTypeBlocks()) {
 				for (TypeState typeState : typeBlock.getTypeStates()) {
 					constraints += "-" + mappings.add(pair.getFirst().getPredicate(), typeState.getStateName()) + " ";
-					constraints += "-" + mappings.add(pair.getSecond().getPredicate(), typeState.getStateName()) + " 0\n";
+					constraints += "-" + mappings.add(pair.getSecond().getPredicate(), typeState.getStateName())
+							+ " 0\n";
 				}
 			}
 		}
@@ -140,24 +141,85 @@ public class AllTypes {
 	 * Generating the mandatory usage constraints of root type @rootType in each
 	 * state of @moduleAutomaton.
 	 * 
-	 * @param rootType
+	 * @param rootTypeID
 	 *            - represent the ID of the root type in the type taxonomy
 	 * @param moduleAutomaton
 	 *            - type automaton
 	 * @return String representation of constraints
 	 */
-	public String typeMandatoryUsage(String rootType, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+	public String typeMandatoryUsage(String rootTypeID, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String constraints = "";
 
-		Type type = types.get(rootType);
+		Type type = types.get(rootTypeID);
 		for (TypeBlock typeBlock : typeAutomaton.getTypeBlocks()) {
 			for (TypeState typeState : typeBlock.getTypeStates()) {
-				constraints += mappings.add(type.getPredicate(), typeState.getStateName()) + " ";
+				constraints += mappings.add(type.getPredicate(), typeState.getStateName()) + " 0\n";
 			}
 		}
-		constraints += "0\n";
 
 		return constraints;
+	}
+
+
+	/**
+	 * Generating the mandatory usage of a subtypes in case of the parent type being
+	 * used, with respect to the Type Taxonomy. The rule starts from the @rootType
+	 * and it's valid in each state of @typeAutomaton. @emptyType denotes the type
+	 * that is being used if the state has no type.
+	 * 
+	 * @param rootTypeID
+	 *            - represent the ID of the root type in the type taxonomy
+	 * @param emptyTypeID
+	 *            - represent the ID of the empty type in the type taxonomy
+	 * @param typeAutomaton
+	 *            - type automaton
+	 * @param mappings
+	 *            - mapping function
+	 * @return String representation of constraints enforcing taxonomy
+	 *         classifications
+	 */
+	public String typeEnforceTaxonomyStructure(String rootTypeID, String emptyTypeID, TypeAutomaton typeAutomaton,
+			AtomMapping mappings) {
+
+		String constraints = "";
+		for (TypeBlock typeBlock : typeAutomaton.getTypeBlocks()) {
+			for (TypeState typeState : typeBlock.getTypeStates()) {
+				constraints += typeEnforceTaxonomyStructureForState(rootTypeID, emptyTypeID, typeAutomaton, mappings,
+						typeState);
+			}
+		}
+		return constraints;
+	}
+
+	/**
+	 * Supporting recursive method for typeEnforceTaxonomyStructure.
+	 */
+	private String typeEnforceTaxonomyStructureForState(String rootTypeID, String emptyTypeID,
+			TypeAutomaton typeAutomaton, AtomMapping mappings, TypeState typeState) {
+		Type currType = types.get(rootTypeID);
+		String constraints = "";
+		String superType_State = mappings.add(currType.getPredicate(), typeState.getStateName()).toString();
+		String currConstraint = "-" + superType_State + " ";
+		List<String> subTypes_States = new ArrayList<>();
+		if (!(currType.getSubTypes() == null || currType.getSubTypes().isEmpty())) {
+			for (String subTypeeID : currType.getSubTypes()) {
+				Type subType = types.get(subTypeeID);
+				
+				String subType_State = mappings.add(subType.getPredicate(), typeState.getStateName()).toString();
+				currConstraint += subType_State + " ";
+				subTypes_States.add(subType_State);
+				
+				constraints += typeEnforceTaxonomyStructureForState(subTypeeID, emptyTypeID, typeAutomaton, mappings,
+						typeState);
+			}
+			currConstraint += "0\n";
+			for(String subType_State : subTypes_States) {
+				currConstraint += "-" + subType_State + " " + superType_State + " 0\n";
+			}
+			return currConstraint + constraints;
+		} else {
+			return "";
+		}
 	}
 
 }

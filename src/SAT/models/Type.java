@@ -1,7 +1,9 @@
 package SAT.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.rowset.spi.TransactionalWriter;
 
@@ -9,8 +11,8 @@ public class Type implements Predicate {
 
 	private String typeName;
 	private String typeID;
-	// list of subtypes, null in case of a simple type
-	private List<String> subTypes;
+	// set of subtypes, null in case of a simple type
+	private Set<String> subTypes;
 	// represents whether the type is a simple/leaf type. If false the type is an
 	// abstract (non-leaf) type.
 	private boolean simpleType;
@@ -21,7 +23,7 @@ public class Type implements Predicate {
 		this.typeID = typeID;
 		this.simpleType = simpleType;
 		if (!simpleType) {
-			this.subTypes = new ArrayList<>();
+			this.subTypes = new HashSet<String>();
 		}
 	}
 
@@ -69,7 +71,7 @@ public class Type implements Predicate {
 	}
 
 	/**
-	 * Adds a subtype to a non-simple type.
+	 * Adds a subtype to a non-simple type, if it was not added present already.
 	 * 
 	 * @param typeID
 	 *            - ID of the type that will be added as a subclass
@@ -77,8 +79,7 @@ public class Type implements Predicate {
 	 */
 	public boolean addSubType(String typeID) {
 		if (!simpleType) {
-			subTypes.add(typeID);
-			return true;
+			return subTypes.add(typeID);
 		} else {
 			System.err.println("Cannot add subtypes to a simpleType!");
 			return false;
@@ -90,7 +91,7 @@ public class Type implements Predicate {
 	 * 
 	 * @return List of the subtypes or null in case of a simple/leaf type
 	 */
-	public List<String> getSubTypes() {
+	public Set<String> getSubTypes() {
 		return subTypes;
 	}
 

@@ -29,8 +29,8 @@ public class AtomMapping {
 	 */
 	public Integer add(String atom) {
 		Integer id;
-		size ++;
 		if ((id = mappings.get(atom)) == null) {
+			size ++;
 			mappings.put(atom, size);
 			reverseMapping.put(size, atom);
 			return size;
@@ -49,8 +49,8 @@ public class AtomMapping {
 	public Integer add(String predicate, String argument) {
 		String atom = predicate + "(" + argument + ")";
 		Integer id;
-		size++;
 		if ((id = mappings.get(atom)) == null) {
+			size++;
 			mappings.put(atom, size);
 			reverseMapping.put(size, atom);
 			return size;
