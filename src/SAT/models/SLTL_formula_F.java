@@ -1,12 +1,12 @@
 package SAT.models;
 
 
-import SAT.automaton.AtomMapping;
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
 import SAT.automaton.TypeBlock;
 import SAT.automaton.TypeState;
+import SAT.models.constructs.Predicate;
 
 public class SLTL_formula_F extends SLTL_formula {
 

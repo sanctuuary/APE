@@ -1,5 +1,10 @@
 package SAT.automaton;
 
+/**
+ * Class represents a single Module State in the system.
+ * @author vedran
+ *
+ */
 public class ModuleState implements State {
 
 	

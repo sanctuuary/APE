@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.sql.rowset.spi.TransactionalWriter;
 
+import SAT.models.constructs.Predicate;
+
 public class Type implements Predicate {
 
 	private String typeName;

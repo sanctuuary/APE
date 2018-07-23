@@ -1,9 +1,9 @@
 package SAT.models;
 
-import SAT.automaton.AtomMapping;
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
+import SAT.models.constructs.Predicate;
 
 /**
  * The class is used to represent general SLTL constraints and to generate the

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import SAT.automaton.AtomMapping;
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;

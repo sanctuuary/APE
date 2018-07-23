@@ -1,5 +1,10 @@
 package SAT.automaton;
 
+/**
+ * Class represents a single Type State in the system.
+ * @author vedran
+ *
+ */
 public class TypeState implements State {
 
 	private String stateName;

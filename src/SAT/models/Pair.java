@@ -1,5 +1,7 @@
 package SAT.models;
 
+import SAT.models.constructs.Predicate;
+
 public class Pair {
 
 	private Predicate first, second;

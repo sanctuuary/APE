@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import SAT.automaton.AtomMapping;
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
 import SAT.automaton.TypeBlock;
 import SAT.automaton.TypeState;
 
-public class AllModules {
+public class AllModules{
 
 	private Map<String, AbstractModule> modules;
 

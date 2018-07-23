@@ -1,8 +1,8 @@
 package SAT.models;
 
-import SAT.automaton.AtomMapping;
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.TypeAutomaton;
+import SAT.models.constructs.Predicate;
 
 public class SLTL_formula_X extends SLTL_formula {
 

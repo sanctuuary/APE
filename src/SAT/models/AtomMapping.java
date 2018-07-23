@@ -1,4 +1,4 @@
-package SAT.automaton;
+package SAT.models;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class AtomMapping {
 	public AtomMapping() {
 		mappings = new HashMap<>();
 		reverseMapping = new HashMap<>();
-		size = 1;
+		size = 0;
 	}
 
 	/**

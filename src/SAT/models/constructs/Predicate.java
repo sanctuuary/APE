@@ -1,4 +1,4 @@
-package SAT.models;
+package SAT.models.constructs;
 
 /**
  * Class currently represents a single predicate/label. It is not a whole atom. In order to be an atom relation needs to be added.
