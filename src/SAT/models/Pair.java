@@ -1,7 +1,12 @@
 package SAT.models;
 
 import SAT.models.constructs.Predicate;
-
+/**
+ * The {@code Pair} class represents pairs of objects, in our case used to store pairs of {@link AbstractModule AbstractModules}, {@link Module Modules} or {@link Type Types}.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class Pair {
 
 	private Predicate first, second;

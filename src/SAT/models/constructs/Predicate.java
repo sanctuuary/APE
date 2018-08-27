@@ -1,9 +1,9 @@
 package SAT.models.constructs;
 
 /**
- * Class currently represents a single predicate/label. It is not a whole atom. In order to be an atom relation needs to be added.
+ * The {@code Predicate} class (interface) represents a single predicate/label. It is not a whole atom. In order to be an atom relation needs to be added.
 
- * @author VedranPC
+ * @author Vedran Kasalica
  *
  */
 public interface Predicate {

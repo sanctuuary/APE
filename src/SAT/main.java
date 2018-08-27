@@ -113,7 +113,7 @@ public class main {
 		TypeAutomaton typeAutomaton = new TypeAutomaton();
 
 		/*
-		 * TODO use the mapping for each atom to a number
+		 * Provides mapping from each atom to a number, and vice versa
 		 */
 		mappings = new AtomMapping();
 
@@ -121,6 +121,7 @@ public class main {
 		 * generate the automaton in CNF
 		 */
 		generateAutomaton(moduleAutomaton, typeAutomaton);
+		
 		/*
 		 * encode the taxonomies as objects - generate the list of all types / modules
 		 */
@@ -139,7 +140,7 @@ public class main {
 		Type rootType = allTypes.get("TypesTaxonomy");
 
 		/*
-		 * add empty type
+		 * Define the empty type, representing the absence of types
 		 */
 
 		Type emptyType = Type.generateType("empty", "empty", true, allTypes);
@@ -234,7 +235,7 @@ public class main {
 		}
 
 		/*
-		 * TODO: -permutacije -SWL output?
+		 * TODO: consider removing permutations, SWL output?
 		 */
 
 		// System.out.println(cnf);

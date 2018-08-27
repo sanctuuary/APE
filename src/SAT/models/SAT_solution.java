@@ -15,7 +15,7 @@ import SAT.models.constructs.Predicate;
  * original solution and the mapped one. In case of the parameter @unsad being
  * true, there are no solutions.
  * 
- * @author vedran
+ * @author Vedran Kasalica
  *
  */
 public class SAT_solution {

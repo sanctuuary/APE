@@ -15,6 +15,12 @@ import SAT.automaton.TypeAutomaton;
 import SAT.automaton.TypeBlock;
 import SAT.automaton.TypeState;
 
+/**
+ * The {@code AllTypes} class represent the set of all data types/formats that can be used in our program.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class AllTypes {
 
 	private Map<String, Type> types;

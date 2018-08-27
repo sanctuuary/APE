@@ -13,6 +13,12 @@ import SAT.automaton.TypeAutomaton;
 import SAT.automaton.TypeBlock;
 import SAT.automaton.TypeState;
 
+/**
+ * The {@code AllModules} class represent the set of all modules/tools that can be part of our program. Each of them is either {@link Module} or {@link AbstractModule}.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class AllModules{
 
 	private Map<String, AbstractModule> modules;
@@ -77,7 +83,7 @@ public class AllModules{
 	}
 
 	/**
-	 * Removes the AbstractModule from the set of all modules and adds the Module
+	 * Removes the {@code AbstractModule} from the set of all modules and adds the {@link Module}
 	 * element (or vice versa). Swaps the objects in the set of all modules.
 	 * 
 	 * @param newModule
@@ -250,6 +256,7 @@ public class AllModules{
 	 * 
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
+	 * @param emptyType - represents absence of types
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
@@ -291,7 +298,7 @@ public class AllModules{
 
 	/**
 	 * Return a CNF representation of the INPUT and OUTPUT type constraints.
-	 * Depending on the @param the INPUT constraints will be based on a pipeline or
+	 * Depending on the parameter pipeline, the INPUT constraints will be based on a pipeline or
 	 * general memory approach.
 	 * 
 	 * @param moduleAutomaton
@@ -301,8 +308,9 @@ public class AllModules{
 	 * @param pipeline
 	 *            - if true pipeline approach, otherwise the general memory approach
 	 *            is used
+	 * @param emptyType - represents absence of types
 	 * @param mappings
-	 * @return String representation of constraints regarding the required INPUT and
+	 * @return {@link String} representation of constraints regarding the required INPUT and
 	 *         OUTPUT types of the modules
 	 */
 	public String modulesConstraints(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, boolean pipeline,
@@ -321,12 +329,12 @@ public class AllModules{
 
 	/**
 	 * Generating the mutual exclusion constraints for each pair of tools
-	 * from @modules (excluding abstract modules from the taxonomy) in each state
-	 * of @moduleAutomaton.
+	 * from modules (excluding abstract modules from the taxonomy) in each state
+	 * of moduleAutomaton.
 	 * 
 	 * @param moduleAutomaton
 	 * @param mappings
-	 * @return String representation of constraints
+	 * @return {@link String} representation of constraints
 	 */
 	public String moduleMutualExclusion(ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
 
@@ -388,7 +396,7 @@ public class AllModules{
 	}
 
 	/**
-	 * SUpporting recursive method for @moduleEnforceTaxonomyStructure.
+	 * Providing the recursive method used in {@link #moduleEnforceTaxonomyStructure(String, ModuleAutomaton, AtomMapping) moduleEnforceTaxonomyStructure}.
 	 */
 	private String moduleEnforceTaxonomyStructureForState(String rootModuleID, ModuleAutomaton moduleAutomaton,
 			AtomMapping mappings, ModuleState moduleState) {

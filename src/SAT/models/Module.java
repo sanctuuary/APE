@@ -2,7 +2,12 @@ package SAT.models;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * The {@code Module} class represents concrete modules/tools that can be used in our program.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class Module extends AbstractModule {
 
 	private List<Type> moduleInput;

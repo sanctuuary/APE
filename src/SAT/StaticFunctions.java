@@ -23,7 +23,12 @@ import SAT.models.SAT_solution;
 import SAT.models.SLTL_formula;
 import SAT.models.SLTL_formula_F;
 import SAT.models.Type;
-
+/**
+ * The {@code StaticFunctions} class is used for storing {@code Static} methods.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class StaticFunctions {
 	
 	
@@ -308,11 +313,11 @@ public class StaticFunctions {
 	}
 
 	/**
-	 * Returns the Object SAT_solution by parsing the SAT output file @file. In case of the UNSAT solution the object list of literals is NULL and SAT_solution.isUnsat() returns true, otherwise the list of parsed literals is returned and SAT_solution.isUnsat() returnes false. 
-	 * @param file - file to be parsed for the SAT solutions
+	 * Returns the {@link SAT_solution SAT_solution} by parsing the SAT output {@link java.io.File file} provided by the argument file. In case of the UNSAT solution the object list of literals is {@code NULL} and {@link SAT_solution#isSat()} returns {@code false}, otherwise the list of parsed literals is returned and {@link SAT_solution#isSat()} returns {@code true}. 
+	 * @param file - {@link java.io.File file} to be parsed for the SAT solutions
 	 * @param mappings - atom mappings
-	 * @param allModules - set of all the modules
-	 * @param allTypes - set of all the types
+	 * @param allModules - set of all the {@link Module}s
+	 * @param allTypes - set of all the {@link Type}s
 	 * @return SAT_solution object.
 	 */
 	public static SAT_solution getSATsolution(String file, AtomMapping mappings, AllModules allModules,

@@ -6,7 +6,12 @@ import java.util.List;
 import java.util.Set;
 
 import SAT.models.constructs.Predicate;
-
+/**
+ *  The {@code AbstractModule} class represents modules/tools that can be used. {@code AbstractModules} can be actual tools or their abstraction classes.
+ *  
+ * @author Vedran Kasalica
+ *
+ */
 public class AbstractModule implements Predicate {
 
 	private String moduleName;

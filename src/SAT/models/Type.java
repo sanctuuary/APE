@@ -9,6 +9,13 @@ import javax.sql.rowset.spi.TransactionalWriter;
 
 import SAT.models.constructs.Predicate;
 
+/**
+ * 
+ * The {@code Type} class represents data types/formats that can be used by our tools. {@code Types} can be actual data types or their abstraction classes.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class Type implements Predicate {
 
 	private String typeName;
