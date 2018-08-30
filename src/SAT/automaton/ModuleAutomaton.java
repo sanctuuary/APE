@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Class is used to represent the module automaton.
- * @author vedran
+ * The {@code ModuleAutomaton} class is used to represent the module automaton. Module automaton is represented as an array of {@link ModuleState ModuleStates}.
+ * @author Vedran Kasalica
  *
  */
 public class ModuleAutomaton {
@@ -24,7 +24,7 @@ public class ModuleAutomaton {
 
 	/**
 	 * Return all Module States from the Module automaton
-	 * @return
+	 * @return {@link List} <{@link ModuleState}>
 	 */
 	public List<ModuleState> getModuleStates() {
 		return moduleStates;

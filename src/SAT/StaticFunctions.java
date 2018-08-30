@@ -2,6 +2,7 @@ package SAT;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -13,7 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import SAT.automaton.ModuleAutomaton;
+import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
+import SAT.automaton.TypeBlock;
+import SAT.automaton.TypeState;
 import SAT.models.AbstractModule;
 import SAT.models.AllModules;
 import SAT.models.AllTypes;
@@ -22,6 +26,7 @@ import SAT.models.Module;
 import SAT.models.SAT_solution;
 import SAT.models.SLTL_formula;
 import SAT.models.SLTL_formula_F;
+import SAT.models.SLTL_formula_G;
 import SAT.models.Type;
 /**
  * The {@code StaticFunctions} class is used for storing {@code Static} methods.
@@ -50,101 +55,78 @@ public class StaticFunctions {
 		 * Constraint G1: If Modules_with_xyz_file_input then use
 		 * Modules_with_xyz_file_output
 		 */
-
-		AbstractModule modules_with_xyz_input = allModules.get("Modules_with_xyz_file_input");
-		AbstractModule modules_with_xyz_output = allModules.get("Modules_with_xyz_file_output");
-		// constraints.add(???);
-		cnf_SLTL += SLTL_formula.ite(modules_with_xyz_output, modules_with_xyz_input, moduleAutomaton, typeAutomaton,
+		cnf_SLTL += if_then_module("Modules_with_xyz_file_input", "Modules_with_xyz_file_output", allModules, moduleAutomaton, typeAutomaton,
 				mappings);
+		
 
 		/*
 		 * Constraint G2: If Modules_with_grid_file_input then use
 		 * Modules_with_grid_file_output
 		 */
-		AbstractModule modules_with_grid_input = allModules.get("Modules_with_grid_file_input");
-		AbstractModule modules_with_grid_output = allModules.get("Modules_with_grid_file_output");
-		cnf_SLTL += SLTL_formula.ite(modules_with_grid_output, modules_with_grid_input, moduleAutomaton, typeAutomaton,
+		cnf_SLTL += if_then_module("Modules_with_grid_file_input", "Modules_with_grid_file_output", allModules, moduleAutomaton, typeAutomaton,
 				mappings);
 
 		/*
 		 * Constraint G3: If Modules_with_color_palette_input then use
 		 * Modules_with_color_palette_output
 		 */
-		AbstractModule modules_with_color_palette_input = allModules.get("Modules_with_color_palette_input");
-		AbstractModule modules_with_color_palette_output = allModules.get("Modules_with_color_palette_output");
-		cnf_SLTL += SLTL_formula.ite(modules_with_color_palette_output, modules_with_color_palette_input,
-				moduleAutomaton, typeAutomaton, mappings);
+		cnf_SLTL += if_then_module("Modules_with_color_palette_input", "Modules_with_color_palette_output", allModules, moduleAutomaton, typeAutomaton,
+				mappings);
 
 		/*
 		 * Constraint G4: Do not use module 3D_surfaces
-		 * 
-		 * AbstractModule _3d_surfaces = allModules.get("3D_surfaces"); SLTL_formula_G
-		 * g4 = new SLTL_formula_G(_3d_surfaces, true); constraints.add(g4); cnf_SLTL +=
-		 * g4.getCNF(moduleAutomaton, typeAutomaton, mappings);
-		 */
+		 */ 
+		cnf_SLTL += not_use_module("3D_surfaces", allModules, moduleAutomaton, typeAutomaton,
+				mappings);
+		 
 
 		/*
 		 * Constraint G5: Use the data type Plots
 		 */
-
-		Type plots = allTypes.get("Plots");
-		SLTL_formula_F g5 = new SLTL_formula_F(plots);
-		constraints.add(g5);
-		cnf_SLTL += g5.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		cnf_SLTL += use_type("Plots", allTypes, moduleAutomaton, typeAutomaton,
+				mappings);
 
 		/*
 		 * Constraint E0.1: Use Draw_water in the synthesis
 		 */
-		AbstractModule draw_water = allModules.get("Draw_water");
-		SLTL_formula_F e0_1 = new SLTL_formula_F(draw_water);
-		constraints.add(e0_1);
-		cnf_SLTL += e0_1.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		cnf_SLTL += use_module("Draw_water", allModules, moduleAutomaton, typeAutomaton,
+				mappings);
 
 		/*
 		 * Constraint E0.2: Use Draw_land in the synthesis
 		 */
-		AbstractModule draw_land = allModules.get("Draw_land");
-		SLTL_formula_F e0_2 = new SLTL_formula_F(draw_land);
-		constraints.add(e0_2);
-		cnf_SLTL += e0_2.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		cnf_SLTL += use_module("Draw_land", allModules, moduleAutomaton, typeAutomaton,
+				mappings);
 
 		/*
 		 * Constraint E0.3: Use Draw_political_bourders in the synthesis
 		 */
-		AbstractModule draw_political_bourders = allModules.get("Draw_political_borders");
-		SLTL_formula_F e0_3 = new SLTL_formula_F(draw_political_bourders);
-		constraints.add(e0_3);
-		cnf_SLTL += e0_3.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		cnf_SLTL += use_module("Draw_political_borders", allModules, moduleAutomaton, typeAutomaton,
+				mappings);
 
 		/*
 		 * Constraint E0.4: Use Display_PostScript as last module in the solution
 		 */
-		AbstractModule display_PostScript = allModules.get("Display_PostScript_files");
-		cnf_SLTL += SLTL_formula.useAsLastModule(display_PostScript, moduleAutomaton, typeAutomaton, mappings);
+		cnf_SLTL += last_module("Display_PostScript_files", allModules, moduleAutomaton, typeAutomaton,
+				mappings);
 
 		/*
 		 * Constraint E1.1: Use Draw_boundary_frame in the synthesis
 		 */
-		AbstractModule draw_boundary_frame = allModules.get("Draw_boundary_frame");
-		SLTL_formula_F e1_1 = new SLTL_formula_F(draw_boundary_frame);
-		constraints.add(e1_1);
-		cnf_SLTL += e1_1.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		cnf_SLTL += use_module("Draw_boundary_frame", allModules, moduleAutomaton, typeAutomaton,
+				mappings);
 
 		/*
 		 * Constraint E1.2: Use Write_title in the synthesis
 		 */
-		AbstractModule write_title = allModules.get("Write_title");
-		SLTL_formula_F e1_2 = new SLTL_formula_F(write_title);
-		constraints.add(e1_2);
-		cnf_SLTL += e1_2.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		cnf_SLTL += use_module("Write_title", allModules, moduleAutomaton, typeAutomaton,
+				mappings);
 
 		/*
 		 * Constraint E1.3: Use Draw_time_stamp_logo in the synthesis
 		 */
-		AbstractModule draw_time_stamp_logo = allModules.get("Draw_time_stamp_logo");
-		SLTL_formula_F e1_4 = new SLTL_formula_F(draw_time_stamp_logo);
-		constraints.add(e1_4);
-		cnf_SLTL += e1_4.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		cnf_SLTL += use_module("Draw_time_stamp_logo", allModules, moduleAutomaton, typeAutomaton,
+				mappings);
 
 //		/*
 //		 * Constraint E2: Use Add_table in the synthesis
@@ -184,7 +166,78 @@ public class StaticFunctions {
 
 		return cnf_SLTL;
 	}
+	
+	public static String if_then_module(String if_moduleID, String then_moduleID, AllModules allModules,
+			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+		String constraint = "";
+		AbstractModule if_module = allModules.get("Modules_with_xyz_file_input");
+		AbstractModule then_module = allModules.get("Modules_with_xyz_file_output");
+		constraint = SLTL_formula.ite(then_module, if_module, moduleAutomaton, typeAutomaton,
+				mappings);
+		
+		return constraint; 
+	}
+	
+	/*
+	 * Use module
+	 */
+	public static String use_module(String moduleID, AllModules allModules,
+			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+		String constraint = "";
+		AbstractModule module = allModules.get(moduleID);
+		SLTL_formula_F formula = new SLTL_formula_F(module);
+		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
 
+		return constraint; 
+	}
+	
+	/*
+	 * Do not use module
+	 */
+	public static String not_use_module(String moduleID, AllModules allModules,
+			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+		String constraint = "";
+		
+		AbstractModule module = allModules.get(moduleID); 
+		SLTL_formula_G formula = new SLTL_formula_G(false, module); 
+		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
+
+		return constraint; 
+	}
+	
+	/*
+	 * Use type
+	 */
+	public static String use_type(String typeID, AllTypes allTypes,
+			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+		String constraint = "";
+
+		Type type = allTypes.get(typeID);
+		SLTL_formula_F formula = new SLTL_formula_F(type);
+		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		
+		return constraint; 
+	}
+	
+	/*
+	 * Use the module as a first module
+	 */
+	/*
+	 * Use the module as a last module
+	 */
+	public static String last_module(String moduleID, AllModules allModules,
+			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+		String constraint = "";
+		AbstractModule module = allModules.get(moduleID);
+		constraint += SLTL_formula.useAsLastModule(module, moduleAutomaton, typeAutomaton, mappings);
+
+		return constraint; 
+	}
+	
+	
+	
+	
+	
 	/**
 	 * Used to write the @text to a file @file. If @append is TRUE, the @text is
 	 * appended to the @file, otherwise the file is rewritten.
@@ -197,7 +250,7 @@ public class StaticFunctions {
 	 *            - if true, then bytes will be written to the end of the file
 	 *            rather than the beginning
 	 */
-	public static void write2file(String text, String file, boolean append) {
+	public static void write2file(String text, File file, boolean append) {
 		try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, append), "utf-8"))) {
 			writer.write(text + "\n");
 			writer.close();
@@ -211,116 +264,16 @@ public class StaticFunctions {
 
 	}
 
-	public static String readSATdefinition(String file, AtomMapping mappings) {
-
-		String line = "";
-		String textSplitBy = " ";
-		BufferedReader textReader;
-		String solution = "";
-
-		try {
-			textReader = new BufferedReader(new FileReader(file));
-			String sat = textReader.readLine();
-			/*
-			 * check whether it is SAT or UNSAT
-			 */
-			if (!sat.matches("UNSAT")) {
-
-				while ((line = textReader.readLine()) != null) {
-					String[] terms = line.split(textSplitBy, -1);
-					for (String term : terms) {
-						if (term.startsWith("-")) {
-							solution += "-";
-							solution += mappings.findOriginal(Integer.parseInt(term.substring(1))) + " ";
-						} else if (!term.matches("0")) {
-							solution += mappings.findOriginal(Integer.parseInt(term)) + " ";
-						} else {
-							solution += "\n";
-						}
-
-					}
-				}
-			} else {
-				solution = "The problem is Unsatisfiable";
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return solution;
-	}
-
-	public static String readSATsolution(String file, AtomMapping mappings, AllModules allModules, AllTypes allTypes) {
-
-		String line = "";
-		String textSplitBy = " ";
-		BufferedReader textReader;
-		String solution = "";
-
-		try {
-			textReader = new BufferedReader(new FileReader(file));
-			String sat = textReader.readLine();
-			/*
-			 * check whether it is SAT or UNSAT
-			 */
-			if (!sat.matches("UNSAT")) {
-
-				while ((line = textReader.readLine()) != null) {
-					String[] terms = line.split(textSplitBy, -1);
-					for (String term : terms) {
-						if (term.startsWith("-")) {
-						} else if (!term.matches("0")) {
-
-							String atomID = mappings.findOriginal(Integer.parseInt(term));
-							if (atomID == null) {
-								solution += " Atom: " + term + " cannot be mapped back.\n";
-							} else {
-								String predicate = atomID.split("\\(")[0];
-								AbstractModule tmpModule = allModules.get(predicate);
-								if (!predicate.matches("empty") && (tmpModule != null && tmpModule instanceof Module)) {
-									solution += atomID + " ";
-									solution += "\n";
-								} else if (!predicate.matches("empty") && tmpModule == null) {
-									Type tmpType = allTypes.get(predicate);
-									if (tmpType != null && tmpType.isSimpleType()) {
-										solution += atomID + " ";
-										solution += "\n";
-									}
-								}
-
-							}
-
-						} else {
-							solution += "\n";
-						}
-
-					}
-				}
-			} else {
-				solution = "The problem is Unsatisfiable";
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return solution;
-	}
 
 	/**
 	 * Returns the {@link SAT_solution SAT_solution} by parsing the SAT output {@link java.io.File file} provided by the argument file. In case of the UNSAT solution the object list of literals is {@code NULL} and {@link SAT_solution#isSat()} returns {@code false}, otherwise the list of parsed literals is returned and {@link SAT_solution#isSat()} returns {@code true}. 
-	 * @param file - {@link java.io.File file} to be parsed for the SAT solutions
+	 * @param file - {@link File} to be parsed for the SAT solutions (SAT output)
 	 * @param mappings - atom mappings
 	 * @param allModules - set of all the {@link Module}s
 	 * @param allTypes - set of all the {@link Type}s
 	 * @return SAT_solution object.
 	 */
-	public static SAT_solution getSATsolution(String file, AtomMapping mappings, AllModules allModules,
+	public static SAT_solution getSATsolution(File file, AtomMapping mappings, AllModules allModules,
 			AllTypes allTypes) {
 
 		BufferedReader textReader;
@@ -364,7 +317,7 @@ public class StaticFunctions {
 		}
 
 		long elapsedTimeMillis = System.currentTimeMillis() - start;
-//		System.out.println("|          ...solving compleated!       |\n" + "|          Time:"
+//		System.out.println("|          ...solving completed!       |\n" + "|          Time:"
 //				+ elapsedTimeMillis / 1000F + "                   |\n" + "|_______________________________________|");
 		return elapsedTimeMillis;
 	}
@@ -411,5 +364,38 @@ public class StaticFunctions {
 		return modulesNew;
 	}
 
+	/**
+	 * Generate the State automatons (Module and Type) based on the defined length
+	 * and branching factor.
+	 * 
+	 * @param moduleAutomaton
+	 * @param typeAutomaton
+	 * @param automata_bound - length of the automaton
+	 * @param branching - branching factor (max number of outputs for modules)
+	 */
+	public static void generateAutomaton(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, int automata_bound, int branching) {
+		for (int i = 0; i < automata_bound; i++) {
+			String i_var;
+			if (automata_bound > 10 && i < 10) {
+				i_var = "0" + i;
+			} else {
+				i_var = "" + i;
+			}
+			ModuleState tmpModuleState = new ModuleState("M" + i_var, i);
+			if (i == 0) {
+				tmpModuleState.setFirst();
+			} else if (i == automata_bound - 1) {
+				tmpModuleState.setLast();
+			}
+			moduleAutomaton.addState(tmpModuleState);
+
+			TypeBlock tmpTypeBlock = new TypeBlock(i);
+			for (int j = 0; j < branching; j++) {
+				TypeState tmpTypeState = new TypeState("T" + i_var + "." + j, j);
+				tmpTypeBlock.addState(tmpTypeState);
+			}
+			typeAutomaton.addBlock(tmpTypeBlock);
+		}
+	}
 
 }

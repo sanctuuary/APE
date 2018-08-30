@@ -13,8 +13,8 @@ public class SLTL_formula_G extends SLTL_formula {
 		super(predicate);
 	}
 
-	public SLTL_formula_G(Predicate predicate, boolean negated) {
-		super(predicate, negated);
+	public SLTL_formula_G(boolean sign, Predicate predicate) {
+		super(sign, predicate);
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class SLTL_formula_G extends SLTL_formula {
 	 * @param moduleAutomaton
 	 *            - automaton of all the module states
 	 * @param typeAutomaton
-	 *            - automaton od all the type states
+	 *            - automaton of all the type states
 	 * @return CNF representation of the SLTL formula
 	 */
 	@Override
@@ -32,11 +32,11 @@ public class SLTL_formula_G extends SLTL_formula {
 
 		String constraints = "";
 		String negSign;
-		// check whether the subformula is expected to be negated or not
-		if (super.getNegated()) {
-			negSign = "-";
-		} else {
+		// check whether the sub-formula is negated or not
+		if (super.getSign()) {
 			negSign = "";
+		} else {
+			negSign = "-";
 		}
 		// Distinguishing whether the formula under the modal operator is type
 		// or module.

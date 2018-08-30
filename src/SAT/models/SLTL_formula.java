@@ -1,5 +1,7 @@
 package SAT.models;
 
+import java.util.List;
+
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
@@ -16,42 +18,45 @@ import SAT.models.constructs.Predicate;
 public abstract class SLTL_formula {
 
 	private Predicate predicate;
-	private boolean negated;
+	/*
+	 * Sign of the predicate, <b>false</b> if the predicate is negated, <b>true</b> otherwise
+	 */
+	private boolean sign;
 
 	public SLTL_formula(Predicate predicate) {
 		this.predicate = predicate;
-		negated = false;
+		sign = true;
 	}
 
 	/**
-	 * Modal operator is performed over @formula. In case of value of @negated being
-	 * true, @formula
+	 * Modal operators are performed over <b>formulas</b>. In case of value of <b>sign</b> being
+	 * true, <b>formula</b> is positive, otherwise the formula is negative (<b>predicate</b> is negated).
 	 * 
 	 * @param predicate
-	 * @param negated
+	 * @param sign
 	 */
-	public SLTL_formula(Predicate predicate, boolean negated) {
+	public SLTL_formula(boolean sign, Predicate predicate) {
 		this.predicate = predicate;
-		this.negated = negated;
+		this.sign = sign;
 	}
 
 	/**
-	 * Setting whether the predicate is negated or not. If @negation is true the
+	 * Setting whether the predicate is negated or not. If sign is <b>false</b> the
 	 * predicate will be negated.
 	 * 
-	 * @param negation
+	 * @param sign
 	 */
-	public void setNegated(boolean negation) {
-		this.negated = negation;
+	public void setSign(boolean sign) {
+		this.sign = sign;
 	}
 
 	/**
-	 * Returns true if predicate is negated, false otherwise.
+	 * Returns <b>false</b> if the predicate is negated, <b>true</b> otherwise.
 	 * 
 	 * @return
 	 */
-	public boolean getNegated() {
-		return negated;
+	public boolean getSign() {
+		return sign;
 	}
 
 	/**
@@ -84,8 +89,8 @@ public abstract class SLTL_formula {
 	public abstract String getCNF(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings);
 
 	/**
-	 * Creates a CNF representation of the Constraint: If @if_predicate is used,
-	 * tool @then_predicate has to be used subsequently
+	 * Creates a CNF representation of the Constraint: If <b>if_predicate</b> is used,
+	 * tool <b>then_predicate</b> has to be used subsequently
 	 * 
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
@@ -115,8 +120,8 @@ public abstract class SLTL_formula {
 	}
 
 	/**
-	 * Creates a CNF representation of the Constraint: Use @last_module as last
-	 * module in the solution
+	 * Creates a CNF representation of the Constraint: Use <b>last_module</b> as last
+	 * module in the solution.
 	 * 
 	 * @param last_module - the module that will 
 	 * @param moduleAutomaton
@@ -128,14 +133,10 @@ public abstract class SLTL_formula {
 			TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String constraints = "";
 		
-		if (last_module.getType().matches("type")) {
-
-		} else {
-			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
-				if (moduleState.isLast()) {
-					constraints += mappings.add(last_module.getPredicate(), moduleState.getStateName()) + " 0\n";
-				}
-			}
+		if (!last_module.getType().matches("type")) {
+			List<ModuleState> moduleAutomatonStates = moduleAutomaton.getModuleStates();
+			ModuleState lastModuleState = moduleAutomatonStates.get(moduleAutomatonStates.size() -1);
+					constraints += mappings.add(last_module.getPredicate(), lastModuleState.getStateName()) + " 0\n";
 		}
 
 		return constraints;

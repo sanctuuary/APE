@@ -2,6 +2,7 @@ package SAT;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -40,12 +41,12 @@ public class main {
 	 * Path to the CNF definition file, that will be used as an input for the SAT
 	 * solver.
 	 */
-	private static String sat_input = domainPath + "sat_input.txt";
+//	private static String sat_input = domainPath + "sat_input.txt";
 	/**
 	 * Path to the file that will contain the SAT solution, that will be used as an
-	 * output foe the SAT solver.
+	 * output for the SAT solver.
 	 */
-	private static String sat_output = domainPath + "sat_output.txt";
+//	private static String sat_output = domainPath + "sat_output.txt";
 	/**
 	 * Path to the file that will contain 1 temporary the solution to the problem in
 	 * human readable representation.
@@ -73,39 +74,7 @@ public class main {
 	 */
 	private static boolean pipeline = false;
 
-	/**
-	 * Generate the State automatons (Module and Type) based on the defined length
-	 * and branching factor.
-	 * 
-	 * @param moduleAutomaton
-	 * @param typeAutomaton
-	 */
-	public static void generateAutomaton(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
-		for (int i = 0; i < automata_bound; i++) {
-			String i_var;
-			if (automata_bound > 10 && i < 10) {
-				i_var = "0" + i;
-			} else {
-				i_var = "" + i;
-			}
-			ModuleState tmpModuleState = new ModuleState("M" + i_var, i);
-			if (i == 0) {
-				tmpModuleState.setFirst();
-			} else if (i == automata_bound - 1) {
-				tmpModuleState.setLast();
-			}
-			moduleAutomaton.addState(tmpModuleState);
-
-			TypeBlock tmpTypeBlock = new TypeBlock(i);
-			for (int j = 0; j < branching; j++) {
-				TypeState tmpTypeState = new TypeState("T" + i_var + "." + j, j);
-				tmpTypeBlock.addState(tmpTypeState);
-			}
-			typeAutomaton.addBlock(tmpTypeBlock);
-		}
-	}
-
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		String cnf = "";
 		AtomMapping mappings = new AtomMapping();
@@ -120,7 +89,7 @@ public class main {
 		/*
 		 * generate the automaton in CNF
 		 */
-		generateAutomaton(moduleAutomaton, typeAutomaton);
+		StaticFunctions.generateAutomaton(moduleAutomaton, typeAutomaton, automata_bound, branching);
 		
 		/*
 		 * encode the taxonomies as objects - generate the list of all types / modules
@@ -132,7 +101,6 @@ public class main {
 		try {
 			OWLExplorer.getObjectsFromTaxonomy(taxonomy, allModules, allTypes);
 		} catch (OntEDException | IOException | OntEDMissingImportException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -147,7 +115,7 @@ public class main {
 		rootType.addSubType(emptyType.getTypeID());
 
 		/*
-		 * create constraints for module.csv
+		 * create constraints from the module.csv file
 		 */
 		AllModules annotated_modules = new AllModules(StaticFunctions
 				.readCSV("/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/modules.csv", allModules, allTypes));
@@ -182,55 +150,66 @@ public class main {
 		 */
 		cnf += StaticFunctions.generateSLTLConstraints(allModules, allTypes, mappings, moduleAutomaton, typeAutomaton);
 
+		/*
+		 * Counting the number of variables and clauses that will be given to the SAT solver
+		 * TODO Improve this approach, no need to read the whole String again.
+		 */
 		int variables = mappings.getSize();
 		int clauses = StringUtils.countMatches(cnf, " 0");
-		String description = "p cnf " + variables + " " + clauses + "\n";
+		String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
 
-		StaticFunctions.write2file(description + cnf, sat_input, false);
+		/*
+		 * Create a temp files that will be used as input and output files for the SAT solver.
+		 */
+//		File temp_sat_input = File.createTempFile("sat_input-", ".txt");
+//		File temp_sat_output = File.createTempFile("sat_output-", ".txt");
+		/*
+		 * Delete both files once the synthesis is over
+		 */
+//		temp_sat_input.deleteOnExit();
+//		temp_sat_output.deleteOnExit();
+		
+		/*
+		 * Fixing the input and output files for easier testing. 
+		 */
+		File temp_sat_input = new File("/home/vedran/Desktop/sat_input.txt");
+		File temp_sat_output = new File("/home/vedran/Desktop/sat_output.txt");
+		
+		StaticFunctions.write2file(sat_input_header + cnf, temp_sat_input, false);
 
-		long elapsedTimeMillis = StaticFunctions.solve(miniSat, sat_input, sat_output);
+		long elapsedTimeMillis = StaticFunctions.solve(miniSat, temp_sat_input.getAbsolutePath(), temp_sat_output.getAbsolutePath());
 
-		// get solution
-
+		
+		/*
+		 * Getting the solution from the solver and finding the rest of the solutions (by negating the obtained solution and adding it as an additional clause for the SAT solver)
+		 */
 		List<SAT_solution> allSolutions = new ArrayList<>();
 		long realStartTime = System.currentTimeMillis();
 		long realTimeElapsedMillis;
-		SAT_solution solution = StaticFunctions.getSATsolution(sat_output, mappings, allModules, allTypes);
+		SAT_solution solution = StaticFunctions.getSATsolution(temp_sat_output, mappings, allModules, allTypes);
 		int counter = 0;
 		do {
 			allSolutions.add(solution);
-			StaticFunctions.write2file(
-					"\n" + solution.getNegatedMappedSolution(), sat_input,
-					true);
-			elapsedTimeMillis += StaticFunctions.solve(miniSat, sat_input, sat_output);
-			solution = StaticFunctions.getSATsolution(sat_output, mappings, allModules, allTypes);
+			sat_input_header = "p cnf " + variables + " " + (++clauses) + "\n";
+			cnf += solution.getNegatedMappedSolution() + "\n";
+			StaticFunctions.write2file(sat_input_header + cnf, temp_sat_input, false);
+			
+			elapsedTimeMillis += StaticFunctions.solve(miniSat, temp_sat_input.getAbsolutePath(), temp_sat_output.getAbsolutePath());
+			solution = StaticFunctions.getSATsolution(temp_sat_output, mappings, allModules, allTypes);
 			counter++;
-			if(counter%500==0) {
+			if(counter%100==0) {
 				realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
 				System.out.println("Found " + counter + " solutions. Solving time: " + (elapsedTimeMillis / 1000F) + " sec. Real time: " + (realTimeElapsedMillis / 1000F));
 				System.gc();
 			}
-		} while (solution.isSat());
+		} while (solution.isSat() && counter < 500);
 
 		System.out.println("Total solving time: " + elapsedTimeMillis / 1000F + " sec");
 
-		// String cnf_file_translated = "/home/vedran/Desktop/cnf-translated.txt";
-		//
-		// try (Writer writer = new BufferedWriter(
-		// new OutputStreamWriter(new FileOutputStream(cnf_file_translated), "utf-8")))
-		// {
-		// writer.write(readSATdefinition(cnf_file, mappings));
-		// writer.close();
-		// } catch (UnsupportedEncodingException e) {
-		// e.printStackTrace();
-		// } catch (FileNotFoundException e) {
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
+
 		boolean first = false;
 		for (SAT_solution sol : allSolutions) {
-			StaticFunctions.write2file(sol.getRelevantSolution(), sat_solutions, first);
+			StaticFunctions.write2file(sol.getRelevantSolution(), new File(sat_solutions), first);
 			first = true;
 		}
 

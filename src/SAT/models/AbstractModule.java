@@ -124,7 +124,7 @@ public class AbstractModule implements Predicate {
 	/**
 	 * Print the ID of the AbstractModule
 	 * 
-	 * @return module ID
+	 * @return module ID as a {@link String}
 	 */
 	public String printShort() {
 		return moduleID;
@@ -215,9 +215,10 @@ public class AbstractModule implements Predicate {
 	}
 
 	/**
-	 * Print the tree shaped representation of the module taxonomy
+	 * Print the tree shaped representation of the module taxonomy.
 	 * 
-	 * @param str
+	 * @param str - string that is helping the recursive function to distinguish between the tree levels
+	 * @param allModules - set of all the modules
 	 */
 	public void printTree(String str, AllModules allModules) {
 		System.out.println(str + printShort());

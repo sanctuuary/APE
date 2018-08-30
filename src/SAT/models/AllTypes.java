@@ -60,13 +60,11 @@ public class AllTypes {
 	}
 
 	/**
-	 * Returns the type to which the specified key is mapped, or null if this map
-	 * contains no mapping for the type ID.
+	 * Returns the type to which the specified key is mapped to, or {@code null} if the typeID has no mappings.
 	 * 
 	 * @param typeID
 	 *            - the key whose associated value is to be returned
-	 * @return the type to which the specified key is mapped, or null if this map
-	 *         contains no mapping for the type ID
+	 * @return {@link Type} to which the specified key is mapped to, or {@code null} if the typeID has no mappings
 	 */
 	public Type get(String typeID) {
 		return this.types.get(typeID);

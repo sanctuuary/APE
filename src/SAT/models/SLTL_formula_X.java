@@ -10,8 +10,8 @@ public class SLTL_formula_X extends SLTL_formula {
 		super(predicate);
 	}
 	
-	public SLTL_formula_X(Predicate predicate, boolean negated) {
-		super(predicate, negated);
+	public SLTL_formula_X(boolean sign, Predicate formula) {
+		super(sign, formula);
 	}
 
 	/**

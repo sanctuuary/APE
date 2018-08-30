@@ -11,17 +11,26 @@ import SAT.models.constructs.Literal;
 import SAT.models.constructs.Predicate;
 
 /**
- * Class describes the solution produced by the SAT solver. It stores the
- * original solution and the mapped one. In case of the parameter @unsad being
- * true, there are no solutions.
+ * The {@code SAT_solution} class describes the solution produced by the SAT solver. It stores the
+ * original solution and the mapped one. In case of the parameter <b>unsat</b> being
+ * {@code true}, there are no solutions.
  * 
  * @author Vedran Kasalica
  *
  */
 public class SAT_solution {
 
+	/*
+	 * List of all the literals provided by the solution.
+	 */
 	private List<Literal> literals;
+	/*
+	 * List of only relevant (positive) literals that represent implemented modules/tools.
+	 */
 	private List<Literal> relevantModules;
+	/*
+	 * List of only relevant (positive) literals that represent simple types.
+	 */
 	private List<Literal> relevantTypes;
 	private boolean unsat;
 
@@ -61,7 +70,7 @@ public class SAT_solution {
 	}
 
 	/**
-	 * Creating an empty solution, for UNSAT problem. @literals is NULL.
+	 * Creating an empty solution, for UNSAT problem. The list <b>literals</b> is NULL.
 	 */
 	public SAT_solution() {
 		unsat = true;

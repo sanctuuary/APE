@@ -97,13 +97,11 @@ public class AllModules{
 	}
 
 	/**
-	 * Returns the module to which the specified key is mapped, or null if this map
-	 * contains no mapping for the module ID.
+	 * Returns the module to which the specified key is mapped to, or {@code null} if the moduleID has no mappings.
 	 * 
 	 * @param moduleID
 	 *            - the key whose associated value is to be returned
-	 * @return the module to which the specified key is mapped, or null if this map
-	 *         contains no mapping for the key
+	 * @return {@link AbstractModule} or {@link Module} to which the specified key is mapped to, or {@code null} if the moduleID has no mappings
 	 */
 	public AbstractModule get(String moduleID) {
 		return this.modules.get(moduleID);

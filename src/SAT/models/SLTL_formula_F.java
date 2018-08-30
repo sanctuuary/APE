@@ -14,8 +14,8 @@ public class SLTL_formula_F extends SLTL_formula {
 		super(formula);
 	}
 	
-	public SLTL_formula_F(Predicate formula, boolean negated) {
-		super(formula, negated);
+	public SLTL_formula_F(boolean sign, Predicate formula) {
+		super(sign, formula);
 	}
 
 	/**
@@ -23,7 +23,7 @@ public class SLTL_formula_F extends SLTL_formula {
 	 * defined @moduleAutomaton and @typeAutomaton.
 	 * 
 	 * @param moduleAutomaton - automaton of all the module states
-	 * @param typeAutomaton - automaton od all the type states
+	 * @param typeAutomaton - automaton of all the type states
 	 * @return CNF representation of the SLTL formula
 	 */
 	@Override
@@ -33,10 +33,10 @@ public class SLTL_formula_F extends SLTL_formula {
 
 		String negSign;
 //		Check whether the atom is expected to be negated or not
-		if (super.getNegated()){
-			negSign = "-";
-		} else {
+		if (super.getSign()){
 			negSign = "";
+		} else {
+			negSign = "-";
 		}
 		// Distinguishing whether the atom under the modal operator is type
 		// or module.

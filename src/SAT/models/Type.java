@@ -158,7 +158,8 @@ public class Type implements Predicate {
 	/**
 	 * Print the tree shaped representation of the type taxonomy
 	 * 
-	 * @param str
+	 * @param str - string that is helping the recursive function to distinguish between the tree levels
+	 * @param allTypes - set of all the types
 	 */
 	public void printTree(String str, AllTypes allTypes) {
 		System.out.println(str + print());
