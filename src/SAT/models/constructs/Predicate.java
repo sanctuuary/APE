@@ -9,14 +9,14 @@ package SAT.models.constructs;
 public interface Predicate {
 
 	/**
-	 * Function is used to return the predicate defined.
-	 * @return
+	 * Function is used to return the predicate defined as String.
+	 * @return String representation of the predicate.
 	 */
 	public String getPredicate();
 	
 	/**
-	 * The function is used to determine the type of the predicate ["type", "module" or "abstract module"].
-	 * @return
+	 * The function is used to determine the type of the predicate [<b>type</b>,<b>module</b> or <b>abstract module</b>].
+	 * @return String [<b>type</b>,<b>module</b> or <b>abstract module</b>]
 	 */
 	public String getType();
 }

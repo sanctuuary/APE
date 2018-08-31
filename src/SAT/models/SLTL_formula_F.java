@@ -1,6 +1,5 @@
 package SAT.models;
 
-
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
@@ -13,7 +12,7 @@ public class SLTL_formula_F extends SLTL_formula {
 	public SLTL_formula_F(Predicate formula) {
 		super(formula);
 	}
-	
+
 	public SLTL_formula_F(boolean sign, Predicate formula) {
 		super(sign, formula);
 	}
@@ -22,8 +21,10 @@ public class SLTL_formula_F extends SLTL_formula {
 	 * Generate String representation of the CNF formula for
 	 * defined @moduleAutomaton and @typeAutomaton.
 	 * 
-	 * @param moduleAutomaton - automaton of all the module states
-	 * @param typeAutomaton - automaton of all the type states
+	 * @param moduleAutomaton
+	 *            - automaton of all the module states
+	 * @param typeAutomaton
+	 *            - automaton of all the type states
 	 * @return CNF representation of the SLTL formula
 	 */
 	@Override
@@ -32,8 +33,8 @@ public class SLTL_formula_F extends SLTL_formula {
 		String constraints = "";
 
 		String negSign;
-//		Check whether the atom is expected to be negated or not
-		if (super.getSign()){
+		// Check whether the atom is expected to be negated or not
+		if (super.getSign()) {
 			negSign = "";
 		} else {
 			negSign = "-";
@@ -43,19 +44,20 @@ public class SLTL_formula_F extends SLTL_formula {
 		if (super.getSubFormula().getType().matches("type")) {
 			for (TypeBlock typeBlock : typeAutomaton.getTypeBlocks()) {
 				for (TypeState typeState : typeBlock.getTypeStates()) {
-					constraints += negSign + mappings.add(super.getSubFormula().getPredicate(), typeState.getStateName()) + " ";
+					constraints += negSign
+							+ mappings.add(super.getSubFormula().getPredicate(), typeState.getStateName()) + " ";
 				}
 			}
 			constraints += "0\n";
 		} else {
 			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
-				constraints += negSign + mappings.add(super.getSubFormula().getPredicate(), moduleState.getStateName()) + " ";
+				constraints += negSign + mappings.add(super.getSubFormula().getPredicate(), moduleState.getStateName())
+						+ " ";
 			}
 			constraints += "0\n";
 		}
 		return constraints;
 	}
-
 
 	/**
 	 * Returns the type of the SLTL formula [F, G or X].
