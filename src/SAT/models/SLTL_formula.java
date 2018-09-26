@@ -280,6 +280,7 @@ public abstract class SLTL_formula {
 	}
 	
 	/**
+	 * TODO:
 	 * Creates a CNF representation of the Constraint:<br/><br/>
 	 * Use <b>module</b> in the solution exactly <b>n</b> times.
 	 * @param module - module to be used
@@ -291,13 +292,13 @@ public abstract class SLTL_formula {
 	 */
 	public static String useModuleNtimes(AbstractModule module, int n, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraints = "";
+//		String constraints = "";
+//
+//		List<ModuleState> moduleAutomatonStates = moduleAutomaton.getModuleStates();
+//		ModuleState nthModuleState = moduleAutomatonStates.get(index - 1);
+//		constraints += mappings.add(module.getPredicate(), nthModuleState.getStateName()) + " 0\n";
 
-		List<ModuleState> moduleAutomatonStates = moduleAutomaton.getModuleStates();
-		ModuleState nthModuleState = moduleAutomatonStates.get(index - 1);
-		constraints += mappings.add(module.getPredicate(), nthModuleState.getStateName()) + " 0\n";
-
-		return constraints;
+		return null;
 	}
 
 }
