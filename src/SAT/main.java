@@ -28,6 +28,11 @@ import java_cup.sym;
 
 public class main {
 
+	/*
+	 * Max number of solution that the solver will return.
+	 */
+	private static final int no_of_solutions = 10000;
+
 	/**
 	 * Path to the taxonomy file
 	 */
@@ -58,7 +63,7 @@ public class main {
 	 */
 	private static String sat_solutions = domainPath + "sat_solutions.txt";
 
-	private static String miniSat = "/home/vedran/Documents/minisat/core/minisat";
+//	private static String miniSat = "/home/vedran/Documents/minisat/core/minisat";
 
 	/**
 	 * Length of the automaton.
@@ -161,8 +166,8 @@ public class main {
 		/*
 		 * Create a temp files that will be used as input and output files for the SAT solver.
 		 */
-//		File temp_sat_input = File.createTempFile("sat_input-", ".txt");
-//		File temp_sat_output = File.createTempFile("sat_output-", ".txt");
+//		File temp_sat_input = File.createTempFile("sat_input-", ".cnf");
+//		File temp_sat_output = File.createTempFile("sat_output-", ".cnf");
 		/*
 		 * Delete both files once the synthesis is over
 		 */
@@ -172,39 +177,20 @@ public class main {
 		/*
 		 * Fixing the input and output files for easier testing. 
 		 */
-		File temp_sat_input = new File("/home/vedran/Desktop/sat_input.txt");
-		File temp_sat_output = new File("/home/vedran/Desktop/sat_output.txt");
+		File temp_sat_input = new File("/home/vedran/Desktop/sat_input.cnf");
 		
 		StaticFunctions.write2file(sat_input_header + cnf, temp_sat_input, false);
 
-		long elapsedTimeMillis = StaticFunctions.solve(miniSat, temp_sat_input.getAbsolutePath(), temp_sat_output.getAbsolutePath());
-
+		long realStartTime = System.currentTimeMillis();
+		List<SAT_solution> allSolutions = StaticFunctions.solve(temp_sat_input.getAbsolutePath(),  mappings, allModules, allTypes, no_of_solutions);
+		long realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
+		System.out.println("\nAPE found " + allSolutions.size() + " solutions. Total solving time: " + (realTimeElapsedMillis / 1000F) + " sec.");
 		
 		/*
 		 * Getting the solution from the solver and finding the rest of the solutions (by negating the obtained solution and adding it as an additional clause for the SAT solver)
 		 */
-		List<SAT_solution> allSolutions = new ArrayList<>();
-		long realStartTime = System.currentTimeMillis();
-		long realTimeElapsedMillis;
-		SAT_solution solution = StaticFunctions.getSATsolution(temp_sat_output, mappings, allModules, allTypes);
-		int counter = 0;
-		do {
-			allSolutions.add(solution);
-			sat_input_header = "p cnf " + variables + " " + (++clauses) + "\n";
-			cnf += solution.getNegatedMappedSolution() + "\n";
-			StaticFunctions.write2file(sat_input_header + cnf, temp_sat_input, false);
-			
-			elapsedTimeMillis += StaticFunctions.solve(miniSat, temp_sat_input.getAbsolutePath(), temp_sat_output.getAbsolutePath());
-			solution = StaticFunctions.getSATsolution(temp_sat_output, mappings, allModules, allTypes);
-			counter++;
-			if(counter%100==0) {
-				realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-				System.out.println("Found " + counter + " solutions. Solving time: " + (elapsedTimeMillis / 1000F) + " sec. Real time: " + (realTimeElapsedMillis / 1000F));
-				System.gc();
-			}
-		} while (solution.isSat() && counter < 500);
+		
 
-		System.out.println("Total solving time: " + elapsedTimeMillis / 1000F + " sec");
 
 
 		boolean first = false;

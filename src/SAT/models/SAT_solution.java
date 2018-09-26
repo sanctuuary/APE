@@ -38,7 +38,7 @@ public class SAT_solution {
 	 * Creating a list of Literals to represent the solution.
 	 * 
 	 * @param satOutput
-	 *            - list of mapped literals (SAT output)
+	 *            - list of mapped literals given as text (SAT output)
 	 * @param atomMapping
 	 *            - mapping of the atoms
 	 * @param allModules
@@ -55,6 +55,40 @@ public class SAT_solution {
 		for (String mappedLiteral : mappedLiterals) {
 			if (!mappedLiteral.matches("0")) {
 				Literal currLiteral = new Literal(mappedLiteral, atomMapping, allModules, allTypes);
+				literals.add(currLiteral);
+				if (!currLiteral.isNegated()) {
+					if (currLiteral.getPredicate() instanceof Module) {
+						relevantModules.add(currLiteral);
+					} else if (!currLiteral.isModule() && ((Type) currLiteral.getPredicate()).isSimpleType()) {
+						relevantTypes.add(currLiteral);
+					}
+				}
+			}
+		}
+		Collections.sort(relevantModules);
+		Collections.sort(relevantTypes);
+	}
+	
+	/**
+	 * Creating a list of Literals to represent the solution.
+	 * 
+	 * @param satSolution
+	 *            - list of mapped literals given as a list of integers (library SAT output)
+	 * @param atomMapping
+	 *            - mapping of the atoms
+	 * @param allModules
+	 *            - list of all the modules
+	 * @param allTypes
+	 *            - list of all the types
+	 */
+	public SAT_solution(int[] satSolution, AtomMapping atomMapping, AllModules allModules, AllTypes allTypes) {
+		unsat = false;
+		literals = new ArrayList<>();
+		relevantModules = new ArrayList<>();
+		relevantTypes = new ArrayList<>();
+		for (int mappedLiteral : satSolution) {
+			if (mappedLiteral != 0) {
+				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), atomMapping, allModules, allTypes);
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
 					if (currLiteral.getPredicate() instanceof Module) {
