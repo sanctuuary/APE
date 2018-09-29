@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.sat4j.minisat.SolverFactory;
@@ -24,21 +25,9 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.ModelIterator;
 
-import SAT.automaton.ModuleAutomaton;
-import SAT.automaton.ModuleState;
-import SAT.automaton.TypeAutomaton;
-import SAT.automaton.TypeBlock;
-import SAT.automaton.TypeState;
-import SAT.models.AbstractModule;
-import SAT.models.AllModules;
-import SAT.models.AllTypes;
-import SAT.models.AtomMapping;
-import SAT.models.Module;
-import SAT.models.SAT_solution;
-import SAT.models.SLTL_formula;
-import SAT.models.SLTL_formula_F;
-import SAT.models.SLTL_formula_G;
-import SAT.models.Type;
+import SAT.automaton.*;
+import SAT.constraints.*;
+import SAT.models.*;
 
 /**
  * The {@code StaticFunctions} class is used for storing {@code Static} methods.
@@ -48,6 +37,7 @@ import SAT.models.Type;
  */
 public class StaticFunctions {
 
+	
 	/**
 	 * Returns the CNF representation of the SLTL constraints in our project
 	 * 
@@ -57,7 +47,7 @@ public class StaticFunctions {
 	 * @param typeAutomaton
 	 * @return A string representing SLTL constraints into CNF
 	 */
-	public static String generateSLTLConstraints(AllModules allModules, AllTypes allTypes, AtomMapping mappings,
+	public static String generateSLTLConstraints(AllConstraintTamplates allConsTemplates, AllModules allModules, AllTypes allTypes, AtomMapping mappings,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
 
 		String cnf_SLTL = "";
@@ -66,67 +56,76 @@ public class StaticFunctions {
 		 * Constraint G1: If Modules_with_xyz_file_input then use
 		 * Modules_with_xyz_file_output
 		 */
-		cnf_SLTL += if_then_module("Modules_with_xyz_file_output", "Modules_with_xyz_file_input", allModules,
-				moduleAutomaton, typeAutomaton, mappings);
+		String[] g1 = {"Modules_with_xyz_file_output", "Modules_with_xyz_file_input"};
+		cnf_SLTL += code_function(1, g1, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint G2: If Modules_with_grid_file_input then use
 		 * Modules_with_grid_file_output
 		 */
-		cnf_SLTL += if_then_module("Modules_with_grid_file_output", "Modules_with_grid_file_input", allModules,
-				moduleAutomaton, typeAutomaton, mappings);
+		String[] g2 = {"Modules_with_grid_file_output", "Modules_with_grid_file_input"};
+		cnf_SLTL += code_function(1, g2, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint G3: If Modules_with_color_palette_input then use
 		 * Modules_with_color_palette_output
 		 */
-		cnf_SLTL += if_then_module("Modules_with_color_palette_output", "Modules_with_color_palette_input", allModules,
-				moduleAutomaton, typeAutomaton, mappings);
+		String[] g3 = {"Modules_with_color_palette_output", "Modules_with_color_palette_input"};
+		cnf_SLTL += code_function(1, g3, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint G4: Do not use module 3D_surfaces
 		 */
-		cnf_SLTL += not_use_module("3D_surfaces", allModules, moduleAutomaton, typeAutomaton, mappings);
+		String[] g4 = {"3D_surfaces"};
+		cnf_SLTL += code_function(6, g4, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint G5: Use the data type Plots
 		 */
-		cnf_SLTL += use_type("Plots", allTypes, moduleAutomaton, typeAutomaton, mappings);
+		String[] g5 = {"Plots"};
+		cnf_SLTL += code_function(8, g5, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint E0.1: Use Draw_water in the synthesis
 		 */
-		cnf_SLTL += use_module("Draw_water", allModules, moduleAutomaton, typeAutomaton, mappings);
+		String[] e01 = {"Draw_water"};
+		cnf_SLTL += code_function(5, e01, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint E0.2: Use Draw_land in the synthesis
 		 */
-		cnf_SLTL += use_module("Draw_land", allModules, moduleAutomaton, typeAutomaton, mappings);
+		String[] e02 = {"Draw_land"};
+		cnf_SLTL += code_function(5, e02, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint E0.3: Use Draw_political_bourders in the synthesis
 		 */
-		cnf_SLTL += use_module("Draw_political_borders", allModules, moduleAutomaton, typeAutomaton, mappings);
+		String[] e03 = {"Draw_political_borders"};
+		cnf_SLTL += code_function(5, e03, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint E0.4: Use Display_PostScript as last module in the solution
 		 */
-		cnf_SLTL += last_module("Display_PostScript_files", allModules, moduleAutomaton, typeAutomaton, mappings);
+		String[] e04 = {"Display_PostScript_files"};
+		cnf_SLTL += code_function(7, e04, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint E1.1: Use Draw_boundary_frame in the synthesis
 		 */
-		cnf_SLTL += use_module("Draw_boundary_frame", allModules, moduleAutomaton, typeAutomaton, mappings);
+		String[] e11 = {"Draw_boundary_frame"};
+		cnf_SLTL += code_function(5, e11, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint E1.2: Use Write_title in the synthesis
 		 */
-		cnf_SLTL += use_module("Write_title", allModules, moduleAutomaton, typeAutomaton, mappings);
+		String[] e12 = {"Write_title"};
+		cnf_SLTL += code_function(5, e12, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		/*
 		 * Constraint E1.3: Use Draw_time_stamp_logo in the synthesis
 		 */
-		cnf_SLTL += use_module("Draw_time_stamp_logo", allModules, moduleAutomaton, typeAutomaton, mappings);
+		String[] e13 = {"Draw_time_stamp_logo"};
+		cnf_SLTL += code_function(5, e13, allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 
 		// /*
 		// * Constraint E2: Use Add_table in the synthesis
@@ -178,224 +177,105 @@ public class StaticFunctions {
 	}
 
 	/**
-	 * Implements constraints of the form:<br/>
-	 * <br/>
-	 * If we use module <b>if_moduleID</b>, then use <b>then_moduleID</b>
-	 * consequently.
+	 * Adding each constraint format in the set of all cons. formats
 	 * 
-	 * @param if_moduleID
-	 *            - module that enforce the usage of <b>then_moduleID</b>
-	 * @param then_moduleID
-	 *            - module that is enforced by <b>if_moduleID</b>
-	 * @param allModules
-	 *            - list of all the modules
-	 * @param moduleAutomaton
-	 *            - module automaton
-	 * @param typeAutomaton
-	 *            - type automaton
-	 * @param mappings
-	 *            - set of the mappings for the literals
-	 * @return {@link String} CNF representation of the constraint
+	 * @param allConsTemplates
+	 *            - set that represents all the cons. formats
+	 * @return String description of all the formats (ID, description and number of parameters for each).
 	 */
-	public static String if_then_module(String if_moduleID, String then_moduleID, AllModules allModules,
+	public static String initializeConstraints(AllConstraintTamplates allConsTemplates) {
+
+		/*
+		 * ID:	1
+		 * If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> consequently.
+		 */
+		ConstraintTemplate currTemplate = new Constraint_if_then_module(2,
+				"If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> consequently.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+
+		/*
+		 * ID:	2
+		 * If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b> consequently.
+		 */
+		currTemplate = new Constraint_if_then_not_module(2,
+				"If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b> consequently.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+
+		/*
+		 * ID:	3
+		 * If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it.
+		 */
+		currTemplate = new Constraint_depend_module(2,
+				"If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID:	4
+		 * If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a next module in the sequence.
+		 */
+		currTemplate = new Constraint_next_module(2,
+				"If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a next module in the sequence.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID:	5
+		 * Use module <b>parameters[0]</b> in the solution.
+		 */
+		currTemplate = new Constraint_use_module(1,
+				"Use module <b>parameters[0]</b> in the solution.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID:	6
+		 * Do not use module <b>parameters[0]</b> in the solution.
+		 */
+		currTemplate = new Constraint_not_use_module(1,
+				"Do not use module <b>parameters[0]</b> in the solution.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID:	7
+		 * Use <b>parameters[0]</b> as last module in the solution.
+		 */
+		currTemplate = new Constraint_last_module(1,
+				"Use <b>parameters[0]</b> as last module in the solution.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+
+		/*
+		 * ID:	8
+		 *  Use type <b>parameters[0]</b> in the solution.
+		 */
+		currTemplate = new Constraint_use_type(1,
+				"Use type <b>parameters[0]</b> in the solution.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID:	9
+		 *  Do not use type <b>parameters[0]</b> in the solution.
+		 */
+		currTemplate = new Constraint_not_use_type(1,
+				"Do not use type <b>parameters[0]</b> in the solution.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+		
+		return allConsTemplates.printConstraintsCodes();
+
+	}
+
+	/**
+	 * Function used to define constrain based on the constraint ID specified
+	 * 
+	 * @param constraintID
+	 *            -
+	 * @param parameters
+	 * @return
+	 */
+	public static String code_function(int constraintID, String[] parameters, AllConstraintTamplates allConsTemplates, AllModules allModules, AllTypes allTypes,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-		AbstractModule if_module = allModules.get(if_moduleID);
-		AbstractModule then_module = allModules.get(then_moduleID);
-		constraint = SLTL_formula.ite(if_module, then_module, moduleAutomaton, typeAutomaton, mappings);
-
+		String constraint = allConsTemplates.getConstraintTamplate(constraintID) .getConstraint(parameters, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
+		
 		return constraint;
 	}
 
-	/**
-	 * Implements constraints of the form:<br/>
-	 * <br/>
-	 * If we use module <b>if_moduleID</b>, then do not use <b>then_moduleID</b>
-	 * consequently.
-	 * 
-	 * @param if_moduleID
-	 *            - module that forbids the usage of <b>then_moduleID</b>
-	 * @param then_not_moduleID
-	 *            - module that is forbidden by <b>if_moduleID</b>
-	 * @param allModules
-	 *            - list of all the modules
-	 * @param moduleAutomaton
-	 *            - module automaton
-	 * @param typeAutomaton
-	 *            - type automaton
-	 * @param mappings
-	 *            - set of the mappings for the literals
-	 * @return {@link String} CNF representation of the constraint
-	 */
-	public static String if_then_not_module(String if_moduleID, String then_not_moduleID, AllModules allModules,
-			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-		AbstractModule if_module = allModules.get(if_moduleID);
-		AbstractModule then_not_module = allModules.get(then_not_moduleID);
-		constraint = SLTL_formula.itn(if_module, then_not_module, moduleAutomaton, typeAutomaton, mappings);
-
-		return constraint;
-	}
-
-	/**
-	 * Implements constraints of the form:<br/>
-	 * <br/>
-	 * If we use module <b>second_moduleID</b>, then we must have used
-	 * <b>first_moduleID</b> prior to it.
-	 * 
-	 * @param first_moduleID
-	 *            - module that enforce the usage of <b>second_moduleID</b>
-	 * @param second_moduleID
-	 *            - module that is enforced by <b>if_moduleID</b>
-	 * @param allModules
-	 *            - list of all the modules
-	 * @param moduleAutomaton
-	 *            - module automaton
-	 * @param typeAutomaton
-	 *            - type automaton
-	 * @param mappings
-	 *            - set of the mappings for the literals
-	 * @return {@link String} CNF representation of the constraint
-	 */
-	public static String depend_module(String first_moduleID, String second_moduleID, AllModules allModules,
-			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-		AbstractModule first_module = allModules.get(first_moduleID);
-		AbstractModule second_module = allModules.get(second_moduleID);
-		constraint = SLTL_formula.depend(first_module, second_module, moduleAutomaton, typeAutomaton, mappings);
-
-		return constraint;
-	}
-
-	/**
-	 * Implements constraints of the form:<br/>
-	 * <br/>
-	 * If we use module <b>first_moduleID</b>, then use <b>second_moduleID</b> as a
-	 * next module in the sequence.
-	 * 
-	 * @param first_moduleID
-	 *            - module that enforce the usage of <b>second_moduleID</b>
-	 * @param second_moduleID
-	 *            - module that is enforced by <b>first_moduleID</b>
-	 * @param allModules
-	 *            - list of all the modules
-	 * @param moduleAutomaton
-	 *            - module automaton
-	 * @param typeAutomaton
-	 *            - type automaton
-	 * @param mappings
-	 *            - set of the mappings for the literals
-	 * @return {@link String} CNF representation of the constraint
-	 */
-	public static String next_module(String first_moduleID, String second_moduleID, AllModules allModules,
-			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-		AbstractModule first_module = allModules.get(first_moduleID);
-		AbstractModule second_module = allModules.get(second_moduleID);
-		constraint = SLTL_formula.next(first_module, second_module, moduleAutomaton, typeAutomaton, mappings);
-
-		return constraint;
-	}
-
-	/**
-	 * Use module <b>moduleID</b> in the solution.
-	 */
-	public static String use_module(String moduleID, AllModules allModules, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-		AbstractModule module = allModules.get(moduleID);
-		SLTL_formula_F formula = new SLTL_formula_F(module);
-		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
-
-		return constraint;
-	}
-
-	/**
-	 * Do not use module <b>moduleID</b> in the solution.
-	 */
-	public static String not_use_module(String moduleID, AllModules allModules, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-
-		AbstractModule module = allModules.get(moduleID);
-		SLTL_formula_G formula = new SLTL_formula_G(false, module);
-		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
-
-		return constraint;
-	}
-
-	/**
-	 * Use type <b>typeID</b> in the solution.
-	 */
-	public static String use_type(String typeID, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-
-		Type type = allTypes.get(typeID);
-		SLTL_formula_F formula = new SLTL_formula_F(type);
-		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
-
-		return constraint;
-	}
-
-	/**
-	 * DO not use type <b>typeID</b> in the solution.
-	 */
-
-	public static String not_use_type(String typeID, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-
-		Type type = allTypes.get(typeID);
-		SLTL_formula_G formula = new SLTL_formula_G(false, type);
-		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
-
-		return constraint;
-	}
-
-	/**
-	 * Creates a CNF representation of the Constraint:<br/>
-	 * <br/>
-	 * Use <b>module</b> as the <b>n</b>-th module in the solution.
-	 * 
-	 * @param moduleID
-	 *            - the module
-	 * @param n
-	 *            - absolute position in the solution
-	 * @param moduleAutomaton
-	 * @param typeAutomaton
-	 * @param mappings
-	 * @return CNF representation of the SLTL formula
-	 */
-	public static String nth_module(String moduleID, int n, AllModules allModules, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-		AbstractModule module = allModules.get(moduleID);
-		constraint += SLTL_formula.useAsNthModule(module, n, moduleAutomaton, typeAutomaton, mappings);
-
-		return constraint;
-	}
-
-	/**
-	 * Creates a CNF representation of the Constraint:<br/>
-	 * <br/>
-	 * Use <b>last_module</b> as last module in the solution.
-	 * 
-	 * @param moduleID
-	 *            - the module
-	 * @param moduleAutomaton
-	 * @param typeAutomaton
-	 * @param mappings
-	 * @return CNF representation of the SLTL formula
-	 */
-	public static String last_module(String moduleID, AllModules allModules, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraint = "";
-		AbstractModule module = allModules.get(moduleID);
-		constraint += SLTL_formula.useAsLastModule(module, moduleAutomaton, typeAutomaton, mappings);
-
-		return constraint;
-	}
 
 	/**
 	 * Used to write the @text to a file @file. If @append is TRUE, the @text is
@@ -468,35 +348,41 @@ public class StaticFunctions {
 
 		return sat_solution;
 	}
+
 	/**
-	 * Returns a set of {@link SAT_solution SAT_solutions} by parsing the SAT output.
-	 * In case of the UNSAT the list is empty.
+	 * Returns a set of {@link SAT_solution SAT_solutions} by parsing the SAT
+	 * output. In case of the UNSAT the list is empty.
 	 * 
-	 * @param dimacsFilePath - path to the CNF formula in dimacs form
-	 * @param mappings - atom mappings
-	 * @param allModules - list of all the modules
-	 * @param allTypes - list of all the types
+	 * @param dimacsFilePath
+	 *            - path to the CNF formula in dimacs form
+	 * @param mappings
+	 *            - atom mappings
+	 * @param allModules
+	 *            - list of all the modules
+	 * @param allTypes
+	 *            - list of all the types
 	 * @return List of {@link SAT_solution SAT_solutions}. Possibly empty list.
 	 */
 	public static List<SAT_solution> solve(String dimacsFilePath, AtomMapping mappings, AllModules allModules,
 			AllTypes allTypes, int no_of_solutions) {
 		List<SAT_solution> solutions = new ArrayList<>();
-		
-		ISolver solver = SolverFactory.newDefault();
+
+		ISolver solver = new ModelIterator(SolverFactory.newDefault(), no_of_solutions); //iteration through at most no_of_solutions solutions
 		solver.setTimeout(3600); // 1 hour timeout
 		Reader reader = new DimacsReader(solver);
 		try {
-			IProblem problem = reader.parseInstance(dimacsFilePath);
+			IProblem problem = reader.parseInstance(dimacsFilePath); //loading CNF encoding of the problem
 			int solutionNo = 0;
 			long realStartTime = System.currentTimeMillis();
 			long realTimeElapsedMillis;
-			while(problem.isSatisfiable() && solutionNo < no_of_solutions) {
+			while (solutionNo < no_of_solutions && problem.isSatisfiable()) {
 				SAT_solution sat_solution = new SAT_solution(problem.model(), mappings, allModules, allTypes);
 				solutions.add(sat_solution);
 				solutionNo++;
-				if(solutionNo%500==0) {
+				if (solutionNo % 500 == 0) {
 					realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-					System.out.println("Found " + solutionNo + " solutions. Solving time: " + (realTimeElapsedMillis / 1000F) + " sec.");
+					System.out.println("Found " + solutionNo + " solutions. Solving time: "
+							+ (realTimeElapsedMillis / 1000F) + " sec.");
 				}
 			}
 		} catch (ParseFormatException | IOException e) {

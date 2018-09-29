@@ -21,6 +21,7 @@ import SAT.automaton.ModuleState;
 import SAT.automaton.TypeAutomaton;
 import SAT.automaton.TypeBlock;
 import SAT.automaton.TypeState;
+import SAT.constraints.AllConstraintTamplates;
 import SAT.models.*;
 import de.jabc.plugin.ontEDAPI.Exceptions.OntEDException;
 import de.jabc.plugin.ontEDAPI.Exceptions.OntEDMissingImportException;
@@ -31,53 +32,32 @@ public class main {
 	/*
 	 * Max number of solution that the solver will return.
 	 */
-	private static final int no_of_solutions = 10000;
+	private static final int MAX_NO_SOLUTIONS = 10000;
 
 	/**
 	 * Path to the taxonomy file
 	 */
-	private static String taxonomy = "file:/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/GMT_UseCase_taxonomy.owl";
+	private static String ONTOLOGY_PATH = "file:/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/GMT_UseCase_taxonomy.owl";
 
-	/**
-	 * Path to the folder where all the files used in SAT solving will be created.
-	 */
-	private static String domainPath = "/home/vedran/Desktop/";
-	/**
-	 * Path to the CNF definition file, that will be used as an input for the SAT
-	 * solver.
-	 */
-//	private static String sat_input = domainPath + "sat_input.txt";
-	/**
-	 * Path to the file that will contain the SAT solution, that will be used as an
-	 * output for the SAT solver.
-	 */
-//	private static String sat_output = domainPath + "sat_output.txt";
-	/**
-	 * Path to the file that will contain 1 temporary the solution to the problem in
-	 * human readable representation.
-	 */
-	private static String sat_solution = domainPath + "sat_solution.txt";
 	/**
 	 * Path to the file that will contain all the solutions to the problem in human
 	 * readable representation.
 	 */
-	private static String sat_solutions = domainPath + "sat_solutions.txt";
-
-//	private static String miniSat = "/home/vedran/Documents/minisat/core/minisat";
+	private static String SOLUTION_PATH = "/home/vedran/Desktop/sat_solutions.txt";
 
 	/**
-	 * Length of the automaton.
+	 * Length of the automaton (length of the solutions).
 	 */
-	private static int automata_bound = 7;
+	private static int SOLUTIION_LENGTH = 7;
 	/**
 	 * Output branching factor (max number of outputs per tool).
 	 */
-	private static int branching = 3;
+	private static int MAX_NO_TOOL_OUTPUTS = 3;
 	/**
-	 * True if pipeline approach should be used, false in case of general memory
+	 * {@code true} if THE pipeline approach should be used, {@code false} in case of general memory
 	 * approach.
 	 */
-	private static boolean pipeline = false;
+	private static boolean PILEPINE = false;
 
 	public static void main(String[] args) throws IOException {
 
@@ -94,7 +74,7 @@ public class main {
 		/*
 		 * generate the automaton in CNF
 		 */
-		StaticFunctions.generateAutomaton(moduleAutomaton, typeAutomaton, automata_bound, branching);
+		StaticFunctions.generateAutomaton(moduleAutomaton, typeAutomaton, SOLUTIION_LENGTH, MAX_NO_TOOL_OUTPUTS);
 		
 		/*
 		 * encode the taxonomies as objects - generate the list of all types / modules
@@ -104,7 +84,7 @@ public class main {
 		AllTypes allTypes = new AllTypes();
 
 		try {
-			OWLExplorer.getObjectsFromTaxonomy(taxonomy, allModules, allTypes);
+			OWLExplorer.getObjectsFromTaxonomy(ONTOLOGY_PATH, allModules, allTypes);
 		} catch (OntEDException | IOException | OntEDMissingImportException e) {
 			e.printStackTrace();
 		}
@@ -124,13 +104,13 @@ public class main {
 		 */
 		AllModules annotated_modules = new AllModules(StaticFunctions
 				.readCSV("/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/modules.csv", allModules, allTypes));
-		cnf += annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, pipeline, emptyType, mappings);
+		cnf += annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, PILEPINE, emptyType, mappings);
 
 		/*
 		 * printing the Module and Taxonomy Tree
 		 */
-		allModules.get("ModulesTaxonomy").printTree(" ", allModules);
-		allTypes.get("TypesTaxonomy").printTree(" ", allTypes);
+//		allModules.get("ModulesTaxonomy").printTree(" ", allModules);
+//		allTypes.get("TypesTaxonomy").printTree(" ", allTypes);
 
 		/*
 		 * create constraints on the mutual exclusion and mandatory usage of the tools -
@@ -151,9 +131,14 @@ public class main {
 				mappings);
 
 		/*
+		 * Define set of all constraint formats
+		 */
+		AllConstraintTamplates allConsTemplates = new AllConstraintTamplates();
+		System.out.println(StaticFunctions.initializeConstraints(allConsTemplates ));
+		/*
 		 * encode the constraints from the paper manually
 		 */
-		cnf += StaticFunctions.generateSLTLConstraints(allModules, allTypes, mappings, moduleAutomaton, typeAutomaton);
+		cnf += StaticFunctions.generateSLTLConstraints(allConsTemplates, allModules, allTypes, mappings, moduleAutomaton, typeAutomaton);
 
 		/*
 		 * Counting the number of variables and clauses that will be given to the SAT solver
@@ -164,46 +149,36 @@ public class main {
 		String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
 
 		/*
-		 * Create a temp files that will be used as input and output files for the SAT solver.
+		 * Create a temp file that will be used as input for the SAT solver.
 		 */
-//		File temp_sat_input = File.createTempFile("sat_input-", ".cnf");
-//		File temp_sat_output = File.createTempFile("sat_output-", ".cnf");
-		/*
-		 * Delete both files once the synthesis is over
-		 */
-//		temp_sat_input.deleteOnExit();
-//		temp_sat_output.deleteOnExit();
+		File temp_sat_input = File.createTempFile("sat_input-", ".cnf");
+		temp_sat_input.deleteOnExit();
+		
 		
 		/*
 		 * Fixing the input and output files for easier testing. 
 		 */
-		File temp_sat_input = new File("/home/vedran/Desktop/sat_input.cnf");
 		
 		StaticFunctions.write2file(sat_input_header + cnf, temp_sat_input, false);
 
 		long realStartTime = System.currentTimeMillis();
-		List<SAT_solution> allSolutions = StaticFunctions.solve(temp_sat_input.getAbsolutePath(),  mappings, allModules, allTypes, no_of_solutions);
+		List<SAT_solution> allSolutions = StaticFunctions.solve(temp_sat_input.getAbsolutePath(),  mappings, allModules, allTypes, MAX_NO_SOLUTIONS);
 		long realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
 		System.out.println("\nAPE found " + allSolutions.size() + " solutions. Total solving time: " + (realTimeElapsedMillis / 1000F) + " sec.");
 		
 		/*
-		 * Getting the solution from the solver and finding the rest of the solutions (by negating the obtained solution and adding it as an additional clause for the SAT solver)
+		 * Writing solutions to the specified file in human readable format
 		 */
-		
-
-
-
 		boolean first = false;
 		for (SAT_solution sol : allSolutions) {
-			StaticFunctions.write2file(sol.getRelevantSolution(), new File(sat_solutions), first);
+			StaticFunctions.write2file(sol.getRelevantSolution(), new File(SOLUTION_PATH), first);
 			first = true;
 		}
 
 		/*
-		 * TODO: consider removing permutations, SWL output?
+		 * TODO: use tool multiple times, consider removing permutations, SWL output?
 		 */
 
-		// System.out.println(cnf);
 	}
 
 }
