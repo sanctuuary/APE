@@ -113,6 +113,18 @@ public class Literal implements Comparable<Literal>{
 	}
 	
 	/**
+	 * Returns the negation of the Mapped Literal
+	 * @return Negation of the value of the mapped literal
+	 */
+	public int toNegatedMappedInt() {
+		if (negated) {
+			return Integer.parseInt(mappedAtom);
+		} else {
+			return Integer.parseInt("-" + mappedAtom);
+		}
+	}
+	
+	/**
 	 * Returns TRUE in case the literal is a Module, FALSE in case of the literal being a Type.
 	 * @return boolean TRUE if Literal is a Module
 	 */

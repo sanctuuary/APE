@@ -23,7 +23,7 @@ public class AllConstraintTamplates {
 	/**
 	 * Return the {@code ConstraintTemplate} that corresponds to the given ID.
 	 * @param constraintID - ID of the {@code ConstraintTemplate}.
-	 * @return {@code ConstraintTemplate}.
+	 * @return {@code ConstraintTemplate} or {@code null} if this map contains no mapping for the ID.
 	 */
 	public ConstraintTemplate getConstraintTamplate(Integer constraintID) {
 		return constraintTamplates.get(constraintID);

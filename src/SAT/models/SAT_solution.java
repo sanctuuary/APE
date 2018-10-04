@@ -185,8 +185,34 @@ public class SAT_solution {
 		}
 		return solution + " 0";
 	}
+	
+	
+	/**
+	 * Returns the negated solution in mapped format. Negating the original solution
+	 * created by the SAT solver. Usually used to add to the solver to find new
+	 * solutions.
+	 * 
+	 * @return int[] representing the negated solution
+	 */
+	public int[] getNegatedMappedSolutionArray() {
+		List<Integer> negSol = new ArrayList<>();
+		if (!unsat) {
+			for (Literal literal : literals) {
+				if (!literal.isNegated() && literal.isModule() && (literal.getPredicate() instanceof Module)) {
+					negSol.add(literal.toNegatedMappedInt());
+				}
+			}
+		}
+		int[] negSolList = new int[negSol.size()];
+		for(int i=0;i<negSol.size();i++) {
+			negSolList[i] = negSol.get(i);
+		}
+		
+		return negSolList;
+	}
 
 	/**
+	 * TODO
 	 * Returns all the permutations of the negated solution in mapped format.
 	 * Negating the original solution created by the SAT solver. Usually used to add
 	 * to the solver to find new solutions, by omitting the permutations.

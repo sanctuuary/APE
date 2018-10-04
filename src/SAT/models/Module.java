@@ -128,7 +128,7 @@ public class Module extends AbstractModule {
 		currModule.setModuleInput(inputs);
 		currModule.setModuleOutput(outputs);
 
-		// in case of the tool being instance of the superModule, add it as a sub module
+		// in case of the tool being instance of the superModule, add it as a sub module (enrich the ontology)
 		if (!superModuleID.matches(moduleID)) {
 			AbstractModule superModule = AbstractModule.generateModule(superModuleID, superModuleID, false, allModules);
 			// if the super module is represented as a tool, convert it to abstract module

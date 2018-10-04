@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import SAT.automaton.ModuleAutomaton;
 import SAT.automaton.ModuleState;
@@ -23,9 +24,6 @@ import SAT.automaton.TypeBlock;
 import SAT.automaton.TypeState;
 import SAT.constraints.AllConstraintTamplates;
 import SAT.models.*;
-import de.jabc.plugin.ontEDAPI.Exceptions.OntEDException;
-import de.jabc.plugin.ontEDAPI.Exceptions.OntEDMissingImportException;
-import java_cup.sym;
 
 public class main {
 
@@ -37,14 +35,21 @@ public class main {
 	/**
 	 * Path to the taxonomy file
 	 */
-	private static String ONTOLOGY_PATH = "file:/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/GMT_UseCase_taxonomy.owl";
+	private static String ONTOLOGY_PATH = "/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/GMT_UseCase_taxonomy.owl";
 
+	private static String TOOL_ANNOTATIONS_PATH = "/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/modules.csv";
 	/**
 	 * Path to the file that will contain all the solutions to the problem in human
 	 * readable representation.
 	 */
 	private static String SOLUTION_PATH = "/home/vedran/Desktop/sat_solutions.txt";
+	private static String SOLUTION_PATH2 = "/home/vedran/Desktop/sat_solutionsFull.txt";
 
+	/**
+	 * Path to the file with all workflow constraints.
+	 */
+	private static String CONSTRAINTS_PATH = "/home/vedran/Desktop/constraints.csv"
+;	
 	/**
 	 * Length of the automaton (length of the solutions).
 	 */
@@ -77,17 +82,21 @@ public class main {
 		StaticFunctions.generateAutomaton(moduleAutomaton, typeAutomaton, SOLUTIION_LENGTH, MAX_NO_TOOL_OUTPUTS);
 		
 		/*
-		 * encode the taxonomies as objects - generate the list of all types / modules
+		 * encode the taxonomies as objects - generate the list of all types / modules occurring in the
+		 * taxonomies defining their submodules/subtypes
 		 */
 
 		AllModules allModules = new AllModules();
 		AllTypes allTypes = new AllTypes();
 
+		OWLReader owlReader = new OWLReader(ONTOLOGY_PATH, allModules, allTypes);
 		try {
-			OWLExplorer.getObjectsFromTaxonomy(ONTOLOGY_PATH, allModules, allTypes);
-		} catch (OntEDException | IOException | OntEDMissingImportException e) {
+			Boolean ontologyFormat = owlReader.readOntology();		//true if ontology was well-formatted
+		} catch (OWLOntologyCreationException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}			
+		
 
 		AbstractModule rootModule = allModules.get("ModulesTaxonomy");
 		Type rootType = allTypes.get("TypesTaxonomy");
@@ -95,22 +104,21 @@ public class main {
 		/*
 		 * Define the empty type, representing the absence of types
 		 */
-
 		Type emptyType = Type.generateType("empty", "empty", true, allTypes);
 		rootType.addSubType(emptyType.getTypeID());
 
 		/*
-		 * create constraints from the module.csv file
+		 * create constraints from the module.csv file and update allModules and allTypes sets
 		 */
 		AllModules annotated_modules = new AllModules(StaticFunctions
-				.readCSV("/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/modules.csv", allModules, allTypes));
+				.readModuleCSV(TOOL_ANNOTATIONS_PATH, allModules, allTypes));
 		cnf += annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, PILEPINE, emptyType, mappings);
 
 		/*
 		 * printing the Module and Taxonomy Tree
 		 */
-//		allModules.get("ModulesTaxonomy").printTree(" ", allModules);
-//		allTypes.get("TypesTaxonomy").printTree(" ", allTypes);
+		allModules.get("ModulesTaxonomy").printTree(" ", allModules);
+		allTypes.get("TypesTaxonomy").printTree(" ", allTypes);
 
 		/*
 		 * create constraints on the mutual exclusion and mandatory usage of the tools -
@@ -138,7 +146,7 @@ public class main {
 		/*
 		 * encode the constraints from the paper manually
 		 */
-		cnf += StaticFunctions.generateSLTLConstraints(allConsTemplates, allModules, allTypes, mappings, moduleAutomaton, typeAutomaton);
+		cnf += StaticFunctions.generateSLTLConstraints(CONSTRAINTS_PATH, allConsTemplates, allModules, allTypes, mappings, moduleAutomaton, typeAutomaton);
 
 		/*
 		 * Counting the number of variables and clauses that will be given to the SAT solver
@@ -170,8 +178,13 @@ public class main {
 		 * Writing solutions to the specified file in human readable format
 		 */
 		boolean first = false;
+//		for (SAT_solution sol : allSolutions) {
+//			StaticFunctions.write2file(sol.getSolution() + "\n\n", new File(SOLUTION_PATH2), first);
+//			first = true;
+//		}
+		first = false;
 		for (SAT_solution sol : allSolutions) {
-			StaticFunctions.write2file(sol.getRelevantSolution(), new File(SOLUTION_PATH), first);
+			StaticFunctions.write2file(sol.getRelevantSolution() + "\n", new File(SOLUTION_PATH), first);
 			first = true;
 		}
 
