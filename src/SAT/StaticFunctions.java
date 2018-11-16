@@ -13,6 +13,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.reader.DimacsReader;
@@ -92,12 +95,10 @@ public class StaticFunctions {
 						parameters.add(currConstr[i]);
 					}
 				}
-				cnf_SLTL += code_function(constraintID, parameters.toArray(new String[parameters.size()]), allConsTemplates, allModules, allTypes,
-						moduleAutomaton, typeAutomaton, mappings);
+				cnf_SLTL += code_function(constraintID, parameters.toArray(new String[parameters.size()]),
+						allConsTemplates, allModules, allTypes, moduleAutomaton, typeAutomaton, mappings);
 			}
 		}
-
-		
 
 		// /*
 		// * Constraint E2: Use Add_table in the synthesis
@@ -331,8 +332,9 @@ public class StaticFunctions {
 			AllTypes allTypes, int no_of_solutions) {
 		List<SAT_solution> solutions = new ArrayList<>();
 		ISolver solver = SolverFactory.newDefault();
-//		ISolver solver = new ModelIterator(SolverFactory.newDefault(), no_of_solutions); // iteration through at most
-																							// no_of_solutions solutions
+		// ISolver solver = new ModelIterator(SolverFactory.newDefault(),
+		// no_of_solutions); // iteration through at most
+		// no_of_solutions solutions
 		solver.setTimeout(3600); // 1 hour timeout
 		Reader reader = new DimacsReader(solver);
 		try {
@@ -385,7 +387,7 @@ public class StaticFunctions {
 
 		List<Module> modulesNew = new ArrayList<Module>();
 
-		for(String[] stringModule : getTuplesFromCSV(file)) {
+		for (String[] stringModule : getTuplesFromCSV(file)) {
 			modulesNew.add(Module.moduleFromString(stringModule, allModules, allTypes));
 		}
 
@@ -426,6 +428,145 @@ public class StaticFunctions {
 				tmpTypeBlock.addState(tmpTypeState);
 			}
 			typeAutomaton.addBlock(tmpTypeBlock);
+		}
+	}
+
+	/**
+	 * Method checks whether the provided path is a valid file path with required
+	 * writing permissions.
+	 * 
+	 * @param tag
+	 *            - corresponding tag from the config file
+	 * @param path
+	 *            - path to the file
+	 * @return {@code true} if the file exists or can be created, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean isValidConfigWriteFile(String tag, String path) {
+		if (path == null || path == "") {
+			System.err.println("Tag <" + tag + "> in the configuration file is not provided correctly.");
+			return false;
+		}
+		File f = new File(path);
+		if (f.isDirectory()) {
+			System.err.println("Tag <" + tag + ">:\nProvided path: \"" + path + "\" is a directory.");
+			return false;
+		} else {
+			if (!f.getParentFile().isDirectory()) {
+				System.err.println("Tag <" + tag + ">:\nProvided path: \"" + path + "\" is not a valid path.");
+				return false;
+			} else {
+				if (!f.canWrite() && !f.getParentFile().canWrite()) {
+					System.err.println(
+							"Tag <" + tag + ">:\nProvided path: \"" + path + "\" is missing the writing permission.");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Method checks whether the provided path corresponds to an existing file with
+	 * required reading permissions.
+	 * 
+	 * @param tag
+	 *            - corresponding tag from the config file
+	 * @param path
+	 *            - path to the file
+	 * @return {@code true} if the file exists and can be read, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean isValidConfigReadFile(String tag, String path) {
+		if (path == null || path == "") {
+			System.err.println("Tag <" + tag + "> in the configuration file is not provided correctly.");
+			return false;
+		}
+		File f = new File(path);
+		if (!f.isFile()) {
+			System.err.println("Tag <" + tag + ">:\nProvided path: \"" + path + "\" is not a file.");
+			return false;
+		} else {
+			if (!f.canRead()) {
+				System.err.println(
+						"Tag <" + tag + ">:\nProvided file: \"" + path + "\" is missing the reading permission.");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Method checks whether the provided path corresponds to an existing file with
+	 * required reading permissions.
+	 * 
+	 * @param path
+	 *            - path to the file
+	 * @return {@code true} if the file exists and can be read, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean isValidReadFile(String path) {
+		if (path == null || path == "") {
+			System.err.println("Path is not provided correctly.");
+			return false;
+		}
+		File f = new File(path);
+		if (!f.isFile()) {
+			System.err.println("Provided path: \"" + path + "\" is not a file.");
+			return false;
+		} else {
+			if (!f.canRead()) {
+				System.err.println("Provided file: \"" + path + "\" is missing the reading permission.");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Method checks whether the provided string represent an integer number, and
+	 * return the number if it does
+	 * 
+	 * @param stringNumber
+	 *            - provided string
+	 * @return Integer number represented with the string, {@code null} in case of a
+	 *         bad String format.
+	 */
+	public static Integer isValidConfigInt(String tag, String stringNumber) {
+		if (stringNumber == null || stringNumber == "") {
+			System.err.println("Tag <" + tag + "> in the configuration file is not provided correctly.");
+			return null;
+		} else if (!StringUtils.isNumeric(stringNumber)) {
+			System.err.println(
+					"Tag <" + tag + ">:\nProvided number: \"" + stringNumber + "\" is not in a correct format.");
+			return null;
+		}
+
+		return Integer.parseInt(stringNumber);
+	}
+
+	/**
+	 * Method checks whether the provided string represent a boolean value, and
+	 * return the boolean if it does
+	 * 
+	 * @param stringBool
+	 *            - provided string
+	 * @return Boolean value represented with the string, {@code null} in case of a
+	 *         bad boolean format.
+	 */
+	public static Boolean isValidConfigBoolean(String tag, String stringBool) {
+		if (stringBool == null || stringBool == "") {
+			System.err.println("Tag <" + tag + "> in the configuration file is not provided correctly.");
+			return null;
+		} else {
+			Boolean boolVal = BooleanUtils.toBooleanObject(stringBool);
+			if (boolVal == null) {
+				System.err.println(
+						"Tag <" + tag + ">:\nProvided boolean value: \"" + stringBool + "\" is not in a correct format.");
+				return null;
+			} else {
+				return boolVal;
+			}
 		}
 	}
 

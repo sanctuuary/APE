@@ -11,11 +11,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="jar/com.thoughtworks.xstream.jar"/>
-	<classpathentry kind="lib" path="jar/org.semanticweb.owl.owlapi-3.4.4.jar"/>
-	<classpathentry kind="lib" path="jar/owlapi-osgidistribution-4.1.0.jar"/>
-	<classpathentry kind="lib" path="jar/owlapi-src.jar"/>
-	<classpathentry kind="lib" path="jar/org-apache-commons-lang.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

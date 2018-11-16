@@ -29,9 +29,9 @@ import SAT.models.Type;
  */
 public class OWLReader {
 
-	private static String ONTOLOGY_PATH;
+	private final String ONTOLOGY_PATH;
 	private final AllModules allModules;
-	private AllTypes allTypes;
+	private final AllTypes allTypes;
 
 	/**
 	 * Setting up the reader that will populate the provided module and type sets
@@ -50,20 +50,6 @@ public class OWLReader {
 		this.allTypes = allTypes;
 	}
 
-	public static void main(String[] args) {
-		AllModules allModules = new AllModules();
-		AllTypes allTypes = new AllTypes();
-		String path = "/home/vedran/Dropbox/PhD/GEO_project/UseCase_Paper/GMT_UseCase_taxonomy.owl";
-		OWLReader curr = new OWLReader(path, allModules, allTypes);
-		try {
-			curr.readOntology();
-		} catch (OWLOntologyCreationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
 	/**
 	 * Method used to read separately <b>ModulesTaxonomy</b> and
 	 * <b>TypesTaxonomy</b> part of the ontology.
@@ -73,10 +59,22 @@ public class OWLReader {
 	 * @return {@code true} is the ontology was read correctly, {@code false}
 	 *         otherwise.
 	 */
-	public boolean readOntology() throws OWLOntologyCreationException {
+	public boolean readOntology() {
 
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		final OWLOntology ontology = manager.loadOntologyFromOntologyDocument(new File(ONTOLOGY_PATH));
+		OWLOntology ontology = null;
+		try {
+			File tempOntology = new File(ONTOLOGY_PATH);
+			if (tempOntology.exists()) {
+				ontology = manager.loadOntologyFromOntologyDocument(tempOntology);
+			} else {
+				System.err.println("Provided ontology does not exist.");
+				return false;
+			}
+		} catch (OWLOntologyCreationException e) {
+			System.err.println("Ontology is not properly provided.");
+			return false;
+		}
 		OWLClass thingClass = manager.getOWLDataFactory().getOWLThing();
 		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
@@ -86,7 +84,6 @@ public class OWLReader {
 		OWLClass moduleClass = getModuleClass(subClasses);
 		OWLClass typeClass = getTypeClass(subClasses);
 
-		
 		if (moduleClass != null) {
 			exploreModuleOntologyRec(reasoner, ontology, moduleClass, thingClass);
 		} else {
