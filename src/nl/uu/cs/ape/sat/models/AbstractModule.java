@@ -12,15 +12,18 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
  * @author Vedran Kasalica
  *
  */
-public class AbstractModule implements Predicate {
+public class AbstractModule extends Predicate {
 
 	private String moduleName;
 	private String moduleID;
-	// set of all the modules that are subsumed by the abstract module (null if the
-	// module is a tool)
+	/**
+	 *  Set of all the modules that are subsumed by the abstract module (null if the module is a tool)
+	 */
 	private Set<String> subModules;
-	// represents whether the module is a tool/leaf or simply an abstract module
-	private boolean isTool;
+	/**
+	 * Describes the data node in from the taxonomy. The type can represent a root type, subroot type, an abstract or a simple (implemented leaf) type, or be an empty type.
+	 */
+	private NodeType nodeType;
 
 	/**
 	 * Creates an abstract module from @moduleName and @moduleID. If @isTool is
@@ -33,13 +36,13 @@ public class AbstractModule implements Predicate {
 	 * @param isTool
 	 *            - determines whether the module represents a tool
 	 */
-	public AbstractModule(String moduleName, String moduleID, boolean isTool) {
-		super();
+	public AbstractModule(String moduleName, String moduleID, String rootNode, NodeType nodeType) {
+		super(rootNode, nodeType);
 		this.moduleName = moduleName;
 		this.moduleID = moduleID;
-		this.isTool = isTool;
-		if (!isTool)
+		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			this.subModules = new HashSet<String>();
+		}
 	}
 
 	/**
@@ -47,16 +50,16 @@ public class AbstractModule implements Predicate {
 	 * for combining Module and AbstractModule objects
 	 * 
 	 * @param abstractModule
-	 *            - abstract module that is being coppied
+	 *            - abstract module that is being copied
 	 * @param isTool
 	 *            - determines whether the module represents a tool
 	 */
-	public AbstractModule(AbstractModule abstractModule, boolean isTool) {
-		super();
+	public AbstractModule(AbstractModule abstractModule, NodeType nodeType) {
+		super(abstractModule.getRootNode(), (nodeType != null) ? nodeType : abstractModule.getNodeType());
 		this.moduleName = abstractModule.getModuleName();
 		this.moduleID = abstractModule.getModuleID();
-		this.isTool = isTool;
-		if (!isTool) {
+		
+		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			this.subModules = abstractModule.getSubModules();
 			if (this.subModules == null) {
 				this.subModules = new HashSet<String>();
@@ -86,11 +89,20 @@ public class AbstractModule implements Predicate {
 	 * @return true if the (abstract) module represent an actual tool
 	 */
 	public boolean isTool() {
-		return isTool;
+		return this.nodeType == NodeType.LEAF;
+	}
+	
+	/**
+	 * True if the module is the root module, false otherwise.
+	 * 
+	 * @return true if the (abstract) module represent the root module
+	 */
+	public boolean isRoot() {
+		return this.nodeType == NodeType.ROOT;
 	}
 
-	public void setIsTool(boolean isTool) {
-		this.isTool = isTool;
+	public void setToTool() {
+		this.nodeType = NodeType.LEAF;
 	}
 
 	/**
@@ -98,7 +110,7 @@ public class AbstractModule implements Predicate {
 	 * 
 	 * @return null
 	 */
-	public List<Type> getModuleInput() {
+	public List<Types> getModuleInput() {
 		return null;
 	}
 
@@ -107,7 +119,7 @@ public class AbstractModule implements Predicate {
 	 * 
 	 * @return null
 	 */
-	public List<Type> getModuleOutput() {
+	public List<Types> getModuleOutput() {
 		return null;
 	}
 
@@ -139,7 +151,7 @@ public class AbstractModule implements Predicate {
 	public String getType() {
 		return "abstract module";
 	}
-
+	
 	/**
 	 * Adds a submodule to an abstract/non-tool module, if it was not added present
 	 * already.
@@ -149,7 +161,7 @@ public class AbstractModule implements Predicate {
 	 * @return True if submodule was added, false otherwise.
 	 */
 	public boolean addSubModule(AbstractModule module) {
-		if (!isTool) {
+		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			subModules.add(module.getModuleID());
 			return true;
 		} else {
@@ -166,7 +178,7 @@ public class AbstractModule implements Predicate {
 	 * @return True if submodule was added, false otherwise.
 	 */
 	public boolean addSubModule(String moduleID) {
-		if (!isTool) {
+		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			return subModules.add(moduleID);
 		} else {
 			System.err.println("Cannot add submodules to a tool/leaf module!");
@@ -209,9 +221,9 @@ public class AbstractModule implements Predicate {
 	 *            - set of all the modules created so far
 	 * @return the Abstract Module representing the item.
 	 */
-	public static AbstractModule generateModule(String moduleName, String moduleID, boolean isTool,
+	public static AbstractModule generateModule(String moduleName, String moduleID, String rootNode, NodeType nodeType,
 			AllModules allModules) {
-		return allModules.addModule(new AbstractModule(moduleName, moduleID, isTool));
+		return allModules.addModule(new AbstractModule(moduleName, moduleID, rootNode, nodeType));
 	}
 
 	/**
@@ -221,7 +233,7 @@ public class AbstractModule implements Predicate {
 	 * @param allModules - set of all the modules
 	 */
 	public void printTree(String str, AllModules allModules) {
-		System.out.println(str + printShort());
+		System.out.println(str + printShort() + "[" + getNodeType()+ "]");
 		if (subModules != null)
 			for (String moduleID : subModules) {
 				allModules.get(moduleID).printTree(str + " > ", allModules);

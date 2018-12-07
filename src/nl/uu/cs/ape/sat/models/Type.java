@@ -11,30 +11,36 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
 
 /**
  * 
- * The {@code Type} class represents data types/formats that can be used by our tools. {@code Types} can be actual data types or their abstraction classes.
+ * The {@code Type} class represents data types/formats that can be used by our
+ * tools. {@code Types} can be actual data types or their abstraction classes.
  * 
  * @author Vedran Kasalica
  *
  */
-public class Type implements Predicate {
+
+public class Type extends Predicate {
 
 	private String typeName;
 	private String typeID;
-	// set of subtypes, null in case of a simple type
+	/**
+	 * Set of subtypes, null in case of a simple type or an empty type
+	 */
 	private Set<String> subTypes;
-	// represents whether the type is a simple/leaf type. If false the type is an
-	// abstract (non-leaf) type.
-	private boolean simpleType;
 
-	public Type(String typeName, String typeID, boolean simpleType) {
-		super();
+	public Type(String typeName, String typeID, String rootNode, NodeType nodeType) {
+		super(rootNode, nodeType);
 		this.typeName = typeName;
 		this.typeID = typeID;
-		this.simpleType = simpleType;
-		if (!simpleType) {
+//		if (typeName.matches(APEConfig.getConfig().getTYPE_TAXONOMY_ROOT())) {
+//			this.rootType = true;
+//		} else {
+//			this.rootType = false;
+//		}
+		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			this.subTypes = new HashSet<String>();
 		}
 	}
+
 
 	public String getTypeName() {
 		return typeName;
@@ -65,12 +71,11 @@ public class Type implements Predicate {
 	/**
 	 * Adds a subtype to a non-simple type.
 	 * 
-	 * @param type
-	 *            - type that will be added as a subclass
+	 * @param type - type that will be added as a subclass
 	 * @return True if subtype was added, false otherwise.
 	 */
 	public boolean addSubType(Type type) {
-		if (!simpleType) {
+		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			subTypes.add(type.getTypeID());
 			return true;
 		} else {
@@ -82,12 +87,11 @@ public class Type implements Predicate {
 	/**
 	 * Adds a subtype to a non-simple type, if it was not added present already.
 	 * 
-	 * @param typeID
-	 *            - ID of the type that will be added as a subclass
+	 * @param typeID - ID of the type that will be added as a subclass
 	 * @return True if subtype was added, false otherwise.
 	 */
 	public boolean addSubType(String typeID) {
-		if (!simpleType) {
+		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			return subTypes.add(typeID);
 		} else {
 			System.err.println("Cannot add subtypes to a simpleType!");
@@ -98,7 +102,7 @@ public class Type implements Predicate {
 	/**
 	 * Returns the list of the types that are directly subsumed by the type.
 	 * 
-	 * @return List of the subtypes or null in case of a simple/leaf type
+	 * @return List of the subtypes or null in case of a simple/leaf type or an empty type
 	 */
 	public Set<String> getSubTypes() {
 		return subTypes;
@@ -122,11 +126,62 @@ public class Type implements Predicate {
 	 * @return true (simple/leaf type) or false (abstract/non-leaf type)
 	 */
 	public boolean isSimpleType() {
-		return simpleType;
+		return this.nodeType == NodeType.LEAF;
 	}
 
-	public void setSimpleType(boolean isSimpleType) {
-		this.simpleType = isSimpleType;
+	/**
+	 * Returns true if the type is an empty type, otherwise returns false - the type
+	 * is an actual (abstract or non-abstract) type.
+	 * 
+	 * @return true (empty type) or false (implemented type)
+	 */
+	public boolean isEmptyType() {
+		return this.nodeType == NodeType.EMPTY;
+	}
+
+	/**
+	 * Returns true if the type the root type, otherwise returns false - the type is
+	 * not the root node of the taxonomy
+	 * 
+	 * @return true (root node) or false (non-root node)
+	 */
+	public boolean isRootType() {
+		return this.nodeType == NodeType.ROOT;
+	}
+	
+	/**
+	 * Returns true if the type the sub-root type, otherwise returns false - the type is
+	 * not the sub-root node of the taxonomy
+	 * 
+	 * @return true (sub-root node) or false (non-root node)
+	 */
+	public boolean isSubRootType() {
+		return this.nodeType == NodeType.SUBROOT;
+	}
+
+	/**
+	 * Set whether the type is a simple type or not.
+	 * 
+	 * @param isSimpleType determines the truth value of the {@link Type#simpleType
+	 *                     simpleType} variable.
+	 */
+	public void setToSimpleType() {
+		this.nodeType = NodeType.LEAF;
+	}
+	
+	/**
+	 * Returns the type of the data node, based on the taxonomy.
+	 * @return The node type object
+	 */
+	public NodeType getNodeType() {
+		return this.nodeType;
+	}
+	
+	/**
+	 * Sets the type of the data node, based on the taxonomy.
+	 */
+	public void setNodeType(NodeType nodeType) {
+		this.nodeType = nodeType;
 	}
 
 	/**
@@ -134,21 +189,17 @@ public class Type implements Predicate {
 	 * introduced earlier on in allTypes. In case it was, it returns the item,
 	 * otherwise the new element is generated and returned.
 	 * 
-	 * @param typeName
-	 *            - type name
-	 * @param typeID
-	 *            - unique type identifier
-	 * @param simpleType
-	 *            - determines whether the type is a simple/leaf type
-	 * @param allTypes
-	 *            - set of all the types created so far
+	 * @param typeName   - type name
+	 * @param typeID     - unique type identifier
+	 * @param simpleType - determines whether the type is a simple/leaf type
+	 * @param allTypes   - set of all the types created so far
 	 * @return the Type representing the item.
 	 */
-	public static Type generateType(String typeName, String typeID, boolean simpleType, AllTypes allTypes) {
+	public static Type generateType(String typeName, String typeID, String rootType, NodeType nodeType,  AllTypes allTypes) {
 
 		Type tmpType;
 		if ((tmpType = allTypes.get(typeID)) == null) {
-			tmpType = new Type(typeName, typeID, simpleType);
+			tmpType = new Type(typeName, typeID, rootType, nodeType);
 			allTypes.addType(tmpType);
 		}
 		return tmpType;
@@ -158,11 +209,13 @@ public class Type implements Predicate {
 	/**
 	 * Print the tree shaped representation of the type taxonomy
 	 * 
-	 * @param str - string that is helping the recursive function to distinguish between the tree levels
+	 * @param str      - string that is helping the recursive function to
+	 *                 distinguish between the tree levels
 	 * @param allTypes - set of all the types
 	 */
 	public void printTree(String str, AllTypes allTypes) {
 		System.out.println(str + print());
+
 		if (subTypes != null)
 			for (String typeID : subTypes) {
 				allTypes.get(typeID).printTree(str + "   ", allTypes);
@@ -171,9 +224,9 @@ public class Type implements Predicate {
 
 	private String print() {
 		if (isSimpleType()) {
-			return typeID + "[S]";
+			return typeID + "["+getNodeType()+"]";
 		} else {
-			return typeID;
+			return typeID + "["+getNodeType()+"]";
 		}
 	}
 

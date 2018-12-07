@@ -198,6 +198,8 @@ public class SAT_solution {
 		List<Integer> negSol = new ArrayList<>();
 		if (!unsat) {
 			for (Literal literal : literals) {
+				if(!literal.isNegated())
+				System.out.println(literal.getPredicate().getPredicate() + "\t is N:" + literal.isNegated() + ", is module:" + literal.isModule() + ", Module: " +(literal.getPredicate() instanceof Module));
 				if (!literal.isNegated() && literal.isModule() && (literal.getPredicate() instanceof Module)) {
 					negSol.add(literal.toNegatedMappedInt());
 				}

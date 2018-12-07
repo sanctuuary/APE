@@ -1,6 +1,5 @@
 package nl.uu.cs.ape.sat.models.constructs;
 
-import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
@@ -32,49 +31,21 @@ public class Literal implements Comparable<Literal>{
 		
 		String atom = atomMapping.findOriginal(Integer.parseInt(mappedAtom)).trim();
 		
-		String[] parts = atom.split("\\(");
-
-		predicate = allModules.get(parts[0]);
+		int splitIndex = atom.lastIndexOf("(");
+		String predicateStr = atom.substring(0, splitIndex);
+		predicate = allModules.get(predicateStr);
 		if (predicate == null) {
 			isModule = false;
-			predicate = allTypes.get(parts[0]);
+			predicate = allTypes.get(predicateStr);
 			if (predicate == null) {
-				System.out.println("Literal with predicate " + parts[0] + " was not defined.");
+				System.out.println("Literal over predicate: " + predicateStr + " was not defined. Error while scanning the predicate: " + atom);
 			}
 		} else {
 			isModule = true;
 		}
-		attribute = parts[1].substring(0, parts[1].length() - 1);
+		attribute = atom.substring(splitIndex + 1, atom.length() - 1);
 	}
 	
-//	public Literal(String mappedLiteral, AtomMapping atomMapping, AllModules allModules, AllTypes allTypes) {
-//		String atom;
-//		String literal = atomMapping.findOriginal(mappedLiteral);
-//		String trimLiteral = literal.trim();
-//		
-//		if (trimLiteral.startsWith("-")) {
-//			negated = true;
-//			atom = trimLiteral.substring(1);
-//		} else {
-//			negated = false;
-//			atom = trimLiteral;
-//		}
-//		String[] parts = atom.split("\\(");
-//
-//		predicate = allModules.get(parts[0]);
-//		if (predicate == null) {
-//			isModule = false;
-//			predicate = allTypes.get(parts[0]);
-//			if (predicate == null) {
-//				System.out.println("Literal with predicate " + parts[0] + " was not defined.");
-//			}
-//		} else {
-//			isModule = true;
-//		}
-//		attribute = parts[1].substring(0, parts[1].length() - 1);
-//	}
-	
-
 	/**
 	 * Returns the Original (human readable) value of the literal
 	 *  @return The value of the original literal

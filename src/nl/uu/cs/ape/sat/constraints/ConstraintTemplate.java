@@ -19,7 +19,7 @@ import nl.uu.cs.ape.sat.models.AtomMapping;
 public abstract class ConstraintTemplate {
 
 	/**
-	 * Constraint ID.
+	 * Constraint ID - currently not used field.
 	 */
 	int constraintID;
 	/**

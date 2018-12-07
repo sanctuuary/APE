@@ -57,13 +57,21 @@ where the number of parameters depends on the constraint specified. Constrains t
 ### Constraint formats
 
 ID: 1___desc: If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> consequently.___no. of parameters: 2
+
 ID: 2___desc: If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b> consequently.___no. of parameters: 2
+
 ID: 3___desc: If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it.___no. of parameters: 2
+
 ID: 4___desc: If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a next module in the sequence.___no. of parameters: 2
+
 ID: 5___desc: Use module <b>parameters[0]</b> in the solution.___no. of parameters: 2
+
 ID: 6___desc: Do not use module <b>parameters[0]</b> in the solution.___no. of parameters: 2
+
 ID: 7___desc: Use <b>parameters[0]</b> as last module in the solution.___no. of parameters: 2
+
 ID: 8___desc: Use type <b>parameters[0]</b> in the solution.___no. of parameters: 2
+
 ID: 9___desc: Do not use type <b>parameters[0]</b> in the solution.___no. of parameters: 2
 
 ## Contribute
@@ -78,3 +86,15 @@ Give proper credits. This could be a link to any repo which inspired you to buil
 A short snippet describing the license (MIT, Apache etc)
 
 MIT © [Yourname]()
+
+####Dependencies
+
+**OWL API**	-	LGPL or Apache 2.0
+
+**OpenCSV**	-	Apache 2.0
+
+**SAT4J**	-	EPL or GNu LGPL
+
+**apache-common-lang**	-	Apache 2.0
+
+**DOM4J**-	BSD

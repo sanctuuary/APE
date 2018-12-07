@@ -16,6 +16,14 @@ import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Node;
+import org.dom4j.io.SAXReader;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.io.parsers.ParserException;
+import org.logicng.io.parsers.PropositionalParser;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.reader.DimacsReader;
@@ -43,6 +51,13 @@ import nl.uu.cs.ape.sat.models.*;
  */
 public class StaticFunctions {
 
+	private static String ROOT_XML_path = "/functions/function";
+
+	/**
+	 * Return the list of all the tuples in the CSV.
+	 * @param csvFile
+	 * @return
+	 */
 	public static List<String[]> getTuplesFromCSV(String csvFile) {
 
 		List<String[]> constraints = new ArrayList<>();
@@ -61,7 +76,7 @@ public class StaticFunctions {
 
 		return constraints;
 	}
-
+	
 	/**
 	 * Returns the CNF representation of the SLTL constraints in our project
 	 * 
@@ -392,6 +407,52 @@ public class StaticFunctions {
 		}
 
 		return modulesNew;
+	}
+	
+	public static List<Module> readModuleXML(String file, AllModules allModules, AllTypes allTypes) {
+		List<Module> modulesNew = new ArrayList<Module>();
+
+		for (Node xmlModule : getFunctionsFromXML(file)) {
+			modulesNew.add(Module.moduleFromXML(xmlModule, allModules, allTypes));
+		}
+
+		return modulesNew;
+	}
+	
+	/**
+	 * Transforms the propositional formula into the CNF form.
+	 * @param propositionalFormula - propositional formula
+	 * @return CNF representation of the formula
+	 */
+	public static String convert2CNF(String propositionalFormula) {
+		final FormulaFactory f = new FormulaFactory();
+		final PropositionalParser p = new PropositionalParser(f);
+		Formula formula;
+		try {
+			formula = p.parse(propositionalFormula.replace('-', '~'));
+			final Formula cnf = formula.cnf();
+//			final Formula nnf = formula.nnf();
+//			System.out.println("Old: #" + cnf.toString() + "#");
+//			System.out.println("New: #" + cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ").replace("(", "").replace(")",  " 0\n") + "#");
+			return cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ").replace("(", "").replace(")",  "") + " 0\n";
+		} catch (ParserException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+	
+	public static List<Node> getFunctionsFromXML(String xmlPath){
+		SAXReader reader = new SAXReader();
+		Document document;
+		try {
+			document = reader.read(xmlPath);
+			List<Node> functionList = document.selectNodes(ROOT_XML_path);
+			return functionList;
+		} catch (DocumentException e) {
+			System.err.println("Error parsing the XML file: " + xmlPath);
+			return null;
+		}
 	}
 
 	/**
