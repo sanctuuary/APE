@@ -30,13 +30,14 @@ public class APEConfig {
 	private final String CONFIGURATION_FILE = "ape.configuration";
 	private final String ONTOLOGY_TAG = "ontology_path";
 	private final String MODULE_ONTOLOGY_TAG = "modulesTaxonomyRoot";
-	private final String DATA_ONTOLOGY_TAG = "dataTaxonomyRoot";
+	private final String TYPE_ONTOLOGY_TAG = "typeTaxonomyRoot";
 	private final String TOOL_ANNOTATIONS_TAG = "tool_annotations_path";
 	private final String CONSTRAINTS_TAG = "constraints_path";
 	private final String SOLUTION_TAG = "solutions_path";
 	private final String SOLUTIION_MIN_LENGTH_TAG = "solution_min_length";
 	private final String PILEPINE_TAG = "pipeline";
 	private final String MAX_NO_SOLUTIONS_TAG = "max_solutions";
+	private final String NO_EXECUTIONS_TAG = "executions";
 
 	/*
 	 * Max number of solution that the solver will return.
@@ -52,13 +53,13 @@ public class APEConfig {
 	 * Nodes in the ontology that correspond to the roots of module and data
 	 * taxonomies.
 	 */
-	private String MODULE_TAXONOMY_ROOT, DATA_TAXONOMY_ROOT;
+	private String MODULE_TAXONOMY_ROOT, TYPE_TAXONOMY_ROOT;
 	
 	/**
 	 * List of nodes in the ontology that correspond to the roots of data type and data format
 	 * taxonomies.
 	 */
-	private List<String> DATA_SUB_ROOTS = new ArrayList<>();
+	private List<String> TYPE_SUB_ROOTS = new ArrayList<>();
 
 	private String TOOL_ANNOTATIONS_PATH;
 	/**
@@ -84,6 +85,11 @@ public class APEConfig {
 	 * of general memory approach.
 	 */
 	private Boolean PILEPINE;
+	
+	/**
+	 * Number of the workflow solutions that should be executed. Default is {@code null}.
+	 */
+	private Integer NO_EXECUTIONS;;
 
 	/**
 	 * Configurations used to read/update the "ape.configuration" file.
@@ -136,46 +142,51 @@ public class APEConfig {
 			return false;
 		}
 
-		Node dataTaxonomy = configNode.selectSingleNode(DATA_ONTOLOGY_TAG);
-		DATA_TAXONOMY_ROOT = dataTaxonomy.valueOf("@value");
-		if (DATA_TAXONOMY_ROOT == null || DATA_TAXONOMY_ROOT == "") {
+		Node dataTaxonomy = configNode.selectSingleNode(TYPE_ONTOLOGY_TAG);
+		this.TYPE_TAXONOMY_ROOT = dataTaxonomy.valueOf("@value");
+		if (TYPE_TAXONOMY_ROOT == null || this.TYPE_TAXONOMY_ROOT == "") {
 			return false;
 		}
 		
 		for(Node dataSubRoots: dataTaxonomy.selectNodes("*")) {
-			DATA_SUB_ROOTS.add(dataSubRoots.valueOf("@value"));
+			TYPE_SUB_ROOTS.add(dataSubRoots.valueOf("@value"));
 		}
 
-		TOOL_ANNOTATIONS_PATH = configNode.selectSingleNode(TOOL_ANNOTATIONS_TAG).valueOf("@value");
-		if (!StaticFunctions.isValidConfigReadFile(TOOL_ANNOTATIONS_TAG, TOOL_ANNOTATIONS_PATH)) {
+		this.TOOL_ANNOTATIONS_PATH = configNode.selectSingleNode(TOOL_ANNOTATIONS_TAG).valueOf("@value");
+		if (!StaticFunctions.isValidConfigReadFile(TOOL_ANNOTATIONS_TAG, this.TOOL_ANNOTATIONS_PATH)) {
 			return false;
 		}
 
-		CONSTRAINTS_PATH = configNode.selectSingleNode(CONSTRAINTS_TAG).valueOf("@value");
-		if (!StaticFunctions.isValidConfigReadFile(CONSTRAINTS_TAG, CONSTRAINTS_PATH)) {
+		this.CONSTRAINTS_PATH = configNode.selectSingleNode(CONSTRAINTS_TAG).valueOf("@value");
+		if (!StaticFunctions.isValidConfigReadFile(CONSTRAINTS_TAG, this.CONSTRAINTS_PATH)) {
 			return false;
 		}
 
-		SOLUTION_PATH = configNode.selectSingleNode(SOLUTION_TAG).valueOf("@value");
-		if (!StaticFunctions.isValidConfigWriteFile(SOLUTION_TAG, SOLUTION_PATH)) {
+		this.SOLUTION_PATH = configNode.selectSingleNode(SOLUTION_TAG).valueOf("@value");
+		if (!StaticFunctions.isValidConfigWriteFile(SOLUTION_TAG, this.SOLUTION_PATH)) {
 			return false;
 		}
 
-		SOLUTIION_MIN_LENGTH = StaticFunctions.isValidConfigInt(SOLUTIION_MIN_LENGTH_TAG,
+		this.SOLUTIION_MIN_LENGTH = StaticFunctions.isValidConfigInt(SOLUTIION_MIN_LENGTH_TAG,
 				configNode.selectSingleNode(SOLUTIION_MIN_LENGTH_TAG).valueOf("@value"));
-		if (SOLUTIION_MIN_LENGTH == null) {
+		if (this.SOLUTIION_MIN_LENGTH == null) {
 			return false;
 		}
 
-		MAX_NO_SOLUTIONS = StaticFunctions.isValidConfigInt(MAX_NO_SOLUTIONS_TAG,
+		this.MAX_NO_SOLUTIONS = StaticFunctions.isValidConfigInt(MAX_NO_SOLUTIONS_TAG,
 				configNode.selectSingleNode(MAX_NO_SOLUTIONS_TAG).valueOf("@value"));
-		if (MAX_NO_SOLUTIONS == null) {
+		if (this.MAX_NO_SOLUTIONS == null) {
 			return false;
 		}
 
-		PILEPINE = StaticFunctions.isValidConfigBoolean(PILEPINE_TAG,
+		this.PILEPINE = StaticFunctions.isValidConfigBoolean(PILEPINE_TAG,
 				configNode.selectSingleNode(PILEPINE_TAG).valueOf("@value"));
-		if (PILEPINE == null) {
+		if (this.PILEPINE == null) {
+			return false;
+		}
+		this.NO_EXECUTIONS = StaticFunctions.isValidConfigInt(NO_EXECUTIONS_TAG,
+				configNode.selectSingleNode(NO_EXECUTIONS_TAG).valueOf("@value"));
+		if (this.NO_EXECUTIONS == null) {
 			return false;
 		}
 		return true;
@@ -186,7 +197,7 @@ public class APEConfig {
 	}
 
 	public void setMAX_NO_SOLUTIONS(Integer mAX_NO_SOLUTIONS) {
-		MAX_NO_SOLUTIONS = mAX_NO_SOLUTIONS;
+		this.MAX_NO_SOLUTIONS = mAX_NO_SOLUTIONS;
 	}
 
 	public String getONTOLOGY_PATH() {
@@ -194,7 +205,7 @@ public class APEConfig {
 	}
 
 	public void setONTOLOGY_PATH(String oNTOLOGY_PATH) {
-		ONTOLOGY_PATH = oNTOLOGY_PATH;
+		this.ONTOLOGY_PATH = oNTOLOGY_PATH;
 	}
 
 	public String getMODULE_TAXONOMY_ROOT() {
@@ -202,20 +213,20 @@ public class APEConfig {
 	}
 
 	public void setMODULE_TAXONOMY_ROOT(String mODULE_TAXONOMY_ROOT) {
-		MODULE_TAXONOMY_ROOT = mODULE_TAXONOMY_ROOT;
+		this.MODULE_TAXONOMY_ROOT = mODULE_TAXONOMY_ROOT;
 	}
 	
 
-	public String getDATA_TAXONOMY_ROOT() {
-		return DATA_TAXONOMY_ROOT;
+	public String getTYPE_TAXONOMY_ROOT() {
+		return TYPE_TAXONOMY_ROOT;
 	}
 
-	public void setDATA_TAXONOMY_ROOT(String dATA_TAXONOMY_ROOT) {
-		DATA_TAXONOMY_ROOT = dATA_TAXONOMY_ROOT;
+	public void setTYPE_TAXONOMY_ROOT(String TYPE_TAXONOMY_ROOT) {
+		this.TYPE_TAXONOMY_ROOT = TYPE_TAXONOMY_ROOT;
 	}
 
 	public List<String> getData_Taxonomy_SubRoots() {
-		return DATA_SUB_ROOTS;
+		return TYPE_SUB_ROOTS;
 	}
 
 	public String getTOOL_ANNOTATIONS_PATH() {
@@ -223,7 +234,7 @@ public class APEConfig {
 	}
 
 	public void setTOOL_ANNOTATIONS_PATH(String tOOL_ANNOTATIONS_PATH) {
-		TOOL_ANNOTATIONS_PATH = tOOL_ANNOTATIONS_PATH;
+		this.TOOL_ANNOTATIONS_PATH = tOOL_ANNOTATIONS_PATH;
 	}
 
 	public String getSOLUTION_PATH() {
@@ -231,7 +242,7 @@ public class APEConfig {
 	}
 
 	public void setSOLUTION_PATH(String sOLUTION_PATH) {
-		SOLUTION_PATH = sOLUTION_PATH;
+		this.SOLUTION_PATH = sOLUTION_PATH;
 	}
 
 	public String getCONSTRAINTS_PATH() {
@@ -239,7 +250,7 @@ public class APEConfig {
 	}
 
 	public void setCONSTRAINTS_PATH(String cONSTRAINTS_PATH) {
-		CONSTRAINTS_PATH = cONSTRAINTS_PATH;
+		this.CONSTRAINTS_PATH = cONSTRAINTS_PATH;
 	}
 
 	public Integer getSOLUTIION_MIN_LENGTH() {
@@ -247,7 +258,7 @@ public class APEConfig {
 	}
 
 	public void setSOLUTIION_MIN_LENGTH(Integer sOLUTIION_MIN_LENGTH) {
-		SOLUTIION_MIN_LENGTH = sOLUTIION_MIN_LENGTH;
+		this.SOLUTIION_MIN_LENGTH = sOLUTIION_MIN_LENGTH;
 	}
 
 	public Integer getMAX_NO_TOOL_OUTPUTS() {
@@ -255,7 +266,7 @@ public class APEConfig {
 	}
 
 	public void setMAX_NO_TOOL_OUTPUTS(Integer mAX_NO_TOOL_OUTPUTS) {
-		MAX_NO_TOOL_OUTPUTS = mAX_NO_TOOL_OUTPUTS;
+		this.MAX_NO_TOOL_OUTPUTS = mAX_NO_TOOL_OUTPUTS;
 	}
 
 	public Boolean getPILEPINE() {
@@ -263,7 +274,15 @@ public class APEConfig {
 	}
 
 	public void setPILEPINE(Boolean pILEPINE) {
-		PILEPINE = pILEPINE;
+		this.PILEPINE = pILEPINE;
+	}
+	
+	public Integer getNO_EXECUTIONS() {
+		return NO_EXECUTIONS;
+	}
+
+	public void setNO_EXECUTIONS(Integer nO_EXECUTIONS) {
+		NO_EXECUTIONS = nO_EXECUTIONS;
 	}
 
 	public String getConfigurationFile() {

@@ -11,8 +11,8 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
 
 /**
  * 
- * The {@code Type} class represents data types/formats that can be used by our
- * tools. {@code Types} can be actual data types or their abstraction classes.
+ * The {@code Type} class represents data type/format that can be used by our
+ * tools. {@code Type} can be an actual data type or an abstraction class.
  * 
  * @author Vedran Kasalica
  *
@@ -27,15 +27,18 @@ public class Type extends Predicate {
 	 */
 	private Set<String> subTypes;
 
+	/**
+	 * Constructor used to create a Type object.
+	 * 
+	 * @param typeName	- Type name
+	 * @param typeID	- Type ID
+	 * @param rootNode	- ID of the Taxonomy (Sub)Root node corresponding to the Type.
+	 * @param nodeType	- {@link NodeType} object describing the type w.r.t. the Type Taxonomy.
+	 */
 	public Type(String typeName, String typeID, String rootNode, NodeType nodeType) {
 		super(rootNode, nodeType);
 		this.typeName = typeName;
 		this.typeID = typeID;
-//		if (typeName.matches(APEConfig.getConfig().getTYPE_TAXONOMY_ROOT())) {
-//			this.rootType = true;
-//		} else {
-//			this.rootType = false;
-//		}
 		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			this.subTypes = new HashSet<String>();
 		}
@@ -160,10 +163,8 @@ public class Type extends Predicate {
 	}
 
 	/**
-	 * Set whether the type is a simple type or not.
+	 * Set the type to be a simple type (LEAF type in the Type Taxonomy).
 	 * 
-	 * @param isSimpleType determines the truth value of the {@link Type#simpleType
-	 *                     simpleType} variable.
 	 */
 	public void setToSimpleType() {
 		this.nodeType = NodeType.LEAF;
@@ -188,20 +189,29 @@ public class Type extends Predicate {
 	 * The class is used to check weather the type with typeID was already
 	 * introduced earlier on in allTypes. In case it was, it returns the item,
 	 * otherwise the new element is generated and returned.
+	 * <br>
+	 * <br>
+	 * In case of generating a new Type, the object is added to the set of all the Types and added as a subType to the parent Type.
 	 * 
-	 * @param typeName   - type name
-	 * @param typeID     - unique type identifier
-	 * @param simpleType - determines whether the type is a simple/leaf type
-	 * @param allTypes   - set of all the types created so far
-	 * @return the Type representing the item.
+	 * @param typeName  - Type name
+	 * @param typeID	- Unique Type identifier
+	 * @param rootType	- Determines whether the Type is a simple/leaf type
+	 * @param nodeType	- {@link NodeType} object describing the type w.r.t. the Type Taxonomy.
+	 * @param allTypes  - Set of all the types created
+	 * @param superType - The Parent (abstract) Type of the current Type
+	 * @return The Type object.
 	 */
-	public static Type generateType(String typeName, String typeID, String rootType, NodeType nodeType,  AllTypes allTypes) {
+	public static Type generateType(String typeName, String typeID, String rootType, NodeType nodeType,  AllTypes allTypes, Type superType) {
 
 		Type tmpType;
 		if ((tmpType = allTypes.get(typeID)) == null) {
 			tmpType = new Type(typeName, typeID, rootType, nodeType);
 			allTypes.addType(tmpType);
 		}
+		if(superType != null) {
+			superType.addSubType(typeID);
+		}
+		
 		return tmpType;
 
 	}

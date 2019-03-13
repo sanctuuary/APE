@@ -1,13 +1,14 @@
 package nl.uu.cs.ape.sat.models;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
 /**
- *  The {@code AbstractModule} class represents modules/tools that can be used. {@code AbstractModules} can be actual tools or their abstraction classes.
+ *  The {@code AbstractModule} class represents modules/tools provided by the Module Taxonomy as well as their abstraction classes.
+ *  Instances of {@link AbstractModule} can be actual tools or their abstraction classes, 
+ *  while all instances of the actual tools are extended to {@link Module}.
  *  
  * @author Vedran Kasalica
  *
@@ -20,10 +21,6 @@ public class AbstractModule extends Predicate {
 	 *  Set of all the modules that are subsumed by the abstract module (null if the module is a tool)
 	 */
 	private Set<String> subModules;
-	/**
-	 * Describes the data node in from the taxonomy. The type can represent a root type, subroot type, an abstract or a simple (implemented leaf) type, or be an empty type.
-	 */
-	private NodeType nodeType;
 
 	/**
 	 * Creates an abstract module from @moduleName and @moduleID. If @isTool is
@@ -33,8 +30,9 @@ public class AbstractModule extends Predicate {
 	 *            - module name
 	 * @param moduleID
 	 *            - unique module identifier
-	 * @param isTool
-	 *            - determines whether the module represents a tool
+	 * @param rootNode
+	 *            - ID of the Taxonomy Root node corresponding to the Module.
+	 * @param nodeType	- {@link NodeType} object describing the type w.r.t. the Module Taxonomy.
 	 */
 	public AbstractModule(String moduleName, String moduleID, String rootNode, NodeType nodeType) {
 		super(rootNode, nodeType);
@@ -51,8 +49,7 @@ public class AbstractModule extends Predicate {
 	 * 
 	 * @param abstractModule
 	 *            - abstract module that is being copied
-	 * @param isTool
-	 *            - determines whether the module represents a tool
+	 *@param nodeType	- {@link NodeType} object describing the type w.r.t. the Module Taxonomy.
 	 */
 	public AbstractModule(AbstractModule abstractModule, NodeType nodeType) {
 		super(abstractModule.getRootNode(), (nodeType != null) ? nodeType : abstractModule.getNodeType());
@@ -100,7 +97,12 @@ public class AbstractModule extends Predicate {
 	public boolean isRoot() {
 		return this.nodeType == NodeType.ROOT;
 	}
-
+	
+	/**
+	 * 
+	 * Set the module to be a tool (LEAF in the Module Taxonomy Tree)
+	 * 
+	 */
 	public void setToTool() {
 		this.nodeType = NodeType.LEAF;
 	}
@@ -165,7 +167,7 @@ public class AbstractModule extends Predicate {
 			subModules.add(module.getModuleID());
 			return true;
 		} else {
-			System.err.println("Cannot add submodules to a tool/leaf module!");
+			System.err.println("Cannot add submodules to a tool/leaf or empty module!");
 			return false;
 		}
 	}
@@ -181,7 +183,7 @@ public class AbstractModule extends Predicate {
 		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			return subModules.add(moduleID);
 		} else {
-			System.err.println("Cannot add submodules to a tool/leaf module!");
+			System.err.println("Cannot add submodules to a tool/leaf or empty module!");
 			return false;
 		}
 	}
@@ -210,20 +212,27 @@ public class AbstractModule extends Predicate {
 	 * The class is used to check weather the module with @moduleID was already
 	 * introduced earlier on in @allModules. In case it was it returns the item,
 	 * otherwise the new element is generated and returned.
+	 * <br>
+	 * <br>
+	 * In case of generating a new Module, the object is added to the set of all the Modules and added as a subModule to the parent Module.
 	 * 
-	 * @param moduleName
-	 *            - module name
-	 * @param moduleID
-	 *            - unique module identifier
-	 * @param isTool
-	 *            - determines whether the module represents a tool
+	 * @param moduleName	- module name
+	 * @param moduleID		- unique module identifier
+	 * @param rootNode
+	 *            - ID of the Taxonomy Root node corresponding to the Module.
+	 * @param nodeType		- {@link NodeType} object describing the type w.r.t. the Module Taxonomy.
 	 * @param allModules
 	 *            - set of all the modules created so far
+	 * @param superModule	-  The Parent AbstractModule of the current Module
 	 * @return the Abstract Module representing the item.
 	 */
 	public static AbstractModule generateModule(String moduleName, String moduleID, String rootNode, NodeType nodeType,
-			AllModules allModules) {
-		return allModules.addModule(new AbstractModule(moduleName, moduleID, rootNode, nodeType));
+			AllModules allModules, AbstractModule superModule) {
+		AbstractModule currModule = allModules.addModule(new AbstractModule(moduleName, moduleID, rootNode, nodeType));
+		if(superModule != null) {
+			superModule.addSubModule(moduleID);
+		}
+		return currModule;
 	}
 
 	/**
@@ -234,10 +243,14 @@ public class AbstractModule extends Predicate {
 	 */
 	public void printTree(String str, AllModules allModules) {
 		System.out.println(str + printShort() + "[" + getNodeType()+ "]");
-		if (subModules != null)
+		if (subModules != null && subModules.size()!=0) {
 			for (String moduleID : subModules) {
 				allModules.get(moduleID).printTree(str + " > ", allModules);
 			}
+		} else {
+			if(getNodeType() != NodeType.LEAF)
+				System.out.println(str + " [X]");
+		}
 	}
 
 }

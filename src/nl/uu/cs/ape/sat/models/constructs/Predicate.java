@@ -3,7 +3,8 @@ package nl.uu.cs.ape.sat.models.constructs;
 import nl.uu.cs.ape.sat.models.NodeType;
 
 /**
- * The {@code Predicate} class (interface) represents a single predicate/label. It is not a whole atom. In order to be an atom relation needs to be added.
+ * The {@code Predicate} class (interface) represents a single predicate/label used to depict a module or a data type/format. <br> <br>
+ * Note: In order to be an atom, a relation needs to be added.
 
  * @author Vedran Kasalica
  *
@@ -15,13 +16,13 @@ public abstract class Predicate {
 	 */
 	protected NodeType nodeType;
 	/**
-	 * Root of the tree that this node belongs to
+	 * Root of the Ontology tree that this node belongs to.
 	 */
 	private String rootNode;
 
 	/**
 	 * Setup the taxonomy related information
-	 * @param rootType - root of the tree that this node belongs to
+	 * @param rootType - root of the OWL tree that this node belongs to
 	 * @param nodeType - type of the node
 	 */
 	public Predicate(String rootNode, NodeType nodeType) {

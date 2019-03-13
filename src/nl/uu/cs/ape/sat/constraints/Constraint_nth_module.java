@@ -6,8 +6,7 @@ import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
-import nl.uu.cs.ape.sat.models.SLTL_formula;
-import nl.uu.cs.ape.sat.models.SLTL_formula_F;
+import nl.uu.cs.ape.sat.models.formulas.*;
 
 /**
  * Implements constraints of the form:<br/>

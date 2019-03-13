@@ -115,52 +115,6 @@ public class StaticFunctions {
 			}
 		}
 
-		// /*
-		// * Constraint E2: Use Add_table in the synthesis
-		// */
-		// cnf_SLTL += use_module("Draw_time_stamp_logo", allModules, moduleAutomaton,
-		// typeAutomaton,
-		// mappings);
-		// AbstractModule add_table = allModules.get("Adding_table");
-		// SLTL_formula_F e2 = new SLTL_formula_F(add_table);
-		// constraints.add(e2);
-		// cnf_SLTL += e2.getCNF(moduleAutomaton, typeAutomaton, mappings);
-		//
-		// /*
-		// * Constraint E3: Use 2D_surfaces in the synthesis
-		// */
-		// cnf_SLTL += use_module("2D_surfaces", allModules, moduleAutomaton,
-		// typeAutomaton,
-		// mappings);
-		//
-		// /*
-		// * Constraint E4.1: Use 2D_surfaces again in the synthesis (changed to use
-		// 3D_surfaces after 2D_surfaces)
-		// */
-		// cnf_SLTL += use_module("Draw_time_stamp_logo", allModules, moduleAutomaton,
-		// typeAutomaton,
-		// mappings);
-		// AbstractModule _3D_surfaces = allModules.get("3D_surfaces");
-		// cnf_SLTL += SLTL_formula.ite("2D_surfaces", _3D_surfaces, moduleAutomaton,
-		// typeAutomaton, mappings);
-		//
-		// /*
-		// * Constraint E4.2: Use Gradient_generation in the synthesis after the first
-		// * 2D_surfaces
-		// */
-		// AbstractModule gradient_generation = allModules.get("Gradient_generation");
-		// cnf_SLTL += SLTL_formula.ite(_2D_surfaces, gradient_generation,
-		// moduleAutomaton, typeAutomaton, mappings);
-		//
-		// /*
-		// * Constraint E4.3: Use Modules_with_xyz_file_output in the synthesis after
-		// the
-		// * first 2D_surfaces
-		// */
-		// cnf_SLTL += SLTL_formula.ite(_2D_surfaces, modules_with_color_palette_output,
-		// moduleAutomaton, typeAutomaton,
-		// mappings);
-
 		return cnf_SLTL;
 	}
 
@@ -234,6 +188,12 @@ public class StaticFunctions {
 		 * ID: 9 Do not use type <b>parameters[0]</b> in the solution.
 		 */
 		currTemplate = new Constraint_not_use_type(1, "Do not use type <b>parameters[0]</b> in the solution.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID: 10 Use <b>parameters[0]</b> as N-th module in the solution (where <b>parameters[0]</b> = N).
+		 */
+		currTemplate = new Constraint_nth_module(2, "Use <b>parameters[0]</b> as <b>parameters[1]</b>-th (N-th) module in the solution (where <b>parameters[1]</b> = N)");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		return allConsTemplates.printConstraintsCodes();
@@ -390,7 +350,7 @@ public class StaticFunctions {
 	 * Modules.
 	 * 
 	 * @param file
-	 *            - path to the .CSV file containing tool annotations
+	 *            - path to the .XML file containing tool annotations
 	 * @param allModules
 	 *            - list of all existing modules
 	 * @param allTypes
@@ -398,17 +358,6 @@ public class StaticFunctions {
 	 * @return the list of all annotated Modules in the process (possibly empty
 	 *         list)
 	 */
-	public static List<Module> readModuleCSV(String file, AllModules allModules, AllTypes allTypes) {
-
-		List<Module> modulesNew = new ArrayList<Module>();
-
-		for (String[] stringModule : getTuplesFromCSV(file)) {
-			modulesNew.add(Module.moduleFromString(stringModule, allModules, allTypes));
-		}
-
-		return modulesNew;
-	}
-	
 	public static List<Module> readModuleXML(String file, AllModules allModules, AllTypes allTypes) {
 		List<Module> modulesNew = new ArrayList<Module>();
 

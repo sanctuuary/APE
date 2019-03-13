@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
-	<ontology_path value="/home/vedran/Dropbox/PhD/All Use Cases/Bio.tools/Bio_Paper_AnnaLena_2018/APE_project/BioTools_full_taxonomy.owl"/>
+	<ontology_path value="/home/vedran/Dropbox/PhD/All Use Cases/Geo_UseCase/GEO_UseCase_2018/APE_approach/GMT_UseCase_taxonomy_with.owl"/>
 	<modulesTaxonomyRoot value="ModulesTaxonomy"/>
-	<dataTaxonomyRoot value="TypesTaxonomy">
-		<typesTaxonomyRoot value="DataFormat"/>
-		<formatsTaxonomyRoot value="DataType"/>
-	</dataTaxonomyRoot>
-	<tool_annotations_path value="/home/vedran/Dropbox/PhD/All Use Cases/Bio.tools/Bio_Paper_AnnaLena_2018/APE_project/modules.xml"/>
-	<constraints_path value="/home/vedran/Dropbox/PhD/All Use Cases/Bio.tools/Bio_Paper_AnnaLena_2018/APE_project/constraints.csv"/>
+	<typeTaxonomyRoot value="DataTaxonomy">
+		<typesTaxonomyRoot value="TypesTaxonomy"/>
+	</typeTaxonomyRoot>
+	<tool_annotations_path value="/home/vedran/Dropbox/PhD/All Use Cases/Geo_UseCase/GEO_UseCase_2018/APE_approach/modules_v2.xml"/>
+	<constraints_path value="/home/vedran/Dropbox/PhD/All Use Cases/Geo_UseCase/GEO_UseCase_2018/APE_approach/constraints_e1.csv"/>
 	<solutions_path value="/home/vedran/Desktop/sat_solutions.txt"/>
-	<solution_min_length value="3"/>
+	<solution_min_length value="11"/>
 	<pipeline value="false"/>
-	<max_solutions value="1000"/>
+	<max_solutions value="245000"/>
+	<executions value="0"/>
 </configuration>

@@ -51,7 +51,7 @@ public class OWLReader {
 	public OWLReader(AllModules allModules, AllTypes allTypes) {
 		this.ONTOLOGY_PATH = APEConfig.getConfig().getONTOLOGY_PATH();
 		this.moduleTaxonomyRoot = APEConfig.getConfig().getMODULE_TAXONOMY_ROOT();
-		this.dataTaxonomyRoot = APEConfig.getConfig().getDATA_TAXONOMY_ROOT();
+		this.dataTaxonomyRoot = APEConfig.getConfig().getTYPE_TAXONOMY_ROOT();
 		this.allModules = allModules;
 		this.allTypes = allTypes;
 	}
@@ -162,21 +162,23 @@ public class OWLReader {
 		
 		AbstractModule superModule, subModule;
 		superModule = allModules.get(getLabel(superClass));
-		
+		/*
+		 * Defining the Node Type based on the node.
+		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
 		if(getLabel(currClass).matches(APEConfig.getConfig().getMODULE_TAXONOMY_ROOT())) {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		}
-		subModule = AbstractModule.generateModule(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, allModules);
-		if (superModule != null) {
-			superModule.addSubModule(subModule);
-		}
+		subModule = AbstractModule.generateModule(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, allModules,superModule);
 
 		for (OWLClass child : reasoner.getSubClasses(currClass, true).getFlattened()) {
-			if (reasoner.isSatisfiable(child)) { // in case that the child is not node owl:Nothing
+			if (reasoner.isSatisfiable(child)) { 		// in case that the child is not node owl:Nothing
 				exploreModuleOntologyRec(reasoner, ontology, child, currClass, rootClass);
+			} else { 									// make the module a tool in case of not having subModules
+				subModule.setToTool();	
 			}
+			
 		}
 	}
 
@@ -198,10 +200,10 @@ public class OWLReader {
 		Type superType, subType;
 		superType = allTypes.get(getLabel(superClass));
 		/*
-		 * Check whether the current node is a root or subroot node.
+		 * Check whether the current node is a root or subRoot node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if(getLabel(currClass).matches(APEConfig.getConfig().getDATA_TAXONOMY_ROOT())) {
+		if(getLabel(currClass).matches(APEConfig.getConfig().getTYPE_TAXONOMY_ROOT())) {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		} else {
@@ -213,16 +215,13 @@ public class OWLReader {
 			}
 		}
 		
-		subType = Type.generateType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, allTypes);
-		if (superType != null) {
-			superType.addSubType(subType);
-		}
+		subType = Type.generateType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, allTypes,superType);
 
 		for (OWLClass child : reasoner.getSubClasses(currClass, true).getFlattened()) {
 			if (reasoner.isSatisfiable(child)) { // in case that the child is not node owl:Nothing
 				exploreTypeOntologyRec(reasoner, ontology, child, currClass, rootClass);
 			} else {
-				subType.setToSimpleType();
+				subType.setToSimpleType();		// make the type a simple type in case of not having subTypes
 			}
 		}
 	}

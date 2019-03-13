@@ -4,6 +4,13 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 
+/**
+ * The {@code Literal} class represents literals (atoms that can be negated) corresponding to the usage of the modules and types in the solution. It is of the form {@code Predicate(Attribute)} where
+ * {@code Predicate} represents a single predicate/label used to depict {@code AbstractModule, Module} or {@code Type}, while {@code Attribute} represents the state in the module/type automaton where the module/type is used or not used. <br>
+ * {@code Literal}s can be negated.
+ * @author Vedran Kasalica
+ *
+ */
 public class Literal implements Comparable<Literal>{
 
 	private String mappedAtom;
@@ -96,22 +103,33 @@ public class Literal implements Comparable<Literal>{
 	}
 	
 	/**
-	 * Returns TRUE in case the literal is a Module, FALSE in case of the literal being a Type.
-	 * @return boolean TRUE if Literal is a Module
+	 * Returns {@code true} in case the literal is a Module, {@code false} in case of the literal being a Type.
+	 * @return boolean {@code true} if Literal is a Module
 	 */
 	public boolean isModule() {
 		return isModule;
 	}
 	
+	/**
+	 * Returns {@code true} in case the literal is NEGATED, {@code false} otherwise.
+	 * @return boolean {@code true} if Literal is negated.
+	 */
 	public boolean isNegated() {
 		return negated;
 	}
 	
+	/**
+	 * Returns the label used to depict the state in the automaton.
+	 * @return String representation of the module/type automaton state.
+	 */
 	public String getAttribute() {
 		return attribute;
 	}
 	
-	
+	/**
+	 * Returns the predicate/label used to depict {@code AbstractModule, Module} or {@code Type}.
+	 * @return Predicate object
+	 */
 	public Predicate getPredicate() {
 		return predicate;
 	}

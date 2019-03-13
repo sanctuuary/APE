@@ -1,10 +1,11 @@
-package nl.uu.cs.ape.sat.models;
+package nl.uu.cs.ape.sat.models.formulas;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeBlock;
 import nl.uu.cs.ape.sat.automaton.TypeState;
+import nl.uu.cs.ape.sat.models.*;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
 
 public class SLTL_formula_F extends SLTL_formula {

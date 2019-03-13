@@ -57,8 +57,8 @@ public class AllModules {
 	 * elements. It also check whether the new element extends the existing one, it
 	 * that case the existing one is replaced by the extended one.
 	 * 
-	 * @param module - the element that needs to be added
-	 * @return The same element if it's a new one or the existing element if this
+	 * @param module - The AbstractModule/Module that needs to be added.
+	 * @return The  element if it's a new one or the existing element if this
 	 *         set contains the specified element.
 	 */
 	public AbstractModule addModule(AbstractModule module) {
@@ -85,9 +85,9 @@ public class AllModules {
 	}
 
 	/**
-	 * Removes the {@code AbstractModule} from the set of all modules and adds the
+	 * Removes the {@link AbstractModule} from the set of all modules and adds the
 	 * {@link Module} element (or vice versa). Swaps the objects in the set of all
-	 * modules.
+	 * Modules.
 	 * 
 	 * @param newModule - object that will be added
 	 * @param oldModule - object that will be removed
@@ -149,6 +149,9 @@ public class AllModules {
 			if (module.isTool())
 				iterator.add(module);
 		}
+		
+		
+		System.out.println(APEConfig.getConfig().getMODULE_TAXONOMY_ROOT() + ": " + iterator.size());
 
 		for (int i = 0; i < iterator.size() - 1; i++) {
 			for (int j = i + 1; j < iterator.size(); j++) {
@@ -394,11 +397,14 @@ public class AllModules {
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	public String moduleMandatoryUsage(AbstractModule module, ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
+	public String moduleMandatoryUsage(AllModules annotatedTools, ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
 		String constraints = "";
 
 		for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
-			constraints += mappings.add(module.getPredicate(), moduleState.getStateName()) + " 0\n";
+			for (Entry<String, AbstractModule> tool : annotatedTools.getModules().entrySet()) {
+				constraints += mappings.add(tool.getValue().getPredicate(), moduleState.getStateName()) + " ";
+			}
+			constraints += " 0\n";
 		}
 
 		return constraints;

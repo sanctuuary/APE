@@ -47,17 +47,6 @@ public class CSV2XML {
 		return constraints;
 	}
 
-	public static List<Module> readModuleCSV(String file, AllModules allModules, AllTypes allTypes) {
-
-		List<Module> modulesNew = new ArrayList<Module>();
-
-		for (String[] stringModule : getTuplesFromCSV(file)) {
-			modulesNew.add(Module.moduleFromString(stringModule, allModules, allTypes));
-		}
-
-		return modulesNew;
-	}
-
 	public static void csv2xml(String csvPath) {
 		try {
 

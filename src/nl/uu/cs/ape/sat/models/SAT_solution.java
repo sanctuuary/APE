@@ -146,6 +146,23 @@ public class SAT_solution {
 		}
 		return solution;
 	}
+	
+	/**
+	 * Returns the list of modules, corresponding to their position in the workflow.
+	 * 
+	 * @return List of {@link Module}s in the order they appear in the solution workflow.
+	 */
+	public List<Module> getRelevantSolutionModules(AllModules allModules) {
+		List<Module> solutionModules = new ArrayList<>();
+		if (unsat) {
+			return null;
+		} else {
+			for (Literal literal : relevantModules) {
+				solutionModules.add((Module) allModules.get(literal.getPredicate().getPredicate()));
+			}
+		}
+		return solutionModules;
+	}
 
 	/**
 	 * Returns the solution in mapped format. The original solution created by the
@@ -199,7 +216,7 @@ public class SAT_solution {
 		if (!unsat) {
 			for (Literal literal : literals) {
 				if(!literal.isNegated())
-				System.out.println(literal.getPredicate().getPredicate() + "\t is N:" + literal.isNegated() + ", is module:" + literal.isModule() + ", Module: " +(literal.getPredicate() instanceof Module));
+//				System.out.println(literal.getPredicate().getPredicate() + "\t is N:" + literal.isNegated() + ", is module:" + literal.isModule() + ", Module: " +(literal.getPredicate() instanceof Module));
 				if (!literal.isNegated() && literal.isModule() && (literal.getPredicate() instanceof Module)) {
 					negSol.add(literal.toNegatedMappedInt());
 				}

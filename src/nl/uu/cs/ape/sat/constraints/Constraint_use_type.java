@@ -2,12 +2,10 @@ package nl.uu.cs.ape.sat.constraints;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
-import nl.uu.cs.ape.sat.models.SLTL_formula;
-import nl.uu.cs.ape.sat.models.SLTL_formula_F;
+import nl.uu.cs.ape.sat.models.formulas.*;
 import nl.uu.cs.ape.sat.models.Type;
 
 /**

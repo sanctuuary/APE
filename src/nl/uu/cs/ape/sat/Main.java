@@ -1,7 +1,5 @@
 package nl.uu.cs.ape.sat;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -31,126 +29,12 @@ import java.io.*;
 public class Main {
 
 	/**
-	 * Configuration class.
+	 * Configuration class and the tag used in the config file
 	 */
 	private static APEConfig config;
-//	/**
-//	 * Tags used in the config file
-//	 */
 	private static final String CONFIGURATION_FILE = "ape.configuration";
-//	private static final String ONTOLOGY_TAG = "ontology_path";
-//	private static final String TOOL_ANNOTATIONS_TAG = "tool_annotations_path";
-//	private static final String CONSTRAINTS_TAG = "constraints_path";
-//	private static final String SOLUTION_TAG = "solutions_path";
-//	private static final String SOLUTIION_MIN_LENGTH_TAG = "solution_min_length";
-//	private static final String PILEPINE_TAG = "pipeline";
-//	private static final String MAX_NO_SOLUTIONS_TAG = "max_solutions";
-//	/*
-//	 * Max number of solution that the solver will return.
-//	 */
-//	private static Integer MAX_NO_SOLUTIONS;
-//
-//	/**
-//	 * Path to the taxonomy file
-//	 */
-//	private static String ONTOLOGY_PATH;
-//
-//	private static String TOOL_ANNOTATIONS_PATH;
-//	/**
-//	 * Path to the file that will contain all the solutions to the problem in human
-//	 * readable representation.
-//	 */
-//	private static String SOLUTION_PATH;
-//
-//	/**
-//	 * Path to the file with all workflow constraints.
-//	 */
-//	private static String CONSTRAINTS_PATH;
-//	/**
-//	 * Length of the solutions (length of the automaton).
-//	 */
-//	private static Integer SOLUTIION_MIN_LENGTH;
-//	/**
-//	 * Output branching factor (max number of outputs per tool).
-//	 */
-//	private static Integer MAX_NO_TOOL_OUTPUTS = 3;
-//	/**
-//	 * {@code true} if THE pipeline approach should be used, {@code false} in case
-//	 * of general memory approach.
-//	 */
-//	private static Boolean PILEPINE;
-//
-//	/**
-//	 * Configurations used to read/update the "ape.configuration" file.
-//	 */
-//	
-//	
-//	private static Document document;
-//	private static Node configNode;
-//
-//
-//	/**
-//	 * Setting up the configuration of the library.
-//	 * 
-//	 * @return {@code true} if the method successfully set-up the configuration,
-//	 *         {@code false} otherwise.
-//	 */
-//	private static boolean defaultConfigSetup() {
-//		
-//		ONTOLOGY_PATH = configNode.selectSingleNode(ONTOLOGY_TAG).getText();
-//		if (!StaticFunctions.isValidConfigReadFile(ONTOLOGY_TAG, ONTOLOGY_PATH)) {
-//			return false;
-//		}
-//
-//		TOOL_ANNOTATIONS_PATH = configNode.selectSingleNode(TOOL_ANNOTATIONS_TAG).getText();
-//		if (!StaticFunctions.isValidConfigReadFile(TOOL_ANNOTATIONS_TAG, TOOL_ANNOTATIONS_PATH)) {
-//			return false;
-//		}
-//
-//		CONSTRAINTS_PATH = configNode.selectSingleNode(CONSTRAINTS_TAG).getText();
-//		if (!StaticFunctions.isValidConfigReadFile(CONSTRAINTS_TAG, CONSTRAINTS_PATH)) {
-//			return false;
-//		}
-//
-//		SOLUTION_PATH = configNode.selectSingleNode(SOLUTION_TAG).getText();
-//		if (!StaticFunctions.isValidConfigWriteFile(SOLUTION_TAG, SOLUTION_PATH)) {
-//			return false;
-//		}
-//
-//		SOLUTIION_MIN_LENGTH = StaticFunctions.isValidConfigInt(SOLUTIION_MIN_LENGTH_TAG,
-//				configNode.selectSingleNode(SOLUTIION_MIN_LENGTH_TAG).getText());
-//		if (SOLUTIION_MIN_LENGTH == null) {
-//			return false;
-//		}
-//
-//		MAX_NO_SOLUTIONS = StaticFunctions.isValidConfigInt(MAX_NO_SOLUTIONS_TAG,
-//				configNode.selectSingleNode(MAX_NO_SOLUTIONS_TAG).getText());
-//		if (MAX_NO_SOLUTIONS == null) {
-//			return false;
-//		}
-//
-//		PILEPINE = StaticFunctions.isValidConfigBoolean(PILEPINE_TAG, configNode.selectSingleNode(PILEPINE_TAG).getText());
-//		if (PILEPINE == null) {
-//			return false;
-//		}
-//		return true;
-//	}
-//
-//	private static void initDOM4J() {
-//		File inputFile = new File(CONFIGURATION_FILE);
-//		SAXReader reader = new SAXReader();
-//		try {
-//			document = reader.read(inputFile);
-//
-//			configNode = document.selectSingleNode("/configuration");
-//
-//		} catch (DocumentException e) {
-//			e.printStackTrace();
-//		}
-//
-//	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		config = APEConfig.getConfig();
 
@@ -214,7 +98,6 @@ public class Main {
 		/*
 		 * Define the empty type, representing the absence of types
 		 */
-//		Type emptyType = Type.generateType("empty", "empty", true, allTypes);
 		rootType.addSubType(allTypes.getEmptyType().getTypeID());
 
 		/*
@@ -226,15 +109,16 @@ public class Main {
 		cnf += annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, config.getPILEPINE(),
 				allTypes.getEmptyType(), mappings);
 
-		for (Entry<String, AbstractModule> mapModule : annotated_modules.getModules().entrySet()) {
-			System.out.println(mapModule.getValue().print());
-		}
+//		print all the tools
+//		for (Entry<String, AbstractModule> mapModule : annotated_modules.getModules().entrySet()) {
+//			System.out.println(mapModule.getValue().print());
+//		}
 
 		/*
 		 * printing the Module and Taxonomy Tree
 		 */
-		allModules.get("ModulesTaxonomy").printTree(" ", allModules);
-		allTypes.get("TypesTaxonomy").printTree(" ", allTypes);
+		allModules.getRootModule().printTree(" ", allModules);
+//		allTypes.getRootType().printTree(" ", allTypes);
 
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the tools 2.
@@ -242,7 +126,7 @@ public class Main {
 		 * enforcing the taxonomy structure.
 		 */
 		cnf += allModules.moduleMutualExclusion(moduleAutomaton, mappings);
-		cnf += allModules.moduleMandatoryUsage(rootModule, moduleAutomaton, mappings);
+		cnf += allModules.moduleMandatoryUsage(annotated_modules, moduleAutomaton, mappings);
 		cnf += allModules.moduleEnforceTaxonomyStructure(rootModule.getModuleID(), moduleAutomaton, mappings);
 
 		/*
@@ -308,17 +192,37 @@ public class Main {
 			System.out.println("UNSAT");
 			return;
 		}
-		for (SAT_solution sol : allSolutions) {
-			StaticFunctions.write2file(sol.getRelevantSolution() + "\n", new File(config.getSOLUTION_PATH()), first);
+		for (int i = 0; i < allSolutions.size(); i++) {
+			StaticFunctions.write2file(allSolutions.get(i).getRelevantSolution() + "\n", new File(config.getSOLUTION_PATH()), first);
 			first = true;
 		}
 
-		StaticFunctions.write2file(allSolutions.get(0).getMappedSolution() + "\n",
-				new File("/home/vedran/Desktop/sat_solutions_map.txt"), false);
+//		StaticFunctions.write2file(allSolutions.get(0).getMappedSolution() + "\n",
+//				new File("/home/vedran/Desktop/sat_solutions_map.txt"), false);
+//
+//		StaticFunctions.write2file(allSolutions.get(0).getSolution() + "\n",
+//				new File("/home/vedran/Desktop/sat_solutions_full.txt"), false);
 
-		StaticFunctions.write2file(allSolutions.get(0).getSolution() + "\n",
-				new File("/home/vedran/Desktop/sat_solutions_full.txt"), false);
-
+		/**
+		 * Executing the workflows.
+		 */
+		Integer noExecutions = APEConfig.getConfig().getNO_EXECUTIONS();
+		if (noExecutions != null && noExecutions > 0) {
+			for (int i = 0; i < 5 && i < allSolutions.size(); i++) {
+				
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("/home/vedran/Desktop/APE/workflow "+i+".sh", false)));
+				out.println("");
+				out.close();
+				
+				SAT_solution currSol = allSolutions.get(i);
+				currSol.getRelevantSolutionModules(allModules);
+				for(Module curr: currSol.getRelevantSolutionModules(allModules)) {
+					if(curr.getModuleExecution() != null)
+							curr.getModuleExecution().run("/home/vedran/Desktop/APE/workflow "+i+".sh");
+				}
+			}
+		}
+		System.out.println(".sh files generated.");
 		/*
 		 * TODO: use tool multiple times, consider removing permutations, SWL output?
 		 */

@@ -1,12 +1,14 @@
-package nl.uu.cs.ape.sat.models;
+package nl.uu.cs.ape.sat.models.formulas;
 
 import java.util.List;
-
-import javax.sound.midi.SysexMessage;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.models.AbstractModule;
+import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
 
 /**

@@ -29,7 +29,7 @@ public class AllTypes {
 	public AllTypes() {
 
 		this.types = new HashMap<>();
-		emptyType = new Type("empty", "empty", APEConfig.getConfig().getDATA_TAXONOMY_ROOT(), NodeType.EMPTY);
+		emptyType = new Type("empty", "empty", APEConfig.getConfig().getTYPE_TAXONOMY_ROOT(), NodeType.EMPTY);
 		addType(emptyType);
 	}
 
@@ -78,7 +78,7 @@ public class AllTypes {
 	 * @return The root type.
 	 */
 	public Type getRootType() {
-		return this.types.get(APEConfig.getConfig().getDATA_TAXONOMY_ROOT());
+		return this.types.get(APEConfig.getConfig().getTYPE_TAXONOMY_ROOT());
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class AllTypes {
  * 		Create a list for each subtree of the Data Taxonomy (e.g. TypeSubTaxonomy, FormatSubTaxonomy). Each of these lists represents a class of mutually exclusive types.
  */
 		Map<String, List<Type>> subTreesMap = new HashMap<String, List<Type>>();
-		subTreesMap.put(APEConfig.getConfig().getDATA_TAXONOMY_ROOT(),  new ArrayList<Type>());
+		subTreesMap.put(APEConfig.getConfig().getTYPE_TAXONOMY_ROOT(),  new ArrayList<Type>());
 		for (String subRoot : subRoots) {
 			subTreesMap.put(subRoot, new ArrayList<Type>());
 		}
@@ -173,7 +173,7 @@ public class AllTypes {
 			}
 		}
 
-		System.out.println(APEConfig.getConfig().getDATA_TAXONOMY_ROOT() + ": " + subTreesMap.get(APEConfig.getConfig().getDATA_TAXONOMY_ROOT()).size());
+		System.out.println(APEConfig.getConfig().getTYPE_TAXONOMY_ROOT() + ": " + subTreesMap.get(APEConfig.getConfig().getTYPE_TAXONOMY_ROOT()).size());
 		for (String subRoot : subRoots) {
 			System.out.println(subRoot + ": " + subTreesMap.get(subRoot).size());
 		}
