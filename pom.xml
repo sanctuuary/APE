@@ -6,27 +6,29 @@
 	<version>0.1</version>
 	<packaging>jar</packaging>
 	<build>
+		
   <plugins>
-		<plugin>
-		    <groupId>org.apache.maven.plugins</groupId>
-		    <artifactId>maven-shade-plugin</artifactId>
-		    <executions>
-		        <execution>
-		            <goals>
-		                <goal>shade</goal>
-		            </goals>
-		            <configuration>
-		                <shadedArtifactAttached>true</shadedArtifactAttached>
-		                <transformers>
-		                    <transformer implementation=
-		                      "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-		                        <mainClass>nl.uu.cs.ape.sat.Test</mainClass>
-		                </transformer>
-		            </transformers>
-		        </configuration>
-		        </execution>
-		    </executions>
-		</plugin>
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+      <configuration>
+        <descriptorRefs>
+          <descriptorRef>jar-with-dependencies</descriptorRef>
+        </descriptorRefs>
+        <archive>
+          <manifest>
+            <mainClass>nl.uu.cs.ape.sat.Main</mainClass>
+          </manifest>
+        </archive>
+      </configuration>
+            <executions>
+        <execution>
+          <phase>package</phase>
+          <goals>
+            <goal>single</goal>
+          </goals>
+        </execution>
+      </executions>
+        </plugin>
      </plugins>
 </build>
 

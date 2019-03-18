@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
-	<ontology_path value="/home/vedran/Dropbox/PhD/All Use Cases/Geo_UseCase/GEO_UseCase_2018/APE_approach/GMT_UseCase_taxonomy_with.owl"/>
-	<modulesTaxonomyRoot value="ModulesTaxonomy"/>
-	<typeTaxonomyRoot value="DataTaxonomy">
+	<ontology_path value="/home/vedran/Desktop/Demo_UseCase/GMT_Demo_UseCase.owl"/>
+	<toolsTaxonomyRoot value="ToolsTaxonomy"/>
+	<dataTaxonomyRoot value="DataTaxonomy">
 		<typesTaxonomyRoot value="TypesTaxonomy"/>
-	</typeTaxonomyRoot>
-	<tool_annotations_path value="/home/vedran/Dropbox/PhD/All Use Cases/Geo_UseCase/GEO_UseCase_2018/APE_approach/modules_v2.xml"/>
-	<constraints_path value="/home/vedran/Dropbox/PhD/All Use Cases/Geo_UseCase/GEO_UseCase_2018/APE_approach/constraints_e1.csv"/>
-	<solutions_path value="/home/vedran/Desktop/sat_solutions.txt"/>
-	<solution_min_length value="11"/>
-	<pipeline value="false"/>
-	<max_solutions value="245000"/>
-	<executions value="0"/>
+	</dataTaxonomyRoot>
+	<tool_annotations_path value="/home/vedran/Desktop/Demo_UseCase/modules.xml"/>
+	<constraints_path value="/home/vedran/Desktop/Demo_UseCase/constraints.csv"/>
+	<shared_memory value="true"/>
+	<solutions_path value="/home/vedran/Desktop/Demo_UseCase/sat_solutions.txt"/>
+	<solution_min_length value="5"/>
+	<solution_max_length value="0"/>
+	<max_solutions value="1000"/>
+	<execution_scripts_folder value="/home/vedran/Desktop/Demo_UseCase/Implementations"/>
+	<number_of_execution_scripts value="5"/>
+	<inputs>
+		<input>
+			<type>XYZ_table_file</type>
+		</input>
+	</inputs>
+	<debug_mode value="false"/>
 </configuration>
