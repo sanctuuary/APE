@@ -5,12 +5,12 @@
 	<dataTaxonomyRoot value="DataTaxonomy">
 		<typesTaxonomyRoot value="TypesTaxonomy"/>
 	</dataTaxonomyRoot>
-	<tool_annotations_path value="/home/vedran/Desktop/Demo_UseCase/modules.xml"/>
+	<tool_annotations_path value="/home/vedran/Desktop/Demo_UseCase/tool_annotations.xml"/>
 	<constraints_path value="/home/vedran/Desktop/Demo_UseCase/constraints.csv"/>
 	<shared_memory value="true"/>
 	<solutions_path value="/home/vedran/Desktop/Demo_UseCase/sat_solutions.txt"/>
-	<solution_min_length value="5"/>
-	<solution_max_length value="0"/>
+	<solution_min_length value="1"/>
+	<solution_max_length value="6"/>
 	<max_solutions value="1000"/>
 	<execution_scripts_folder value="/home/vedran/Desktop/Demo_UseCase/Implementations"/>
 	<number_of_execution_scripts value="5"/>

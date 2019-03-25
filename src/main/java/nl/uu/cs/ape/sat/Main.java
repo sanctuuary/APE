@@ -144,7 +144,7 @@ public class Main {
 		 * Loop over different lengths of the workflow until either, max workflow length
 		 * or max number of solutions has been found.
 		 */
-		while (solutionsFound < solutionsFoundMax && solutionLength < solutionLengthMax) {
+		while (solutionsFound < solutionsFoundMax && solutionLength <= solutionLengthMax) {
 			System.out.println("\n-------------------------------------------------------------");
 			System.out.println("\tWorkflow discovery - length " + solutionLength);
 			System.out.println("-------------------------------------------------------------");
@@ -234,12 +234,12 @@ public class Main {
 			 */
 			allSolutions.addAll(currSolutions);
 			long realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-			if (solutionsFound >= solutionsFoundMax - 1) {
+			if ((solutionsFound >= solutionsFoundMax - 1) || solutionLength == solutionLengthMax) {
 				System.out.println("\nAPE found " + solutionsFound + " solutions. Total solving time: "
 						+ (realTimeElapsedMillis / 1000F) + " sec.");
 			} else {
-				System.out.println("Found " + solutionsFound + " solutions. Solving time: "
-						+ (realTimeElapsedMillis / 1000F) + " sec.");
+//				System.out.println("Found " + solutionsFound + " solutions. Solving time: "
+//						+ (realTimeElapsedMillis / 1000F) + " sec.");
 			}
 
 			/**

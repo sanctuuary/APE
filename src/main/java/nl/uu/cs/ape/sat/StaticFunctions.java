@@ -311,15 +311,17 @@ public class StaticFunctions {
 			AllTypes allTypes, int solutionsFound, int solutionsFoundMax, int solutionLength) {
 		List<SAT_solution> solutions = new ArrayList<SAT_solution>();
 		ISolver solver = SolverFactory.newDefault();
+		int timeout = 3600;
 		// ISolver solver = new ModelIterator(SolverFactory.newDefault(),
 		// no_of_solutions); // iteration through at most
 		// no_of_solutions solutions
-		solver.setTimeout(3600); // 1 hour timeout
+		solver.setTimeout(timeout); // 1 hour timeout
+		long realStartTime = 0;
+		long realTimeElapsedMillis;
 		Reader reader = new DimacsReader(solver);
 		try {
 			IProblem problem = reader.parseInstance(dimacsFilePath); // loading CNF encoding of the problem
-			long realStartTime = System.currentTimeMillis();
-			long realTimeElapsedMillis;
+			realStartTime = System.currentTimeMillis();
 			while (solutionsFound < solutionsFoundMax && problem.isSatisfiable()) {
 				SAT_solution sat_solution = new SAT_solution(problem.model(), mappings, allModules, allTypes,
 						solutionLength);
@@ -343,7 +345,7 @@ public class StaticFunctions {
 		} catch (ContradictionException e) {
 			System.err.println("Unsatisfiable");
 		} catch (TimeoutException e) {
-			System.err.println("Timeout");
+			System.err.println("Timeout. Solving took longer than default timeout: " + timeout + " seconds.");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -352,6 +354,12 @@ public class StaticFunctions {
 			e.printStackTrace();
 		}
 
+		if (solutionsFound == 0 || solutionsFound % 500 != 0) {
+			realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
+			System.out.println("Found " + solutionsFound + " solutions. Solving time: "
+					+ (realTimeElapsedMillis / 1000F) + " sec.");
+		}
+		
 		return solutions;
 	}
 
