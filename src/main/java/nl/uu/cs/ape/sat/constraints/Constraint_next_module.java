@@ -20,8 +20,8 @@ import nl.uu.cs.ape.sat.models.formulas.*;
 public class Constraint_next_module extends ConstraintTemplate {
 
 
-	public Constraint_next_module(int parametersNo, String description) {
-		super(parametersNo, description);
+	public Constraint_next_module(String id, int parametersNo, String description) {
+		super(id, parametersNo, description);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class Constraint_next_module extends ConstraintTemplate {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");
 			return null;
 		}
-		constraint = SLTL_formula.next(first_module, second_module, moduleAutomaton, typeAutomaton, mappings);
+		constraint = SLTL_formula.next_module(first_module, second_module, moduleAutomaton, typeAutomaton, mappings);
 
 		return constraint;
 	}

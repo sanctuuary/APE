@@ -172,13 +172,20 @@ public class OWLReader {
 		}
 		subModule = AbstractModule.generateModule(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, allModules,superModule);
 
+		/*
+		 * Define the counter to check whether all the subclasses are empty / owl:Nothing
+		 */
+		int unsatSubClasses = 0,subClasses = reasoner.getSubClasses(currClass, true).getFlattened().size();
 		for (OWLClass child : reasoner.getSubClasses(currClass, true).getFlattened()) {
 			if (reasoner.isSatisfiable(child)) { 		// in case that the child is not node owl:Nothing
 				exploreModuleOntologyRec(reasoner, ontology, child, currClass, rootClass);
 			} else { 									// make the module a tool in case of not having subModules
 				subModule.setToTool();	
+				unsatSubClasses ++;
 			}
-			
+		}
+		if(unsatSubClasses == subClasses) {
+			subModule.setToTool();			// make the module a tool in case of not having subTypes
 		}
 	}
 
@@ -215,14 +222,24 @@ public class OWLReader {
 			}
 		}
 		
-		subType = Type.generateType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, allTypes,superType);
+		subType = Type.generateType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, allTypes, superType);
 
+		/*
+		 * Define the counter to check whether all the subclasses are empty / owl:Nothing
+		 */
+//		System.out.println("-> " + subType.getTypeID());
+		int unsatSubClasses = 0,subClasses = reasoner.getSubClasses(currClass, true).getFlattened().size();
 		for (OWLClass child : reasoner.getSubClasses(currClass, true).getFlattened()) {
+//			System.out.println(" - -> " + getLabel(currClass) + "_OF_" + getLabel(child));
 			if (reasoner.isSatisfiable(child)) { // in case that the child is not node owl:Nothing
+//				System.out.println(" - - +");
 				exploreTypeOntologyRec(reasoner, ontology, child, currClass, rootClass);
 			} else {
-				subType.setToSimpleType();		// make the type a simple type in case of not having subTypes
+				unsatSubClasses ++;
 			}
+		}
+		if(unsatSubClasses == subClasses) {
+			subType.setToSimpleType();		// make the type a simple type in case of not having subTypes
 		}
 	}
 

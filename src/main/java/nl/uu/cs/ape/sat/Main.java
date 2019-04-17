@@ -145,6 +145,7 @@ public class Main {
 		 * or max number of solutions has been found.
 		 */
 		while (solutionsFound < solutionsFoundMax && solutionLength <= solutionLengthMax) {
+			long problemSetupStartTime = System.currentTimeMillis();
 			System.out.println("\n-------------------------------------------------------------");
 			System.out.println("\tWorkflow discovery - length " + solutionLength);
 			System.out.println("-------------------------------------------------------------");
@@ -154,7 +155,7 @@ public class Main {
 			TypeAutomaton typeAutomaton = new TypeAutomaton();
 
 			/*
-			 * generate the automaton in CNF
+			 * Generate the automaton in CNF
 			 */
 			StaticFunctions.generateAutomaton(moduleAutomaton, typeAutomaton, solutionLength,
 					config.getMax_no_tool_outputs());
@@ -162,18 +163,24 @@ public class Main {
 			/*
 			 * Encode the workflow input
 			 */
-			 String inputDataEncoding = StaticFunctions.encodeInputData(config.getProgram_inputs(), typeAutomaton, solutionLength,
-					allTypes.getEmptyType(), mappings, allTypes);
+			 String inputDataEncoding = allTypes.encodeInputData(config.getProgram_inputs(), typeAutomaton, mappings);
 			 if (inputDataEncoding == null) {
 				 return;
 			 }
 			 cnf += inputDataEncoding; 
+			 /*
+			 * Encode the workflow output
+			 */
+			 String outputDataEncoding = allTypes.encodeOutputData(config.getProgram_outputs(), typeAutomaton, mappings);
+			 if (outputDataEncoding == null) {
+				 return;
+			 }
+			 cnf += outputDataEncoding; 
 			/*
 			 * Create constraints from the module.csv file
 			 */
 			cnf += annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, config.getShared_memory(),
 					allTypes.getEmptyType(), mappings);
-
 			/*
 			 * Create the constraints enforcing: 1. Mutual exclusion of the tools 2.
 			 * Mandatory usage of the tools - from taxonomy. 3. Adding the constraints
@@ -201,7 +208,7 @@ public class Main {
 
 			/*
 			 * Counting the number of variables and clauses that will be given to the SAT
-			 * solver TODO Improve this approach, no need to read the whole String again.
+			 * solver TODO Improve thi-s approach, no need to read the whole String again.
 			 */
 			int variables = mappings.getSize();
 			int clauses = StringUtils.countMatches(cnf, " 0");
@@ -224,7 +231,9 @@ public class Main {
 			 */
 
 			StaticFunctions.write2file(sat_input_header + cnf, temp_sat_input, false);
-
+			
+			long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
+			System.out.println("Problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) +" sec.");
 			long realStartTime = System.currentTimeMillis();
 			List<SAT_solution> currSolutions = StaticFunctions.solve(temp_sat_input.getAbsolutePath(), mappings,
 					allModules, allTypes, solutionsFound, solutionsFoundMax, solutionLength);

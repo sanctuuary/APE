@@ -323,5 +323,73 @@ public class AllTypes {
 			return "";
 		}
 	}
+	
+	/**
+	 * Encoding the initial workflow input.
+	 * 
+	 * @param program_inputs - input types for the program
+	 * @param typeAutomaton
+	 * @param solutionLength
+	 * @param emptyType
+	 * @param mappings
+	 * @param allTypes
+	 * @return String representation of the initial input encoding.
+	 */
+	public String encodeInputData(List<Types> program_inputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+		String encoding = "";
+
+		List<TypeState> inputStates = typeAutomaton.getBlock(0).getTypeStates();
+		for (int i = 0; i < inputStates.size(); i++) {
+			if (i < program_inputs.size()) {
+				List<Type> currTypes = program_inputs.get(i).getTypes();
+				for (Type currType : currTypes) {
+					if (get(currType.getTypeID()) == null) {
+						System.err.println(
+								"Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
+						return null;
+					}
+					encoding += mappings.add(currType.getPredicate(), inputStates.get(i).getStateName()) + " 0\n";
+				}
+			} else {
+				encoding += mappings.add(emptyType.getPredicate(), inputStates.get(i).getStateName()) + " 0\n";
+			}
+
+		}
+		return encoding;
+	}
+
+	/**
+	 * Encoding the workflow output. The provided output files have to occur as
+	 * output from the final tool.
+	 * 
+	 * @param program_outputs - input types for the program
+	 * @param typeAutomaton
+	 * @param solutionLength
+	 * @param emptyType
+	 * @param mappings
+	 * @param allTypes
+	 * @return String representation of the workflow output encoding.
+	 */
+	public String encodeOutputData(List<Types> program_outputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+		String encoding = "";
+
+		// TODO
+		List<TypeState> outputStates = typeAutomaton.getBlock(typeAutomaton.getTypeBlocks().size() - 1).getTypeStates();
+		for (Types currTypes : program_outputs) {
+			for (Type currType : currTypes.getTypes()) {
+				if (get(currType.getTypeID()) == null) {
+					System.err.println("Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
+					return null;
+				} else {
+					for (TypeState currOutputState : outputStates) {
+						encoding += mappings.add(currType.getPredicate(), currOutputState.getStateName()) + " ";
+					}
+					encoding += "0\n";
+				}
+			}
+		}
+
+		return encoding;
+	}
 
 }

@@ -12,7 +12,7 @@ import nl.uu.cs.ape.sat.models.formulas.*;
  * Implements constraints of the form:<br/>
  * <br/>
  * If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b>
- * consequently using the function {@link #getConstraint}.
+ * subsequently using the function {@link #getConstraint}.
  * 
  * @author Vedran Kasalica
  *
@@ -20,8 +20,8 @@ import nl.uu.cs.ape.sat.models.formulas.*;
 public class Constraint_if_then_not_module extends ConstraintTemplate {
 
 
-	public Constraint_if_then_not_module(int parametersNo, String description) {
-		super(parametersNo, description);
+	public Constraint_if_then_not_module(String id, int parametersNo, String description) {
+		super(id, parametersNo, description);
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class Constraint_if_then_not_module extends ConstraintTemplate {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");
 			return null;
 		}
-		constraint = SLTL_formula.itn(if_module, then_module, moduleAutomaton, typeAutomaton, mappings);
+		constraint = SLTL_formula.itn_module(if_module, then_module, moduleAutomaton, typeAutomaton, mappings);
 
 		return constraint;
 	}

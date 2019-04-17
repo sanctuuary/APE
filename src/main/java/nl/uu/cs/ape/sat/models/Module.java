@@ -141,7 +141,10 @@ public class Module extends AbstractModule {
 
 		String superModuleID = xmlModule.selectSingleNode("operation").getText();
 		String moduleName = xmlModule.valueOf("@name");
-		String moduleID = xmlModule.valueOf("@name");
+		if(moduleName == null || moduleName.matches("")) {
+			moduleName = superModuleID + "_ID:" + (int)(1000 * Math.random());
+		}
+		String moduleID = moduleName;
 		String executionCode = xmlModule.selectSingleNode("implementation").selectSingleNode("code").getText();
 
 //		BIO tools 
@@ -308,7 +311,7 @@ public class Module extends AbstractModule {
 
 		// In case of generating a new Module, the object is added as a subModule to the
 		// parent Module.
-		if (allModules.get(moduleID) == null && superModule != null) {
+		if (superModule != null) {
 			superModule.addSubModule(moduleID);
 		}
 		AbstractModule currModule = allModules.addModule(new Module(moduleName, moduleID, rootNode, moduleExecution));

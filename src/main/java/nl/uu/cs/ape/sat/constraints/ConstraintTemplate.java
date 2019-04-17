@@ -21,7 +21,7 @@ public abstract class ConstraintTemplate {
 	/**
 	 * Constraint ID - currently not used field.
 	 */
-	int constraintID;
+	String constraintID;
 	/**
 	 * Number of parameters the constraint requires.
 	 */
@@ -40,13 +40,13 @@ public abstract class ConstraintTemplate {
 	 * @param description
 	 *            - Description of the constraint.
 	 */
-	public ConstraintTemplate(int parametersNo, String description) {
-		this.constraintID = 0;
+	public ConstraintTemplate(String id, int parametersNo, String description) {
+		this.constraintID = id;
 		this.parametersNo = parametersNo;
 		this.description = description;
 	}
 
-	public void setConstraintID(int constraintID) {
+	public void setConstraintID(String constraintID) {
 		this.constraintID = constraintID;
 	}
 
@@ -58,7 +58,7 @@ public abstract class ConstraintTemplate {
 		return this.parametersNo;
 	}
 
-	public int getConstraintID() {
+	public String getConstraintID() {
 		return this.constraintID;
 	}
 
@@ -96,7 +96,7 @@ public abstract class ConstraintTemplate {
 	 * @param givenParameters Provided number of parameters
 	 */
 	public void throwParametersError(int givenParameters) {
-		System.err.println("Error in the constraints file.\nConstraint: " + this.description + "\nExpected number of parameters: 2.\nProvided number of parameters: " + givenParameters);
+		System.err.println("Error in the constraints file.\nConstraint: " + this.description + "\nExpected number of parameters: " + parametersNo + ".\nProvided number of parameters: " + givenParameters);
 		
 	}
 	

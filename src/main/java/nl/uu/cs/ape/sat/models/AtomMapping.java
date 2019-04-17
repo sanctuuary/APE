@@ -58,6 +58,9 @@ public class AtomMapping {
 			reverseMapping.put(size, atom);
 			return size;
 		}
+		if(id.toString().contains("@RESERVED_CNF_")) {
+			System.out.println(id + " for: " + predicate + "(" + argument);
+		}
 		return id;
 	}
 

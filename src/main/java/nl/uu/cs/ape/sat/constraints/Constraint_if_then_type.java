@@ -2,44 +2,44 @@ package nl.uu.cs.ape.sat.constraints;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
-import nl.uu.cs.ape.sat.models.formulas.*;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.formulas.*;
 
 /**
  * Implements constraints of the form:<br/>
  * <br/>
- * Use type <b>parameters[0]</b> in the solution
- * using the function {@link #getConstraint}.
+ * If we have data module <b>parameters[0]</b>, then generate <b>parameters[1]</b>
+ * subsequently using the function {@link #getConstraint}.
  * 
  * @author Vedran Kasalica
  *
  */
-public class Constraint_use_type extends ConstraintTemplate {
+public class Constraint_if_then_type extends ConstraintTemplate {
 
 
-	public Constraint_use_type(String id, int parametersNo, String description) {
+	public Constraint_if_then_type(String id, int parametersNo, String description) {
 		super(id, parametersNo, description);
 	}
 
 	@Override
 	public String getConstraint(String[] parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		if (parameters.length != 1) {
+		if (parameters.length != 2) {
 			super.throwParametersError(parameters.length);
 			return null;
 		}
 		String constraint = "";
-
-		Type type = allTypes.get(parameters[0]);
-		if (type == null) {
+		Type if_type = allTypes.get(parameters[0]);
+		Type then_type = allTypes.get(parameters[1]);
+		if (if_type == null || then_type == null) {
 			System.err.println("Constraint argument does not exist in the type taxonomy.");
 			return null;
 		}
-		SLTL_formula_F formula = new SLTL_formula_F(type);
-		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		constraint = SLTL_formula.ite_type(if_type, then_type, moduleAutomaton, typeAutomaton, mappings);
 
 		return constraint;
 	}

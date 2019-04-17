@@ -208,9 +208,12 @@ public class Type extends Predicate {
 			tmpType = new Type(typeName, typeID, rootType, nodeType);
 			allTypes.addType(tmpType);
 			
-			if(superType != null) {
-				superType.addSubType(typeID);
-			}
+		}
+		/*
+		 * Adding class as a subtype to the superclass, even if currType was already introduced (extending taxonomy tree) 
+		 */
+		if(superType != null) {
+			superType.addSubType(typeID);
 		}
 		
 		return tmpType;

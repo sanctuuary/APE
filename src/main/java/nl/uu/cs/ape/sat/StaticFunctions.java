@@ -1,25 +1,15 @@
 package nl.uu.cs.ape.sat;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
@@ -28,6 +18,7 @@ import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.io.parsers.ParserException;
 import org.logicng.io.parsers.PropositionalParser;
+import org.logicng.transformations.cnf.CNFConfig;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.reader.DimacsReader;
@@ -38,14 +29,36 @@ import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
-import org.sat4j.tools.ModelIterator;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
-import nl.uu.cs.ape.sat.automaton.*;
-import nl.uu.cs.ape.sat.constraints.*;
-import nl.uu.cs.ape.sat.models.*;
+import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
+import nl.uu.cs.ape.sat.automaton.ModuleState;
+import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.automaton.TypeBlock;
+import nl.uu.cs.ape.sat.automaton.TypeState;
+import nl.uu.cs.ape.sat.constraints.AllConstraintTamplates;
+import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
+import nl.uu.cs.ape.sat.constraints.Constraint_depend_module;
+import nl.uu.cs.ape.sat.constraints.Constraint_if_then_module;
+import nl.uu.cs.ape.sat.constraints.Constraint_if_then_not_module;
+import nl.uu.cs.ape.sat.constraints.Constraint_if_then_not_type;
+import nl.uu.cs.ape.sat.constraints.Constraint_if_then_type;
+import nl.uu.cs.ape.sat.constraints.Constraint_last_module;
+import nl.uu.cs.ape.sat.constraints.Constraint_next_module;
+import nl.uu.cs.ape.sat.constraints.Constraint_not_use_module;
+import nl.uu.cs.ape.sat.constraints.Constraint_not_use_type;
+import nl.uu.cs.ape.sat.constraints.Constraint_prev_module;
+import nl.uu.cs.ape.sat.constraints.Constraint_use_module;
+import nl.uu.cs.ape.sat.constraints.Constraint_use_type;
+import nl.uu.cs.ape.sat.models.AllModules;
+import nl.uu.cs.ape.sat.models.AllTypes;
+import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.SAT_solution;
+import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.Types;
 
 /**
  * The {@code StaticFunctions} class is used for storing {@code Static} methods.
@@ -95,14 +108,19 @@ public class StaticFunctions {
 			TypeAutomaton typeAutomaton) {
 
 		String cnf_SLTL = "";
-		int constraintID, currRow = 1;
+		String constraintID;
+		int currRow = 1;
 		List<String> parameters;
 		for (String[] currConstr : getTuplesFromCSV(constraintsPath)) {
 			currRow++;
 			try {
-				constraintID = Integer.parseInt(currConstr[0]);
+				constraintID = currConstr[0];
 			} catch (NumberFormatException e) {
-				System.err.println("Constraint ID provided: " + currConstr[0] + " is not Integer.");
+				if (currConstr.length < 2) {
+					System.err.println("There is an empty row in the file: " + constraintsPath);
+				} else {
+					System.err.println("Constraint ID provided: " + currConstr[0] + " is not Integer.");
+				}
 				continue;
 			}
 			if (allConsTemplates.getConstraintTamplate(constraintID) == null) {
@@ -140,69 +158,94 @@ public class StaticFunctions {
 	public static String initializeConstraints(AllConstraintTamplates allConsTemplates) {
 
 		/*
-		 * ID: 1 If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b>
-		 * consequently.
+		 * ID: ite_m If we use module <b>parameters[0]</b>, then use module <b>parameters[1]</b>
+		 * subsequently.
 		 */
-		ConstraintTemplate currTemplate = new Constraint_if_then_module(2,
-				"If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> consequently.");
+		ConstraintTemplate currTemplate = new Constraint_if_then_module("ite_m", 2,
+				"If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> subsequently.");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: 2 If we use module <b>parameters[0]</b>, then do not use
-		 * <b>parameters[1]</b> consequently.
+		 * ID: itn_m If we use module <b>parameters[0]</b>, then do not use module
+		 * <b>parameters[1]</b> subsequently.
 		 */
-		currTemplate = new Constraint_if_then_not_module(2,
-				"If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b> consequently.");
+		currTemplate = new Constraint_if_then_not_module("itn_m", 2,
+				"If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b> subsequently.");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: 3 If we use module <b>parameters[0]</b>, then we must have used
+		 * ID: depend_m If we use module <b>parameters[0]</b>, then we must have used module
 		 * <b>parameters[1]</b> prior to it.
 		 */
-		currTemplate = new Constraint_depend_module(2,
+		currTemplate = new Constraint_depend_module("depend_m", 2,
 				"If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it.");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: 4 If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as
+		 * ID: next_m If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as
 		 * a next module in the sequence.
 		 */
-		currTemplate = new Constraint_next_module(2,
+		currTemplate = new Constraint_next_module("next_m", 2,
 				"If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a next module in the sequence.");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: 5 Use module <b>parameters[0]</b> in the solution.
+		 * ID: prev_m If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> as
+		 * a previous module in the sequence.
 		 */
-		currTemplate = new Constraint_use_module(1, "Use module <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_prev_module("prev_m", 2,
+				"If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> as a previous module in the sequence.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID: use_m Use module <b>parameters[0]</b> in the solution.
+		 */
+		currTemplate = new Constraint_use_module("use_m", 1, "Use module <b>parameters[0]</b> in the solution.");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: 6 Do not use module <b>parameters[0]</b> in the solution.
+		 * ID: nuse_m Do not use module <b>parameters[0]</b> in the solution.
 		 */
-		currTemplate = new Constraint_not_use_module(1, "Do not use module <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_not_use_module("nuse_m", 1, "Do not use module <b>parameters[0]</b> in the solution.");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: 7 Use <b>parameters[0]</b> as last module in the solution.
+		 * ID: last_m Use <b>parameters[0]</b> as last module in the solution.
 		 */
-		currTemplate = new Constraint_last_module(1, "Use <b>parameters[0]</b> as last module in the solution.");
+		currTemplate = new Constraint_last_module("last_m", 1, "Use <b>parameters[0]</b> as last module in the solution.");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: 8 Use type <b>parameters[0]</b> in the solution.
+		 * ID: use_t Use type <b>parameters[0]</b> in the solution.
 		 */
-		currTemplate = new Constraint_use_type(1, "Use type <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_use_type("use_t", 1, "Use type <b>parameters[0]</b> in the solution.");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: 9 Do not use type <b>parameters[0]</b> in the solution.
+		 * ID: nuse_t Do not use type <b>parameters[0]</b> in the solution.
 		 */
-		currTemplate = new Constraint_not_use_type(1, "Do not use type <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_not_use_type("nuse_t", 1, "Do not use type <b>parameters[0]</b> in the solution.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+		
+		
+		/*
+		 * ID: ite_t If we have data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b>
+		 * subsequently.
+		 */
+		currTemplate = new Constraint_if_then_type("ite_t", 2,
+				"If we have data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b> subsequently.");
 		allConsTemplates.addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: 10 Use <b>parameters[0]</b> as N-th module in the solution (where
+		 * ID: itn_t If we have data type <b>parameters[0]</b>, then do not generate type
+		 * <b>parameters[1]</b> subsequently.
+		 */
+		currTemplate = new Constraint_if_then_not_type("itn_t", 2,
+				"If we have data type <b>parameters[0]</b>, then do not generate type <b>parameters[1]</b> subsequently.");
+		allConsTemplates.addConstraintTamplate(currTemplate);
+
+		/*
+		 * ID: X Use <b>parameters[0]</b> as N-th module in the solution (where
 		 * <b>parameters[0]</b> = N).
 		 */
 //		currTemplate = new Constraint_nth_module(2,
@@ -222,7 +265,7 @@ public class StaticFunctions {
 	 * @return String representation of the SAT encoding for the specified
 	 *         constraint.
 	 */
-	public static String constraintSATEncoding(int constraintID, String[] parameters,
+	public static String constraintSATEncoding(String constraintID, String[] parameters,
 			AllConstraintTamplates allConsTemplates, AllModules allModules, AllTypes allTypes,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String constraint = allConsTemplates.getConstraintTamplate(constraintID).getConstraint(parameters, allModules,
@@ -359,7 +402,7 @@ public class StaticFunctions {
 			System.out.println("Found " + solutionsFound + " solutions. Solving time: "
 					+ (realTimeElapsedMillis / 1000F) + " sec.");
 		}
-		
+
 		return solutions;
 	}
 
@@ -392,11 +435,16 @@ public class StaticFunctions {
 	 */
 	public static String convert2CNF(String propositionalFormula) {
 		final FormulaFactory f = new FormulaFactory();
+//		f.cnfEncoder(). = ff;
+		CNFConfig.Algorithm ff = CNFConfig.Algorithm.FACTORIZATION;
 		final PropositionalParser p = new PropositionalParser(f);
+
 		Formula formula;
 		try {
+//			System.out.println(propositionalFormula);
 			formula = p.parse(propositionalFormula.replace('-', '~'));
 			final Formula cnf = formula.cnf();
+//			System.out.println("CNF: \n" + cnf);
 			return cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ").replace("(", "")
 					.replace(")", "") + " 0\n";
 		} catch (ParserException e) {
@@ -482,54 +530,17 @@ public class StaticFunctions {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Provide a safe interface for iteration throng a list.
-	 * @param <E>
-	 * @param currList - list that is being evaluated 
-	 * @return An empty list in case of {@code currList == null}, or {@code currList} otherwise.
+	 * 
+	 * @param          <E>
+	 * @param currList - list that is being evaluated
+	 * @return An empty list in case of {@code currList == null}, or
+	 *         {@code currList} otherwise.
 	 */
-	public static <E> List<E> safe( List<E> currList ) {
-	    return currList == null ? Collections.EMPTY_LIST : currList;
+	public static <E> List<E> safe(List<E> currList) {
+		return currList == null ? Collections.EMPTY_LIST : currList;
 	}
 
-	/**
-	 * Encoding the initial workflow input.
-	 * @param program_inputs - input types for the program
-	 * @param typeAutomaton 
-	 * @param solutionLength 
-	 * @param emptyType 
-	 * @param mappings 
-	 * @param allTypes 
-	 * @return String representation of the initial input encoding.
-	 */
-	public static String encodeInputData(List<Types> program_inputs, TypeAutomaton typeAutomaton, int solutionLength, Type emptyType, AtomMapping mappings, AllTypes allTypes) {
-		String encoding = "";
-
-		List<TypeState> inputStates = typeAutomaton.getBlock(0).getTypeStates();
-		for(int i=0; i < inputStates.size();i++) {
-			if(i < program_inputs.size()) {
-				List<Type> currTypes = program_inputs.get(i).getTypes();
-				for(Type currType : currTypes) {
-					if (allTypes.get(currType.getTypeID()) == null) {
-						System.err.println("Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
-						return null;
-					}
-					encoding += mappings.add(currType.getPredicate(), inputStates.get(i).getStateName()) + " 0\n";
-				}
-			} else {
-				encoding += mappings.add(emptyType.getPredicate(), inputStates.get(i).getStateName()) + " 0\n";
-			}
-			
-		}
-		return encoding;
-	}
 }
-	
-	
-	
-	
-	
-	
-	
-	

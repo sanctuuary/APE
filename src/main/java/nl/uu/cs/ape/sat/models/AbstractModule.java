@@ -229,7 +229,7 @@ public class AbstractModule extends Predicate {
 	public static AbstractModule generateModule(String moduleName, String moduleID, String rootNode, NodeType nodeType,
 			AllModules allModules, AbstractModule superModule) {
 		// In case of generating a new Module, the object is added as a subModule to the parent Module.
-		if(allModules.get(moduleID) == null && superModule != null) {
+		if(superModule != null) {
 			superModule.addSubModule(moduleID);
 		}
 		AbstractModule currModule = allModules.addModule(new AbstractModule(moduleName, moduleID, rootNode, nodeType));

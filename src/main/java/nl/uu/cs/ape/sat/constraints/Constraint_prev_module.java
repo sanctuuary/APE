@@ -11,34 +11,35 @@ import nl.uu.cs.ape.sat.models.formulas.*;
 /**
  * Implements constraints of the form:<br/>
  * <br/>
- * Use module <b>parameters[0]</b> in the solution
+ * If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> as a previous module in the sequence.
  * using the function {@link #getConstraint}.
  * 
  * @author Vedran Kasalica
  *
  */
-public class Constraint_use_module extends ConstraintTemplate {
+public class Constraint_prev_module extends ConstraintTemplate {
 
 
-	public Constraint_use_module(String id, int parametersNo, String description) {
+	public Constraint_prev_module(String id, int parametersNo, String description) {
 		super(id, parametersNo, description);
 	}
 
 	@Override
 	public String getConstraint(String[] parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		if (parameters.length != 1) {
+		if (parameters.length != 2) {
 			super.throwParametersError(parameters.length);
 			return null;
 		}
+
 		String constraint = "";
-		AbstractModule module = allModules.get(parameters[0]);
-		if (module == null) {
+		AbstractModule second_module_in_sequence = allModules.get(parameters[0]);
+		AbstractModule first_module_in_sequence = allModules.get(parameters[1]);
+		if (second_module_in_sequence == null || first_module_in_sequence == null) {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");
 			return null;
 		}
-		SLTL_formula_F formula = new SLTL_formula_F(module);
-		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		constraint = SLTL_formula.prev_module(second_module_in_sequence, first_module_in_sequence, moduleAutomaton, typeAutomaton, mappings);
 
 		return constraint;
 	}

@@ -10,13 +10,13 @@ import java.util.Map;
  */
 public class AllConstraintTamplates {
 
-	private Map<Integer, ConstraintTemplate> constraintTamplates;
+	private Map<String, ConstraintTemplate> constraintTamplates;
 	
 	public AllConstraintTamplates() {
-		this.constraintTamplates = new HashMap<Integer, ConstraintTemplate>();
+		this.constraintTamplates = new HashMap<String, ConstraintTemplate>();
 	}
 	
-	public Map<Integer, ConstraintTemplate> getConstraintTamplates(){
+	public Map<String, ConstraintTemplate> getConstraintTamplates(){
 		return this.constraintTamplates;
 	}
 	
@@ -25,16 +25,21 @@ public class AllConstraintTamplates {
 	 * @param constraintID - ID of the {@code ConstraintTemplate}.
 	 * @return {@code ConstraintTemplate} or {@code null} if this map contains no mapping for the ID.
 	 */
-	public ConstraintTemplate getConstraintTamplate(Integer constraintID) {
+	public ConstraintTemplate getConstraintTamplate(String constraintID) {
 		return constraintTamplates.get(constraintID);
 	}
 	
-	
-	public Integer addConstraintTamplate(ConstraintTemplate constraintTemplate) {
-		int currID = constraintTamplates.size() + 1;
-		constraintTamplates.put(currID, constraintTemplate);
-		constraintTemplate.setConstraintID(currID);
-		return currID;
+	/**
+	 * Add constraint template to the set of constraints.
+	 * @param constraintTemplate - constraint template that is added to the set.
+	 * @return {@code true} if the constraint template was successfully added to the set or {@code false} in case that the constraint ID already exists in the set.
+	 */
+	public boolean addConstraintTamplate(ConstraintTemplate constraintTemplate) {
+		if(constraintTamplates.put(constraintTemplate.getConstraintID(), constraintTemplate) != null) {
+			System.err.println("Duplicate constraint ID: " + constraintTemplate.getConstraintID() + ". Please change the ID in order to be able to use the constraint template.");
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -43,8 +48,8 @@ public class AllConstraintTamplates {
 	 */
 	public String printConstraintsCodes() {
 		String templates = "Constraint ID;\tNo. of parameters;\tDescription\n";
-		for(int i=1; i<=constraintTamplates.size();i++) {
-			templates += constraintTamplates.get(i).printConstraintCode();
+		for(ConstraintTemplate currConstr : constraintTamplates.values()) {
+			templates += currConstr.printConstraintCode();
 		}
 		return templates;
 	}

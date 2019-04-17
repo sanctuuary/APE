@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Class is used to represent the type automaton.
- * @author vedran
+ * @author Vedran Kasalica
  *
  */
 public class TypeAutomaton {
@@ -38,7 +38,7 @@ public class TypeAutomaton {
 	}
 	
 	/**
-	 * Get @i-th block of Type states from the automaton.
+	 * Get @i-th block of Type state blocks from the automaton.
 	 * @param i - ordering number of the block to be returned
 	 * @return Block of Type states
 	 */

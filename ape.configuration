@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
-	<ontology_path value="/home/vedran/Desktop/Demo_UseCase/GMT_Demo_UseCase.owl"/>
-	<toolsTaxonomyRoot value="ToolsTaxonomy"/>
-	<dataTaxonomyRoot value="DataTaxonomy">
-		<typesTaxonomyRoot value="TypesTaxonomy"/>
+	<ontology_path value="/home/vedran/ownCloud/APE_Demo_UseCase/GISTaxonomy.rdf"/>
+	<toolsTaxonomyRoot value="Tool"/>
+	<dataTaxonomyRoot value="DType">
+		<typesTaxonomyRoot value="DType"/>
 	</dataTaxonomyRoot>
-	<tool_annotations_path value="/home/vedran/Desktop/Demo_UseCase/tool_annotations.xml"/>
-	<constraints_path value="/home/vedran/Desktop/Demo_UseCase/constraints.csv"/>
+	<tool_annotations_path value="/home/vedran/ownCloud/APE_Demo_UseCase/ToolDescription_ct.xml"/>
+	<constraints_path value="/home/vedran/ownCloud/APE_Demo_UseCase/constraints.csv"/>
 	<shared_memory value="true"/>
-	<solutions_path value="/home/vedran/Desktop/Demo_UseCase/sat_solutions.txt"/>
+	<solutions_path value="/home/vedran/Desktop/APE_Demo_UseCase/sat_solutions.txt"/>
 	<solution_min_length value="1"/>
 	<solution_max_length value="6"/>
-	<max_solutions value="1000"/>
-	<execution_scripts_folder value="/home/vedran/Desktop/Demo_UseCase/Implementations"/>
+	<max_solutions value="100"/>
+	<execution_scripts_folder value="/home/vedran/Desktop/APE_Demo_UseCase/Implementations"/>
 	<number_of_execution_scripts value="5"/>
 	<inputs>
 		<input>
-			<type>XYZ_table_file</type>
+			<type>ObjectPoint</type>			
+		</input>
+		<input>
+			<type>TessellationAVectorA</type>
 		</input>
 	</inputs>
+	<outputs>
+		<output>
+			<type>Lattice</type>
+		</output>
+	</outputs>
 	<debug_mode value="false"/>
 </configuration>

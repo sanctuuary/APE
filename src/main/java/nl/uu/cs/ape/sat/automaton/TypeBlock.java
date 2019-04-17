@@ -45,9 +45,9 @@ public class TypeBlock {
 	}
 
 	/**
-	 * Return the block size.
+	 * Returns the size for each block in the automaton.
 	 * 
-	 * @return Block size.
+	 * @return {@code int} block size.
 	 */
 	public int getBlockSize() {
 		return blockSize;
@@ -60,6 +60,15 @@ public class TypeBlock {
 	public void addState(TypeState state) {
 		typeStates.add(state);
 		this.blockSize++;
+	}
+	
+	/**
+	 * Get @i-th state of Type states from the block.
+	 * @param i - ordering number of the state to be returned
+	 * @return A type state
+	 */
+	public TypeState getState(int i) {
+		return typeStates.get(i);
 	}
 
 }

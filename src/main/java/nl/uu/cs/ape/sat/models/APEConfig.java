@@ -43,6 +43,7 @@ public class APEConfig {
 	private final String EXECUTION_SCRIPTS_FOLDER_TAG = "execution_scripts_folder";
 	private final String NO_EXECUTIONS_TAG = "number_of_execution_scripts";
 	private final String PROGRAM_INPUTS_TAG = "inputs/input";
+	private final String PROGRAM_OUTPUTS_TAG = "outputs/output";
 	private final String DEBUG_MODE_TAG = "debug_mode";
 
 
@@ -112,7 +113,11 @@ public class APEConfig {
 	 */
 	private Integer max_no_tool_outputs = 3;
 	
+	/**
+	 * Input and output types of the workflow.
+	 */
 	private List<Types> program_inputs;
+	private List<Types> program_outputs;
 	
 	private Boolean debug_mode;
 	
@@ -158,7 +163,6 @@ public class APEConfig {
 	public boolean defaultConfigSetup() {
 
 		if(configNode.selectSingleNode(ONTOLOGY_TAG) != null)
-			System.out.println("s");
 		ontology_path = (configNode.selectSingleNode(ONTOLOGY_TAG) != null) ? configNode.selectSingleNode(ONTOLOGY_TAG).valueOf("@value") : null;
 		if (!isValidConfigReadFile(ONTOLOGY_TAG, ontology_path)) {
 			return false;
@@ -250,6 +254,19 @@ public class APEConfig {
 					input.addType(new Type(xmlType.getText(), xmlType.getText(), APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
 				}
 				program_inputs.add(input);
+			}
+		}
+		
+		List<Node> xmlModuleOutput = configNode.selectNodes(PROGRAM_OUTPUTS_TAG);
+		program_outputs = new ArrayList<Types>();
+
+		for (Node xmlOutput : StaticFunctions.safe(xmlModuleOutput)) {
+			if (xmlOutput.hasContent()) {
+				Types output = new Types();
+				for (Node xmlType : xmlOutput.selectNodes("*")) {
+					output.addType(new Type(xmlType.getText(), xmlType.getText(), APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
+				}
+				program_outputs.add(output);
 			}
 		}
 		
@@ -401,6 +418,14 @@ public class APEConfig {
 
 	public void setProgram_inputs(List<Types> program_inputs) {
 		this.program_inputs = program_inputs;
+	}
+	
+	public List<Types> getProgram_outputs() {
+		return program_outputs;
+	}
+
+	public void setProgram_outputs(List<Types> program_outputs) {
+		this.program_outputs = program_outputs;
 	}
 
 	public Boolean getDebug_mode() {

@@ -20,8 +20,8 @@ import nl.uu.cs.ape.sat.models.formulas.*;
 public class Constraint_not_use_module extends ConstraintTemplate {
 
 
-	public Constraint_not_use_module(int parametersNo, String description) {
-		super(parametersNo, description);
+	public Constraint_not_use_module(String id, int parametersNo, String description) {
+		super(id, parametersNo, description);
 	}
 
 	@Override

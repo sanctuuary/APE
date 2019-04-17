@@ -21,8 +21,8 @@ import nl.uu.cs.ape.sat.models.Type;
 public class Constraint_not_use_type extends ConstraintTemplate {
 
 
-	public Constraint_not_use_type(int parametersNo, String description) {
-		super(parametersNo, description);
+	public Constraint_not_use_type(String id, int parametersNo, String description) {
+		super(id, parametersNo, description);
 	}
 
 	@Override
