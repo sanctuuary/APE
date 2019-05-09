@@ -6,10 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
@@ -340,73 +342,6 @@ public class StaticFunctions {
 	}
 
 	/**
-	 * Returns a set of {@link SAT_solution SAT_solutions} by parsing the SAT
-	 * output. In case of the UNSAT the list is empty.
-	 * 
-	 * @param dimacsFilePath    - path to the CNF formula in dimacs form
-	 * @param mappings          - atom mappings
-	 * @param allModules        - list of all the modules
-	 * @param allTypes          - list of all the types
-	 * @param solutionsFoundMax
-	 * @return List of {@link SAT_solution SAT_solutions}. Possibly empty list.
-	 */
-	public static List<SAT_solution> solve(String dimacsFilePath, AtomMapping mappings, AllModules allModules,
-			AllTypes allTypes, int solutionsFound, int solutionsFoundMax, int solutionLength) {
-		List<SAT_solution> solutions = new ArrayList<SAT_solution>();
-		ISolver solver = SolverFactory.newDefault();
-		int timeout = 3600;
-		// ISolver solver = new ModelIterator(SolverFactory.newDefault(),
-		// no_of_solutions); // iteration through at most
-		// no_of_solutions solutions
-		solver.setTimeout(timeout); // 1 hour timeout
-		long realStartTime = 0;
-		long realTimeElapsedMillis;
-		Reader reader = new DimacsReader(solver);
-		try {
-			IProblem problem = reader.parseInstance(dimacsFilePath); // loading CNF encoding of the problem
-			realStartTime = System.currentTimeMillis();
-			while (solutionsFound < solutionsFoundMax && problem.isSatisfiable()) {
-				SAT_solution sat_solution = new SAT_solution(problem.model(), mappings, allModules, allTypes,
-						solutionLength);
-				solutions.add(sat_solution);
-				solutionsFound++;
-				if (solutionsFound % 500 == 0) {
-					realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-					System.out.println("Found " + solutionsFound + " solutions. Solving time: "
-							+ (realTimeElapsedMillis / 1000F) + " sec.");
-				}
-				/*
-				 * Adding the negation of the positive part of the solution as a constraint
-				 * (default negation does not work)
-				 */
-				IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray());
-				solver.addClause(negSol);
-			}
-		} catch (ParseFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ContradictionException e) {
-			System.err.println("Unsatisfiable");
-		} catch (TimeoutException e) {
-			System.err.println("Timeout. Solving took longer than default timeout: " + timeout + " seconds.");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (solutionsFound == 0 || solutionsFound % 500 != 0) {
-			realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-			System.out.println("Found " + solutionsFound + " solutions. Solving time: "
-					+ (realTimeElapsedMillis / 1000F) + " sec.");
-		}
-
-		return solutions;
-	}
-
-	/**
 	 * Updates the list of All Modules by annotating the existing ones (or adding
 	 * non-existing) using the I/O Types from the @file. Returns the list of Updated
 	 * Modules.
@@ -543,4 +478,44 @@ public class StaticFunctions {
 		return currList == null ? Collections.EMPTY_LIST : currList;
 	}
 
+	
+	public static int countLinesNewFromString(String inputString) throws IOException {
+	    InputStream is = IOUtils.toInputStream(inputString, "UTF-8");
+	    try {
+	        byte[] c = new byte[1024];
+
+	        int readChars = is.read(c);
+	        if (readChars == -1) {
+	            // bail out if nothing to read
+	            return 0;
+	        }
+
+	        // make it easy for the optimizer to tune this loop
+	        int count = 0;
+	        while (readChars == 1024) {
+	            for (int i=0; i<1024;) {
+	                if (c[i++] == '\n') {
+	                    ++count;
+	                }
+	            }
+	            readChars = is.read(c);
+	        }
+
+	        // count remaining characters
+	        while (readChars != -1) {
+	            System.out.println(readChars);
+	            for (int i=0; i<readChars; ++i) {
+	                if (c[i] == '\n') {
+	                    ++count;
+	                }
+	            }
+	            readChars = is.read(c);
+	        }
+
+	        return count == 0 ? 1 : count;
+	    } finally {
+	        is.close();
+	    }
+	}
+	
 }

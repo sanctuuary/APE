@@ -18,7 +18,7 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
  * @author Vedran Kasalica
  *
  */
-public class SAT_solution {
+public class SAT_solution implements Solution {
 
 	/*
 	 * List of all the literals provided by the solution.
