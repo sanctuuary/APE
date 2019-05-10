@@ -11,7 +11,7 @@
 	<solutions_path value="/home/vedran/Desktop/APE_Demo_UseCase/sat_solutions.txt"/>
 	<solution_min_length value="1"/>
 	<solution_max_length value="6"/>
-	<max_solutions value="100"/>
+	<max_solutions value="50"/>
 	<execution_scripts_folder value="/home/vedran/Desktop/APE_Demo_UseCase/Implementations"/>
 	<number_of_execution_scripts value="5"/>
 	<inputs>

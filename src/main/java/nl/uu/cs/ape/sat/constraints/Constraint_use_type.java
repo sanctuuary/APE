@@ -17,7 +17,7 @@ import nl.uu.cs.ape.sat.models.Type;
  * @author Vedran Kasalica
  *
  */
-public class Constraint_use_type extends ConstraintTemplate {
+public class Constraint_use_type extends Constraint {
 
 
 	public Constraint_use_type(String id, int parametersNo, String description) {

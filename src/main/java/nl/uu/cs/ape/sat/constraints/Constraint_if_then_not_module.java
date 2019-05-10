@@ -17,7 +17,7 @@ import nl.uu.cs.ape.sat.models.formulas.*;
  * @author Vedran Kasalica
  *
  */
-public class Constraint_if_then_not_module extends ConstraintTemplate {
+public class Constraint_if_then_not_module extends Constraint {
 
 
 	public Constraint_if_then_not_module(String id, int parametersNo, String description) {

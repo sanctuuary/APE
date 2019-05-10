@@ -1,31 +1,18 @@
 package nl.uu.cs.ape.sat;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
-import org.xml.sax.SAXException;
-
-import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
-import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.constraints.AllConstraintTamplates;
+import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.models.APEConfig;
-import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.All_SAT_solutions;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.SAT_solution;
-import nl.uu.cs.ape.sat.models.Type;
-
-import javax.xml.parsers.*;
-import java.io.*;
 
 public class Main {
 
@@ -35,6 +22,50 @@ public class Main {
 	private static APEConfig config;
 	private static final String CONFIGURATION_FILE = "ape.configuration";
 
+	/**
+	 * In case that the debug mode is on, print the constraint templates and tool
+	 * and data taxonomy trees.
+	 * 
+	 * @param allModules         - set of all tools
+	 * @param allTypes           - set of all data types
+	 * @param constraintsFormats - String list of all constraint templates
+	 */
+	private static void debugPrintout(AllModules allModules, AllTypes allTypes, String constraintsFormats) {
+		if (config.getDebug_mode()) {
+
+			/*
+			 * Printing the constraint templates
+			 */
+			System.out.println("-------------------------------------------------------------");
+			System.out.println("\tConstraint templates:");
+			System.out.println("-------------------------------------------------------------");
+			System.out.println(constraintsFormats + "\n");
+
+			/*
+			 * Printing the Module and Taxonomy Tree
+			 */
+			System.out.println("-------------------------------------------------------------");
+			System.out.println("\tTool Taxonomy:");
+			System.out.println("-------------------------------------------------------------");
+			allModules.getRootModule().printTree(" ", allModules);
+			System.out.println("\n-------------------------------------------------------------");
+			System.out.println("\tData Taxonomy:");
+			System.out.println("-------------------------------------------------------------");
+			allTypes.getRootType().printTree(" ", allTypes);
+			System.out.println("-------------------------------------------------------------");
+		}
+	}
+
+	/**
+	 * Print header to specify the current workflow length that is being explored
+	 */
+	private static void printHeader(int solutionLength) {
+
+		System.out.println("\n-------------------------------------------------------------");
+		System.out.println("\tWorkflow discovery - length " + solutionLength);
+		System.out.println("-------------------------------------------------------------");
+	}
+
 	public static void main(String[] args) throws IOException {
 
 		config = APEConfig.getConfig();
@@ -43,35 +74,22 @@ public class Main {
 		}
 
 		/*
-		 * Check whether the config file is supposed to be updated or the default values
-		 * should be used.
+		 * Check whether the config file is properly formatted.
 		 */
-		if (args.length == 0) {
-			if (!config.defaultConfigSetup()) {
-				System.out.println("Please validate the syntax of the configuration file: ./" + CONFIGURATION_FILE
-						+ " in order to be able to run the library correctly.");
-				return;
-			}
-		} else {
-			System.out.println("Invalid number of arguments.");
+		if (!config.defaultConfigSetup()) {
+			System.out.println("Please validate the syntax of the configuration file: ./" + CONFIGURATION_FILE
+					+ " in order to be able to run the library correctly.");
 			return;
 		}
 
-		/*
-		 * Variables defining the current and maximum lengths and solutions count.
-		 */
-		int solutionsFound = 0;
-		int solutionsFoundMax = (config.getMax_no_solutions() > 0) ? config.getMax_no_solutions() : 1000;
-		int solutionLength = (config.getSolution_min_length() > 0) ? config.getSolution_min_length() : 1;
-		int solutionLengthMax = (config.getSolution_max_length() > 0) ? config.getSolution_max_length() : 20;
-
+		
 		/**
-		 * Provides mapping from each atom to a number, and vice versa
+		 * List of all the solutions
 		 */
-		AtomMapping mappings = new AtomMapping();
+		All_SAT_solutions allSolutions = new All_SAT_solutions(config);
 
 		/*
-		 * encode the taxonomies as objects - generate the list of all types / modules
+		 * Encode the taxonomies as objects - generate the list of all types / modules
 		 * occurring in the taxonomies defining their submodules/subtypes
 		 */
 
@@ -86,13 +104,11 @@ public class Main {
 			return;
 		}
 
-		AbstractModule rootModule = allModules.getRootModule();
-		Type rootType = allTypes.getRootType();
-
 		/*
-		 * Define the empty type, representing the absence of types
+		 * Set the the empty type (representing the absence of types) as a direct child
+		 * of root type
 		 */
-		rootType.addSubType(allTypes.getEmptyType().getTypeID());
+		allTypes.getRootType().addSubType(allTypes.getEmptyType().getTypeID());
 
 		/*
 		 * Update allModules and allTypes sets based on the module.csv file
@@ -103,35 +119,12 @@ public class Main {
 		/*
 		 * Define set of all constraint formats
 		 */
-		AllConstraintTamplates allConsTemplates = new AllConstraintTamplates();
-		if(!config.getDebug_mode()) {
-			StaticFunctions.initializeConstraints(allConsTemplates);
-		} else {
-			System.out.println("-------------------------------------------------------------");
-			System.out.println("\tConstraint templates:");
-			System.out.println("-------------------------------------------------------------");
-			System.out.println(StaticFunctions.initializeConstraints(allConsTemplates) + "\n");
-		}
+		ConstraintFactory constraintFactory = new ConstraintFactory();
+		constraintFactory.initializeConstraints();
 
-		/**
-		 * List of all the solutions
-		 */
-		List<SAT_solution> allSolutions = new ArrayList<SAT_solution>();
+		/** Print the setup information when necessary. */
+		debugPrintout(allModules, allTypes, constraintFactory.printConstraintsCodes());
 
-		/*
-		 * printing the Module and Taxonomy Tree
-		 */
-		if (config.getDebug_mode()) {
-			System.out.println("-------------------------------------------------------------");
-			System.out.println("\tTool Taxonomy:");
-			System.out.println("-------------------------------------------------------------");
-			allModules.getRootModule().printTree(" ", allModules);
-			System.out.println("\n-------------------------------------------------------------");
-			System.out.println("\tData Taxonomy:");
-			System.out.println("-------------------------------------------------------------");
-			allTypes.getRootType().printTree(" ", allTypes);
-			System.out.println("-------------------------------------------------------------");
-		}
 
 		/*
 		 * print all the tools
@@ -144,131 +137,42 @@ public class Main {
 		 * Loop over different lengths of the workflow until either, max workflow length
 		 * or max number of solutions has been found.
 		 */
-		while (solutionsFound < solutionsFoundMax && solutionLength <= solutionLengthMax) {
-			long problemSetupStartTime = System.currentTimeMillis();
-			System.out.println("\n-------------------------------------------------------------");
-			System.out.println("\tWorkflow discovery - length " + solutionLength);
-			System.out.println("-------------------------------------------------------------");
-			String cnf = "";
+		long realStartTime = System.currentTimeMillis();
+		while (allSolutions.getSolutionsFound() < allSolutions.getSolutionsFoundMax() && allSolutions.getSolutionLengthMax() <= allSolutions.getSolutionLengthMax()) {
 
-			ModuleAutomaton moduleAutomaton = new ModuleAutomaton();
-			TypeAutomaton typeAutomaton = new TypeAutomaton();
-
-			/*
-			 * Generate the automaton in CNF
-			 */
-			StaticFunctions.generateAutomaton(moduleAutomaton, typeAutomaton, solutionLength,
-					config.getMax_no_tool_outputs());
-
-			/*
-			 * Encode the workflow input
-			 */
-			 String inputDataEncoding = allTypes.encodeInputData(config.getProgram_inputs(), typeAutomaton, mappings);
-			 if (inputDataEncoding == null) {
-				 return;
-			 }
-			 cnf += inputDataEncoding; 
-			 /*
-			 * Encode the workflow output
-			 */
-			 String outputDataEncoding = allTypes.encodeOutputData(config.getProgram_outputs(), typeAutomaton, mappings);
-			 if (outputDataEncoding == null) {
-				 return;
-			 }
-			 cnf += outputDataEncoding; 
-			/*
-			 * Create constraints from the module.csv file
-			 */
-			cnf += annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, config.getShared_memory(),
-					allTypes.getEmptyType(), mappings);
-			/*
-			 * Create the constraints enforcing: 1. Mutual exclusion of the tools 2.
-			 * Mandatory usage of the tools - from taxonomy. 3. Adding the constraints
-			 * enforcing the taxonomy structure.
-			 */
-			cnf += allModules.moduleMutualExclusion(moduleAutomaton, mappings);
-			cnf += allModules.moduleMandatoryUsage(annotated_modules, moduleAutomaton, mappings);
-			cnf += allModules.moduleEnforceTaxonomyStructure(rootModule.getModuleID(), moduleAutomaton, mappings);
-
-			/*
-			 * Create the constraints enforcing: 1. Mutual exclusion of the types/formats 2.
-			 * Mandatory usage of the types in the transition nodes (note: "empty type" is
-			 * considered a type) 3. Adding the constraints enforcing the taxonomy
-			 * structure.
-			 */
-			cnf += allTypes.typeMutualExclusion(typeAutomaton, mappings);
-			cnf += allTypes.typeMandatoryUsage(rootType, typeAutomaton, mappings);
-			cnf += allTypes.typeEnforceTaxonomyStructure(rootType.getTypeID(), typeAutomaton, mappings);
-
-			/*
-			 * Encode the constraints from the paper manually
-			 */
-			cnf += StaticFunctions.generateSLTLConstraints(config.getConstraints_path(), allConsTemplates, allModules,
-					allTypes, mappings, moduleAutomaton, typeAutomaton);
-
-			/*
-			 * Counting the number of variables and clauses that will be given to the SAT
-			 * solver TODO Improve thi-s approach, no need to read the whole String again.
-			 */
-			int variables = mappings.getSize();
-			int clauses = StringUtils.countMatches(cnf, " 0");
-			String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
-
-			/*
-			 * Create a temp file that will be used as input for the SAT solver.
-			 */
-			File temp_sat_input = null;
-			try {
-				temp_sat_input = File.createTempFile("sat_input_" + solutionLength + "_len_", ".cnf");
-//				temp_sat_input.deleteOnExit();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			/*
-			 * Fixing the input and output files for easier testing.
-			 */
-
-			StaticFunctions.write2file(sat_input_header + cnf, temp_sat_input, false);
+			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(allModules, allTypes, allSolutions, config,
+					annotated_modules, constraintFactory);
 			
-			long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
-			System.out.println("Problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) +" sec.");
-			long realStartTime = System.currentTimeMillis();
-			List<SAT_solution> currSolutions = StaticFunctions.solve(temp_sat_input.getAbsolutePath(), mappings,
-					allModules, allTypes, solutionsFound, solutionsFoundMax, solutionLength);
-			solutionsFound += currSolutions.size();
-			/**
-			 * Add current solutions to list of all solutions.
-			 */
-			allSolutions.addAll(currSolutions);
-			long realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-			if ((solutionsFound >= solutionsFoundMax - 1) || solutionLength == solutionLengthMax) {
-				System.out.println("\nAPE found " + solutionsFound + " solutions. Total solving time: "
-						+ (realTimeElapsedMillis / 1000F) + " sec.");
-			} else {
-//				System.out.println("Found " + solutionsFound + " solutions. Solving time: "
-//						+ (realTimeElapsedMillis / 1000F) + " sec.");
-			}
+			printHeader(allSolutions.getCurrSolutionLenght());
 
-			/**
-			 * Increase the size of the workflow for the next depth iteration
-			 */
-			solutionLength++;
+			if (implSATsynthesis.synthesisEncoding() == null) {
+				return;
+			}
+			
+			implSATsynthesis.synthesisExecution();
+			long realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
+			
+			if ((allSolutions.getSolutionsFound() >= allSolutions.getSolutionsFoundMax() - 1) || allSolutions.getSolutionLengthMax() == allSolutions.getSolutionLengthMax()) {
+				System.out.println("\nAPE found " + allSolutions.getSolutionsFound() + " solutions. Total solving time: "
+						+ (realTimeElapsedMillis / 1000F) + " sec.");
+			}
+			
+			/** Increase the size of the workflow for the next depth iteration */
+			allSolutions.incrementLength();
 		}
 		/*
 		 * Writing solutions to the specified file in human readable format
 		 */
-		boolean first = false;
 		if (allSolutions.isEmpty()) {
 			System.out.println("UNSAT");
-			return;
 		}
-		for (int i = 0; i < allSolutions.size(); i++) {
-			StaticFunctions.write2file(allSolutions.get(i).getRelevantSolutionWithTypes() + "\n",
-					new File(config.getSolution_path()), first);
-			first = true;
+		
+		String solutions2write = "";
+		
+		for (int i = 0; i < allSolutions.getSolutionsFound(); i++) {
+			solutions2write += allSolutions.get(i).getRelevantSolutionWithTypes() + "\n";
 		}
+		StaticFunctions.write2file(solutions2write, new File(config.getSolution_path()), false);
 
 //		StaticFunctions.write2file(allSolutions.get(0).getMappedSolution() + "\n",
 //				new File("/home/vedran/Desktop/sat_solutions_map.txt"), false);
@@ -281,7 +185,7 @@ public class Main {
 		 */
 		Integer noExecutions = APEConfig.getConfig().getNo_executions();
 		if (noExecutions != null && noExecutions > 0) {
-			for (int i = 0; i < noExecutions && i < allSolutions.size(); i++) {
+			for (int i = 0; i < noExecutions && i < allSolutions.getSolutionsFound(); i++) {
 
 				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
 						config.getExecution_scripts_folder() + "/workflowSolution_" + i + ".sh", false)));
@@ -302,5 +206,5 @@ public class Main {
 		 */
 
 	}
-
+	
 }
