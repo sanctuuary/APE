@@ -40,8 +40,8 @@ import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeBlock;
 import nl.uu.cs.ape.sat.automaton.TypeState;
-import nl.uu.cs.ape.sat.constraints.AllConstraintTamplates;
-import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
+import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
+import nl.uu.cs.ape.sat.constraints.Constraint;
 import nl.uu.cs.ape.sat.constraints.Constraint_depend_module;
 import nl.uu.cs.ape.sat.constraints.Constraint_if_then_module;
 import nl.uu.cs.ape.sat.constraints.Constraint_if_then_not_module;
@@ -105,7 +105,7 @@ public class StaticFunctions {
 	 * @param typeAutomaton
 	 * @return A string representing SLTL constraints into CNF
 	 */
-	public static String generateSLTLConstraints(String constraintsPath, AllConstraintTamplates allConsTemplates,
+	public static String generateSLTLConstraints(String constraintsPath, ConstraintFactory allConsTemplates,
 			AllModules allModules, AllTypes allTypes, AtomMapping mappings, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton) {
 
@@ -150,113 +150,7 @@ public class StaticFunctions {
 		return cnf_SLTL;
 	}
 
-	/**
-	 * Adding each constraint format in the set of all cons. formats
-	 * 
-	 * @param allConsTemplates - set that represents all the cons. formats
-	 * @return String description of all the formats (ID, description and number of
-	 *         parameters for each).
-	 */
-	public static String initializeConstraints(AllConstraintTamplates allConsTemplates) {
-
-		/*
-		 * ID: ite_m If we use module <b>parameters[0]</b>, then use module <b>parameters[1]</b>
-		 * subsequently.
-		 */
-		ConstraintTemplate currTemplate = new Constraint_if_then_module("ite_m", 2,
-				"If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> subsequently.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: itn_m If we use module <b>parameters[0]</b>, then do not use module
-		 * <b>parameters[1]</b> subsequently.
-		 */
-		currTemplate = new Constraint_if_then_not_module("itn_m", 2,
-				"If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b> subsequently.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: depend_m If we use module <b>parameters[0]</b>, then we must have used module
-		 * <b>parameters[1]</b> prior to it.
-		 */
-		currTemplate = new Constraint_depend_module("depend_m", 2,
-				"If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: next_m If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as
-		 * a next module in the sequence.
-		 */
-		currTemplate = new Constraint_next_module("next_m", 2,
-				"If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a next module in the sequence.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: prev_m If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> as
-		 * a previous module in the sequence.
-		 */
-		currTemplate = new Constraint_prev_module("prev_m", 2,
-				"If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> as a previous module in the sequence.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-		
-		/*
-		 * ID: use_m Use module <b>parameters[0]</b> in the solution.
-		 */
-		currTemplate = new Constraint_use_module("use_m", 1, "Use module <b>parameters[0]</b> in the solution.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: nuse_m Do not use module <b>parameters[0]</b> in the solution.
-		 */
-		currTemplate = new Constraint_not_use_module("nuse_m", 1, "Do not use module <b>parameters[0]</b> in the solution.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: last_m Use <b>parameters[0]</b> as last module in the solution.
-		 */
-		currTemplate = new Constraint_last_module("last_m", 1, "Use <b>parameters[0]</b> as last module in the solution.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: use_t Use type <b>parameters[0]</b> in the solution.
-		 */
-		currTemplate = new Constraint_use_type("use_t", 1, "Use type <b>parameters[0]</b> in the solution.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: nuse_t Do not use type <b>parameters[0]</b> in the solution.
-		 */
-		currTemplate = new Constraint_not_use_type("nuse_t", 1, "Do not use type <b>parameters[0]</b> in the solution.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-		
-		
-		/*
-		 * ID: ite_t If we have data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b>
-		 * subsequently.
-		 */
-		currTemplate = new Constraint_if_then_type("ite_t", 2,
-				"If we have data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b> subsequently.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: itn_t If we have data type <b>parameters[0]</b>, then do not generate type
-		 * <b>parameters[1]</b> subsequently.
-		 */
-		currTemplate = new Constraint_if_then_not_type("itn_t", 2,
-				"If we have data type <b>parameters[0]</b>, then do not generate type <b>parameters[1]</b> subsequently.");
-		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		/*
-		 * ID: X Use <b>parameters[0]</b> as N-th module in the solution (where
-		 * <b>parameters[0]</b> = N).
-		 */
-//		currTemplate = new Constraint_nth_module(2,
-//				"Use <b>parameters[0]</b> as <b>parameters[1]</b>-th (N-th) module in the solution (where <b>parameters[1]</b> = N)");
-//		allConsTemplates.addConstraintTamplate(currTemplate);
-
-		return allConsTemplates.printConstraintsCodes();
-
-	}
+	
 
 	/**
 	 * Function used to provide SAT encoding of a constrain based on the constraint
@@ -268,7 +162,7 @@ public class StaticFunctions {
 	 *         constraint.
 	 */
 	public static String constraintSATEncoding(String constraintID, String[] parameters,
-			AllConstraintTamplates allConsTemplates, AllModules allModules, AllTypes allTypes,
+			ConstraintFactory allConsTemplates, AllModules allModules, AllTypes allTypes,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String constraint = allConsTemplates.getConstraintTamplate(constraintID).getConstraint(parameters, allModules,
 				allTypes, moduleAutomaton, typeAutomaton, mappings);
@@ -503,7 +397,6 @@ public class StaticFunctions {
 
 	        // count remaining characters
 	        while (readChars != -1) {
-	            System.out.println(readChars);
 	            for (int i=0; i<readChars; ++i) {
 	                if (c[i] == '\n') {
 	                    ++count;

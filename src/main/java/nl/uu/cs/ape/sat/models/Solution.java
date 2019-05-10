@@ -3,19 +3,19 @@ package nl.uu.cs.ape.sat.models;
 import java.util.List;
 
 /**
- * Used as interface for solutions represented in any format.
+ * The {@code Solution} class is sed as an interface for solutions that can be implemented in different formats.
  * 
  * @author Vedran Kasalica
  *
  */
-public interface Solution {
+public abstract class Solution {
 
 	
-	public String getSolution();
+	public abstract String getSolution();
 	
-	public String getRelevantSolution();
+	public abstract String getRelevantSolution();
 	
-	public List<Module> getRelevantSolutionModules(AllModules allModules);
+	public abstract List<Module> getRelevantSolutionModules(AllModules allModules);
 	
-	public boolean isSat();
+	public abstract boolean isSat();
 }

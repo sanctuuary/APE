@@ -16,7 +16,7 @@ import nl.uu.cs.ape.sat.models.AtomMapping;
  * @author Vedran Kasalica
  *
  */
-public abstract class ConstraintTemplate {
+public abstract class Constraint {
 
 	/**
 	 * Constraint ID - currently not used field.
@@ -40,7 +40,7 @@ public abstract class ConstraintTemplate {
 	 * @param description
 	 *            - Description of the constraint.
 	 */
-	public ConstraintTemplate(String id, int parametersNo, String description) {
+	public Constraint(String id, int parametersNo, String description) {
 		this.constraintID = id;
 		this.parametersNo = parametersNo;
 		this.description = description;

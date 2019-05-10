@@ -17,7 +17,7 @@ import nl.uu.cs.ape.sat.models.formulas.*;
  * @author Vedran Kasalica
  *
  */
-public class Constraint_next_module extends ConstraintTemplate {
+public class Constraint_next_module extends Constraint {
 
 
 	public Constraint_next_module(String id, int parametersNo, String description) {

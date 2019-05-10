@@ -223,7 +223,7 @@ public abstract class SLTL_formula {
 		for (int i_block = 0; i_block < numberOfBlocks - 1; i_block++) {
 			for (int i_state = 0; i_state < numberOfStates; i_state++) {
 				for (int j_block = i_block + 1; j_block < numberOfBlocks; j_block++) {
-					for (int j_state = i_state + 1; j_state < numberOfBlocks; j_state++) {
+					for (int j_state = 0; j_state < numberOfStates; j_state++) {
 						/*
 						 * If if_predicate is used in any state of a certain block
 						 */

@@ -1,33 +1,18 @@
 package nl.uu.cs.ape.sat;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
-import org.xml.sax.SAXException;
-
-import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
-import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.constraints.AllConstraintTamplates;
+import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.models.APEConfig;
-import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.All_solutions;
-import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.All_SAT_solutions;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.SAT_solution;
-import nl.uu.cs.ape.sat.models.Type;
-
-import javax.xml.parsers.*;
-import java.io.*;
 
 public class Main {
 
@@ -101,7 +86,7 @@ public class Main {
 		/**
 		 * List of all the solutions
 		 */
-		All_solutions allSolutions = new All_solutions(config);
+		All_SAT_solutions allSolutions = new All_SAT_solutions(config);
 
 		/*
 		 * Encode the taxonomies as objects - generate the list of all types / modules
@@ -134,11 +119,11 @@ public class Main {
 		/*
 		 * Define set of all constraint formats
 		 */
-		AllConstraintTamplates allConsTemplates = new AllConstraintTamplates();
-		String constraintsFormats = StaticFunctions.initializeConstraints(allConsTemplates);
+		ConstraintFactory constraintFactory = new ConstraintFactory();
+		constraintFactory.initializeConstraints();
 
 		/** Print the setup information when necessary. */
-		debugPrintout(allModules, allTypes, constraintsFormats);
+		debugPrintout(allModules, allTypes, constraintFactory.printConstraintsCodes());
 
 
 		/*
@@ -152,42 +137,42 @@ public class Main {
 		 * Loop over different lengths of the workflow until either, max workflow length
 		 * or max number of solutions has been found.
 		 */
+		long realStartTime = System.currentTimeMillis();
 		while (allSolutions.getSolutionsFound() < allSolutions.getSolutionsFoundMax() && allSolutions.getSolutionLengthMax() <= allSolutions.getSolutionLengthMax()) {
-			long problemSetupStartTime = System.currentTimeMillis();
-			
+
 			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(allModules, allTypes, allSolutions, config,
-					annotated_modules, allConsTemplates);
-			printHeader(solutionLength);
+					annotated_modules, constraintFactory);
+			
+			printHeader(allSolutions.getCurrSolutionLenght());
 
 			if (implSATsynthesis.synthesisEncoding() == null) {
 				return;
 			}
-			long realStartTime = System.currentTimeMillis();
-			implSATsynthesis.synthesisExecution(allSolutions);
+			
+			implSATsynthesis.synthesisExecution();
 			long realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-			if ((solutionsFound >= solutionsFoundMax - 1) || solutionLength == solutionLengthMax) {
-				System.out.println("\nAPE found " + solutionsFound + " solutions. Total solving time: "
+			
+			if ((allSolutions.getSolutionsFound() >= allSolutions.getSolutionsFoundMax() - 1) || allSolutions.getSolutionLengthMax() == allSolutions.getSolutionLengthMax()) {
+				System.out.println("\nAPE found " + allSolutions.getSolutionsFound() + " solutions. Total solving time: "
 						+ (realTimeElapsedMillis / 1000F) + " sec.");
 			}
 			
-			/**
-			 * Increase the size of the workflow for the next depth iteration
-			 */
-			solutionLength++;
+			/** Increase the size of the workflow for the next depth iteration */
+			allSolutions.incrementLength();
 		}
 		/*
 		 * Writing solutions to the specified file in human readable format
 		 */
-		boolean first = false;
 		if (allSolutions.isEmpty()) {
 			System.out.println("UNSAT");
-			return;
 		}
-		for (int i = 0; i < allSolutions.size(); i++) {
-			StaticFunctions.write2file(allSolutions.get(i).getRelevantSolutionWithTypes() + "\n",
-					new File(config.getSolution_path()), first);
-			first = true;
+		
+		String solutions2write = "";
+		
+		for (int i = 0; i < allSolutions.getSolutionsFound(); i++) {
+			solutions2write += allSolutions.get(i).getRelevantSolutionWithTypes() + "\n";
 		}
+		StaticFunctions.write2file(solutions2write, new File(config.getSolution_path()), false);
 
 //		StaticFunctions.write2file(allSolutions.get(0).getMappedSolution() + "\n",
 //				new File("/home/vedran/Desktop/sat_solutions_map.txt"), false);
@@ -200,7 +185,7 @@ public class Main {
 		 */
 		Integer noExecutions = APEConfig.getConfig().getNo_executions();
 		if (noExecutions != null && noExecutions > 0) {
-			for (int i = 0; i < noExecutions && i < allSolutions.size(); i++) {
+			for (int i = 0; i < noExecutions && i < allSolutions.getSolutionsFound(); i++) {
 
 				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
 						config.getExecution_scripts_folder() + "/workflowSolution_" + i + ".sh", false)));

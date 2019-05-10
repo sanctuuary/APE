@@ -19,73 +19,60 @@ import org.sat4j.specs.TimeoutException;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.constraints.AllConstraintTamplates;
+import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.models.APEConfig;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
+import nl.uu.cs.ape.sat.models.All_SAT_solutions;
 import nl.uu.cs.ape.sat.models.All_solutions;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.SAT_solution;
 import nl.uu.cs.ape.sat.models.Type;
 
+/**
+ * The {@code SAT_SynthesisEngine} class represents a synthesis instance, i.e. it is represented with the set of inputs (tools, types, constraints and workflow lenght that is being explored).<br>
+ * It is used to execute synthesis algorithm over the given input, implemented using MiniSAT solver.
+ * <br><br>
+ * The class implements general synthesis interface {@link SynthesisEngine}.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class SAT_SynthesisEngine implements SynthesisEngine {
 
 	private final AllModules allModules;
 	private final AllTypes allTypes;
-	private final int solutionLength;
 	private final APEConfig config;
 	private final AllModules annotated_modules;
 	private final AtomMapping mappings;
-	private final AllConstraintTamplates allConsTemplates;
-	private File temp_sat_input;
-	private int solutionsFound;
-	private int solutionsFoundMax;
-	private List<SAT_solution> allSolutions;
-	
+	private final ConstraintFactory allConsTemplates;
+	/** Set of all the solutions found by the program */
+	private final All_SAT_solutions allSolutions;
 	private String cnfEncoding;
+	private File temp_sat_input;
 	
 	/**
 	 * Setup of the SAT synthesis engine
 	 * @param allModules
 	 * @param allTypes
-	 * @param solutionLength
+	 * @param allSolutions
 	 * @param config
 	 * @param annotated_modules
-	 * @param mappings
 	 * @param allConsTemplates
 	 */
-	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, int solutionLength, APEConfig config, AllModules annotated_modules, AtomMapping mappings, AllConstraintTamplates allConsTemplates, int solutionsFoundMax) {
+	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, All_SAT_solutions allSolutions,
+			APEConfig config, AllModules annotated_modules, ConstraintFactory allConsTemplates) {
 		this.allModules = allModules;
 		this.allTypes = allTypes;
-		this.solutionLength = solutionLength;
-		this.config = config;
-		this.annotated_modules = annotated_modules;
-		this.mappings = mappings;
-		this.allConsTemplates = allConsTemplates;
-		allSolutions = new ArrayList<SAT_solution>();
-		
-		this.temp_sat_input = null;
-		this.cnfEncoding = "";
-		this.solutionsFound = 0;
-		this.solutionsFoundMax = solutionsFoundMax;
-	}
-	
-	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, All_solutions allSolutions,
-			APEConfig config, AllModules annotated_modules, AllConstraintTamplates allConsTemplates) {
-		this.allModules = allModules;
-		this.allTypes = allTypes;
-		this.solutionLength = allSolutions.getSolutionLengthMax();
+		this.allSolutions = allSolutions;
 		this.config = config;
 		this.annotated_modules = annotated_modules;
 		this.mappings = allSolutions.getMappings();
 		this.allConsTemplates = allConsTemplates;
-		allSolutions = new ArrayList<SAT_solution>();
 		
 		this.temp_sat_input = null;
 		this.cnfEncoding = "";
-		this.solutionsFound = 0;
-		this.solutionsFoundMax = allSolutions.getsolutionsFoundMax;
 	}
 
 	/**
@@ -104,9 +91,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Generate the automaton in CNF
 		 */
-		StaticFunctions.generateAutomaton(moduleAutomaton, typeAutomaton, solutionLength,
+		StaticFunctions.generateAutomaton(moduleAutomaton, typeAutomaton, allSolutions.getCurrSolutionLenght(),
 				config.getMax_no_tool_outputs());
-
 		/*
 		 * Encode the workflow input
 		 */
@@ -152,7 +138,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 */
 		cnfEncoding += StaticFunctions.generateSLTLConstraints(config.getConstraints_path(), allConsTemplates, allModules,
 				allTypes, mappings, moduleAutomaton, typeAutomaton);
-		
+
 		/*
 		 * Counting the number of variables and clauses that will be given to the SAT
 		 * solver TODO Improve thi-s approach, no need to read the whole String again.
@@ -164,7 +150,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Create a temp file that will be used as input for the SAT solver.
 		 */
-			temp_sat_input = File.createTempFile("sat_input_" + solutionLength + "_len_", ".cnf");
+			temp_sat_input = File.createTempFile("sat_input_" + allSolutions.getCurrSolutionLenght() + "_len_", ".cnf");
 			temp_sat_input.deleteOnExit();
 
 		/*
@@ -182,28 +168,15 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	/**
 	 * Using the SAT input generated from SAT encoding and running MiniSAT solver to find the solutions
 	 * 
-	 * @param allSolutions - current set of solutions that will be extended with newly found solutions
+	 * @param allSolutions - current set of {@link SAT_solution} that will be extended with newly found solutions, it 
 	 * @return {@code true} if the synthesis execution runs properly, {@code false} if it fails.
 	 */
-	public boolean synthesisExecution(List<SAT_solution> allSolutions) {
-		
+	public boolean synthesisExecution() {
 		
 		List<SAT_solution> currSolutions = runMiniSAT(temp_sat_input.getAbsolutePath(), mappings,
-				allModules, allTypes, solutionsFound, solutionsFoundMax, solutionLength);
-		solutionsFound += currSolutions.size();
-		/**
-		 * Add current solutions to list of all solutions.
-		 */
-		allSolutions.addAll(currSolutions);
-		long realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-		if ((solutionsFound >= solutionsFoundMax - 1) || solutionLength == solutionLengthMax) {
-			System.out.println("\nAPE found " + solutionsFound + " solutions. Total solving time: "
-					+ (realTimeElapsedMillis / 1000F) + " sec.");
-		} else {
-//			System.out.println("Found " + solutionsFound + " solutions. Solving time: "
-//					+ (realTimeElapsedMillis / 1000F) + " sec.");
-		}
-		return false;
+				allModules, allTypes, allSolutions.getSolutionsFound(), allSolutions.getSolutionsFoundMax(), allSolutions.getCurrSolutionLenght());
+		/** Add current solutions to list of all solutions. */
+		return allSolutions.addAll(currSolutions);
 	}
 	
 	

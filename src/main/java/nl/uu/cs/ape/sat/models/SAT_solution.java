@@ -14,11 +14,13 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
  * The {@code SAT_solution} class describes the solution produced by the SAT solver. It stores the
  * original solution and the mapped one. In case of the parameter <b>unsat</b> being
  * {@code true}, there are no solutions.
+ * <br> <br> 
+ * It also implements general solution interface {@link Solution}.
  * 
  * @author Vedran Kasalica
  *
  */
-public class SAT_solution implements Solution {
+public class SAT_solution extends Solution {
 
 	/*
 	 * List of all the literals provided by the solution.
