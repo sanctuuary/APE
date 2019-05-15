@@ -91,7 +91,7 @@ public class SAT_solution extends Solution {
 		relevantModules = new ArrayList<Literal>();
 		relevantTypes = new ArrayList<Literal>();
 		for (int mappedLiteral : satSolution) {
-			if (mappedLiteral != 0) {
+			if (mappedLiteral > atomMapping.getMaxNumOfMappedAuxVar()) {
 				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), atomMapping, allModules, allTypes);
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {

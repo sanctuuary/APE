@@ -234,7 +234,6 @@ public class StaticFunctions {
 
 		return sat_solution;
 	}
-
 	/**
 	 * Updates the list of All Modules by annotating the existing ones (or adding
 	 * non-existing) using the I/O Types from the @file. Returns the list of Updated
@@ -262,7 +261,7 @@ public class StaticFunctions {
 	 * @param propositionalFormula - propositional formula
 	 * @return CNF representation of the formula
 	 */
-	public static String convert2CNF(String propositionalFormula) {
+	public static String convert2CNF(String propositionalFormula, AtomMapping mappings) {
 		final FormulaFactory f = new FormulaFactory();
 //		f.cnfEncoder(). = ff;
 		CNFConfig.Algorithm ff = CNFConfig.Algorithm.FACTORIZATION;
@@ -273,9 +272,23 @@ public class StaticFunctions {
 //			System.out.println(propositionalFormula);
 			formula = p.parse(propositionalFormula.replace('-', '~'));
 			final Formula cnf = formula.cnf();
-//			System.out.println("CNF: \n" + cnf);
-			return cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ").replace("(", "")
+			String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ").replace("(", "")
 					.replace(")", "") + " 0\n";
+			boolean exists = true;
+			int counter = 0;
+			String auxVariable = "";
+			while(exists) {
+				auxVariable = "@RESERVED_CNF_" + counter + " ";
+				if(transformedCNF.contains(auxVariable)) {
+					transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
+				} else {
+					exists = false;
+				}
+				counter++;
+			}
+			
+//			System.out.println("CNF: \n" + cnf);
+			return transformedCNF;
 		} catch (ParserException e) {
 			e.printStackTrace();
 			return null;

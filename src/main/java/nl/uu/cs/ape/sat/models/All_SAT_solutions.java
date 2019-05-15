@@ -71,6 +71,13 @@ public class All_SAT_solutions implements All_solutions {
 	public boolean isEmpty() {
 		return solutions.isEmpty();
 	}
+	
+	/**
+	 * The procedure resets the encodings specific for a synthesis run (such as auxiliary variables).
+	 */
+	public void newEncoding() {
+		mappings.resetAuxVariables();
+	}
 
 	/**
 	 * Appends all of the elements in the specified collection to the end of this list, in the order that they are returned by the specified collection's iterator (optional operation). The behavior of this operation is undefined if the specified collection is modified while the operation is in progress. (Note that this will occur if the specified collection is this list, and it's nonempty.)
