@@ -68,6 +68,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		this.allSolutions = allSolutions;
 		this.config = config;
 		this.annotated_modules = annotated_modules;
+		allSolutions.newEncoding();
 		this.mappings = allSolutions.getMappings();
 		this.allConsTemplates = allConsTemplates;
 		
@@ -151,7 +152,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * Create a temp file that will be used as input for the SAT solver.
 		 */
 			temp_sat_input = File.createTempFile("sat_input_" + allSolutions.getCurrSolutionLenght() + "_len_", ".cnf");
-			temp_sat_input.deleteOnExit();
+//			temp_sat_input.deleteOnExit();
 
 		/*
 		 * Fixing the input and output files for easier testing.

@@ -207,7 +207,7 @@ public class AllModules {
 								tempConstraint += ")";
 							}
 //							transforming the formula (e.g -X | (type(s1) & format(s1)) | (type(s2) & format(s2)) into CNF
-							constraints += StaticFunctions.convert2CNF(tempConstraint);
+							constraints += StaticFunctions.convert2CNF(tempConstraint,mappings);
 						}
 				}
 			}
@@ -262,7 +262,7 @@ public class AllModules {
 								}
 							}
 //							transforming the formula (e.g -X | (type(s1) & format(s1)) | (type(s2) & format(s2)) into CNF
-							constraints += StaticFunctions.convert2CNF(tempConstraint);
+							constraints += StaticFunctions.convert2CNF(tempConstraint,mappings);
 						}
 				}
 			}

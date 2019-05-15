@@ -16,12 +16,19 @@ public class AtomMapping {
 
 	private Map<String, Integer> mappings;
 	private Map<Integer, String> reverseMapping;
+	/** Number of mapped predicates */
 	private int size;
+	/** Number  of auxiliary introduced variables */
+	private int auxiliary;
+	/** Number of all auxiliary variables */
+	private int auxMax = 100000;
 
 	public AtomMapping() {
 		mappings = new HashMap<String, Integer>();
 		reverseMapping = new HashMap<Integer, String>();
-		size = 0;
+		/** First {@link #auxMax} variables are reserved for auxiliary variables */
+		size = auxMax + 1;
+		auxiliary = 1;
 	}
 
 	/**
@@ -89,6 +96,26 @@ public class AtomMapping {
 	 */
 	public int getSize(){
 		return size;
+	}
+	
+	/**
+	 * Get the next auxiliary number and increse the counter by 1.
+	 * @return Mapping number that can be used for auxiliary variables.
+	 */
+	public int getNextAuxNum() {
+		return auxiliary++;
+	}
+	
+	public void resetAuxVariables() {
+		auxiliary = 1;
+	}
+	
+	/**
+	 * Get the number of mapped auxiliary variables that are not part of the solution.
+	 * @return Number of mapped auxiliary variables.
+	 */
+	public int getMaxNumOfMappedAuxVar() {
+		return auxMax;
 	}
 	
 	
