@@ -22,49 +22,6 @@ public class Main {
 	private static APEConfig config;
 	private static final String CONFIGURATION_FILE = "ape.configuration";
 
-	/**
-	 * In case that the debug mode is on, print the constraint templates and tool
-	 * and data taxonomy trees.
-	 * 
-	 * @param allModules         - set of all tools
-	 * @param allTypes           - set of all data types
-	 * @param constraintsFormats - String list of all constraint templates
-	 */
-	private static void debugPrintout(AllModules allModules, AllTypes allTypes, String constraintsFormats) {
-		if (config.getDebug_mode()) {
-
-			/*
-			 * Printing the constraint templates
-			 */
-			System.out.println("-------------------------------------------------------------");
-			System.out.println("\tConstraint templates:");
-			System.out.println("-------------------------------------------------------------");
-			System.out.println(constraintsFormats + "\n");
-
-			/*
-			 * Printing the Module and Taxonomy Tree
-			 */
-			System.out.println("-------------------------------------------------------------");
-			System.out.println("\tTool Taxonomy:");
-			System.out.println("-------------------------------------------------------------");
-			allModules.getRootModule().printTree(" ", allModules);
-			System.out.println("\n-------------------------------------------------------------");
-			System.out.println("\tData Taxonomy:");
-			System.out.println("-------------------------------------------------------------");
-			allTypes.getRootType().printTree(" ", allTypes);
-			System.out.println("-------------------------------------------------------------");
-		}
-	}
-
-	/**
-	 * Print header to specify the current workflow length that is being explored
-	 */
-	private static void printHeader(int solutionLength) {
-
-		System.out.println("\n-------------------------------------------------------------");
-		System.out.println("\tWorkflow discovery - length " + solutionLength);
-		System.out.println("-------------------------------------------------------------");
-	}
 
 	public static void main(String[] args) throws IOException {
 
@@ -123,7 +80,7 @@ public class Main {
 		constraintFactory.initializeConstraints();
 
 		/** Print the setup information when necessary. */
-		debugPrintout(allModules, allTypes, constraintFactory.printConstraintsCodes());
+		StaticFunctions.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory.printConstraintsCodes());
 
 
 		/*
@@ -143,12 +100,13 @@ public class Main {
 			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(allModules, allTypes, allSolutions, config,
 					annotated_modules, constraintFactory);
 			
-			printHeader(allSolutions.getCurrSolutionLenght());
+			StaticFunctions.printHeader(allSolutions.getCurrSolutionLenght());
 
+			/** Encoding of the synthesis problem */
 			if (implSATsynthesis.synthesisEncoding() == null) {
 				return;
 			}
-			
+			/** Execution of the synthesis */
 			implSATsynthesis.synthesisExecution();
 			long realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
 			

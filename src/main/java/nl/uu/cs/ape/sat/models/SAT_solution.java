@@ -157,7 +157,7 @@ public class SAT_solution extends Solution {
 	 * format, filtering out the information that are not required to generate the
 	 * workflow. The solution literals are sorted according the state they are used
 	 * in.
-	 * 
+	 * TMem TUsed
 	 * @return String representing the tools and data used in the solutions
 	 */
 	public String getRelevantSolutionWithTypes() {
@@ -173,11 +173,11 @@ public class SAT_solution extends Solution {
 //					System.out.println(typeLiteral);
 //					System.out.println(typeLiteral.getAttribute());
 					if(solutionLength > 9 && i < 9) {
-						if(typeLiteral.getAttribute().startsWith("T0" + (i + 1) + ".")) {
+						if(typeLiteral.getAttribute().startsWith("UsedT0" + (i + 1) + ".") || typeLiteral.getAttribute().startsWith("MemT0" + (i + 1) + ".")) {
 							solution += typeLiteral.toString() + " ";
 						}
 					} else {
-						if(typeLiteral.getAttribute().startsWith("T" + (i + 1) + ".")) {
+						if(typeLiteral.getAttribute().startsWith("UsedT" + (i + 1) + ".") || typeLiteral.getAttribute().startsWith("MemT" + (i + 1) + ".")) {
 							solution += typeLiteral.toString() + " ";
 						}
 					}

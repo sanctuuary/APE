@@ -129,6 +129,7 @@ public class Module extends AbstractModule {
 		return this.moduleExecution;
 	}
 
+	static int id = 1;
 	/**
 	 * Creates a module from a row provided by the tool annotations CSV.
 	 * 
@@ -142,7 +143,7 @@ public class Module extends AbstractModule {
 		String superModuleID = xmlModule.selectSingleNode("operation").getText();
 		String moduleName = xmlModule.valueOf("@name");
 		if(moduleName == null || moduleName.matches("")) {
-			moduleName = superModuleID + "_ID:" + (int)(1000 * Math.random());
+			moduleName = superModuleID + "_ID:" + (id++);
 		}
 		String moduleID = moduleName;
 		String executionCode = xmlModule.selectSingleNode("implementation").selectSingleNode("code").getText();

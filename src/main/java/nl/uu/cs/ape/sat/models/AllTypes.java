@@ -228,12 +228,24 @@ public class AllTypes {
 	public String typeMutualExclusion(TypeAutomaton typeAutomaton, AtomMapping mappings) {
 
 		String constraints = "";
-
+		String firstPair,secondPair;
+		List<TypeBlock> tmpBlocks = typeAutomaton.getAllBlocks();
 		for (Pair pair : getTypePairsForEachSubTaxonomy()) {
-			for (TypeBlock typeBlock : typeAutomaton.getTypeBlocks()) {
+			firstPair = pair.getFirst().getPredicate();
+			secondPair = pair.getSecond().getPredicate();
+			// mutual exclusion of types in states that represent general memory
+			for (TypeBlock typeBlock : tmpBlocks) {
 				for (TypeState typeState : typeBlock.getTypeStates()) {
-					constraints += "-" + mappings.add(pair.getFirst().getPredicate(), typeState.getStateName()) + " ";
-					constraints += "-" + mappings.add(pair.getSecond().getPredicate(), typeState.getStateName())
+					constraints += "-" + mappings.add(firstPair, typeState.getStateName()) + " ";
+					constraints += "-" + mappings.add(secondPair, typeState.getStateName())
+							+ " 0\n";
+				}
+			}
+			// mutual exclusion of types in states that represent tool inputs
+			for (TypeBlock typeBlock : typeAutomaton.getUsedTypesBlocks()) {
+				for (TypeState typeState : typeBlock.getTypeStates()) {
+					constraints += "-" + mappings.add(firstPair, typeState.getStateName()) + " ";
+					constraints += "-" + mappings.add(secondPair, typeState.getStateName())
 							+ " 0\n";
 				}
 			}
@@ -253,8 +265,14 @@ public class AllTypes {
 	 */
 	public String typeMandatoryUsage(Type type, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String constraints = "";
-
-		for (TypeBlock typeBlock : typeAutomaton.getTypeBlocks()) {
+		// enforcement of types in states that represent general memory
+		for (TypeBlock typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+			for (TypeState typeState : typeBlock.getTypeStates()) {
+				constraints += mappings.add(type.getPredicate(), typeState.getStateName()) + " 0\n";
+			}
+		}
+		// enforcement of types in states that represent tool inputs
+		for (TypeBlock typeBlock : typeAutomaton.getUsedTypesBlocks()) {
 			for (TypeState typeState : typeBlock.getTypeStates()) {
 				constraints += mappings.add(type.getPredicate(), typeState.getStateName()) + " 0\n";
 			}
@@ -280,7 +298,14 @@ public class AllTypes {
 	public String typeEnforceTaxonomyStructure(String rootTypeID, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 
 		String constraints = "";
-		for (TypeBlock typeBlock : typeAutomaton.getTypeBlocks()) {
+		// taxonomy enforcement of types in states that represent general memory
+		for (TypeBlock typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+			for (TypeState typeState : typeBlock.getTypeStates()) {
+				constraints += typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState);
+			}
+		}
+		// taxonomy enforcement of types in states that represent tool inputs
+		for (TypeBlock typeBlock : typeAutomaton.getUsedTypesBlocks()) {
 			for (TypeState typeState : typeBlock.getTypeStates()) {
 				constraints += typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState);
 			}
@@ -338,7 +363,7 @@ public class AllTypes {
 	public String encodeInputData(List<Types> program_inputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String encoding = "";
 
-		List<TypeState> inputStates = typeAutomaton.getBlock(0).getTypeStates();
+		List<TypeState> inputStates = typeAutomaton.getMemoryTypesBlock(0).getTypeStates();
 		for (int i = 0; i < inputStates.size(); i++) {
 			if (i < program_inputs.size()) {
 				List<Type> currTypes = program_inputs.get(i).getTypes();
@@ -360,7 +385,7 @@ public class AllTypes {
 
 	/**
 	 * Encoding the workflow output. The provided output files have to occur as
-	 * output from the final tool.
+	 * the final set of "used" data types.
 	 * 
 	 * @param program_outputs - input types for the program
 	 * @param typeAutomaton
@@ -373,8 +398,7 @@ public class AllTypes {
 	public String encodeOutputData(List<Types> program_outputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String encoding = "";
 
-		// TODO
-		List<TypeState> outputStates = typeAutomaton.getBlock(typeAutomaton.getTypeBlocks().size() - 1).getTypeStates();
+		List<TypeState> outputStates = typeAutomaton.getUsedTypesBlock(typeAutomaton.getWorkflowLength()).getTypeStates();
 		for (Types currTypes : program_outputs) {
 			for (Type currType : currTypes.getTypes()) {
 				if (get(currType.getTypeID()) == null) {

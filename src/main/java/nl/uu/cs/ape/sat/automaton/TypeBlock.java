@@ -12,19 +12,16 @@ public class TypeBlock {
 
 	private List<TypeState> typeStates;
 	private int blockNumber;
-	private int blockSize;
 
 	public TypeBlock(int blockNumber) {
 		typeStates = new ArrayList<TypeState>();
 		this.blockNumber = blockNumber;
-		this.blockSize = 0;
 	}
 
 	public TypeBlock(List<TypeState> typeStates, int blockNumber) {
 		super();
 		this.typeStates = typeStates;
 		this.blockNumber = blockNumber;
-		this.blockSize = typeStates.size();
 	}
 
 	public List<TypeState> getTypeStates() {
@@ -50,7 +47,7 @@ public class TypeBlock {
 	 * @return {@code int} block size.
 	 */
 	public int getBlockSize() {
-		return blockSize;
+		return typeStates.size();
 	}
 
 	/**
@@ -59,7 +56,6 @@ public class TypeBlock {
 	 */
 	public void addState(TypeState state) {
 		typeStates.add(state);
-		this.blockSize++;
 	}
 	
 	/**

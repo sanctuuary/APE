@@ -5,18 +5,28 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 
 /**
- * The {@code Literal} class represents literals (atoms that can be negated) corresponding to the usage of the modules and types in the solution. It is of the form {@code Predicate(Attribute)} where
- * {@code Predicate} represents a single predicate/label used to depict {@code AbstractModule, Module} or {@code Type}, while {@code Attribute} represents the state in the module/type automaton where the module/type is used or not used. <br>
- * {@code Literal}s can be negated.
+ * The {@code Literal} class represents literals (atoms that can be negated) corresponding to the usage of the modules 
+ * and types in the solution. It is of the form {@code Predicate(Attribute)} where
+ * {@code Predicate} represents a single predicate/label used to depict {@code AbstractModule, Module} 
+ * or {@code Type}, while {@code Attribute} represents the state in the module/type automaton where the 
+ * module/type is used (or not used if the literal is negative). <br><br>
+ * {@code Literals} can start with a negation.
+ * <br><br>
+ * {@code Literals} are compared according to the state in which they are used ({@linkplain #attribute}), i.e. a literal that represents the n-th state in the workflow, comes before the literal that represents the (n+1)th state.
  * @author Vedran Kasalica
  *
  */
 public class Literal implements Comparable<Literal>{
 
+	/** Mapped value of the atom*/
 	private String mappedAtom;
+	/** Contains the original value of the predicate. It represents a {@code AbstractModule, Module} or a {@code Type}. */
 	private Predicate predicate;
+	/** Contains the value that is given as an attribute for the predicate. It represents the state in the module/type automaton where the predicate is used (or not used if the literal is negative). */
 	private String attribute;
+	/** {@code true} if the atom is negated */
 	private boolean negated;
+	/** {@code true} if the atom represents a module, atom represents a type otherwise. */
 	private boolean isModule;
 
 	/**

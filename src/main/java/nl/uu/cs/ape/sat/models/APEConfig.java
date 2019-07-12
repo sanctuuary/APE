@@ -47,83 +47,58 @@ public class APEConfig {
 	private final String DEBUG_MODE_TAG = "debug_mode";
 
 
-	/**
-	 * Path to the taxonomy file
-	 */
+	/** Path to the taxonomy file */
 	private String ontology_path;
 
-	/**
-	 * Nodes in the ontology that correspond to the roots of module and data
-	 * taxonomies.
-	 */
+	/** Nodes in the ontology that correspond to the roots of module and data
+	 * taxonomies. */
 	private String tool_taxonomy_root, data_taxonomy_root;
 	
-	/**
-	 * List of nodes in the ontology that correspond to the roots of data type and data format
-	 * taxonomies.
-	 */
+	/** List of nodes in the ontology that correspond to the roots of data type and data format
+	 * taxonomies. */
 	private List<String> data_taxonomy_subroots = new ArrayList<String>();
 	
-	/**
-	 * Path to the XML file with all tool annotations.
-	 */
+	/** Path to the XML file with all tool annotations.*/
 	private String tool_annotations_path;
 	
-	/**
-	 * Path to the file with all workflow constraints.
-	 */
+	/** Path to the file with all workflow constraints. */
 	private String constraints_path;
 	
-	/**
-	 * {@code true} if the shared memory structure should be used, {@code false} in case
-	 * of a restrictive pipeline structure.
-	 */
+	/** {@code true} if the shared memory structure should be used, {@code false} in case
+	 * of a restrictive pipeline structure. */
 	private Boolean shared_memory;
 	
-	/**
-	 * Path to the file that will contain all the solutions to the problem in human
-	 * readable representation.
-	 */
+	/** Path to the file that will contain all the solutions to the problem in human
+	 * readable representation. */
 	private String solution_path;
 
-	/**
-	 * Min and Max possible length of the solutions (length of the automaton). For no upper limit, max length should be set to 0.
-	 */
+	/** Min and Max possible length of the solutions (length of the automaton). For no upper limit, max length should be set to 0. */
 	private Integer solution_min_length, solution_max_length;
 
-	/*
-	 * Max number of solution that the solver will return.
-	 */
+	/** Max number of solution that the solver will return.*/
 	private Integer max_no_solutions;
 	
-	/**
-	 * Path to the folder that will contain all the scripts generated based on 
-	 * the candidate workflows.
-	 */
+	/** Path to the folder that will contain all the scripts generated based on 
+	 * the candidate workflows. */
 	private String execution_scripts_folder;
 	
-	/**
-	 * Number of the workflow scripts that should be generated from candidate workflows.
-	 * Default is 0.
-	 */
+	/** Number of the workflow scripts that should be generated from candidate workflows.
+	 * Default is 0. */
 	private Integer no_executions;
 
-	/**
-	 * Output branching factor (max number of outputs per tool).
-	 */
+	/** Output branching factor (max number of outputs per tool). */
 	private Integer max_no_tool_outputs = 3;
 	
-	/**
-	 * Input and output types of the workflow.
-	 */
+	/** Input branching factor (max number of inputs per tool). */
+	private Integer max_no_tool_inputs = 3;
+	
+	/** Input and output types of the workflow. */
 	private List<Types> program_inputs;
 	private List<Types> program_outputs;
 	
 	private Boolean debug_mode;
 	
-	/**
-	 * Configurations used to read/update the "ape.configuration" file.
-	 */
+	/** Configurations used to read/update the "ape.configuration" file. */
 	private Document document;
 	private Node configNode;
 
@@ -390,6 +365,14 @@ public class APEConfig {
 
 	public void setMax_no_tool_outputs(Integer max_no_tool_outputs) {
 		this.max_no_tool_outputs = max_no_tool_outputs;
+	}
+	
+	public Integer getMax_no_tool_inputs() {
+		return max_no_tool_inputs;
+	}
+
+	public void setMax_no_tool_oinputs(Integer max_no_tool_inputs) {
+		this.max_no_tool_inputs = max_no_tool_inputs;
 	}
 
 	public Document getDocument() {

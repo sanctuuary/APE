@@ -51,7 +51,7 @@ public class AtomMapping {
 	
 	/**
 	 * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. If the Atom did not occur before,
-	 * it is added to the mapping set and the mapping value is returned, otherwise just the existing mapping value is returned.
+	 * it is added to the mapping set and the mapping value is returned, otherwise the existing mapping value is returned.
 	 * @param predicate - predicate of the mapped atom
 	 * @param argument - argument of the mapped atom
 	 * @return Mapping number of the atom (number is always > 0)

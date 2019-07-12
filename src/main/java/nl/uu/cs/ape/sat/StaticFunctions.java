@@ -150,8 +150,6 @@ public class StaticFunctions {
 		return cnf_SLTL;
 	}
 
-	
-
 	/**
 	 * Function used to provide SAT encoding of a constrain based on the constraint
 	 * ID specified and provided parameters.
@@ -234,6 +232,7 @@ public class StaticFunctions {
 
 		return sat_solution;
 	}
+
 	/**
 	 * Updates the list of All Modules by annotating the existing ones (or adding
 	 * non-existing) using the I/O Types from the @file. Returns the list of Updated
@@ -272,21 +271,21 @@ public class StaticFunctions {
 //			System.out.println(propositionalFormula);
 			formula = p.parse(propositionalFormula.replace('-', '~'));
 			final Formula cnf = formula.cnf();
-			String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ").replace("(", "")
-					.replace(")", "") + " 0\n";
+			String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ")
+					.replace("(", "").replace(")", "") + " 0\n";
 			boolean exists = true;
 			int counter = 0;
 			String auxVariable = "";
-			while(exists) {
+			while (exists) {
 				auxVariable = "@RESERVED_CNF_" + counter + " ";
-				if(transformedCNF.contains(auxVariable)) {
+				if (transformedCNF.contains(auxVariable)) {
 					transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
 				} else {
 					exists = false;
 				}
 				counter++;
 			}
-			
+
 //			System.out.println("CNF: \n" + cnf);
 			return transformedCNF;
 		} catch (ParserException e) {
@@ -306,44 +305,6 @@ public class StaticFunctions {
 		} catch (DocumentException e) {
 			System.err.println("Error parsing the XML file: " + xmlPath);
 			return null;
-		}
-	}
-
-	/**
-	 * Generate the State automatons (Module and Type) based on the defined length
-	 * and branching factor.
-	 * 
-	 * @param moduleAutomaton
-	 * @param typeAutomaton
-	 * @param automata_bound  - length of the automaton
-	 * @param branching       - branching factor (max number of outputs for modules)
-	 */
-	public static void generateAutomaton(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
-			int automata_bound, int branching) {
-		for (int i = 0; i <= automata_bound; i++) {
-			String i_var;
-			if (automata_bound > 10 && i < 10) {
-				i_var = "0" + i;
-			} else {
-				i_var = "" + i;
-			}
-			if (i > 0) {
-				ModuleState tmpModuleState = new ModuleState("M" + i_var, i);
-				if (i == 1) {
-					tmpModuleState.setFirst();
-				} else if (i == automata_bound) {
-					tmpModuleState.setLast();
-				}
-				moduleAutomaton.addState(tmpModuleState);
-
-			}
-
-			TypeBlock tmpTypeBlock = new TypeBlock(i);
-			for (int j = 0; j < branching; j++) {
-				TypeState tmpTypeState = new TypeState("T" + i_var + "." + j, j);
-				tmpTypeBlock.addState(tmpTypeState);
-			}
-			typeAutomaton.addBlock(tmpTypeBlock);
 		}
 	}
 
@@ -374,6 +335,51 @@ public class StaticFunctions {
 	}
 
 	/**
+	 * In case that the debug mode is on, print the constraint templates and tool
+	 * and data taxonomy trees.
+	 * 
+	 * @param allModules         - set of all tools
+	 * @param allTypes           - set of all data types
+	 * @param constraintsFormats - String list of all constraint templates
+	 */
+	public static void debugPrintout(boolean debug, AllModules allModules, AllTypes allTypes,
+			String constraintsFormats) {
+		if (debug) {
+
+			/*
+			 * Printing the constraint templates
+			 */
+			System.out.println("-------------------------------------------------------------");
+			System.out.println("\tConstraint templates:");
+			System.out.println("-------------------------------------------------------------");
+			System.out.println(constraintsFormats + "\n");
+
+			/*
+			 * Printing the Module and Taxonomy Tree
+			 */
+			System.out.println("-------------------------------------------------------------");
+			System.out.println("\tTool Taxonomy:");
+			System.out.println("-------------------------------------------------------------");
+			allModules.getRootModule().printTree(" ", allModules);
+			System.out.println("\n-------------------------------------------------------------");
+			System.out.println("\tData Taxonomy:");
+			System.out.println("-------------------------------------------------------------");
+			allTypes.getRootType().printTree(" ", allTypes);
+			System.out.println("-------------------------------------------------------------");
+		}
+	}
+
+	/**
+	 * Print header to specify the current workflow length that is being explored
+	 */
+	public static void printHeader(int solutionLength) {
+
+		System.out.println("\n-------------------------------------------------------------");
+		System.out.println("\tWorkflow discovery - length " + solutionLength);
+		System.out.println("-------------------------------------------------------------");
+	}
+
+	/**
 	 * Provide a safe interface for iteration throng a list.
 	 * 
 	 * @param          <E>
@@ -385,43 +391,62 @@ public class StaticFunctions {
 		return currList == null ? Collections.EMPTY_LIST : currList;
 	}
 
-	
 	public static int countLinesNewFromString(String inputString) throws IOException {
-	    InputStream is = IOUtils.toInputStream(inputString, "UTF-8");
-	    try {
-	        byte[] c = new byte[1024];
+		InputStream is = IOUtils.toInputStream(inputString, "UTF-8");
+		try {
+			byte[] c = new byte[1024];
 
-	        int readChars = is.read(c);
-	        if (readChars == -1) {
-	            // bail out if nothing to read
-	            return 0;
-	        }
+			int readChars = is.read(c);
+			if (readChars == -1) {
+				// bail out if nothing to read
+				return 0;
+			}
 
-	        // make it easy for the optimizer to tune this loop
-	        int count = 0;
-	        while (readChars == 1024) {
-	            for (int i=0; i<1024;) {
-	                if (c[i++] == '\n') {
-	                    ++count;
-	                }
-	            }
-	            readChars = is.read(c);
-	        }
+			// make it easy for the optimizer to tune this loop
+			int count = 0;
+			while (readChars == 1024) {
+				for (int i = 0; i < 1024;) {
+					if (c[i++] == '\n') {
+						++count;
+					}
+				}
+				readChars = is.read(c);
+			}
 
-	        // count remaining characters
-	        while (readChars != -1) {
-	            for (int i=0; i<readChars; ++i) {
-	                if (c[i] == '\n') {
-	                    ++count;
-	                }
-	            }
-	            readChars = is.read(c);
-	        }
+			// count remaining characters
+			while (readChars != -1) {
+				for (int i = 0; i < readChars; ++i) {
+					if (c[i] == '\n') {
+						++count;
+					}
+				}
+				readChars = is.read(c);
+			}
 
-	        return count == 0 ? 1 : count;
-	    } finally {
-	        is.close();
-	    }
+			return count == 0 ? 1 : count;
+		} finally {
+			is.close();
+		}
 	}
-	
+
+	private static long timerStartTime = 0;
+
+	public static void startTimer(Boolean debugMode) {
+		if (debugMode) {
+			timerStartTime = System.currentTimeMillis();
+		} else {
+			timerStartTime = -1;
+		}
+
+	}
+
+	public static void restartTimerNPrint(String printString) {
+		if(timerStartTime == -1) {
+			return;
+		}
+		long printTime = System.currentTimeMillis() - timerStartTime;
+		System.out.println(printString + " setup time: " + (printTime / 1000F) + " sec.");
+		timerStartTime = System.currentTimeMillis();
+	}
+
 }

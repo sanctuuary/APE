@@ -142,22 +142,22 @@ public abstract class SLTL_formula {
 	public static String ite_type(Predicate if_predicate, Predicate then_predicate, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String constraints = "";
-		int numberOfBlocks = typeAutomaton.getTypeBlocks().size();
-		int numberOfStates = typeAutomaton.getTypeBlocks().get(0).getBlockSize();
+		int numberOfBlocks = typeAutomaton.getUsedTypesBlocks().size();
+		int numberOfStates = typeAutomaton.getUsedTypesBlocks().get(0).getBlockSize();
 		for (int i_block = 0; i_block < numberOfBlocks; i_block++) {
 			for (int i_state = 0; i_state < numberOfStates; i_state++) {
 				/*
 				 * If if_predicate is used in any state of a certain block
 				 */
 				constraints += "-" + mappings.add(if_predicate.getPredicate(),
-						typeAutomaton.getBlock(i_block).getState(i_state).getStateName()) + " ";
+						typeAutomaton.getUsedTypesBlock(i_block).getState(i_state).getStateName()) + " ";
 				/*
 				 * then then_predicate must be used in a state of the subsequent blocks.
 				 */
 				for (int j_block = i_block + 1; j_block < numberOfBlocks; j_block++) {
 					for (int j_state = i_state + 1; j_state < numberOfBlocks; j_state++) {
 						constraints += mappings.add(then_predicate.getPredicate(),
-								typeAutomaton.getBlock(j_block).getState(j_state).getStateName()) + " ";
+								typeAutomaton.getUsedTypesBlock(j_block).getState(j_state).getStateName()) + " ";
 					}
 
 				}
@@ -218,8 +218,8 @@ public abstract class SLTL_formula {
 	public static String itn_type(Predicate if_predicate, Predicate then_not_predicate, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		String constraints = "";
-		int numberOfBlocks = typeAutomaton.getTypeBlocks().size();
-		int numberOfStates = typeAutomaton.getTypeBlocks().get(0).getBlockSize();
+		int numberOfBlocks = typeAutomaton.getUsedTypesBlocks().size();
+		int numberOfStates = typeAutomaton.getUsedTypesBlocks().get(0).getBlockSize();
 		for (int i_block = 0; i_block < numberOfBlocks - 1; i_block++) {
 			for (int i_state = 0; i_state < numberOfStates; i_state++) {
 				for (int j_block = i_block + 1; j_block < numberOfBlocks; j_block++) {
@@ -228,12 +228,12 @@ public abstract class SLTL_formula {
 						 * If if_predicate is used in any state of a certain block
 						 */
 						constraints += "-" + mappings.add(if_predicate.getPredicate(),
-								typeAutomaton.getBlock(i_block).getState(i_state).getStateName()) + " ";
+								typeAutomaton.getUsedTypesBlock(i_block).getState(i_state).getStateName()) + " ";
 						/*
 						 * then then_predicate cannot be used in a state of the subsequent blocks.
 						 */
 						constraints += "-" + mappings.add(then_not_predicate.getPredicate(),
-								typeAutomaton.getBlock(j_block).getState(j_state).getStateName()) + " 0\n";
+								typeAutomaton.getUsedTypesBlock(j_block).getState(j_state).getStateName()) + " 0\n";
 					}
 
 				}

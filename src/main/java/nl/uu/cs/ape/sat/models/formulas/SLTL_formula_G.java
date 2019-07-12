@@ -20,7 +20,7 @@ public class SLTL_formula_G extends SLTL_formula {
 
 	/**
 	 * Generate String representation of the CNF formula for
-	 * defined @moduleAutomaton and @typeAutomaton.
+	 * defined @moduleAutomaton and @typeAutomaton. However, the function only considers the memory states of type automaton (not the tool input/"used" states).
 	 * 
 	 * @param moduleAutomaton
 	 *            - automaton of all the module states
@@ -42,7 +42,7 @@ public class SLTL_formula_G extends SLTL_formula {
 		// Distinguishing whether the formula under the modal operator is type
 		// or module.
 		if (super.getSubFormula().getType().matches("type")) {
-			for (TypeBlock typeBlock : typeAutomaton.getTypeBlocks()) {
+			for (TypeBlock typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
 				for (TypeState typeState : typeBlock.getTypeStates()) {
 					constraints += negSign
 							+ mappings.add(super.getSubFormula().getPredicate(), typeState.getStateName()) + " 0\n";

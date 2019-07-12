@@ -86,14 +86,14 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		AbstractModule rootModule = allModules.getRootModule();
 		Type rootType = allTypes.getRootType();
 		
-		ModuleAutomaton moduleAutomaton = new ModuleAutomaton();
-		TypeAutomaton typeAutomaton = new TypeAutomaton();
-
 		/*
-		 * Generate the automaton in CNF
+		 * Generate the automaton
 		 */
-		StaticFunctions.generateAutomaton(moduleAutomaton, typeAutomaton, allSolutions.getCurrSolutionLenght(),
-				config.getMax_no_tool_outputs());
+		StaticFunctions.startTimer(config.getDebug_mode());
+		ModuleAutomaton moduleAutomaton = new ModuleAutomaton(allSolutions.getCurrSolutionLenght());
+		TypeAutomaton typeAutomaton = new TypeAutomaton(allSolutions.getCurrSolutionLenght(),
+				config.getMax_no_tool_inputs(), config.getMax_no_tool_outputs());
+		StaticFunctions.restartTimerNPrint("Automaton");
 		/*
 		 * Encode the workflow input
 		 */
@@ -113,17 +113,19 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Create constraints from the module.csv file
 		 */
-		cnfEncoding += annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, config.getShared_memory(),
+		cnfEncoding += annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, allTypes, config.getShared_memory(),
 				allTypes.getEmptyType(), mappings);
+		StaticFunctions.restartTimerNPrint("Tool I/O constraints");
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the tools 2.
 		 * Mandatory usage of the tools - from taxonomy. 3. Adding the constraints
 		 * enforcing the taxonomy structure.
 		 */
 		cnfEncoding += allModules.moduleMutualExclusion(moduleAutomaton, mappings);
+		StaticFunctions.restartTimerNPrint("Tool exclusions enfocements");
 		cnfEncoding += allModules.moduleMandatoryUsage(annotated_modules, moduleAutomaton, mappings);
 		cnfEncoding += allModules.moduleEnforceTaxonomyStructure(rootModule.getModuleID(), moduleAutomaton, mappings);
-
+		StaticFunctions.restartTimerNPrint("Tool usage enfocements");
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the types/formats 2.
 		 * Mandatory usage of the types in the transition nodes (note: "empty type" is
@@ -131,15 +133,16 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * structure.
 		 */
 		cnfEncoding += allTypes.typeMutualExclusion(typeAutomaton, mappings);
+		StaticFunctions.restartTimerNPrint("Type exclusions enfocements");
 		cnfEncoding += allTypes.typeMandatoryUsage(rootType, typeAutomaton, mappings);
 		cnfEncoding += allTypes.typeEnforceTaxonomyStructure(rootType.getTypeID(), typeAutomaton, mappings);
-
+		StaticFunctions.restartTimerNPrint("Type usage enfocements");
 		/*
 		 * Encode the constraints from the file based on the templates (manual templates)
 		 */
 		cnfEncoding += StaticFunctions.generateSLTLConstraints(config.getConstraints_path(), allConsTemplates, allModules,
 				allTypes, mappings, moduleAutomaton, typeAutomaton);
-
+		StaticFunctions.restartTimerNPrint("SLTL constraints");
 		/*
 		 * Counting the number of variables and clauses that will be given to the SAT
 		 * solver TODO Improve thi-s approach, no need to read the whole String again.
@@ -147,7 +150,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		int variables = mappings.getSize();
 		int clauses = StaticFunctions.countLinesNewFromString(cnfEncoding);
 		String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
-
+		StaticFunctions.restartTimerNPrint("Reading rows");
+		System.out.println();
 		/*
 		 * Create a temp file that will be used as input for the SAT solver.
 		 */
@@ -161,11 +165,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		StaticFunctions.write2file(sat_input_header + cnfEncoding, temp_sat_input, false);
 
 		long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
-		System.out.println("Problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");
+		System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");
 		
 		return cnfEncoding;
 	}
-
+	
 	/**
 	 * Using the SAT input generated from SAT encoding and running MiniSAT solver to find the solutions
 	 * 
