@@ -49,7 +49,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	private final ConstraintFactory allConsTemplates;
 	/** Set of all the solutions found by the program */
 	private final All_SAT_solutions allSolutions;
-	private String cnfEncoding;
+	private StringBuilder cnfEncoding;
 	private File temp_sat_input;
 	
 	/**
@@ -73,7 +73,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		this.allConsTemplates = allConsTemplates;
 		
 		this.temp_sat_input = null;
-		this.cnfEncoding = "";
+		this.cnfEncoding = new StringBuilder();
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		if (inputDataEncoding == null) {
 			return null;
 		}
-		cnfEncoding += inputDataEncoding;
+		cnfEncoding = cnfEncoding.append(inputDataEncoding);
 		/*
 		 * Encode the workflow output
 		 */
@@ -109,22 +109,22 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		if (outputDataEncoding == null) {
 			return null;
 		}
-		cnfEncoding += outputDataEncoding;
+		cnfEncoding = cnfEncoding.append(outputDataEncoding);
 		/*
 		 * Create constraints from the module.csv file
 		 */
-		cnfEncoding += annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, allTypes, config.getShared_memory(),
-				allTypes.getEmptyType(), mappings);
+		cnfEncoding = cnfEncoding.append(annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, allTypes, config.getShared_memory(),
+				allTypes.getEmptyType(), mappings));
 		StaticFunctions.restartTimerNPrint("Tool I/O constraints");
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the tools 2.
 		 * Mandatory usage of the tools - from taxonomy. 3. Adding the constraints
 		 * enforcing the taxonomy structure.
 		 */
-		cnfEncoding += allModules.moduleMutualExclusion(moduleAutomaton, mappings);
+		cnfEncoding = cnfEncoding.append(allModules.moduleMutualExclusion(moduleAutomaton, mappings));
 		StaticFunctions.restartTimerNPrint("Tool exclusions enfocements");
-		cnfEncoding += allModules.moduleMandatoryUsage(annotated_modules, moduleAutomaton, mappings);
-		cnfEncoding += allModules.moduleEnforceTaxonomyStructure(rootModule.getModuleID(), moduleAutomaton, mappings);
+		cnfEncoding = cnfEncoding.append(allModules.moduleMandatoryUsage(annotated_modules, moduleAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(allModules.moduleEnforceTaxonomyStructure(rootModule.getModuleID(), moduleAutomaton, mappings));
 		StaticFunctions.restartTimerNPrint("Tool usage enfocements");
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the types/formats 2.
@@ -132,23 +132,23 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * considered a type) 3. Adding the constraints enforcing the taxonomy
 		 * structure.
 		 */
-		cnfEncoding += allTypes.typeMutualExclusion(typeAutomaton, mappings);
+		cnfEncoding = cnfEncoding.append(allTypes.typeMutualExclusion(typeAutomaton, mappings));
 		StaticFunctions.restartTimerNPrint("Type exclusions enfocements");
-		cnfEncoding += allTypes.typeMandatoryUsage(rootType, typeAutomaton, mappings);
-		cnfEncoding += allTypes.typeEnforceTaxonomyStructure(rootType.getTypeID(), typeAutomaton, mappings);
+		cnfEncoding = cnfEncoding.append(allTypes.typeMandatoryUsage(rootType, typeAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(allTypes.typeEnforceTaxonomyStructure(rootType.getTypeID(), typeAutomaton, mappings));
 		StaticFunctions.restartTimerNPrint("Type usage enfocements");
 		/*
 		 * Encode the constraints from the file based on the templates (manual templates)
 		 */
-		cnfEncoding += StaticFunctions.generateSLTLConstraints(config.getConstraints_path(), allConsTemplates, allModules,
-				allTypes, mappings, moduleAutomaton, typeAutomaton);
+		cnfEncoding = cnfEncoding.append(StaticFunctions.generateSLTLConstraints(config.getConstraints_path(), allConsTemplates, allModules,
+				allTypes, mappings, moduleAutomaton, typeAutomaton));
 		StaticFunctions.restartTimerNPrint("SLTL constraints");
 		/*
 		 * Counting the number of variables and clauses that will be given to the SAT
 		 * solver TODO Improve thi-s approach, no need to read the whole String again.
 		 */
 		int variables = mappings.getSize();
-		int clauses = StaticFunctions.countLinesNewFromString(cnfEncoding);
+		int clauses = StaticFunctions.countLinesNewFromString(cnfEncoding.toString());
 		String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
 		StaticFunctions.restartTimerNPrint("Reading rows");
 		System.out.println();
@@ -167,7 +167,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
 		System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");
 		
-		return cnfEncoding;
+		return cnfEncoding.toString();
 	}
 	
 	/**
@@ -186,7 +186,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	
 	
 	public String getCnfEncoding() {
-		return cnfEncoding;
+		return cnfEncoding.toString();
 	}
 	
 	/**

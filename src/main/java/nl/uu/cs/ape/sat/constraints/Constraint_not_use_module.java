@@ -39,7 +39,7 @@ public class Constraint_not_use_module extends Constraint {
 			return null;
 		}
 		SLTL_formula_G formula = new SLTL_formula_G(false, module);
-		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		constraint = formula.getCNF(moduleAutomaton, null, mappings);
 
 		return constraint;
 	}

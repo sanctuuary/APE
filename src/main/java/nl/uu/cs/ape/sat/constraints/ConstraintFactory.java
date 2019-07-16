@@ -126,6 +126,12 @@ public class ConstraintFactory {
 		 */
 		currTemplate = new Constraint_use_type("use_t", 1, "Use type <b>parameters[0]</b> in the solution.");
 		addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID: gen_t Generate type <b>parameters[0]</b> in the solution.
+		 */
+		currTemplate = new Constraint_gen_type("gen_t", 1, "Generate type <b>parameters[0]</b> in the solution.");
+		addConstraintTamplate(currTemplate);
 
 		/*
 		 * ID: nuse_t Do not use type <b>parameters[0]</b> in the solution.
@@ -133,21 +139,42 @@ public class ConstraintFactory {
 		currTemplate = new Constraint_not_use_type("nuse_t", 1, "Do not use type <b>parameters[0]</b> in the solution.");
 		addConstraintTamplate(currTemplate);
 		
+		/*
+		 * ID: ngen_t Do not generate type <b>parameters[0]</b> in the solution.
+		 */
+		currTemplate = new Constraint_not_gen_type("ngen_t", 1, "Do not generate type <b>parameters[0]</b> in the solution.");
+		addConstraintTamplate(currTemplate);
 		
 		/*
-		 * ID: ite_t If we have data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b>
+		 * ID: use_ite_t If we have used data type <b>parameters[0]</b>, then use type <b>parameters[1]</b>
 		 * subsequently.
 		 */
-		currTemplate = new Constraint_if_then_type("ite_t", 2,
-				"If we have data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b> subsequently.");
+		currTemplate = new Constraint_if_use_then_type("use_ite_t", 2,
+				"If we have used data type <b>parameters[0]</b>, then use type <b>parameters[1]</b> subsequently.");
+		addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID: gen_ite_t If we have data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b>
+		 * subsequently.
+		 */
+		currTemplate = new Constraint_if_gen_then_type("gen_ite_t", 2,
+				"If we have generated data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b> subsequently.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: itn_t If we have data type <b>parameters[0]</b>, then do not generate type
+		 * ID: use_itn_t If we have used data type <b>parameters[0]</b>, then do not use type
 		 * <b>parameters[1]</b> subsequently.
 		 */
-		currTemplate = new Constraint_if_then_not_type("itn_t", 2,
-				"If we have data type <b>parameters[0]</b>, then do not generate type <b>parameters[1]</b> subsequently.");
+		currTemplate = new Constraint_if_use_then_not_type("use_itn_t", 2,
+				"If we have used data type <b>parameters[0]</b>, then do not use type <b>parameters[1]</b> subsequently.");
+		addConstraintTamplate(currTemplate);
+		
+		/*
+		 * ID: gen_itn_t If we have generated data type <b>parameters[0]</b>, then do not generate type
+		 * <b>parameters[1]</b> subsequently.
+		 */
+		currTemplate = new Constraint_if_gen_then_not_type("gen_itn_t", 2,
+				"If we have generated data type <b>parameters[0]</b>, then do not generate type <b>parameters[1]</b> subsequently.");
 		addConstraintTamplate(currTemplate);
 
 		/*

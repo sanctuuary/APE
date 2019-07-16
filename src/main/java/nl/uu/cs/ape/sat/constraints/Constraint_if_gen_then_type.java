@@ -6,21 +6,22 @@ import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.formulas.*;
 
 /**
  * Implements constraints of the form:<br/>
  * <br/>
- * If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b>
+ * If we have generated data module <b>parameters[0]</b>, then generate <b>parameters[1]</b>
  * subsequently using the function {@link #getConstraint}.
  * 
  * @author Vedran Kasalica
  *
  */
-public class Constraint_if_then_module extends Constraint {
+public class Constraint_if_gen_then_type extends Constraint {
 
 
-	public Constraint_if_then_module(String id, int parametersNo, String description) {
+	public Constraint_if_gen_then_type(String id, int parametersNo, String description) {
 		super(id, parametersNo, description);
 	}
 
@@ -32,13 +33,13 @@ public class Constraint_if_then_module extends Constraint {
 			return null;
 		}
 		String constraint = "";
-		AbstractModule if_module = allModules.get(parameters[0]);
-		AbstractModule then_module = allModules.get(parameters[1]);
-		if (if_module == null || then_module == null) {
-			System.err.println("Constraint argument does not exist in the tool taxonomy.");
+		Type if_type = allTypes.get(parameters[0]);
+		Type then_type = allTypes.get(parameters[1]);
+		if (if_type == null || then_type == null) {
+			System.err.println("Constraint argument does not exist in the type taxonomy.");
 			return null;
 		}
-		constraint = SLTL_formula.ite_module(if_module, then_module, moduleAutomaton, mappings);
+		constraint = SLTL_formula.ite_type(if_type, then_type, moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
 
 		return constraint;
 	}

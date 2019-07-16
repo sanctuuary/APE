@@ -142,14 +142,30 @@ public class TypeAutomaton {
 		}
 		return tmp;
 	}
+	
+	/**
+	 * Get the last used Type state blocks from the automaton. The last used
+	 * block represent The last's tool output.
+	 * 
+	 * @return The workflow output.
+	 */
+	public TypeBlock getWorkflowOutputBlock() {
+		TypeBlock tmp;
+		try {
+			tmp = usedTypesAutomaton.get(usedTypesAutomaton.size() - 1);
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		}
+		return tmp;
+	}
 
 	/**
 	 * Get the last memory Type state blocks from the automaton. The last memory
-	 * block represent the required output to the workflow.
+	 * block represent The last's tool output.
 	 * 
-	 * @return Memory Type Block that represents workflow output.
+	 * @return The last's tool output Block.
 	 */
-	public TypeBlock getWorkflowOutputBlock() {
+	public TypeBlock getLastToolOutputBlock() {
 		TypeBlock tmp;
 		try {
 			tmp = memoryTypesAutomaton.get(memoryTypesAutomaton.size() - 1);

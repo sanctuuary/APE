@@ -39,7 +39,7 @@ public class Constraint_depend_module extends Constraint {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");
 			return null;
 		}
-		constraint = SLTL_formula.depend_module(second_module_in_sequence, first_module_in_sequence, moduleAutomaton, typeAutomaton, mappings);
+		constraint = SLTL_formula.depend_module(second_module_in_sequence, first_module_in_sequence, moduleAutomaton, mappings);
 
 		return constraint;
 	

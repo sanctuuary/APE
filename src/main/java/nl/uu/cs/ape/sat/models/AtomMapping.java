@@ -99,7 +99,7 @@ public class AtomMapping {
 	}
 	
 	/**
-	 * Get the next auxiliary number and increse the counter by 1.
+	 * Get the next auxiliary number and increase the counter by 1.
 	 * @return Mapping number that can be used for auxiliary variables.
 	 */
 	public int getNextAuxNum() {
@@ -110,9 +110,18 @@ public class AtomMapping {
 		auxiliary = 1;
 	}
 	
+	
 	/**
 	 * Get the number of mapped auxiliary variables that are not part of the solution.
 	 * @return Number of mapped auxiliary variables.
+	 */
+	public int getCurrNumOfMappedAuxVar() {
+		return auxiliary;
+	}
+	
+	/**
+	 * Get the max number of mapped auxiliary variables that are not part of the solution.
+	 * @return Max number of possible mapped auxiliary variables.
 	 */
 	public int getMaxNumOfMappedAuxVar() {
 		return auxMax;

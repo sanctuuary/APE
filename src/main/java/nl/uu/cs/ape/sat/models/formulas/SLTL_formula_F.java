@@ -1,5 +1,7 @@
 package nl.uu.cs.ape.sat.models.formulas;
 
+import java.util.List;
+
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
@@ -24,12 +26,12 @@ public class SLTL_formula_F extends SLTL_formula {
 	 * 
 	 * @param moduleAutomaton
 	 *            - automaton of all the module states
-	 * @param typeAutomaton
+	 * @param list
 	 *            - automaton of all the type states
 	 * @return CNF representation of the SLTL formula
 	 */
 	@Override
-	public String getCNF(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+	public String getCNF(ModuleAutomaton moduleAutomaton, List<TypeBlock> typeStateBlocks, AtomMapping mappings) {
 
 		String constraints = "";
 
@@ -43,7 +45,7 @@ public class SLTL_formula_F extends SLTL_formula {
 		// Distinguishing whether the atom under the modal operator is type
 		// or module.
 		if (super.getSubFormula().getType().matches("type")) {
-			for (TypeBlock typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+			for (TypeBlock typeBlock : typeStateBlocks) {
 				for (TypeState typeState : typeBlock.getTypeStates()) {
 					constraints += negSign
 							+ mappings.add(super.getSubFormula().getPredicate(), typeState.getStateName()) + " ";

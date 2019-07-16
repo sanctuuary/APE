@@ -39,7 +39,7 @@ public class Constraint_next_module extends Constraint {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");
 			return null;
 		}
-		constraint = SLTL_formula.next_module(first_module, second_module, moduleAutomaton, typeAutomaton, mappings);
+		constraint = SLTL_formula.next_module(first_module, second_module, moduleAutomaton, mappings);
 
 		return constraint;
 	}

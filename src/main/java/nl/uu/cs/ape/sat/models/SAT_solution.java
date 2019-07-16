@@ -11,10 +11,10 @@ import nl.uu.cs.ape.sat.models.constructs.Literal;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
 
 /**
- * The {@code SAT_solution} class describes the solution produced by the SAT solver. It stores the
- * original solution and the mapped one. In case of the parameter <b>unsat</b> being
- * {@code true}, there are no solutions.
- * <br> <br> 
+ * The {@code SAT_solution} class describes the solution produced by the SAT
+ * solver. It stores the original solution and the mapped one. In case of the
+ * parameter <b>unsat</b> being {@code true}, there are no solutions. <br>
+ * <br>
  * It also implements general solution interface {@link Solution}.
  * 
  * @author Vedran Kasalica
@@ -27,7 +27,8 @@ public class SAT_solution extends Solution {
 	 */
 	private List<Literal> literals;
 	/*
-	 * List of only relevant (positive) literals that represent implemented modules/tools.
+	 * List of only relevant (positive) literals that represent implemented
+	 * modules/tools.
 	 */
 	private List<Literal> relevantModules;
 	/*
@@ -40,16 +41,13 @@ public class SAT_solution extends Solution {
 	/**
 	 * Creating a list of Literals to represent the solution.
 	 * 
-	 * @param satOutput
-	 *            - list of mapped literals given as text (SAT output)
-	 * @param atomMapping
-	 *            - mapping of the atoms
-	 * @param allModules
-	 *            - list of all the modules
-	 * @param allTypes
-	 *            - list of all the types
+	 * @param satOutput   - list of mapped literals given as text (SAT output)
+	 * @param atomMapping - mapping of the atoms
+	 * @param allModules  - list of all the modules
+	 * @param allTypes    - list of all the types
 	 */
-	public SAT_solution(String satOutput, AtomMapping atomMapping, AllModules allModules, AllTypes allTypes, int solutionLength) {
+	public SAT_solution(String satOutput, AtomMapping atomMapping, AllModules allModules, AllTypes allTypes,
+			int solutionLength) {
 		unsat = false;
 		literals = new ArrayList<Literal>();
 		relevantModules = new ArrayList<Literal>();
@@ -72,20 +70,18 @@ public class SAT_solution extends Solution {
 		Collections.sort(relevantTypes);
 		this.solutionLength = solutionLength;
 	}
-	
+
 	/**
 	 * Creating a list of Literals to represent the solution.
 	 * 
-	 * @param satSolution
-	 *            - list of mapped literals given as a list of integers (library SAT output)
-	 * @param atomMapping
-	 *            - mapping of the atoms
-	 * @param allModules
-	 *            - list of all the modules
-	 * @param allTypes
-	 *            - list of all the types
+	 * @param satSolution - list of mapped literals given as a list of integers
+	 *                    (library SAT output)
+	 * @param atomMapping - mapping of the atoms
+	 * @param allModules  - list of all the modules
+	 * @param allTypes    - list of all the types
 	 */
-	public SAT_solution(int[] satSolution, AtomMapping atomMapping, AllModules allModules, AllTypes allTypes, int solutionLength) {
+	public SAT_solution(int[] satSolution, AtomMapping atomMapping, AllModules allModules, AllTypes allTypes,
+			int solutionLength) {
 		unsat = false;
 		literals = new ArrayList<Literal>();
 		relevantModules = new ArrayList<Literal>();
@@ -109,7 +105,8 @@ public class SAT_solution extends Solution {
 	}
 
 	/**
-	 * Creating an empty solution, for UNSAT problem. The list <b>literals</b> is NULL.
+	 * Creating an empty solution, for UNSAT problem. The list <b>literals</b> is
+	 * NULL.
 	 */
 	public SAT_solution() {
 		unsat = true;
@@ -121,15 +118,15 @@ public class SAT_solution extends Solution {
 	 * @return String representing the solution
 	 */
 	public String getSolution() {
-		String solution = "";
+		StringBuilder solution = new StringBuilder();
 		if (unsat) {
-			solution = "UNSAT";
+			solution = new StringBuilder("UNSAT");
 		} else {
 			for (Literal literal : literals) {
-				solution += literal.toString() + " ";
+				solution = solution.append(literal.toString()).append(" ");
 			}
 		}
-		return solution;
+		return solution.toString();
 	}
 
 	/**
@@ -141,56 +138,59 @@ public class SAT_solution extends Solution {
 	 * @return String representing the tools used in the solution
 	 */
 	public String getRelevantSolution() {
-		String solution = "";
+		StringBuilder solution = new StringBuilder();
 		if (unsat) {
-			solution = "UNSAT";
+			solution = new StringBuilder("UNSAT");
 		} else {
 			for (Literal literal : relevantModules) {
-				solution += literal.toString() + " ";
+				solution = solution.append(literal.toString()).append(" ");
 			}
 		}
-		return solution;
+		return solution.toString();
 	}
-	
+
 	/**
 	 * Returns only the most important part of the solution in human readable
 	 * format, filtering out the information that are not required to generate the
 	 * workflow. The solution literals are sorted according the state they are used
-	 * in.
-	 * TMem TUsed
+	 * in. TMem TUsed
+	 * 
 	 * @return String representing the tools and data used in the solutions
 	 */
 	public String getRelevantSolutionWithTypes() {
-		String solution = "";
+		StringBuilder solution = new StringBuilder();
 		if (unsat) {
-			solution = "UNSAT";
+			solution = new StringBuilder("UNSAT");
 		} else {
-			for (int i=-1; i < relevantModules.size();i++) {
-				if(i >= 0 ) {
-					solution += relevantModules.get(i).toString() + " ";
+			for (int i = -1; i < relevantModules.size(); i++) {
+				if (i >= 0) {
+					solution = solution.append(relevantModules.get(i).toString() + " ");
 				}
-				for(Literal typeLiteral : relevantTypes) {
+				for (Literal typeLiteral : relevantTypes) {
 //					System.out.println(typeLiteral);
 //					System.out.println(typeLiteral.getAttribute());
-					if(solutionLength > 9 && i < 9) {
-						if(typeLiteral.getAttribute().startsWith("UsedT0" + (i + 1) + ".") || typeLiteral.getAttribute().startsWith("MemT0" + (i + 1) + ".")) {
-							solution += typeLiteral.toString() + " ";
+					if (solutionLength > 9 && i < 9) {
+						if (typeLiteral.getAttribute().startsWith("UsedT0" + (i + 1) + ".")
+								|| typeLiteral.getAttribute().startsWith("MemT0" + (i + 1) + ".")) {
+							solution = solution.append(typeLiteral.toString() + " ");
 						}
 					} else {
-						if(typeLiteral.getAttribute().startsWith("UsedT" + (i + 1) + ".") || typeLiteral.getAttribute().startsWith("MemT" + (i + 1) + ".")) {
-							solution += typeLiteral.toString() + " ";
+						if (typeLiteral.getAttribute().startsWith("UsedT" + (i + 1) + ".")
+								|| typeLiteral.getAttribute().startsWith("MemT" + (i + 1) + ".")) {
+							solution = solution.append(typeLiteral.toString() + " ");
 						}
 					}
 				}
 			}
 		}
-		return solution;
+		return solution.toString();
 	}
-	
+
 	/**
 	 * Returns the list of modules, corresponding to their position in the workflow.
 	 * 
-	 * @return List of {@link Module}s in the order they appear in the solution workflow.
+	 * @return List of {@link Module}s in the order they appear in the solution
+	 *         workflow.
 	 */
 	public List<Module> getRelevantSolutionModules(AllModules allModules) {
 		List<Module> solutionModules = new ArrayList<Module>();
@@ -211,15 +211,13 @@ public class SAT_solution extends Solution {
 	 * @return String representing the mapped solution
 	 */
 	public String getMappedSolution() {
-		String solution = "";
-		if (unsat) {
-			solution = "";
-		} else {
+		StringBuilder solution = new StringBuilder();
+			if (!unsat) {
 			for (Literal literal : literals) {
-				solution += literal.toMappedString() + " ";
+				solution = solution.append(literal.toMappedString()).append(" ");
 			}
 		}
-		return solution;
+		return solution.toString();
 	}
 
 	/**
@@ -230,20 +228,17 @@ public class SAT_solution extends Solution {
 	 * @return String representing the negated solution
 	 */
 	public String getNegatedMappedSolution() {
-		String solution = "";
-		if (unsat) {
-			solution = "";
-		} else {
+		StringBuilder solution = new StringBuilder();
+		if (!unsat) {
 			for (Literal literal : literals) {
 				if (!literal.isNegated() && literal.isModule() && (literal.getPredicate() instanceof Module)) {
-					solution += literal.toNegatedMappedString() + " ";
+					solution = solution.append(literal.toNegatedMappedString()).append(" ");
 				}
 			}
 		}
 		return solution + " 0";
 	}
-	
-	
+
 	/**
 	 * Returns the negated solution in mapped format. Negating the original solution
 	 * created by the SAT solver. Usually used to add to the solver to find new
@@ -261,25 +256,26 @@ public class SAT_solution extends Solution {
 			}
 		}
 		int[] negSolList = new int[negSol.size()];
-		for(int i=0;i<negSol.size();i++) {
+		for (int i = 0; i < negSol.size(); i++) {
 			negSolList[i] = negSol.get(i);
 		}
-		
+
 		return negSolList;
 	}
 
 	/**
-	 * TODO
-	 * Returns all the permutations of the negated solution in mapped format.
-	 * Negating the original solution created by the SAT solver. Usually used to add
-	 * to the solver to find new solutions, by omitting the permutations.
-	 * @param typeAutomaton 
-	 * @param moduleAutomaton 
+	 * TODO - NOT WORKING!! Returns all the permutations of the negated solution in
+	 * mapped format. Negating the original solution created by the SAT solver.
+	 * Usually used to add to the solver to find new solutions, by omitting the
+	 * permutations.
+	 * 
+	 * @param typeAutomaton
+	 * @param moduleAutomaton
 	 * 
 	 * @return String representing all permutations of the negated solution
 	 */
 	public String getNegatedMappedSolutionPermutations(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
-		String solution = "";
+		StringBuilder solution = new StringBuilder();
 		if (unsat) {
 			return "";
 		} else {

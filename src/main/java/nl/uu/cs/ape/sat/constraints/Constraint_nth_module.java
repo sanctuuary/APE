@@ -47,7 +47,7 @@ public class Constraint_nth_module extends Constraint {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");
 			return null;
 		}
-		constraint += SLTL_formula.useAsNthModule(module, n, moduleAutomaton, typeAutomaton, mappings);
+		constraint += SLTL_formula.useAsNthModule(module, n, moduleAutomaton, mappings);
 
 		return constraint;
 	}

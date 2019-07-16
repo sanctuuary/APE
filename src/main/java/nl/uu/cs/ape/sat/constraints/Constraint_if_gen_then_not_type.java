@@ -12,16 +12,16 @@ import nl.uu.cs.ape.sat.models.formulas.*;
 /**
  * Implements constraints of the form:<br/>
  * <br/>
- * If we have data module <b>parameters[0]</b>, then generate <b>parameters[1]</b>
- * subsequently using the function {@link #getConstraint}.
+ * If we have generated data module <b>parameters[0]</b>,  then do not generate type <b>parameters[1]</b> subsequently
+ * using the function {@link #getConstraint}.
  * 
  * @author Vedran Kasalica
  *
  */
-public class Constraint_if_then_type extends Constraint {
+public class Constraint_if_gen_then_not_type extends Constraint {
 
 
-	public Constraint_if_then_type(String id, int parametersNo, String description) {
+	public Constraint_if_gen_then_not_type(String id, int parametersNo, String description) {
 		super(id, parametersNo, description);
 	}
 
@@ -34,12 +34,12 @@ public class Constraint_if_then_type extends Constraint {
 		}
 		String constraint = "";
 		Type if_type = allTypes.get(parameters[0]);
-		Type then_type = allTypes.get(parameters[1]);
-		if (if_type == null || then_type == null) {
+		Type then_not_type = allTypes.get(parameters[1]);
+		if (if_type == null || then_not_type == null) {
 			System.err.println("Constraint argument does not exist in the type taxonomy.");
 			return null;
 		}
-		constraint = SLTL_formula.ite_type(if_type, then_type, moduleAutomaton, typeAutomaton, mappings);
+		constraint = SLTL_formula.itn_type(if_type, then_not_type, moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
 
 		return constraint;
 	}

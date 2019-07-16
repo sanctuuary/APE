@@ -12,16 +12,16 @@ import nl.uu.cs.ape.sat.models.formulas.*;
 /**
  * Implements constraints of the form:<br/>
  * <br/>
- * If we have data module <b>parameters[0]</b>,  then do not generate type <b>parameters[1]</b> subsequently
+ * If we have used data module <b>parameters[0]</b>,  then do not use type <b>parameters[1]</b> subsequently
  * using the function {@link #getConstraint}.
  * 
  * @author Vedran Kasalica
  *
  */
-public class Constraint_if_then_not_type extends Constraint {
+public class Constraint_if_use_then_not_type extends Constraint {
 
 
-	public Constraint_if_then_not_type(String id, int parametersNo, String description) {
+	public Constraint_if_use_then_not_type(String id, int parametersNo, String description) {
 		super(id, parametersNo, description);
 	}
 
@@ -39,7 +39,7 @@ public class Constraint_if_then_not_type extends Constraint {
 			System.err.println("Constraint argument does not exist in the type taxonomy.");
 			return null;
 		}
-		constraint = SLTL_formula.itn_type(if_type, then_not_type, moduleAutomaton, typeAutomaton, mappings);
+		constraint = SLTL_formula.itn_type(if_type, then_not_type, moduleAutomaton, typeAutomaton.getUsedTypesBlocks(), mappings);
 
 		return constraint;
 	}

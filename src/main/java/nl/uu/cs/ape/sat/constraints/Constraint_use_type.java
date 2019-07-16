@@ -39,7 +39,7 @@ public class Constraint_use_type extends Constraint {
 			return null;
 		}
 		SLTL_formula_F formula = new SLTL_formula_F(type);
-		constraint = formula.getCNF(moduleAutomaton, typeAutomaton, mappings);
+		constraint = formula.getCNF(null, typeAutomaton.getUsedTypesBlocks(), mappings);
 
 		return constraint;
 	}

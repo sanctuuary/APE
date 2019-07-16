@@ -38,7 +38,7 @@ public class Constraint_if_then_not_module extends Constraint {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");
 			return null;
 		}
-		constraint = SLTL_formula.itn_module(if_module, then_module, moduleAutomaton, typeAutomaton, mappings);
+		constraint = SLTL_formula.itn_module(if_module, then_module, moduleAutomaton, mappings);
 
 		return constraint;
 	}

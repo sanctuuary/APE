@@ -227,31 +227,22 @@ public class AllTypes {
 	 */
 	public String typeMutualExclusion(TypeAutomaton typeAutomaton, AtomMapping mappings) {
 
-		String constraints = "";
+		StringBuilder constraints = new StringBuilder();
 		String firstPair,secondPair;
 		List<TypeBlock> tmpBlocks = typeAutomaton.getAllBlocks();
 		for (Pair pair : getTypePairsForEachSubTaxonomy()) {
 			firstPair = pair.getFirst().getPredicate();
 			secondPair = pair.getSecond().getPredicate();
-			// mutual exclusion of types in states that represent general memory
+			// mutual exclusion of types in all the states (those that represent general memory and used data instances)
 			for (TypeBlock typeBlock : tmpBlocks) {
 				for (TypeState typeState : typeBlock.getTypeStates()) {
-					constraints += "-" + mappings.add(firstPair, typeState.getStateName()) + " ";
-					constraints += "-" + mappings.add(secondPair, typeState.getStateName())
-							+ " 0\n";
-				}
-			}
-			// mutual exclusion of types in states that represent tool inputs
-			for (TypeBlock typeBlock : typeAutomaton.getUsedTypesBlocks()) {
-				for (TypeState typeState : typeBlock.getTypeStates()) {
-					constraints += "-" + mappings.add(firstPair, typeState.getStateName()) + " ";
-					constraints += "-" + mappings.add(secondPair, typeState.getStateName())
-							+ " 0\n";
+					constraints = constraints.append("-").append(mappings.add(firstPair, typeState.getStateName())).append(" ");
+					constraints = constraints.append("-").append(mappings.add(secondPair, typeState.getStateName())).append(" ").append("0\n");
 				}
 			}
 		}
 
-		return constraints;
+		return constraints.toString();
 	}
 
 	/**
@@ -264,21 +255,15 @@ public class AllTypes {
 	 * @return String representation of constraints
 	 */
 	public String typeMandatoryUsage(Type type, TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String constraints = "";
-		// enforcement of types in states that represent general memory
-		for (TypeBlock typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+		StringBuilder constraints = new StringBuilder();
+		// enforcement of types in in all the states (those that represent general memory and used data instances)
+		for (TypeBlock typeBlock : typeAutomaton.getAllBlocks()) {
 			for (TypeState typeState : typeBlock.getTypeStates()) {
-				constraints += mappings.add(type.getPredicate(), typeState.getStateName()) + " 0\n";
-			}
-		}
-		// enforcement of types in states that represent tool inputs
-		for (TypeBlock typeBlock : typeAutomaton.getUsedTypesBlocks()) {
-			for (TypeState typeState : typeBlock.getTypeStates()) {
-				constraints += mappings.add(type.getPredicate(), typeState.getStateName()) + " 0\n";
+				constraints = constraints.append(mappings.add(type.getPredicate(), typeState.getStateName())).append(" 0\n");
 			}
 		}
 
-		return constraints;
+		return constraints.toString();
 	}
 
 	/**
@@ -297,20 +282,15 @@ public class AllTypes {
 	 */
 	public String typeEnforceTaxonomyStructure(String rootTypeID, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 
-		String constraints = "";
-		// taxonomy enforcement of types in states that represent general memory
-		for (TypeBlock typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+		StringBuilder constraints = new StringBuilder();
+		// taxonomy enforcement of types in in all the states (those that represent general memory and used data instances)
+		for (TypeBlock typeBlock : typeAutomaton.getAllBlocks()) {
 			for (TypeState typeState : typeBlock.getTypeStates()) {
-				constraints += typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState);
+				constraints = constraints.append(typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState));
 			}
 		}
-		// taxonomy enforcement of types in states that represent tool inputs
-		for (TypeBlock typeBlock : typeAutomaton.getUsedTypesBlocks()) {
-			for (TypeState typeState : typeBlock.getTypeStates()) {
-				constraints += typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState);
-			}
-		}
-		return constraints;
+		
+		return constraints.toString();
 	}
 
 	/**
@@ -318,10 +298,13 @@ public class AllTypes {
 	 */
 	private String typeEnforceTaxonomyStructureForState(String rootTypeID, TypeAutomaton typeAutomaton,
 			AtomMapping mappings, TypeState typeState) {
+		
 		Type currType = types.get(rootTypeID);
-		String constraints = "";
 		String superType_State = mappings.add(currType.getPredicate(), typeState.getStateName()).toString();
-		String currConstraint = "-" + superType_State + " ";
+		
+		StringBuilder constraints = new StringBuilder();
+		StringBuilder currConstraint = new StringBuilder("-").append(superType_State).append(" ");
+		
 		List<String> subTypes_States = new ArrayList<String>();
 		if (!(currType.getSubTypes() == null || currType.getSubTypes().isEmpty())) {
 			/*
@@ -331,19 +314,19 @@ public class AllTypes {
 				Type subType = types.get(subTypeeID);
 
 				String subType_State = mappings.add(subType.getPredicate(), typeState.getStateName()).toString();
-				currConstraint += subType_State + " ";
+				currConstraint = currConstraint.append(subType_State).append(" ");
 				subTypes_States.add(subType_State);
 
-				constraints += typeEnforceTaxonomyStructureForState(subTypeeID, typeAutomaton, mappings, typeState);
+				constraints = constraints.append(typeEnforceTaxonomyStructureForState(subTypeeID, typeAutomaton, mappings, typeState));
 			}
-			currConstraint += "0\n";
+			currConstraint = currConstraint.append("0\n");
 			/*
 			 * Ensuring the BOTTOM-UP taxonomy tree dependency
 			 */
 			for (String subType_State : subTypes_States) {
-				currConstraint += "-" + subType_State + " " + superType_State + " 0\n";
+				currConstraint = currConstraint.append("-").append(subType_State).append(" ").append(superType_State).append(" 0\n");
 			}
-			return currConstraint + constraints;
+			return currConstraint.append(constraints).toString();
 		} else {
 			return "";
 		}
@@ -361,7 +344,7 @@ public class AllTypes {
 	 * @return String representation of the initial input encoding.
 	 */
 	public String encodeInputData(List<Types> program_inputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String encoding = "";
+		StringBuilder encoding = new StringBuilder();
 
 		List<TypeState> inputStates = typeAutomaton.getMemoryTypesBlock(0).getTypeStates();
 		for (int i = 0; i < inputStates.size(); i++) {
@@ -373,14 +356,14 @@ public class AllTypes {
 								"Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
 						return null;
 					}
-					encoding += mappings.add(currType.getPredicate(), inputStates.get(i).getStateName()) + " 0\n";
+					encoding = encoding.append(mappings.add(currType.getPredicate(), inputStates.get(i).getStateName())).append(" 0\n");
 				}
 			} else {
-				encoding += mappings.add(emptyType.getPredicate(), inputStates.get(i).getStateName()) + " 0\n";
+				encoding = encoding.append(mappings.add(emptyType.getPredicate(), inputStates.get(i).getStateName())).append(" 0\n");
 			}
 
 		}
-		return encoding;
+		return encoding.toString();
 	}
 
 	/**
@@ -396,9 +379,10 @@ public class AllTypes {
 	 * @return String representation of the workflow output encoding.
 	 */
 	public String encodeOutputData(List<Types> program_outputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
-		String encoding = "";
+		StringBuilder encoding = new StringBuilder();
 
-		List<TypeState> outputStates = typeAutomaton.getUsedTypesBlock(typeAutomaton.getWorkflowLength()).getTypeStates();
+//		List<TypeState> outputStates = typeAutomaton.getWorkflowOutputBlock().getTypeStates();
+		List<TypeState> outputStates = typeAutomaton.getLastToolOutputBlock().getTypeStates();
 		for (Types currTypes : program_outputs) {
 			for (Type currType : currTypes.getTypes()) {
 				if (get(currType.getTypeID()) == null) {
@@ -406,14 +390,14 @@ public class AllTypes {
 					return null;
 				} else {
 					for (TypeState currOutputState : outputStates) {
-						encoding += mappings.add(currType.getPredicate(), currOutputState.getStateName()) + " ";
+						encoding = encoding.append(mappings.add(currType.getPredicate(), currOutputState.getStateName())).append(" ");
 					}
-					encoding += "0\n";
+					encoding = encoding.append("0\n");
 				}
 			}
 		}
 
-		return encoding;
+		return encoding.toString();
 	}
 
 }
