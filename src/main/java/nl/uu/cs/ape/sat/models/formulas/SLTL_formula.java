@@ -114,10 +114,10 @@ public abstract class SLTL_formula {
 		int automatonSize = moduleAutomaton.getModuleStates().size();
 		for (int i = 0; i < automatonSize; i++) {
 			constraints = constraints.append("-"
-					+ mappings.add(if_predicate.getPredicate(), moduleAutomaton.getModuleStates().get(i).getStateName())
+					+ mappings.add(if_predicate, moduleAutomaton.getModuleStates().get(i))
 					+ " ");
 			for (int j = i + 1; j < automatonSize; j++) {
-				constraints = constraints.append(mappings.add(then_predicate.getPredicate(), moduleAutomaton.get(j).getStateName())).append(" ");
+				constraints = constraints.append(mappings.add(then_predicate, moduleAutomaton.get(j))).append(" ");
 			}
 			constraints = constraints.append("0\n");
 		}
@@ -149,15 +149,15 @@ public abstract class SLTL_formula {
 				/*
 				 * If if_predicate is used in any state of a certain block
 				 */
-				constraints = constraints.append("-").append(mappings.add(if_predicate.getPredicate(),
-						typeBlocks.get(i_block).getState(i_state).getStateName())).append(" ");
+				constraints = constraints.append("-").append(mappings.add(if_predicate,
+						typeBlocks.get(i_block).getState(i_state))).append(" ");
 				/*
 				 * then then_predicate must be used in a state of the subsequent blocks.
 				 */
 				for (int j_block = i_block + 1; j_block < numberOfBlocks; j_block++) {
 					for (int j_state = i_state + 1; j_state < numberOfBlocks; j_state++) {
-						constraints = constraints.append(mappings.add(then_predicate.getPredicate(),
-								typeBlocks.get(j_block).getState(j_state).getStateName())).append(" ");
+						constraints = constraints.append(mappings.add(then_predicate,
+								typeBlocks.get(j_block).getState(j_state))).append(" ");
 					}
 
 				}
@@ -188,9 +188,9 @@ public abstract class SLTL_formula {
 		for (int i = 0; i < automatonSize - 1; i++) {
 			ModuleState currModuleState = moduleAutomaton.getModuleStates().get(i);
 			for (int j = i + 1; j < automatonSize; j++) {
-				constraints = constraints.append("-").append(mappings.add(if_predicate.getPredicate(), currModuleState.getStateName())).append(" ");
+				constraints = constraints.append("-").append(mappings.add(if_predicate, currModuleState)).append(" ");
 				constraints = constraints.append("-"
-						+ mappings.add(then_not_predicate.getPredicate(), moduleAutomaton.get(j).getStateName())
+						+ mappings.add(then_not_predicate, moduleAutomaton.get(j))
 						+ " 0\n");
 			}
 		}
@@ -226,13 +226,13 @@ public abstract class SLTL_formula {
 						/*
 						 * If if_predicate is used in any state of a certain block
 						 */
-						constraints = constraints.append("-").append(mappings.add(if_predicate.getPredicate(),
-								typeBlocks.get(i_block).getState(i_state).getStateName())).append(" ");
+						constraints = constraints.append("-").append(mappings.add(if_predicate,
+								typeBlocks.get(i_block).getState(i_state))).append(" ");
 						/*
 						 * then then_predicate cannot be used in a state of the subsequent blocks.
 						 */
-						constraints = constraints.append("-").append(mappings.add(then_not_predicate.getPredicate(),
-								typeBlocks.get(j_block).getState(j_state).getStateName())).append(" 0\n");
+						constraints = constraints.append("-").append(mappings.add(then_not_predicate,
+								typeBlocks.get(j_block).getState(j_state))).append(" 0\n");
 					}
 
 				}
@@ -261,11 +261,11 @@ public abstract class SLTL_formula {
 		StringBuilder constraints = new StringBuilder();
 		int automatonSize = moduleAutomaton.getModuleStates().size();
 		for (int i = 0; i < automatonSize; i++) {
-			constraints = constraints.append("-").append(mappings.add(second_module_in_sequence.getPredicate(),
-					moduleAutomaton.getModuleStates().get(i).getStateName())).append(" ");
+			constraints = constraints.append("-").append(mappings.add(second_module_in_sequence,
+					moduleAutomaton.getModuleStates().get(i))).append(" ");
 			for (int j = 0; j < i; j++) {
-				constraints = constraints.append(mappings.add(first_module_in_sequence.getPredicate(),
-						moduleAutomaton.get(j).getStateName())).append(" ");
+				constraints = constraints.append(mappings.add(first_module_in_sequence,
+						moduleAutomaton.get(j))).append(" ");
 			}
 			constraints = constraints.append("0\n");
 		}
@@ -292,14 +292,14 @@ public abstract class SLTL_formula {
 		StringBuilder constraints = new StringBuilder();
 		int automatonSize = moduleAutomaton.getModuleStates().size();
 		for (int i = 0; i < automatonSize; i++) {
-			constraints = constraints.append("-").append(mappings.add(first_module_in_sequence.getPredicate(),
-					moduleAutomaton.getModuleStates().get(i).getStateName())).append(" ");
+			constraints = constraints.append("-").append(mappings.add(first_module_in_sequence,
+					moduleAutomaton.getModuleStates().get(i))).append(" ");
 			/*
 			 * Clause that forbids using first_predicate as the last in the sequence
 			 */
 			if (i < automatonSize - 1) {
-				constraints = constraints.append(mappings.add(second_module_in_sequence.getPredicate(),
-						moduleAutomaton.get(i + 1).getStateName())).append(" ");
+				constraints = constraints.append(mappings.add(second_module_in_sequence,
+						moduleAutomaton.get(i + 1))).append(" ");
 			}
 			constraints = constraints.append("0\n");
 		}
@@ -326,15 +326,15 @@ public abstract class SLTL_formula {
 		StringBuilder constraints = new StringBuilder();
 		int automatonSize = moduleAutomaton.getModuleStates().size();
 		for (int i = 0; i < automatonSize; i++) {
-			constraints = constraints.append("-").append(mappings.add(second_module_in_sequence.getPredicate(),
-					moduleAutomaton.getModuleStates().get(i).getStateName())).append(" ");
+			constraints = constraints.append("-").append(mappings.add(second_module_in_sequence,
+					moduleAutomaton.getModuleStates().get(i))).append(" ");
 			/*
 			 * Clause that forbids using second_module_in_sequence as the first tool in the
 			 * sequence
 			 */
 			if (i > 0) {
-				constraints = constraints.append(mappings.add(first_module_in_sequence.getPredicate(),
-						moduleAutomaton.get(i - 1).getStateName())).append(" ");
+				constraints = constraints.append(mappings.add(first_module_in_sequence,
+						moduleAutomaton.get(i - 1))).append(" ");
 			}
 			constraints = constraints.append("0\n");
 		}
@@ -357,7 +357,7 @@ public abstract class SLTL_formula {
 
 		List<ModuleState> moduleAutomatonStates = moduleAutomaton.getModuleStates();
 		ModuleState lastModuleState = moduleAutomatonStates.get(moduleAutomatonStates.size() - 1);
-		constraints = constraints.append(mappings.add(last_module.getPredicate(), lastModuleState.getStateName())).append(" 0\n");
+		constraints = constraints.append(mappings.add(last_module, lastModuleState)).append(" 0\n");
 
 		return constraints.toString();
 	}
@@ -379,7 +379,7 @@ public abstract class SLTL_formula {
 
 		List<ModuleState> moduleAutomatonStates = moduleAutomaton.getModuleStates();
 		ModuleState nthModuleState = moduleAutomatonStates.get(n - 1);
-		constraints = constraints.append(mappings.add(module.getPredicate(), nthModuleState.getStateName())).append(" 0\n");
+		constraints = constraints.append(mappings.add(module, nthModuleState)).append(" 0\n");
 
 		return constraints.toString();
 	}
@@ -402,7 +402,7 @@ public abstract class SLTL_formula {
 //
 //		List<ModuleState> moduleAutomatonStates = moduleAutomaton.getModuleStates();
 //		ModuleState nthModuleState = moduleAutomatonStates.get(index - 1);
-//		constraints = constraints.append(mappings.add(module.getPredicate(), nthModuleState.getStateName())).append(" 0\n";
+//		constraints = constraints.append(mappings.add(module, nthModuleState)).append(" 0\n";
 
 		return null;
 	}

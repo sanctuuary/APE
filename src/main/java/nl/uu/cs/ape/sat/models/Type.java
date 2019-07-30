@@ -78,11 +78,11 @@ public class Type extends Predicate {
 	 * @return True if subtype was added, false otherwise.
 	 */
 	public boolean addSubType(Type type) {
-		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
+		if (!(nodeType == NodeType.EMPTY)) {
 			subTypes.add(type.getTypeID());
 			return true;
 		} else {
-			System.err.println("Cannot add subtypes to a simpleType!");
+			System.err.println("Cannot add subtypes to an empty type!");
 			return false;
 		}
 	}
@@ -94,10 +94,10 @@ public class Type extends Predicate {
 	 * @return True if subtype was added, false otherwise.
 	 */
 	public boolean addSubType(String typeID) {
-		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
+		if (!(nodeType == NodeType.EMPTY)) {
 			return subTypes.add(typeID);
 		} else {
-			System.err.println("Cannot add subtypes to a simpleType!");
+			System.err.println("Cannot add subtypes to an empty type!");
 			return false;
 		}
 	}
@@ -111,16 +111,42 @@ public class Type extends Predicate {
 		return subTypes;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		Type other = (Type) obj;
-		return this.typeID.matches(other.typeID);
-	}
+
+	
+
 
 	@Override
 	public int hashCode() {
-		return typeID.hashCode();
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((typeID == null) ? 0 : typeID.hashCode());
+		result = prime * result + ((typeName == null) ? 0 : typeName.hashCode());
+		return result;
 	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Type other = (Type) obj;
+		if (typeID == null) {
+			if (other.typeID != null)
+				return false;
+		} else if (!typeID.equals(other.typeID))
+			return false;
+		if (typeName == null) {
+			if (other.typeName != null)
+				return false;
+		} else if (!typeName.equals(other.typeName))
+			return false;
+		return true;
+	}
+
 
 	/**
 	 * Returns true if the type is a simple/leaf type, otherwise returns false - the
@@ -129,9 +155,19 @@ public class Type extends Predicate {
 	 * @return true (simple/leaf type) or false (abstract/non-leaf type)
 	 */
 	public boolean isSimpleType() {
-		return this.nodeType == NodeType.LEAF;
+		return (this.nodeType == NodeType.LEAF);
 	}
 
+	/**
+	 * Returns true if the type is an instance, otherwise returns false - the
+	 * type is an abstract (non-leaf) type or a regular leaf type.
+	 * 
+	 * @return true (instance) or false (leaf type or abstract/non-leaf type)
+	 */
+	public boolean isInstanceType() {
+		return this.nodeType == NodeType.INSTANCE;
+	}
+	
 	/**
 	 * Returns true if the type is an empty type, otherwise returns false - the type
 	 * is an actual (abstract or non-abstract) type.

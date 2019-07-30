@@ -40,6 +40,7 @@ import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeBlock;
 import nl.uu.cs.ape.sat.automaton.TypeState;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.constraints.Constraint;
 import nl.uu.cs.ape.sat.constraints.Constraint_depend_module;
@@ -248,7 +249,12 @@ public class StaticFunctions {
 		List<Module> modulesNew = new ArrayList<Module>();
 
 		for (Node xmlModule : getFunctionsFromXML(file)) {
-			modulesNew.add(Module.moduleFromXML(xmlModule, allModules, allTypes));
+			Module tmpModule = Module.moduleFromXML(xmlModule, allModules, allTypes);
+			if(tmpModule != null) {
+				modulesNew.add(tmpModule);
+				allModules.addAnnotatedModule(tmpModule.getModuleID());
+			}
+			
 		}
 
 		return modulesNew;
@@ -262,13 +268,10 @@ public class StaticFunctions {
 	 */
 	public static String convert2CNF(String propositionalFormula, AtomMapping mappings) {
 		final FormulaFactory f = new FormulaFactory();
-//		f.cnfEncoder(). = ff;
-		CNFConfig.Algorithm ff = CNFConfig.Algorithm.FACTORIZATION;
 		final PropositionalParser p = new PropositionalParser(f);
 
 		Formula formula;
 		try {
-//			System.out.println(propositionalFormula);
 			formula = p.parse(propositionalFormula.replace('-', '~'));
 			final Formula cnf = formula.cnf();
 			String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ")
@@ -278,15 +281,13 @@ public class StaticFunctions {
 			String auxVariable = "";
 			while (exists) {
 				auxVariable = "@RESERVED_CNF_" + counter + " ";
-				if (transformedCNF.contains(auxVariable)) {
+				if (transformedCNF.contains("@RESERVED_CNF_")) {
 					transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
 				} else {
 					exists = false;
 				}
 				counter++;
 			}
-
-//			System.out.println("CNF: \n" + cnf);
 			return transformedCNF;
 		} catch (ParserException e) {
 			e.printStackTrace();
@@ -380,7 +381,7 @@ public class StaticFunctions {
 	}
 
 	/**
-	 * Provide a safe interface for iteration throng a list.
+	 * Provide a safe interface for iteration trough a list.
 	 * 
 	 * @param          <E>
 	 * @param currList - list that is being evaluated
@@ -448,5 +449,34 @@ public class StaticFunctions {
 		System.out.println(printString + " setup time: " + (printTime / 1000F) + " sec.");
 		timerStartTime = System.currentTimeMillis();
 	}
+
+	/**
+	 * Function used to calculate the absolute order number of a state based on the information regarding its block number, order number within the block and type of the state.
+	 * @param blockNumber - corresponds to the block number within the type automaton (not applicable for the module automaton)
+	 * @param stateNumber - corresponds to the state number within block
+	 * @param input_branching - max number of branching
+	 * @param typeOfTheState - parameter determining the state type:
+	 * <br>MEMORY_TYPE corresponds to the Memory Type State, 
+	 * <br>USED_TYPE corresponds to the Used Type State, 
+	 * <br>MODULE corresponds to the Module/Tool State
+	 * @return The calculated absolute order number of the state.
+	 */
+	public static int calculateAbsStateNumber(Integer blockNumber, int stateNumber, int input_branching, WorkflowElement typeOfTheState) {
+		int absOrderNumber = -1;
+		
+		if (typeOfTheState == WorkflowElement.MEMORY_TYPE) {		/* Case: Memory Type State */
+			absOrderNumber = (blockNumber * input_branching * 2) + blockNumber + stateNumber;
+		} else if (typeOfTheState == WorkflowElement.USED_TYPE) {	/* Case: Used Type State */
+			absOrderNumber = (blockNumber * input_branching * 2) + blockNumber + input_branching + stateNumber;
+		} else if (typeOfTheState == WorkflowElement.MODULE) {		/* Case: Module/Tool State */
+			absOrderNumber = (stateNumber * input_branching * 2) + stateNumber - 1;
+		}
+		
+		return absOrderNumber;
+	}
+	
+	
+	
+	
 
 }

@@ -3,9 +3,11 @@ package nl.uu.cs.ape.sat.models;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import nl.uu.cs.ape.sat.StaticFunctions;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
@@ -25,9 +27,12 @@ import nl.uu.cs.ape.sat.automaton.TypeState;
 public class AllModules {
 
 	private Map<String, AbstractModule> modules;
+	/** Set of all the module IDs of the annotated modules in the domain. */
+	private Set<String> annotatedModules;
 
 	public AllModules() {
 		this.modules = new HashMap<String, AbstractModule>();
+		this.annotatedModules = new HashSet<String>();
 	}
 
 	/**
@@ -164,10 +169,30 @@ public class AllModules {
 	}
 
 	/**
+	 * Return {@code true} if the module is annotated.
+	 * 
+	 * @param moduleID - ID of the module that is evaluated.
+	 * @return {@code true} if the module is annotated, {@code false} otherwise.
+	 */
+	public boolean getIsAnnotatedModule(String moduleID) {
+		return annotatedModules.contains(moduleID);
+	}
+
+	/**
+	 * Adds the module to the set of annotated modules.
+	 * 
+	 * @param moduleID - ID of the module that is annotated.
+	 */
+	public void addAnnotatedModule(String moduleID) {
+		annotatedModules.add(moduleID);
+	}
+
+	/**
+	 * Generate constraints that ensure that the set of inputs correspond to the
+	 * tool specifications.<br>
 	 * Return the CNF representation of the input type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton. <br>
 	 * <br>
-	 * Generate constraints that preserve tool inputs.
 	 * 
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
@@ -175,64 +200,98 @@ public class AllModules {
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String inputCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, Type emptyType,
+	private String inputCons(AllTypes allTypes, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, Type emptyType,
 			AtomMapping mappings) {
 
 		StringBuilder constraints = new StringBuilder();
 
-		// for each module
+		/* For each module..  */
+		StringBuilder allToolsInputConstraints = new StringBuilder();
 		for (Entry<String, AbstractModule> mapModule : modules.entrySet()) {
 			AbstractModule module = mapModule.getValue();
-			// that is a Tool
+			/* ..which is a Tool.. */
 			if ((module instanceof Module)) {
-				// iterate through all the states
+				/* ..iterate through all the states..  */
+				StringBuilder toolInputConstraint = new StringBuilder();
 				for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
 					int moduleNo = moduleState.getStateNumber();
-					// and for each state and output state of that module state
+					if(moduleNo > 1) {
+						toolInputConstraint = toolInputConstraint.append(") & ");
+					}
+					/* ..and for each state and input state of that module state.. */
 					List<TypeState> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getTypeStates();
 					List<Types> moduleInputs = module.getModuleInput();
-					for (int i = 0; i < currInputStates.size(); i++) {
-						if (i < moduleInputs.size()) {
-							for (Type inputType : moduleInputs.get(i).getTypes()) { // set type and format for the
-																					// single input
-								// if module was used in the module state
-								constraints = constraints.append("-")
-										.append(mappings.add(module.getPredicate(), moduleState.getStateName()))
-										.append(" ");
-								// require type and/or format to be used in one of the directly
-								// preceding input states if it exists, otherwise use empty type
-
-								constraints = constraints.append(
-										mappings.add(inputType.getPredicate(), currInputStates.get(i).getStateName()))
-										.append(" 0\n");
+					for (TypeState currInputState : currInputStates) {
+						int currInputStateNo = currInputState.getStateNumber();
+						/* ..require data type and/or format to be used in one of the directly
+						 preceding input states if it exists, otherwise use empty type.  */
+						if (currInputStateNo < moduleInputs.size()) {
+//							
+							/* Encode: if module was used in the module state  */
+							toolInputConstraint = toolInputConstraint.append("(-")
+									.append(mappings.add(module, moduleState))
+									.append(" ");
+							/* Get all memory type states that were generated in order to find the desired data instance  */
+							for (TypeState exictingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(moduleNo)) {
+								toolInputConstraint = toolInputConstraint.append("| (");
+								int inputs = 0;
+								/* Get input type and/or format that are/is required by the tool */
+								for (Type currInputType : moduleInputs.get(currInputStateNo).getTypes()) {
+									inputs++;
+									String typeInstance = currInputType.getPredicate() + "[" + exictingMemState.getStateName() + "]";
+									/* Generate a new instance of the data type/format */
+									Type.generateType(typeInstance, typeInstance, currInputType.getRootNode(), NodeType.INSTANCE, allTypes, currInputType);
+									toolInputConstraint = toolInputConstraint
+											.append(mappings.add(currInputType,
+													exictingMemState, currInputState));
+									if(inputs < moduleInputs.get(currInputStateNo).getTypes().size()) {
+										toolInputConstraint = toolInputConstraint.append(" & ");
+									}
+								}
+								toolInputConstraint = toolInputConstraint.append(") ");
 							}
 						} else {
 							constraints = constraints.append("-")
-									.append(mappings.add(module.getPredicate(), moduleState.getStateName()))
+									.append(mappings.add(module, moduleState))
 									.append(" ");
-							constraints = constraints.append(
-									mappings.add(emptyType.getPredicate(), currInputStates.get(i).getStateName()))
+							constraints = constraints
+									.append(mappings.add(emptyType, currInputState))
 									.append(" 0\n");
 						}
+					}
+//					
+					}
+//				System.out.println("Transforming to CNF: " + toolInputConstraint);
+				if(!toolInputConstraint.toString().replace("(", "").replace(")", "").replace("&", "").trim().matches("")) {
+					toolInputConstraint = toolInputConstraint.append(")");
+					if(allToolsInputConstraints.length()!=0) {
+						allToolsInputConstraints = allToolsInputConstraints.append(" & ").append(toolInputConstraint.toString());
+					} else {
+						allToolsInputConstraints = allToolsInputConstraints.append(toolInputConstraint.toString());
 					}
 				}
 			}
 		}
+		constraints = constraints
+				.append(StaticFunctions.convert2CNF(allToolsInputConstraints.toString(), mappings));
 
 		return constraints.toString();
 	}
 
 	/**
+	 * Generate constraints that ensure that the inputs are available in the memory.
+	 * Memory in Message Passing Approach is limited to one the output of the
+	 * previous tool. <br>
 	 * Return the CNF representation of the input type constraints for all modules
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
-	 * the Pipeline Approach.
+	 * the Message Passing Approach.
 	 * 
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String inputPipelineCons(AllTypes allTypes, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
+	private String inputMsgPassingCons(AllTypes allTypes, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
 			AtomMapping mappings) {
 
 		StringBuilder constraints = new StringBuilder();
@@ -249,7 +308,7 @@ public class AllModules {
 					if (type.isSimpleType()) {
 
 						constraints = constraints.append("-")
-								.append(mappings.add(type.getPredicate(), currUsedTypeState.getStateName()));
+								.append(mappings.add(type, currUsedTypeState));
 						// there needs to be a place (directly prior to it) when it was added to the
 						// memory
 						int i2 = i1;
@@ -257,7 +316,7 @@ public class AllModules {
 						for (int j2 = 0; j2 < currUsedTypesBlock.getBlockSize(); j2++) {
 							TypeState currMemoryTypeState = currMemoryTypesBlock.getState(j2);
 							constraints = constraints.append(" ")
-									.append(mappings.add(type.getPredicate(), currMemoryTypeState.getStateName()));
+									.append(mappings.add(type, currMemoryTypeState));
 
 						}
 						constraints = constraints.append(" 0\n");
@@ -269,16 +328,19 @@ public class AllModules {
 	}
 
 	/**
+	 * Generate constraints that ensure that the inputs are available in the memory.
+	 * Memory in Shared Memory Approach contains outputs of all the previous tools.
+	 * <br>
 	 * Return the CNF representation of the input type constraints for all modules,
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
-	 * the General Memory Approach.
+	 * the Shared Memory Approach.
 	 * 
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String inputGenMemoryCons(AllTypes allTypes, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
+	private String inputSharedMemCons(AllTypes allTypes, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
 			AtomMapping mappings) {
 
 		StringBuilder constraints = new StringBuilder();
@@ -295,14 +357,14 @@ public class AllModules {
 					if (type.isSimpleType()) {
 
 						constraints = constraints.append("-")
-								.append(mappings.add(type.getPredicate(), currUsedTypeState.getStateName()));
+								.append(mappings.add(type, currUsedTypeState));
 						// there needs to be a place (prior to it) when it was added to the memory
 						for (int i2 = 0; i2 <= i1; i2++) {
 							TypeBlock currMemoryTypesBlock = typeAutomaton.getMemoryTypesBlock(i2);
 							for (int j2 = 0; j2 < currUsedTypesBlock.getBlockSize(); j2++) {
 								TypeState currMemoryTypeState = currMemoryTypesBlock.getState(j2);
 								constraints = constraints.append(" ")
-										.append(mappings.add(type.getPredicate(), currMemoryTypeState.getStateName()));
+										.append(mappings.add(type, currMemoryTypeState));
 
 							}
 						}
@@ -348,21 +410,21 @@ public class AllModules {
 																						// single output
 								// if module was used in the module state
 								constraints = constraints.append("-")
-										.append(mappings.add(module.getPredicate(), moduleState.getStateName()))
+										.append(mappings.add(module, moduleState))
 										.append(" ");
 								// require type and/or format to be used in one of the directly
 								// proceeding output states if it exists, otherwise use empty type
 
 								constraints = constraints.append(
-										mappings.add(outputType.getPredicate(), currOutputStates.get(i).getStateName()))
+										mappings.add(outputType, currOutputStates.get(i)))
 										.append(" 0\n");
 							}
 						} else {
 							constraints = constraints.append("-")
-									.append(mappings.add(module.getPredicate(), moduleState.getStateName()))
+									.append(mappings.add(module, moduleState))
 									.append(" ");
 							constraints = constraints.append(
-									mappings.add(emptyType.getPredicate(), currOutputStates.get(i).getStateName()))
+									mappings.add(emptyType, currOutputStates.get(i)))
 									.append(" 0\n");
 						}
 					}
@@ -391,11 +453,11 @@ public class AllModules {
 			boolean shared_memory, Type emptyType, AtomMapping mappings) {
 
 		StringBuilder constraints = new StringBuilder();
-		constraints = constraints.append(inputCons(moduleAutomaton, typeAutomaton, emptyType, mappings));
+		constraints = constraints.append(inputCons(allTypes, moduleAutomaton, typeAutomaton, emptyType, mappings));
 		if (!shared_memory) {
-			constraints = constraints.append(inputPipelineCons(allTypes, moduleAutomaton, typeAutomaton, mappings));
+			constraints = constraints.append(inputMsgPassingCons(allTypes, moduleAutomaton, typeAutomaton, mappings));
 		} else {
-			constraints = constraints.append(inputGenMemoryCons(allTypes, moduleAutomaton, typeAutomaton, mappings));
+			constraints = constraints.append(inputSharedMemCons(allTypes, moduleAutomaton, typeAutomaton, mappings));
 		}
 
 		constraints = constraints.append(outputCons(moduleAutomaton, typeAutomaton, emptyType, mappings));
@@ -418,9 +480,9 @@ public class AllModules {
 		for (Pair pair : getToolPairs()) {
 			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
 				constraints = constraints.append("-")
-						.append(mappings.add(pair.getFirst().getPredicate(), moduleState.getStateName())).append(" ");
+						.append(mappings.add(pair.getFirst(), moduleState)).append(" ");
 				constraints = constraints.append("-")
-						.append(mappings.add(pair.getSecond().getPredicate(), moduleState.getStateName()))
+						.append(mappings.add(pair.getSecond(), moduleState))
 						.append(" 0\n");
 			}
 		}
@@ -445,7 +507,7 @@ public class AllModules {
 		for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
 			for (Entry<String, AbstractModule> tool : annotatedTools.getModules().entrySet()) {
 				constraints = constraints
-						.append(mappings.add(tool.getValue().getPredicate(), moduleState.getStateName())).append(" ");
+						.append(mappings.add(tool.getValue(), moduleState)).append(" ");
 			}
 			constraints = constraints.append(" 0\n");
 		}
@@ -484,7 +546,7 @@ public class AllModules {
 	private String moduleEnforceTaxonomyStructureForState(String rootModuleID, ModuleAutomaton moduleAutomaton,
 			AtomMapping mappings, ModuleState moduleState) {
 		AbstractModule currModule = modules.get(rootModuleID);
-		String superModule_state = mappings.add(currModule.getPredicate(), moduleState.getStateName()).toString();
+		String superModule_state = mappings.add(currModule, moduleState).toString();
 
 		StringBuilder constraints = new StringBuilder();
 		StringBuilder currConstraint = new StringBuilder("-").append(superModule_state).append(" ");
@@ -496,7 +558,7 @@ public class AllModules {
 			 */
 			for (String subModuleID : currModule.getSubModules()) {
 				AbstractModule subModule = modules.get(subModuleID);
-				String subModule_State = mappings.add(subModule.getPredicate(), moduleState.getStateName()).toString();
+				String subModule_State = mappings.add(subModule, moduleState).toString();
 				currConstraint = currConstraint.append(subModule_State).append(" ");
 				subModules_States.add(subModule_State);
 				constraints = constraints.append(

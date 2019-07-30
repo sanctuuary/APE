@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import nl.uu.cs.ape.sat.StaticFunctions;
+
 /**
  * Class is used to represent the type automaton. It comprises blocks of data
  * types that are added to the memory and those that are being used by tools, as
@@ -59,14 +61,14 @@ public class TypeAutomaton {
 			
 			TypeBlock tmpMemoryTypeBlock = new TypeBlock(i);
 			for (int j = 0; j < input_branching; j++) {
-				TypeState tmpMemoryTypeState = new TypeState("MemT" + i_var + "." + j, j);
+				TypeState tmpMemoryTypeState = new TypeState("MemT" + i_var + "." + j, j, StaticFunctions.calculateAbsStateNumber(i, j, input_branching, WorkflowElement.MEMORY_TYPE));
 				tmpMemoryTypeBlock.addState(tmpMemoryTypeState);
 			}
 			addMemoryTypesBlock(tmpMemoryTypeBlock);
 			
 			TypeBlock tmpUsedTypesBlock = new TypeBlock(i);
 			for (int j = 0; j < input_branching; j++) {
-				TypeState tmpUsedTypeState = new TypeState("UsedT" + i_var + "." + j, j);
+				TypeState tmpUsedTypeState = new TypeState("UsedT" + i_var + "." + j, j,StaticFunctions.calculateAbsStateNumber(i, j, input_branching, WorkflowElement.USED_TYPE));
 				tmpUsedTypesBlock.addState(tmpUsedTypeState);
 			}
 			addUsedTypesBlock(tmpUsedTypesBlock);
@@ -203,6 +205,22 @@ public class TypeAutomaton {
 	 */
 	public int getWorkflowLength() {
 		return workflowLength;
+	}
+
+	/**
+	 * Return all the memory type states that are generated prior to a certain block, i.e. all the slots of memory are generated prior to a certain block/tool.
+	 * @param maxBlockNo - memory block prior to which we are looking into memory (this block is not included).
+	 * @return List of memory TypeStates.
+	 */
+	public List<TypeState> getMemoryStatesUntilBlockNo(int maxBlockNo) {
+		 List<TypeState> untilTypeStates= new ArrayList<TypeState>();
+		for(int i = 0; i < maxBlockNo; i++) {
+			TypeBlock currBlock = this.memoryTypesAutomaton.get(i);
+			for(TypeState currState : currBlock.getTypeStates()) {
+				untilTypeStates.add(currState);
+			}
+		}
+		return untilTypeStates;
 	}
 
 }

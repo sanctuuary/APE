@@ -10,7 +10,9 @@ import java.util.List;
  */
 public class TypeBlock {
 
+	/** States that comprise this block. Number of stater correpond to the max number of inputs or outputs. */
 	private List<TypeState> typeStates;
+	/** Order number of the block in the solution. */
 	private int blockNumber;
 
 	public TypeBlock(int blockNumber) {

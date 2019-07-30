@@ -2,13 +2,12 @@ package nl.uu.cs.ape.sat.models;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.constructs.Literal;
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
 
 /**
  * The {@code SAT_solution} class describes the solution produced by the SAT
@@ -22,20 +21,18 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
  */
 public class SAT_solution extends Solution {
 
-	/*
-	 * List of all the literals provided by the solution.
-	 */
+	/** List of all the literals provided by the solution.*/
 	private List<Literal> literals;
-	/*
-	 * List of only relevant (positive) literals that represent implemented
-	 * modules/tools.
-	 */
+	/**List of only relevant (positive) literals that represent implemented
+	 * modules/tools.  */
 	private List<Literal> relevantModules;
-	/*
-	 * List of only relevant (positive) literals that represent simple types.
-	 */
+	/** List of only relevant (positive) literals that represent simple types.*/
 	private List<Literal> relevantTypes;
+	/** List of all the relevant types and modules combined.  */
+	private List<Literal> relevantElements;
+	/** True if the there is no solution to the problem. Problem is UNASATISFIABLE. */
 	private boolean unsat;
+	/** Lengths of the current solution. */
 	private int solutionLength;
 
 	/**
@@ -52,15 +49,17 @@ public class SAT_solution extends Solution {
 		literals = new ArrayList<Literal>();
 		relevantModules = new ArrayList<Literal>();
 		relevantTypes = new ArrayList<Literal>();
+		relevantElements = new ArrayList<Literal>();
 		String[] mappedLiterals = satOutput.split(" ");
 		for (String mappedLiteral : mappedLiterals) {
-			if (!mappedLiteral.matches("0")) {
-				Literal currLiteral = new Literal(mappedLiteral, atomMapping, allModules, allTypes);
+			if(Integer.getInteger(mappedLiteral) > atomMapping.getMaxNumOfMappedAuxVar()) {
+				Literal currLiteral = new Literal(mappedLiteral, atomMapping);
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
+					relevantElements.add(currLiteral);
 					if (currLiteral.getPredicate() instanceof Module) {
 						relevantModules.add(currLiteral);
-					} else if (!currLiteral.isModule() && ((Type) currLiteral.getPredicate()).isSimpleType()) {
+					} else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE && ((Type) currLiteral.getPredicate()).isSimpleType()) {
 						relevantTypes.add(currLiteral);
 					}
 				}
@@ -68,6 +67,7 @@ public class SAT_solution extends Solution {
 		}
 		Collections.sort(relevantModules);
 		Collections.sort(relevantTypes);
+		Collections.sort(relevantElements);
 		this.solutionLength = solutionLength;
 	}
 
@@ -86,14 +86,16 @@ public class SAT_solution extends Solution {
 		literals = new ArrayList<Literal>();
 		relevantModules = new ArrayList<Literal>();
 		relevantTypes = new ArrayList<Literal>();
+		relevantElements = new ArrayList<Literal>();
 		for (int mappedLiteral : satSolution) {
 			if (mappedLiteral > atomMapping.getMaxNumOfMappedAuxVar()) {
-				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), atomMapping, allModules, allTypes);
+				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), atomMapping);
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
+					relevantElements.add(currLiteral);
 					if (currLiteral.getPredicate() instanceof Module) {
 						relevantModules.add(currLiteral);
-					} else if (!currLiteral.isModule() && ((Type) currLiteral.getPredicate()).isSimpleType()) {
+					} else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE && ((Type) currLiteral.getPredicate()).isSimpleType()) {
 						relevantTypes.add(currLiteral);
 					}
 				}
@@ -101,6 +103,7 @@ public class SAT_solution extends Solution {
 		}
 		Collections.sort(relevantModules);
 		Collections.sort(relevantTypes);
+		Collections.sort(relevantElements);
 		this.solutionLength = solutionLength;
 	}
 
@@ -153,7 +156,7 @@ public class SAT_solution extends Solution {
 	 * Returns only the most important part of the solution in human readable
 	 * format, filtering out the information that are not required to generate the
 	 * workflow. The solution literals are sorted according the state they are used
-	 * in. TMem TUsed
+	 * in.
 	 * 
 	 * @return String representing the tools and data used in the solutions
 	 */
@@ -162,25 +165,8 @@ public class SAT_solution extends Solution {
 		if (unsat) {
 			solution = new StringBuilder("UNSAT");
 		} else {
-			for (int i = -1; i < relevantModules.size(); i++) {
-				if (i >= 0) {
-					solution = solution.append(relevantModules.get(i).toString() + " ");
-				}
-				for (Literal typeLiteral : relevantTypes) {
-//					System.out.println(typeLiteral);
-//					System.out.println(typeLiteral.getAttribute());
-					if (solutionLength > 9 && i < 9) {
-						if (typeLiteral.getAttribute().startsWith("UsedT0" + (i + 1) + ".")
-								|| typeLiteral.getAttribute().startsWith("MemT0" + (i + 1) + ".")) {
-							solution = solution.append(typeLiteral.toString() + " ");
-						}
-					} else {
-						if (typeLiteral.getAttribute().startsWith("UsedT" + (i + 1) + ".")
-								|| typeLiteral.getAttribute().startsWith("MemT" + (i + 1) + ".")) {
-							solution = solution.append(typeLiteral.toString() + " ");
-						}
-					}
-				}
+			for(Literal relevantElement : relevantElements) {
+				solution = solution.append(relevantElement.toString() + " ");
 			}
 		}
 		return solution.toString();
@@ -208,9 +194,9 @@ public class SAT_solution extends Solution {
 	 * Returns the solution in mapped format. The original solution created by the
 	 * SAT solver.
 	 * 
-	 * @return String representing the mapped solution
+	 * @return String representing the mapped solution created by SAT solver.
 	 */
-	public String getMappedSolution() {
+	public String getOriginalSATSolution() {
 		StringBuilder solution = new StringBuilder();
 			if (!unsat) {
 			for (Literal literal : literals) {
@@ -226,7 +212,7 @@ public class SAT_solution extends Solution {
 	 * solutions.
 	 * 
 	 * @return String representing the negated solution
-	 */
+	 
 	public String getNegatedMappedSolution() {
 		StringBuilder solution = new StringBuilder();
 		if (!unsat) {
@@ -237,7 +223,7 @@ public class SAT_solution extends Solution {
 			}
 		}
 		return solution + " 0";
-	}
+	}*/
 
 	/**
 	 * Returns the negated solution in mapped format. Negating the original solution
@@ -249,8 +235,8 @@ public class SAT_solution extends Solution {
 	public int[] getNegatedMappedSolutionArray() {
 		List<Integer> negSol = new ArrayList<Integer>();
 		if (!unsat) {
-			for (Literal literal : literals) {
-				if (!literal.isNegated() && literal.isModule() && (literal.getPredicate() instanceof Module)) {
+			for (Literal literal : relevantElements) {
+				if (literal.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
 					negSol.add(literal.toNegatedMappedInt());
 				}
 			}

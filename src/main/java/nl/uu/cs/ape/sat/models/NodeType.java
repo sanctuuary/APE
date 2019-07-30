@@ -6,7 +6,7 @@ package nl.uu.cs.ape.sat.models;
  * <br>
  * values:
  * <br>
- * {@code ROOT, SUBROOT, ABSTRACT, LEAF, EMPTY}
+ * {@code ROOT, SUBROOT, ABSTRACT, LEAF, INSTANCE, EMPTY}
  */
 public enum NodeType{
 	
@@ -23,9 +23,13 @@ public enum NodeType{
 	 */
 	ABSTRACT, 
 	/**
-	 * Leaf in the taxonomy. usually represent the implementation of the tool, simple data type or format, etc.
+	 * Leaf in the taxonomy. Usually represent the implementation of the tool, simple data type or format, etc.
 	 */
 	LEAF,
+	/**
+	 * Instance in the taxonomy. Usually represent an instance of a simple data type or format. It is subclass of {@link #LEAF}s.
+	 */
+	INSTANCE,
 	/**
 	 * Represents the empty predicate.
 	 */

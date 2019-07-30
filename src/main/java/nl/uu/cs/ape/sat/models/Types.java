@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class Types {
 
+	/** List of data types/formats (List<{@link Type}>) that correspond to a single data instance. */
 	private List<Type> types;
 	
 	public Types(List<Type> types) {
@@ -32,6 +33,10 @@ public class Types {
 		types.add(type);
 	}
 	
+	/**
+	 *  Get a list of types/formats that correspond to the specific data instance 
+	 * @return List of {@link Type}s
+	 */
 	public List<Type> getTypes() {
 		return types;
 	}

@@ -19,17 +19,48 @@ public abstract class Predicate {
 	 * Root of the Ontology tree that this node belongs to. Used to distinguish between mutually exclusive data taxonomy subtrees (type and format).
 	 */
 	private String rootNode;
-
+	
+	/**
+	 * Describes whether the node is relevant in the described scenario. In other words, the node is relevant if it is part of the active domain (tool annotations).
+	 */
+	private boolean isRelevant;
 	/**
 	 * Setup the taxonomy related information
 	 * @param rootType - root of the OWL tree that this node belongs to
 	 * @param nodeType - type of the node
 	 */
 	public Predicate(String rootNode, NodeType nodeType) {
-		this.nodeType = nodeType;
 		this.rootNode = rootNode;
+		this.nodeType = nodeType;
+		isRelevant = false;
 	}
 	
+	
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((nodeType == null) ? 0 : nodeType.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Predicate other = (Predicate) obj;
+		if (nodeType != other.nodeType)
+			return false;
+		return true;
+	}
+
+
 	/**
 	 * Get root of the Ontology tree that this node belongs to. Used to distinguish between mutually exclusive data taxonomy subtrees (type and format).
 	 * @return String ID of the root class.
@@ -60,6 +91,21 @@ public abstract class Predicate {
 	 */
 	public void setNodeType(NodeType nodeType) {
 		this.nodeType = nodeType;
+	}
+	
+	/**
+	 * Sets the node to be relevant.
+	 */
+	public void setIsRelevant() {
+		this.isRelevant = true;
+	}
+	
+	/**
+	 * Returns whether the node is relevant for the scenario (if it can be used in practice).
+	 * @return {@code true} if the node can occur in our solution (as a type or module), {@code false} otherwise.
+	 */
+	public boolean getIsRelevant() {
+		return isRelevant;
 	}
 	
 	/**

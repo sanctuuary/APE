@@ -68,7 +68,7 @@ public class Main {
 		allTypes.getRootType().addSubType(allTypes.getEmptyType().getTypeID());
 
 		/*
-		 * Update allModules and allTypes sets based on the module.csv file
+		 * Update allModules and allTypes sets based on the module.xml file
 		 */
 		AllModules annotated_modules = new AllModules(
 				StaticFunctions.readModuleXML(config.getTool_annotations_path(), allModules, allTypes));
@@ -82,13 +82,6 @@ public class Main {
 		/** Print the setup information when necessary. */
 		StaticFunctions.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory.printConstraintsCodes());
 
-
-		/*
-		 * print all the tools
-		 */
-//		for (Entry<String, AbstractModule> mapModule : annotated_modules.getModules().entrySet()) {
-//			System.out.println(mapModule.getValue().print());
-//		}
 
 		/**
 		 * Loop over different lengths of the workflow until either, max workflow length

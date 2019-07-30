@@ -1,33 +1,33 @@
 package nl.uu.cs.ape.sat.models.constructs;
 
+import nl.uu.cs.ape.sat.automaton.State;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
+import nl.uu.cs.ape.sat.models.Atom;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 
 /**
  * The {@code Literal} class represents literals (atoms that can be negated) corresponding to the usage of the modules 
  * and types in the solution. It is of the form {@code Predicate(Attribute)} where
  * {@code Predicate} represents a single predicate/label used to depict {@code AbstractModule, Module} 
- * or {@code Type}, while {@code Attribute} represents the state in the module/type automaton where the 
- * module/type is used (or not used if the literal is negative). <br><br>
+ * or {@code Type}, while {@code State} represents the state in the module/type automaton where the 
+ * module/type is used (or not used if the literal is negative). The second attribute (referedStateArgument) is optional and used when
+ * the Literal represent the type that is used as tool input - referred state is the state when the type was created.<br><br>
  * {@code Literals} can start with a negation.
  * <br><br>
- * {@code Literals} are compared according to the state in which they are used ({@linkplain #attribute}), i.e. a literal that represents the n-th state in the workflow, comes before the literal that represents the (n+1)th state.
+ * {@code Literals} are compared according to the state in which they are used ({@linkplain #usedInStateArgument}), i.e. a literal that represents the n-th state in the workflow, comes before the literal that represents the (n+1)th state.
  * @author Vedran Kasalica
  *
  */
 public class Literal implements Comparable<Literal>{
 
-	/** Mapped value of the atom*/
-	private String mappedAtom;
-	/** Contains the original value of the predicate. It represents a {@code AbstractModule, Module} or a {@code Type}. */
-	private Predicate predicate;
-	/** Contains the value that is given as an attribute for the predicate. It represents the state in the module/type automaton where the predicate is used (or not used if the literal is negative). */
-	private String attribute;
+	/** Integer value used to encode the atom into cnf form. */
+	private Integer mappedAtom;
 	/** {@code true} if the atom is negated */
 	private boolean negated;
-	/** {@code true} if the atom represents a module, atom represents a type otherwise. */
-	private boolean isModule;
+	/** The {@link Atom} class represents elements of the workflow, that can be true or not (depending of the truth value of the literal). */
+	private Atom atom;
 
 	/**
 	 * Generating an object from a mapped representation of the Literal.
@@ -36,43 +36,18 @@ public class Literal implements Comparable<Literal>{
 	 * @param allModules - list of all the modules
 	 * @param allTypes - list of all the types
 	 */
-	public Literal(String mappedLiteral, AtomMapping atomMapping, AllModules allModules, AllTypes allTypes) {
-		
+	public Literal(String mappedLiteral, AtomMapping atomMapping) {
+		super();
 		if (mappedLiteral.startsWith("-")) {
 			negated = true;
-			mappedAtom = mappedLiteral.substring(1);
+			mappedAtom = Integer.parseInt(mappedLiteral.substring(1));
 		} else {
 			negated = false;
-			mappedAtom = mappedLiteral;
+			mappedAtom = Integer.parseInt(mappedLiteral);
 		}
 		
-		String atom = atomMapping.findOriginal(Integer.parseInt(mappedAtom)).trim();
+		atom = atomMapping.findOriginal(mappedAtom);
 		
-		int splitIndex = atom.lastIndexOf("(");
-		String predicateStr = atom.substring(0, splitIndex);
-		predicate = allModules.get(predicateStr);
-		if (predicate == null) {
-			isModule = false;
-			predicate = allTypes.get(predicateStr);
-			if (predicate == null) {
-				System.out.println("Literal over predicate: " + predicateStr + " was not defined. Error while scanning the predicate: " + atom);
-			}
-		} else {
-			isModule = true;
-		}
-		attribute = atom.substring(splitIndex + 1, atom.length() - 1);
-	}
-	
-	/**
-	 * Returns the Original (human readable) value of the literal
-	 *  @return The value of the original literal
-	 */
-	public String toString() {
-		if (negated) {
-			return "-" + predicate.getPredicate() + "(" + attribute + ")";
-		} else {
-			return predicate.getPredicate() + "(" + attribute + ")";
-		}
 	}
 	
 	
@@ -84,7 +59,7 @@ public class Literal implements Comparable<Literal>{
 		if (negated) {
 			return "-" + mappedAtom;
 		} else {
-			return mappedAtom;
+			return mappedAtom.toString();
 		}
 	}
 	
@@ -94,7 +69,7 @@ public class Literal implements Comparable<Literal>{
 	 */
 	public String toNegatedMappedString() {
 		if (negated) {
-			return mappedAtom;
+			return mappedAtom.toString();
 		} else {
 			return "-" + mappedAtom;
 		}
@@ -106,18 +81,18 @@ public class Literal implements Comparable<Literal>{
 	 */
 	public int toNegatedMappedInt() {
 		if (negated) {
-			return Integer.parseInt(mappedAtom);
+			return mappedAtom;
 		} else {
-			return Integer.parseInt("-" + mappedAtom);
+			return -mappedAtom;
 		}
 	}
 	
 	/**
-	 * Returns {@code true} in case the literal is a Module, {@code false} in case of the literal being a Type.
-	 * @return boolean {@code true} if Literal is a Module
+	 * Return the type of the element in the workflow (tool, memory type, etc.)
+	 * @return The {@link WorkflowElement} that corresponds to the Literal usage or not usage (in case of a negated literal).
 	 */
-	public boolean isModule() {
-		return isModule;
+	public WorkflowElement getWorkflowElementType() {
+		return atom.getWorkflowElementType();
 	}
 	
 	/**
@@ -129,11 +104,19 @@ public class Literal implements Comparable<Literal>{
 	}
 	
 	/**
+	 * Returns the state in the automaton.
+	 * @return String representation of the module/type automaton state.
+	 */
+	public State getUsedInStateArgument() {
+		return atom.getUsedInStateArgument();
+	}
+	
+	/**
 	 * Returns the label used to depict the state in the automaton.
 	 * @return String representation of the module/type automaton state.
 	 */
-	public String getAttribute() {
-		return attribute;
+	public State getReferedStateArgument() {
+		return atom.getReferedStateArgument();
 	}
 	
 	/**
@@ -141,22 +124,36 @@ public class Literal implements Comparable<Literal>{
 	 * @return Predicate object
 	 */
 	public Predicate getPredicate() {
-		return predicate;
+		return atom.getPredicate();
 	}
 	
 	/**
 	 *	Compare the two Literals according to the state they are used in. Returns a negative integer, zero, or a positive integer as this Literal's state comes before than, is equal to, or comes after than the @otherLiteral's state.
 	 * 
 	 *  @param otherLiteral - the Literal to be compared
-	 *  @return the value 0 if the argument Literal's state is equal to this Literal's state; a value less than 0 if this Literal's state comes before the @otherLiteral's state; and a value greater than 0 if this Literal's state comes after the @otherLiteral's state.
+	 *  @return The value 0 if the argument Literal's state is equal to this Literal's state; a value less than 0 if this Literal's state comes before the @otherLiteral's state; and a value greater than 0 if this Literal's state comes after the @otherLiteral's state.
 	 */
 	public int compareTo(Literal otherLiteral) {
-		if(attribute == null) {
+		if(this.getUsedInStateArgument() == null) {
 			return -1;
 		}
 		if(otherLiteral == null) {
 			return 1;
 		}
-	    return attribute.compareTo(otherLiteral.getAttribute());
+		int thisLiteralState = this.getUsedInStateArgument().getAbsoluteStateNumber();
+		int otherLiteralState = otherLiteral.atom.getUsedInStateArgument().getAbsoluteStateNumber();
+	    return Integer.compare(thisLiteralState, otherLiteralState);
+	}
+	
+	/**
+	 * Returns the Original (human readable) value of the literal. The atom of the Literal is transformed using the {@link Atom#toString()} function.
+	 *  @return The value of the original literal
+	 */
+	public String toString() {
+		if (negated) {
+			return "-" + atom.toString();
+		} else {
+			return atom.toString();
+		}
 	}
 }

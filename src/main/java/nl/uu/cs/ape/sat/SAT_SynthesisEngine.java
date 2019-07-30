@@ -90,7 +90,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * Generate the automaton
 		 */
 		StaticFunctions.startTimer(config.getDebug_mode());
-		ModuleAutomaton moduleAutomaton = new ModuleAutomaton(allSolutions.getCurrSolutionLenght());
+		ModuleAutomaton moduleAutomaton = new ModuleAutomaton(allSolutions.getCurrSolutionLenght(), config.getMax_no_tool_outputs());
 		TypeAutomaton typeAutomaton = new TypeAutomaton(allSolutions.getCurrSolutionLenght(),
 				config.getMax_no_tool_inputs(), config.getMax_no_tool_outputs());
 		StaticFunctions.restartTimerNPrint("Automaton");
@@ -111,11 +111,17 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		}
 		cnfEncoding = cnfEncoding.append(outputDataEncoding);
 		/*
-		 * Create constraints from the module.csv file
+		 * Create constraints from the module.xml file regarding the Inputs/Outputs
 		 */
 		cnfEncoding = cnfEncoding.append(annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, allTypes, config.getShared_memory(),
 				allTypes.getEmptyType(), mappings));
 		StaticFunctions.restartTimerNPrint("Tool I/O constraints");
+		
+		/*
+		 * Create the constraints that provide distinction of data instances.
+		 */
+//		cnfEncoding = cnfEncoding.append(allTypes.endoceInstances(typeAutomaton));
+		
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the tools 2.
 		 * Mandatory usage of the tools - from taxonomy. 3. Adding the constraints

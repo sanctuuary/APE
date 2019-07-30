@@ -3,6 +3,7 @@ package nl.uu.cs.ape.sat.models;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
 
 /**
@@ -14,8 +15,8 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
  */
 public class AtomMapping {
 
-	private Map<String, Integer> mappings;
-	private Map<Integer, String> reverseMapping;
+	private Map<Atom, Integer> mappings;
+	private Map<Integer, Atom> reverseMapping;
 	/** Number of mapped predicates */
 	private int size;
 	/** Number  of auxiliary introduced variables */
@@ -24,8 +25,8 @@ public class AtomMapping {
 	private int auxMax = 100000;
 
 	public AtomMapping() {
-		mappings = new HashMap<String, Integer>();
-		reverseMapping = new HashMap<Integer, String>();
+		mappings = new HashMap<Atom, Integer>();
+		reverseMapping = new HashMap<Integer, Atom>();
 		/** First {@link #auxMax} variables are reserved for auxiliary variables */
 		size = auxMax + 1;
 		auxiliary = 1;
@@ -36,7 +37,7 @@ public class AtomMapping {
 	 * it is added to the mapping set and the mapping value is returned, otherwise just the existing mapping value is returned.
 	 * @param atom - atom that is being mapped [format: <b>{@code predicate(argument)}</b> ]
 	 * @return Mapping number of the atom (number is always > 0)
-	 */
+	 
 	public Integer add(String atom) {
 		Integer id;
 		if ((id = mappings.get(atom)) == null) {
@@ -47,17 +48,18 @@ public class AtomMapping {
 		}
 		return id;
 	}
-	
+	*/
 	
 	/**
 	 * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. If the Atom did not occur before,
 	 * it is added to the mapping set and the mapping value is returned, otherwise the existing mapping value is returned.
 	 * @param predicate - predicate of the mapped atom
-	 * @param argument - argument of the mapped atom
+	 * @param usedInState - argument of the mapped atom (usually name of the type/module state)
 	 * @return Mapping number of the atom (number is always > 0)
 	 */
-	public Integer add(String predicate, String argument) {
-		String atom = predicate + "(" + argument + ")";
+	public Integer add(Predicate predicate,State usedInState) {
+		Atom atom = new Atom(predicate, usedInState);
+		
 		Integer id;
 		if ((id = mappings.get(atom)) == null) {
 			size++;
@@ -65,8 +67,25 @@ public class AtomMapping {
 			reverseMapping.put(size, atom);
 			return size;
 		}
-		if(id.toString().contains("@RESERVED_CNF_")) {
-			System.out.println(id + " for: " + predicate + "(" + argument);
+		return id;
+	}
+	
+	/**
+	 * Function is returning the mapping number of the <b>{@code predicate[memoryState](usedState)}</b>. If the Atom did not occur before,
+	 * it is added to the mapping set and the mapping value is returned, otherwise the existing mapping value is returned.
+	 * @param predicate - predicate of the mapped atom
+	 * @param memoryState - argument of the mapped atom that corresponds to the memory state in the type automaton when the predicate was created
+	 * @param usedState - argument of the mapped atom that corresponds to the used type state in the type automaton when the predicate is being used as a tool input (or workflow output)
+	 * @return Mapping (integer) number of the atom (number is always > 0)
+	 */
+	public Integer add(Predicate predicate,State usedInState, State referedState) {
+		Atom atom = new Atom(predicate, usedInState, referedState);
+		Integer id;
+		if ((id = mappings.get(atom)) == null) {
+			size++;
+			mappings.put(atom, size);
+			reverseMapping.put(size, atom);
+			return size;
 		}
 		return id;
 	}
@@ -75,17 +94,18 @@ public class AtomMapping {
 	 * Return the mapping value (Integer) for the <b>atom</b>. If the <b>atom</b> was not mapped it returns null.
 	 * @param atom - string representation of the atom
 	 * @return mapping of the atom
-	 */
+	 
 	public Integer findMapping(String atom) {
 		return mappings.get(atom);
 	}
+	*/
 	
 	/**
 	 * Return the mapping value (Integer) for the<b>atom</b>. If the <b>atom</b> was not mapped it returns null.
 	 * @param mapping - Integer mapping of the atom
-	 * @return original atom
+	 * @return The original atom
 	 */
-	public String findOriginal(Integer mapping) {
+	public Atom findOriginal(Integer mapping) {
 		return reverseMapping.get(mapping);
 		
 	}

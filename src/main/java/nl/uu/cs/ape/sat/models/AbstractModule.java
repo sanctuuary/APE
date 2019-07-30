@@ -63,6 +63,37 @@ public class AbstractModule extends Predicate {
 			}
 		}
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((moduleID == null) ? 0 : moduleID.hashCode());
+		result = prime * result + ((moduleName == null) ? 0 : moduleName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AbstractModule other = (AbstractModule) obj;
+		if (moduleID == null) {
+			if (other.moduleID != null)
+				return false;
+		} else if (!moduleID.equals(other.moduleID))
+			return false;
+		if (moduleName == null) {
+			if (other.moduleName != null)
+				return false;
+		} else if (!moduleName.equals(other.moduleName))
+			return false;
+		return true;
+	}
 
 	public String getModuleID() {
 		return moduleID;
@@ -197,16 +228,6 @@ public class AbstractModule extends Predicate {
 		return subModules;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		AbstractModule other = (AbstractModule) obj;
-		return this.moduleID.matches(other.moduleID);
-	}
-
-	@Override
-	public int hashCode() {
-		return moduleID.hashCode();
-	}
 
 	/**
 	 * The class is used to check weather the module with @moduleID was already

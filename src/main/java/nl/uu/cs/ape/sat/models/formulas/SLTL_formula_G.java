@@ -47,12 +47,12 @@ public class SLTL_formula_G extends SLTL_formula {
 			for (TypeBlock typeBlock : typeStateBlocks) {
 				for (TypeState typeState : typeBlock.getTypeStates()) {
 					constraints += negSign
-							+ mappings.add(super.getSubFormula().getPredicate(), typeState.getStateName()) + " 0\n";
+							+ mappings.add(super.getSubFormula(), typeState) + " 0\n";
 				}
 			}
 		} else {
 			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
-				constraints += negSign + mappings.add(super.getSubFormula().getPredicate(), moduleState.getStateName())
+				constraints += negSign + mappings.add(super.getSubFormula(), moduleState)
 						+ " 0\n";
 			}
 		}
