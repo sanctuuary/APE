@@ -2,13 +2,16 @@ package nl.uu.cs.ape.sat.models;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.constructs.Literal;
+import nl.uu.cs.ape.sat.models.constructs.Predicate;
 
 /**
  * The {@code SAT_solution} class describes the solution produced by the SAT
@@ -33,52 +36,12 @@ public class SAT_solution extends Solution {
 	private List<Literal> relevantElements;
 	/** List of all the references for the types in the memory, when used as tool inputs.  */
 	private List<Literal> references2MemTypes;
+	private Set<Predicate> usedTypeStates;
 	/** True if the there is no solution to the problem. Problem is UNASATISFIABLE. */
 	private boolean unsat;
 	/** Lengths of the current solution. */
 	private int solutionLength;
 
-	/**
-	 * Creating a list of Literals to represent the solution.
-	 * 
-	 * @param satOutput   - list of mapped literals given as text (SAT output)
-	 * @param atomMapping - mapping of the atoms
-	 * @param allModules  - list of all the modules
-	 * @param allTypes    - list of all the types
-	 */
-	public SAT_solution(String satOutput, AtomMapping atomMapping, AllModules allModules, AllTypes allTypes,
-			int solutionLength) {
-		unsat = false;
-		literals = new ArrayList<Literal>();
-		relevantModules = new ArrayList<Literal>();
-		relevantTypes = new ArrayList<Literal>();
-		relevantElements = new ArrayList<Literal>();
-		references2MemTypes = new ArrayList<Literal>();
-		String[] mappedLiterals = satOutput.split(" ");
-		for (String mappedLiteral : mappedLiterals) {
-			if(Integer.getInteger(mappedLiteral) > atomMapping.getMaxNumOfMappedAuxVar()) {
-				Literal currLiteral = new Literal(mappedLiteral, atomMapping);
-				literals.add(currLiteral);
-				if (!currLiteral.isNegated()) {
-					if (currLiteral.getPredicate() instanceof Module) {
-						relevantElements.add(currLiteral);
-						relevantModules.add(currLiteral);
-					} else if(currLiteral.getPredicate() instanceof State) {
-						relevantElements.add(currLiteral);
-						references2MemTypes.add(currLiteral);
-					} else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE && ((Type) currLiteral.getPredicate()).isSimpleType()) {
-						relevantElements.add(currLiteral);
-						relevantTypes.add(currLiteral);
-					}
-				}
-			}
-		}
-		Collections.sort(relevantModules);
-		Collections.sort(relevantTypes);
-		Collections.sort(relevantElements);
-		Collections.sort(references2MemTypes);
-		this.solutionLength = solutionLength;
-	}
 
 	/**
 	 * Creating a list of Literals to represent the solution.
@@ -97,28 +60,34 @@ public class SAT_solution extends Solution {
 		relevantTypes = new ArrayList<Literal>();
 		relevantElements = new ArrayList<Literal>();
 		references2MemTypes = new ArrayList<Literal>();
+		usedTypeStates = new HashSet<Predicate>();
 		for (int mappedLiteral : satSolution) {
 			if (mappedLiteral > atomMapping.getMaxNumOfMappedAuxVar()) {
 				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), atomMapping);
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
 					if (currLiteral.getPredicate() instanceof Module) {
+						/* add all positive literals that describe tool implementations */
 						relevantElements.add(currLiteral);
 						relevantModules.add(currLiteral);
-					} else if(currLiteral.getPredicate() instanceof State) {
-						relevantElements.add(currLiteral);
-						references2MemTypes.add(currLiteral);
-					} else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE && ((Type) currLiteral.getPredicate()).isSimpleType()) {
+					} else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE && currLiteral.getWorkflowElementType() != WorkflowElement.MEM_TYPE_REFERENCE
+							&& ((Type) currLiteral.getPredicate()).isSimpleType()) {
+						/* add all positive literals that describe simple types */
 						relevantElements.add(currLiteral);
 						relevantTypes.add(currLiteral);
+						usedTypeStates.add(currLiteral.getUsedInStateArgument());
+					} else if(currLiteral.getPredicate() instanceof State && ((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {
+						/* add all positive literals that describe memory type references that are not pointing to null state */
+						references2MemTypes.add(currLiteral);
+						relevantElements.add(currLiteral);
 					} 
 				}
 			}
 		}
 		Collections.sort(relevantModules);
 		Collections.sort(relevantTypes);
-		Collections.sort(relevantElements);
 		Collections.sort(references2MemTypes);
+		Collections.sort(relevantElements);
 		this.solutionLength = solutionLength;
 	}
 

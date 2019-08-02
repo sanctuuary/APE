@@ -29,6 +29,9 @@ public class TypeAutomaton {
 	 */
 	private List<Block> usedTypesAutomaton;
 	
+	/** State is used in order to represent no state. */
+	private State nullState;
+	
 	
 	/** Workflow length */
 	private int workflowLength;
@@ -46,6 +49,7 @@ public class TypeAutomaton {
 	public TypeAutomaton(int automata_bound, int input_branching, int output_branching) {
 		memoryTypesAutomaton = new ArrayList<Block>();
 		usedTypesAutomaton = new ArrayList<Block>();
+		nullState = new State(null, null, -1, input_branching);
 	
 		workflowLength =  automata_bound < 1 ? 1 : automata_bound;
 			
@@ -67,11 +71,6 @@ public class TypeAutomaton {
 			addUsedTypesBlock(tmpUsedTypesBlock);
 		}
 	}
-
-//	public TypeAutomaton(List<TypeBlock> typeAutomaton) {
-//		super();
-//		this.typeAutomaton = typeAutomaton;
-//	}
 
 	/**
 	 * Return from the automaton all the Type Blocks that contain types used by
@@ -102,6 +101,14 @@ public class TypeAutomaton {
 		List<Block> x = new ArrayList<Block> (usedTypesAutomaton);
 		x.addAll(memoryTypesAutomaton);
 		return x;
+	}
+	
+	/**
+	 * Returns the null state. 
+	 * @return State representing a null state.
+	 */
+	public State getNullState() {
+		return nullState;
 	}
 
 	/**
@@ -225,6 +232,22 @@ public class TypeAutomaton {
 		 List<State> untilStates= new ArrayList<State>();
 		for(int i = minBlockNo + 1; i < this.memoryTypesAutomaton.size(); i++) {
 			Block currBlock = this.memoryTypesAutomaton.get(i);
+			for(State currState : currBlock.getStates()) {
+				untilStates.add(currState);
+			}
+		}
+		return untilStates;
+	}
+	
+	/**
+	 * Return all the type states that are used after a certain block, i.e. all the slots of tool inputs that are used after current types were added to the memory.
+	 * @param minBlockNo - memory block after which we are looking into tool inputs (this block is not included).
+	 * @return List of Used States.
+	 */
+	public List<State> getUsedStatesAfterBlockNo(int minBlockNo) {
+		 List<State> untilStates= new ArrayList<State>();
+		for(int i = minBlockNo + 1; i < this.usedTypesAutomaton.size(); i++) {
+			Block currBlock = this.usedTypesAutomaton.get(i);
 			for(State currState : currBlock.getStates()) {
 				untilStates.add(currState);
 			}

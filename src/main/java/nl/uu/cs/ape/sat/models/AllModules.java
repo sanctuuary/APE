@@ -170,7 +170,7 @@ public class AllModules {
 
 		return pairs;
 	}
-	
+
 	/**
 	 * Returns a list of pairs of tools from modules. Note that the abstract modules
 	 * are not returned, only the unique pairs of modules that are representing
@@ -223,8 +223,8 @@ public class AllModules {
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String inputCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
-			Type emptyType, AtomMapping mappings) {
+	private String inputCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, Type emptyType,
+			AtomMapping mappings) {
 
 		StringBuilder constraints = new StringBuilder();
 
@@ -272,45 +272,67 @@ public class AllModules {
 
 		return constraints.toString();
 	}
+
 	/**
-	 * Constraints that ensure that the referenced memory states contain the same data type as the one that is used as the input for the tool. Constraints ensure that the {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
+	 * Constraints that ensure that the referenced memory states contain the same
+	 * data type as the one that is used as the input for the tool. Constraints
+	 * ensure that the {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented
+	 * correctly.
+	 * 
 	 * @param allTypes
 	 * @param typeAutomaton
 	 * @param mappings
-	 * @return String representing the constraints required to ensure that the {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
+	 * @return String representing the constraints required to ensure that the
+	 *         {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
 	private String generalReferenceCons(AllTypes allTypes, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		StringBuilder constraints = new StringBuilder();
-		
+
 		/* For each type instance */
 		for (Entry<String, Type> mapType : allTypes.getTypes().entrySet()) {
 			Type currType = mapType.getValue();
-			if (currType.isSimpleType()) {
-				/* ..for each state in which type can be used ..*/
-				for(Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
-					for(State currUsedTypeState : currUsedBlock.getStates()) {
-						/* ..and for each state in which type can be created in memory ..*/
-						for(Block memoryBlock : typeAutomaton.getMemoryTypesBlocks()) {
-							for(State refMemoryTypeState : memoryBlock.getStates()) {
-								/* If the type (currType) is used as an input for a tool (in state currUsedTypeState).. */
-								constraints = constraints.append("-")
-										.append(mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE)).append(" ");
-								/* ..and the state is referencing a memory state where the type was created (refMemoryTypeState) */
-								constraints = constraints.append("-")
-										.append(mappings.add(refMemoryTypeState, currUsedTypeState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" ");
-								/* ..the type has to be generated in the the referenced memory type state. */
-								constraints = constraints.append(mappings.add(currType, refMemoryTypeState, WorkflowElement.MEMORY_TYPE)).append(" 0\n");
+			if (currType.isSimpleType() || currType.isEmptyType()) {
+				/* ..for each state in which type can be used .. */
+				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
+					for (State currUsedTypeState : currUsedBlock.getStates()) {
+						if (currType.isSimpleType()) {
+							/* ..and for each state in which type can be created in memory .. */
+							for (Block memoryBlock : typeAutomaton.getMemoryTypesBlocks()) {
+								for (State refMemoryTypeState : memoryBlock.getStates()) {
+									/*
+									 * If the type (currType) is used as an input for a tool (in state
+									 * currUsedTypeState)..
+									 */
+									constraints = constraints.append("-").append(
+											mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
+											.append(" ");
+									/*
+									 * ..and the state is referencing a memory state where the type was created
+									 * (refMemoryTypeState)
+									 */
+									constraints = constraints.append("-").append(mappings.add(refMemoryTypeState,
+											currUsedTypeState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" ");
+									/* ..the type has to be generated in the the referenced memory type state. */
+									constraints = constraints.append(
+											mappings.add(currType, refMemoryTypeState, WorkflowElement.MEMORY_TYPE))
+											.append(" 0\n");
+								}
 							}
+							/* If the type is empty the referenced state has to be null.*/
+						} else {
+							constraints = constraints.append("-").append(
+									mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
+									.append(" ");
+							constraints = constraints.append(mappings.add(typeAutomaton.getNullState(),
+									currUsedTypeState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" 0\n");
 						}
 					}
 				}
 			}
 		}
-		
-		
+
 		return constraints.toString();
 	}
-	
 
 	/**
 	 * Generate constraints that ensure that the inputs are available in the memory.
@@ -325,7 +347,7 @@ public class AllModules {
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String inputMsgPassingCons(TypeAutomaton typeAutomaton,	AtomMapping mappings) {
+	private String inputMsgPassingCons(TypeAutomaton typeAutomaton, AtomMapping mappings) {
 
 		// setting up input constraints (Message Passing Approach)
 		StringBuilder constraints = new StringBuilder();
@@ -335,19 +357,22 @@ public class AllModules {
 			for (State currInputState : currBlock.getStates()) {
 				/* Used state can reference states that are directly preceding the state */
 				List<State> possibleMemStates = typeAutomaton.getMemoryTypesBlock(blockNumber).getStates();
+				possibleMemStates.add(typeAutomaton.getNullState());
 				for (State exictingMemState : possibleMemStates) {
 					constraints = constraints
 							.append(mappings.add(exictingMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
 							.append(" ");
 				}
 				constraints = constraints.append(" 0\n");
-				
+
 				/* Defining that each input can reference only one state in the shared memory */
 				for (Pair pair : getPredicatePairs(possibleMemStates)) {
-						constraints = constraints.append("-")
-								.append(mappings.add(pair.getFirst(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" ");
-						constraints = constraints.append("-")
-								.append(mappings.add(pair.getSecond(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" 0\n");
+					constraints = constraints.append("-")
+							.append(mappings.add(pair.getFirst(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
+							.append(" ");
+					constraints = constraints.append("-")
+							.append(mappings.add(pair.getSecond(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
+							.append(" 0\n");
 				}
 				/*
 				 * Used state cannot reference states that are not directly preceding the state
@@ -364,8 +389,55 @@ public class AllModules {
 				}
 			}
 		}
-		
-		
+
+		return constraints.toString();
+	}
+
+	private String enforcingUsageOfGeneratedTypesMsgPassingCons(Type emptyType, TypeAutomaton typeAutomaton,
+			AtomMapping mappings, boolean enforceUsageOfAllWorkflowInputTypes,
+			boolean enforceUsageOfAllGeneratedTypes) {
+
+		StringBuilder constraints = new StringBuilder();
+		String usageOfAllTypes = " ", usageOfAllWorkflowInputType = " ";
+		String notUsageOfAllTypes = " 0\n", notUsageOfAllWorkflowInputType = " 0\n";
+		if (enforceUsageOfAllGeneratedTypes) {
+			usageOfAllTypes = " 0\n";
+			notUsageOfAllTypes = " ";
+		}
+		if (enforceUsageOfAllWorkflowInputTypes) {
+			usageOfAllWorkflowInputType = " 0\n";
+			notUsageOfAllWorkflowInputType = " ";
+		}
+		/*
+		 * Setting up the constraints that ensure usage of the generated types in the
+		 * memory, i.e. all workflow inputs and at least one of each of the tool outputs
+		 * needs to be used in the program, unless they are empty.
+		 */
+		for (Block currBlock : typeAutomaton.getMemoryTypesBlocks()) {
+			int blockNumber = currBlock.getBlockNumber();
+			for (State currMemoryState : currBlock.getStates()) {
+				/* If the memory is provided as input */
+				if (blockNumber == 0) {
+					constraints = constraints
+							.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE)).append(" ");
+					for (State inputState : typeAutomaton.getUsedTypesBlock(blockNumber).getStates()) {
+						constraints = constraints
+								.append(mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
+								.append(usageOfAllWorkflowInputType);
+					}
+					constraints = constraints.append(notUsageOfAllWorkflowInputType);
+				} else {
+					constraints = constraints
+							.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE)).append(" ");
+					for (State inputState : typeAutomaton.getUsedTypesBlock(blockNumber).getStates()) {
+						constraints = constraints
+								.append(mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
+								.append(usageOfAllTypes);
+					}
+					constraints = constraints.append(notUsageOfAllTypes);
+				}
+			}
+		}
 
 		return constraints.toString();
 	}
@@ -383,7 +455,7 @@ public class AllModules {
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String inputSharedMemCons(TypeAutomaton typeAutomaton,	AtomMapping mappings) {
+	private String inputSharedMemCons(TypeAutomaton typeAutomaton, AtomMapping mappings) {
 
 		// setting up input constraints (Shared Memory Approach)
 		StringBuilder constraints = new StringBuilder();
@@ -395,12 +467,25 @@ public class AllModules {
 				 * Used state can reference states that are currently in the shared memory, i.e.
 				 * already created.
 				 */
-				for (State exictingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
+				List<State> possibleMemStates = typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber);
+				possibleMemStates.add(typeAutomaton.getNullState());
+				for (State exictingMemState : possibleMemStates) {
 					constraints = constraints
 							.append(mappings.add(exictingMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
 							.append(" ");
 				}
 				constraints = constraints.append(" 0\n");
+
+				/* Defining that each input can reference only one state in the shared memory */
+				for (Pair pair : getPredicatePairs(possibleMemStates)) {
+					constraints = constraints.append("-")
+							.append(mappings.add(pair.getFirst(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
+							.append(" ");
+					constraints = constraints.append("-")
+							.append(mappings.add(pair.getSecond(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
+							.append(" 0\n");
+				}
+
 				/*
 				 * Used state cannot reference states that are yet to be created, i.e. not yet
 				 * in the shared memory.
@@ -409,6 +494,71 @@ public class AllModules {
 					constraints = constraints.append("-").append(
 							mappings.add(nonExictingMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
 							.append(" 0\n");
+				}
+			}
+		}
+
+		return constraints.toString();
+	}
+
+	private String enforcingUsageOfGeneratedTypesSharedMemCons(Type emptyType, TypeAutomaton typeAutomaton,
+			AtomMapping mappings, boolean enforceUsageOfAllWorkflowInputTypes,
+			boolean enforceUsageOfAllGeneratedTypes) {
+
+		StringBuilder constraints = new StringBuilder();
+		/*
+		 * Setting up the constraints that ensure usage of the generated types in the
+		 * memory, i.e. all workflow inputs and at least one of each of the tool outputs
+		 * needs to be used in the program, unless they are empty.
+		 */
+		for (Block currBlock : typeAutomaton.getMemoryTypesBlocks()) {
+			int blockNumber = currBlock.getBlockNumber();
+			for (State currMemoryState : currBlock.getStates()) {
+				/* If the memory is provided as input */
+				if (blockNumber == 0) {
+					if (enforceUsageOfAllWorkflowInputTypes) {
+						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
+							constraints = constraints
+									.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
+									.append(" ");
+							constraints = constraints.append(
+									mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
+									.append(" 0\n");
+						}
+					} else {
+						constraints = constraints
+								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
+								.append(" ");
+						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
+
+							constraints = constraints.append(
+									mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
+									.append(" ");
+						}
+						constraints = constraints.append(" 0\n");
+					}
+				} else {
+					if (enforceUsageOfAllGeneratedTypes) {
+						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
+							constraints = constraints
+									.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
+									.append(" ");
+							constraints = constraints.append(
+									mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
+									.append(" 0\n");
+						}
+					} else {
+						constraints = constraints
+								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
+								.append(" ");
+						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
+							constraints = constraints.append(
+									mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
+									.append(" ");
+						}
+						constraints = constraints.append(" 0\n");
+					}
+
 				}
 			}
 		}
@@ -494,9 +644,14 @@ public class AllModules {
 		constraints = constraints.append(inputCons(moduleAutomaton, typeAutomaton, emptyType, mappings));
 		if (!shared_memory) {
 			constraints = constraints.append(inputMsgPassingCons(typeAutomaton, mappings));
+			constraints = constraints.append(
+					enforcingUsageOfGeneratedTypesMsgPassingCons(emptyType, typeAutomaton, mappings, true, false));
 		} else {
 			constraints = constraints.append(inputSharedMemCons(typeAutomaton, mappings));
+			constraints = constraints.append(
+					enforcingUsageOfGeneratedTypesSharedMemCons(emptyType, typeAutomaton, mappings, true, false));
 		}
+
 		constraints = constraints.append(generalReferenceCons(allTypes, typeAutomaton, mappings));
 
 		constraints = constraints.append(outputCons(moduleAutomaton, typeAutomaton, emptyType, mappings));

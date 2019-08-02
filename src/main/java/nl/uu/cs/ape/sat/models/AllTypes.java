@@ -406,8 +406,8 @@ public class AllTypes {
 	public String encodeInputData(List<Types> program_inputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		StringBuilder encoding = new StringBuilder();
 
-		List<State> inputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
-		for (int i = 0; i < inputStates.size(); i++) {
+		List<State> workfloInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
+		for (int i = 0; i < workfloInputStates.size(); i++) {
 			if (i < program_inputs.size()) {
 				List<Type> currTypes = program_inputs.get(i).getTypes();
 				for (Type currType : currTypes) {
@@ -416,13 +416,13 @@ public class AllTypes {
 								"Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
 						return null;
 					}
-					encoding = encoding.append(mappings.add(currType, inputStates.get(i), WorkflowElement.USED_TYPE))
+					encoding = encoding.append(mappings.add(currType, workfloInputStates.get(i), WorkflowElement.MEMORY_TYPE))
 							.append(" 0\n");
 					this.addAnnotatedType(currType.getTypeID());
 				}
 			} else {
 				/* Forcing in the rest of the input states to be empty types. */
-				encoding = encoding.append(mappings.add(emptyType, inputStates.get(i), WorkflowElement.USED_TYPE))
+				encoding = encoding.append(mappings.add(emptyType, workfloInputStates.get(i), WorkflowElement.MEMORY_TYPE))
 						.append(" 0\n");
 			}
 
@@ -445,23 +445,26 @@ public class AllTypes {
 	public String encodeOutputData(List<Types> program_outputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		StringBuilder encoding = new StringBuilder();
 
-		List<State> outputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
-//		List<State> outputStates = typeAutomaton.getLastToolOutputBlock().getTypeStates();
-		for (Types currTypes : program_outputs) {
-			for (Type currType : currTypes.getTypes()) {
-				if (get(currType.getTypeID()) == null) {
-					System.err.println("Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
-					return null;
-				} else {
-					for (State currOutputState : outputStates) {
-						encoding = encoding
-								.append(mappings.add(currType, currOutputState, WorkflowElement.MEMORY_TYPE))
-								.append(" ");
+		List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
+		for (int i = 0; i < workflowOutputStates.size(); i++) {
+			if (i < program_outputs.size()) {
+				List<Type> currTypes = program_outputs.get(i).getTypes();
+				for (Type currType : currTypes) {
+					if (get(currType.getTypeID()) == null) {
+						System.err.println(
+								"Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
+						return null;
 					}
-					encoding = encoding.append("0\n");
+					encoding = encoding.append(mappings.add(currType, workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
+							.append(" 0\n");
 					this.addAnnotatedType(currType.getTypeID());
 				}
+			} else {
+				/* Forcing in the rest of the input states to be empty types. */
+				encoding = encoding.append(mappings.add(emptyType, workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
+						.append(" 0\n");
 			}
+
 		}
 
 		return encoding.toString();

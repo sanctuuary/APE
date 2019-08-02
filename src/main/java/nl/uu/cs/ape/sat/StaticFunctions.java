@@ -192,49 +192,6 @@ public class StaticFunctions {
 	}
 
 	/**
-	 * Returns the {@link SAT_solution SAT_solution} by parsing the SAT output
-	 * {@link java.io.File file} provided by the argument file. In case of the UNSAT
-	 * solution the object list of literals is {@code NULL} and
-	 * {@link SAT_solution#isSat()} returns {@code false}, otherwise the list of
-	 * parsed literals is returned and {@link SAT_solution#isSat()} returns
-	 * {@code true}.
-	 * 
-	 * @param file       - {@link File} to be parsed for the SAT solutions (SAT
-	 *                   output)
-	 * @param mappings   - atom mappings
-	 * @param allModules - set of all the {@link Module}s
-	 * @param allTypes   - set of all the {@link Type}s
-	 * @return SAT_solution object.
-	 */
-	public static SAT_solution getSATsolution(File file, AtomMapping mappings, AllModules allModules, AllTypes allTypes,
-			int solutionLength) {
-
-		BufferedReader textReader;
-		SAT_solution sat_solution = null;
-
-		try {
-			textReader = new BufferedReader(new FileReader(file));
-			String sat = textReader.readLine();
-			/*
-			 * check whether it is SAT or UNSAT
-			 */
-			if (!sat.matches("UNSAT")) {
-				String solution = textReader.readLine();
-				sat_solution = new SAT_solution(solution, mappings, allModules, allTypes, solutionLength);
-			} else {
-				sat_solution = new SAT_solution();
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return sat_solution;
-	}
-
-	/**
 	 * Updates the list of All Modules by annotating the existing ones (or adding
 	 * non-existing) using the I/O Types from the @file. Returns the list of Updated
 	 * Modules.

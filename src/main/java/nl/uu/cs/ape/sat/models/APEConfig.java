@@ -87,10 +87,10 @@ public class APEConfig {
 	private Integer no_executions;
 
 	/** Output branching factor (max number of outputs per tool). */
-	private Integer max_no_tool_outputs = 1;
+	private Integer max_no_tool_outputs = 3;
 	
 	/** Input branching factor (max number of inputs per tool). */
-	private Integer max_no_tool_inputs = 1;
+	private Integer max_no_tool_inputs = 3;
 	
 	/** Input and output types of the workflow. */
 	private List<Types> program_inputs;

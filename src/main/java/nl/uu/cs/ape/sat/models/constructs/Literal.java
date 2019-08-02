@@ -112,7 +112,7 @@ public class Literal implements Comparable<Literal>{
 	}
 	
 	/**
-	 * Returns the predicate/label used to depict {@code AbstractModule, Module} or {@code Type}.
+	 * Returns the predicate/label used to depict {@code AbstractModule, Module, Type} or {@code State}.
 	 * @return Predicate object
 	 */
 	public Predicate getPredicate() {
