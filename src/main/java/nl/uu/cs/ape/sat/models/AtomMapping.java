@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.uu.cs.ape.sat.automaton.State;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
 
 /**
  * Class is used to store the data used for representing the atoms with integer numbers. Atoms are not a separate data structure, 
- * but a string combination of a {@link Predicate} and a {@link State} as am argument.<br/>
+ * but a string combination of a {@link TaxonomyPredicate} and a {@link State} as am argument.<br/>
  * Required for the SAT representation of the CNF formula.
  * @author Vedran Kasalica
  *
@@ -33,32 +34,14 @@ public class AtomMapping {
 	}
 
 	/**
-	 * Function is returning the mapping number of the <b>atom</b> (>0). If the <b>atom</b> did not occur before,
-	 * it is added to the mapping set and the mapping value is returned, otherwise just the existing mapping value is returned.
-	 * @param atom - atom that is being mapped [format: <b>{@code predicate(argument)}</b> ]
-	 * @return Mapping number of the atom (number is always > 0)
-	 
-	public Integer add(String atom) {
-		Integer id;
-		if ((id = mappings.get(atom)) == null) {
-			size ++;
-			mappings.put(atom, size);
-			reverseMapping.put(size, atom);
-			return size;
-		}
-		return id;
-	}
-	*/
-	
-	/**
 	 * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. If the Atom did not occur before,
 	 * it is added to the mapping set and the mapping value is returned, otherwise the existing mapping value is returned.
 	 * @param predicate - predicate of the mapped atom
 	 * @param usedInState - argument of the mapped atom (usually name of the type/module state)
 	 * @return Mapping number of the atom (number is always > 0)
 	 */
-	public Integer add(Predicate predicate,State usedInState) {
-		Atom atom = new Atom(predicate, usedInState);
+	public Integer add(Predicate predicate, State usedInState, WorkflowElement elementType) {
+		Atom atom = new Atom(predicate, usedInState, elementType);
 		
 		Integer id;
 		if ((id = mappings.get(atom)) == null) {
@@ -77,10 +60,10 @@ public class AtomMapping {
 	 * @param memoryState - argument of the mapped atom that corresponds to the memory state in the type automaton when the predicate was created
 	 * @param usedState - argument of the mapped atom that corresponds to the used type state in the type automaton when the predicate is being used as a tool input (or workflow output)
 	 * @return Mapping (integer) number of the atom (number is always > 0)
-	 */
-	public Integer add(Predicate predicate,State usedInState, State referedState) {
+	
+	public Integer add(TaxonomyPredicate predicate,State usedInState, State referedState) {
 		Atom atom = new Atom(predicate, usedInState, referedState);
-		Integer id;
+		Integer id ;
 		if ((id = mappings.get(atom)) == null) {
 			size++;
 			mappings.put(atom, size);
@@ -88,7 +71,7 @@ public class AtomMapping {
 			return size;
 		}
 		return id;
-	}
+	} */
 
 	/**
 	 * Return the mapping value (Integer) for the <b>atom</b>. If the <b>atom</b> was not mapped it returns null.

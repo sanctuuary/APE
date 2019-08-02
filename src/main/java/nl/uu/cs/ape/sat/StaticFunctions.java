@@ -38,7 +38,7 @@ import com.opencsv.CSVReaderBuilder;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.automaton.TypeBlock;
+import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.TypeState;
 import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
@@ -450,33 +450,5 @@ public class StaticFunctions {
 		timerStartTime = System.currentTimeMillis();
 	}
 
-	/**
-	 * Function used to calculate the absolute order number of a state based on the information regarding its block number, order number within the block and type of the state.
-	 * @param blockNumber - corresponds to the block number within the type automaton (not applicable for the module automaton)
-	 * @param stateNumber - corresponds to the state number within block
-	 * @param input_branching - max number of branching
-	 * @param typeOfTheState - parameter determining the state type:
-	 * <br>MEMORY_TYPE corresponds to the Memory Type State, 
-	 * <br>USED_TYPE corresponds to the Used Type State, 
-	 * <br>MODULE corresponds to the Module/Tool State
-	 * @return The calculated absolute order number of the state.
-	 */
-	public static int calculateAbsStateNumber(Integer blockNumber, int stateNumber, int input_branching, WorkflowElement typeOfTheState) {
-		int absOrderNumber = -1;
-		
-		if (typeOfTheState == WorkflowElement.MEMORY_TYPE) {		/* Case: Memory Type State */
-			absOrderNumber = (blockNumber * input_branching * 2) + blockNumber + stateNumber;
-		} else if (typeOfTheState == WorkflowElement.USED_TYPE) {	/* Case: Used Type State */
-			absOrderNumber = (blockNumber * input_branching * 2) + blockNumber + input_branching + stateNumber;
-		} else if (typeOfTheState == WorkflowElement.MODULE) {		/* Case: Module/Tool State */
-			absOrderNumber = (stateNumber * input_branching * 2) + stateNumber - 1;
-		}
-		
-		return absOrderNumber;
-	}
-	
-	
-	
-	
 
 }

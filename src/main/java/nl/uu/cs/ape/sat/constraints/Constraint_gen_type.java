@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.constraints;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
@@ -39,7 +40,7 @@ public class Constraint_gen_type extends Constraint {
 			return null;
 		}
 		SLTL_formula_F formula = new SLTL_formula_F(type);
-		constraint = formula.getCNF(moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
+		constraint = formula.getCNF(moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), WorkflowElement.MEMORY_TYPE, mappings);
 
 		return constraint;
 	}

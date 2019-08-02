@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.constraints;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
@@ -39,7 +40,7 @@ public class Constraint_not_use_module extends Constraint {
 			return null;
 		}
 		SLTL_formula_G formula = new SLTL_formula_G(false, module);
-		constraint = formula.getCNF(moduleAutomaton, null, mappings);
+		constraint = formula.getCNF(moduleAutomaton, null, WorkflowElement.MODULE, mappings);
 
 		return constraint;
 	}

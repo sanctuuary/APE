@@ -4,36 +4,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Block of Type states that comprise the Type automaton.
- * @author vedran
+ * Block of states that comprise a type automaton.
+ * 
+ * @author Vedran Kasalica
  *
  */
-public class TypeBlock {
+public class Block {
 
-	/** States that comprise this block. Number of stater correpond to the max number of inputs or outputs. */
-	private List<TypeState> typeStates;
+	/** States that comprise this block. Number of stater correspond to the max number of inputs or outputs. */
+	private List<State> typeStates;
 	/** Order number of the block in the solution. */
 	private int blockNumber;
 
-	public TypeBlock(int blockNumber) {
-		typeStates = new ArrayList<TypeState>();
+	public Block(int blockNumber) {
+		typeStates = new ArrayList<State>();
 		this.blockNumber = blockNumber;
 	}
 
-	public TypeBlock(List<TypeState> typeStates, int blockNumber) {
+	public Block(List<State> typeStates, int blockNumber) {
 		super();
 		this.typeStates = typeStates;
 		this.blockNumber = blockNumber;
 	}
 
-	public List<TypeState> getTypeStates() {
+	/**
+	 * Return the states that are part of the block. Those are usually Type States.
+	 * @return List of states (usually type states).
+	 */
+	public List<State> getStates() {
 		return typeStates;
 	}
-
-	public void setTypeStates(List<TypeState> typeStates) {
-		this.typeStates = typeStates;
-	}
-
+	
 	/**
 	 * Return the ordering number of the block in the Type automaton.
 	 * 
@@ -56,7 +57,7 @@ public class TypeBlock {
 	 * Add Type state to the Type Block
 	 * @param state - Type State to be added
 	 */
-	public void addState(TypeState state) {
+	public void addState(State state) {
 		typeStates.add(state);
 	}
 	
@@ -65,7 +66,7 @@ public class TypeBlock {
 	 * @param i - ordering number of the state to be returned
 	 * @return A type state
 	 */
-	public TypeState getState(int i) {
+	public State getState(int i) {
 		return typeStates.get(i);
 	}
 

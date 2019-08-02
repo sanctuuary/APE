@@ -14,42 +14,25 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
 public class Atom {
 
 	/**  Predicate that is referred (tool or type). */
-	private final Predicate predicate;
+	private Predicate predicate;
 	/**  State in which the type/tool was used. */
 	private final State usedInStateArgument;
-	/**  Referred state in which the type was created. This argument exists only if the atom represent a tool input. */
-	private State referedStateArgument;
 	/**  Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.) */
 	private WorkflowElement elementType;
 	
 	
 	/**
-	 * Creates a regular state in the automaton that corresponds to a usage of a tool or type that is added to the memory.
-	 * @param predicate - tool used or data type created (added to memory)
+	 * Creates an atom that can represent usage of the tool, creation or usage of a type, or a reference between an input type and the state in which it was generated..
+	 * @param predicate - predicate used
 	 * @param usedInState - state in the automaton it was used/created in
+	 * @param elementType - element that describes what type of a predicate is described
 	 */
-	public Atom(Predicate predicate, State usedInState) {
+	public Atom(Predicate predicate, State usedInState, WorkflowElement elementType) {
 		this.predicate = predicate;
 		this.usedInStateArgument = usedInState;
-		if(predicate.getClass().equals(Type.class)) {
-			this.elementType = WorkflowElement.MEMORY_TYPE;
-		} else {
-			this.elementType = WorkflowElement.MODULE;
-		}
+		this.elementType = elementType;
 	}
 	
-	/**
-	 * Creates a state in the automaton that corresponds to a usage of a data type as input, by a tool.
-	 * @param predicate - used data type 
-	 * @param usedInState - state in the automaton the types is used as input
-	 * @param usedInState - state in the automaton when the type was created
-	 */
-	public Atom(Predicate predicate, State usedInState, State referedState) {
-		this.predicate = predicate;
-		this.usedInStateArgument = usedInState;
-		this.referedStateArgument = referedState;
-		this.elementType = WorkflowElement.USED_TYPE;
-	}
 	
 	/**
 	 * Creates a state in the automaton that corresponds to a usage of a data type as input, by a tool.
@@ -58,21 +41,24 @@ public class Atom {
 	public Atom(Atom atom) {
 		this.predicate = atom.predicate;
 		this.usedInStateArgument = atom.usedInStateArgument;
-		this.referedStateArgument = atom.referedStateArgument;
 		this.elementType = atom.elementType;
 	}
 	
     
+
+	public Predicate getPredicate() {
+		return predicate;
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((predicate == null) ? 0 : predicate.hashCode());
-		result = prime * result + ((referedStateArgument == null) ? 0 : referedStateArgument.hashCode());
 		result = prime * result + ((usedInStateArgument == null) ? 0 : usedInStateArgument.hashCode());
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -88,11 +74,6 @@ public class Atom {
 				return false;
 		} else if (!predicate.equals(other.predicate))
 			return false;
-		if (referedStateArgument == null) {
-			if (other.referedStateArgument != null)
-				return false;
-		} else if (!referedStateArgument.equals(other.referedStateArgument))
-			return false;
 		if (usedInStateArgument == null) {
 			if (other.usedInStateArgument != null)
 				return false;
@@ -101,18 +82,11 @@ public class Atom {
 		return true;
 	}
 
-	public Predicate getPredicate() {
-		return predicate;
-	}
 
 	public State getUsedInStateArgument() {
 		return usedInStateArgument;
 	}
 
-	public State getReferedStateArgument() {
-		return referedStateArgument;
-	}
-	
 	/**
 	 * Return the type of the element in the workflow (tool, memory type, etc.)
 	 * @return The {@link WorkflowElement} that corresponds to the atom usage.
@@ -128,8 +102,8 @@ public class Atom {
 	 * @return String representing the workflow element in a textual form.
 	 */
 	public String toString() {
-		if(this.elementType == WorkflowElement.USED_TYPE) {
-			return predicate.getPredicate() + "[" + referedStateArgument.getStateName() + "]("+ usedInStateArgument.getStateName() + ")";
+		if(this.elementType == WorkflowElement.MEM_TYPE_REFERENCE) {
+			return "[" + predicate.getPredicate() + "] <- ("+ usedInStateArgument.getStateName() + ")";
 		} else {
 			return predicate.getPredicate() + "(" + usedInStateArgument.getStateName() + ")";
 		}

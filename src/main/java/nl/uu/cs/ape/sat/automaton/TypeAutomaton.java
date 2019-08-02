@@ -22,12 +22,12 @@ public class TypeAutomaton {
 	 * Blocks of data types that are being added to the memory (usually outputs from
 	 * the tools, apart from the initial workflow input)
 	 */
-	private List<TypeBlock> memoryTypesAutomaton;
+	private List<Block> memoryTypesAutomaton;
 	/**
 	 * Blocks of data types that are being used by tools from the memory (inputs to
 	 * the tools)
 	 */
-	private List<TypeBlock> usedTypesAutomaton;
+	private List<Block> usedTypesAutomaton;
 	
 	
 	/** Workflow length */
@@ -44,32 +44,25 @@ public class TypeAutomaton {
 	 * @param output_branching - output branching factor (max number of outputs for modules)
 	 */
 	public TypeAutomaton(int automata_bound, int input_branching, int output_branching) {
-		memoryTypesAutomaton = new ArrayList<TypeBlock>();
-		usedTypesAutomaton = new ArrayList<TypeBlock>();
+		memoryTypesAutomaton = new ArrayList<Block>();
+		usedTypesAutomaton = new ArrayList<Block>();
 	
 		workflowLength =  automata_bound < 1 ? 1 : automata_bound;
 			
-		
-		for (int i = 0; i <= workflowLength; i++) {
-			String i_var;
-			if (workflowLength > 10 && i < 10) {
-				i_var = "0" + i;
-			} else {
-				i_var = "" + i;
-			}
+		for (int i = 0; i <= workflowLength; i++) { 
 			
+			Block tmpMemoryTypeBlock = new Block(i);
 			
-			TypeBlock tmpMemoryTypeBlock = new TypeBlock(i);
 			for (int j = 0; j < input_branching; j++) {
-				TypeState tmpMemoryTypeState = new TypeState("MemT" + i_var + "." + j, j, StaticFunctions.calculateAbsStateNumber(i, j, input_branching, WorkflowElement.MEMORY_TYPE));
-				tmpMemoryTypeBlock.addState(tmpMemoryTypeState);
+				State tmpMemoryState = new State(WorkflowElement.MEMORY_TYPE, i, j, input_branching);
+				tmpMemoryTypeBlock.addState(tmpMemoryState);
 			}
 			addMemoryTypesBlock(tmpMemoryTypeBlock);
 			
-			TypeBlock tmpUsedTypesBlock = new TypeBlock(i);
+			Block tmpUsedTypesBlock = new Block(i);
 			for (int j = 0; j < input_branching; j++) {
-				TypeState tmpUsedTypeState = new TypeState("UsedT" + i_var + "." + j, j,StaticFunctions.calculateAbsStateNumber(i, j, input_branching, WorkflowElement.USED_TYPE));
-				tmpUsedTypesBlock.addState(tmpUsedTypeState);
+				State tmpUsedState = new State(WorkflowElement.USED_TYPE, i, j, input_branching);
+				tmpUsedTypesBlock.addState(tmpUsedState);
 			}
 			addUsedTypesBlock(tmpUsedTypesBlock);
 		}
@@ -86,7 +79,7 @@ public class TypeAutomaton {
 	 * 
 	 * @return Blocks of data types used by tools.
 	 */
-	public List<TypeBlock> getUsedTypesBlocks() {
+	public List<Block> getUsedTypesBlocks() {
 		return usedTypesAutomaton;
 	}
 
@@ -96,7 +89,7 @@ public class TypeAutomaton {
 	 * 
 	 * @return Blocks of data types added to the memory.
 	 */
-	public List<TypeBlock> getMemoryTypesBlocks() {
+	public List<Block> getMemoryTypesBlocks() {
 		return memoryTypesAutomaton;
 	}
 	
@@ -105,8 +98,8 @@ public class TypeAutomaton {
 	 * 
 	 * @return Blocks of data types used by tools.
 	 */
-	public List<TypeBlock> getAllBlocks() {
-		List<TypeBlock> x = new ArrayList<TypeBlock> (usedTypesAutomaton);
+	public List<Block> getAllBlocks() {
+		List<Block> x = new ArrayList<Block> (usedTypesAutomaton);
 		x.addAll(memoryTypesAutomaton);
 		return x;
 	}
@@ -116,7 +109,7 @@ public class TypeAutomaton {
 	 * 
 	 * @return true (as specified by {@link Collection#add(E)}
 	 */
-	public boolean addUsedTypesBlock(TypeBlock block) {
+	public boolean addUsedTypesBlock(Block block) {
 		return usedTypesAutomaton.add(block);
 	}
 
@@ -125,7 +118,7 @@ public class TypeAutomaton {
 	 * 
 	 * @return true (as specified by {@link Collection#add(E)}
 	 */
-	public boolean addMemoryTypesBlock(TypeBlock block) {
+	public boolean addMemoryTypesBlock(Block block) {
 		return memoryTypesAutomaton.add(block);
 	}
 
@@ -135,8 +128,8 @@ public class TypeAutomaton {
 	 * 
 	 * @return Memory Type Block that represents workflow input.
 	 */
-	public TypeBlock getWorkflowInputBlock() {
-		TypeBlock tmp;
+	public Block getWorkflowInputBlock() {
+		Block tmp;
 		try {
 			tmp = memoryTypesAutomaton.get(0);
 		} catch (IndexOutOfBoundsException e) {
@@ -151,8 +144,8 @@ public class TypeAutomaton {
 	 * 
 	 * @return The workflow output.
 	 */
-	public TypeBlock getWorkflowOutputBlock() {
-		TypeBlock tmp;
+	public Block getWorkflowOutputBlock() {
+		Block tmp;
 		try {
 			tmp = usedTypesAutomaton.get(usedTypesAutomaton.size() - 1);
 		} catch (IndexOutOfBoundsException e) {
@@ -167,8 +160,8 @@ public class TypeAutomaton {
 	 * 
 	 * @return The last's tool output Block.
 	 */
-	public TypeBlock getLastToolOutputBlock() {
-		TypeBlock tmp;
+	public Block getLastToolOutputBlock() {
+		Block tmp;
 		try {
 			tmp = memoryTypesAutomaton.get(memoryTypesAutomaton.size() - 1);
 		} catch (IndexOutOfBoundsException e) {
@@ -184,7 +177,7 @@ public class TypeAutomaton {
 	 * @param i - ordering number of the used type block to be returned.
 	 * @return Block of Type states that are used by tools.
 	 */
-	public TypeBlock getUsedTypesBlock(int i) {
+	public Block getUsedTypesBlock(int i) {
 		return usedTypesAutomaton.get(i);
 	}
 
@@ -195,7 +188,7 @@ public class TypeAutomaton {
 	 * @param i - ordering number of the memory type block to be returned
 	 * @return lock of Type states that are added to the memory.
 	 */
-	public TypeBlock getMemoryTypesBlock(int i) {
+	public Block getMemoryTypesBlock(int i) {
 		return memoryTypesAutomaton.get(i);
 	}
 	
@@ -208,19 +201,55 @@ public class TypeAutomaton {
 	}
 
 	/**
-	 * Return all the memory type states that are generated prior to a certain block, i.e. all the slots of memory are generated prior to a certain block/tool.
-	 * @param maxBlockNo - memory block prior to which we are looking into memory (this block is not included).
-	 * @return List of memory TypeStates.
+	 * Return all the memory type states that are generated until a certain block, i.e. all the slots of memory are generated until a certain block/tool.
+	 * @param maxBlockNo - memory block prior to which we are looking into memory (this block is included).
+	 * @return List of memory States.
 	 */
-	public List<TypeState> getMemoryStatesUntilBlockNo(int maxBlockNo) {
-		 List<TypeState> untilTypeStates= new ArrayList<TypeState>();
-		for(int i = 0; i < maxBlockNo; i++) {
-			TypeBlock currBlock = this.memoryTypesAutomaton.get(i);
-			for(TypeState currState : currBlock.getTypeStates()) {
-				untilTypeStates.add(currState);
+	public List<State> getMemoryStatesUntilBlockNo(int maxBlockNo) {
+		 List<State> untilStates= new ArrayList<State>();
+		for(int i = 0; i <= maxBlockNo; i++) {
+			Block currBlock = this.memoryTypesAutomaton.get(i);
+			for(State currState : currBlock.getStates()) {
+				untilStates.add(currState);
 			}
 		}
-		return untilTypeStates;
+		return untilStates;
+	}
+	
+	/**
+	 * Return all the memory type states that are generated after a certain block, i.e. all the slots of memory are generated prior to a certain block/tool.
+	 * @param minBlockNo - memory block after which we are looking into memory (this block is not included).
+	 * @return List of memory States.
+	 */
+	public List<State> getMemoryStatesAfterBlockNo(int minBlockNo) {
+		 List<State> untilStates= new ArrayList<State>();
+		for(int i = minBlockNo + 1; i < this.memoryTypesAutomaton.size(); i++) {
+			Block currBlock = this.memoryTypesAutomaton.get(i);
+			for(State currState : currBlock.getStates()) {
+				untilStates.add(currState);
+			}
+		}
+		return untilStates;
+	}
+	
+	public void print() {
+		System.out.println("-------------------------------------------------------------");
+		System.out.println("\tType automaton:");
+		System.out.println("-------------------------------------------------------------");
+		for(Block memBlock : memoryTypesAutomaton) {
+			for(State memState : memBlock.getStates()) {
+				System.out.println("\tType state: " + memState.getStateName() + ", order number: " + memState.getAbsoluteStateNumber());
+			}
+		}
+		System.out.println("-------------------------------------------------------------");
+		for(Block usedBlock : usedTypesAutomaton) {
+			for(State usedState : usedBlock.getStates()) {
+				System.out.println("\tType state: " + usedState.getStateName() + ", order number: " + usedState.getAbsoluteStateNumber());
+			}
+		}
+			
+		System.out.println("-------------------------------------------------------------");
+		
 	}
 
 }

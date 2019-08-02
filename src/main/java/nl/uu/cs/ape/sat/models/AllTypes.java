@@ -9,9 +9,12 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.automaton.TypeBlock;
+import nl.uu.cs.ape.sat.automaton.Block;
+import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeState;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
 
 /**
  * The {@code AllTypes} class represent the set of all data types/formats that
@@ -257,22 +260,29 @@ public class AllTypes {
 
 		StringBuilder constraints = new StringBuilder();
 		Predicate firstPair, secondPair;
-		List<TypeBlock> tmpBlocks = typeAutomaton.getAllBlocks();
 		for (Pair pair : getTypePairsForEachSubTaxonomy()) {
 			firstPair = pair.getFirst();
 			secondPair = pair.getSecond();
 			// mutual exclusion of types in all the states (those that represent general
 			// memory and used data instances)
-			for (TypeBlock typeBlock : tmpBlocks) {
-				for (TypeState typeState : typeBlock.getTypeStates()) {
-					constraints = constraints.append("-").append(mappings.add(firstPair, typeState))
+			for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+				for (State typeState : typeBlock.getStates()) {
+					constraints = constraints.append("-").append(mappings.add(firstPair, typeState, WorkflowElement.MEMORY_TYPE))
 							.append(" ");
-					constraints = constraints.append("-").append(mappings.add(secondPair, typeState))
+					constraints = constraints.append("-").append(mappings.add(secondPair, typeState, WorkflowElement.MEMORY_TYPE))
+							.append(" ").append("0\n");
+				}
+			}
+			
+			for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
+				for (State typeState : typeBlock.getStates()) {
+					constraints = constraints.append("-").append(mappings.add(firstPair, typeState, WorkflowElement.USED_TYPE))
+							.append(" ");
+					constraints = constraints.append("-").append(mappings.add(secondPair, typeState, WorkflowElement.USED_TYPE))
 							.append(" ").append("0\n");
 				}
 			}
 		}
-		System.err.println(constraints.length());
 		return constraints.toString();
 	}
 	
@@ -289,9 +299,15 @@ public class AllTypes {
 		StringBuilder constraints = new StringBuilder();
 		// enforcement of types in in all the states (those that represent general
 		// memory and used data instances)
-		for (TypeBlock typeBlock : typeAutomaton.getAllBlocks()) {
-			for (TypeState typeState : typeBlock.getTypeStates()) {
-				constraints = constraints.append(mappings.add(type, typeState))
+		for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+			for (State typeState : typeBlock.getStates()) {
+				constraints = constraints.append(mappings.add(type, typeState, WorkflowElement.MEMORY_TYPE))
+						.append(" 0\n");
+			}
+		}
+		for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
+			for (State typeState : typeBlock.getStates()) {
+				constraints = constraints.append(mappings.add(type, typeState, WorkflowElement.USED_TYPE))
 						.append(" 0\n");
 			}
 		}
@@ -318,10 +334,16 @@ public class AllTypes {
 		StringBuilder constraints = new StringBuilder();
 		// taxonomy enforcement of types in in all the states (those that represent
 		// general memory and used data instances)
-		for (TypeBlock typeBlock : typeAutomaton.getAllBlocks()) {
-			for (TypeState typeState : typeBlock.getTypeStates()) {
+		for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+			for (State typeState : typeBlock.getStates()) {
 				constraints = constraints
-						.append(typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState));
+						.append(typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState, WorkflowElement.MEMORY_TYPE));
+			}
+		}
+		for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
+			for (State typeState : typeBlock.getStates()) {
+				constraints = constraints
+						.append(typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState, WorkflowElement.USED_TYPE));
 			}
 		}
 
@@ -330,12 +352,13 @@ public class AllTypes {
 
 	/**
 	 * Supporting recursive method for typeEnforceTaxonomyStructure.
+	 * @param typeElement 
 	 */
 	private String typeEnforceTaxonomyStructureForState(String rootTypeID, TypeAutomaton typeAutomaton,
-			AtomMapping mappings, TypeState typeState) {
+			AtomMapping mappings, State typeState, WorkflowElement typeElement) {
 
 		Type currType = types.get(rootTypeID);
-		String superType_State = mappings.add(currType, typeState).toString();
+		String superType_State = mappings.add(currType, typeState, typeElement).toString();
 
 		StringBuilder constraints = new StringBuilder();
 		StringBuilder currConstraint = new StringBuilder("-").append(superType_State).append(" ");
@@ -348,12 +371,12 @@ public class AllTypes {
 			for (String subTypeeID : currType.getSubTypes()) {
 				Type subType = types.get(subTypeeID);
 
-				String subType_State = mappings.add(subType, typeState).toString();
+				String subType_State = mappings.add(subType, typeState, typeElement).toString();
 				currConstraint = currConstraint.append(subType_State).append(" ");
 				subTypes_States.add(subType_State);
 
 				constraints = constraints
-						.append(typeEnforceTaxonomyStructureForState(subTypeeID, typeAutomaton, mappings, typeState));
+						.append(typeEnforceTaxonomyStructureForState(subTypeeID, typeAutomaton, mappings, typeState, typeElement));
 			}
 			currConstraint = currConstraint.append("0\n");
 			/*
@@ -383,7 +406,7 @@ public class AllTypes {
 	public String encodeInputData(List<Types> program_inputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		StringBuilder encoding = new StringBuilder();
 
-		List<TypeState> inputStates = typeAutomaton.getMemoryTypesBlock(0).getTypeStates();
+		List<State> inputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
 		for (int i = 0; i < inputStates.size(); i++) {
 			if (i < program_inputs.size()) {
 				List<Type> currTypes = program_inputs.get(i).getTypes();
@@ -393,13 +416,13 @@ public class AllTypes {
 								"Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
 						return null;
 					}
-					encoding = encoding.append(mappings.add(currType, inputStates.get(i)))
+					encoding = encoding.append(mappings.add(currType, inputStates.get(i), WorkflowElement.USED_TYPE))
 							.append(" 0\n");
 					this.addAnnotatedType(currType.getTypeID());
 				}
 			} else {
 				/* Forcing in the rest of the input states to be empty types. */
-				encoding = encoding.append(mappings.add(emptyType, inputStates.get(i)))
+				encoding = encoding.append(mappings.add(emptyType, inputStates.get(i), WorkflowElement.USED_TYPE))
 						.append(" 0\n");
 			}
 
@@ -422,17 +445,17 @@ public class AllTypes {
 	public String encodeOutputData(List<Types> program_outputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		StringBuilder encoding = new StringBuilder();
 
-		List<TypeState> outputStates = typeAutomaton.getWorkflowOutputBlock().getTypeStates();
-//		List<TypeState> outputStates = typeAutomaton.getLastToolOutputBlock().getTypeStates();
+		List<State> outputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
+//		List<State> outputStates = typeAutomaton.getLastToolOutputBlock().getTypeStates();
 		for (Types currTypes : program_outputs) {
 			for (Type currType : currTypes.getTypes()) {
 				if (get(currType.getTypeID()) == null) {
 					System.err.println("Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
 					return null;
 				} else {
-					for (TypeState currOutputState : outputStates) {
+					for (State currOutputState : outputStates) {
 						encoding = encoding
-								.append(mappings.add(currType, currOutputState))
+								.append(mappings.add(currType, currOutputState, WorkflowElement.MEMORY_TYPE))
 								.append(" ");
 					}
 					encoding = encoding.append("0\n");
@@ -466,7 +489,7 @@ public class AllTypes {
 //		int i=0,j=0;
 //		for (TypeBlock currBlock : memoryBlocks) {
 //			i=currBlock.getBlockNumber();
-//			for (TypeState currState :currBlock.getTypeStates()) {
+//			for (State currState :currBlock.getTypeStates()) {
 //				j=currState.getStateNumber();
 //				for (String currInstanceType : annotatedTypes) {
 //					/*

@@ -93,6 +93,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		ModuleAutomaton moduleAutomaton = new ModuleAutomaton(allSolutions.getCurrSolutionLenght(), config.getMax_no_tool_outputs());
 		TypeAutomaton typeAutomaton = new TypeAutomaton(allSolutions.getCurrSolutionLenght(),
 				config.getMax_no_tool_inputs(), config.getMax_no_tool_outputs());
+//		moduleAutomaton.print();
+//		typeAutomaton.print();
 		StaticFunctions.restartTimerNPrint("Automaton");
 		/*
 		 * Encode the workflow input

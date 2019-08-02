@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
+import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.constructs.Literal;
@@ -30,6 +31,8 @@ public class SAT_solution extends Solution {
 	private List<Literal> relevantTypes;
 	/** List of all the relevant types and modules combined.  */
 	private List<Literal> relevantElements;
+	/** List of all the references for the types in the memory, when used as tool inputs.  */
+	private List<Literal> references2MemTypes;
 	/** True if the there is no solution to the problem. Problem is UNASATISFIABLE. */
 	private boolean unsat;
 	/** Lengths of the current solution. */
@@ -50,16 +53,21 @@ public class SAT_solution extends Solution {
 		relevantModules = new ArrayList<Literal>();
 		relevantTypes = new ArrayList<Literal>();
 		relevantElements = new ArrayList<Literal>();
+		references2MemTypes = new ArrayList<Literal>();
 		String[] mappedLiterals = satOutput.split(" ");
 		for (String mappedLiteral : mappedLiterals) {
 			if(Integer.getInteger(mappedLiteral) > atomMapping.getMaxNumOfMappedAuxVar()) {
 				Literal currLiteral = new Literal(mappedLiteral, atomMapping);
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
-					relevantElements.add(currLiteral);
 					if (currLiteral.getPredicate() instanceof Module) {
+						relevantElements.add(currLiteral);
 						relevantModules.add(currLiteral);
+					} else if(currLiteral.getPredicate() instanceof State) {
+						relevantElements.add(currLiteral);
+						references2MemTypes.add(currLiteral);
 					} else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE && ((Type) currLiteral.getPredicate()).isSimpleType()) {
+						relevantElements.add(currLiteral);
 						relevantTypes.add(currLiteral);
 					}
 				}
@@ -68,6 +76,7 @@ public class SAT_solution extends Solution {
 		Collections.sort(relevantModules);
 		Collections.sort(relevantTypes);
 		Collections.sort(relevantElements);
+		Collections.sort(references2MemTypes);
 		this.solutionLength = solutionLength;
 	}
 
@@ -87,23 +96,29 @@ public class SAT_solution extends Solution {
 		relevantModules = new ArrayList<Literal>();
 		relevantTypes = new ArrayList<Literal>();
 		relevantElements = new ArrayList<Literal>();
+		references2MemTypes = new ArrayList<Literal>();
 		for (int mappedLiteral : satSolution) {
 			if (mappedLiteral > atomMapping.getMaxNumOfMappedAuxVar()) {
 				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), atomMapping);
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
-					relevantElements.add(currLiteral);
 					if (currLiteral.getPredicate() instanceof Module) {
+						relevantElements.add(currLiteral);
 						relevantModules.add(currLiteral);
+					} else if(currLiteral.getPredicate() instanceof State) {
+						relevantElements.add(currLiteral);
+						references2MemTypes.add(currLiteral);
 					} else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE && ((Type) currLiteral.getPredicate()).isSimpleType()) {
+						relevantElements.add(currLiteral);
 						relevantTypes.add(currLiteral);
-					}
+					} 
 				}
 			}
 		}
 		Collections.sort(relevantModules);
 		Collections.sort(relevantTypes);
 		Collections.sort(relevantElements);
+		Collections.sort(references2MemTypes);
 		this.solutionLength = solutionLength;
 	}
 

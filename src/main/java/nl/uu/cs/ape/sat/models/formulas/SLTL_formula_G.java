@@ -4,19 +4,21 @@ import java.util.List;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.ModuleState;
+import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.automaton.TypeBlock;
+import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.TypeState;
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
+import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.*;
 
 public class SLTL_formula_G extends SLTL_formula {
 
-	public SLTL_formula_G(Predicate predicate) {
+	public SLTL_formula_G(TaxonomyPredicate predicate) {
 		super(predicate);
 	}
 
-	public SLTL_formula_G(boolean sign, Predicate predicate) {
+	public SLTL_formula_G(boolean sign, TaxonomyPredicate predicate) {
 		super(sign, predicate);
 	}
 
@@ -31,7 +33,7 @@ public class SLTL_formula_G extends SLTL_formula {
 	 * @return CNF representation of the SLTL formula
 	 */
 	@Override
-	public String getCNF(ModuleAutomaton moduleAutomaton, List<TypeBlock> typeStateBlocks, AtomMapping mappings) {
+	public String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement workflowElement, AtomMapping mappings) {
 
 		String constraints = "";
 		String negSign;
@@ -44,15 +46,15 @@ public class SLTL_formula_G extends SLTL_formula {
 		// Distinguishing whether the formula under the modal operator is type
 		// or module.
 		if (super.getSubFormula().getType().matches("type")) {
-			for (TypeBlock typeBlock : typeStateBlocks) {
-				for (TypeState typeState : typeBlock.getTypeStates()) {
+			for (Block typeBlock : typeStateBlocks) {
+				for (State  typeState : typeBlock.getStates()) {
 					constraints += negSign
-							+ mappings.add(super.getSubFormula(), typeState) + " 0\n";
+							+ mappings.add(super.getSubFormula(), typeState, workflowElement) + " 0\n";
 				}
 			}
 		} else {
-			for (ModuleState moduleState : moduleAutomaton.getModuleStates()) {
-				constraints += negSign + mappings.add(super.getSubFormula(), moduleState)
+			for (State  moduleState : moduleAutomaton.getModuleStates()) {
+				constraints += negSign + mappings.add(super.getSubFormula(), moduleState, workflowElement)
 						+ " 0\n";
 			}
 		}

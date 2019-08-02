@@ -7,7 +7,7 @@ import java.util.Set;
 
 import javax.sql.rowset.spi.TransactionalWriter;
 
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
 
 /**
  * 
@@ -18,7 +18,7 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
  *
  */
 
-public class Type extends Predicate {
+public class Type extends TaxonomyPredicate {
 
 	private String typeName;
 	private String typeID;

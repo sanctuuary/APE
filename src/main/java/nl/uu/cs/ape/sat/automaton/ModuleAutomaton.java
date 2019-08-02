@@ -8,8 +8,8 @@ import nl.uu.cs.ape.sat.StaticFunctions;
 
 /**
  * The {@code ModuleAutomaton} class is used to represent the module automaton.
- * Module automaton is represented as an array of {@link ModuleState
- * ModuleStates}. <br>
+ * Module automaton is represented as an array of {@link State
+ * States}. <br>
  * <br>
  * Labeling of the automaton is provided in
  * /APE/res/WorkflowAutomaton_Implementation.png
@@ -19,7 +19,7 @@ import nl.uu.cs.ape.sat.StaticFunctions;
  */
 public class ModuleAutomaton {
 
-	private List<ModuleState> moduleStates;
+	private List<State> moduleStates;
 
 	/**
 	 * Generate the Module State automatons based on the defined length.
@@ -28,26 +28,15 @@ public class ModuleAutomaton {
 	 * @param input_branching  - input branching factor (max number of inputs for modules)
 	 */
 	public ModuleAutomaton(int automata_bound, int input_branching) {
-		moduleStates = new ArrayList<ModuleState>();
+		moduleStates = new ArrayList<State>();
 		for (int i = 1; i <= automata_bound; i++) {
-			String i_var;
-			if (automata_bound > 10 && i < 10) {
-				i_var = "0" + i;
-			} else {
-				i_var = "" + i;
-			}
-			ModuleState tmpModuleState = new ModuleState("M" + i_var, i, StaticFunctions.calculateAbsStateNumber(null, i,input_branching,WorkflowElement.MODULE));
-			if (i == 1) {
-				tmpModuleState.setFirst();
-			} else if (i == automata_bound) {
-				tmpModuleState.setLast();
-			}
-			addState(tmpModuleState);
+			State tmpState = new State(WorkflowElement.MODULE, null, i, input_branching);
+			addState(tmpState);
 
 		}
 	}
 
-//	public ModuleAutomaton(List<ModuleState> moduleStates) {
+//	public ModuleAutomaton(List<State> moduleStates) {
 //		super();
 //		this.moduleStates = moduleStates;
 //	}
@@ -55,9 +44,9 @@ public class ModuleAutomaton {
 	/**
 	 * Return all Module States from the Module automaton
 	 * 
-	 * @return {@link List} <{@link ModuleState}>
+	 * @return {@link List} <{@link State}>
 	 */
-	public List<ModuleState> getModuleStates() {
+	public List<State> getModuleStates() {
 		return moduleStates;
 	}
 
@@ -66,7 +55,7 @@ public class ModuleAutomaton {
 	 * 
 	 * @param state - module state to be added
 	 */
-	public void addState(ModuleState state) {
+	public void addState(State state) {
 		moduleStates.add(state);
 	}
 
@@ -85,8 +74,20 @@ public class ModuleAutomaton {
 	 * @param i - ordering number of the state to be returned
 	 * @return - Module State
 	 */
-	public ModuleState get(int i) {
+	public State get(int i) {
 		return moduleStates.get(i);
+	}
+
+	
+	public void print() {
+		System.out.println("-------------------------------------------------------------");
+		System.out.println("\tModule automaton:");
+		System.out.println("-------------------------------------------------------------");
+		for(State state : moduleStates) {
+			System.out.println("\tModule state: " + state.getStateName() + ", order number: " + state.getAbsoluteStateNumber());
+		}
+		System.out.println("-------------------------------------------------------------");
+		
 	}
 
 }

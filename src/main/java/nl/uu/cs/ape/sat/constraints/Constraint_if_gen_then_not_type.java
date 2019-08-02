@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.constraints;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
@@ -39,7 +40,7 @@ public class Constraint_if_gen_then_not_type extends Constraint {
 			System.err.println("Constraint argument does not exist in the type taxonomy.");
 			return null;
 		}
-		constraint = SLTL_formula.itn_type(if_type, then_not_type, moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
+		constraint = SLTL_formula.itn_type(if_type, then_not_type, WorkflowElement.MEMORY_TYPE, moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
 
 		return constraint;
 	}

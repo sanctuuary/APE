@@ -112,14 +112,6 @@ public class Literal implements Comparable<Literal>{
 	}
 	
 	/**
-	 * Returns the label used to depict the state in the automaton.
-	 * @return String representation of the module/type automaton state.
-	 */
-	public State getReferedStateArgument() {
-		return atom.getReferedStateArgument();
-	}
-	
-	/**
 	 * Returns the predicate/label used to depict {@code AbstractModule, Module} or {@code Type}.
 	 * @return Predicate object
 	 */
@@ -134,12 +126,7 @@ public class Literal implements Comparable<Literal>{
 	 *  @return The value 0 if the argument Literal's state is equal to this Literal's state; a value less than 0 if this Literal's state comes before the @otherLiteral's state; and a value greater than 0 if this Literal's state comes after the @otherLiteral's state.
 	 */
 	public int compareTo(Literal otherLiteral) {
-		if(this.getUsedInStateArgument() == null) {
-			return -1;
-		}
-		if(otherLiteral == null) {
-			return 1;
-		}
+		
 		int thisLiteralState = this.getUsedInStateArgument().getAbsoluteStateNumber();
 		int otherLiteralState = otherLiteral.atom.getUsedInStateArgument().getAbsoluteStateNumber();
 	    return Integer.compare(thisLiteralState, otherLiteralState);

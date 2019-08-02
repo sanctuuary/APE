@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
 /**
  *  The {@code AbstractModule} class represents modules/tools provided by the Module Taxonomy as well as their abstraction classes.
  *  Instances of {@link AbstractModule} can be actual tools or their abstraction classes, 
@@ -13,7 +13,7 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
  * @author Vedran Kasalica
  *
  */
-public class AbstractModule extends Predicate {
+public class AbstractModule extends TaxonomyPredicate {
 
 	private String moduleName;
 	private String moduleID;
