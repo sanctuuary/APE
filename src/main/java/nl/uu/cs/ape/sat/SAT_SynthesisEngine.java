@@ -116,7 +116,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * Create constraints from the module.xml file regarding the Inputs/Outputs
 		 */
 		cnfEncoding = cnfEncoding.append(annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, allTypes, config.getShared_memory(),
-				allTypes.getEmptyType(), mappings));
+				allTypes.getEmptyType(), mappings, config.getUse_workflow_input(), config.getUse_all_generated_data()));
 		StaticFunctions.restartTimerNPrint("Tool I/O constraints");
 		
 		/*

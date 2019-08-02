@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
-	<ontology_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase2/GMT_UseCase_taxonomy.owl"/>
+	<ontology_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase3/GMT_UseCase_taxonomy.owl"/>
 	<toolsTaxonomyRoot value="ToolsTaxonomy"/>
 	<dataTaxonomyRoot value="DataTaxonomy">
 		<typesTaxonomyRoot value="TypesTaxonomy"/>
 	</dataTaxonomyRoot>
-	<tool_annotations_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase2/tool_annotations.xml"/>
-	<constraints_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase2/constraints_e0.csv"/>
+	<tool_annotations_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase3/tool_annotations.xml"/>
+	<constraints_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase3/constraints_e1.csv"/>
 	<shared_memory value="true"/>
-	<solutions_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase2/sat_solutions.txt"/>
+	<solutions_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase3/sat_solutions.txt"/>
 	<solution_min_length value="1"/>
 	<solution_max_length value="15"/>
 	<max_solutions value="100"/>
-	<execution_scripts_folder value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase2/Implementations"/>
+	<execution_scripts_folder value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase3/Implementations"/>
 	<number_of_execution_scripts value="5"/>
 	<debug_mode value="true"/>
 </configuration>

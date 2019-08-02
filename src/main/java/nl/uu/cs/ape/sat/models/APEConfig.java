@@ -44,6 +44,8 @@ public class APEConfig {
 	private final String NO_EXECUTIONS_TAG = "number_of_execution_scripts";
 	private final String PROGRAM_INPUTS_TAG = "inputs/input";
 	private final String PROGRAM_OUTPUTS_TAG = "outputs/output";
+	private final String USE_WORKFLOW_INPUT = "use_workflow_input";
+	private final String USE_ALL_GENERATED_DATA = "use_all_generated_data";
 	private final String DEBUG_MODE_TAG = "debug_mode";
 
 
@@ -96,7 +98,7 @@ public class APEConfig {
 	private List<Types> program_inputs;
 	private List<Types> program_outputs;
 	
-	private Boolean debug_mode;
+	private Boolean use_workflow_input, use_all_generated_data,debug_mode;
 	
 	/** Configurations used to read/update the "ape.configuration" file. */
 	private Document document;
@@ -245,10 +247,23 @@ public class APEConfig {
 			}
 		}
 		
+		
+		String tempUseWInput = (configNode.selectSingleNode(USE_WORKFLOW_INPUT) != null) ? configNode.selectSingleNode(USE_WORKFLOW_INPUT).valueOf("@value") : null;
+		this.use_workflow_input = isValidConfigBoolean(USE_WORKFLOW_INPUT, tempUseWInput);
+		if (this.use_workflow_input == null) {
+			this.use_workflow_input = true;
+		}
+		
+		String tempUseAllGenInput = (configNode.selectSingleNode(USE_ALL_GENERATED_DATA) != null) ? configNode.selectSingleNode(USE_ALL_GENERATED_DATA).valueOf("@value") : null;
+		this.use_all_generated_data = isValidConfigBoolean(USE_ALL_GENERATED_DATA, tempUseAllGenInput);
+		if (this.use_all_generated_data == null) {
+			this.use_all_generated_data = false;
+		}
+		
 		String tempDebugMode = (configNode.selectSingleNode(DEBUG_MODE_TAG) != null) ? configNode.selectSingleNode(DEBUG_MODE_TAG).valueOf("@value") : null;
 		this.debug_mode = isValidConfigBoolean(DEBUG_MODE_TAG, tempDebugMode);
 		if (this.debug_mode == null) {
-			return false;
+			this.debug_mode = false;
 		}
 		
 		return true;
@@ -409,6 +424,22 @@ public class APEConfig {
 
 	public void setProgram_outputs(List<Types> program_outputs) {
 		this.program_outputs = program_outputs;
+	}
+	
+	public Boolean getUse_workflow_input() {
+		return use_workflow_input;
+	}
+
+	public void setUse_workflow_input(Boolean use_workflow_input) {
+		this.use_workflow_input = use_workflow_input;
+	}
+
+	public Boolean getUse_all_generated_data() {
+		return use_all_generated_data;
+	}
+
+	public void setUse_all_generated_data(Boolean use_all_generated_data) {
+		this.use_all_generated_data = use_all_generated_data;
 	}
 
 	public Boolean getDebug_mode() {

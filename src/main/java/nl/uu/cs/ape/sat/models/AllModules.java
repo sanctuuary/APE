@@ -296,6 +296,14 @@ public class AllModules {
 				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
 					for (State currUsedTypeState : currUsedBlock.getStates()) {
 						if (currType.isSimpleType()) {
+							/* ..the referenced memory state cannot be null..*/
+							constraints = constraints.append("-").append(
+									mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
+									.append(" ");
+							constraints = constraints.append("-").append(
+									mappings.add(typeAutomaton.getNullState(), currUsedTypeState, WorkflowElement.MEM_TYPE_REFERENCE))
+									.append(" 0\n");
+							
 							/* ..and for each state in which type can be created in memory .. */
 							for (Block memoryBlock : typeAutomaton.getMemoryTypesBlocks()) {
 								for (State refMemoryTypeState : memoryBlock.getStates()) {
@@ -316,6 +324,7 @@ public class AllModules {
 									constraints = constraints.append(
 											mappings.add(currType, refMemoryTypeState, WorkflowElement.MEMORY_TYPE))
 											.append(" 0\n");
+									
 								}
 							}
 							/* If the type is empty the referenced state has to be null.*/
@@ -392,7 +401,17 @@ public class AllModules {
 
 		return constraints.toString();
 	}
-
+	/**
+	 * Function returns the encoding that ensures that each time a memory type is referenced by a tool's input type, it has to be of right type.
+	 * <br>Function is implementing the Message Passing Approach.
+	 * 
+	 * @param emptyType
+	 * @param typeAutomaton
+	 * @param mappings
+	 * @param enforceUsageOfAllWorkflowInputTypes - true if all the inputs given to the workflow should be used
+	 * @param enforceUsageOfAllGeneratedTypes - true if all the generated types have to be used
+	 * @return String representation of constraints.
+	 */
 	private String enforcingUsageOfGeneratedTypesMsgPassingCons(Type emptyType, TypeAutomaton typeAutomaton,
 			AtomMapping mappings, boolean enforceUsageOfAllWorkflowInputTypes,
 			boolean enforceUsageOfAllGeneratedTypes) {
@@ -453,7 +472,7 @@ public class AllModules {
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
 	 * @param mappings
-	 * @return String representation of constraints
+	 * @return String representation of constraints.
 	 */
 	private String inputSharedMemCons(TypeAutomaton typeAutomaton, AtomMapping mappings) {
 
@@ -501,6 +520,17 @@ public class AllModules {
 		return constraints.toString();
 	}
 
+	/**
+	 * Function returns the encoding that ensures that each time a memory type is referenced by a tool's input type, it has to be of right type.
+	 * <br>Function is implementing the Shared Memory Approach.
+	 * 
+	 * @param emptyType
+	 * @param typeAutomaton
+	 * @param mappings
+	 * @param enforceUsageOfAllWorkflowInputTypes - true if all the inputs given to the workflow should be used
+	 * @param enforceUsageOfAllGeneratedTypes - true if all the generated types have to be used
+	 * @return String representation of constraints.
+	 */
 	private String enforcingUsageOfGeneratedTypesSharedMemCons(Type emptyType, TypeAutomaton typeAutomaton,
 			AtomMapping mappings, boolean enforceUsageOfAllWorkflowInputTypes,
 			boolean enforceUsageOfAllGeneratedTypes) {
@@ -634,22 +664,25 @@ public class AllModules {
 	 *                        memory approach is used
 	 * @param emptyType       - represents absence of types
 	 * @param mappings
+	 * @param useAllWorkflowInputs - true if all the inputs given to the workflow should be used
+	 * @param useAllGeneratedTypes - true if all the generated types have to be used
 	 * @return {@link String} representation of constraints regarding the required
 	 *         INPUT and OUTPUT types of the modules
 	 */
 	public String modulesConstraints(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AllTypes allTypes,
-			boolean shared_memory, Type emptyType, AtomMapping mappings) {
+			boolean shared_memory, Type emptyType, AtomMapping mappings, boolean useAllWorkflowInputs,
+			boolean useAllGeneratedTypes) {
 
 		StringBuilder constraints = new StringBuilder();
 		constraints = constraints.append(inputCons(moduleAutomaton, typeAutomaton, emptyType, mappings));
 		if (!shared_memory) {
 			constraints = constraints.append(inputMsgPassingCons(typeAutomaton, mappings));
 			constraints = constraints.append(
-					enforcingUsageOfGeneratedTypesMsgPassingCons(emptyType, typeAutomaton, mappings, true, false));
+					enforcingUsageOfGeneratedTypesMsgPassingCons(emptyType, typeAutomaton, mappings, useAllWorkflowInputs, useAllGeneratedTypes));
 		} else {
 			constraints = constraints.append(inputSharedMemCons(typeAutomaton, mappings));
 			constraints = constraints.append(
-					enforcingUsageOfGeneratedTypesSharedMemCons(emptyType, typeAutomaton, mappings, true, false));
+					enforcingUsageOfGeneratedTypesSharedMemCons(emptyType, typeAutomaton, mappings, useAllWorkflowInputs, useAllGeneratedTypes));
 		}
 
 		constraints = constraints.append(generalReferenceCons(allTypes, typeAutomaton, mappings));
