@@ -32,9 +32,6 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
@@ -42,19 +39,6 @@ import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.TypeState;
 import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
-import nl.uu.cs.ape.sat.constraints.Constraint;
-import nl.uu.cs.ape.sat.constraints.Constraint_depend_module;
-import nl.uu.cs.ape.sat.constraints.Constraint_if_then_module;
-import nl.uu.cs.ape.sat.constraints.Constraint_if_then_not_module;
-import nl.uu.cs.ape.sat.constraints.Constraint_if_use_then_not_type;
-import nl.uu.cs.ape.sat.constraints.Constraint_if_use_then_type;
-import nl.uu.cs.ape.sat.constraints.Constraint_last_module;
-import nl.uu.cs.ape.sat.constraints.Constraint_next_module;
-import nl.uu.cs.ape.sat.constraints.Constraint_not_use_module;
-import nl.uu.cs.ape.sat.constraints.Constraint_not_use_type;
-import nl.uu.cs.ape.sat.constraints.Constraint_prev_module;
-import nl.uu.cs.ape.sat.constraints.Constraint_use_module;
-import nl.uu.cs.ape.sat.constraints.Constraint_use_type;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
@@ -71,32 +55,9 @@ import nl.uu.cs.ape.sat.models.Types;
  */
 public class StaticFunctions {
 
-	private static String ROOT_XML_path = "/functions/function";
+	private static String ROOT_TOOL_XML_path = "/functions/function";
+	private static String ROOT_CONSTR_XML_path = "/constraints/constraint";
 
-	/**
-	 * Return the list of all the tuples in the CSV.
-	 * 
-	 * @param csvFile
-	 * @return
-	 */
-	public static List<String[]> getTuplesFromCSV(String csvFile) {
-
-		List<String[]> constraints = new ArrayList<String[]>();
-
-		try {
-
-			FileReader filereader = new FileReader(csvFile);
-
-			// create csvReader object and skip first Line
-			CSVReader csvReader = new CSVReaderBuilder(filereader).withSkipLines(1).build();
-			constraints = csvReader.readAll();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return constraints;
-	}
 
 	/**
 	 * Returns the CNF representation of the SLTL constraints in our project
@@ -112,42 +73,38 @@ public class StaticFunctions {
 
 		String cnf_SLTL = "";
 		String constraintID;
-		int currRow = 1;
+		int currNode = 0;
 		List<String> parameters;
-		for (String[] currConstr : getTuplesFromCSV(constraintsPath)) {
-			currRow++;
+		for (Node xmlConstraint : getFunctionsFromXML(constraintsPath, ROOT_CONSTR_XML_path)) {
+			currNode++;
 			try {
-				constraintID = currConstr[0];
-			} catch (NumberFormatException e) {
-				if (currConstr.length < 2) {
-					System.err.println("There is an empty row in the file: " + constraintsPath);
-				} else {
-					System.err.println("Constraint ID provided: " + currConstr[0] + " is not Integer.");
+				constraintID = xmlConstraint.selectSingleNode("constraintid").getText();
+				List<Node> xmlConstParam = xmlConstraint.selectNodes("parameters/parameter");
+				parameters = new ArrayList<String>();
+				for (Node xmlParam : xmlConstParam) {
+					parameters.add(xmlParam.getText());
 				}
+			} catch (Exception e) {
+				System.err.println(
+						"Error in file: " + constraintsPath + ", at <constraint> no: " + currNode + ". Constraint skipped.");
 				continue;
 			}
 			if (allConsTemplates.getConstraintTamplate(constraintID) == null) {
-				System.err.println("Constraint ID provided: " + currConstr[0] + " is not valid.");
+				System.err.println("Constraint ID provided: '" + constraintID + "' is not valid. Constraint skipped.");
 				continue;
 			} else {
-				parameters = new ArrayList<String>();
-				for (int i = 1; i < currConstr.length; i++) {
-					if (!currConstr[i].isEmpty()) {
-						parameters.add(currConstr[i]);
-					}
-				}
 				String currConstrEncoding = constraintSATEncoding(constraintID,
 						parameters.toArray(new String[parameters.size()]), allConsTemplates, allModules, allTypes,
 						moduleAutomaton, typeAutomaton, mappings);
 				if (currConstrEncoding == null) {
 					System.err.println(
-							"Error in file: " + constraintsPath + ", at row: " + currRow + ". Constraint skipped.");
+							"Error in file: " + constraintsPath + ", at row: " + currNode + ". Constraint skipped.");
 				} else {
 					cnf_SLTL += currConstrEncoding;
 				}
 			}
+			
 		}
-
 		return cnf_SLTL;
 	}
 
@@ -205,7 +162,7 @@ public class StaticFunctions {
 	public static List<Module> readModuleXML(String file, AllModules allModules, AllTypes allTypes) {
 		List<Module> modulesNew = new ArrayList<Module>();
 
-		for (Node xmlModule : getFunctionsFromXML(file)) {
+		for (Node xmlModule : getFunctionsFromXML(file, ROOT_TOOL_XML_path)) {
 			Module tmpModule = Module.moduleFromXML(xmlModule, allModules, allTypes);
 			if(tmpModule != null) {
 				modulesNew.add(tmpModule);
@@ -253,12 +210,18 @@ public class StaticFunctions {
 
 	}
 
-	public static List<Node> getFunctionsFromXML(String xmlPath) {
+	/**
+	 * Get List of nodes that correpond to the elements of the structured XML file.
+	 * @param xmlPath - path to the XML file
+	 * @param rootXMLpath - root structure of the elements within the path.
+	 * @return List of {@link Node} elements of the XML.
+	 */
+	public static List<Node> getFunctionsFromXML(String xmlPath, String rootXMLpath) {
 		SAXReader reader = new SAXReader();
 		Document document;
 		try {
 			document = reader.read(xmlPath);
-			List<Node> functionList = document.selectNodes(ROOT_XML_path);
+			List<Node> functionList = document.selectNodes(rootXMLpath);
 			return functionList;
 		} catch (DocumentException e) {
 			System.err.println("Error parsing the XML file: " + xmlPath);
@@ -323,6 +286,7 @@ public class StaticFunctions {
 			System.out.println("\tData Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
 			allTypes.getRootType().printTree(" ", allTypes);
+//			allTypes.getTypes().get("Lattice").printTree(" ", allTypes);
 			System.out.println("-------------------------------------------------------------");
 		}
 	}

@@ -43,6 +43,13 @@
 			<artifactId>logicng</artifactId>
 			<version>1.5.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.json/json 
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20190722</version>
+		</dependency>
+		-->
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
@@ -53,13 +60,11 @@
 			<artifactId>owlapi-distribution</artifactId>
 			<version>5.1.5</version>
 		</dependency>
-		<!-- 
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-lang3</artifactId>
 		    <version>3.8.1</version>
 		</dependency> 
-		-->
 		<!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
 		<dependency>
 		    <groupId>org.dom4j</groupId>

@@ -66,33 +66,17 @@ public class AbstractModule extends TaxonomyPredicate {
 	
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((moduleID == null) ? 0 : moduleID.hashCode());
-		result = prime * result + ((moduleName == null) ? 0 : moduleName.hashCode());
-		return result;
+		return moduleID.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
-			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		AbstractModule other = (AbstractModule) obj;
-		if (moduleID == null) {
-			if (other.moduleID != null)
-				return false;
-		} else if (!moduleID.equals(other.moduleID))
-			return false;
-		if (moduleName == null) {
-			if (other.moduleName != null)
-				return false;
-		} else if (!moduleName.equals(other.moduleName))
-			return false;
-		return true;
+		return this.moduleID.equals(other.getModuleID());
 	}
 
 	public String getModuleID() {

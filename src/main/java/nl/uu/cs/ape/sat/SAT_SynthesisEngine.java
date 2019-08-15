@@ -19,6 +19,7 @@ import org.sat4j.specs.TimeoutException;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.models.APEConfig;
 import nl.uu.cs.ape.sat.models.AbstractModule;
@@ -26,6 +27,7 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.All_SAT_solutions;
 import nl.uu.cs.ape.sat.models.All_solutions;
+import nl.uu.cs.ape.sat.models.Atom;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.SAT_solution;
 import nl.uu.cs.ape.sat.models.Type;
@@ -125,9 +127,10 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 //		cnfEncoding = cnfEncoding.append(allTypes.endoceInstances(typeAutomaton));
 		
 		/*
-		 * Create the constraints enforcing: 1. Mutual exclusion of the tools 2.
-		 * Mandatory usage of the tools - from taxonomy. 3. Adding the constraints
-		 * enforcing the taxonomy structure.
+		 * Create the constraints enforcing: 
+		 * 1. Mutual exclusion of the tools 
+		 * 2. Mandatory usage of the tools - from taxonomy. 
+		 * 3. Adding the constraints enforcing the taxonomy structure.
 		 */
 		cnfEncoding = cnfEncoding.append(allModules.moduleMutualExclusion(moduleAutomaton, mappings));
 		StaticFunctions.restartTimerNPrint("Tool exclusions enfocements");
@@ -135,10 +138,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		cnfEncoding = cnfEncoding.append(allModules.moduleEnforceTaxonomyStructure(rootModule.getModuleID(), moduleAutomaton, mappings));
 		StaticFunctions.restartTimerNPrint("Tool usage enfocements");
 		/*
-		 * Create the constraints enforcing: 1. Mutual exclusion of the types/formats 2.
-		 * Mandatory usage of the types in the transition nodes (note: "empty type" is
-		 * considered a type) 3. Adding the constraints enforcing the taxonomy
-		 * structure.
+		 * Create the constraints enforcing: 
+		 * 1. Mutual exclusion of the types/formats 
+		 * 2. Mandatory usage of the types in the transition nodes (note: "empty type" is
+		 * considered a type) 
+		 * 3. Adding the constraints enforcing the taxonomy structure.
 		 */
 		cnfEncoding = cnfEncoding.append(allTypes.typeMutualExclusion(typeAutomaton, mappings));
 		StaticFunctions.restartTimerNPrint("Type exclusions enfocements");
@@ -153,7 +157,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		StaticFunctions.restartTimerNPrint("SLTL constraints");
 		/*
 		 * Counting the number of variables and clauses that will be given to the SAT
-		 * solver TODO Improve thi-s approach, no need to read the whole String again.
+		 * solver 
+		 * TODO Improve thi-s approach, no need to read the whole String again.
 		 */
 		int variables = mappings.getSize();
 		int clauses = StaticFunctions.countLinesNewFromString(cnfEncoding.toString());
@@ -169,7 +174,9 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Fixing the input and output files for easier testing.
 		 */
-
+			
+//			System.out.println("$$$$$$");
+//			System.out.println(cnfEncoding);
 		StaticFunctions.write2file(sat_input_header + cnfEncoding, temp_sat_input, false);
 
 		long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;

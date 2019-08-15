@@ -35,14 +35,8 @@ public class State implements Predicate {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + absoluteStateNumber;
-		result = prime * result + ((stateName == null) ? 0 : stateName.hashCode());
-		result = prime * result + stateNumber;
-		return result;
+		return stateName.hashCode();
 	}
-
 
 
 	@Override
@@ -54,18 +48,8 @@ public class State implements Predicate {
 		if (getClass() != obj.getClass())
 			return false;
 		State other = (State) obj;
-		if (absoluteStateNumber != other.absoluteStateNumber)
-			return false;
-		if (stateName == null) {
-			if (other.stateName != null)
-				return false;
-		} else if (!stateName.equals(other.stateName))
-			return false;
-		if (stateNumber != other.stateNumber)
-			return false;
-		return true;
+		return this.stateName.equals(other.getStateName());
 	}
-
 
 
 	/**

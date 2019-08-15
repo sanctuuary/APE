@@ -263,8 +263,7 @@ public class AllTypes {
 		for (Pair pair : getTypePairsForEachSubTaxonomy()) {
 			firstPair = pair.getFirst();
 			secondPair = pair.getSecond();
-			// mutual exclusion of types in all the states (those that represent general
-			// memory and used data instances)
+			// mutual exclusion of types in all the states (those that represent general memory)
 			for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
 				for (State typeState : typeBlock.getStates()) {
 					constraints = constraints.append("-").append(mappings.add(firstPair, typeState, WorkflowElement.MEMORY_TYPE))
@@ -273,7 +272,7 @@ public class AllTypes {
 							.append(" ").append("0\n");
 				}
 			}
-			
+			// mutual exclusion of types in all the states (those that represent used instances)
 			for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
 				for (State typeState : typeBlock.getStates()) {
 					constraints = constraints.append("-").append(mappings.add(firstPair, typeState, WorkflowElement.USED_TYPE))
@@ -334,19 +333,17 @@ public class AllTypes {
 		StringBuilder constraints = new StringBuilder();
 		// taxonomy enforcement of types in in all the states (those that represent
 		// general memory and used data instances)
-		for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
-			for (State typeState : typeBlock.getStates()) {
+		for (Block memTypeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+			for (State memTypeState : memTypeBlock.getStates()) {
 				constraints = constraints
-						.append(typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState, WorkflowElement.MEMORY_TYPE));
+						.append(typeEnforceTaxonomyStructureForState(rootTypeID, mappings, memTypeState, WorkflowElement.MEMORY_TYPE));
 			}
 		}
-		for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
-			for (State typeState : typeBlock.getStates()) {
-				constraints = constraints
-						.append(typeEnforceTaxonomyStructureForState(rootTypeID, typeAutomaton, mappings, typeState, WorkflowElement.USED_TYPE));
+		for (Block usedTypeBlock : typeAutomaton.getUsedTypesBlocks()) {
+			for (State usedTypeState : usedTypeBlock.getStates()) {
+				constraints = constraints.append(typeEnforceTaxonomyStructureForState(rootTypeID, mappings, usedTypeState, WorkflowElement.USED_TYPE));
 			}
 		}
-
 		return constraints.toString();
 	}
 
@@ -354,7 +351,7 @@ public class AllTypes {
 	 * Supporting recursive method for typeEnforceTaxonomyStructure.
 	 * @param typeElement 
 	 */
-	private String typeEnforceTaxonomyStructureForState(String rootTypeID, TypeAutomaton typeAutomaton,
+	private String typeEnforceTaxonomyStructureForState(String rootTypeID,
 			AtomMapping mappings, State typeState, WorkflowElement typeElement) {
 
 		Type currType = types.get(rootTypeID);
@@ -375,8 +372,7 @@ public class AllTypes {
 				currConstraint = currConstraint.append(subType_State).append(" ");
 				subTypes_States.add(subType_State);
 
-				constraints = constraints
-						.append(typeEnforceTaxonomyStructureForState(subTypeeID, typeAutomaton, mappings, typeState, typeElement));
+				constraints = constraints.append(typeEnforceTaxonomyStructureForState(subTypeeID, mappings, typeState, typeElement));
 			}
 			currConstraint = currConstraint.append("0\n");
 			/*

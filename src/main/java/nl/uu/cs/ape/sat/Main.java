@@ -118,12 +118,16 @@ public class Main {
 			System.out.println("UNSAT");
 		}
 		
-		String solutions2write = "";
+		StringBuilder solutions2write = new StringBuilder();
 		
 		for (int i = 0; i < allSolutions.getSolutionsFound(); i++) {
-			solutions2write += allSolutions.get(i).getRelevantSolutionWithTypes() + "\n";
+			solutions2write = solutions2write.append(allSolutions.get(i).getRelevantSolution()).append("\n");
 		}
-		StaticFunctions.write2file(solutions2write, new File(config.getSolution_path()), false);
+//		solutions2write = solutions2write.append("\n\n$$$\n\n");
+//		for (int i = 0; i < allSolutions.getSolutionsFound(); i++) {
+//			solutions2write = solutions2write.append(allSolutions.get(i).getOriginalSATSolution()).append("\n");
+//		}
+		StaticFunctions.write2file(solutions2write.toString(), new File(config.getSolution_path()), false);
 
 //		StaticFunctions.write2file(allSolutions.get(0).getMappedSolution() + "\n",
 //				new File("/home/vedran/Desktop/sat_solutions_map.txt"), false);

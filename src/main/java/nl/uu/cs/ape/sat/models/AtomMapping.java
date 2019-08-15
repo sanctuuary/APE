@@ -77,11 +77,11 @@ public class AtomMapping {
 	 * Return the mapping value (Integer) for the <b>atom</b>. If the <b>atom</b> was not mapped it returns null.
 	 * @param atom - string representation of the atom
 	 * @return mapping of the atom
-	 
-	public Integer findMapping(String atom) {
+	 */
+	public Integer findMapping(Atom atom) {
 		return mappings.get(atom);
 	}
-	*/
+	
 	
 	/**
 	 * Return the mapping value (Integer) for the<b>atom</b>. If the <b>atom</b> was not mapped it returns null.

@@ -53,42 +53,23 @@ public class CSV2XML {
 			List<String[]> modules = getTuplesFromCSV(csvPath);
 
 			Document document = DocumentHelper.createDocument();
-			Element root = document.addElement("functions");
+			Element root = document.addElement("constraints");
 			/*
 			 * Iteration trough all the modules described in the CSV
 			 */
 			for (String[] function : modules) {
-				Element module = root.addElement("function").addAttribute("name", function[1]); // function name
+				Element module = root.addElement("constraint"); // function name
 
-				module.addElement("operation").addText(function[0]); // superclass name - operation from the taxonomy
+				module.addElement("constraintid").addText(function[0]); // superclass name - operation from the taxonomy
 				/*
 				 * Check for the input types (if any)
 				 */
-				if (!function[2].matches("")) {
-					String[] stringModuleInputTypes = function[2].split("#");
-					Element inputs = module.addElement("inputs");
-					for (String inputStr : stringModuleInputTypes) {
-						if (!inputStr.matches("")) {
-							inputs.addElement("input").addElement("type").addText(inputStr); // creating an input of a
-																								// type "inputStr", no
-																								// format is specified.
-						}
-					}
-
+				Element inputs = module.addElement("parameters");
+				if (!function[1].matches("")) {
+					inputs.addElement("parameter").addText(function[1]); // creating an input of a
 				}
-				/*
-				 * Check for output types (if any)
-				 */
-				if (!function[3].matches("")) {
-					String[] stringModuleOutputTypes = function[3].split("#");
-					Element outputs = module.addElement("outputs");
-					for (String outputStr : stringModuleOutputTypes) {
-						if (!outputStr.matches("")) {
-							outputs.addElement("output").addElement("type").addText(outputStr); // creating an output of
-																								// a type "inputStr", no
-																								// format is specified.
-						}
-					}
+				if (!function[2].matches("")) {
+					inputs.addElement("parameter").addText(function[2]); // creating an input of a
 				}
 
 			}
@@ -144,21 +125,21 @@ public class CSV2XML {
 	}
 
 	public static void main(String[] args) throws ParserException {
-		String csvPath = "/home/vedran/Dropbox/PhD/All Use Cases/Geo_UseCase/GEO_UseCase_2018/UseCase_Paper/modules.csv";
-		String xmlPath = "/home/vedran/Dropbox/PhD/All Use Cases/Geo_UseCase/GEO_UseCase_2018/UseCase_Paper/modules.xml";
-//		csv2xml(csvPath);
+		String csvPath = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/constraints.csv";
+		String xmlPath = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase2/constraints_e0.xml";
+		csv2xml(csvPath);
 //		xml2print(xmlPath);
 		
-		final FormulaFactory f = new FormulaFactory();
-		final PropositionalParser p = new PropositionalParser(f);
-		final Formula formula = p.parse("(11) | (12 & 22) | (13 & 23)");
-
-		final Formula nnf = formula.nnf();
-		final Formula cnf = formula.cnf();
-		
-		System.out.println(formula.toString());
-		System.out.println(nnf.toString());
-		System.out.println(cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ").replace("(", "").replace(")",  " 0\n"));
+//		final FormulaFactory f = new FormulaFactory();
+//		final PropositionalParser p = new PropositionalParser(f);
+//		final Formula formula = p.parse("(11) | (12 & 22) | (13 & 23)");
+//
+//		final Formula nnf = formula.nnf();
+//		final Formula cnf = formula.cnf();
+//		
+//		System.out.println(formula.toString());
+//		System.out.println(nnf.toString());
+//		System.out.println(cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ").replace("(", "").replace(")",  " 0\n"));
 		
 //		final SATSolver miniSat = MiniSat.miniSat(f);
 //		miniSat.add(formula);

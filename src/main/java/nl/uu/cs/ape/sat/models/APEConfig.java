@@ -252,18 +252,21 @@ public class APEConfig {
 		this.use_workflow_input = isValidConfigBoolean(USE_WORKFLOW_INPUT, tempUseWInput);
 		if (this.use_workflow_input == null) {
 			this.use_workflow_input = true;
+			System.out.println("The default vaule for tag " + USE_WORKFLOW_INPUT + " is: TRUE.");
 		}
 		
 		String tempUseAllGenInput = (configNode.selectSingleNode(USE_ALL_GENERATED_DATA) != null) ? configNode.selectSingleNode(USE_ALL_GENERATED_DATA).valueOf("@value") : null;
 		this.use_all_generated_data = isValidConfigBoolean(USE_ALL_GENERATED_DATA, tempUseAllGenInput);
 		if (this.use_all_generated_data == null) {
 			this.use_all_generated_data = false;
+			System.out.println("The default vaule for tag " + USE_ALL_GENERATED_DATA + " is: FALSE.");
 		}
 		
 		String tempDebugMode = (configNode.selectSingleNode(DEBUG_MODE_TAG) != null) ? configNode.selectSingleNode(DEBUG_MODE_TAG).valueOf("@value") : null;
 		this.debug_mode = isValidConfigBoolean(DEBUG_MODE_TAG, tempDebugMode);
 		if (this.debug_mode == null) {
 			this.debug_mode = false;
+			System.out.println("The default vaule for tag " + DEBUG_MODE_TAG + " is: FALSE.");
 		}
 		
 		return true;

@@ -14,7 +14,7 @@ import nl.uu.cs.ape.sat.models.constructs.Predicate;
 public class Atom {
 
 	/**  Predicate that is referred (tool or type). */
-	private Predicate predicate;
+	private final Predicate predicate;
 	/**  State in which the type/tool was used. */
 	private final State usedInStateArgument;
 	/**  Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.) */
@@ -52,11 +52,7 @@ public class Atom {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((predicate == null) ? 0 : predicate.hashCode());
-		result = prime * result + ((usedInStateArgument == null) ? 0 : usedInStateArgument.hashCode());
-		return result;
+		return predicate.hashCode() + usedInStateArgument.hashCode();
 	}
 
 
@@ -69,20 +65,11 @@ public class Atom {
 		if (getClass() != obj.getClass())
 			return false;
 		Atom other = (Atom) obj;
-		if (predicate == null) {
-			if (other.predicate != null)
-				return false;
-		} else if (!predicate.equals(other.predicate))
-			return false;
-		if (usedInStateArgument == null) {
-			if (other.usedInStateArgument != null)
-				return false;
-		} else if (!usedInStateArgument.equals(other.usedInStateArgument))
-			return false;
-		return true;
+		
+		return this.predicate.equals(other.getPredicate()) && this.usedInStateArgument.equals(other.getUsedInStateArgument());
 	}
-
-
+	
+	
 	public State getUsedInStateArgument() {
 		return usedInStateArgument;
 	}

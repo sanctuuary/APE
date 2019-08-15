@@ -117,34 +117,17 @@ public class Type extends TaxonomyPredicate {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((typeID == null) ? 0 : typeID.hashCode());
-		result = prime * result + ((typeName == null) ? 0 : typeName.hashCode());
-		return result;
+		return this.typeID.hashCode();
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
-			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		Type other = (Type) obj;
-		if (typeID == null) {
-			if (other.typeID != null)
-				return false;
-		} else if (!typeID.equals(other.typeID))
-			return false;
-		if (typeName == null) {
-			if (other.typeName != null)
-				return false;
-		} else if (!typeName.equals(other.typeName))
-			return false;
-		return true;
+		return this.typeID.equals(other.getTypeID());
 	}
 
 

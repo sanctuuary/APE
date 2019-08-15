@@ -38,27 +38,11 @@ public abstract class TaxonomyPredicate implements Predicate {
 	
 	
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((nodeType == null) ? 0 : nodeType.hashCode());
-		return result;
-	}
+	public abstract int hashCode();
 
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TaxonomyPredicate other = (TaxonomyPredicate) obj;
-		if (nodeType != other.nodeType)
-			return false;
-		return true;
-	}
+	public abstract boolean equals(Object obj);
 
 
 	/**

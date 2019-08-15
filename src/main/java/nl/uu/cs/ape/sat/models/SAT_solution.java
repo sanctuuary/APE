@@ -27,6 +27,8 @@ public class SAT_solution extends Solution {
 
 	/** List of all the literals provided by the solution.*/
 	private List<Literal> literals;
+	/** List of all the positive literals provided by the solution.*/
+	private List<Literal> postitiveLiterals;
 	/**List of only relevant (positive) literals that represent implemented
 	 * modules/tools.  */
 	private List<Literal> relevantModules;
@@ -56,6 +58,7 @@ public class SAT_solution extends Solution {
 			int solutionLength) {
 		unsat = false;
 		literals = new ArrayList<Literal>();
+		postitiveLiterals = new ArrayList<Literal>();
 		relevantModules = new ArrayList<Literal>();
 		relevantTypes = new ArrayList<Literal>();
 		relevantElements = new ArrayList<Literal>();
@@ -66,6 +69,7 @@ public class SAT_solution extends Solution {
 				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), atomMapping);
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
+					postitiveLiterals.add(currLiteral);
 					if (currLiteral.getPredicate() instanceof Module) {
 						/* add all positive literals that describe tool implementations */
 						relevantElements.add(currLiteral);
@@ -102,14 +106,14 @@ public class SAT_solution extends Solution {
 	/**
 	 * Returns the solution in human readable format.
 	 * 
-	 * @return String representing the solution
+	 * @return String representing the solution (only positive literals).
 	 */
 	public String getSolution() {
 		StringBuilder solution = new StringBuilder();
 		if (unsat) {
 			solution = new StringBuilder("UNSAT");
 		} else {
-			for (Literal literal : literals) {
+			for (Literal literal : postitiveLiterals) {
 				solution = solution.append(literal.toString()).append(" ");
 			}
 		}
@@ -124,7 +128,7 @@ public class SAT_solution extends Solution {
 	 * 
 	 * @return String representing the tools used in the solution
 	 */
-	public String getRelevantSolution() {
+	public String getRelevantToolsInSolution() {
 		StringBuilder solution = new StringBuilder();
 		if (unsat) {
 			solution = new StringBuilder("UNSAT");
@@ -144,7 +148,7 @@ public class SAT_solution extends Solution {
 	 * 
 	 * @return String representing the tools and data used in the solutions
 	 */
-	public String getRelevantSolutionWithTypes() {
+	public String getRelevantSolution() {
 		StringBuilder solution = new StringBuilder();
 		if (unsat) {
 			solution = new StringBuilder("UNSAT");

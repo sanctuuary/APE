@@ -1,7 +1,16 @@
 package nl.uu.cs.ape.sat.constraints;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.dom4j.Node;
+
+import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
+import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.models.AllModules;
+import nl.uu.cs.ape.sat.models.AllTypes;
+import nl.uu.cs.ape.sat.models.AtomMapping;
 
 /**
  * The  {@code ConstraintFactory} class represents the Factory Method Pattern for generating and mapping {@link Constraint} classes the set of constraint formats that can be used to describe the desired synthesis output.
@@ -188,5 +197,5 @@ public class ConstraintFactory {
 		return true;
 
 	}
-	
+
 }
