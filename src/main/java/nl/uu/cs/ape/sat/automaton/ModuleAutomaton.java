@@ -1,13 +1,12 @@
 package nl.uu.cs.ape.sat.automaton;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import nl.uu.cs.ape.sat.StaticFunctions;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
- * The {@code ModuleAutomaton} class is used to represent the module automaton.
+ * The {@code ModuleAutomaton} class is used to represent the module automaton. Module Automaton represents the structure that tools in the provided solutions will follow.
  * Module automaton is represented as an array of {@link State
  * States}. <br>
  * <br>
@@ -29,9 +28,11 @@ public class ModuleAutomaton {
 	 */
 	public ModuleAutomaton(int automata_bound, int input_branching) {
 		moduleStates = new ArrayList<State>();
+		automata_bound =  automata_bound < 1 ? 1 : automata_bound;
+		
 		for (int i = 1; i <= automata_bound; i++) {
 			State tmpState = new State(WorkflowElement.MODULE, null, i, input_branching);
-			addState(tmpState);
+			moduleStates.add(tmpState);
 
 		}
 	}
@@ -84,7 +85,7 @@ public class ModuleAutomaton {
 		System.out.println("\tModule automaton:");
 		System.out.println("-------------------------------------------------------------");
 		for(State state : moduleStates) {
-			System.out.println("\tModule state: " + state.getStateName() + ", order number: " + state.getAbsoluteStateNumber());
+			System.out.println("\tModule state: " + state.getPredicateID() + ", order number: " + state.getAbsoluteStateNumber());
 		}
 		System.out.println("-------------------------------------------------------------");
 		

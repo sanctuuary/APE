@@ -2,12 +2,12 @@ package nl.uu.cs.ape.sat.constraints;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.formulas.*;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
  * Implements constraints of the form:<br/>

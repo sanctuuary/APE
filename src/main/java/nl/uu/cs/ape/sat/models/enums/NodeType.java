@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.models;
+package nl.uu.cs.ape.sat.models.enums;
 
 /**
  * Defines the values describing the nodes in the taxonomy trees.

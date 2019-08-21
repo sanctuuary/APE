@@ -1,11 +1,10 @@
 package nl.uu.cs.ape.sat.models.constructs;
 
 import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.Atom;
 import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
  * The {@code Literal} class represents literals (atoms that can be negated) corresponding to the usage of the modules 
@@ -46,7 +45,7 @@ public class Literal implements Comparable<Literal>{
 			mappedAtom = Integer.parseInt(mappedLiteral);
 		}
 		
-		atom = atomMapping.findOriginal(mappedAtom);
+		this.atom = atomMapping.findOriginal(mappedAtom);
 		
 	}
 	

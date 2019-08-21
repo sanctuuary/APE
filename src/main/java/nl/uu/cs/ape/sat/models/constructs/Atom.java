@@ -1,8 +1,8 @@
-package nl.uu.cs.ape.sat.models;
+package nl.uu.cs.ape.sat.models.constructs;
 
 import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
  *  The {@code Atom} class represents elements of the workflow, that consists of the tool or type used, state where it is used
@@ -90,9 +90,9 @@ public class Atom {
 	 */
 	public String toString() {
 		if(this.elementType == WorkflowElement.MEM_TYPE_REFERENCE) {
-			return "[" + predicate.getPredicate() + "] <- ("+ usedInStateArgument.getStateName() + ")";
+			return "[" + predicate.getPredicateID() + "] <- ("+ usedInStateArgument.getPredicateID() + ")";
 		} else {
-			return predicate.getPredicate() + "(" + usedInStateArgument.getStateName() + ")";
+			return predicate.getPredicateID() + "(" + usedInStateArgument.getPredicateID() + ")";
 		}
 	}
 	

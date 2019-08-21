@@ -1,5 +1,10 @@
-package nl.uu.cs.ape.sat;
-
+package nl.uu.cs.ape.sat.utils;
+/**
+ * Class used for testing.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class Test {
 
 	public static void main(String[] args) {

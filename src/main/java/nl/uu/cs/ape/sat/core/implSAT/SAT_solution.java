@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.models;
+package nl.uu.cs.ape.sat.core.implSAT;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,40 +9,46 @@ import java.util.Set;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.automaton.WorkflowElement;
+import nl.uu.cs.ape.sat.core.SolutionInterpreter;
+import nl.uu.cs.ape.sat.models.AllModules;
+import nl.uu.cs.ape.sat.models.AllTypes;
+import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.constructs.Literal;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
  * The {@code SAT_solution} class describes the solution produced by the SAT
  * solver. It stores the original solution and the mapped one. In case of the
  * parameter <b>unsat</b> being {@code true}, there are no solutions. <br>
  * <br>
- * It also implements general solution interface {@link Solution}.
+ * It also implements general solution interface {@link SolutionInterpreter}.
  * 
  * @author Vedran Kasalica
  *
  */
-public class SAT_solution extends Solution {
+public class SAT_solution extends SolutionInterpreter {
 
 	/** List of all the literals provided by the solution.*/
-	private List<Literal> literals;
+	private final List<Literal> literals;
 	/** List of all the positive literals provided by the solution.*/
-	private List<Literal> postitiveLiterals;
+	private final List<Literal> postitiveLiterals;
 	/**List of only relevant (positive) literals that represent implemented
 	 * modules/tools.  */
-	private List<Literal> relevantModules;
+	private final List<Literal> relevantModules;
 	/** List of only relevant (positive) literals that represent simple types.*/
-	private List<Literal> relevantTypes;
+	private final List<Literal> relevantTypes;
 	/** List of all the relevant types and modules combined.  */
-	private List<Literal> relevantElements;
+	private final List<Literal> relevantElements;
 	/** List of all the references for the types in the memory, when used as tool inputs.  */
-	private List<Literal> references2MemTypes;
-	private Set<Predicate> usedTypeStates;
+	private final List<Literal> references2MemTypes;
+	private final Set<Predicate> usedTypeStates;
 	/** True if the there is no solution to the problem. Problem is UNASATISFIABLE. */
-	private boolean unsat;
+	private final boolean unsat;
 	/** Lengths of the current solution. */
-	private int solutionLength;
+	private final int solutionLength;
 
 
 	/**
@@ -54,8 +60,7 @@ public class SAT_solution extends Solution {
 	 * @param allModules  - list of all the modules
 	 * @param allTypes    - list of all the types
 	 */
-	public SAT_solution(int[] satSolution, AtomMapping atomMapping, AllModules allModules, AllTypes allTypes,
-			int solutionLength) {
+	public SAT_solution(int[] satSolution, SAT_SynthesisEngine synthesisInstance) {
 		unsat = false;
 		literals = new ArrayList<Literal>();
 		postitiveLiterals = new ArrayList<Literal>();
@@ -65,8 +70,8 @@ public class SAT_solution extends Solution {
 		references2MemTypes = new ArrayList<Literal>();
 		usedTypeStates = new HashSet<Predicate>();
 		for (int mappedLiteral : satSolution) {
-			if (mappedLiteral > atomMapping.getMaxNumOfMappedAuxVar()) {
-				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), atomMapping);
+			if (mappedLiteral > synthesisInstance.getMappings().getMaxNumOfMappedAuxVar()) {
+				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
 					postitiveLiterals.add(currLiteral);
@@ -81,7 +86,7 @@ public class SAT_solution extends Solution {
 						relevantTypes.add(currLiteral);
 						usedTypeStates.add(currLiteral.getUsedInStateArgument());
 					} else if(currLiteral.getPredicate() instanceof State && ((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {
-						/* add all positive literals that describe memory type references that are not pointing to null state */
+						/* add all positive literals that describe memory type references that are not pointing to null state (NULL state has AbsoluteStateNumber == -1) */
 						references2MemTypes.add(currLiteral);
 						relevantElements.add(currLiteral);
 					} 
@@ -92,7 +97,7 @@ public class SAT_solution extends Solution {
 		Collections.sort(relevantTypes);
 		Collections.sort(references2MemTypes);
 		Collections.sort(relevantElements);
-		this.solutionLength = solutionLength;
+		this.solutionLength = synthesisInstance.getSolutionSize();
 	}
 
 	/**
@@ -101,6 +106,14 @@ public class SAT_solution extends Solution {
 	 */
 	public SAT_solution() {
 		unsat = true;
+		solutionLength = 0;
+		literals = null;
+		postitiveLiterals = null;
+		relevantModules = null;
+		relevantTypes = null;
+		relevantElements = null;
+		references2MemTypes = null;
+		usedTypeStates = null;
 	}
 
 	/**
@@ -172,7 +185,7 @@ public class SAT_solution extends Solution {
 			return null;
 		} else {
 			for (Literal literal : relevantModules) {
-				solutionModules.add((Module) allModules.get(literal.getPredicate().getPredicate()));
+				solutionModules.add((Module) allModules.get(literal.getPredicate().getPredicateID()));
 			}
 		}
 		return solutionModules;
@@ -199,25 +212,6 @@ public class SAT_solution extends Solution {
 	 * created by the SAT solver. Usually used to add to the solver to find new
 	 * solutions.
 	 * 
-	 * @return String representing the negated solution
-	 
-	public String getNegatedMappedSolution() {
-		StringBuilder solution = new StringBuilder();
-		if (!unsat) {
-			for (Literal literal : literals) {
-				if (!literal.isNegated() && literal.isModule() && (literal.getPredicate() instanceof Module)) {
-					solution = solution.append(literal.toNegatedMappedString()).append(" ");
-				}
-			}
-		}
-		return solution + " 0";
-	}*/
-
-	/**
-	 * Returns the negated solution in mapped format. Negating the original solution
-	 * created by the SAT solver. Usually used to add to the solver to find new
-	 * solutions.
-	 * 
 	 * @return int[] representing the negated solution
 	 */
 	public int[] getNegatedMappedSolutionArray() {
@@ -235,35 +229,6 @@ public class SAT_solution extends Solution {
 		}
 
 		return negSolList;
-	}
-
-	/**
-	 * TODO - NOT WORKING!! Returns all the permutations of the negated solution in
-	 * mapped format. Negating the original solution created by the SAT solver.
-	 * Usually used to add to the solver to find new solutions, by omitting the
-	 * permutations.
-	 * 
-	 * @param typeAutomaton
-	 * @param moduleAutomaton
-	 * 
-	 * @return String representing all permutations of the negated solution
-	 */
-	public String getNegatedMappedSolutionPermutations(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
-		StringBuilder solution = new StringBuilder();
-		if (unsat) {
-			return "";
-		} else {
-			List<String> predicates = new ArrayList<String>();
-			List<String> types = new ArrayList<String>();
-
-			for (Literal literal : relevantModules) {
-				predicates.add("-" + literal.getPredicate().getPredicate());
-			}
-			for (Literal literal : relevantTypes) {
-				types.add("-" + literal.getPredicate().getPredicate());
-			}
-		}
-		return solution + " 0";
 	}
 
 	/**

@@ -1,15 +1,14 @@
-package nl.uu.cs.ape.sat;
+package nl.uu.cs.ape.sat.utils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
@@ -20,32 +19,14 @@ import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.io.parsers.ParserException;
 import org.logicng.io.parsers.PropositionalParser;
-import org.logicng.transformations.cnf.CNFConfig;
-import org.sat4j.core.VecInt;
-import org.sat4j.minisat.SolverFactory;
-import org.sat4j.reader.DimacsReader;
-import org.sat4j.reader.ParseFormatException;
-import org.sat4j.reader.Reader;
-import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.IProblem;
-import org.sat4j.specs.ISolver;
-import org.sat4j.specs.IVecInt;
-import org.sat4j.specs.TimeoutException;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
-import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.automaton.Block;
-import nl.uu.cs.ape.sat.automaton.TypeState;
-import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.Module;
-import nl.uu.cs.ape.sat.models.SAT_solution;
-import nl.uu.cs.ape.sat.models.Type;
-import nl.uu.cs.ape.sat.models.Types;
 
 /**
  * The {@code StaticFunctions} class is used for storing {@code Static} methods.
@@ -53,11 +34,11 @@ import nl.uu.cs.ape.sat.models.Types;
  * @author Vedran Kasalica
  *
  */
-public class StaticFunctions {
+public class APEUtils {
 
-	private static String ROOT_TOOL_XML_path = "/functions/function";
-	private static String ROOT_CONSTR_XML_path = "/constraints/constraint";
-
+	private final static String ROOT_TOOL_XML_path = "/functions/function";
+	private final static String ROOT_CONSTR_XML_path = "/constraints/constraint";
+	private final static Map<String, Long> timers = new HashMap<String, Long>();
 
 	/**
 	 * Returns the CNF representation of the SLTL constraints in our project
@@ -166,7 +147,7 @@ public class StaticFunctions {
 			Module tmpModule = Module.moduleFromXML(xmlModule, allModules, allTypes);
 			if(tmpModule != null) {
 				modulesNew.add(tmpModule);
-				allModules.addAnnotatedModule(tmpModule.getModuleID());
+				allModules.addAnnotatedModule(tmpModule.getPredicateID());
 			}
 			
 		}
@@ -312,6 +293,21 @@ public class StaticFunctions {
 	public static <E> List<E> safe(List<E> currList) {
 		return currList == null ? Collections.EMPTY_LIST : currList;
 	}
+	
+	/**
+	 * Provide a safe interface for getting an element from the list. In order to bypass "index out of bounds" error.
+	 * 
+	 * @param currList - list of elements
+	 * @param index - index of the element that is to be returned
+	 * @return Element of the list, or null if the index is out of bounds.
+	 */
+	public static <E> E safeGet(List<E> currList, int index){
+		if(currList == null || index < 0 || currList.size() <= index) {
+			return null;
+		} else {
+			return currList.get(index);
+		}
+	}
 
 	public static int countLinesNewFromString(String inputString) throws IOException {
 		InputStream is = IOUtils.toInputStream(inputString, "UTF-8");
@@ -351,25 +347,31 @@ public class StaticFunctions {
 		}
 	}
 
-	private static long timerStartTime = 0;
-
-	public static void startTimer(Boolean debugMode) {
+	public static void timerStart(String timerID, Boolean debugMode) {
 		if (debugMode) {
-			timerStartTime = System.currentTimeMillis();
+			timers.put(timerID, System.currentTimeMillis());
 		} else {
-			timerStartTime = -1;
+			timers.put(timerID, (long) -1);
 		}
 
 	}
 
-	public static void restartTimerNPrint(String printString) {
-		if(timerStartTime == -1) {
+	public static void timerRestartAndPrint(String timerID, String printString) {
+		if(timers.get(timerID) == -1) {
 			return;
 		}
-		long printTime = System.currentTimeMillis() - timerStartTime;
+		long printTime = System.currentTimeMillis() - timers.get(timerID);
 		System.out.println(printString + " setup time: " + (printTime / 1000F) + " sec.");
-		timerStartTime = System.currentTimeMillis();
+		timers.put(timerID, System.currentTimeMillis());
 	}
 
+	public static void timerPrint(String timerID, int solutionsFound) {
+		if(timers.get(timerID) == -1) {
+			return;
+		}
+		long printTime = System.currentTimeMillis() - timers.get(timerID);
+		System.out.println("\nAPE found " + solutionsFound + " solutions. Total solving time: "
+				+ (printTime / 1000F) + " sec.");
+	}
 
 }

@@ -9,15 +9,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import nl.uu.cs.ape.sat.StaticFunctions;
+import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
-import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.automaton.Block;
-import nl.uu.cs.ape.sat.automaton.TypeState;
-import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
  * The {@code AllModules} class represent the set of all modules/tools that can
@@ -70,7 +69,7 @@ public class AllModules {
 	 *         contains the specified element.
 	 */
 	public AbstractModule addModule(AbstractModule module) {
-		AbstractModule tmpModule = modules.get(module.getModuleID());
+		AbstractModule tmpModule = modules.get(module.getPredicateID());
 		if (module instanceof Module && (tmpModule != null)) {
 			if (tmpModule instanceof Module) {
 				return tmpModule;
@@ -86,7 +85,7 @@ public class AllModules {
 			if (tmpModule != null) {
 				return tmpModule;
 			} else {
-				this.modules.put(module.getModuleID(), module);
+				this.modules.put(module.getPredicateID(), module);
 				return module;
 			}
 		}
@@ -101,8 +100,8 @@ public class AllModules {
 	 * @param oldModule - object that will be removed
 	 */
 	public void swapAbstractModule2Module(AbstractModule newModule, AbstractModule oldModule) {
-		this.modules.remove(oldModule.getModuleID());
-		this.modules.put(newModule.getModuleID(), newModule);
+		this.modules.remove(oldModule.getPredicateID());
+		this.modules.put(newModule.getPredicateID(), newModule);
 	}
 
 	/**
@@ -135,7 +134,7 @@ public class AllModules {
 	 * @return true if this set contains the specified element
 	 */
 	public boolean existsModule(AbstractModule module) {
-		return modules.containsKey(module.getModuleID());
+		return modules.containsKey(module.getPredicateID());
 	}
 
 	public int size() {
@@ -223,20 +222,19 @@ public class AllModules {
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String inputCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, Type emptyType,
-			AtomMapping mappings) {
+	private String inputCons(SAT_SynthesisEngine synthesisInstance) {
 
 		StringBuilder constraints = new StringBuilder();
-
+		AtomMapping mappings = synthesisInstance.getMappings();
 		for (Entry<String, AbstractModule> mapModule : modules.entrySet()) {
 			AbstractModule module = mapModule.getValue();
 			/* ..which is a Tool.. */
 			if ((module instanceof Module)) {
 				/* ..iterate through all the states.. */
-				for (State moduleState : moduleAutomaton.getModuleStates()) {
+				for (State moduleState : synthesisInstance.getModuleAutomaton().getModuleStates()) {
 					int moduleNo = moduleState.getStateNumber();
 					/* ..and for each state and input state of that module state.. */
-					List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
+					List<State> currInputStates = synthesisInstance.getTypeAutomaton().getUsedTypesBlock(moduleNo - 1).getStates();
 					List<Types> moduleInputs = module.getModuleInput();
 					for (State currInputState : currInputStates) {
 						int currInputStateNo = currInputState.getStateNumber();
@@ -262,7 +260,7 @@ public class AllModules {
 							constraints = constraints.append("-")
 									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
 							constraints = constraints
-									.append(mappings.add(emptyType, currInputState, WorkflowElement.USED_TYPE))
+									.append(mappings.add(synthesisInstance.getAllTypes().getEmptyType(), currInputState, WorkflowElement.USED_TYPE))
 									.append(" 0\n");
 						}
 					}
@@ -415,18 +413,20 @@ public class AllModules {
 	 *                                            have to be used
 	 * @return String representation of constraints.
 	 */
-	private String enforcingUsageOfGeneratedTypesMsgPassingCons(Type emptyType, TypeAutomaton typeAutomaton,
-			AtomMapping mappings, boolean enforceUsageOfAllWorkflowInputTypes,
-			boolean enforceUsageOfAllGeneratedTypes) {
+	private String enforcingUsageOfGeneratedTypesMsgPassingCons(SAT_SynthesisEngine synthesisInstance) {
 
+		AtomMapping mappings = synthesisInstance.getMappings();
+		Type emptyType = synthesisInstance.getAllTypes().getEmptyType();
+		
+		
 		StringBuilder constraints = new StringBuilder();
 		String usageOfAllTypes = " ", usageOfAllWorkflowInputType = " ";
 		String notUsageOfAllTypes = " 0\n", notUsageOfAllWorkflowInputType = " 0\n";
-		if (enforceUsageOfAllGeneratedTypes) {
+		if (synthesisInstance.getConfig().getUse_workflow_input()) {
 			usageOfAllTypes = " 0\n";
 			notUsageOfAllTypes = " ";
 		}
-		if (enforceUsageOfAllWorkflowInputTypes) {
+		if (synthesisInstance.getConfig().getUse_all_generated_data()) {
 			usageOfAllWorkflowInputType = " 0\n";
 			notUsageOfAllWorkflowInputType = " ";
 		}
@@ -435,14 +435,14 @@ public class AllModules {
 		 * memory, i.e. all workflow inputs and at least one of each of the tool outputs
 		 * needs to be used in the program, unless they are empty.
 		 */
-		for (Block currBlock : typeAutomaton.getMemoryTypesBlocks()) {
+		for (Block currBlock : synthesisInstance.getTypeAutomaton().getMemoryTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
 			for (State currMemoryState : currBlock.getStates()) {
 				/* If the memory is provided as input */
 				if (blockNumber == 0) {
 					constraints = constraints
 							.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE)).append(" ");
-					for (State inputState : typeAutomaton.getUsedTypesBlock(blockNumber).getStates()) {
+					for (State inputState : synthesisInstance.getTypeAutomaton().getUsedTypesBlock(blockNumber).getStates()) {
 						constraints = constraints
 								.append(mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
 								.append(usageOfAllWorkflowInputType);
@@ -451,7 +451,7 @@ public class AllModules {
 				} else {
 					constraints = constraints
 							.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE)).append(" ");
-					for (State inputState : typeAutomaton.getUsedTypesBlock(blockNumber).getStates()) {
+					for (State inputState : synthesisInstance.getTypeAutomaton().getUsedTypesBlock(blockNumber).getStates()) {
 						constraints = constraints
 								.append(mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
 								.append(usageOfAllTypes);
@@ -537,10 +537,11 @@ public class AllModules {
 	 *                                            have to be used
 	 * @return String representation of constraints.
 	 */
-	private String enforcingUsageOfGeneratedTypesSharedMemCons(Type emptyType, TypeAutomaton typeAutomaton,
-			AtomMapping mappings, boolean enforceUsageOfAllWorkflowInputTypes,
-			boolean enforceUsageOfAllGeneratedTypes) {
+	private String enforcingUsageOfGeneratedTypesSharedMemCons(SAT_SynthesisEngine synthesisInstance) {
 
+		AtomMapping mappings = synthesisInstance.getMappings();
+		Type emptyType = synthesisInstance.getAllTypes().getEmptyType();
+		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
 		StringBuilder constraints = new StringBuilder();
 		/*
 		 * Setting up the constraints that ensure usage of the generated types in the
@@ -551,7 +552,7 @@ public class AllModules {
 			int blockNumber = currBlock.getBlockNumber();
 			/* If the memory is provided as input */
 			if (blockNumber == 0) {
-				if (enforceUsageOfAllWorkflowInputTypes) {
+				if (synthesisInstance.getConfig().getUse_workflow_input()) {
 					for (State currMemoryState : currBlock.getStates()) {
 						constraints = constraints
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
@@ -580,7 +581,7 @@ public class AllModules {
 					constraints = constraints.append(" 0\n");
 				}
 			} else {
-				if (enforceUsageOfAllGeneratedTypes) {
+				if (synthesisInstance.getConfig().getUse_all_generated_data()) {
 					for (State currMemoryState : currBlock.getStates()) {
 						constraints = constraints
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
@@ -626,9 +627,9 @@ public class AllModules {
 	 * @param mappings
 	 * @return String representation of constraints
 	 */
-	private String outputCons(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, Type emptyType,
-			AtomMapping mappings) {
+	private String outputCons(SAT_SynthesisEngine synthesisInstance) {
 
+		AtomMapping mappings = synthesisInstance.getMappings();
 		StringBuilder constraints = new StringBuilder();
 
 		// for each module
@@ -637,10 +638,10 @@ public class AllModules {
 			// that is a Tool
 			if ((module instanceof Module)) {
 				// iterate through all the states
-				for (State moduleState : moduleAutomaton.getModuleStates()) {
+				for (State moduleState : synthesisInstance.getModuleAutomaton().getModuleStates()) {
 					int moduleNo = moduleState.getStateNumber();
 					// and for each state and output state of that module state
-					List<State> currOutputStates = typeAutomaton.getMemoryTypesBlock(moduleNo).getStates();
+					List<State> currOutputStates = synthesisInstance.getTypeAutomaton().getMemoryTypesBlock(moduleNo).getStates();
 					List<Types> moduleOutputs = module.getModuleOutput();
 					for (int i = 0; i < currOutputStates.size(); i++) {
 						if (i < moduleOutputs.size()) {
@@ -660,7 +661,7 @@ public class AllModules {
 							constraints = constraints.append("-")
 									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
 							constraints = constraints.append(
-									mappings.add(emptyType, currOutputStates.get(i), WorkflowElement.MEMORY_TYPE))
+									mappings.add(synthesisInstance.getAllTypes().getEmptyType(), currOutputStates.get(i), WorkflowElement.MEMORY_TYPE))
 									.append(" 0\n");
 						}
 					}
@@ -688,25 +689,21 @@ public class AllModules {
 	 * @return {@link String} representation of constraints regarding the required
 	 *         INPUT and OUTPUT types of the modules
 	 */
-	public String modulesConstraints(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AllTypes allTypes,
-			boolean shared_memory, Type emptyType, AtomMapping mappings, boolean useAllWorkflowInputs,
-			boolean useAllGeneratedTypes) {
+	public String modulesConstraints(SAT_SynthesisEngine synthesisInstance) {
 
 		StringBuilder constraints = new StringBuilder();
-		constraints = constraints.append(inputCons(moduleAutomaton, typeAutomaton, emptyType, mappings));
-		if (!shared_memory) {
-			constraints = constraints.append(inputMsgPassingCons(typeAutomaton, mappings));
-			constraints = constraints.append(enforcingUsageOfGeneratedTypesMsgPassingCons(emptyType, typeAutomaton,
-					mappings, useAllWorkflowInputs, useAllGeneratedTypes));
+		constraints = constraints.append(inputCons(synthesisInstance));
+		if (!synthesisInstance.getConfig().getShared_memory()) {
+			constraints = constraints.append(inputMsgPassingCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+			constraints = constraints.append(enforcingUsageOfGeneratedTypesMsgPassingCons(synthesisInstance));
 		} else {
-			constraints = constraints.append(inputSharedMemCons(typeAutomaton, mappings));
-			constraints = constraints.append(enforcingUsageOfGeneratedTypesSharedMemCons(emptyType, typeAutomaton,
-					mappings, useAllWorkflowInputs, useAllGeneratedTypes));
+			constraints = constraints.append(inputSharedMemCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+			constraints = constraints.append(enforcingUsageOfGeneratedTypesSharedMemCons(synthesisInstance));
 		}
 
-		constraints = constraints.append(generalReferenceCons(allTypes, typeAutomaton, mappings));
+		constraints = constraints.append(generalReferenceCons(synthesisInstance.getAllTypes(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
 
-		constraints = constraints.append(outputCons(moduleAutomaton, typeAutomaton, emptyType, mappings));
+		constraints = constraints.append(outputCons(synthesisInstance));
 		return constraints.toString();
 	}
 

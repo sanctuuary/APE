@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import nl.uu.cs.ape.sat.StaticFunctions;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
- * Class is used to represent the type automaton. It comprises blocks of data
- * types that are added to the memory and those that are being used by tools, as
+ * Class is used to represent the type automaton. Type Automaton represents the structure that data instances in the provided solutions will follow.
+ * It comprises blocks of data types that are added to the memory and those that are being used by tools, as
  * input.
  * <br><br>
  * Labeling of the automaton is provided in /APE/res/WorkflowAutomaton_Implementation.png
@@ -32,10 +32,6 @@ public class TypeAutomaton {
 	/** State is used in order to represent no state. */
 	private State nullState;
 	
-	
-	/** Workflow length */
-	private int workflowLength;
-
 	/**
 	 * Generate the Type State automatons based on the defined length
 	 * and branching factor.
@@ -51,9 +47,9 @@ public class TypeAutomaton {
 		usedTypesAutomaton = new ArrayList<Block>();
 		nullState = new State(null, null, -1, input_branching);
 	
-		workflowLength =  automata_bound < 1 ? 1 : automata_bound;
+		automata_bound =  automata_bound < 1 ? 1 : automata_bound;
 			
-		for (int i = 0; i <= workflowLength; i++) { 
+		for (int i = 0; i <= automata_bound; i++) { 
 			
 			Block tmpMemoryTypeBlock = new Block(i);
 			
@@ -200,14 +196,6 @@ public class TypeAutomaton {
 	}
 	
 	/**
-	 * Get workflow length.
-	 * @return
-	 */
-	public int getWorkflowLength() {
-		return workflowLength;
-	}
-
-	/**
 	 * Return all the memory type states that are generated until a certain block, i.e. all the slots of memory are generated until a certain block/tool.
 	 * @param maxBlockNo - memory block prior to which we are looking into memory (this block is included).
 	 * @return List of memory States.
@@ -261,13 +249,13 @@ public class TypeAutomaton {
 		System.out.println("-------------------------------------------------------------");
 		for(Block memBlock : memoryTypesAutomaton) {
 			for(State memState : memBlock.getStates()) {
-				System.out.println("\tType state: " + memState.getStateName() + ", order number: " + memState.getAbsoluteStateNumber());
+				System.out.println("\tType state: " + memState.getPredicateID() + ", order number: " + memState.getAbsoluteStateNumber());
 			}
 		}
 		System.out.println("-------------------------------------------------------------");
 		for(Block usedBlock : usedTypesAutomaton) {
 			for(State usedState : usedBlock.getStates()) {
-				System.out.println("\tType state: " + usedState.getStateName() + ", order number: " + usedState.getAbsoluteStateNumber());
+				System.out.println("\tType state: " + usedState.getPredicateID() + ", order number: " + usedState.getAbsoluteStateNumber());
 			}
 		}
 			

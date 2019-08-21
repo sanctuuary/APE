@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat;
+package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
 import java.util.HashSet;
@@ -15,12 +15,12 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 
-import nl.uu.cs.ape.sat.models.APEConfig;
+import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.NodeType;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 
 /**
  * The {@code OWLReader} class is used to extract the classification information
@@ -214,7 +214,7 @@ public class OWLReader {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		} else {
-			for(String dataTaxonomySubRoot : APEConfig.getConfig().getData_Taxonomy_SubRoots()) {
+			for(String dataTaxonomySubRoot : APEConfig.getConfig().getData_taxonomy_subroots()) {
 				if(getLabel(currClass).matches(dataTaxonomySubRoot)) {
 					currNodeType = NodeType.SUBROOT;
 					rootClass = currClass;

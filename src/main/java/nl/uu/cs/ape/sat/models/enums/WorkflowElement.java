@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.automaton;
+package nl.uu.cs.ape.sat.models.enums;
 
 /**
  * Defines the values describing the states in the workflow.

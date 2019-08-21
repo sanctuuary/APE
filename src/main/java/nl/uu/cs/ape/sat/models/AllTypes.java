@@ -11,10 +11,10 @@ import java.util.Map.Entry;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.automaton.TypeState;
-import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
-import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.utils.APEConfig;
 
 /**
  * The {@code AllTypes} class represent the set of all data types/formats that
@@ -62,10 +62,10 @@ public class AllTypes {
 	 */
 	public Type addType(Type type) {
 		Type tmpType;
-		if ((tmpType = types.get(type.getTypeID())) != null) {
+		if ((tmpType = types.get(type.getPredicateID())) != null) {
 			return tmpType;
 		} else {
-			this.types.put(type.getTypeID(), type);
+			this.types.put(type.getPredicateID(), type);
 			return type;
 		}
 	}
@@ -109,7 +109,7 @@ public class AllTypes {
 	 * @return {@code true} if the type exists in the set.
 	 */
 	public boolean existsType(Type type) {
-		return types.containsKey(type.getTypeID());
+		return types.containsKey(type.getPredicateID());
 	}
 
 	public int size() {
@@ -155,7 +155,7 @@ public class AllTypes {
 	 */
 	private List<Pair> getTypePairsForEachSubTaxonomy() {
 		List<Pair> pairs = new ArrayList<Pair>();
-		List<String> subRoots = APEConfig.getConfig().getData_Taxonomy_SubRoots();
+		List<String> subRoots = APEConfig.getConfig().getData_taxonomy_subroots();
 
 		/*
 		 * Create a list for each subtree of the Data Taxonomy (e.g. TypeSubTaxonomy,
@@ -190,11 +190,6 @@ public class AllTypes {
 				}
 			}
 		}
-
-//		System.out.println(APEConfig.getConfig().getData_taxonomy_root() + ": " + subTreesMap.get(APEConfig.getConfig().getData_taxonomy_root()).size());
-//		for (String subRoot : subRoots) {
-//			System.out.println(subRoot + ": " + subTreesMap.get(subRoot).size());
-//		}
 
 		for (List<Type> iterator : subTreesMap.values()) {
 			for (int i = 0; i < iterator.size() - 1; i++) {
@@ -407,14 +402,15 @@ public class AllTypes {
 			if (i < program_inputs.size()) {
 				List<Type> currTypes = program_inputs.get(i).getTypes();
 				for (Type currType : currTypes) {
-					if (get(currType.getTypeID()) == null) {
+					if (get(currType.getPredicateID()) == null) {
 						System.err.println(
-								"Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
+								"Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
 						return null;
 					}
+					
 					encoding = encoding.append(mappings.add(currType, workfloInputStates.get(i), WorkflowElement.MEMORY_TYPE))
 							.append(" 0\n");
-					this.addAnnotatedType(currType.getTypeID());
+					this.addAnnotatedType(currType.getPredicateID());
 				}
 			} else {
 				/* Forcing in the rest of the input states to be empty types. */
@@ -446,14 +442,14 @@ public class AllTypes {
 			if (i < program_outputs.size()) {
 				List<Type> currTypes = program_outputs.get(i).getTypes();
 				for (Type currType : currTypes) {
-					if (get(currType.getTypeID()) == null) {
+					if (get(currType.getPredicateID()) == null) {
 						System.err.println(
-								"Program input '" + currType.getTypeID() + "' was not defined in the taxonomy.");
+								"Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
 						return null;
 					}
 					encoding = encoding.append(mappings.add(currType, workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
 							.append(" 0\n");
-					this.addAnnotatedType(currType.getTypeID());
+					this.addAnnotatedType(currType.getPredicateID());
 				}
 			} else {
 				/* Forcing in the rest of the input states to be empty types. */

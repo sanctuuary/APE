@@ -3,13 +3,10 @@ package nl.uu.cs.ape.sat.models.formulas;
 import java.util.List;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
-import nl.uu.cs.ape.sat.automaton.ModuleState;
 import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.automaton.Block;
-import nl.uu.cs.ape.sat.automaton.TypeState;
-import nl.uu.cs.ape.sat.automaton.WorkflowElement;
-import nl.uu.cs.ape.sat.models.*;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
 
 public class SLTL_formula_F extends SLTL_formula {

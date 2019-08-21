@@ -1,13 +1,10 @@
 package nl.uu.cs.ape.sat.models;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import javax.sql.rowset.spi.TransactionalWriter;
-
 import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 
 /**
  * 
@@ -20,8 +17,8 @@ import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
 
 public class Type extends TaxonomyPredicate {
 
-	private String typeName;
-	private String typeID;
+	private final String typeName;
+	private final String typeID;
 	/**
 	 * Set of subtypes, null in case of a simple type or an empty type
 	 */
@@ -45,24 +42,13 @@ public class Type extends TaxonomyPredicate {
 	}
 
 
-	public String getTypeName() {
+	@Override
+	public String getPredicateLabel() {
 		return typeName;
 	}
 
-	public void setTypeName(String typeName) {
-		this.typeName = typeName;
-	}
-
-	public String getTypeID() {
-		return typeID;
-	}
-
-	public void setTypeID(String typeID) {
-		this.typeID = typeID;
-	}
-
 	@Override
-	public String getPredicate() {
+	public String getPredicateID() {
 		return typeID;
 	}
 
@@ -79,7 +65,7 @@ public class Type extends TaxonomyPredicate {
 	 */
 	public boolean addSubType(Type type) {
 		if (!(nodeType == NodeType.EMPTY)) {
-			subTypes.add(type.getTypeID());
+			subTypes.add(type.getPredicateID());
 			return true;
 		} else {
 			System.err.println("Cannot add subtypes to an empty type!");
@@ -127,15 +113,15 @@ public class Type extends TaxonomyPredicate {
 		if (getClass() != obj.getClass())
 			return false;
 		Type other = (Type) obj;
-		return this.typeID.equals(other.getTypeID());
+		return this.typeID.equals(other.getPredicateID());
 	}
 
 
 	/**
-	 * Returns true if the type is a simple/leaf type, otherwise returns false - the
+	 * Returns true if the type is a simple/primitive/leaf type, otherwise returns false - the
 	 * type is an abstract (non-leaf) type.
 	 * 
-	 * @return true (simple/leaf type) or false (abstract/non-leaf type)
+	 * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type)
 	 */
 	public boolean isSimpleType() {
 		return (this.nodeType == NodeType.LEAF);

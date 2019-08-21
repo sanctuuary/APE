@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat;
+package nl.uu.cs.ape.sat.core.implSAT;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,21 +19,19 @@ import org.sat4j.specs.TimeoutException;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.automaton.WorkflowElement;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
-import nl.uu.cs.ape.sat.models.APEConfig;
+import nl.uu.cs.ape.sat.core.SynthesisEngine;
+import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.All_SAT_solutions;
-import nl.uu.cs.ape.sat.models.All_solutions;
-import nl.uu.cs.ape.sat.models.Atom;
 import nl.uu.cs.ape.sat.models.AtomMapping;
-import nl.uu.cs.ape.sat.models.SAT_solution;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
- * The {@code SAT_SynthesisEngine} class represents a synthesis instance, i.e. it is represented with the set of inputs (tools, types, constraints and workflow lenght that is being explored).<br>
+ * The {@code SAT_SynthesisEngine} class represents a <b>synthesis instance</b>, i.e. it is represented with the set of inputs (tools, types, constraints and workflow lenght that is being explored).<br>
  * It is used to execute synthesis algorithm over the given input, implemented using MiniSAT solver.
  * <br><br>
  * The class implements general synthesis interface {@link SynthesisEngine}.
@@ -53,6 +51,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	private final All_SAT_solutions allSolutions;
 	private StringBuilder cnfEncoding;
 	private File temp_sat_input;
+	private ModuleAutomaton moduleAutomaton;
+	private TypeAutomaton typeAutomaton;
 	
 	/**
 	 * Setup of the SAT synthesis engine
@@ -64,7 +64,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	 * @param allConsTemplates
 	 */
 	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, All_SAT_solutions allSolutions,
-			APEConfig config, AllModules annotated_modules, ConstraintFactory allConsTemplates) {
+			APEConfig config, AllModules annotated_modules, ConstraintFactory allConsTemplates, int size) {
 		this.allModules = allModules;
 		this.allTypes = allTypes;
 		this.allSolutions = allSolutions;
@@ -76,10 +76,15 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		
 		this.temp_sat_input = null;
 		this.cnfEncoding = new StringBuilder();
+		
+		moduleAutomaton = new ModuleAutomaton(size, config.getMax_no_tool_outputs());
+		typeAutomaton = new TypeAutomaton(size,
+				config.getMax_no_tool_inputs(), config.getMax_no_tool_outputs());
+		
 	}
-
 	/**
-	 * Generate the SAT encoding of the workflow synthesis and write it in a tmp file
+	 * Generate the SAT encoding of the workflow synthesis and rerurn it as a string.
+	 * @return String representing the SAT encoding.
 	 * @throws IOException 
 	 */
 	public String synthesisEncoding() throws IOException {
@@ -91,15 +96,55 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Generate the automaton
 		 */
-		StaticFunctions.startTimer(config.getDebug_mode());
-		ModuleAutomaton moduleAutomaton = new ModuleAutomaton(allSolutions.getCurrSolutionLenght(), config.getMax_no_tool_outputs());
-		TypeAutomaton typeAutomaton = new TypeAutomaton(allSolutions.getCurrSolutionLenght(),
-				config.getMax_no_tool_inputs(), config.getMax_no_tool_outputs());
-//		moduleAutomaton.print();
-//		typeAutomaton.print();
-		StaticFunctions.restartTimerNPrint("Automaton");
+		String currLengthTimer = "length" + this.getSolutionSize();
+		APEUtils.timerStart(currLengthTimer, config.getDebug_mode());
+		
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton");
+		
 		/*
-		 * Encode the workflow input
+		 * Create constraints from the module.xml file regarding the Inputs/Outputs
+		 */
+		cnfEncoding = cnfEncoding.append(annotated_modules.modulesConstraints(this));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
+		
+		/*
+		 * Create the constraints that provide distinction of data instances.
+		 */
+//		cnfEncoding = cnfEncoding.append(allTypes.endoceInstances(typeAutomaton));
+		
+		/*
+		 * Create the constraints enforcing: 
+		 * 1. Mutual exclusion of the tools 
+		 * 2. Mandatory usage of the tools - from taxonomy. 
+		 * 3. Adding the constraints enforcing the taxonomy structure.
+		 */
+		cnfEncoding = cnfEncoding.append(allModules.moduleMutualExclusion(moduleAutomaton, mappings));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions enfocements");
+		cnfEncoding = cnfEncoding.append(allModules.moduleMandatoryUsage(annotated_modules, moduleAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(allModules.moduleEnforceTaxonomyStructure(rootModule.getPredicateID(), moduleAutomaton, mappings));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage enfocements");
+		/*
+		 * Create the constraints enforcing: 
+		 * 1. Mutual exclusion of the types/formats 
+		 * 2. Mandatory usage of the types in the transition nodes (note: "empty type" is
+		 * considered a type) 
+		 * 3. Adding the constraints enforcing the taxonomy structure.
+		 */
+		cnfEncoding = cnfEncoding.append(allTypes.typeMutualExclusion(typeAutomaton, mappings));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions enfocements");
+		cnfEncoding = cnfEncoding.append(allTypes.typeMandatoryUsage(rootType, typeAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(allTypes.typeEnforceTaxonomyStructure(rootType.getPredicateID(), typeAutomaton, mappings));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage enfocements");
+		/*
+		 * Encode the constraints from the file based on the templates (manual templates)
+		 */
+		cnfEncoding = cnfEncoding.append(APEUtils.generateSLTLConstraints(config.getConstraints_path(), allConsTemplates, allModules,
+				allTypes, mappings, moduleAutomaton, typeAutomaton));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
+		
+		/*
+		 * Encode the workflow input.
+		 * Workflow I/O are encoded the last in order to reuse the mappings for states, instead of introducing new ones, using the I/O types of NodeType.UNKNOWN.
 		 */
 		String inputDataEncoding = allTypes.encodeInputData(config.getProgram_inputs(), typeAutomaton, mappings);
 		if (inputDataEncoding == null) {
@@ -114,70 +159,27 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 			return null;
 		}
 		cnfEncoding = cnfEncoding.append(outputDataEncoding);
-		/*
-		 * Create constraints from the module.xml file regarding the Inputs/Outputs
-		 */
-		cnfEncoding = cnfEncoding.append(annotated_modules.modulesConstraints(moduleAutomaton, typeAutomaton, allTypes, config.getShared_memory(),
-				allTypes.getEmptyType(), mappings, config.getUse_workflow_input(), config.getUse_all_generated_data()));
-		StaticFunctions.restartTimerNPrint("Tool I/O constraints");
 		
-		/*
-		 * Create the constraints that provide distinction of data instances.
-		 */
-//		cnfEncoding = cnfEncoding.append(allTypes.endoceInstances(typeAutomaton));
-		
-		/*
-		 * Create the constraints enforcing: 
-		 * 1. Mutual exclusion of the tools 
-		 * 2. Mandatory usage of the tools - from taxonomy. 
-		 * 3. Adding the constraints enforcing the taxonomy structure.
-		 */
-		cnfEncoding = cnfEncoding.append(allModules.moduleMutualExclusion(moduleAutomaton, mappings));
-		StaticFunctions.restartTimerNPrint("Tool exclusions enfocements");
-		cnfEncoding = cnfEncoding.append(allModules.moduleMandatoryUsage(annotated_modules, moduleAutomaton, mappings));
-		cnfEncoding = cnfEncoding.append(allModules.moduleEnforceTaxonomyStructure(rootModule.getModuleID(), moduleAutomaton, mappings));
-		StaticFunctions.restartTimerNPrint("Tool usage enfocements");
-		/*
-		 * Create the constraints enforcing: 
-		 * 1. Mutual exclusion of the types/formats 
-		 * 2. Mandatory usage of the types in the transition nodes (note: "empty type" is
-		 * considered a type) 
-		 * 3. Adding the constraints enforcing the taxonomy structure.
-		 */
-		cnfEncoding = cnfEncoding.append(allTypes.typeMutualExclusion(typeAutomaton, mappings));
-		StaticFunctions.restartTimerNPrint("Type exclusions enfocements");
-		cnfEncoding = cnfEncoding.append(allTypes.typeMandatoryUsage(rootType, typeAutomaton, mappings));
-		cnfEncoding = cnfEncoding.append(allTypes.typeEnforceTaxonomyStructure(rootType.getTypeID(), typeAutomaton, mappings));
-		StaticFunctions.restartTimerNPrint("Type usage enfocements");
-		/*
-		 * Encode the constraints from the file based on the templates (manual templates)
-		 */
-		cnfEncoding = cnfEncoding.append(StaticFunctions.generateSLTLConstraints(config.getConstraints_path(), allConsTemplates, allModules,
-				allTypes, mappings, moduleAutomaton, typeAutomaton));
-		StaticFunctions.restartTimerNPrint("SLTL constraints");
 		/*
 		 * Counting the number of variables and clauses that will be given to the SAT
 		 * solver 
 		 * TODO Improve thi-s approach, no need to read the whole String again.
 		 */
 		int variables = mappings.getSize();
-		int clauses = StaticFunctions.countLinesNewFromString(cnfEncoding.toString());
+		int clauses = APEUtils.countLinesNewFromString(cnfEncoding.toString());
 		String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
-		StaticFunctions.restartTimerNPrint("Reading rows");
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
 		System.out.println();
 		/*
 		 * Create a temp file that will be used as input for the SAT solver.
 		 */
-			temp_sat_input = File.createTempFile("sat_input_" + allSolutions.getCurrSolutionLenght() + "_len_", ".cnf");
-//			temp_sat_input.deleteOnExit();
+			temp_sat_input = File.createTempFile("sat_input_" + this.getSolutionSize() + "_len_", ".cnf");
+			temp_sat_input.deleteOnExit();
 
 		/*
 		 * Fixing the input and output files for easier testing.
 		 */
-			
-//			System.out.println("$$$$$$");
-//			System.out.println(cnfEncoding);
-		StaticFunctions.write2file(sat_input_header + cnfEncoding, temp_sat_input, false);
+		APEUtils.write2file(sat_input_header + cnfEncoding, temp_sat_input, false);
 
 		long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
 		System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");
@@ -193,10 +195,9 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	 */
 	public boolean synthesisExecution() {
 		
-		List<SAT_solution> currSolutions = runMiniSAT(temp_sat_input.getAbsolutePath(), mappings,
-				allModules, allTypes, allSolutions.getSolutionsFound(), allSolutions.getSolutionsFoundMax(), allSolutions.getCurrSolutionLenght());
+		List<SolutionWorkflow> currSolutions = runMiniSAT(temp_sat_input.getAbsolutePath(), allSolutions.getSolutionsFound(), allSolutions.getSolutionsFoundMax());
 		/** Add current solutions to list of all solutions. */
-		return allSolutions.addAll(currSolutions);
+		return allSolutions.addSolutions(currSolutions);
 	}
 	
 	
@@ -215,9 +216,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	 * @param solutionsFoundMax
 	 * @return List of {@link SAT_solution SAT_solutions}. Possibly empty list.
 	 */
-	public static List<SAT_solution> runMiniSAT(String dimacsFilePath, AtomMapping mappings, AllModules allModules,
-			AllTypes allTypes, int solutionsFound, int solutionsFoundMax, int solutionLength) {
-		List<SAT_solution> solutions = new ArrayList<SAT_solution>();
+	public List<SolutionWorkflow> runMiniSAT(String dimacsFilePath, int solutionsFound, int solutionsFoundMax) {
+		List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
 		ISolver solver = SolverFactory.newDefault();
 		int timeout = 3600;
 		// ISolver solver = new ModelIterator(SolverFactory.newDefault(),
@@ -231,8 +231,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 			IProblem problem = reader.parseInstance(dimacsFilePath); // loading CNF encoding of the problem
 			realStartTime = System.currentTimeMillis();
 			while (solutionsFound < solutionsFoundMax && problem.isSatisfiable()) {
-				SAT_solution sat_solution = new SAT_solution(problem.model(), mappings, allModules, allTypes,
-						solutionLength);
+				SolutionWorkflow sat_solution = new SolutionWorkflow(problem.model(), this);
 				solutions.add(sat_solution);
 				solutionsFound++;
 				if (solutionsFound % 500 == 0) {
@@ -260,6 +259,9 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		if (solutionsFound == 0 || solutionsFound % 500 != 0) {
@@ -270,5 +272,42 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 
 		return solutions;
 	}
+	public AllModules getAllModules() {
+		return allModules;
+	}
+	public AllTypes getAllTypes() {
+		return allTypes;
+	}
+	public APEConfig getConfig() {
+		return config;
+	}
+	public AllModules getAnnotated_modules() {
+		return annotated_modules;
+	}
+	public AtomMapping getMappings() {
+		return mappings;
+	}
+	public ConstraintFactory getAllConsTemplates() {
+		return allConsTemplates;
+	}
+	public All_SAT_solutions getAllSolutions() {
+		return allSolutions;
+	}
+	public ModuleAutomaton getModuleAutomaton() {
+		return moduleAutomaton;
+	}
+	public TypeAutomaton getTypeAutomaton() {
+		return typeAutomaton;
+	}
+
+	/** 
+	 * Get size of the solution that is being synthesized.
+	 * @return Length of the solution.
+	 */
+	public int getSolutionSize() {
+		return moduleAutomaton.size();
+	}
+	
+	
 
 }

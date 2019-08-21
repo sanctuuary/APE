@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.dom4j.Node;
 
+import nl.uu.cs.ape.sat.models.enums.NodeType;
+import nl.uu.cs.ape.sat.utils.APEConfig;
+
 /**
  * The {@code Module} class represents concrete modules/tools that can be used
  * in our program. It must be annotated using the proper Input/Output pair
@@ -159,6 +162,7 @@ public class Module extends AbstractModule {
 		/** Determines whether the superModule is the root or an abstract tool. */
 		boolean superModuleIsRoot;
 		String moduleName = xmlModule.valueOf("@name");
+		String moduleID = moduleName;
 
 		/* If the superModule exists in the taxonomy */
 		if (superModuleExists) {
@@ -166,8 +170,9 @@ public class Module extends AbstractModule {
 			 * and the module name was not uniquely specified. The name is defined based on
 			 * the "operation" specified
 			 */
-			if (moduleName == null || moduleName.matches("") || superModuleID.matches(moduleName)) {
-				moduleName = superModuleID + "_ID:" + (id++);
+			if (moduleID == null || moduleID.matches("") || superModuleID.matches(moduleID)) {
+				moduleID = superModuleID + "_ID:" + (id++);
+				moduleName = superModuleID;
 			}
 			superModuleIsRoot = false;
 		} /* If the superModule does not exist in the taxonomy */
@@ -176,7 +181,7 @@ public class Module extends AbstractModule {
 			 * but is distinguished from the tool implementation. The superModule should be
 			 * created.
 			 */
-			if (!superModuleID.matches(moduleName)) {
+			if (!superModuleID.matches(moduleID)) {
 				superModuleIsRoot = false;
 			}
 			/**
@@ -184,14 +189,15 @@ public class Module extends AbstractModule {
 			 * not be created, and the root is considered to be the superModule.
 			 */
 			else {
+				moduleID = superModuleID;
 				moduleName = superModuleID;
 				superModuleIsRoot = true;
 			}
 		}
-		if (moduleName == null || moduleName.matches("") || (superModuleExists && superModuleID.matches(moduleName))) {
-			moduleName = superModuleID + "_ID:" + (id++);
+		if (moduleID == null || moduleID.matches("") || (superModuleExists && superModuleID.matches(moduleID))) {
+			moduleID = superModuleID + "_ID:" + (id++);
+			moduleName = superModuleID;
 		}
-		String moduleID = moduleName;
 		String executionCode = xmlModule.selectSingleNode("implementation").selectSingleNode("code").getText();
 
 //		BIO tools 
@@ -216,7 +222,7 @@ public class Module extends AbstractModule {
 							allTypes.getRootType());
 					if (tmpType != null) {
 						input.addType(tmpType);
-						allTypes.addAnnotatedType(tmpType.getTypeID());
+						allTypes.addAnnotatedType(tmpType.getPredicateID());
 					}
 				}
 				inputs.add(input);
@@ -236,7 +242,7 @@ public class Module extends AbstractModule {
 							allTypes.getRootType());
 					if (tmpType != null) {
 						output.addType(tmpType);
-						allTypes.addAnnotatedType(tmpType.getTypeID());
+						allTypes.addAnnotatedType(tmpType.getPredicateID());
 					}
 				}
 				outputs.add(output);
@@ -304,14 +310,14 @@ public class Module extends AbstractModule {
 		for (Types types : moduleInput) {
 			inputs += "{";
 			for (Type type : types.getTypes()) {
-				inputs += type.getTypeName() + "_";
+				inputs += type.getPredicateLabel() + "_";
 			}
 			inputs += "}";
 		}
 		for (Types types : moduleOutput) {
 			outputs += "{";
 			for (Type type : types.getTypes()) {
-				outputs += type.getTypeName() + "_";
+				outputs += type.getPredicateLabel() + "_";
 			}
 			outputs += "}";
 		}

@@ -1,8 +1,6 @@
-package nl.uu.cs.ape.sat;
+package nl.uu.cs.ape.sat.core;
 
 import java.io.IOException;
-
-import nl.uu.cs.ape.sat.models.All_solutions;
 
 /**
  * The {@code SynthesisEngine} interface is used as a template in order to implement different synthesis approaches over the given input.

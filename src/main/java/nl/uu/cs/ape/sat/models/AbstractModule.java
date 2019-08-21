@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 /**
  *  The {@code AbstractModule} class represents modules/tools provided by the Module Taxonomy as well as their abstraction classes.
  *  Instances of {@link AbstractModule} can be actual tools or their abstraction classes, 
@@ -15,8 +16,8 @@ import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
  */
 public class AbstractModule extends TaxonomyPredicate {
 
-	private String moduleName;
-	private String moduleID;
+	private final String moduleName;
+	private final String moduleID;
 	/**
 	 *  Set of all the modules that are subsumed by the abstract module (null if the module is a tool)
 	 */
@@ -53,8 +54,8 @@ public class AbstractModule extends TaxonomyPredicate {
 	 */
 	public AbstractModule(AbstractModule abstractModule, NodeType nodeType) {
 		super(abstractModule.getRootNode(), (nodeType != null) ? nodeType : abstractModule.getNodeType());
-		this.moduleName = abstractModule.getModuleName();
-		this.moduleID = abstractModule.getModuleID();
+		this.moduleName = abstractModule.getPredicateLabel();
+		this.moduleID = abstractModule.getPredicateID();
 		
 		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			this.subModules = abstractModule.getSubModules();
@@ -76,23 +77,17 @@ public class AbstractModule extends TaxonomyPredicate {
 		if (getClass() != obj.getClass())
 			return false;
 		AbstractModule other = (AbstractModule) obj;
-		return this.moduleID.equals(other.getModuleID());
+		return this.moduleID.equals(other.getPredicateID());
 	}
 
-	public String getModuleID() {
+	@Override
+	public String getPredicateID() {
 		return moduleID;
 	}
 
-	public void setModuleID(String moduleID) {
-		this.moduleID = moduleID;
-	}
-
-	public String getModuleName() {
+	@Override
+	public String getPredicateLabel() {
 		return moduleName;
-	}
-
-	public void setModuleName(String moduleName) {
-		this.moduleName = moduleName;
 	}
 
 	/**
@@ -147,7 +142,7 @@ public class AbstractModule extends TaxonomyPredicate {
 	 */
 	public String print() {
 
-		return getModuleID() + ", " + getModuleName();
+		return getPredicateID() + ", " + getPredicateLabel();
 	}
 
 	/**
@@ -156,11 +151,6 @@ public class AbstractModule extends TaxonomyPredicate {
 	 * @return module ID as a {@link String}
 	 */
 	public String printShort() {
-		return moduleID;
-	}
-
-	@Override
-	public String getPredicate() {
 		return moduleID;
 	}
 
@@ -179,7 +169,7 @@ public class AbstractModule extends TaxonomyPredicate {
 	 */
 	public boolean addSubModule(AbstractModule module) {
 		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
-			subModules.add(module.getModuleID());
+			subModules.add(module.getPredicateID());
 			return true;
 		} else {
 			System.err.println("Cannot add submodules to a tool/leaf or empty module!");

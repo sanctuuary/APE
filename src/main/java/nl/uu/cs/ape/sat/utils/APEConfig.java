@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.models;
+package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,7 +11,9 @@ import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
-import nl.uu.cs.ape.sat.StaticFunctions;
+import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.Types;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 
 /**
  * The {@code APEConfig} (singleton) class is used to define the configuration
@@ -94,11 +96,17 @@ public class APEConfig {
 	/** Input branching factor (max number of inputs per tool). */
 	private Integer max_no_tool_inputs = 3;
 	
-	/** Input and output types of the workflow. */
+	/** Input types of the workflow. */
 	private List<Types> program_inputs;
+	/** Output types of the workflow. */
 	private List<Types> program_outputs;
 	
-	private Boolean use_workflow_input, use_all_generated_data,debug_mode;
+	/** {@code true} if all the workflow inputs have to be used, otherwise usage of one is sufficient. */
+	private Boolean use_workflow_input;
+	/** {@code true} if all the generated data has to be used, otherwise usage of one of the outputs per tool is sufficient. */
+	private Boolean use_all_generated_data;
+	/** {@code true} if debug mode is turned on. */
+	private Boolean debug_mode;
 	
 	/** Configurations used to read/update the "ape.configuration" file. */
 	private Document document;
@@ -191,6 +199,8 @@ public class APEConfig {
 		this.solution_min_length = isValidConfigInt(SOLUTION_MIN_LENGTH_TAG,tempMinLength);
 		if (this.solution_min_length == null) {
 			return false;
+		} else if(this.solution_min_length < 1) {
+			this.solution_min_length = 1;
 		}
 		
 		String tempMaxLength = (configNode.selectSingleNode(SOLUTION_MAX_LENGTH_TAG) != null) ? configNode.selectSingleNode(SOLUTION_MAX_LENGTH_TAG).valueOf("@value") : null;
@@ -224,11 +234,11 @@ public class APEConfig {
 		List<Node> xmlModuleInput = configNode.selectNodes(PROGRAM_INPUTS_TAG);
 		program_inputs = new ArrayList<Types>();
 
-		for (Node xmlInput : StaticFunctions.safe(xmlModuleInput)) {
+		for (Node xmlInput : APEUtils.safe(xmlModuleInput)) {
 			if (xmlInput.hasContent()) {
 				Types input = new Types();
 				for (Node xmlType : xmlInput.selectNodes("*")) {
-					input.addType(new Type(xmlType.getText(), xmlType.getText(), APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
+					input.addType(new Type(xmlType.getText(), xmlType.getText(), data_taxonomy_root, NodeType.UNKNOWN));
 				}
 				program_inputs.add(input);
 			}
@@ -237,11 +247,11 @@ public class APEConfig {
 		List<Node> xmlModuleOutput = configNode.selectNodes(PROGRAM_OUTPUTS_TAG);
 		program_outputs = new ArrayList<Types>();
 
-		for (Node xmlOutput : StaticFunctions.safe(xmlModuleOutput)) {
+		for (Node xmlOutput : APEUtils.safe(xmlModuleOutput)) {
 			if (xmlOutput.hasContent()) {
 				Types output = new Types();
 				for (Node xmlType : xmlOutput.selectNodes("*")) {
-					output.addType(new Type(xmlType.getText(), xmlType.getText(), APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
+					output.addType(new Type(xmlType.getText(), xmlType.getText(), data_taxonomy_root, NodeType.UNKNOWN));
 				}
 				program_outputs.add(output);
 			}
@@ -273,184 +283,167 @@ public class APEConfig {
 	}
 
 	
+	
+
+	/**
+	 * @return the {@link #configAPE}
+	 */
+	public static APEConfig getConfigura() {
+		return configAPE;
+	}
+
+	/**
+	 *@return the {@link #ontology_path}
+	 */
 	public String getOntology_path() {
 		return ontology_path;
 	}
 
-	public void setOntology_path(String ontology_path) {
-		this.ontology_path = ontology_path;
-	}
-
+	/**
+	 *@return the {@link #tool_taxonomy_root}
+	 */
 	public String getTool_taxonomy_root() {
 		return tool_taxonomy_root;
 	}
 
-	public void setTool_taxonomy_root(String tool_taxonomy_root) {
-		this.tool_taxonomy_root = tool_taxonomy_root;
-	}
-
+	/**
+	 *@return the {@link #data_taxonomy_root}
+	 */
 	public String getData_taxonomy_root() {
 		return data_taxonomy_root;
 	}
 
-	public void setData_taxonomy_root(String type_taxonomy_root) {
-		this.data_taxonomy_root = type_taxonomy_root;
-	}
-
-	public List<String> getData_Taxonomy_SubRoots() {
+	/**
+	 *@return the {@link #data_taxonomy_subroots}
+	 */
+	public List<String> getData_taxonomy_subroots() {
 		return data_taxonomy_subroots;
 	}
 
-	public void setData_Taxonomy_SubRoots(List<String> type_sub_roots) {
-		this.data_taxonomy_subroots = type_sub_roots;
-	}
-
+	/**
+	 *@return the {@link #tool_annotations_path}
+	 */
 	public String getTool_annotations_path() {
 		return tool_annotations_path;
 	}
 
-	public void setTool_annotations_path(String tool_annotations_path) {
-		this.tool_annotations_path = tool_annotations_path;
-	}
-
+	/**
+	 *@return the {@link #constraints_path}
+	 */
 	public String getConstraints_path() {
 		return constraints_path;
 	}
 
-	public void setConstraints_path(String constraints_path) {
-		this.constraints_path = constraints_path;
-	}
-
+	/**
+	 *@return the {@link #shared_memory}
+	 */
 	public Boolean getShared_memory() {
 		return shared_memory;
 	}
 
-	public void setShared_memory(Boolean shared_memory) {
-		this.shared_memory = shared_memory;
-	}
-
+	/**
+	 *@return the {@link #solution_path}
+	 */
 	public String getSolution_path() {
 		return solution_path;
 	}
 
-	public void setSolution_path(String solution_path) {
-		this.solution_path = solution_path;
-	}
-
+	/**
+	 *@return the {@link #solution_min_length}
+	 */
 	public Integer getSolution_min_length() {
 		return solution_min_length;
 	}
 
-	public void setSolution_min_length(Integer solution_min_length) {
-		this.solution_min_length = solution_min_length;
-	}
-
+	/**
+	 *@return the {@link #solution_max_length}
+	 */
 	public Integer getSolution_max_length() {
 		return solution_max_length;
 	}
 
-	public void setSolution_max_length(Integer solution_max_length) {
-		this.solution_max_length = solution_max_length;
-	}
-
+	/**
+	 *@return the {@link #max_no_solutions}
+	 */
 	public Integer getMax_no_solutions() {
 		return max_no_solutions;
 	}
 
-	public void setMax_no_solutions(Integer max_no_solutions) {
-		this.max_no_solutions = max_no_solutions;
-	}
-
+	/**
+	 *@return the {@link #execution_scripts_folder}
+	 */
 	public String getExecution_scripts_folder() {
 		return execution_scripts_folder;
 	}
 
-	public void setExecution_scripts_folder(String execution_scripts_folder) {
-		this.execution_scripts_folder = execution_scripts_folder;
-	}
-
+	/**
+	 *@return the {@link #no_executions}
+	 */
 	public Integer getNo_executions() {
 		return no_executions;
 	}
 
-	public void setNo_executions(Integer no_executions) {
-		this.no_executions = no_executions;
-	}
-
+	/**
+	 *@return the {@link #max_no_tool_outputs}
+	 */
 	public Integer getMax_no_tool_outputs() {
 		return max_no_tool_outputs;
 	}
 
-	public void setMax_no_tool_outputs(Integer max_no_tool_outputs) {
-		this.max_no_tool_outputs = max_no_tool_outputs;
-	}
-	
+	/**
+	 *@return the {@link #max_no_tool_inputs}
+	 */
 	public Integer getMax_no_tool_inputs() {
 		return max_no_tool_inputs;
 	}
 
-	public void setMax_no_tool_oinputs(Integer max_no_tool_inputs) {
-		this.max_no_tool_inputs = max_no_tool_inputs;
-	}
-
-	public Document getDocument() {
-		return document;
-	}
-
-	public void setDocument(Document document) {
-		this.document = document;
-	}
-
-	public Node getConfigNode() {
-		return configNode;
-	}
-
-	public void setConfigNode(Node configNode) {
-		this.configNode = configNode;
-	}
-
-	public static APEConfig getConfigape() {
-		return configAPE;
-	}
-
+	/**
+	 *@return the {@link #program_inputs}
+	 */
 	public List<Types> getProgram_inputs() {
 		return program_inputs;
 	}
 
-	public void setProgram_inputs(List<Types> program_inputs) {
-		this.program_inputs = program_inputs;
-	}
-	
+	/**
+	 *@return the {@link #program_outputs}
+	 */
 	public List<Types> getProgram_outputs() {
 		return program_outputs;
 	}
 
-	public void setProgram_outputs(List<Types> program_outputs) {
-		this.program_outputs = program_outputs;
-	}
-	
+	/**
+	 *@return the {@link #use_workflow_input}
+	 */
 	public Boolean getUse_workflow_input() {
 		return use_workflow_input;
 	}
 
-	public void setUse_workflow_input(Boolean use_workflow_input) {
-		this.use_workflow_input = use_workflow_input;
-	}
-
+	/**
+	 *@return the {@link #use_all_generated_data}
+	 */
 	public Boolean getUse_all_generated_data() {
 		return use_all_generated_data;
 	}
 
-	public void setUse_all_generated_data(Boolean use_all_generated_data) {
-		this.use_all_generated_data = use_all_generated_data;
-	}
-
+	/**
+	 *@return the {@link #debug_mode}
+	 */
 	public Boolean getDebug_mode() {
 		return debug_mode;
 	}
 
-	public void setDebug_mode(Boolean debug_mode) {
-		this.debug_mode = debug_mode;
+	/**
+	 *@return the {@link #document}
+	 */
+	public Document getDocument() {
+		return document;
+	}
+
+	/**
+	 *@return the {@link #configNode}
+	 */
+	public Node getConfigNode() {
+		return configNode;
 	}
 
 	/**

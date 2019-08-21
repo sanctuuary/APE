@@ -1,9 +1,10 @@
 package nl.uu.cs.ape.sat.automaton;
 
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /***
- * Class is used to represent the states in module and type automatons.
+ * Class is used to represent the states in module and type automatons. Automaton corresponds to the structure of the possible solutions of the synthesis, i.e. it represents the structure that the provided solutions will follow.
  * <br><br>
  * Labeling of the automaton is provided in /APE/res/WorkflowAutomaton_Implementation.png
  * 
@@ -14,9 +15,10 @@ public class State implements Predicate {
 	
 
 
-	private String stateName;
-	private int stateNumber;
-	private int absoluteStateNumber;
+	private final String stateName;
+	private final int stateNumber;
+	private final int absoluteStateNumber;
+	private final WorkflowElement workflowStateType;
 	
 	/**
 	 * Creates a state that corresponds to a state of the overall solution workflow.
@@ -30,12 +32,13 @@ public class State implements Predicate {
 		this.stateName = WorkflowElement.getStringShorcut(workflowStateType, blockNumber, stateNumber);
 		this.stateNumber = stateNumber;
 		this.absoluteStateNumber = calculateAbsStateNumber(blockNumber, stateNumber, input_branching, workflowStateType);
+		this.workflowStateType = workflowStateType;
 	}
 
 
 	@Override
 	public int hashCode() {
-		return stateName.hashCode();
+		return stateName.hashCode() + absoluteStateNumber;
 	}
 
 
@@ -48,7 +51,7 @@ public class State implements Predicate {
 		if (getClass() != obj.getClass())
 			return false;
 		State other = (State) obj;
-		return this.stateName.equals(other.getStateName());
+		return this.stateName.equals(other.getPredicateID()) && (absoluteStateNumber == other.absoluteStateNumber);
 	}
 
 
@@ -56,11 +59,7 @@ public class State implements Predicate {
 	 * Returns the text representing the state (e.g. M04 or T02.31)
 	 * @return String representation of the state.
 	 */
-	public String getStateName() {
-		return stateName;
-	}
-	
-	public String getPredicate() {
+	public String getPredicateID() {
 		return stateName;
 	}
 
@@ -74,14 +73,22 @@ public class State implements Predicate {
 
 	/**
 	 * Returns the absolute order number of the state within the whole workflow. Unlike {@link getStateNumber}, this function returns number that can be used to compare ordering of any 2 states in the system,
-	 * disregarding the block or their type (data type, tool, etc.).
-	 * @return Absolute order number of the state.
+	 * disregarding the block or their type (data type, tool, etc.). {@code NULL} state has AbsoluteStateNumber -1.
+	 * @return Non-negative number that corresponds to the absolute order number of the state or -1 for {@code NULL} state.
 	 */
 	public int getAbsoluteStateNumber() {
 		return absoluteStateNumber;
 	}
 	
-	
+	/**
+	 * Get the type of the state (e.g. tool, memory type, etc.)
+	 * @return {@link WorkflowElement} that describes the state.
+	 */
+	public WorkflowElement getWorkflowStateType() {
+		return workflowStateType;
+	}
+
+
 	/**
 	 * Function used to calculate the absolute order number of a state based on the information regarding its block number, order number within the block and type of the state.
 	 * @param blockNumber - corresponds to the block number within the type automaton (not applicable for the module automaton)
@@ -93,7 +100,7 @@ public class State implements Predicate {
 	 * <br>MODULE corresponds to the Module/Tool State
 	 * @return The calculated absolute order number of the state.
 	 */
-	private  int calculateAbsStateNumber(Integer blockNumber, int stateNumber, int input_branching, WorkflowElement typeOfTheState) {
+	private static int calculateAbsStateNumber(Integer blockNumber, int stateNumber, int input_branching, WorkflowElement typeOfTheState) {
 		int absOrderNumber = -1;
 		
 		if (typeOfTheState == WorkflowElement.MEMORY_TYPE) {		/* Case: Memory Type State */

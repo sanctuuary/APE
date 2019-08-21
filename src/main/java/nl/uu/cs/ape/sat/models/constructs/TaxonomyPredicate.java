@@ -1,6 +1,6 @@
 package nl.uu.cs.ape.sat.models.constructs;
 
-import nl.uu.cs.ape.sat.models.NodeType;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 
 /**
  * The {@code Predicate} class (interface) represents a single predicate/label used to depict a module or a data type/format. <br> <br>
@@ -93,10 +93,16 @@ public abstract class TaxonomyPredicate implements Predicate {
 	}
 	
 	/**
-	 * Function is used to return the predicate defined as String.
-	 * @return String representation of the predicate.
+	 * Function is used to return the predicate identifier defined as String.
+	 * @return String representation of the predicate, used to uniquely identify the predicate.
 	 */
-	public abstract String getPredicate();
+	public abstract String getPredicateID();
+	
+	/**
+	 * Function is used to return the label that describes the predicate.
+	 * @return String representation of the predicate label, used for presentation in case when the predicate id is too complex/long.
+	 */
+	public abstract String getPredicateLabel();
 	
 	/**
 	 * The function is used to determine the type of the predicate [<b>type</b>,<b>module</b> or <b>abstract module</b>].
