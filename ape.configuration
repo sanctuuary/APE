@@ -11,7 +11,7 @@
 	<solutions_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/sat_solutions.txt"/>
 	<solution_min_length value="1"/>
 	<solution_max_length value="8"/>
-	<max_solutions value="100"/>
+	<max_solutions value="10"/>
 	<execution_scripts_folder value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/Implementations"/>
 	<number_of_execution_scripts value="5"/>
 	<inputs>
