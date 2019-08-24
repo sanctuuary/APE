@@ -1,8 +1,14 @@
 package nl.uu.cs.ape.sat.core.solutionStructure;
 
+import static guru.nidi.graphviz.model.Factory.node;
+
 import java.util.HashSet;
 import java.util.Set;
 
+import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.attribute.Label;
+import guru.nidi.graphviz.attribute.Shape;
+import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
@@ -149,7 +155,11 @@ public class TypeNode extends SolutionWorkflowNode {
 	}
 	
 	public String getDotDefinition() {
-		return getDotID() + " [label=\"" + getDotLabel() + "\", color=blue];";
+		return getDotID() + " [label=\"" + getDotLabel() + "\", color=blue];\n";
+	}
+	
+	public Graph addTypeToGraph(Graph workflowGraph) {
+		return workflowGraph = workflowGraph.with(node(getDotID()).with(Label.of(getDotLabel()), Color.BLUE));
 	}
 	
 	public String getDotLabel() {

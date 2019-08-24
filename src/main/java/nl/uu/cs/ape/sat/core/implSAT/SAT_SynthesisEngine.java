@@ -195,7 +195,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	 */
 	public boolean synthesisExecution() {
 		
-		List<SolutionWorkflow> currSolutions = runMiniSAT(temp_sat_input.getAbsolutePath(), allSolutions.getSolutionsFound(), allSolutions.getSolutionsFoundMax());
+		List<SolutionWorkflow> currSolutions = runMiniSAT(temp_sat_input.getAbsolutePath(), allSolutions.getNumberOfSolutions(), allSolutions.getMaxNumberOfSolutions());
 		/** Add current solutions to list of all solutions. */
 		return allSolutions.addSolutions(currSolutions);
 	}

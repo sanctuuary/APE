@@ -21,7 +21,10 @@ public class All_SAT_solutions {
 	private int solutionsFoundMax;
 	private AtomMapping mappings;
 
-	
+	/**
+	 * Create an object that will contain all the solutions of the synthesis.
+	 * @param config - setup configuration for the synthesis.
+	 */
 	public All_SAT_solutions(APEConfig config) {
 		solutionWorkflow = new ArrayList<SolutionWorkflow>();
 		
@@ -36,21 +39,34 @@ public class All_SAT_solutions {
 		}
 	}
 
-
+	/**
+	 * Get all the solutions that are currently found.
+	 * @return List of {@link SolutionWorkflow solution} objects
+	 */
 	public List<SolutionWorkflow> getSolutions() {
 		return solutionWorkflow;
 	}
 
-	public int getSolutionsFound() {
+	/** 
+	 * Get the number of solutions that are currently found.
+	 * @return Number of solutions in the solutions set.
+	 */
+	public int getNumberOfSolutions() {
 		return solutionWorkflow.size();
 	}
 
-
-	public int getSolutionsFoundMax() {
+	/**
+	 * Get max number of solutions that should be found. This number is defined in the ape.config file.
+	 * @return Max number of solutions that should be found.
+	 */
+	public int getMaxNumberOfSolutions() {
 		return solutionsFoundMax;
 	}
 
-
+	/**
+	 * Get object that contains mappings of all the atoms.
+	 * @return {@link AtomMapping} object.
+	 */
 	public AtomMapping getMappings() {
 		return mappings;
 	}

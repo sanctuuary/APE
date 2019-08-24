@@ -273,12 +273,13 @@ public class APEUtils {
 	}
 
 	/**
-	 * Print header to specify the current workflow length that is being explored
+	 * Print header to illustrate the part of the synthesis that is being performed.
 	 */
-	public static void printHeader(int solutionLength) {
-
+	public static void printHeader(String title, Integer argument) {
+		String arg = (argument == null) ? "" : (" " + argument);
+		
 		System.out.println("\n-------------------------------------------------------------");
-		System.out.println("\tWorkflow discovery - length " + solutionLength);
+		System.out.println("\t" + title + arg);
 		System.out.println("-------------------------------------------------------------");
 	}
 
@@ -365,12 +366,21 @@ public class APEUtils {
 		timers.put(timerID, System.currentTimeMillis());
 	}
 
-	public static void timerPrint(String timerID, int solutionsFound) {
+	public static void timerPrintSolutions(String timerID, int solutionsFound) {
 		if(timers.get(timerID) == -1) {
 			return;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
 		System.out.println("\nAPE found " + solutionsFound + " solutions. Total solving time: "
+				+ (printTime / 1000F) + " sec.");
+	}
+	
+	public static void timerPrintText(String timerID, String text) {
+		if(timers.get(timerID) == -1) {
+			return;
+		}
+		long printTime = System.currentTimeMillis() - timers.get(timerID);
+		System.out.println("\n" + text + " Running time: "
 				+ (printTime / 1000F) + " sec.");
 	}
 
