@@ -192,7 +192,7 @@ public class APEUtils {
 	}
 
 	/**
-	 * Get List of nodes that correpond to the elements of the structured XML file.
+	 * Get List of nodes that correspond to the elements of the structured XML file.
 	 * @param xmlPath - path to the XML file
 	 * @param rootXMLpath - root structure of the elements within the path.
 	 * @return List of {@link Node} elements of the XML.

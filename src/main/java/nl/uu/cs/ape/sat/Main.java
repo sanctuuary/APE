@@ -1,7 +1,5 @@
 package nl.uu.cs.ape.sat;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,13 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
-import org.apache.commons.io.FileUtils;
-
-import guru.nidi.graphviz.attribute.Color;
-import guru.nidi.graphviz.attribute.RankDir;
-import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.Graph;
@@ -31,7 +22,6 @@ import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import nl.uu.cs.ape.sat.utils.OWLReader;
-import static guru.nidi.graphviz.model.Factory.*;
 
 public class Main {
 

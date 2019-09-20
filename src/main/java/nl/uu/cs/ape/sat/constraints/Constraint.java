@@ -88,7 +88,16 @@ public abstract class Constraint {
 	 * @return String representing the description.
 	 */
 	public String printConstraintCode() {
-		return constraintID + ";\t" + parametersNo + ";\t" + description + "\n";
+		String constraint = "	<constraint>\n" + 
+				"		<constraintid>" + constraintID + "</constraintid>\n" + 
+				"		<parameters>\n" + 
+				"			<parameter>parameters[0]</parameter>\n"; 
+		if(parametersNo > 1)
+			constraint += "			<parameter>parameters[1]</parameter>\n";
+		constraint += 		"		</parameters>\n" + 
+				"	</constraint>\n";
+		constraint += "Description: " + description + "\n";
+		return constraint;
 	}
 
 	/**

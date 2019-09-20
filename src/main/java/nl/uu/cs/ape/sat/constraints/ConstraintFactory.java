@@ -56,7 +56,7 @@ public class ConstraintFactory {
 	 * @return String representing the description.
 	 */
 	public String printConstraintsCodes() {
-		String templates = "Constraint ID;\tNo. of parameters;\tDescription\n";
+		String templates = "";
 		for(Constraint currConstr : constraintTamplates.values()) {
 			templates += currConstr.printConstraintCode();
 		}
