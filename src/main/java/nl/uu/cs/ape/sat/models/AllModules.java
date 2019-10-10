@@ -16,6 +16,7 @@ import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
@@ -400,6 +401,7 @@ public class AllModules {
 	}
 
 	/**
+	 * TODO: TEST THE METHOD!!
 	 * Function returns the encoding that ensures that each time a memory type is
 	 * referenced by a tool's input type, it has to be of right type. <br>
 	 * Function is implementing the Message Passing Approach.
@@ -421,25 +423,29 @@ public class AllModules {
 		
 		StringBuilder constraints = new StringBuilder();
 		String usageOfAllTypes = " ", usageOfAllWorkflowInputType = " ";
-		String notUsageOfAllTypes = " 0\n", notUsageOfAllWorkflowInputType = " 0\n";
-		if (synthesisInstance.getConfig().getUse_workflow_input()) {
-			usageOfAllTypes = " 0\n";
-			notUsageOfAllTypes = " ";
-		}
-		if (synthesisInstance.getConfig().getUse_all_generated_data()) {
+		String usageOfOneType = " 0\n", usageOfWorkflowInputType = " 0\n";
+		if (synthesisInstance.getConfig().getUse_workflow_input() == ConfigEnum.ALL) {
 			usageOfAllWorkflowInputType = " 0\n";
-			notUsageOfAllWorkflowInputType = " ";
+			usageOfWorkflowInputType = " ";
+		}
+		if (synthesisInstance.getConfig().getUse_all_generated_data()  == ConfigEnum.ALL) {
+			
+			usageOfAllTypes = " 0\n";
+			usageOfOneType = " ";
 		}
 		/*
 		 * Setting up the constraints that ensure usage of the generated types in the
-		 * memory, i.e. all workflow inputs and at least one of each of the tool outputs
-		 * needs to be used in the program, unless they are empty.
+		 * memory. (e.g.  all workflow inputs and at least one of each of the tool outputs
+		 * needs to be used in the program, unless they are empty).
 		 */
 		for (Block currBlock : synthesisInstance.getTypeAutomaton().getMemoryTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
 			for (State currMemoryState : currBlock.getStates()) {
 				/* If the memory is provided as input */
 				if (blockNumber == 0) {
+					if(synthesisInstance.getConfig().getUse_workflow_input()  == ConfigEnum.NONE) {
+						continue;
+					}
 					constraints = constraints
 							.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE)).append(" ");
 					for (State inputState : synthesisInstance.getTypeAutomaton().getUsedTypesBlock(blockNumber).getStates()) {
@@ -447,8 +453,11 @@ public class AllModules {
 								.append(mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
 								.append(usageOfAllWorkflowInputType);
 					}
-					constraints = constraints.append(notUsageOfAllWorkflowInputType);
+					constraints = constraints.append(usageOfWorkflowInputType);
 				} else {
+					if(synthesisInstance.getConfig().getUse_all_generated_data()  == ConfigEnum.NONE) {
+						break;
+					}
 					constraints = constraints
 							.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE)).append(" ");
 					for (State inputState : synthesisInstance.getTypeAutomaton().getUsedTypesBlock(blockNumber).getStates()) {
@@ -456,7 +465,7 @@ public class AllModules {
 								.append(mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
 								.append(usageOfAllTypes);
 					}
-					constraints = constraints.append(notUsageOfAllTypes);
+					constraints = constraints.append(usageOfOneType);
 				}
 			}
 		}
@@ -545,14 +554,15 @@ public class AllModules {
 		StringBuilder constraints = new StringBuilder();
 		/*
 		 * Setting up the constraints that ensure usage of the generated types in the
-		 * memory, i.e. all workflow inputs and at least one of each of the tool outputs
-		 * needs to be used in the program, unless they are empty.
+		 * memory, (e.g. all workflow inputs and at least one of each of the tool outputs
+		 * needs to be used in the program, unless they are empty.)
 		 */
 		for (Block currBlock : typeAutomaton.getMemoryTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
 			/* If the memory is provided as input */
 			if (blockNumber == 0) {
-				if (synthesisInstance.getConfig().getUse_workflow_input()) {
+				/* In case that all workflow inputs need to be used */
+				if (synthesisInstance.getConfig().getUse_workflow_input() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
 						constraints = constraints
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
@@ -564,7 +574,8 @@ public class AllModules {
 						}
 						constraints = constraints.append(" 0\n");
 					}
-				} else {
+					/* In case that at least one workflow input need to be used */
+				} else if (synthesisInstance.getConfig().getUse_workflow_input() == ConfigEnum.ONE) {
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getStateNumber() == 0) {
 							constraints = constraints
@@ -580,8 +591,10 @@ public class AllModules {
 					}
 					constraints = constraints.append(" 0\n");
 				}
+				/* In case that none of the workflow input has to be used, do nothing. */
 			} else {
-				if (synthesisInstance.getConfig().getUse_all_generated_data()) {
+				/* In case that all generated data need to be used. */
+				if (synthesisInstance.getConfig().getUse_all_generated_data() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
 						constraints = constraints
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
@@ -593,7 +606,8 @@ public class AllModules {
 						}
 						constraints = constraints.append(" 0\n");
 					}
-				} else {
+					/* In case that at least one of the generated data instances per tool need to be used. */
+				} else if (synthesisInstance.getConfig().getUse_all_generated_data() == ConfigEnum.ONE) {
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getStateNumber() == 0) {
 							constraints = constraints
@@ -608,6 +622,7 @@ public class AllModules {
 					}
 					constraints = constraints.append(" 0\n");
 				}
+				/* In case that none generated data has to be used do nothing. */
 
 			}
 		}

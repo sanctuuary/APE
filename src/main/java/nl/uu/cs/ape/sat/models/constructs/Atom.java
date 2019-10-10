@@ -45,7 +45,7 @@ public class Atom {
 	}
 	
     
-
+	/** @return Object {@link #predicate}. */
 	public Predicate getPredicate() {
 		return predicate;
 	}
@@ -69,7 +69,7 @@ public class Atom {
 		return this.predicate.equals(other.getPredicate()) && this.usedInStateArgument.equals(other.getUsedInStateArgument());
 	}
 	
-	
+	/** @return Object {@link #usedInStateArgument}. */
 	public State getUsedInStateArgument() {
 		return usedInStateArgument;
 	}

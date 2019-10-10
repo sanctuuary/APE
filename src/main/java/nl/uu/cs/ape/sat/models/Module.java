@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dom4j.Node;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
  * The {@code Module} class represents concrete modules/tools that can be used
@@ -147,12 +150,12 @@ public class Module extends AbstractModule {
 	static int id = 1;
 
 	/**
-	 * Creates a module from a row provided by the tool annotations CSV.
+	 * Creates a module from a tool annotation instance represented in XML.
 	 * 
-	 * @param stringModule
-	 * @param allModules
-	 * @param allTypes
-	 * @return
+	 * @param xmlModule - xml representation of a module
+	 * @param allModules - list of all the modules
+	 * @param allTypes - list of all the types
+	 * @return Module object.
 	 */
 	public static Module moduleFromXML(Node xmlModule, AllModules allModules, AllTypes allTypes) {
 
@@ -239,6 +242,187 @@ public class Module extends AbstractModule {
 					}
 					Type tmpType = Type.generateType(xmlType.getText(), xmlType.getText(),
 							APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN, allTypes,
+							allTypes.getRootType());
+					if (tmpType != null) {
+						output.addType(tmpType);
+						allTypes.addAnnotatedType(tmpType.getPredicateID());
+					}
+				}
+				outputs.add(output);
+			}
+		}
+
+		Module_Execution moduleExecutionImpl = null;
+		if (executionCode != null && !executionCode.matches("")) {
+			moduleExecutionImpl = new Module_Execution_Code(executionCode);
+		}
+
+		AbstractModule currSuperModule;
+
+		if (!superModuleExists) {
+			System.err.println("Annotated tool \"" + superModuleID
+					+ "\" does not exists in the Tool Taxonomy. It is added as a direct subclass of the root in the Tool Taxonomy.");
+		}
+		/*
+		 * In case of the tool is an instance of the abstract superModule, add it as a
+		 * sub module (enrich the ontology). Depending of the superModuleID.
+		 * currSuperModule is an AbstractModule or the Module Taxonomy root. In case
+		 * that the
+		 */
+		if (!superModuleIsRoot) {
+			AbstractModule superModule = AbstractModule.generateModule(superModuleID, superModuleID,
+					APEConfig.getConfig().getTool_taxonomy_root(), NodeType.ABSTRACT, allModules,
+					allModules.getRootModule());
+			/*
+			 * If the super module is represented as a tool, convert it to abstract module
+			 */
+			if (superModule instanceof Module) {
+				AbstractModule newSuperModule = new AbstractModule(superModule, NodeType.ABSTRACT);
+				allModules.swapAbstractModule2Module(newSuperModule, superModule);
+				currSuperModule = newSuperModule;
+			} else {
+				superModule.setNodeType(NodeType.ABSTRACT);
+				currSuperModule = superModule;
+			}
+		} else {
+			currSuperModule = allModules.getRootModule();
+		}
+
+		/*
+		 * Add the module and make it sub module of the currSuperModule (if it was not
+		 * previously defined)
+		 */
+		Module currModule = Module.generateModule(moduleName, moduleID, APEConfig.getConfig().getTool_taxonomy_root(),
+				allModules, currSuperModule, moduleExecutionImpl);
+		currModule.setModuleInput(inputs);
+		currModule.setModuleOutput(outputs);
+
+		return currModule;
+	}
+	
+	/**
+	 * Creates a module from a tool annotation instance from a Json file.
+	 * 
+	 * @param jsonModule - Json representation of a module
+	 * @param allModules - list of all the modules
+	 * @param allTypes - list of all the types
+	 * @return Module object.
+	 */
+	public static Module moduleFromJson(JSONObject jsonModule, AllModules allModules, AllTypes allTypes) throws JSONException {
+
+		String superModuleID = jsonModule.getString(APEConfig.getConstraintTags("id"));
+		/** Determines whether the superModule exists in the tool taxonomy */
+		boolean superModuleExists = allModules.get(superModuleID) != null;
+		/** Determines whether the superModule is the root or an abstract tool. */
+		boolean superModuleIsRoot;
+		String moduleName = jsonModule.getString(APEConfig.getConstraintTags("label"));
+		String moduleID = moduleName;
+
+		/* If the superModule exists in the taxonomy */
+		if (superModuleExists) {
+			/*
+			 * and the module name was not uniquely specified. The name is defined based on
+			 * the "operation" specified
+			 */
+			if (moduleID == null || moduleID.matches("") || superModuleID.matches(moduleID)) {
+				moduleID = superModuleID + "_ID:" + (id++);
+				moduleName = superModuleID;
+			}
+			superModuleIsRoot = false;
+		} /* If the superModule does not exist in the taxonomy */
+		else {
+			/**
+			 * but is distinguished from the tool implementation. The superModule should be
+			 * created.
+			 */
+			if (!superModuleID.matches(moduleID)) {
+				superModuleIsRoot = false;
+			}
+			/**
+			 * and is not distinguished from the tool implementation. The superModule should
+			 * not be created, and the root is considered to be the superModule.
+			 */
+			else {
+				moduleID = superModuleID;
+				moduleName = superModuleID;
+				superModuleIsRoot = true;
+			}
+		}
+		if (moduleID == null || moduleID.matches("") || (superModuleExists && superModuleID.matches(moduleID))) {
+			moduleID = superModuleID + "_ID:" + (id++);
+			moduleName = superModuleID;
+		}
+		String executionCode = null;
+		try {
+		executionCode = jsonModule.getJSONObject(APEConfig.getConstraintTags("implementation")).getString(APEConfig.getConstraintTags("code"));
+		} catch (JSONException e) { /* Skip the execution code */}
+//		BIO tools 
+//		String moduleName = xmlModule.selectSingleNode("displayName").getText();
+//		String moduleID = xmlModule.selectSingleNode("displayName").getText();
+		List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APEConfig.getConstraintTags("inputs"));
+		List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APEConfig.getConstraintTags("outputs"));
+
+		List<Types> inputs = new ArrayList<Types>();
+		List<Types> outputs = new ArrayList<Types>();
+
+		for (JSONObject jsonInput : jsonModuleInput) {
+			if (!jsonInput.isEmpty()) {
+				Types input = new Types();
+				
+				for (JSONObject jsonType : APEUtils.getListFromJson(jsonInput, APEConfig.getConstraintTags("type"))) {
+					if (allTypes.get(jsonType.toString()) == null) {
+						System.err.println("Data format \"" + jsonType.toString()
+								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
+					}
+					Type tmpType = Type.generateType(jsonType.toString(), jsonType.toString(),
+							APEConfig.getConfig().getData_taxonomy_type_subroot(), NodeType.UNKNOWN, allTypes,
+							allTypes.getRootType());
+					if (tmpType != null) {
+						input.addType(tmpType);
+						allTypes.addAnnotatedType(tmpType.getPredicateID());
+					}
+				}
+				for (JSONObject jsonType : APEUtils.getListFromJson(jsonInput, APEConfig.getConstraintTags("format"))) {
+					if (allTypes.get(jsonType.toString()) == null) {
+						System.err.println("Data format \"" + jsonType.toString()
+								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
+					}
+					Type tmpType = Type.generateType(jsonType.toString(), jsonType.toString(),
+							APEConfig.getConfig().getData_taxonomy_format_subroot(), NodeType.UNKNOWN, allTypes,
+							allTypes.getRootType());
+					if (tmpType != null) {
+						input.addType(tmpType);
+						allTypes.addAnnotatedType(tmpType.getPredicateID());
+					}
+				}
+				inputs.add(input);
+			}
+		}
+
+		for (JSONObject jsonOutput : jsonModuleInput) {
+			if (!jsonOutput.isEmpty()) {
+				Types output = new Types();
+				
+				for (JSONObject jsonType : APEUtils.getListFromJson(jsonOutput, APEConfig.getConstraintTags("type"))) {
+					if (allTypes.get(jsonType.toString()) == null) {
+						System.err.println("Data format \"" + jsonType.toString()
+								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
+					}
+					Type tmpType = Type.generateType(jsonType.toString(), jsonType.toString(),
+							APEConfig.getConfig().getData_taxonomy_type_subroot(), NodeType.UNKNOWN, allTypes,
+							allTypes.getRootType());
+					if (tmpType != null) {
+						output.addType(tmpType);
+						allTypes.addAnnotatedType(tmpType.getPredicateID());
+					}
+				}
+				for (JSONObject jsonType : APEUtils.getListFromJson(jsonOutput, APEConfig.getConstraintTags("format"))) {
+					if (allTypes.get(jsonType.toString()) == null) {
+						System.err.println("Data format \"" + jsonType.toString()
+								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
+					}
+					Type tmpType = Type.generateType(jsonType.toString(), jsonType.toString(),
+							APEConfig.getConfig().getData_taxonomy_format_subroot(), NodeType.UNKNOWN, allTypes,
 							allTypes.getRootType());
 					if (tmpType != null) {
 						output.addType(tmpType);

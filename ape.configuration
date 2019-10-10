@@ -1,33 +1,34 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<configuration>
-	<ontology_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/GISTaxonomy.rdf"/>
-	<toolsTaxonomyRoot value="Tool"/>
-	<dataTaxonomyRoot value="DType">
-		<typesTaxonomyRoot value="DType"/>
-	</dataTaxonomyRoot>
-	<tool_annotations_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/ToolDescription_ct.xml"/>
-	<constraints_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/constraints.xml"/>
-	<shared_memory value="true"/>
-	<solutions_path value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/sat_solutions.txt"/>
-	<solution_min_length value="1"/>
-	<solution_max_length value="8"/>
-	<max_solutions value="10"/>
-	<execution_scripts_folder value="/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/Implementations"/>
-	<number_of_execution_scripts value="5"/>
-	<inputs>
-		<input>
-			<type>ObjectPoint</type>			
-		</input>
-		<input>
-			<type>TessellationAVectorA</type>
-		</input>
-	</inputs>
-	<outputs>
-		<output>
-			<type>Lattice</type>
-		</output>
-	</outputs>
-	<debug_mode value="true"/>
-	<use_workflow_input value="true"/>
-	<use_all_generated_data value="false"/>
-</configuration>
+{
+  "ontology_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/GISTaxonomy.rdf",
+  "toolsTaxonomyRoot": "Tool",
+  "dataTaxonomyRoot": "DType",
+  "typesTaxonomyRoot": "DType",
+  "tool_annotations_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/ToolDescription_ct.xml",
+  "constraints_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/constraints.json",
+  "shared_memory": "true",
+  "solutions_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/sat_solutions.txt",
+  "solution_min_length": "1",
+  "solution_max_length": "8",
+  "max_solutions": "10",
+  "execution_scripts_folder": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/Implementations",
+  "number_of_execution_scripts": "5",
+  "inputs": [
+    {
+      "type": "ObjectPoint"
+    },
+    {
+      "type": "TessellationAVectorA"
+    }
+  ],
+  "outputs": [
+    {
+      "type": "Lattice"
+    },
+    {
+      "type": "FieldRasterRatioA"
+    }
+  ],
+  "debug_mode": "true",
+  "use_workflow_input": "ALL",
+  "use_all_generated_data": "ONE"
+}

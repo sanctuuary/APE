@@ -73,125 +73,125 @@ public class ConstraintFactory {
 	public boolean initializeConstraints() {
 
 		/*
-		 * ID: ite_m If we use module <b>parameters[0]</b>, then use module <b>parameters[1]</b>
+		 * ID: ite_m If we use module 'parameters[0]', then use module 'parameters[1]'
 		 * subsequently.
 		 */
 		Constraint currTemplate = new Constraint_if_then_module("ite_m", 2,
-				"If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> subsequently.");
+				"If we use module 'parameters[0]', then use 'parameters[1]' subsequently.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: itn_m If we use module <b>parameters[0]</b>, then do not use module
-		 * <b>parameters[1]</b> subsequently.
+		 * ID: itn_m If we use module 'parameters[0]', then do not use module
+		 * 'parameters[1]' subsequently.
 		 */
 		currTemplate = new Constraint_if_then_not_module("itn_m", 2,
-				"If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b> subsequently.");
+				"If we use module 'parameters[0]', then do not use 'parameters[1]' subsequently.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: depend_m If we use module <b>parameters[0]</b>, then we must have used module
-		 * <b>parameters[1]</b> prior to it.
+		 * ID: depend_m If we use module 'parameters[0]', then we must have used module
+		 * 'parameters[1]' prior to it.
 		 */
 		currTemplate = new Constraint_depend_module("depend_m", 2,
-				"If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it.");
+				"If we use module 'parameters[0]', then we must have used 'parameters[1]' prior to it.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: next_m If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as
+		 * ID: next_m If we use module 'parameters[0]', then use 'parameters[1]' as
 		 * a next module in the sequence.
 		 */
 		currTemplate = new Constraint_next_module("next_m", 2,
-				"If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a next module in the sequence.");
+				"If we use module 'parameters[0]', then use 'parameters[1]' as a next module in the sequence.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: prev_m If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> as
+		 * ID: prev_m If we use module 'parameters[0]', then we must have used 'parameters[1]' as
 		 * a previous module in the sequence.
 		 */
 		currTemplate = new Constraint_prev_module("prev_m", 2,
-				"If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> as a previous module in the sequence.");
+				"If we use module 'parameters[0]', then we must have used 'parameters[1]' as a previous module in the sequence.");
 		addConstraintTamplate(currTemplate);
 		
 		/*
-		 * ID: use_m Use module <b>parameters[0]</b> in the solution.
+		 * ID: use_m Use module 'parameters[0]' in the solution.
 		 */
-		currTemplate = new Constraint_use_module("use_m", 1, "Use module <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_use_module("use_m", 1, "Use module 'parameters[0]' in the solution.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: nuse_m Do not use module <b>parameters[0]</b> in the solution.
+		 * ID: nuse_m Do not use module 'parameters[0]' in the solution.
 		 */
-		currTemplate = new Constraint_not_use_module("nuse_m", 1, "Do not use module <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_not_use_module("nuse_m", 1, "Do not use module 'parameters[0]' in the solution.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: last_m Use <b>parameters[0]</b> as last module in the solution.
+		 * ID: last_m Use 'parameters[0]' as last module in the solution.
 		 */
-		currTemplate = new Constraint_last_module("last_m", 1, "Use <b>parameters[0]</b> as last module in the solution.");
+		currTemplate = new Constraint_last_module("last_m", 1, "Use 'parameters[0]' as last module in the solution.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: use_t Use type <b>parameters[0]</b> in the solution.
+		 * ID: use_t Use type 'parameters[0]' in the solution.
 		 */
-		currTemplate = new Constraint_use_type("use_t", 1, "Use type <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_use_type("use_t", 1, "Use type 'parameters[0]' in the solution.");
 		addConstraintTamplate(currTemplate);
 		
 		/*
-		 * ID: gen_t Generate type <b>parameters[0]</b> in the solution.
+		 * ID: gen_t Generate type 'parameters[0]' in the solution.
 		 */
-		currTemplate = new Constraint_gen_type("gen_t", 1, "Generate type <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_gen_type("gen_t", 1, "Generate type 'parameters[0]' in the solution.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: nuse_t Do not use type <b>parameters[0]</b> in the solution.
+		 * ID: nuse_t Do not use type 'parameters[0]' in the solution.
 		 */
-		currTemplate = new Constraint_not_use_type("nuse_t", 1, "Do not use type <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_not_use_type("nuse_t", 1, "Do not use type 'parameters[0]' in the solution.");
 		addConstraintTamplate(currTemplate);
 		
 		/*
-		 * ID: ngen_t Do not generate type <b>parameters[0]</b> in the solution.
+		 * ID: ngen_t Do not generate type 'parameters[0]' in the solution.
 		 */
-		currTemplate = new Constraint_not_gen_type("ngen_t", 1, "Do not generate type <b>parameters[0]</b> in the solution.");
+		currTemplate = new Constraint_not_gen_type("ngen_t", 1, "Do not generate type 'parameters[0]' in the solution.");
 		addConstraintTamplate(currTemplate);
 		
 		/*
-		 * ID: use_ite_t If we have used data type <b>parameters[0]</b>, then use type <b>parameters[1]</b>
+		 * ID: use_ite_t If we have used data type 'parameters[0]', then use type 'parameters[1]'
 		 * subsequently.
 		 */
 		currTemplate = new Constraint_if_use_then_type("use_ite_t", 2,
-				"If we have used data type <b>parameters[0]</b>, then use type <b>parameters[1]</b> subsequently.");
+				"If we have used data type 'parameters[0]', then use type 'parameters[1]' subsequently.");
 		addConstraintTamplate(currTemplate);
 		
 		/*
-		 * ID: gen_ite_t If we have data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b>
+		 * ID: gen_ite_t If we have data type 'parameters[0]', then generate type 'parameters[1]'
 		 * subsequently.
 		 */
 		currTemplate = new Constraint_if_gen_then_type("gen_ite_t", 2,
-				"If we have generated data type <b>parameters[0]</b>, then generate type <b>parameters[1]</b> subsequently.");
+				"If we have generated data type 'parameters[0]', then generate type 'parameters[1]' subsequently.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: use_itn_t If we have used data type <b>parameters[0]</b>, then do not use type
-		 * <b>parameters[1]</b> subsequently.
+		 * ID: use_itn_t If we have used data type 'parameters[0]', then do not use type
+		 * 'parameters[1]' subsequently.
 		 */
 		currTemplate = new Constraint_if_use_then_not_type("use_itn_t", 2,
-				"If we have used data type <b>parameters[0]</b>, then do not use type <b>parameters[1]</b> subsequently.");
+				"If we have used data type 'parameters[0]', then do not use type 'parameters[1]' subsequently.");
 		addConstraintTamplate(currTemplate);
 		
 		/*
-		 * ID: gen_itn_t If we have generated data type <b>parameters[0]</b>, then do not generate type
-		 * <b>parameters[1]</b> subsequently.
+		 * ID: gen_itn_t If we have generated data type 'parameters[0]', then do not generate type
+		 * 'parameters[1]' subsequently.
 		 */
 		currTemplate = new Constraint_if_gen_then_not_type("gen_itn_t", 2,
-				"If we have generated data type <b>parameters[0]</b>, then do not generate type <b>parameters[1]</b> subsequently.");
+				"If we have generated data type 'parameters[0]', then do not generate type 'parameters[1]' subsequently.");
 		addConstraintTamplate(currTemplate);
 
 		/*
-		 * ID: X Use <b>parameters[0]</b> as N-th module in the solution (where
-		 * <b>parameters[0]</b> = N).
+		 * ID: X Use 'parameters[0]' as N-th module in the solution (where
+		 * 'parameters[0]' = N).
 		 */
 //		currTemplate = new Constraint_nth_module(2,
-//				"Use <b>parameters[0]</b> as <b>parameters[1]</b>-th (N-th) module in the solution (where <b>parameters[1]</b> = N)");
+//				"Use 'parameters[0]' as 'parameters[1]'-th (N-th) module in the solution (where 'parameters[1]' = N)");
 //		addConstraintTamplate(currTemplate);
 
 		return true;

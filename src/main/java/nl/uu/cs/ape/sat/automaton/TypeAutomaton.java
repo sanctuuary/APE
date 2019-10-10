@@ -57,14 +57,14 @@ public class TypeAutomaton {
 				State tmpMemoryState = new State(WorkflowElement.MEMORY_TYPE, i, j, input_branching);
 				tmpMemoryTypeBlock.addState(tmpMemoryState);
 			}
-			addMemoryTypesBlock(tmpMemoryTypeBlock);
+			memoryTypesAutomaton.add(tmpMemoryTypeBlock);
 			
 			Block tmpUsedTypesBlock = new Block(i);
 			for (int j = 0; j < input_branching; j++) {
 				State tmpUsedState = new State(WorkflowElement.USED_TYPE, i, j, input_branching);
 				tmpUsedTypesBlock.addState(tmpUsedState);
 			}
-			addUsedTypesBlock(tmpUsedTypesBlock);
+			usedTypesAutomaton.add(tmpUsedTypesBlock);
 		}
 	}
 

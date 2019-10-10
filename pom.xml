@@ -38,16 +38,11 @@
 			<artifactId>org.sat4j.core</artifactId>
 			<version>2.3.1</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.logicng</groupId>
 			<artifactId>logicng</artifactId>
 			<version>1.5.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.json/json 
-		<dependency>
-		    <groupId>org.json</groupId>
-		    <artifactId>json</artifactId>
-		    <version>20190722</version>
 		</dependency>
 		
 		<dependency>
@@ -81,6 +76,12 @@
 		    <groupId>org.dom4j</groupId>
 		    <artifactId>dom4j</artifactId>
 		    <version>2.0.0</version>
+		</dependency>
+		<!--  https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20190722</version>
 		</dependency>
 	</dependencies>
 </project>

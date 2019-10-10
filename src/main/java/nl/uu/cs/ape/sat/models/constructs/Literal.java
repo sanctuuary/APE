@@ -95,6 +95,15 @@ public class Literal implements Comparable<Literal>{
 	}
 	
 	/**
+	 * Return {@code true} if the current workflow element is of the given {@link WorkflowElement} type.
+	 * @param workflowElemType - element type that is current literal is compared to 
+	 * @return {@code true} if the current workflow element corresponds to the given {@link WorkflowElement}, {@code false} otherwise.
+	 */
+	public boolean isWorkflowElementType(WorkflowElement workflowElemType) {
+		return atom.getWorkflowElementType() == workflowElemType;
+	}
+	
+	/**
 	 * Returns {@code true} in case the literal is NEGATED, {@code false} otherwise.
 	 * @return boolean {@code true} if Literal is negated.
 	 */
@@ -111,8 +120,8 @@ public class Literal implements Comparable<Literal>{
 	}
 	
 	/**
-	 * Returns the predicate/label used to depict {@code AbstractModule, Module, Type} or {@code State}.
-	 * @return Predicate object
+	 * Returns the predicate/label used to depict {@code AbstractModule, Module, Type} or {@code State}. Each of those refers to the element that is described by the Literal (e.g. Predicate(State)).
+	 * @return Predicate object that is referred by the literal.
 	 */
 	public Predicate getPredicate() {
 		return atom.getPredicate();

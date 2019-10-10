@@ -442,7 +442,7 @@ public class AllTypes {
 			if (i < program_outputs.size()) {
 				List<Type> currTypes = program_outputs.get(i).getTypes();
 				for (Type currType : currTypes) {
-					if (get(currType.getPredicateID()) == null) {
+					if (this.get(currType.getPredicateID()) == null) {
 						System.err.println(
 								"Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
 						return null;

@@ -1,25 +1,33 @@
 package nl.uu.cs.ape.sat.utils;
-/**
- * Class used for testing.
- * 
- * @author Vedran Kasalica
- *
- */
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class Test {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		
+		try {
+			
+			String content = FileUtils.readFileToString(new File("/home/vedran/Desktop/test2"), "utf-8");
+		
 
-		String x = "Max";
-		String y = "Maxer";
-		y = y.substring(0, 3);
-		String z = "M";
-		z += "ax";
+		// Convert JSON string to JSONObject
+		JSONObject jsonObject = new JSONObject(content);
+		Object tmp = jsonObject.get("input");
+		System.out.println(tmp instanceof JSONArray);
+		System.out.println(tmp instanceof JSONObject);
 		
-		System.out.println(x.equals(y));
-		System.out.println(z.equals(y));
-		System.out.println(x.equals(z));
 		
+		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

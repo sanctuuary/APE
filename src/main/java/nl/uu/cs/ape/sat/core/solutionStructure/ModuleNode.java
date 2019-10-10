@@ -8,15 +8,22 @@ import java.util.Set;
 import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
+import guru.nidi.graphviz.attribute.Shape.Polygon;
 import guru.nidi.graphviz.model.Graph;
+import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
+import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
- * The {@code ModuleNode} class is used to represent module step in the actual solution workflow. Each {@code ModuleNode} represents an action/tool in the solution workflow.
+ * The {@code ModuleNode} class is used to represent module step in the actual
+ * solution workflow. Each {@code ModuleNode} represents an action/tool in the
+ * solution workflow.<br><br>
+ * When compared to the {@link ModuleAutomaton} representation of the problem, a Workflow {@code TypeNode} correspond to a {@link State} of a {@link WorkflowElement#MODULE} element.
+ * 
  * 
  * @author Vedran Kasalica
  *
@@ -35,46 +42,57 @@ public class ModuleNode extends SolutionWorkflowNode {
 	private Set<TypeNode> inputTypes;
 	/** List of the data instances that are generated as output of the tool. */
 	private Set<TypeNode> outputTypes;
-	
-	
-	
+
+	/**
+	 * Creating Workflow Node that corresponds to a tool usage.
+	 * 
+	 * @param automatonState - state in the {@link ModuleAutomaton} that corresponds
+	 *                       to the workflow node.
+	 * @throws Exception Exception when the Tool Workflow Node is instantiated using
+	 *                   a State in ModuleAutomaton that does not correspond to a
+	 *                   {@code WorkflowElement#MODULE}..
+	 */
 	public ModuleNode(State automatonState) throws Exception {
 		super(automatonState);
 		this.usedModule = null;
 		this.abstractModules = new HashSet<AbstractModule>();
 		this.prevModuleNode = null;
 		this.nextModuleNode = null;
-		if(automatonState.getWorkflowStateType() != WorkflowElement.MODULE) {
-			throw new Exception("Class ModuleNode can only be instantiated using State that is of type WorkflowElement.MODULE, as a parameter.");
+		if (automatonState.getWorkflowStateType() != WorkflowElement.MODULE) {
+			throw new Exception(
+					"Class ModuleNode can only be instantiated using State that is of type WorkflowElement.MODULE, as a parameter.");
 		}
 		inputTypes = new HashSet<TypeNode>();
 		outputTypes = new HashSet<TypeNode>();
 	}
-	
-	/** 
+
+	/**
 	 * Set module/tool that defines this step in the workflow.
+	 * 
 	 * @param module - tool provided by the tool/module annotations.
 	 */
 	public void setUsedModule(Module module) {
 		this.usedModule = module;
 	}
-	
+
 	/**
-	 * Add the abstract module to the list of modules that describes the tool instance.
+	 * Add the abstract module to the list of modules that describes the tool
+	 * instance.
+	 * 
 	 * @param abstractModule - abstract type that describes the instance.
 	 */
 	public void addAbstractDescriptionOfUsedType(AbstractModule abstractModule) {
-		if(!abstractModule.isTool()) {
+		if (!abstractModule.isTool()) {
 			this.abstractModules.add(abstractModule);
 		} else {
 			System.err.println("Actual tool cannot be uset to describe a module in an abstract way.");
 		}
 	}
-	
+
 	public void addInputType(TypeNode inputTypeNode) {
 		inputTypes.add(inputTypeNode);
 	}
-	
+
 	public void addOutputType(TypeNode outputTypeNode) {
 		outputTypes.add(outputTypeNode);
 	}
@@ -110,43 +128,57 @@ public class ModuleNode extends SolutionWorkflowNode {
 	public Set<TypeNode> getOutputTypes() {
 		return outputTypes;
 	}
-	
+
 	public boolean isEmpty() {
 		return usedModule == null;
 	}
-	
+
 	/**
 	 * Get string representation of the ModuleNode.
 	 * 
-	 * @return Printable string that can be used for the presentation of this workflow node.
+	 * @return Printable string that can be used for the presentation of this
+	 *         workflow node.
 	 */
 	public String toString() {
+		if(usedModule == null) {
+			return "[]";
+		}
 		StringBuilder printString = new StringBuilder();
 		printString = printString.append("[").append(this.usedModule.getPredicateID()).append("]");
-		
+
 		return printString.toString();
 	}
-	
+
 	public String getDotDefinition() {
 		return getDotID() + " [label=\"" + getDotLabel() + "\", shape=box];\n";
 	}
+
+	/**
+	 * Add the current tool node to the workflow graph, and return the graph.
+	 * 
+	 * @param workflowGraph - graph that is to be extended
+	 * @return {@link Graph} extended with the current {@link ModuleNode}
+	 */
 	public Graph addModuleToGraph(Graph workflowGraph) {
-		return workflowGraph = workflowGraph.with(node(getDotID()).with(Label.of(getDotLabel())));
+		return workflowGraph = workflowGraph
+				.with(node(getDotID()).with(Label.of(getDotLabel() + "              "), Shape.polygon(4), Color.BLUE));
 	}
-	
+
+	/** Get id of the current workflow node in .dot representation. */
 	public String getDotID() {
 		StringBuilder printString = new StringBuilder();
 		printString = printString.append("\"").append(this.usedModule.getPredicateID());
 		printString = printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
-		
+
 		return printString.toString();
 	}
-	
+
+	/** Get label of the current workflow node in .dot representation. */
 	public String getDotLabel() {
 		StringBuilder printString = new StringBuilder();
 		printString = printString.append(this.usedModule.getPredicateLabel());
-		
+
 		return printString.toString();
 	}
-	
+
 }

@@ -38,7 +38,7 @@ public class Main {
 	 */
 	private static boolean configSetup() {
 		config = APEConfig.getConfig();
-		if (config == null || config.getConfigNode() == null) {
+		if (config == null || config.getConfigJsonObj() == null) {
 			return false;
 		}
 
@@ -57,7 +57,7 @@ public class Main {
 		StringBuilder solutions2write = new StringBuilder();
 		
 		for (int i = 0; i < allSolutions.getNumberOfSolutions(); i++) {
-			solutions2write = solutions2write.append(allSolutions.get(i).getReadableSolution()).append("\n");
+			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getRelevantSolution()).append("\n");
 		}
 		APEUtils.write2file(solutions2write.toString(), new File(config.getSolution_path()), false);
 	}
@@ -164,7 +164,7 @@ public class Main {
 		 * Update allModules and allTypes sets based on the module.xml file
 		 */
 		AllModules annotated_modules = new AllModules(
-				APEUtils.readModuleXML(config.getTool_annotations_path(), allModules, allTypes));
+				APEUtils.readModuleJson(config.getTool_annotations_path(), allModules, allTypes));
 
 		/*
 		 * Define set of all constraint formats
@@ -210,11 +210,13 @@ public class Main {
 		 */
 		if (allSolutions.isEmpty()) {
 			System.out.println("UNSAT");
-		}
+		} else {
 		
 		writeToFile(allSolutions);
 		getGraphOutput(allSolutions);
 		executeWorkflows(allSolutions, allModules);
+		
+		}
 		
 		
 

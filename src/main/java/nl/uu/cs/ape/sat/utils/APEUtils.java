@@ -10,16 +10,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
-import org.logicng.formulas.Formula;
-import org.logicng.formulas.FormulaFactory;
-import org.logicng.io.parsers.ParserException;
-import org.logicng.io.parsers.PropositionalParser;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+/*
+ * import org.logicng.formulas.Formula;
+ * import org.logicng.formulas.FormulaFactory;
+ * import org.logicng.io.parsers.ParserException;
+ * import org.logicng.io.parsers.PropositionalParser;
+ */
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
@@ -27,6 +33,9 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.Types;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 
 /**
  * The {@code StaticFunctions} class is used for storing {@code Static} methods.
@@ -38,15 +47,26 @@ public class APEUtils {
 
 	private final static String ROOT_TOOL_XML_path = "/functions/function";
 	private final static String ROOT_CONSTR_XML_path = "/constraints/constraint";
+	private final static String TOOLS_JSOM_TAG = "functions";
+	private final static String CONSTR_JSON_TAG = "constraints";
+	private final static String CONSTR_ID_TAG = "constraintid";
+	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
+	private final static String PROGRAM_IO_TYPE_TAG = "type";
+	private final static String PROGRAM_IO_FORMAT_TAG = "format";
 	private final static Map<String, Long> timers = new HashMap<String, Long>();
 
+	
 	/**
 	 * Returns the CNF representation of the SLTL constraints in our project
 	 * 
-	 * @param allModules      - list of all modules
+	 * @param constraintsPath - path to the Json file (xml files are only partially supported)
+	 * @param allConsTemplates
+	 * @param allModules
+	 * @param allTypes
+	 * @param mappings
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
-	 * @return A string representing SLTL constraints into CNF
+	 * @return
 	 */
 	public static String generateSLTLConstraints(String constraintsPath, ConstraintFactory allConsTemplates,
 			AllModules allModules, AllTypes allTypes, AtomMapping mappings, ModuleAutomaton moduleAutomaton,
@@ -55,21 +75,50 @@ public class APEUtils {
 		String cnf_SLTL = "";
 		String constraintID;
 		int currNode = 0;
+		boolean jsonFile;
 		List<String> parameters;
-		for (Node xmlConstraint : getFunctionsFromXML(constraintsPath, ROOT_CONSTR_XML_path)) {
+		List<? extends Object> constraints;
+		
+		if(constraintsPath.toLowerCase().endsWith(".xml")) {
+			System.err.println("Constraints file is XML format. It should be transformed into a JSON file.");
+			jsonFile = false;
+			constraints = getListFromXML(constraintsPath, ROOT_CONSTR_XML_path);
+		} else {
+			jsonFile = true;
+			constraints = getListFromJson(constraintsPath, CONSTR_JSON_TAG);
+			
+		}
+		
+		
+		for (Object constraint : constraints) {
 			currNode++;
+			/* READ THE CONSTRAINT */
 			try {
-				constraintID = xmlConstraint.selectSingleNode("constraintid").getText();
-				List<Node> xmlConstParam = xmlConstraint.selectNodes("parameters/parameter");
-				parameters = new ArrayList<String>();
-				for (Node xmlParam : xmlConstParam) {
-					parameters.add(xmlParam.getText());
+				if(jsonFile) {
+					JSONObject jsonConstraint = (JSONObject) constraint;
+					constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
+					
+					List<JSONObject> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG);
+					parameters = new ArrayList<String>();
+					for (JSONObject jsonParam : jsonConstParam) {
+						System.out.println(jsonParam + " = " + jsonParam.toString());
+						parameters.add(jsonParam.toString());
+					}
+				} else {
+					Node xmlConstraint = (Node) constraint;
+					constraintID = xmlConstraint.selectSingleNode(CONSTR_ID_TAG).getText();
+					List<Node> xmlConstParam = xmlConstraint.selectNodes("parameters/parameter");
+					parameters = new ArrayList<String>();
+					for (Node xmlParam : xmlConstParam) {
+						parameters.add(xmlParam.getText());
+					}
 				}
 			} catch (Exception e) {
 				System.err.println(
-						"Error in file: " + constraintsPath + ", at <constraint> no: " + currNode + ". Constraint skipped.");
+						"Error in file: " + constraintsPath + ", at constraint no: " + currNode + ". Constraint skipped.");
 				continue;
 			}
+			/* ENCODE THE CONSTRAINT */
 			if (allConsTemplates.getConstraintTamplate(constraintID) == null) {
 				System.err.println("Constraint ID provided: '" + constraintID + "' is not valid. Constraint skipped.");
 				continue;
@@ -79,7 +128,7 @@ public class APEUtils {
 						moduleAutomaton, typeAutomaton, mappings);
 				if (currConstrEncoding == null) {
 					System.err.println(
-							"Error in file: " + constraintsPath + ", at row: " + currNode + ". Constraint skipped.");
+							"Error in file: " + constraintsPath + ", at constraint no: " + currNode + ". Constraint skipped.");
 				} else {
 					cnf_SLTL += currConstrEncoding;
 				}
@@ -143,7 +192,7 @@ public class APEUtils {
 	public static List<Module> readModuleXML(String file, AllModules allModules, AllTypes allTypes) {
 		List<Module> modulesNew = new ArrayList<Module>();
 
-		for (Node xmlModule : getFunctionsFromXML(file, ROOT_TOOL_XML_path)) {
+		for (Node xmlModule : getListFromXML(file, ROOT_TOOL_XML_path)) {
 			Module tmpModule = Module.moduleFromXML(xmlModule, allModules, allTypes);
 			if(tmpModule != null) {
 				modulesNew.add(tmpModule);
@@ -154,13 +203,48 @@ public class APEUtils {
 
 		return modulesNew;
 	}
+	
+	/**
+	 * Updates the list of All Modules by annotating the existing ones (or adding
+	 * non-existing) using the I/O Types from the @file. Returns the list of Updated
+	 * Modules.
+	 * 
+	 * @param file       - path to the .json file containing tool annotations
+	 * @param allModules - list of all existing modules
+	 * @param allTypes   - list of all existing types
+	 * @return the list of all annotated Modules in the process (possibly empty
+	 *         list)
+	 */
+	public static List<Module> readModuleJson(String file, AllModules allModules, AllTypes allTypes) {
+		if(file.toLowerCase().endsWith(".xml")) {
+			System.err.println("Tool annotation file is in XML format. It should be transformed into a JSON file.");
+			return readModuleXML(file, allModules, allTypes);
+		}
+		List<Module> modulesNew = new ArrayList<Module>();
+		int currModule = 0;
+		for (JSONObject xmlModule : getListFromJson(file, TOOLS_JSOM_TAG)) {
+			currModule++;
+			try {
+			Module tmpModule = Module.moduleFromJson(xmlModule, allModules, allTypes);
+			if(tmpModule != null) {
+				modulesNew.add(tmpModule);
+				allModules.addAnnotatedModule(tmpModule.getPredicateID());
+			}
+			} catch (JSONException e) {
+				System.err.println("Error in file: " + file + ", at tool no: " + currModule + ". Tool skipped.");
+				continue;
+			}
+		}
+
+		return modulesNew;
+	}
 
 	/**
 	 * Transforms the propositional formula into the CNF form.
 	 * 
 	 * @param propositionalFormula - propositional formula
 	 * @return CNF representation of the formula
-	 */
+	 
 	public static String convert2CNF(String propositionalFormula, AtomMapping mappings) {
 		final FormulaFactory f = new FormulaFactory();
 		final PropositionalParser p = new PropositionalParser(f);
@@ -189,7 +273,7 @@ public class APEUtils {
 			return null;
 		}
 
-	}
+	}*/
 
 	/**
 	 * Get List of nodes that correspond to the elements of the structured XML file.
@@ -197,7 +281,7 @@ public class APEUtils {
 	 * @param rootXMLpath - root structure of the elements within the path.
 	 * @return List of {@link Node} elements of the XML.
 	 */
-	public static List<Node> getFunctionsFromXML(String xmlPath, String rootXMLpath) {
+	public static List<Node> getListFromXML(String xmlPath, String rootXMLpath) {
 		SAXReader reader = new SAXReader();
 		Document document;
 		try {
@@ -209,7 +293,78 @@ public class APEUtils {
 			return null;
 		}
 	}
+	
+	/**
+	 * The method return a list of {@link JSONObject} elements that correspond to a given key in a Json file.
+	 * If the key corresponds to a {@link JSONArray} all the elements are put in a {@link List}, otherwise if the key corresponds
+	 * to a {@link JSONObject} list will contain only that object.
+	 * 
+	 * @param jsonPath - path to the Json file
+	 *  @param key - key label that corresponds to the elements
+	 * @return List of elements that corresponds to the key. If the key does not exists returns empty list.
+	 */
+	public static List<JSONObject> getListFromJson(String jsonPath, String key) {
+		try {
+			String content = FileUtils.readFileToString(new File(jsonPath), "utf-8");
+			// Convert JSON string to JSONObject
+			JSONObject jsonObject = new JSONObject(content);
+			
+			List<JSONObject> jsonArray = getListFromJson(jsonObject, key);
+			
+			return jsonArray;
+			
+		} catch (IOException e1) {
+			System.err.println("Error parsing the Json file: " + jsonPath);
+			return null;
+		}
+	}
+	
+	/** 
+	 * The method return a list of {@link JSONObject} elements that correspond to a given key in the given json object. 
+	 * If the key corresponds to a {@link JSONArray} all the elements are put in a {@link List}, otherwise if the key corresponds
+	 * to a {@link JSONObject} list will contain only that object.
+	 * 
+	 * @param jsonObject - Json object that is being explored
+	 * @param key - key label that corresponds to the elements
+	 * @return List of elements that corresponds to the key. If the key does not exists returns empty list.
+	 */
+	public static List<JSONObject> getListFromJson(JSONObject jsonObject, String key){
+		List<JSONObject> jsonList = new ArrayList<JSONObject>();
+		try {
+			Object tmp = jsonObject.get(key);
+			System.out.println(tmp + "  -  " + key);
+			if(tmp instanceof JSONArray) {
+				JSONArray elements = (JSONArray) tmp;
+				for (int i = 0; i < elements.length(); i++) {
+					JSONObject element = elements.getJSONObject(i);
+					System.out.println("# " + element);
+					jsonList.add(element);
+				}
+			}  else {
+				JSONObject element = (JSONObject) tmp;
+				jsonList.add(element);
+			}
+		return jsonList;
+		} catch (JSONException e) {
+			return jsonList;
+		}
+		
+	}
 
+	/**
+	 * Transform the {@link JSONArray} object to list of {@link JSONObject} objects.
+	 * @param jsonArray - {@link JSONArray} that should be transformed.
+	 * @return {@link ArrayList} of {@link JSONObject} elements.
+	
+	public static List<JSONObject> fromJsonArray2JsonObjects(JSONArray jsonArray) {
+		List<JSONObject> jsonObjectList = new ArrayList<JSONObject>();
+		
+		for(int i=0; i<jsonArray.length(); i++) {
+			jsonObjectList.add(jsonArray.getJSONObject(i));
+		}
+		return jsonObjectList;
+	}
+ */
 	/**
 	 * Method checks whether the provided path corresponds to an existing file with
 	 * required reading permissions.
@@ -235,6 +390,41 @@ public class APEUtils {
 		}
 		return true;
 	}
+	
+	
+	/**TODO
+	 * Read the list of inputs or outputs presented in json format and format them in a list of {@link Types}.
+	 * @param jsonListIO - {@link JSONArray} of the elements
+	 * @return {@link List} of {@link Types}.
+	 */
+	public static List<Types> readModuleIO(JSONArray jsonListIO) throws JSONException{
+			List<Types> listIO = new ArrayList<Types>();
+
+			for (int i = 0; i < jsonListIO.length(); i++) {
+				JSONObject moduleIO = jsonListIO.getJSONObject(i);
+
+				Types output = new Types();
+				try {
+					List<JSONObject> jsonIOTypes = getListFromJson(moduleIO, PROGRAM_IO_TYPE_TAG);
+					for(JSONObject jsonIOType : jsonIOTypes) {
+					String jsonOutputType = moduleIO.getString(PROGRAM_IO_TYPE_TAG);
+					output.addType(new Type(jsonOutputType, jsonOutputType, APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
+					}
+				} catch (JSONException JSONException) {
+					/* Configuration output does not have the type */}
+				try {
+					String jsonOutputFormat = moduleIO.getString(PROGRAM_IO_FORMAT_TAG);
+					output.addType(new Type(jsonOutputFormat, jsonOutputFormat, APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
+				} catch (JSONException JSONException) {
+					/* Configuration output does not have the type */}
+				if (!output.getTypes().isEmpty()) {
+					listIO.add(output);
+				}
+			}
+			
+			return listIO;
+	}
+	
 
 	/**
 	 * In case that the debug mode is on, print the constraint templates and tool

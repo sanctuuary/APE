@@ -27,10 +27,12 @@ public class Type extends TaxonomyPredicate {
 	/**
 	 * Constructor used to create a Type object.
 	 * 
-	 * @param typeName	- Type name
-	 * @param typeID	- Type ID
-	 * @param rootNode	- ID of the Taxonomy (Sub)Root node corresponding to the Type.
-	 * @param nodeType	- {@link NodeType} object describing the type w.r.t. the Type Taxonomy.
+	 * @param typeName - Type name
+	 * @param typeID   - Type ID
+	 * @param rootNode - ID of the Taxonomy (Sub)Root node corresponding to the
+	 *                 Type.
+	 * @param nodeType - {@link NodeType} object describing the type w.r.t. the Type
+	 *                 Taxonomy.
 	 */
 	public Type(String typeName, String typeID, String rootNode, NodeType nodeType) {
 		super(rootNode, nodeType);
@@ -40,7 +42,6 @@ public class Type extends TaxonomyPredicate {
 			this.subTypes = new HashSet<String>();
 		}
 	}
-
 
 	@Override
 	public String getPredicateLabel() {
@@ -91,15 +92,12 @@ public class Type extends TaxonomyPredicate {
 	/**
 	 * Returns the list of the types that are directly subsumed by the type.
 	 * 
-	 * @return List of the subtypes or null in case of a simple/leaf type or an empty type
+	 * @return List of the subtypes or null in case of a simple/leaf type or an
+	 *         empty type
 	 */
 	public Set<String> getSubTypes() {
 		return subTypes;
 	}
-
-
-	
-
 
 	@Override
 	public int hashCode() {
@@ -116,9 +114,8 @@ public class Type extends TaxonomyPredicate {
 		return this.typeID.equals(other.getPredicateID());
 	}
 
-
 	/**
-	 * Returns true if the type is a simple/primitive/leaf type, otherwise returns false - the
+	 * Returns true if the type is a simple/leaf type, otherwise returns false - the
 	 * type is an abstract (non-leaf) type.
 	 * 
 	 * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type)
@@ -128,15 +125,15 @@ public class Type extends TaxonomyPredicate {
 	}
 
 	/**
-	 * Returns true if the type is an instance, otherwise returns false - the
-	 * type is an abstract (non-leaf) type or a regular leaf type.
+	 * Returns true if the type is an instance, otherwise returns false - the type
+	 * is an abstract (non-leaf) type or a regular leaf type.
 	 * 
 	 * @return true (instance) or false (leaf type or abstract/non-leaf type)
 	 */
 	public boolean isInstanceType() {
 		return this.nodeType == NodeType.INSTANCE;
 	}
-	
+
 	/**
 	 * Returns true if the type is an empty type, otherwise returns false - the type
 	 * is an actual (abstract or non-abstract) type.
@@ -156,10 +153,10 @@ public class Type extends TaxonomyPredicate {
 	public boolean isRootType() {
 		return this.nodeType == NodeType.ROOT;
 	}
-	
+
 	/**
-	 * Returns true if the type the sub-root type, otherwise returns false - the type is
-	 * not the sub-root node of the taxonomy
+	 * Returns true if the type the sub-root type, otherwise returns false - the
+	 * type is not the sub-root node of the taxonomy
 	 * 
 	 * @return true (sub-root node) or false (non-root node)
 	 */
@@ -174,15 +171,16 @@ public class Type extends TaxonomyPredicate {
 	public void setToSimpleType() {
 		this.nodeType = NodeType.LEAF;
 	}
-	
+
 	/**
 	 * Returns the type of the data node, based on the taxonomy.
+	 * 
 	 * @return The node type object
 	 */
 	public NodeType getNodeType() {
 		return this.nodeType;
 	}
-	
+
 	/**
 	 * Sets the type of the data node, based on the taxonomy.
 	 */
@@ -193,34 +191,37 @@ public class Type extends TaxonomyPredicate {
 	/**
 	 * The class is used to check weather the type with typeID was already
 	 * introduced earlier on in allTypes. In case it was, it returns the item,
-	 * otherwise the new element is generated and returned.
+	 * otherwise the new element is generated and returned. <br>
 	 * <br>
-	 * <br>
-	 * In case of generating a new Type, the object is added to the set of all the Types and added as a subType to the parent Type.
+	 * In case of generating a new Type, the object is added to the set of all the
+	 * Types and added as a subType to the parent Type.
 	 * 
 	 * @param typeName  - Type name
-	 * @param typeID	- Unique Type identifier
-	 * @param rootType	- Determines whether the Type is a simple/leaf type
-	 * @param nodeType	- {@link NodeType} object describing the type w.r.t. the Type Taxonomy.
+	 * @param typeID    - Unique Type identifier
+	 * @param rootType  - Determines whether the Type is a simple/leaf type
+	 * @param nodeType  - {@link NodeType} object describing the type w.r.t. the
+	 *                  Type Taxonomy.
 	 * @param allTypes  - Set of all the types created
 	 * @param superType - The Parent (abstract) Type of the current Type
 	 * @return The Type object.
 	 */
-	public static Type generateType(String typeName, String typeID, String rootType, NodeType nodeType,  AllTypes allTypes, Type superType) {
+	public static Type generateType(String typeName, String typeID, String rootType, NodeType nodeType,
+			AllTypes allTypes, Type superType) {
 
 		Type tmpType;
 		if ((tmpType = allTypes.get(typeID)) == null) {
 			tmpType = new Type(typeName, typeID, rootType, nodeType);
 			allTypes.addType(tmpType);
-			
+
 		}
 		/*
-		 * Adding class as a subtype to the superclass, even if currType was already introduced (extending taxonomy tree) 
+		 * Adding class as a subtype to the superclass, even if currType was already
+		 * introduced (extending taxonomy tree)
 		 */
-		if(superType != null) {
+		if (superType != null) {
 			superType.addSubType(typeID);
 		}
-		
+
 		return tmpType;
 
 	}
@@ -243,9 +244,9 @@ public class Type extends TaxonomyPredicate {
 
 	private String print() {
 		if (isSimpleType()) {
-			return typeID + "["+getNodeType()+"]";
+			return typeID + "[" + getNodeType() + "]";
 		} else {
-			return typeID + "["+getNodeType()+"]";
+			return typeID + "[" + getNodeType() + "]";
 		}
 	}
 
