@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import guru.nidi.graphviz.attribute.Label;
+import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
@@ -190,7 +191,7 @@ public class TypeNode extends SolutionWorkflowNode {
 	 * @return {@link Graph} extended with the current {@link TypeNode}
 	 */
 	public Graph addTypeToGraph(Graph workflowGraph) {
-		return workflowGraph = workflowGraph.with(node(getDotID()).with(Label.of(getDotLabel() + "   ")));
+		return workflowGraph = workflowGraph.with(node(getDotID()).with(Label.of(getDotLabel() + "   "), Style.DASHED));
 	}
 
 	/** Get label of the current workflow node in .dot representation. */

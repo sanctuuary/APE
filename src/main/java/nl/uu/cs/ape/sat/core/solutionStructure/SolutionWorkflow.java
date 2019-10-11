@@ -12,12 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
+import guru.nidi.graphviz.attribute.Arrow;
 import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
+import guru.nidi.graphviz.attribute.LinkAttr;
 import guru.nidi.graphviz.attribute.RankDir;
 import guru.nidi.graphviz.attribute.Shape;
+import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
+import guru.nidi.graphviz.model.Link;
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
@@ -314,11 +317,11 @@ public class SolutionWorkflow {
 		for(TypeNode workflowInput : this.workflowInputTypeStates) {
 			index++;
 			if(!inputDefined) {
-				workflowGraph = workflowGraph.with(node(input).with(Color.RED, Shape.RECTANGLE));
+				workflowGraph = workflowGraph.with(node(input).with(Color.RED, Shape.RECTANGLE, Style.BOLD));
 				inputDefined = true;
 			}
 			workflowGraph = workflowInput.addTypeToGraph(workflowGraph);
-			workflowGraph = workflowGraph.with(node(input).link(to(node(workflowInput.getDotID())).with(Label.of("is(" + index + ")   "))));
+			workflowGraph = workflowGraph.with(node(input).link(to(node(workflowInput.getDotID())).with(LinkAttr.weight(index), Style.DOTTED)));
 		}
 		
 		for(ModuleNode currTool : this.moduleNodes) {
@@ -327,7 +330,7 @@ public class SolutionWorkflow {
 			for(TypeNode toolInput : currTool.getInputTypes()) {
 				if(!toolInput.isEmpty()) {
 					index++;
-					workflowGraph = workflowGraph.with(node(toolInput.getDotID()).link(to(node(currTool.getDotID())).with(Label.of("in(" + index + ")   "))));
+					workflowGraph = workflowGraph.with(node(toolInput.getDotID()).link(to(node(currTool.getDotID())).with(Label.of("in   "), Color.ORANGE, LinkAttr.weight(index))));
 				}
 			}
 //			index = 0;
@@ -335,7 +338,7 @@ public class SolutionWorkflow {
 				if(!toolOutput.isEmpty()) {
 					index++;
 					workflowGraph = toolOutput.addTypeToGraph(workflowGraph);
-					workflowGraph = workflowGraph.with(node(currTool.getDotID()).link(to(node(toolOutput.getDotID())).with(Label.of("out(" + index + ")   "))));
+					workflowGraph = workflowGraph.with(node(currTool.getDotID()).link(to(node(toolOutput.getDotID())).with(Label.of("out   "), Color.BLACK, LinkAttr.weight(index))));
 				}
 			}
 		}
@@ -343,11 +346,11 @@ public class SolutionWorkflow {
 		for(TypeNode workflowOutput : this.workflowOutputTypeStates) {
 			index++;
 			if(!outputDefined) {
-				workflowGraph = workflowGraph.with(node(output).with(Color.RED, Shape.RECTANGLE));
+				workflowGraph = workflowGraph.with(node(output).with(Color.RED, Shape.RECTANGLE, Style.BOLD));
 				outputDefined = true;
 			}
 			workflowGraph = workflowOutput.addTypeToGraph(workflowGraph);
-			workflowGraph = workflowGraph.with(node(workflowOutput.getDotID()).link(to(node(output)).with(Label.of("in(" + index + ")   "))));
+			workflowGraph = workflowGraph.with(node(workflowOutput.getDotID()).link(to(node(output)).with(LinkAttr.weight(index), Style.DOTTED)));
 		}
 		
 		return workflowGraph;

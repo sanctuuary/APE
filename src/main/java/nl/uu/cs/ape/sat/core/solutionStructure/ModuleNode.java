@@ -9,6 +9,7 @@ import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Shape.Polygon;
+import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
@@ -161,7 +162,7 @@ public class ModuleNode extends SolutionWorkflowNode {
 	 */
 	public Graph addModuleToGraph(Graph workflowGraph) {
 		return workflowGraph = workflowGraph
-				.with(node(getDotID()).with(Label.of(getDotLabel() + "              "), Shape.polygon(4), Color.BLUE));
+				.with(node(getDotID()).with(Label.of(getDotLabel() + "              "), Shape.polygon(4), Color.BLUE, Style.BOLD));
 	}
 
 	/** Get id of the current workflow node in .dot representation. */
