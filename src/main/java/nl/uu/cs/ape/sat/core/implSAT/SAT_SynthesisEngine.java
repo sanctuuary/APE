@@ -138,10 +138,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Encode the constraints from the file based on the templates (manual templates)
 		 */
+		if(config.getConstraints_path() != null) {
 		cnfEncoding = cnfEncoding.append(APEUtils.generateSLTLConstraints(config.getConstraints_path(), allConsTemplates, allModules,
 				allTypes, mappings, moduleAutomaton, typeAutomaton));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
-		
+		}
 		/*
 		 * Encode the workflow input.
 		 * Workflow I/O are encoded the last in order to reuse the mappings for states, instead of introducing new ones, using the I/O types of NodeType.UNKNOWN.

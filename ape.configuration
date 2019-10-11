@@ -3,15 +3,17 @@
   "toolsTaxonomyRoot": "Tool",
   "dataTaxonomyRoot": "DType",
   "typesTaxonomyRoot": "DType",
-  "tool_annotations_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/ToolDescription_ct.xml",
+  "tool_annotations_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/ToolDescription_ct.json",
   "constraints_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/constraints.json",
   "shared_memory": "true",
   "solutions_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/sat_solutions.txt",
   "solution_min_length": "1",
   "solution_max_length": "8",
   "max_solutions": "10",
-  "execution_scripts_folder": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/Implementations",
-  "number_of_execution_scripts": "5",
+  "execution_scripts_folder": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/Implementations/",
+  "number_of_execution_scripts": "6",
+  "solution_graphs_folder": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/Figures",
+  "number_of_generated_graphs": "10",
   "inputs": [
     {
       "type": "ObjectPoint"
@@ -28,7 +30,7 @@
       "type": "FieldRasterRatioA"
     }
   ],
-  "debug_mode": "true",
-  "use_workflow_input": "ALL",
-  "use_all_generated_data": "ONE"
+  "debug_mode": "false",
+  "use_workflow_input": "all",
+  "use_all_generated_data": "one"
 }

@@ -55,11 +55,11 @@ public class APEUtils {
 	private final static String PROGRAM_IO_FORMAT_TAG = "format";
 	private final static Map<String, Long> timers = new HashMap<String, Long>();
 
-	
 	/**
 	 * Returns the CNF representation of the SLTL constraints in our project
 	 * 
-	 * @param constraintsPath - path to the Json file (xml files are only partially supported)
+	 * @param constraintsPath  - path to the Json file (xml files are only partially
+	 *                         supported)
 	 * @param allConsTemplates
 	 * @param allModules
 	 * @param allTypes
@@ -78,30 +78,28 @@ public class APEUtils {
 		boolean jsonFile;
 		List<String> parameters;
 		List<? extends Object> constraints;
-		
-		if(constraintsPath.toLowerCase().endsWith(".xml")) {
+
+		if (constraintsPath.toLowerCase().endsWith(".xml")) {
 			System.err.println("Constraints file is XML format. It should be transformed into a JSON file.");
 			jsonFile = false;
 			constraints = getListFromXML(constraintsPath, ROOT_CONSTR_XML_path);
 		} else {
 			jsonFile = true;
 			constraints = getListFromJson(constraintsPath, CONSTR_JSON_TAG);
-			
+
 		}
-		
-		
+
 		for (Object constraint : constraints) {
 			currNode++;
 			/* READ THE CONSTRAINT */
 			try {
-				if(jsonFile) {
+				if (jsonFile) {
 					JSONObject jsonConstraint = (JSONObject) constraint;
 					constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
-					
-					List<JSONObject> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG);
+
+					List<String> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG, String.class);
 					parameters = new ArrayList<String>();
-					for (JSONObject jsonParam : jsonConstParam) {
-						System.out.println(jsonParam + " = " + jsonParam.toString());
+					for (String jsonParam : jsonConstParam) {
 						parameters.add(jsonParam.toString());
 					}
 				} else {
@@ -114,8 +112,8 @@ public class APEUtils {
 					}
 				}
 			} catch (Exception e) {
-				System.err.println(
-						"Error in file: " + constraintsPath + ", at constraint no: " + currNode + ". Constraint skipped.");
+				System.err.println("Error in file: " + constraintsPath + ", at constraint no: " + currNode
+						+ ". Constraint skipped.");
 				continue;
 			}
 			/* ENCODE THE CONSTRAINT */
@@ -127,13 +125,13 @@ public class APEUtils {
 						parameters.toArray(new String[parameters.size()]), allConsTemplates, allModules, allTypes,
 						moduleAutomaton, typeAutomaton, mappings);
 				if (currConstrEncoding == null) {
-					System.err.println(
-							"Error in file: " + constraintsPath + ", at constraint no: " + currNode + ". Constraint skipped.");
+					System.err.println("Error in file: " + constraintsPath + ", at constraint no: " + currNode
+							+ ". Constraint skipped.");
 				} else {
 					cnf_SLTL += currConstrEncoding;
 				}
 			}
-			
+
 		}
 		return cnf_SLTL;
 	}
@@ -194,16 +192,16 @@ public class APEUtils {
 
 		for (Node xmlModule : getListFromXML(file, ROOT_TOOL_XML_path)) {
 			Module tmpModule = Module.moduleFromXML(xmlModule, allModules, allTypes);
-			if(tmpModule != null) {
+			if (tmpModule != null) {
 				modulesNew.add(tmpModule);
 				allModules.addAnnotatedModule(tmpModule.getPredicateID());
 			}
-			
+
 		}
 
 		return modulesNew;
 	}
-	
+
 	/**
 	 * Updates the list of All Modules by annotating the existing ones (or adding
 	 * non-existing) using the I/O Types from the @file. Returns the list of Updated
@@ -216,7 +214,7 @@ public class APEUtils {
 	 *         list)
 	 */
 	public static List<Module> readModuleJson(String file, AllModules allModules, AllTypes allTypes) {
-		if(file.toLowerCase().endsWith(".xml")) {
+		if (file.toLowerCase().endsWith(".xml")) {
 			System.err.println("Tool annotation file is in XML format. It should be transformed into a JSON file.");
 			return readModuleXML(file, allModules, allTypes);
 		}
@@ -225,11 +223,11 @@ public class APEUtils {
 		for (JSONObject xmlModule : getListFromJson(file, TOOLS_JSOM_TAG)) {
 			currModule++;
 			try {
-			Module tmpModule = Module.moduleFromJson(xmlModule, allModules, allTypes);
-			if(tmpModule != null) {
-				modulesNew.add(tmpModule);
-				allModules.addAnnotatedModule(tmpModule.getPredicateID());
-			}
+				Module tmpModule = Module.moduleFromJson(xmlModule, allModules, allTypes);
+				if (tmpModule != null) {
+					modulesNew.add(tmpModule);
+					allModules.addAnnotatedModule(tmpModule.getPredicateID());
+				}
 			} catch (JSONException e) {
 				System.err.println("Error in file: " + file + ", at tool no: " + currModule + ". Tool skipped.");
 				continue;
@@ -244,40 +242,31 @@ public class APEUtils {
 	 * 
 	 * @param propositionalFormula - propositional formula
 	 * @return CNF representation of the formula
-	 
-	public static String convert2CNF(String propositionalFormula, AtomMapping mappings) {
-		final FormulaFactory f = new FormulaFactory();
-		final PropositionalParser p = new PropositionalParser(f);
-
-		Formula formula;
-		try {
-			formula = p.parse(propositionalFormula.replace('-', '~'));
-			final Formula cnf = formula.cnf();
-			String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ")
-					.replace("(", "").replace(")", "") + " 0\n";
-			boolean exists = true;
-			int counter = 0;
-			String auxVariable = "";
-			while (exists) {
-				auxVariable = "@RESERVED_CNF_" + counter + " ";
-				if (transformedCNF.contains("@RESERVED_CNF_")) {
-					transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
-				} else {
-					exists = false;
-				}
-				counter++;
-			}
-			return transformedCNF;
-		} catch (ParserException e) {
-			e.printStackTrace();
-			return null;
-		}
-
-	}*/
+	 * 
+	 *         public static String convert2CNF(String propositionalFormula,
+	 *         AtomMapping mappings) { final FormulaFactory f = new
+	 *         FormulaFactory(); final PropositionalParser p = new
+	 *         PropositionalParser(f);
+	 * 
+	 *         Formula formula; try { formula =
+	 *         p.parse(propositionalFormula.replace('-', '~')); final Formula cnf =
+	 *         formula.cnf(); String transformedCNF = cnf.toString().replace('~',
+	 *         '-').replace(") & (", " 0\n").replace(" | ", " ") .replace("(",
+	 *         "").replace(")", "") + " 0\n"; boolean exists = true; int counter =
+	 *         0; String auxVariable = ""; while (exists) { auxVariable =
+	 *         "@RESERVED_CNF_" + counter + " "; if
+	 *         (transformedCNF.contains("@RESERVED_CNF_")) { transformedCNF =
+	 *         transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
+	 *         } else { exists = false; } counter++; } return transformedCNF; }
+	 *         catch (ParserException e) { e.printStackTrace(); return null; }
+	 * 
+	 *         }
+	 */
 
 	/**
 	 * Get List of nodes that correspond to the elements of the structured XML file.
-	 * @param xmlPath - path to the XML file
+	 * 
+	 * @param xmlPath     - path to the XML file
 	 * @param rootXMLpath - root structure of the elements within the path.
 	 * @return List of {@link Node} elements of the XML.
 	 */
@@ -293,78 +282,88 @@ public class APEUtils {
 			return null;
 		}
 	}
-	
+
 	/**
-	 * The method return a list of {@link JSONObject} elements that correspond to a given key in a Json file.
-	 * If the key corresponds to a {@link JSONArray} all the elements are put in a {@link List}, otherwise if the key corresponds
-	 * to a {@link JSONObject} list will contain only that object.
+	 * The method return a list of {@link JSONObject} elements that correspond to a
+	 * given key in a Json file. If the key corresponds to a {@link JSONArray} all
+	 * the elements are put in a {@link List}, otherwise if the key corresponds to a
+	 * {@link JSONObject} list will contain only that object.
 	 * 
 	 * @param jsonPath - path to the Json file
-	 *  @param key - key label that corresponds to the elements
-	 * @return List of elements that corresponds to the key. If the key does not exists returns empty list.
+	 * @param key      - key label that corresponds to the elements
+	 * @return List of elements that corresponds to the key. If the key does not
+	 *         exists returns empty list.
 	 */
 	public static List<JSONObject> getListFromJson(String jsonPath, String key) {
 		try {
 			String content = FileUtils.readFileToString(new File(jsonPath), "utf-8");
 			// Convert JSON string to JSONObject
 			JSONObject jsonObject = new JSONObject(content);
-			
-			List<JSONObject> jsonArray = getListFromJson(jsonObject, key);
-			
+
+			List<JSONObject> jsonArray = getListFromJson(jsonObject, key, JSONObject.class);
+
 			return jsonArray;
-			
+
 		} catch (IOException e1) {
 			System.err.println("Error parsing the Json file: " + jsonPath);
 			return null;
 		}
 	}
-	
-	/** 
-	 * The method return a list of {@link JSONObject} elements that correspond to a given key in the given json object. 
-	 * If the key corresponds to a {@link JSONArray} all the elements are put in a {@link List}, otherwise if the key corresponds
-	 * to a {@link JSONObject} list will contain only that object.
+
+	/**
+	 * The method return a list of {@link JSONObject} elements that correspond to a
+	 * given key in the given json object. If the key corresponds to a
+	 * {@link JSONArray} all the elements are put in a {@link List}, otherwise if
+	 * the key corresponds to a {@link JSONObject} list will contain only that
+	 * object.
 	 * 
 	 * @param jsonObject - Json object that is being explored
-	 * @param key - key label that corresponds to the elements
-	 * @return List of elements that corresponds to the key. If the key does not exists returns empty list.
+	 * @param key        - key label that corresponds to the elements
+	 * @param clazz      - class to which the elements should belong to
+	 * @return List of elements that corresponds to the key. If the key does not
+	 *         exists returns empty list.
 	 */
-	public static List<JSONObject> getListFromJson(JSONObject jsonObject, String key){
-		List<JSONObject> jsonList = new ArrayList<JSONObject>();
+	public static <T> List<T> getListFromJson(JSONObject jsonObject, String key, Class<T> clazz) {
+		List<T> jsonList = new ArrayList<T>();
 		try {
 			Object tmp = jsonObject.get(key);
-			System.out.println(tmp + "  -  " + key);
-			if(tmp instanceof JSONArray) {
-				JSONArray elements = (JSONArray) tmp;
-				for (int i = 0; i < elements.length(); i++) {
-					JSONObject element = elements.getJSONObject(i);
-					System.out.println("# " + element);
+			try {
+				if (tmp instanceof JSONArray) {
+					JSONArray elements = (JSONArray) tmp;
+					for (int i = 0; i < elements.length(); i++) {
+						T element = (T) elements.get(i);
+						jsonList.add(element);
+					}
+				} else {
+					T element = (T) tmp;
 					jsonList.add(element);
 				}
-			}  else {
-				JSONObject element = (JSONObject) tmp;
-				jsonList.add(element);
+			} catch (JSONException e) {
+				System.err.println("Json parsing error. Expected object '" + clazz.getSimpleName() + "' under the tag '"
+						+ key + "'. The followig object does not match the provided format:\n" + jsonObject.toString());
+				return jsonList;
 			}
-		return jsonList;
+			return jsonList;
 		} catch (JSONException e) {
 			return jsonList;
 		}
-		
+
 	}
 
 	/**
 	 * Transform the {@link JSONArray} object to list of {@link JSONObject} objects.
+	 * 
 	 * @param jsonArray - {@link JSONArray} that should be transformed.
 	 * @return {@link ArrayList} of {@link JSONObject} elements.
-	
-	public static List<JSONObject> fromJsonArray2JsonObjects(JSONArray jsonArray) {
-		List<JSONObject> jsonObjectList = new ArrayList<JSONObject>();
-		
-		for(int i=0; i<jsonArray.length(); i++) {
-			jsonObjectList.add(jsonArray.getJSONObject(i));
-		}
-		return jsonObjectList;
-	}
- */
+	 * 
+	 *         public static List<JSONObject> fromJsonArray2JsonObjects(JSONArray
+	 *         jsonArray) { List<JSONObject> jsonObjectList = new
+	 *         ArrayList<JSONObject>();
+	 * 
+	 *         for(int i=0; i<jsonArray.length(); i++) {
+	 *         jsonObjectList.add(jsonArray.getJSONObject(i)); } return
+	 *         jsonObjectList; }
+	 */
 	/**
 	 * Method checks whether the provided path corresponds to an existing file with
 	 * required reading permissions.
@@ -390,41 +389,43 @@ public class APEUtils {
 		}
 		return true;
 	}
-	
-	
-	/**TODO
-	 * Read the list of inputs or outputs presented in json format and format them in a list of {@link Types}.
+
+	/**
+	 * TODO Read the list of inputs or outputs presented in json format and format
+	 * them in a list of {@link Types}.
+	 * 
 	 * @param jsonListIO - {@link JSONArray} of the elements
 	 * @return {@link List} of {@link Types}.
 	 */
-	public static List<Types> readModuleIO(JSONArray jsonListIO) throws JSONException{
-			List<Types> listIO = new ArrayList<Types>();
+	public static List<Types> readModuleIO(JSONArray jsonListIO) throws JSONException {
+		List<Types> listIO = new ArrayList<Types>();
 
-			for (int i = 0; i < jsonListIO.length(); i++) {
-				JSONObject moduleIO = jsonListIO.getJSONObject(i);
+		for (int i = 0; i < jsonListIO.length(); i++) {
+			JSONObject moduleIO = jsonListIO.getJSONObject(i);
 
-				Types output = new Types();
-				try {
-					List<JSONObject> jsonIOTypes = getListFromJson(moduleIO, PROGRAM_IO_TYPE_TAG);
-					for(JSONObject jsonIOType : jsonIOTypes) {
+			Types output = new Types();
+			try {
+				List<JSONObject> jsonIOTypes = getListFromJson(moduleIO, PROGRAM_IO_TYPE_TAG, JSONObject.class);
+				for (JSONObject jsonIOType : jsonIOTypes) {
 					String jsonOutputType = moduleIO.getString(PROGRAM_IO_TYPE_TAG);
-					output.addType(new Type(jsonOutputType, jsonOutputType, APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
-					}
-				} catch (JSONException JSONException) {
-					/* Configuration output does not have the type */}
-				try {
-					String jsonOutputFormat = moduleIO.getString(PROGRAM_IO_FORMAT_TAG);
-					output.addType(new Type(jsonOutputFormat, jsonOutputFormat, APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
-				} catch (JSONException JSONException) {
-					/* Configuration output does not have the type */}
-				if (!output.getTypes().isEmpty()) {
-					listIO.add(output);
+					output.addType(new Type(jsonOutputType, jsonOutputType,
+							APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
 				}
+			} catch (JSONException JSONException) {
+				/* Configuration output does not have the type */}
+			try {
+				String jsonOutputFormat = moduleIO.getString(PROGRAM_IO_FORMAT_TAG);
+				output.addType(new Type(jsonOutputFormat, jsonOutputFormat,
+						APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
+			} catch (JSONException JSONException) {
+				/* Configuration output does not have the type */}
+			if (!output.getTypes().isEmpty()) {
+				listIO.add(output);
 			}
-			
-			return listIO;
+		}
+
+		return listIO;
 	}
-	
 
 	/**
 	 * In case that the debug mode is on, print the constraint templates and tool
@@ -465,11 +466,14 @@ public class APEUtils {
 	/**
 	 * Print header to illustrate the part of the synthesis that is being performed.
 	 */
-	public static void printHeader(String title, Integer argument) {
+	public static void printHeader(Integer argument, String... title) {
 		String arg = (argument == null) ? "" : (" " + argument);
-		
+
 		System.out.println("\n-------------------------------------------------------------");
-		System.out.println("\t" + title + arg);
+		System.out.println("\t" + title[0] + arg);
+		if(title.length > 1) {
+			System.out.println("\t" + title[1] + arg);
+		}
 		System.out.println("-------------------------------------------------------------");
 	}
 
@@ -484,16 +488,17 @@ public class APEUtils {
 	public static <E> List<E> safe(List<E> currList) {
 		return currList == null ? Collections.EMPTY_LIST : currList;
 	}
-	
+
 	/**
-	 * Provide a safe interface for getting an element from the list. In order to bypass "index out of bounds" error.
+	 * Provide a safe interface for getting an element from the list. In order to
+	 * bypass "index out of bounds" error.
 	 * 
 	 * @param currList - list of elements
-	 * @param index - index of the element that is to be returned
+	 * @param index    - index of the element that is to be returned
 	 * @return Element of the list, or null if the index is out of bounds.
 	 */
-	public static <E> E safeGet(List<E> currList, int index){
-		if(currList == null || index < 0 || currList.size() <= index) {
+	public static <E> E safeGet(List<E> currList, int index) {
+		if (currList == null || index < 0 || currList.size() <= index) {
 			return null;
 		} else {
 			return currList.get(index);
@@ -548,7 +553,7 @@ public class APEUtils {
 	}
 
 	public static void timerRestartAndPrint(String timerID, String printString) {
-		if(timers.get(timerID) == -1) {
+		if (timers.get(timerID) == -1) {
 			return;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
@@ -557,21 +562,20 @@ public class APEUtils {
 	}
 
 	public static void timerPrintSolutions(String timerID, int solutionsFound) {
-		if(timers.get(timerID) == -1) {
+		if (timers.get(timerID) == -1) {
 			return;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
-		System.out.println("\nAPE found " + solutionsFound + " solutions. Total solving time: "
-				+ (printTime / 1000F) + " sec.");
+		System.out.println(
+				"\nAPE found " + solutionsFound + " solutions. Total solving time: " + (printTime / 1000F) + " sec.");
 	}
-	
+
 	public static void timerPrintText(String timerID, String text) {
-		if(timers.get(timerID) == -1) {
+		if (timers.get(timerID) == -1) {
 			return;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
-		System.out.println("\n" + text + " Running time: "
-				+ (printTime / 1000F) + " sec.");
+		System.out.println("\n" + text + " Running time: " + (printTime / 1000F) + " sec.");
 	}
 
 }

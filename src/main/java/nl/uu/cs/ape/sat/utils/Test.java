@@ -11,23 +11,12 @@ public class Test {
 
 	public static void main(String[] args) {
 		
-		try {
-			
-			String content = FileUtils.readFileToString(new File("/home/vedran/Desktop/test2"), "utf-8");
 		
-
-		// Convert JSON string to JSONObject
-		JSONObject jsonObject = new JSONObject(content);
-		Object tmp = jsonObject.get("input");
-		System.out.println(tmp instanceof JSONArray);
-		System.out.println(tmp instanceof JSONObject);
+		Integer x = null;
 		
+		int t = x;
 		
-		
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println(t);
 	}
 
 }

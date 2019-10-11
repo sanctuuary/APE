@@ -52,6 +52,8 @@ public class APEConfig {
 	private final String MAX_NO_SOLUTIONS_TAG = "max_solutions";
 	private final String EXECUTION_SCRIPTS_FOLDER_TAG = "execution_scripts_folder";
 	private final String NO_EXECUTIONS_TAG = "number_of_execution_scripts";
+	private final String SOLUTION_GRAPS_FOLDER_TAG = "solution_graphs_folder";
+	private final String NO_GRAPHS_TAG = "number_of_generated_graphs";
 	private final String PROGRAM_INPUTS_TAG = "inputs";
 	private final String PROGRAM_OUTPUTS_TAG = "outputs";
 	private final String PROGRAM_IO_TYPE_TAG = "type";
@@ -107,17 +109,15 @@ public class APEConfig {
 	/** Max number of solution that the solver will return. */
 	private Integer max_no_solutions;
 
-	/**
-	 * Path to the folder that will contain all the scripts generated based on the
-	 * candidate workflows.
-	 */
+	/** Path to the folder that will contain all the scripts generated based on the candidate workflows. */
 	private String execution_scripts_folder;
-
-	/**
-	 * Number of the workflow scripts that should be generated from candidate
-	 * workflows. Default is 0.
-	 */
+	/**  Number of the workflow scripts that should be generated from candidate workflows. Default is 0. */
 	private Integer no_executions;
+	
+	/** Path to the folder that will contain all the figures/graphs generated based on the candidate workflows. */
+	private String solution_graphs_folder;
+	/**  Number of the solution graphs that should be generated from candidate workflows. Default is 0. */
+	private Integer no_graphs;
 
 	/** Output branching factor (max number of outputs per tool). */
 	private Integer max_no_tool_outputs = 3;
@@ -255,15 +255,15 @@ public class APEConfig {
 				return false;
 			}
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + CONSTRAINTS_TAG + "' in the configuration file is not provided correctly.");
-			return false;
+			System.out.println("Tag '" + CONSTRAINTS_TAG + "' in the configuration file is not provided correctly. No constraints will be applied.");
+			this.constraints_path = null;
 		}
 
 		try {
 			this.shared_memory = jsonObject.getBoolean(SHARED_MEMORY_TAG);
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + SHARED_MEMORY_TAG + "' in the configuration file is not provided correctly.");
-			return false;
+			System.out.println("Tag '" + SHARED_MEMORY_TAG + "' in the configuration file is not provided correctly. Default value is: false.");
+			this.shared_memory = false;
 		}
 
 		try {
@@ -321,8 +321,8 @@ public class APEConfig {
 			}
 		} catch (JSONException JSONException) {
 			System.err.println(
-					"Tag '" + EXECUTION_SCRIPTS_FOLDER_TAG + "' in the configuration file is not provided correctly.");
-			return false;
+					"Tag '" + EXECUTION_SCRIPTS_FOLDER_TAG + "' in the configuration file is not provided correctly. Solution workflows will not be executed.");
+			this.execution_scripts_folder = null;
 		}
 
 		try {
@@ -331,8 +331,29 @@ public class APEConfig {
 				return false;
 			}
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + NO_EXECUTIONS_TAG + "' in the configuration file is not provided correctly.");
-			return false;
+			System.err.println("Tag '" + NO_EXECUTIONS_TAG + "' in the configuration file is not provided correctly. Default value is: 0.");
+			this.no_executions = 0;
+		}
+		
+		try {
+			this.solution_graphs_folder = jsonObject.getString(SOLUTION_GRAPS_FOLDER_TAG);
+			if (!isValidConfigWriteFolder(SOLUTION_GRAPS_FOLDER_TAG, this.solution_graphs_folder)) {
+				return false;
+			}
+		} catch (JSONException JSONException) {
+			System.err.println(
+					"Tag '" + SOLUTION_GRAPS_FOLDER_TAG + "' in the configuration file is not provided correctly. Solution graphs will not be generated.");
+			this.solution_graphs_folder = null;
+		}
+
+		try {
+			this.no_graphs = jsonObject.getInt(NO_GRAPHS_TAG);
+			if (this.no_executions < 0) {
+				return false;
+			}
+		} catch (JSONException JSONException) {
+			System.err.println("Tag '" + NO_GRAPHS_TAG + "' in the configuration file is not provided correctly. Default value is: 0.");
+			this.no_graphs = 0;
 		}
 
 		try {
@@ -396,7 +417,7 @@ public class APEConfig {
 			this.use_workflow_input = isValidConfigEnum(USE_WORKFLOW_INPUT, tempUseWInput);
 			if (this.use_workflow_input == null) {
 				this.use_workflow_input = ConfigEnum.ALL;
-				System.out.println("The default vaule for tag " + USE_WORKFLOW_INPUT + " is: ALL.");
+				System.out.println("Tag " + USE_WORKFLOW_INPUT + "' in the configuration file is not provided. Default value is: ALL.");
 			}
 		} catch (JSONException JSONException) {
 			System.err.println("Tag '" + USE_WORKFLOW_INPUT + "' in the configuration file is not provided correctly.");
@@ -404,13 +425,11 @@ public class APEConfig {
 		}
 
 		try {
-			this.use_all_generated_data = jsonObject.getEnum(ConfigEnum.class, USE_ALL_GENERATED_DATA);
-
 			String tempUseGenData = jsonObject.getString(USE_ALL_GENERATED_DATA);
 			this.use_all_generated_data = isValidConfigEnum(USE_ALL_GENERATED_DATA, tempUseGenData);
 			if (this.use_workflow_input == null) {
 				this.use_workflow_input = ConfigEnum.ONE;
-				System.out.println("The default vaule for tag " + USE_ALL_GENERATED_DATA + " is: ALL.");
+				System.out.println("Tag " + USE_ALL_GENERATED_DATA + "' in the configuration file is not provided. Default value is: ONE.");
 			}
 		
 		} catch (JSONException JSONException) {
@@ -421,7 +440,7 @@ public class APEConfig {
 		try {
 			this.debug_mode = jsonObject.getBoolean(DEBUG_MODE_TAG);
 		} catch (JSONException JSONException) {
-			System.out.println("Tag '" + DEBUG_MODE_TAG + "' in the configuration file is not provided. Default value is: false.");
+			System.out.println("Tag '" + DEBUG_MODE_TAG + "' in the configuration file is not provided correctly. Default value is: false.");
 			this.debug_mode = false;
 		}
 
@@ -539,7 +558,22 @@ public class APEConfig {
 	public Integer getNo_executions() {
 		return no_executions;
 	}
+	
+	/**
+	 * @return the {@link #solution_graphs_folder}
+	 */
+	public String getSolution_graphs_folder() {
+		return solution_graphs_folder;
+	}
 
+	/**
+	 * @return the {@link #no_graphs}
+	 */
+	public Integer getNo_graphs() {
+		return no_graphs;
+	}
+	
+	
 	/**
 	 * @return the {@link #max_no_tool_outputs}
 	 */
@@ -612,9 +646,9 @@ public class APEConfig {
 	public static String getConstraintTags(String tag) {
 		switch (tag) {
 		case "id":
-			return "id";
+			return "operation";
 		case "label":
-			return "label";
+			return "name";
 		case "inputs":
 			return "inputs";
 		case "outputs":

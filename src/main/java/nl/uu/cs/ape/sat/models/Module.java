@@ -306,7 +306,7 @@ public class Module extends AbstractModule {
 	 * @param jsonModule - Json representation of a module
 	 * @param allModules - list of all the modules
 	 * @param allTypes - list of all the types
-	 * @return Module object.
+	 * @return New Module object.
 	 */
 	public static Module moduleFromJson(JSONObject jsonModule, AllModules allModules, AllTypes allTypes) throws JSONException {
 
@@ -359,8 +359,8 @@ public class Module extends AbstractModule {
 //		BIO tools 
 //		String moduleName = xmlModule.selectSingleNode("displayName").getText();
 //		String moduleID = xmlModule.selectSingleNode("displayName").getText();
-		List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APEConfig.getConstraintTags("inputs"));
-		List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APEConfig.getConstraintTags("outputs"));
+		List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APEConfig.getConstraintTags("inputs"), JSONObject.class);
+		List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APEConfig.getConstraintTags("outputs"), JSONObject.class);
 
 		List<Types> inputs = new ArrayList<Types>();
 		List<Types> outputs = new ArrayList<Types>();
@@ -369,7 +369,7 @@ public class Module extends AbstractModule {
 			if (!jsonInput.isEmpty()) {
 				Types input = new Types();
 				
-				for (JSONObject jsonType : APEUtils.getListFromJson(jsonInput, APEConfig.getConstraintTags("type"))) {
+				for (String jsonType : APEUtils.getListFromJson(jsonInput, APEConfig.getConstraintTags("type"), String.class)) {
 					if (allTypes.get(jsonType.toString()) == null) {
 						System.err.println("Data format \"" + jsonType.toString()
 								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
@@ -382,7 +382,7 @@ public class Module extends AbstractModule {
 						allTypes.addAnnotatedType(tmpType.getPredicateID());
 					}
 				}
-				for (JSONObject jsonType : APEUtils.getListFromJson(jsonInput, APEConfig.getConstraintTags("format"))) {
+				for (String jsonType : APEUtils.getListFromJson(jsonInput, APEConfig.getConstraintTags("format"), String.class)) {
 					if (allTypes.get(jsonType.toString()) == null) {
 						System.err.println("Data format \"" + jsonType.toString()
 								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
@@ -399,11 +399,11 @@ public class Module extends AbstractModule {
 			}
 		}
 
-		for (JSONObject jsonOutput : jsonModuleInput) {
+		for (JSONObject jsonOutput : jsonModuleOutput) {
 			if (!jsonOutput.isEmpty()) {
 				Types output = new Types();
 				
-				for (JSONObject jsonType : APEUtils.getListFromJson(jsonOutput, APEConfig.getConstraintTags("type"))) {
+				for (String jsonType : APEUtils.getListFromJson(jsonOutput, APEConfig.getConstraintTags("type"), String.class)) {
 					if (allTypes.get(jsonType.toString()) == null) {
 						System.err.println("Data format \"" + jsonType.toString()
 								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
@@ -416,7 +416,7 @@ public class Module extends AbstractModule {
 						allTypes.addAnnotatedType(tmpType.getPredicateID());
 					}
 				}
-				for (JSONObject jsonType : APEUtils.getListFromJson(jsonOutput, APEConfig.getConstraintTags("format"))) {
+				for (String jsonType : APEUtils.getListFromJson(jsonOutput, APEConfig.getConstraintTags("format"), String.class)) {
 					if (allTypes.get(jsonType.toString()) == null) {
 						System.err.println("Data format \"" + jsonType.toString()
 								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
