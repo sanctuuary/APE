@@ -6,8 +6,9 @@ import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.AtomMapping;
-import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.models.Type;
 
 public class SLTL_formula_F extends SLTL_formula {
 
@@ -43,6 +44,7 @@ public class SLTL_formula_F extends SLTL_formula {
 		}
 		// Distinguishing whether the atom under the modal operator is type
 		// or module.
+//		if (super.getSubFormula() instanceof Type) {
 		if (super.getSubFormula().getType().matches("type")) {
 			for (Block typeBlock : typeStateBlocks) {
 				for (State  typeState : typeBlock.getStates()) {

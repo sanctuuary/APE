@@ -18,7 +18,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  * @author Vedran Kasalica
  *
  */
-public class Constraint_gen_type extends Constraint {
+public class Constraint_gen_type extends ConstraintTemplate {
 
 
 	public Constraint_gen_type(String id, int parametersNo, String description) {

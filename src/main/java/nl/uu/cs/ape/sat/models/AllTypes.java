@@ -11,9 +11,9 @@ import java.util.Map.Entry;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 
 /**

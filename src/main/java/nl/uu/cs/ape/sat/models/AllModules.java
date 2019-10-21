@@ -15,9 +15,9 @@ import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.automaton.Block;
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
 
 /**
  * The {@code AllModules} class represent the set of all modules/tools that can
@@ -91,6 +91,7 @@ public class AllModules {
 			}
 		}
 	}
+	
 
 	/**
 	 * Removes the {@link AbstractModule} from the set of all modules and adds the
@@ -209,6 +210,7 @@ public class AllModules {
 	public void addAnnotatedModule(String moduleID) {
 		annotatedModules.add(moduleID);
 	}
+	
 
 	/**
 	 * Generate constraints that ensure that the set of inputs correspond to the
@@ -705,7 +707,6 @@ public class AllModules {
 	 *         INPUT and OUTPUT types of the modules
 	 */
 	public String modulesConstraints(SAT_SynthesisEngine synthesisInstance) {
-
 		StringBuilder constraints = new StringBuilder();
 		constraints = constraints.append(inputCons(synthesisInstance));
 		if (!synthesisInstance.getConfig().getShared_memory()) {
@@ -759,8 +760,12 @@ public class AllModules {
 	 */
 	public String moduleMandatoryUsage(AllModules annotatedTools, ModuleAutomaton moduleAutomaton,
 			AtomMapping mappings) {
+		if(annotatedTools.getModules().isEmpty()) {
+			System.err.println("No tools were I/O annotated.");
+			return "";
+		}
 		StringBuilder constraints = new StringBuilder();
-
+		
 		for (State moduleState : moduleAutomaton.getModuleStates()) {
 			for (Entry<String, AbstractModule> tool : annotatedTools.getModules().entrySet()) {
 				constraints = constraints.append(mappings.add(tool.getValue(), moduleState, WorkflowElement.MODULE))

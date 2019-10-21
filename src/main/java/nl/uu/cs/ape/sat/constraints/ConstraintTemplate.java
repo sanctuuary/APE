@@ -3,6 +3,11 @@
  */
 package nl.uu.cs.ape.sat.constraints;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AllModules;
@@ -16,10 +21,10 @@ import nl.uu.cs.ape.sat.models.AtomMapping;
  * @author Vedran Kasalica
  *
  */
-public abstract class Constraint {
+public abstract class ConstraintTemplate {
 
 	/**
-	 * Constraint ID - currently not used field.
+	 * Identification String of the constraint template.
 	 */
 	String constraintID;
 	/**
@@ -40,7 +45,7 @@ public abstract class Constraint {
 	 * @param description
 	 *            - Description of the constraint.
 	 */
-	public Constraint(String id, int parametersNo, String description) {
+	public ConstraintTemplate(String id, int parametersNo, String description) {
 		this.constraintID = id;
 		this.parametersNo = parametersNo;
 		this.description = description;
@@ -88,16 +93,16 @@ public abstract class Constraint {
 	 * @return String representing the description.
 	 */
 	public String printConstraintCode() {
-		String constraint = "	<constraint>\n" + 
-				"		<constraintid>" + constraintID + "</constraintid>\n" + 
-				"		<parameters>\n" + 
-				"			<parameter>parameters[0]</parameter>\n"; 
-		if(parametersNo > 1)
-			constraint += "			<parameter>parameters[1]</parameter>\n";
-		constraint += 		"		</parameters>\n" + 
-				"	</constraint>\n";
-		constraint += "Description: " + description + "\n";
-		return constraint;
+		JSONArray params = new JSONArray();
+		for(int i = 0; i < parametersNo; i++) {
+			params.put("parameters[" + i + "]");
+		}
+		JSONObject constJson = new JSONObject();
+		constJson.put("constraintid", constraintID);
+		constJson.put("parameters", params);
+		constJson.put("description", description);
+		
+		return constJson.toString(3) + ",\n";
 	}
 
 	/**

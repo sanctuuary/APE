@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.models.constructs;
+package nl.uu.cs.ape.sat.models.logic.constructs;
 
 import java.util.ArrayList;
 import java.util.List;

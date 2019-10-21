@@ -29,9 +29,11 @@ import org.json.JSONObject;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
+import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.Types;
@@ -55,30 +57,18 @@ public class APEUtils {
 	private final static String PROGRAM_IO_FORMAT_TAG = "format";
 	private final static Map<String, Long> timers = new HashMap<String, Long>();
 
-	/**
-	 * Returns the CNF representation of the SLTL constraints in our project
-	 * 
-	 * @param constraintsPath  - path to the Json file (xml files are only partially
-	 *                         supported)
-	 * @param allConsTemplates
-	 * @param allModules
-	 * @param allTypes
-	 * @param mappings
-	 * @param moduleAutomaton
-	 * @param typeAutomaton
-	 * @return
-	 */
-	public static String generateSLTLConstraints(String constraintsPath, ConstraintFactory allConsTemplates,
-			AllModules allModules, AllTypes allTypes, AtomMapping mappings, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton) {
-
-		String cnf_SLTL = "";
+	
+	
+	public static List<ConstraintData> readConstraints(String constraintsPath){
+		List<ConstraintData> unformattedConstr = new ArrayList<ConstraintData>();
+		if(constraintsPath == null) {
+			return unformattedConstr;
+		}
 		String constraintID;
 		int currNode = 0;
 		boolean jsonFile;
 		List<String> parameters;
 		List<? extends Object> constraints;
-
 		if (constraintsPath.toLowerCase().endsWith(".xml")) {
 			System.err.println("Constraints file is XML format. It should be transformed into a JSON file.");
 			jsonFile = false;
@@ -88,8 +78,9 @@ public class APEUtils {
 			constraints = getListFromJson(constraintsPath, CONSTR_JSON_TAG);
 
 		}
+		
 
-		for (Object constraint : constraints) {
+		for (Object constraint : safe(constraints)) {
 			currNode++;
 			/* READ THE CONSTRAINT */
 			try {
@@ -116,16 +107,44 @@ public class APEUtils {
 						+ ". Constraint skipped.");
 				continue;
 			}
+			ConstraintData currConstr = new ConstraintData(constraintID, parameters);
+			unformattedConstr.add(currConstr);
+		}
+		return unformattedConstr;
+	}
+	
+	/**
+	 * Returns the CNF representation of the SLTL constraints in our project
+	 * 
+	 * @param constraintsPath  - path to the Json file (xml files are only partially
+	 *                         supported)
+	 * @param allConsTemplates
+	 * @param allModules
+	 * @param allTypes
+	 * @param mappings
+	 * @param moduleAutomaton
+	 * @param typeAutomaton
+	 * @return
+	 */
+	public static String encodeAPEConstraints(List<ConstraintData> constraintData, ConstraintFactory allConsTemplates,
+			AllModules allModules, AllTypes allTypes, AtomMapping mappings, ModuleAutomaton moduleAutomaton,
+			TypeAutomaton typeAutomaton) {
+
+		String cnf_SLTL = "";
+		int currConst = 0;
+
+		for (ConstraintData constraint : constraintData) {
+			currConst++;
 			/* ENCODE THE CONSTRAINT */
-			if (allConsTemplates.getConstraintTamplate(constraintID) == null) {
-				System.err.println("Constraint ID provided: '" + constraintID + "' is not valid. Constraint skipped.");
+			if (allConsTemplates.getConstraintTamplate(constraint.getConstraintID()) == null) {
+				System.err.println("Constraint ID provided: '" + constraint.getConstraintID() + "' is not valid. Constraint skipped.");
 				continue;
 			} else {
-				String currConstrEncoding = constraintSATEncoding(constraintID,
-						parameters.toArray(new String[parameters.size()]), allConsTemplates, allModules, allTypes,
+				String currConstrEncoding = constraintSATEncoding(constraint.getConstraintID(),
+						constraint.getParameters(), allConsTemplates, allModules, allTypes,
 						moduleAutomaton, typeAutomaton, mappings);
 				if (currConstrEncoding == null) {
-					System.err.println("Error in file: " + constraintsPath + ", at constraint no: " + currNode
+					System.err.println("Error in constraint file. Constraint no: " + currConst
 							+ ". Constraint skipped.");
 				} else {
 					cnf_SLTL += currConstrEncoding;
@@ -220,7 +239,7 @@ public class APEUtils {
 		}
 		List<Module> modulesNew = new ArrayList<Module>();
 		int currModule = 0;
-		for (JSONObject xmlModule : getListFromJson(file, TOOLS_JSOM_TAG)) {
+		for (JSONObject xmlModule : safe(getListFromJson(file, TOOLS_JSOM_TAG))) {
 			currModule++;
 			try {
 				Module tmpModule = Module.moduleFromJson(xmlModule, allModules, allTypes);
@@ -304,7 +323,7 @@ public class APEUtils {
 
 			return jsonArray;
 
-		} catch (IOException e1) {
+		} catch (Exception e1) {
 			System.err.println("Error parsing the Json file: " + jsonPath);
 			return null;
 		}
@@ -433,10 +452,11 @@ public class APEUtils {
 	 * 
 	 * @param allModules         - set of all tools
 	 * @param allTypes           - set of all data types
-	 * @param constraintsFormats - String list of all constraint templates
+	 * @param constraintFactory - String list of all constraint templates
+	 * @param unformattedConstr 
 	 */
 	public static void debugPrintout(boolean debug, AllModules allModules, AllTypes allTypes,
-			String constraintsFormats) {
+			ConstraintFactory constraintFactory, List<ConstraintData> unformattedConstr, AllModules annotated_tools) {
 		if (debug) {
 
 			/*
@@ -445,7 +465,7 @@ public class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tConstraint templates:");
 			System.out.println("-------------------------------------------------------------");
-			System.out.println(constraintsFormats + "\n");
+			System.out.println(constraintFactory.printConstraintsCodes() + "\n");
 
 			/*
 			 * Printing the Module and Taxonomy Tree
@@ -458,7 +478,31 @@ public class APEUtils {
 			System.out.println("\tData Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
 			allTypes.getRootType().printTree(" ", allTypes);
-//			allTypes.getTypes().get("Lattice").printTree(" ", allTypes);
+			
+			/*
+			 * Printing the tool annotations
+			 */
+			System.out.println("-------------------------------------------------------------");
+			System.out.println("\tAnnotated tools:");
+			System.out.println("-------------------------------------------------------------");
+			for(AbstractModule module : annotated_tools.getModules().values()) {
+				System.out.println(module.print());
+			}
+			if(annotated_tools.getModules().values().isEmpty()) {
+				System.out.println("\tNo annotated tools.");
+			}
+			/*
+			 * Print out the constraints
+			 */
+			System.out.println("-------------------------------------------------------------");
+			System.out.println("\tConstraints:");
+			System.out.println("-------------------------------------------------------------");
+			for(ConstraintData constr : unformattedConstr) {
+				System.out.println(constraintFactory.getDescription(constr));
+			}
+			if(unformattedConstr.isEmpty()) {
+				System.out.println("\tNo constraints.");
+			}
 			System.out.println("-------------------------------------------------------------");
 		}
 	}
@@ -505,15 +549,21 @@ public class APEUtils {
 		}
 	}
 
-	public static int countLinesNewFromString(String inputString) throws IOException {
-		InputStream is = IOUtils.toInputStream(inputString, "UTF-8");
+	/**
+	 * Count number of new lines in a Sting.
+	 * @param inputString - string that is evaluated.
+	 * @return Number of lines in the String.
+	 * @throws IOException - error in case that the string 
+	 */
+	public static int countNewLines(String inputString) throws IOException {
+		InputStream stream = IOUtils.toInputStream(inputString, "UTF-8");
 		try {
 			byte[] c = new byte[1024];
 
-			int readChars = is.read(c);
+			int readChars = stream.read(c);
 			if (readChars == -1) {
 				// bail out if nothing to read
-				return 0;
+				return 1;
 			}
 
 			// make it easy for the optimizer to tune this loop
@@ -524,7 +574,7 @@ public class APEUtils {
 						++count;
 					}
 				}
-				readChars = is.read(c);
+				readChars = stream.read(c);
 			}
 
 			// count remaining characters
@@ -534,12 +584,12 @@ public class APEUtils {
 						++count;
 					}
 				}
-				readChars = is.read(c);
+				readChars = stream.read(c);
 			}
 
 			return count == 0 ? 1 : count;
 		} finally {
-			is.close();
+			stream.close();
 		}
 	}
 

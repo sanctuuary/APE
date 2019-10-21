@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.models.constructs;
+package nl.uu.cs.ape.sat.models.logic.constructs;
 
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 
@@ -12,7 +12,7 @@ import nl.uu.cs.ape.sat.models.enums.NodeType;
 public abstract class TaxonomyPredicate implements Predicate {
 	
 	/**
-	 * Describes the data node in from the taxonomy. The type can represent a root type, subroot type, an abstract or a simple (implemented leaf) type, or be an empty type.
+	 * Describes the node in from the taxonomy hierarchy. The type can represent a root type, subroot type, an abstract or a simple (implemented leaf) term, or be an empty term.
 	 */
 	protected NodeType nodeType;
 	/**
@@ -63,8 +63,8 @@ public abstract class TaxonomyPredicate implements Predicate {
 
 
 	/**
-	 * Returns the type of the module node, based on the taxonomy.
-	 * The node type object
+	 * Returns the type of the node, based on the taxonomy hierarchy.
+	 * @return the {@link NodeType} object that represent the type of the node (e.g. {@link NodeType#LEAF},  {@link NodeType#ROOT}).
 	 */
 	public NodeType getNodeType() {
 		return this.nodeType;
@@ -109,6 +109,5 @@ public abstract class TaxonomyPredicate implements Predicate {
 	 * @return String [<b>type</b>,<b>module</b> or <b>abstract module</b>]
 	 */
 	public abstract String getType();
-	
 }
 

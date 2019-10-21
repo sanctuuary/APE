@@ -1,8 +1,8 @@
-package nl.uu.cs.ape.sat.models.constructs;
+package nl.uu.cs.ape.sat.models.logic.constructs;
 
 import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
 
 /**
  *  The {@code Atom} class represents elements of the workflow, that consists of the tool or type used, state where it is used

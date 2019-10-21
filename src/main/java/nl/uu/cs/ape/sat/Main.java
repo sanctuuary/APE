@@ -16,8 +16,10 @@ import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.core.implSAT.All_SAT_solutions;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
+import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
+import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
@@ -52,100 +54,104 @@ public class Main {
 		}
 		return true;
 	}
-	
+
 	public static void writeToFile(All_SAT_solutions allSolutions) {
 		StringBuilder solutions2write = new StringBuilder();
-		
+
 		for (int i = 0; i < allSolutions.getNumberOfSolutions(); i++) {
-			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getRelevantSolution()).append("\n");
+			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getRelevantSolution())
+					.append("\n");
 		}
 		APEUtils.write2file(solutions2write.toString(), new File(config.getSolution_path()), false);
 	}
-	
+
 	public static void executeWorkflows(All_SAT_solutions allSolutions, AllModules allModules) throws IOException {
 		/**
 		 * Executing the workflows.
 		 */
 		String executionsFolder = config.getExecution_scripts_folder();
 		Integer noExecutions = config.getNo_executions();
-		if(executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
+		if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
 			return;
 		}
 		APEUtils.printHeader(null, "Executing first " + noExecutions + " solution");
 		APEUtils.timerStart("executingWorkflows", true);
-		
-		Arrays.stream(new File(executionsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_"))).forEach(File::delete);
-			for (int i = 0; i < noExecutions && i < allSolutions.getNumberOfSolutions(); i++) {
 
-				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
-						executionsFolder + "/workflowSolution_" + i + ".sh", false)));
-				out.println("");
-				out.close();
-				SAT_solution currSol = allSolutions.get(i).getnativeSATsolution();
-				currSol.getRelevantSolutionModules(allModules);
-				for (Module curr : currSol.getRelevantSolutionModules(allModules)) {
-					if (curr.getModuleExecution() != null) {
-						curr.getModuleExecution().run(config.getExecution_scripts_folder() + "/workflowSolution_" + i + ".sh");
-					}
-				}
-				System.out.print(".");
-				if(i > 0 && i%60 == 0) {
-					System.out.println();
+		Arrays.stream(
+				new File(executionsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
+				.forEach(File::delete);
+		System.out.print("Loading");
+		for (int i = 0; i < noExecutions && i < allSolutions.getNumberOfSolutions(); i++) {
+
+			PrintWriter out = new PrintWriter(
+					new BufferedWriter(new FileWriter(executionsFolder + "/workflowSolution_" + i + ".sh", false)));
+			out.println("");
+			out.close();
+			SAT_solution currSol = allSolutions.get(i).getnativeSATsolution();
+			currSol.getRelevantSolutionModules(allModules);
+			for (Module curr : currSol.getRelevantSolutionModules(allModules)) {
+				if (curr.getModuleExecution() != null) {
+					curr.getModuleExecution()
+							.run(config.getExecution_scripts_folder() + "/workflowSolution_" + i + ".sh");
 				}
 			}
+			System.out.print(".");
+			if (i > 0 && i % 60 == 0) {
+				System.out.println();
+			}
+		}
 		APEUtils.timerPrintText("executingWorkflows", "\nWorkflows have been executed.");
 	}
-	
+
 	private static void getGraphOutput(All_SAT_solutions allSolutions) throws IOException {
 		String graphsFolder = config.getSolution_graphs_folder();
 		Integer noGraphs = config.getNo_graphs();
-		if(graphsFolder == null ||  noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
+		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return;
 		}
 		APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 		System.out.println();
 		List<String> images = new ArrayList<String>();
-		Arrays.stream(new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("digraph GraphNo_"))).forEach(File::delete);
+		Arrays.stream(
+				new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
+				.forEach(File::delete);
+		System.out.print("Loading");
 		for (int i = 0; i < noGraphs && i < allSolutions.getNumberOfSolutions(); i++) {
-			
-			String currTitle = "digraph GraphNo_"+ i + "_length_" + allSolutions.get(i).getSolutionlength();
+
+			String currTitle = "SolutionNo_" + i + "_length_" + allSolutions.get(i).getSolutionlength();
 			String filePath = graphsFolder + "/" + currTitle;
 //			if(i==0) {
 //			System.out.println(currTitle +"{\n rankdir=LR;");
 //			System.out.println(allSolutions.get(i).getSolutionDotFormat());
 //			System.out.println("}");
 //			}
-			
+
 			Graph workflowGraph = allSolutions.get(i).getSolutionGraph(currTitle);
-			
+
 			Graphviz.fromGraph(workflowGraph).render(Format.PNG).toFile(new File(filePath));
 			images.add(filePath);
 			System.out.print(".");
-			if(i > 0 && i%60 == 0) {
+			if (i > 0 && i % 60 == 0) {
 				System.out.println();
 			}
 		}
 		APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
 		/*
-		BufferedImage result = new BufferedImage(4000, 250 * images.size(), BufferedImage.TYPE_INT_RGB);
-		Graphics g = result.getGraphics();
-		
-		 int x=0, y=0;
-		 for(String image : images){
-		        BufferedImage bi = ImageIO.read(new File(image));
-		        g.drawImage(bi, x, y, null);
-		        y += 250;
-		    }
-		 
-		 ImageIO.write(result,"png",new File("res/solutions.png"));
+		 * BufferedImage result = new BufferedImage(4000, 250 * images.size(),
+		 * BufferedImage.TYPE_INT_RGB); Graphics g = result.getGraphics();
+		 * 
+		 * int x=0, y=0; for(String image : images){ BufferedImage bi = ImageIO.read(new
+		 * File(image)); g.drawImage(bi, x, y, null); y += 250; }
+		 * 
+		 * ImageIO.write(result,"png",new File("res/solutions.png"));
 		 */
-		
+
 	}
 
 	public static void main(String[] args) throws IOException {
 
-		if(!configSetup()) {
+		if (!configSetup()) {
 			return;
 		}
 
@@ -186,11 +192,14 @@ public class Main {
 		 */
 		ConstraintFactory constraintFactory = new ConstraintFactory();
 		constraintFactory.initializeConstraints();
+		List<ConstraintData> unformattedConstr = new ArrayList<ConstraintData>();
+		
+		unformattedConstr = APEUtils.readConstraints(config.getConstraints_path());
+		
 
 		/** Print the setup information when necessary. */
-		APEUtils.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory.printConstraintsCodes());
+		APEUtils.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory, unformattedConstr, annotated_modules);
 
-		
 		/**
 		 * Loop over different lengths of the workflow until either, max workflow length
 		 * or max number of solutions has been found.
@@ -198,42 +207,43 @@ public class Main {
 		String globalTimerID = "globalTimer";
 		APEUtils.timerStart(globalTimerID, true);
 		int solutionLength = config.getSolution_min_length();
-		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions() && solutionLength <= config.getSolution_max_length()) {
+		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
+				&& solutionLength <= config.getSolution_max_length()) {
 
 			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(allModules, allTypes, allSolutions, config,
-					annotated_modules, constraintFactory, solutionLength);
-			
-			APEUtils.printHeader(implSATsynthesis.getSolutionSize(),"Workflow discovery - length");
+					annotated_modules, constraintFactory, unformattedConstr, solutionLength);
+
+			APEUtils.printHeader(implSATsynthesis.getSolutionSize(), "Workflow discovery - length");
 
 			/** Encoding of the synthesis problem */
-			if (implSATsynthesis.synthesisEncoding() == null) {
+			if (!implSATsynthesis.synthesisEncoding()) {
+				System.err.println("Internal error in problem encoding.");
 				return;
 			}
 			/** Execution of the synthesis */
 			implSATsynthesis.synthesisExecution();
-			
-			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1) || solutionLength == config.getSolution_max_length()) {
+
+			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
+					|| solutionLength == config.getSolution_max_length()) {
 				APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
 			}
-			
+
 			/** Increase the size of the workflow for the next depth iteration */
 			solutionLength++;
 		}
-		
+
 		/*
 		 * Writing solutions to the specified file in human readable format
 		 */
 		if (allSolutions.isEmpty()) {
 			System.out.println("UNSAT");
 		} else {
-		
-		writeToFile(allSolutions);
-		getGraphOutput(allSolutions);
-		executeWorkflows(allSolutions, allModules);
-		
+
+			writeToFile(allSolutions);
+			getGraphOutput(allSolutions);
+			executeWorkflows(allSolutions, allModules);
+
 		}
-		
-		
 
 	}
 

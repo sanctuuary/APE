@@ -19,7 +19,7 @@ import nl.uu.cs.ape.sat.models.Type;
  * @author Vedran Kasalica
  *
  */
-public class Constraint_not_gen_type extends Constraint {
+public class Constraint_not_gen_type extends ConstraintTemplate {
 
 
 	public Constraint_not_gen_type(String id, int parametersNo, String description) {

@@ -356,10 +356,9 @@ public class APEConfig {
 			this.no_graphs = 0;
 		}
 
+		program_inputs = new ArrayList<Types>();
 		try {
 			JSONArray jsonModuleInputs = jsonObject.getJSONArray(PROGRAM_INPUTS_TAG);
-			program_inputs = new ArrayList<Types>();
-
 			for (int i = 0; i < jsonModuleInputs.length(); i++) {
 				JSONObject jsonModuleInput = jsonModuleInputs.getJSONObject(i);
 
@@ -380,14 +379,12 @@ public class APEConfig {
 				}
 			}
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + PROGRAM_INPUTS_TAG + "' in the configuration file is not provided correctly.");
-			return false;
+			System.out.println("Tag '" + PROGRAM_INPUTS_TAG + "' is not provided in the configuration file. Program will have no inputs.");
 		}
 
+		program_outputs = new ArrayList<Types>();
 		try {
 			JSONArray jsonModuleOutputs = jsonObject.getJSONArray(PROGRAM_OUTPUTS_TAG);
-			program_outputs = new ArrayList<Types>();
-
 			for (int i = 0; i < jsonModuleOutputs.length(); i++) {
 				JSONObject jsonModuleOutput = jsonModuleOutputs.getJSONObject(i);
 
@@ -407,9 +404,7 @@ public class APEConfig {
 				}
 			}
 		} catch (JSONException JSONException) {
-			System.err
-					.println("Tag '" + PROGRAM_OUTPUTS_TAG + "' in the configuration file is not provided correctly.");
-			return false;
+			System.out.println("Tag '" + PROGRAM_OUTPUTS_TAG + "' is not provided in the configuration file. Program will have no outputs.");
 		}
 
 		try {

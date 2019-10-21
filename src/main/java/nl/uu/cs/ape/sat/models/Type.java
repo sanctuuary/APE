@@ -3,8 +3,8 @@ package nl.uu.cs.ape.sat.models;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 /**
  * 

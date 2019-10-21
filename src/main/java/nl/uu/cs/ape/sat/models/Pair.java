@@ -1,6 +1,6 @@
 package nl.uu.cs.ape.sat.models;
 
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
 /**
  * The {@code Pair} class represents pairs of objects, in our case used to store pairs of {@link AbstractModule AbstractModules}, {@link Module Modules} or {@link Type Types}.
  * <br>

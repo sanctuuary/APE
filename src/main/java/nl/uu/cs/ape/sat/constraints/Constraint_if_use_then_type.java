@@ -18,7 +18,7 @@ import nl.uu.cs.ape.sat.models.formulas.*;
  * @author Vedran Kasalica
  *
  */
-public class Constraint_if_use_then_type extends Constraint {
+public class Constraint_if_use_then_type extends ConstraintTemplate {
 
 
 	public Constraint_if_use_then_type(String id, int parametersNo, String description) {

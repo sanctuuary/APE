@@ -11,21 +11,22 @@ import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.ConstraintData;
 
 /**
- * The  {@code ConstraintFactory} class represents the Factory Method Pattern for generating and mapping {@link Constraint} classes the set of constraint formats that can be used to describe the desired synthesis output.
+ * The  {@code ConstraintFactory} class represents the Factory Method Pattern for generating and mapping {@link ConstraintTemplate} classes the set of constraint formats that can be used to describe the desired synthesis output.
  * @author Vedran Kasalica
  *
  */
 public class ConstraintFactory {
 
-	private Map<String, Constraint> constraintTamplates;
+	private Map<String, ConstraintTemplate> constraintTamplates;
 	
 	public ConstraintFactory() {
-		this.constraintTamplates = new HashMap<String, Constraint>();
+		this.constraintTamplates = new HashMap<String, ConstraintTemplate>();
 	}
 	
-	public Map<String, Constraint> getConstraintTamplates(){
+	public Map<String, ConstraintTemplate> getConstraintTamplates(){
 		return this.constraintTamplates;
 	}
 	
@@ -34,7 +35,7 @@ public class ConstraintFactory {
 	 * @param constraintID - ID of the {@code ConstraintTemplate}.
 	 * @return {@code ConstraintTemplate} or {@code null} if this map contains no mapping for the ID.
 	 */
-	public Constraint getConstraintTamplate(String constraintID) {
+	public ConstraintTemplate getConstraintTamplate(String constraintID) {
 		return constraintTamplates.get(constraintID);
 	}
 	
@@ -43,7 +44,7 @@ public class ConstraintFactory {
 	 * @param constraintTemplate - constraint template that is added to the set.
 	 * @return {@code true} if the constraint template was successfully added to the set or {@code false} in case that the constraint ID already exists in the set.
 	 */
-	public boolean addConstraintTamplate(Constraint constraintTemplate) {
+	public boolean addConstraintTamplate(ConstraintTemplate constraintTemplate) {
 		if(constraintTamplates.put(constraintTemplate.getConstraintID(), constraintTemplate) != null) {
 			System.err.println("Duplicate constraint ID: " + constraintTemplate.getConstraintID() + ". Please change the ID in order to be able to use the constraint template.");
 			return false;
@@ -56,11 +57,12 @@ public class ConstraintFactory {
 	 * @return String representing the description.
 	 */
 	public String printConstraintsCodes() {
-		String templates = "";
-		for(Constraint currConstr : constraintTamplates.values()) {
-			templates += currConstr.printConstraintCode();
+		StringBuilder templates = new StringBuilder("{\n" + "  \"constraints\": [\n");
+		for(ConstraintTemplate currConstr : constraintTamplates.values()) {
+			templates = templates.append(currConstr.printConstraintCode());
 		}
-		return templates;
+		templates = templates.append("    ]\n}");
+		return templates.toString();
 	}
 	
 	/**
@@ -76,7 +78,7 @@ public class ConstraintFactory {
 		 * ID: ite_m If we use module 'parameters[0]', then use module 'parameters[1]'
 		 * subsequently.
 		 */
-		Constraint currTemplate = new Constraint_if_then_module("ite_m", 2,
+		ConstraintTemplate currTemplate = new Constraint_if_then_module("ite_m", 2,
 				"If we use module 'parameters[0]', then use 'parameters[1]' subsequently.");
 		addConstraintTamplate(currTemplate);
 
@@ -196,6 +198,20 @@ public class ConstraintFactory {
 
 		return true;
 
+	}
+
+	/**
+	 * @param constr
+	 * @return
+	 */
+	public String getDescription(ConstraintData constr) {
+		ConstraintTemplate currTmpl = this.constraintTamplates.get(constr.getConstraintID());
+		String[] params = constr.getParameters();
+		String description = currTmpl.getDescription();
+		for(int i = 0; i < params.length; i++) {
+			description = description.replace("parameters[" + i + "]", constr.getParameters()[i]);
+		}
+		return description;
 	}
 
 }

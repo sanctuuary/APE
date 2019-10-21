@@ -30,8 +30,8 @@ import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
-import nl.uu.cs.ape.sat.models.constructs.Literal;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.logic.constructs.Literal;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**

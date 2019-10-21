@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.sat.automaton;
 
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
 
 /***
  * Class is used to represent the states in module and type automatons. Automaton corresponds to the structure of the possible solutions of the synthesis, i.e. it represents the structure that the provided solutions will follow.

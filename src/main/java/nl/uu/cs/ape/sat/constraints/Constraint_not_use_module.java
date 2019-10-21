@@ -18,7 +18,7 @@ import nl.uu.cs.ape.sat.models.formulas.*;
  * @author Vedran Kasalica
  *
  */
-public class Constraint_not_use_module extends Constraint {
+public class Constraint_not_use_module extends ConstraintTemplate {
 
 
 	public Constraint_not_use_module(String id, int parametersNo, String description) {

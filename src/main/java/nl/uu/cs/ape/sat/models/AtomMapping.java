@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.models.constructs.Atom;
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
+import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
 
 /**
  * Class is used to store the data used for representing the atoms with integer numbers. Atoms are not a separate data structure, 

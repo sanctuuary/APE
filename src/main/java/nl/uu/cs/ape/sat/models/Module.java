@@ -488,26 +488,26 @@ public class Module extends AbstractModule {
 	 */
 	@Override
 	public String print() {
-		String inputs = "";
-		String outputs = "";
+		StringBuilder inputs = new StringBuilder();
+		StringBuilder outputs = new StringBuilder();
 
 		for (Types types : moduleInput) {
-			inputs += "{";
+			inputs = inputs.append("{ ");
 			for (Type type : types.getTypes()) {
-				inputs += type.getPredicateLabel() + "_";
+				inputs = inputs.append("'").append(type.getPredicateLabel()).append("' ");
 			}
-			inputs += "}";
+			inputs = inputs.append("} ");
 		}
 		for (Types types : moduleOutput) {
-			outputs += "{";
+			outputs = outputs.append("{ ");
 			for (Type type : types.getTypes()) {
-				outputs += type.getPredicateLabel() + "_";
+				outputs = outputs.append("'").append(type.getPredicateLabel()).append("' ");
 			}
-			outputs += "}";
+			outputs = outputs.append("} ");
 		}
 
-		return "\n________________________\n|" + super.print() + ",\n|" + inputs + ",\n|" + outputs
-				+ "\n|________________________|";
+		return "______________________________________\n|" + super.print() + ",\n|IN:\t" + inputs + ",\n|OUT\t" + outputs
+				+ "\n|______________________________________";
 	}
 
 	/**

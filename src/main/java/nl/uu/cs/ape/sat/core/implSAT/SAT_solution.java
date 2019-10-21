@@ -15,9 +15,9 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
-import nl.uu.cs.ape.sat.models.constructs.Literal;
-import nl.uu.cs.ape.sat.models.constructs.Predicate;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.logic.constructs.Literal;
+import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
 
 /**
  * The {@code SAT_solution} class describes the solution produced by the SAT

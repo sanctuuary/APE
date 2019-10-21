@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nl.uu.cs.ape.sat.models.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 /**
  *  The {@code AbstractModule} class represents modules/tools provided by the Module Taxonomy as well as their abstraction classes.
  *  Instances of {@link AbstractModule} can be actual tools or their abstraction classes, 
@@ -142,7 +142,7 @@ public class AbstractModule extends TaxonomyPredicate {
 	 */
 	public String print() {
 
-		return getPredicateID() + ", " + getPredicateLabel();
+		return "ID: " + getPredicateID() + ", Label:" + getPredicateLabel();
 	}
 
 	/**
