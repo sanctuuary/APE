@@ -25,9 +25,9 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  */
 public class TypeNode extends SolutionWorkflowNode {
 
-	/** Types that define the data instance. The set cannot contain {@code EmptyType}. */
+	/** DataInstance that define the data instance. The set cannot contain {@code EmptyType}. */
 	private Set<Type> usedTypes;
-	/** Abstract Types that describe the data instance. */
+	/** Abstract DataInstance that describe the data instance. */
 	private Set<Type> abstractTypes;
 	/**
 	 * Module/step in the workflow that generates the data instance as input. If

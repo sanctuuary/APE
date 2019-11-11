@@ -31,9 +31,9 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Return the {@code ConstraintTemplate} that corresponds to the given ID.
+	 * Return the {@code ConstraintTemplate} that corresponds to the given ID, or {@code null} if the constraint with the given ID doesn not exist.
 	 * @param constraintID - ID of the {@code ConstraintTemplate}.
-	 * @return {@code ConstraintTemplate} or {@code null} if this map contains no mapping for the ID.
+	 * @return the {@code ConstraintTemplate} that corresponds to the given ID, or {@code null} if the ID is not mapped to any constraint.
 	 */
 	public ConstraintTemplate getConstraintTamplate(String constraintID) {
 		return constraintTamplates.get(constraintID);

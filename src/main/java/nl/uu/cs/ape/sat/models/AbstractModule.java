@@ -122,7 +122,7 @@ public class AbstractModule extends TaxonomyPredicate {
 	 * 
 	 * @return null
 	 */
-	public List<Types> getModuleInput() {
+	public List<DataInstance> getModuleInput() {
 		return null;
 	}
 
@@ -131,7 +131,7 @@ public class AbstractModule extends TaxonomyPredicate {
 	 * 
 	 * @return null
 	 */
-	public List<Types> getModuleOutput() {
+	public List<DataInstance> getModuleOutput() {
 		return null;
 	}
 

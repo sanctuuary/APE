@@ -8,8 +8,8 @@ import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 /**
  * 
- * The {@code Type} class represents data type/format that can be used by our
- * tools. {@code Type} can be an actual data type or an abstraction class.
+ * The {@code Type} class represents data dimension (e.g. data type, data format, etc.) that can be used by operations/tools
+ * from the domain. {@code Type} can be an actual data type of a dimension or an abstraction class.
  * 
  * @author Vedran Kasalica
  *
@@ -186,44 +186,6 @@ public class Type extends TaxonomyPredicate {
 	 */
 	public void setNodeType(NodeType nodeType) {
 		this.nodeType = nodeType;
-	}
-
-	/**
-	 * The class is used to check weather the type with typeID was already
-	 * introduced earlier on in allTypes. In case it was, it returns the item,
-	 * otherwise the new element is generated and returned. <br>
-	 * <br>
-	 * In case of generating a new Type, the object is added to the set of all the
-	 * Types and added as a subType to the parent Type.
-	 * 
-	 * @param typeName  - Type name
-	 * @param typeID    - Unique Type identifier
-	 * @param rootType  - Determines whether the Type is a simple/leaf type
-	 * @param nodeType  - {@link NodeType} object describing the type w.r.t. the
-	 *                  Type Taxonomy.
-	 * @param allTypes  - Set of all the types created
-	 * @param superType - The Parent (abstract) Type of the current Type
-	 * @return The Type object.
-	 */
-	public static Type generateType(String typeName, String typeID, String rootType, NodeType nodeType,
-			AllTypes allTypes, Type superType) {
-
-		Type tmpType;
-		if ((tmpType = allTypes.get(typeID)) == null) {
-			tmpType = new Type(typeName, typeID, rootType, nodeType);
-			allTypes.addType(tmpType);
-
-		}
-		/*
-		 * Adding class as a subtype to the superclass, even if currType was already
-		 * introduced (extending taxonomy tree)
-		 */
-		if (superType != null) {
-			superType.addSubType(typeID);
-		}
-
-		return tmpType;
-
 	}
 
 	/**

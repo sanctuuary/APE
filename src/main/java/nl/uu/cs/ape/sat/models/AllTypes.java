@@ -1,12 +1,12 @@
 package nl.uu.cs.ape.sat.models;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.automaton.Block;
@@ -17,15 +17,14 @@ import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 
 /**
- * The {@code AllTypes} class represent the set of all data types/formats that
+ * The {@code AllTypes} class represent the set of all data dimensions (e.g. types,formats, etc.) that
  * can be used in our program.
  * 
  * @author Vedran Kasalica
  *
  */
-public class AllTypes {
+public class AllTypes extends HashMap<String, Type>{
 
-	private Map<String, Type> types;
 
 	/**
 	 * Set of all the type IDs of the annotated type in the domain, ie. types that
@@ -34,17 +33,26 @@ public class AllTypes {
 	private Set<String> annotatedTypes;
 	/** {@link Type} object representing the "empty type". */
 	private Type emptyType;
+	/** List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).*/
+	private List<String> dataTaxonomyDimensions;
+	/** Root of the data taxonomy. */
+	private String dataTaxonomyRoot;
 
 	public AllTypes() {
-
-		this.types = new HashMap<String, Type>();
+		super();
 		this.annotatedTypes = new HashSet<String>();
-		emptyType = new Type("empty", "empty", APEConfig.getConfig().getData_taxonomy_root(), NodeType.EMPTY);
-		addType(emptyType);
+		dataTaxonomyDimensions = APEConfig.getConfig().getData_taxonomy_subroots();
+		dataTaxonomyRoot = APEConfig.getConfig().getData_taxonomy_root();
+		emptyType = new Type("empty", "empty", dataTaxonomyRoot, NodeType.EMPTY);
+		this.put(emptyType);
 	}
 
-	public Map<String, Type> getTypes() {
-		return types;
+	/**
+	 * Returns the set of {@link Type}s that are currently defined.  
+	 * @return {@link Collection} of {@link Type}s
+	 */
+	public Collection<Type> getTypes() {
+		return this.values();
 	}
 
 	/**
@@ -60,14 +68,51 @@ public class AllTypes {
 	 * @return The same element if it's a new one or the existing element if this
 	 *         set contains the specified element.
 	 */
-	public Type addType(Type type) {
+	private Type put(Type type) {
 		Type tmpType;
-		if ((tmpType = types.get(type.getPredicateID())) != null) {
+		if ((tmpType = this.get(type.getPredicateID())) != null) {
 			return tmpType;
 		} else {
-			this.types.put(type.getPredicateID(), type);
+			super.put(type.getPredicateID(), type);
 			return type;
 		}
+	}
+	
+	/**
+	 * The method is used to check weather the type with typeID was already
+	 * introduced earlier on in {@code allTypes}. In case it was, it returns the item,
+	 * otherwise the new element is generated and returned. <br>
+	 * <br>
+	 * In case of generating a new Type, the object is added to the set of all the
+	 * DataInstance and added as a subType to the parent Type.
+	 * 
+	 * @param typeName  - Type name
+	 * @param typeID    - Unique Type identifier
+	 * @param rootType  - Determines whether the Type is a simple/leaf type
+	 * @param nodeType  - {@link NodeType} object describing the type w.r.t. the
+	 *                  Type Taxonomy.
+	 * @param superType - The Parent (abstract) Type of the current Type
+	 * @return The Type object.
+	 */
+	public Type addType(String typeName, String typeID, String rootType, NodeType nodeType,
+			Type superType) {
+
+		Type tmpType;
+		if ((tmpType = this.get(typeID)) == null) {
+			tmpType = new Type(typeName, typeID, rootType, nodeType);
+			this.put(tmpType);
+
+		}
+		/*
+		 * Adding class as a subtype to the superclass, even if currType was already
+		 * introduced (extending taxonomy tree)
+		 */
+		if (superType != null) {
+			superType.addSubType(typeID);
+		}
+
+		return tmpType;
+
 	}
 
 	/**
@@ -79,7 +124,7 @@ public class AllTypes {
 	 *         if the typeID has no mappings
 	 */
 	public Type get(String typeID) {
-		return this.types.get(typeID);
+		return super.get(typeID);
 	}
 
 	/**
@@ -88,7 +133,16 @@ public class AllTypes {
 	 * @return The root type.
 	 */
 	public Type getRootType() {
-		return this.types.get(APEConfig.getConfig().getData_taxonomy_root());
+		return this.get(dataTaxonomyRoot);
+	}
+	
+	/**
+	 * Returns the ID of the root type of the taxonomy.
+	 * 
+	 * @return The root type ID.
+	 */
+	public String getRootID() {
+		return dataTaxonomyRoot;
 	}
 
 	/**
@@ -101,19 +155,23 @@ public class AllTypes {
 	}
 
 	/**
-	 * Returns true if this set contains the specified element. More formally,
+	 * Returns true if this set contains the specified type element. More formally,
 	 * returns true if and only if this set contains an element e such that (o==null
 	 * ? e==null : o.equals(e)).
 	 * 
-	 * @param type
+	 * @param type - type that is searched for
 	 * @return {@code true} if the type exists in the set.
 	 */
 	public boolean existsType(Type type) {
-		return types.containsKey(type.getPredicateID());
+		return this.containsKey(type.getPredicateID());
 	}
 
+	/**
+	 * Returns number of types currently defined.
+	 * @return Number of types.
+	 */
 	public int size() {
-		return types.size();
+		return super.size();
 	}
 
 	/**
@@ -127,8 +185,7 @@ public class AllTypes {
 		List<Pair> pairs = new ArrayList<Pair>();
 
 		List<Type> iterator = new ArrayList<Type>();
-		for (Entry<String, Type> mapType : types.entrySet()) {
-			Type type = mapType.getValue();
+		for (Type type : this.values()) {
 			if (type.isSimpleType() || type.isEmptyType()) {
 				iterator.add(type);
 			}
@@ -155,7 +212,6 @@ public class AllTypes {
 	 */
 	private List<Pair> getTypePairsForEachSubTaxonomy() {
 		List<Pair> pairs = new ArrayList<Pair>();
-		List<String> subRoots = APEConfig.getConfig().getData_taxonomy_subroots();
 
 		/*
 		 * Create a list for each subtree of the Data Taxonomy (e.g. TypeSubTaxonomy,
@@ -164,9 +220,9 @@ public class AllTypes {
 		 */
 		Map<String, List<Type>> subTreesMap = new HashMap<String, List<Type>>();
 		// Add general data taxonomy root to the list
-		subTreesMap.put(APEConfig.getConfig().getData_taxonomy_root(), new ArrayList<Type>());
+		subTreesMap.put(dataTaxonomyRoot, new ArrayList<Type>());
 		// Add each of the subtree roots (type and format taxonomy) to the list
-		for (String subRoot : subRoots) {
+		for (String subRoot : dataTaxonomyDimensions) {
 			subTreesMap.put(subRoot, new ArrayList<Type>());
 		}
 
@@ -174,8 +230,7 @@ public class AllTypes {
 		 * Allocate each simple type to the corresponding subtree, according to the
 		 * field Type.rootNode
 		 */
-		for (Entry<String, Type> mapType : types.entrySet()) {
-			Type type = mapType.getValue();
+		for (Type type : this.values()) {
 			if (type.isSimpleType()) {
 				// If the root type for the curr type exists in our list, add the type to it
 				if (subTreesMap.get(type.getRootNode()) != null) {
@@ -211,8 +266,7 @@ public class AllTypes {
 	private List<Type> getAllNonEmptyTypes() {
 
 		List<Type> allNonEmptyTypes = new ArrayList<Type>();
-		for (Entry<String, Type> mapType : types.entrySet()) {
-			Type type = mapType.getValue();
+		for (Type type : this.values()) {
 			if (!(type.isEmptyType() || type.isRootType())) {
 //				System.out.println("Type: " + type.getPredicate() + ", is root:" + type.isRootType() + ", is empty:" + type.isEmptyType());
 				allNonEmptyTypes.add(type);
@@ -223,7 +277,7 @@ public class AllTypes {
 	}
 
 	/**
-	 * Return {@code true} if the type is annotated.
+	 * Return {@code true} if the type is annotated, i.e. used as I/O by the annotated tools.
 	 * 
 	 * @param typeID - ID of the type that is evaluated.
 	 * @return {@code true} if the type is annotated, {@code false} otherwise.
@@ -233,12 +287,20 @@ public class AllTypes {
 	}
 
 	/**
-	 * Adds the type ID to the set of annotated type.
+	 * Adds the type ID to the set of annotated type (used as I/O by the annotated tools).
 	 * 
 	 * @param typeID - ID of the type that is annotated.
 	 */
 	public void addAnnotatedType(String typeID) {
 		annotatedTypes.add(typeID);
+	}
+	
+	/**
+	 * Return the list of dimensions that represent the data. Each dimension represents a node in the data taxonomy and the root for the corresponding sub-taxonomy.
+	 * @return List of abstract types that represent dimensions.
+	 */
+	public List<String> getDataTaxonomyDimensions(){
+		return dataTaxonomyDimensions;
 	}
 
 	/**
@@ -349,7 +411,7 @@ public class AllTypes {
 	private String typeEnforceTaxonomyStructureForState(String rootTypeID,
 			AtomMapping mappings, State typeState, WorkflowElement typeElement) {
 
-		Type currType = types.get(rootTypeID);
+		Type currType = this.get(rootTypeID);
 		String superType_State = mappings.add(currType, typeState, typeElement).toString();
 
 		StringBuilder constraints = new StringBuilder();
@@ -361,7 +423,7 @@ public class AllTypes {
 			 * Ensuring the TOP-DOWN taxonomy tree dependency
 			 */
 			for (String subTypeeID : currType.getSubTypes()) {
-				Type subType = types.get(subTypeeID);
+				Type subType = this.get(subTypeeID);
 
 				String subType_State = mappings.add(subType, typeState, typeElement).toString();
 				currConstraint = currConstraint.append(subType_State).append(" ");
@@ -394,7 +456,7 @@ public class AllTypes {
 	 * @param allTypes
 	 * @return String representation of the initial input encoding.
 	 */
-	public String encodeInputData(List<Types> program_inputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+	public String encodeInputData(List<DataInstance> program_inputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		StringBuilder encoding = new StringBuilder();
 
 		List<State> workfloInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
@@ -434,7 +496,7 @@ public class AllTypes {
 	 * @param allTypes
 	 * @return String representation of the workflow output encoding.
 	 */
-	public String encodeOutputData(List<Types> program_outputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+	public String encodeOutputData(List<DataInstance> program_outputs, TypeAutomaton typeAutomaton, AtomMapping mappings) {
 		StringBuilder encoding = new StringBuilder();
 
 		List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
@@ -461,62 +523,5 @@ public class AllTypes {
 
 		return encoding.toString();
 	}
-
-	/**
-	 * TODO: The function returns the encoding that introduces instances. It requires instances to be created for each typeState and ensures that they are being used properly.<br><br>
-	 * The functionalities that are supported:<br>
-	 *  1) creating subclasses of leaf types (instances) - one for each memory typeState.
-	 *  2) enforcing usage of at least one (corresponding) instance per state
-	 *  3) forbidding usage of instances in memory type states that don't correspond to it (e.g. [intanceT2.2] in state T3.1)
-	 *  4) 
-	 * @param typeAutomaton
-	 * @param mappings
-	 * @return
-	 */
-//	public String enforceInstances(TypeAutomaton typeAutomaton, AtomMapping mappings) {
-//		StringBuilder encoding = new StringBuilder();
-//		StringBuilder constrDemandingUsage = new StringBuilder(); 
-//		StringBuilder constrForbiddingUsage = new StringBuilder();
-//		List<TypeBlock> memoryBlocks = typeAutomaton.getMemoryTypesBlocks();
-//		int solutionLength = memoryBlocks.size();
-//		int outputNo = memoryBlocks.get(0).getBlockSize();
-//		List<String>[][] instanceClasses = new List[solutionLength][outputNo];
-//		int i=0,j=0;
-//		for (TypeBlock currBlock : memoryBlocks) {
-//			i=currBlock.getBlockNumber();
-//			for (State currState :currBlock.getTypeStates()) {
-//				j=currState.getStateNumber();
-//				for (String currInstanceType : annotatedTypes) {
-//					/*
-//					 * TODO:
-//					 * ! create sub instances
-//					 * - bind their usage per state
-//					 * - forbid their usage in other states
-//					 * - connect instance to the super-instance
-//					 * - connect instance to the matrix var
-//					 * - ensure usage of it
-//					 * - ensure not usage of it in the other places?
-//					 */
-//
-//					instanceClasses[i][j] = new ArrayList<String>();
-//					String currInstanceLabel = currInstanceType + "[instance_" + currState.getStateName() + "]";
-//					while (get(currInstanceLabel) != null) {
-//						System.err.println("Type with label '" + currInstanceLabel
-//								+ "' already exists in the taxonomy. It cannot be used to represent an instance of type '"
-//								+ currInstanceType + "'.");
-//						currInstanceLabel = currInstanceLabel + (int) (Math.random() * 10);
-//					}
-//					instanceClasses[i][j].add(currInstanceLabel);
-//
-//					constrDemandingUsage = constrDemandingUsage.append(mappings.add(currInstanceLabel, currState)).append(" ");
-//					
-//					
-//					
-//				}
-//				constrDemandingUsage = constrDemandingUsage.append("0\n");
-//			}
-//		}
-//		return null;
-//	}
 
 }

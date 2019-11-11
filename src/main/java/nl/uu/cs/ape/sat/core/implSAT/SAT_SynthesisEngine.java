@@ -71,6 +71,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	private StringBuilder cnfEncoding;
 	/** String used as an input for the SAT solver. */
 	private InputStream temp_sat_input;
+	/** Configuration of the program. */
 	/*
 	 * Representation of the tool part of the automaton used to encode the structure
 	 * of the solution.
@@ -290,21 +291,13 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 				solver.addClause(negSol);
 			}
 		} catch (ParseFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
 		} catch (ContradictionException e) {
 			System.err.println("Unsatisfiable");
 		} catch (TimeoutException e) {
 			System.err.println("Timeout. Solving took longer than default timeout: " + timeout + " seconds.");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Internal error while creating an object of SolutionWorkflow class.");
 		}
 
 		if (solutionsFound == 0 || solutionsFound % 500 != 0) {

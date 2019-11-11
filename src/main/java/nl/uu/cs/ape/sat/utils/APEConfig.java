@@ -17,7 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import nl.uu.cs.ape.sat.models.Type;
-import nl.uu.cs.ape.sat.models.Types;
+import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 
@@ -33,16 +33,15 @@ public class APEConfig {
 	/**
 	 * Singleton instance of the class.
 	 */
-	private static final APEConfig configAPE = new APEConfig();
+	private static APEConfig configAPE = null;
 	/**
 	 * Tags used in the ape.config file
 	 */
-	private final String CONFIGURATION_FILE = "ape.configuration";
+	private static final String CONFIGURATION_FILE = "ape.configuration";
 	private final String ONTOLOGY_TAG = "ontology_path";
 	private final String TOOL_ONTOLOGY_TAG = "toolsTaxonomyRoot";
 	private final String DATA_ONTOLOGY_TAG = "dataTaxonomyRoot";
-	private final String TYPE_SUBONTOLOGY_TAG = "typesTaxonomyRoot";
-	private final String FORMAT_SUBONTOLOGY_TAG = "formatsTaxonomyRoot";
+	private final String SUBONTOLOGY_TAG = "dataSubTaxonomyRoot";
 	private final String TOOL_ANNOTATIONS_TAG = "tool_annotations_path";
 	private final String CONSTRAINTS_TAG = "constraints_path";
 	private final String SHARED_MEMORY_TAG = "shared_memory";
@@ -56,8 +55,6 @@ public class APEConfig {
 	private final String NO_GRAPHS_TAG = "number_of_generated_graphs";
 	private final String PROGRAM_INPUTS_TAG = "inputs";
 	private final String PROGRAM_OUTPUTS_TAG = "outputs";
-	private final String PROGRAM_IO_TYPE_TAG = "type";
-	private final String PROGRAM_IO_FORMAT_TAG = "format";
 	private final String USE_WORKFLOW_INPUT = "use_workflow_input";
 	private final String USE_ALL_GENERATED_DATA = "use_all_generated_data";
 	private final String DEBUG_MODE_TAG = "debug_mode";
@@ -70,17 +67,11 @@ public class APEConfig {
 	 * taxonomies.
 	 */
 	private String tool_taxonomy_root, data_taxonomy_root;
-	/** Root of the data-type taxonomy. */
-	private String typeSubntology;
-
-	/** Root of the data-format taxonomy. */
-	private String formatSubntology;
 
 	/**
-	 * List of nodes in the ontology that correspond to the roots of data type and
-	 * data format taxonomies.
+	 * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each respresents a data dimension (e.g. data type, data format, etc.).
 	 */
-	private List<String> data_taxonomy_subroots = new ArrayList<String>();
+	private List<String> data_taxonomy_subroots;
 
 	/** Path to the XML file with all tool annotations. */
 	private String tool_annotations_path;
@@ -109,14 +100,26 @@ public class APEConfig {
 	/** Max number of solution that the solver will return. */
 	private Integer max_no_solutions;
 
-	/** Path to the folder that will contain all the scripts generated based on the candidate workflows. */
+	/**
+	 * Path to the folder that will contain all the scripts generated based on the
+	 * candidate workflows.
+	 */
 	private String execution_scripts_folder;
-	/**  Number of the workflow scripts that should be generated from candidate workflows. Default is 0. */
+	/**
+	 * Number of the workflow scripts that should be generated from candidate
+	 * workflows. Default is 0.
+	 */
 	private Integer no_executions;
-	
-	/** Path to the folder that will contain all the figures/graphs generated based on the candidate workflows. */
+
+	/**
+	 * Path to the folder that will contain all the figures/graphs generated based
+	 * on the candidate workflows.
+	 */
 	private String solution_graphs_folder;
-	/**  Number of the solution graphs that should be generated from candidate workflows. Default is 0. */
+	/**
+	 * Number of the solution graphs that should be generated from candidate
+	 * workflows. Default is 0.
+	 */
 	private Integer no_graphs;
 
 	/** Output branching factor (max number of outputs per tool). */
@@ -126,9 +129,9 @@ public class APEConfig {
 	private Integer max_no_tool_inputs = 3;
 
 	/** Input types of the workflow. */
-	private List<Types> program_inputs;
+	private List<DataInstance> program_inputs;
 	/** Output types of the workflow. */
-	private List<Types> program_outputs;
+	private List<DataInstance> program_outputs;
 
 	/**
 	 * Determines the required usage for the data instances that are given as
@@ -156,29 +159,58 @@ public class APEConfig {
 	/**
 	 * Initialize the configuration of the project.
 	 */
-	private APEConfig() {
-		File file = new File(CONFIGURATION_FILE);
-		String content;
-		try {
-			content = FileUtils.readFileToString(file, "utf-8");
-
-			// Convert JSON string to JSONObject
-			jsonObject = new JSONObject(content);
-
-		} catch (IOException e) {
-			System.err.println("Configuration file ./" + CONFIGURATION_FILE
-					+ " is not provided at location  or its format is corrupted.");
+	private APEConfig(String congifPath) throws IOException {
+		if (congifPath == null) {
+			congifPath = CONFIGURATION_FILE;
 		}
+		
+		data_taxonomy_subroots = new ArrayList<String>();
+		program_inputs = new ArrayList<DataInstance>(); 
+		program_outputs = new ArrayList<DataInstance>();
+		
+		File file = new File(congifPath);
+
+		String content = FileUtils.readFileToString(file, "utf-8");
+
+		// Convert JSON string to JSONObject
+		jsonObject = new JSONObject(content);
 
 	}
 
 	/**
 	 * Returns the singleton class representing the library configuration.
 	 * 
-	 * @return
+	 * @param configPath - path to the configuration file
+	 * @return object that represent the configuration.
+	 * @throws IOException - error in case of a bad configuration file
+	 */
+	public static APEConfig getConfig(String configPath) throws IOException {
+		if (configAPE == null) {
+			configAPE = new APEConfig(configPath);
+			return configAPE;
+		} else {
+			return configAPE;
+		}
+	}
+
+	/**
+	 * TODO: Not safe! Returns the singleton class representing the library
+	 * configuration.
+	 * 
+	 * @return object that represent the configuration.
+	 * @throws IOException - error in case of a bad configuration file
 	 */
 	public static APEConfig getConfig() {
-		return configAPE;
+		if (configAPE == null) {
+			try {
+				configAPE = new APEConfig(CONFIGURATION_FILE);
+			} catch (IOException e) {
+				System.err.println("Configuration file ./" + CONFIGURATION_FILE + "is not provided correctly.");
+			}
+			return configAPE;
+		} else {
+			return configAPE;
+		}
 	}
 
 	/**
@@ -194,7 +226,7 @@ public class APEConfig {
 			if (!isValidConfigReadFile(ONTOLOGY_TAG, ontology_path)) {
 				return false;
 			}
-		} catch(JSONException JSONException) {
+		} catch (JSONException JSONException) {
 			System.err.println("Tag '" + ONTOLOGY_TAG + "' in the configuration file is not provided correctly.");
 			return false;
 		}
@@ -219,23 +251,14 @@ public class APEConfig {
 			System.err.println("Tag '" + DATA_ONTOLOGY_TAG + "' in the configuration file is not provided correctly.");
 			return false;
 		}
+
 		try {
-			this.typeSubntology = jsonObject.getString(TYPE_SUBONTOLOGY_TAG);
-			if (typeSubntology == null || typeSubntology == "") {
-				data_taxonomy_subroots.add(typeSubntology);
+			List<String> tmpDataSubontology = APEUtils.getListFromJson(jsonObject, SUBONTOLOGY_TAG, String.class);
+			for (String subTaxonomy : tmpDataSubontology) {
+				data_taxonomy_subroots.add(subTaxonomy);
 			}
 		} catch (JSONException JSONException) {
 			/* Configuration does not have the type sub-ontology */
-			typeSubntology = data_taxonomy_root;
-		}
-		try {
-			this.formatSubntology = jsonObject.getString(FORMAT_SUBONTOLOGY_TAG);
-			if (formatSubntology == null || formatSubntology == "") {
-				data_taxonomy_subroots.add(formatSubntology);
-			}
-		} catch (JSONException JSONException) {
-			/* Configuration does not have the format sub-ontology */
-			formatSubntology = data_taxonomy_root;
 		}
 
 		try {
@@ -255,14 +278,16 @@ public class APEConfig {
 				return false;
 			}
 		} catch (JSONException JSONException) {
-			System.out.println("Tag '" + CONSTRAINTS_TAG + "' in the configuration file is not provided correctly. No constraints will be applied.");
+			System.out.println("Tag '" + CONSTRAINTS_TAG
+					+ "' in the configuration file is not provided correctly. No constraints will be applied.");
 			this.constraints_path = null;
 		}
 
 		try {
 			this.shared_memory = jsonObject.getBoolean(SHARED_MEMORY_TAG);
 		} catch (JSONException JSONException) {
-			System.out.println("Tag '" + SHARED_MEMORY_TAG + "' in the configuration file is not provided correctly. Default value is: false.");
+			System.out.println("Tag '" + SHARED_MEMORY_TAG
+					+ "' in the configuration file is not provided correctly. Default value is: false.");
 			this.shared_memory = false;
 		}
 
@@ -320,8 +345,8 @@ public class APEConfig {
 				return false;
 			}
 		} catch (JSONException JSONException) {
-			System.err.println(
-					"Tag '" + EXECUTION_SCRIPTS_FOLDER_TAG + "' in the configuration file is not provided correctly. Solution workflows will not be executed.");
+			System.err.println("Tag '" + EXECUTION_SCRIPTS_FOLDER_TAG
+					+ "' in the configuration file is not provided correctly. Solution workflows will not be executed.");
 			this.execution_scripts_folder = null;
 		}
 
@@ -331,18 +356,19 @@ public class APEConfig {
 				return false;
 			}
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + NO_EXECUTIONS_TAG + "' in the configuration file is not provided correctly. Default value is: 0.");
+			System.err.println("Tag '" + NO_EXECUTIONS_TAG
+					+ "' in the configuration file is not provided correctly. Default value is: 0.");
 			this.no_executions = 0;
 		}
-		
+
 		try {
 			this.solution_graphs_folder = jsonObject.getString(SOLUTION_GRAPS_FOLDER_TAG);
 			if (!isValidConfigWriteFolder(SOLUTION_GRAPS_FOLDER_TAG, this.solution_graphs_folder)) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
-			System.err.println(
-					"Tag '" + SOLUTION_GRAPS_FOLDER_TAG + "' in the configuration file is not provided correctly. Solution graphs will not be generated.");
+			System.err.println("Tag '" + SOLUTION_GRAPS_FOLDER_TAG
+					+ "' in the configuration file is not provided correctly. Solution graphs will not be generated.");
 			this.solution_graphs_folder = null;
 		}
 
@@ -352,59 +378,60 @@ public class APEConfig {
 				return false;
 			}
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + NO_GRAPHS_TAG + "' in the configuration file is not provided correctly. Default value is: 0.");
+			System.err.println("Tag '" + NO_GRAPHS_TAG
+					+ "' in the configuration file is not provided correctly. Default value is: 0.");
 			this.no_graphs = 0;
 		}
 
-		program_inputs = new ArrayList<Types>();
 		try {
 			JSONArray jsonModuleInputs = jsonObject.getJSONArray(PROGRAM_INPUTS_TAG);
 			for (int i = 0; i < jsonModuleInputs.length(); i++) {
 				JSONObject jsonModuleInput = jsonModuleInputs.getJSONObject(i);
 
-				Types input = new Types();
-				try {
-					String jsonInputType = jsonModuleInput.getString(PROGRAM_IO_TYPE_TAG);
-					input.addType(new Type(jsonInputType, jsonInputType, typeSubntology, NodeType.UNKNOWN));
-				} catch (JSONException JSONException) {
-					/* Configuration input does not have the type */}
+				DataInstance input = new DataInstance();
+				for (String typeSubntology : jsonModuleInput.keySet()) {
+					String inputType = jsonModuleInput.getString(typeSubntology);
+					if (data_taxonomy_subroots.contains(typeSubntology)) {
+						input.addType(new Type(inputType, inputType, typeSubntology, NodeType.UNKNOWN));
+					} else {
+						System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
+								+ "' was not defined, but it was used for input type '" + inputType + "'.");
+						return false;
+					}
+				}
 
-				try {
-					String jsonInputFormat = jsonModuleInput.getString(PROGRAM_IO_FORMAT_TAG);
-					input.addType(new Type(jsonInputFormat, jsonInputFormat, formatSubntology, NodeType.UNKNOWN));
-				} catch (JSONException JSONException) {
-					/* Configuration input does not have the format */}
 				if (!input.getTypes().isEmpty()) {
 					program_inputs.add(input);
 				}
 			}
 		} catch (JSONException JSONException) {
-			System.out.println("Tag '" + PROGRAM_INPUTS_TAG + "' is not provided in the configuration file. Program will have no inputs.");
+			System.out.println("Tag '" + PROGRAM_INPUTS_TAG
+					+ "' is not provided in the configuration file. Program will have no inputs.");
 		}
 
-		program_outputs = new ArrayList<Types>();
 		try {
 			JSONArray jsonModuleOutputs = jsonObject.getJSONArray(PROGRAM_OUTPUTS_TAG);
 			for (int i = 0; i < jsonModuleOutputs.length(); i++) {
 				JSONObject jsonModuleOutput = jsonModuleOutputs.getJSONObject(i);
 
-				Types output = new Types();
-				try {
-					String jsonOutputType = jsonModuleOutput.getString(PROGRAM_IO_TYPE_TAG);
-					output.addType(new Type(jsonOutputType, jsonOutputType, typeSubntology, NodeType.UNKNOWN));
-				} catch (JSONException JSONException) {
-					/* Configuration output does not have the type */}
-				try {
-					String jsonOutputFormat = jsonModuleOutput.getString(PROGRAM_IO_FORMAT_TAG);
-					output.addType(new Type(jsonOutputFormat, jsonOutputFormat, typeSubntology, NodeType.UNKNOWN));
-				} catch (JSONException JSONException) {
-					/* Configuration output does not have the type */}
+				DataInstance output = new DataInstance();
+				for (String typeSubntology : jsonModuleOutput.keySet()) {
+					String outputType = jsonModuleOutput.getString(typeSubntology);
+					if (data_taxonomy_subroots.contains(typeSubntology)) {
+						output.addType(new Type(outputType, outputType, typeSubntology, NodeType.UNKNOWN));
+					} else {
+						System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
+								+ "' was not defined, but it was used for output type '" + outputType + "'.");
+						return false;
+					}
+				}
 				if (!output.getTypes().isEmpty()) {
 					program_outputs.add(output);
 				}
 			}
 		} catch (JSONException JSONException) {
-			System.out.println("Tag '" + PROGRAM_OUTPUTS_TAG + "' is not provided in the configuration file. Program will have no outputs.");
+			System.out.println("Tag '" + PROGRAM_OUTPUTS_TAG
+					+ "' is not provided in the configuration file. Program will have no outputs.");
 		}
 
 		try {
@@ -412,7 +439,8 @@ public class APEConfig {
 			this.use_workflow_input = isValidConfigEnum(USE_WORKFLOW_INPUT, tempUseWInput);
 			if (this.use_workflow_input == null) {
 				this.use_workflow_input = ConfigEnum.ALL;
-				System.out.println("Tag " + USE_WORKFLOW_INPUT + "' in the configuration file is not provided. Default value is: ALL.");
+				System.out.println("Tag " + USE_WORKFLOW_INPUT
+						+ "' in the configuration file is not provided. Default value is: ALL.");
 			}
 		} catch (JSONException JSONException) {
 			System.err.println("Tag '" + USE_WORKFLOW_INPUT + "' in the configuration file is not provided correctly.");
@@ -424,18 +452,21 @@ public class APEConfig {
 			this.use_all_generated_data = isValidConfigEnum(USE_ALL_GENERATED_DATA, tempUseGenData);
 			if (this.use_workflow_input == null) {
 				this.use_workflow_input = ConfigEnum.ONE;
-				System.out.println("Tag " + USE_ALL_GENERATED_DATA + "' in the configuration file is not provided. Default value is: ONE.");
+				System.out.println("Tag " + USE_ALL_GENERATED_DATA
+						+ "' in the configuration file is not provided. Default value is: ONE.");
 			}
-		
+
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + USE_ALL_GENERATED_DATA + "' in the configuration file is not provided correctly.");
+			System.err.println(
+					"Tag '" + USE_ALL_GENERATED_DATA + "' in the configuration file is not provided correctly.");
 			return false;
 		}
 
 		try {
 			this.debug_mode = jsonObject.getBoolean(DEBUG_MODE_TAG);
 		} catch (JSONException JSONException) {
-			System.out.println("Tag '" + DEBUG_MODE_TAG + "' in the configuration file is not provided correctly. Default value is: false.");
+			System.out.println("Tag '" + DEBUG_MODE_TAG
+					+ "' in the configuration file is not provided correctly. Default value is: false.");
 			this.debug_mode = false;
 		}
 
@@ -468,20 +499,6 @@ public class APEConfig {
 	 */
 	public String getData_taxonomy_root() {
 		return data_taxonomy_root;
-	}
-	
-	/**
-	 * @return the {@link #typeSubntology}
-	 */
-	public String getData_taxonomy_type_subroot() {
-		return typeSubntology;
-	}
-	
-	/**
-	 * @return the {@link #data_taxonomy_subroots}
-	 */
-	public String getData_taxonomy_format_subroot() {
-		return formatSubntology;
 	}
 
 	/**
@@ -553,7 +570,7 @@ public class APEConfig {
 	public Integer getNo_executions() {
 		return no_executions;
 	}
-	
+
 	/**
 	 * @return the {@link #solution_graphs_folder}
 	 */
@@ -567,8 +584,7 @@ public class APEConfig {
 	public Integer getNo_graphs() {
 		return no_graphs;
 	}
-	
-	
+
 	/**
 	 * @return the {@link #max_no_tool_outputs}
 	 */
@@ -586,14 +602,14 @@ public class APEConfig {
 	/**
 	 * @return the {@link #program_inputs}
 	 */
-	public List<Types> getProgram_inputs() {
+	public List<DataInstance> getProgram_inputs() {
 		return program_inputs;
 	}
 
 	/**
 	 * @return the {@link #program_outputs}
 	 */
-	public List<Types> getProgram_outputs() {
+	public List<DataInstance> getProgram_outputs() {
 		return program_outputs;
 	}
 
@@ -631,10 +647,11 @@ public class APEConfig {
 	public JSONObject getConfigJsonObj() {
 		return jsonObject;
 	}
-	
+
 	/**
-	 * Function that returns the tags that are used in the Constraint file. Function can be used to rename the tags.
-	 *  
+	 * Function that returns the tags that are used in the Constraint file. Function
+	 * can be used to rename the tags.
+	 * 
 	 * @param tag
 	 * @return
 	 */
@@ -648,10 +665,6 @@ public class APEConfig {
 			return "inputs";
 		case "outputs":
 			return "outputs";
-		case "type":
-			return "type";
-		case "format":
-			return "format";
 		case "implementation":
 			return "implementation";
 		case "code":

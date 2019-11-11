@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +39,7 @@ import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
-import nl.uu.cs.ape.sat.models.Types;
+import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 
 /**
@@ -159,8 +162,8 @@ public class APEUtils {
 	 * Function used to provide SAT encoding of a constrain based on the constraint
 	 * ID specified and provided parameters.
 	 * 
-	 * @param constraintID - ID of the constraint -
-	 * @param parameters
+	 * @param constraintID - ID of the constraint
+	 * @param parameters parameters for the constraint template
 	 * @return String representation of the SAT encoding for the specified
 	 *         constraint.
 	 */
@@ -197,7 +200,7 @@ public class APEUtils {
 
 	/**
 	 * Updates the list of All Modules by annotating the existing ones (or adding
-	 * non-existing) using the I/O Types from the @file. Returns the list of Updated
+	 * non-existing) using the I/O DataInstance from the @file. Returns the list of Updated
 	 * Modules.
 	 * 
 	 * @param file       - path to the .XML file containing tool annotations
@@ -223,7 +226,7 @@ public class APEUtils {
 
 	/**
 	 * Updates the list of All Modules by annotating the existing ones (or adding
-	 * non-existing) using the I/O Types from the @file. Returns the list of Updated
+	 * non-existing) using the I/O DataInstance from the @file. Returns the list of Updated
 	 * Modules.
 	 * 
 	 * @param file       - path to the .json file containing tool annotations
@@ -370,20 +373,6 @@ public class APEUtils {
 	}
 
 	/**
-	 * Transform the {@link JSONArray} object to list of {@link JSONObject} objects.
-	 * 
-	 * @param jsonArray - {@link JSONArray} that should be transformed.
-	 * @return {@link ArrayList} of {@link JSONObject} elements.
-	 * 
-	 *         public static List<JSONObject> fromJsonArray2JsonObjects(JSONArray
-	 *         jsonArray) { List<JSONObject> jsonObjectList = new
-	 *         ArrayList<JSONObject>();
-	 * 
-	 *         for(int i=0; i<jsonArray.length(); i++) {
-	 *         jsonObjectList.add(jsonArray.getJSONObject(i)); } return
-	 *         jsonObjectList; }
-	 */
-	/**
 	 * Method checks whether the provided path corresponds to an existing file with
 	 * required reading permissions.
 	 * 
@@ -409,42 +398,42 @@ public class APEUtils {
 		return true;
 	}
 
-	/**
-	 * TODO Read the list of inputs or outputs presented in json format and format
-	 * them in a list of {@link Types}.
-	 * 
-	 * @param jsonListIO - {@link JSONArray} of the elements
-	 * @return {@link List} of {@link Types}.
-	 */
-	public static List<Types> readModuleIO(JSONArray jsonListIO) throws JSONException {
-		List<Types> listIO = new ArrayList<Types>();
-
-		for (int i = 0; i < jsonListIO.length(); i++) {
-			JSONObject moduleIO = jsonListIO.getJSONObject(i);
-
-			Types output = new Types();
-			try {
-				List<JSONObject> jsonIOTypes = getListFromJson(moduleIO, PROGRAM_IO_TYPE_TAG, JSONObject.class);
-				for (JSONObject jsonIOType : jsonIOTypes) {
-					String jsonOutputType = moduleIO.getString(PROGRAM_IO_TYPE_TAG);
-					output.addType(new Type(jsonOutputType, jsonOutputType,
-							APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
-				}
-			} catch (JSONException JSONException) {
-				/* Configuration output does not have the type */}
-			try {
-				String jsonOutputFormat = moduleIO.getString(PROGRAM_IO_FORMAT_TAG);
-				output.addType(new Type(jsonOutputFormat, jsonOutputFormat,
-						APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
-			} catch (JSONException JSONException) {
-				/* Configuration output does not have the type */}
-			if (!output.getTypes().isEmpty()) {
-				listIO.add(output);
-			}
-		}
-
-		return listIO;
-	}
+//	/**
+//	 * TODO Read the list of inputs or outputs presented in json format and format
+//	 * them in a list of {@link DataInstance}.
+//	 * 
+//	 * @param jsonListIO - {@link JSONArray} of the elements
+//	 * @return {@link List} of {@link DataInstance}.
+//	 */
+//	public static List<DataInstance> readModuleIO(JSONArray jsonListIO) throws JSONException {
+//		List<DataInstance> listIO = new ArrayList<DataInstance>();
+//
+//		for (int i = 0; i < jsonListIO.length(); i++) {
+//			JSONObject moduleIO = jsonListIO.getJSONObject(i);
+//
+//			DataInstance output = new DataInstance();
+//			try {
+//				List<JSONObject> jsonIOTypes = getListFromJson(moduleIO, PROGRAM_IO_TYPE_TAG, JSONObject.class);
+//				for (JSONObject jsonIOType : jsonIOTypes) {
+//					String jsonOutputType = moduleIO.getString(PROGRAM_IO_TYPE_TAG);
+//					output.addType(new Type(jsonOutputType, jsonOutputType,
+//							APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
+//				}
+//			} catch (JSONException JSONException) {
+//				/* Configuration output does not have the type */}
+//			try {
+//				String jsonOutputFormat = moduleIO.getString(PROGRAM_IO_FORMAT_TAG);
+//				output.addType(new Type(jsonOutputFormat, jsonOutputFormat,
+//						APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
+//			} catch (JSONException JSONException) {
+//				/* Configuration output does not have the type */}
+//			if (!output.getTypes().isEmpty()) {
+//				listIO.add(output);
+//			}
+//		}
+//
+//		return listIO;
+//	}
 
 	/**
 	 * In case that the debug mode is on, print the constraint templates and tool
@@ -485,10 +474,10 @@ public class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tAnnotated tools:");
 			System.out.println("-------------------------------------------------------------");
-			for(AbstractModule module : annotated_tools.getModules().values()) {
+			for(AbstractModule module : annotated_tools.getModules()) {
 				System.out.println(module.print());
 			}
-			if(annotated_tools.getModules().values().isEmpty()) {
+			if(annotated_tools.getModules().isEmpty()) {
 				System.out.println("\tNo annotated tools.");
 			}
 			/*
@@ -592,6 +581,19 @@ public class APEUtils {
 			stream.close();
 		}
 	}
+	/**
+	 * Get file content as a string.
+	 * @param path
+	 * @param encoding
+	 * @return
+	 * @throws IOException
+	 */
+	public static String readFile(String path, Charset encoding) 
+			  throws IOException 
+			{
+			  byte[] encoded = Files.readAllBytes(Paths.get(path));
+			  return new String(encoded, encoding);
+			}
 
 	public static void timerStart(String timerID, Boolean debugMode) {
 		if (debugMode) {

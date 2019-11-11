@@ -31,8 +31,6 @@ public class OWLReader {
 	private final String ONTOLOGY_PATH;
 	private final AllModules allModules;
 	private final AllTypes allTypes;
-	private final String moduleTaxonomyRoot;
-	private final String dataTaxonomyRoot;
 
 	/**
 	 * Setting up the reader that will populate the provided module and type sets
@@ -47,8 +45,6 @@ public class OWLReader {
 	 */
 	public OWLReader(AllModules allModules, AllTypes allTypes) {
 		this.ONTOLOGY_PATH = APEConfig.getConfig().getOntology_path();
-		this.moduleTaxonomyRoot = APEConfig.getConfig().getTool_taxonomy_root();
-		this.dataTaxonomyRoot = APEConfig.getConfig().getData_taxonomy_root();
 		this.allModules = allModules;
 		this.allTypes = allTypes;
 	}
@@ -90,13 +86,13 @@ public class OWLReader {
 		if (moduleClass != null) {
 			exploreModuleOntologyRec(reasoner, ontology, moduleClass, thingClass, thingClass);
 		} else {
-			System.err.println("Provided ontology does not contain the "+moduleTaxonomyRoot+" class.");
+			System.err.println("Provided ontology does not contain the "+allModules.getRootID()+" class.");
 		}
 
 		if (typeClass != null) {
 			exploreTypeOntologyRec(reasoner, ontology, typeClass, thingClass, thingClass);
 		} else {
-			System.err.println("Provided ontology does not contain the "+dataTaxonomyRoot+" class.");
+			System.err.println("Provided ontology does not contain the "+allTypes.getRootID()+" class.");
 		}
 
 		if (moduleClass == null || typeClass == null) {
@@ -117,7 +113,7 @@ public class OWLReader {
 	private OWLClass getModuleClass(Set<OWLClass> subClasses) {
 		OWLClass moduleClass = null;
 		for (OWLClass currClass : subClasses) {
-			if (getLabel(currClass).matches(moduleTaxonomyRoot)) {
+			if (getLabel(currClass).matches(allModules.getRootID())) {
 				moduleClass = currClass;
 			}
 		}
@@ -134,7 +130,7 @@ public class OWLReader {
 	private OWLClass getTypeClass(Set<OWLClass> subClasses) {
 		OWLClass typeClass = null;
 		for (OWLClass currClass : subClasses) {
-			if (getLabel(currClass).matches(dataTaxonomyRoot)) {
+			if (getLabel(currClass).matches(allTypes.getRootID())) {
 				typeClass = currClass;
 			}
 		}
@@ -163,7 +159,7 @@ public class OWLReader {
 		 * Defining the Node Type based on the node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if(getLabel(currClass).matches(APEConfig.getConfig().getTool_taxonomy_root())) {
+		if(getLabel(currClass).matches(allModules.getRootID())) {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		}
@@ -207,19 +203,18 @@ public class OWLReader {
 		 * Check whether the current node is a root or subRoot node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if(getLabel(currClass).matches(APEConfig.getConfig().getData_taxonomy_root())) {
+		if(getLabel(currClass).matches(allTypes.getRootID())) {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		} else {
-			for(String dataTaxonomySubRoot : APEConfig.getConfig().getData_taxonomy_subroots()) {
+			for(String dataTaxonomySubRoot : allTypes.getDataTaxonomyDimensions()) {
 				if(getLabel(currClass).matches(dataTaxonomySubRoot)) {
 					currNodeType = NodeType.SUBROOT;
 					rootClass = currClass;
 				}
 			}
 		}
-		
-		subType = Type.generateType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, allTypes, superType);
+		subType = allTypes.addType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, superType);
 
 		/*
 		 * Define the counter to check whether all the subclasses are empty / owl:Nothing

@@ -27,15 +27,17 @@ import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
  * @author Vedran Kasalica
  *
  */
-public class AllModules {
+public class AllModules extends HashMap<String, AbstractModule>{
 
-	private Map<String, AbstractModule> modules;
 	/** Set of all the module IDs of the annotated modules in the domain. */
 	private Set<String> annotatedModules;
+	/** Root of the data taxonomy. */
+	private String moduleTaxonomyRoot;
 
 	public AllModules() {
-		this.modules = new HashMap<String, AbstractModule>();
+		super();
 		this.annotatedModules = new HashSet<String>();
+		this.moduleTaxonomyRoot = APEConfig.getConfig().getTool_taxonomy_root();
 	}
 
 	/**
@@ -45,14 +47,18 @@ public class AllModules {
 	 * @param modules
 	 */
 	public AllModules(Collection<? extends AbstractModule> modules) {
-		this.modules = new HashMap<String, AbstractModule>();
+		super();
 		for (AbstractModule module : modules) {
 			this.addModule(module);
 		}
 	}
 
-	public Map<String, AbstractModule> getModules() {
-		return modules;
+	/**
+	 * Return the set of currently defined modules (both {@link AbstractModule} and {@link Module}).
+	 * @return
+	 */
+	public Collection<AbstractModule> getModules() {
+		return super.values();
 	}
 
 	/**
@@ -70,7 +76,7 @@ public class AllModules {
 	 *         contains the specified element.
 	 */
 	public AbstractModule addModule(AbstractModule module) {
-		AbstractModule tmpModule = modules.get(module.getPredicateID());
+		AbstractModule tmpModule = super.get(module.getPredicateID());
 		if (module instanceof Module && (tmpModule != null)) {
 			if (tmpModule instanceof Module) {
 				return tmpModule;
@@ -86,7 +92,7 @@ public class AllModules {
 			if (tmpModule != null) {
 				return tmpModule;
 			} else {
-				this.modules.put(module.getPredicateID(), module);
+				this.put(module.getPredicateID(), module);
 				return module;
 			}
 		}
@@ -102,8 +108,8 @@ public class AllModules {
 	 * @param oldModule - object that will be removed
 	 */
 	public void swapAbstractModule2Module(AbstractModule newModule, AbstractModule oldModule) {
-		this.modules.remove(oldModule.getPredicateID());
-		this.modules.put(newModule.getPredicateID(), newModule);
+		this.remove(oldModule.getPredicateID());
+		this.put(newModule.getPredicateID(), newModule);
 	}
 
 	/**
@@ -115,7 +121,7 @@ public class AllModules {
 	 *         is mapped to, or {@code null} if the moduleID has no mappings
 	 */
 	public AbstractModule get(String moduleID) {
-		return this.modules.get(moduleID);
+		return super.get(moduleID);
 	}
 
 	/**
@@ -124,7 +130,16 @@ public class AllModules {
 	 * @return The root module.
 	 */
 	public AbstractModule getRootModule() {
-		return this.modules.get(APEConfig.getConfig().getTool_taxonomy_root());
+		return this.get(moduleTaxonomyRoot);
+	}
+	
+	/**
+	 * Returns the ID of the root module of the taxonomy.
+	 * 
+	 * @return The root module.
+	 */
+	public String getRootID() {
+		return moduleTaxonomyRoot;
 	}
 
 	/**
@@ -136,11 +151,11 @@ public class AllModules {
 	 * @return true if this set contains the specified element
 	 */
 	public boolean existsModule(AbstractModule module) {
-		return modules.containsKey(module.getPredicateID());
+		return this.containsKey(module.getPredicateID());
 	}
 
 	public int size() {
-		return modules.size();
+		return this.size();
 	}
 
 	/**
@@ -154,8 +169,7 @@ public class AllModules {
 		List<Pair> pairs = new ArrayList<Pair>();
 
 		List<AbstractModule> iterator = new ArrayList<AbstractModule>();
-		for (Entry<String, AbstractModule> mapModule : modules.entrySet()) {
-			AbstractModule module = mapModule.getValue();
+		for (AbstractModule module : this.values()) {
 			if (module.isTool())
 				iterator.add(module);
 		}
@@ -229,7 +243,7 @@ public class AllModules {
 
 		StringBuilder constraints = new StringBuilder();
 		AtomMapping mappings = synthesisInstance.getMappings();
-		for (Entry<String, AbstractModule> mapModule : modules.entrySet()) {
+		for (Entry<String, AbstractModule> mapModule : this.entrySet()) {
 			AbstractModule module = mapModule.getValue();
 			/* ..which is a Tool.. */
 			if ((module instanceof Module)) {
@@ -238,7 +252,7 @@ public class AllModules {
 					int moduleNo = moduleState.getStateNumber();
 					/* ..and for each state and input state of that module state.. */
 					List<State> currInputStates = synthesisInstance.getTypeAutomaton().getUsedTypesBlock(moduleNo - 1).getStates();
-					List<Types> moduleInputs = module.getModuleInput();
+					List<DataInstance> moduleInputs = module.getModuleInput();
 					for (State currInputState : currInputStates) {
 						int currInputStateNo = currInputState.getStateNumber();
 						/*
@@ -290,8 +304,7 @@ public class AllModules {
 		StringBuilder constraints = new StringBuilder();
 
 		/* For each type instance */
-		for (Entry<String, Type> mapType : allTypes.getTypes().entrySet()) {
-			Type currType = mapType.getValue();
+		for (Type currType : allTypes.getTypes()) {
 			if (currType.isSimpleType() || currType.isEmptyType()) {
 				/* ..for each state in which type can be used .. */
 				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
@@ -650,7 +663,7 @@ public class AllModules {
 		StringBuilder constraints = new StringBuilder();
 
 		// for each module
-		for (Entry<String, AbstractModule> mapModule : modules.entrySet()) {
+		for (Entry<String, AbstractModule> mapModule : this.entrySet()) {
 			AbstractModule module = mapModule.getValue();
 			// that is a Tool
 			if ((module instanceof Module)) {
@@ -659,7 +672,7 @@ public class AllModules {
 					int moduleNo = moduleState.getStateNumber();
 					// and for each state and output state of that module state
 					List<State> currOutputStates = synthesisInstance.getTypeAutomaton().getMemoryTypesBlock(moduleNo).getStates();
-					List<Types> moduleOutputs = module.getModuleOutput();
+					List<DataInstance> moduleOutputs = module.getModuleOutput();
 					for (int i = 0; i < currOutputStates.size(); i++) {
 						if (i < moduleOutputs.size()) {
 							for (Type outputType : moduleOutputs.get(i).getTypes()) { // set type and format for the
@@ -767,8 +780,8 @@ public class AllModules {
 		StringBuilder constraints = new StringBuilder();
 		
 		for (State moduleState : moduleAutomaton.getModuleStates()) {
-			for (Entry<String, AbstractModule> tool : annotatedTools.getModules().entrySet()) {
-				constraints = constraints.append(mappings.add(tool.getValue(), moduleState, WorkflowElement.MODULE))
+			for (AbstractModule tool : annotatedTools.getModules()) {
+				constraints = constraints.append(mappings.add(tool, moduleState, WorkflowElement.MODULE))
 						.append(" ");
 			}
 			constraints = constraints.append(" 0\n");
@@ -807,7 +820,7 @@ public class AllModules {
 	 */
 	private String moduleEnforceTaxonomyStructureForState(String rootModuleID,
 			AtomMapping mappings, State moduleState) {
-		AbstractModule currModule = modules.get(rootModuleID);
+		AbstractModule currModule = this.get(rootModuleID);
 		String superModule_state = mappings.add(currModule, moduleState, WorkflowElement.MODULE).toString();
 
 		StringBuilder constraints = new StringBuilder();
@@ -819,7 +832,7 @@ public class AllModules {
 			 * Ensuring the TOP-DOWN taxonomy tree dependency
 			 */
 			for (String subModuleID : currModule.getSubModules()) {
-				AbstractModule subModule = modules.get(subModuleID);
+				AbstractModule subModule = this.get(subModuleID);
 				String subModule_State = mappings.add(subModule, moduleState, WorkflowElement.MODULE).toString();
 				currConstraint = currConstraint.append(subModule_State).append(" ");
 				subModules_States.add(subModule_State);
