@@ -384,10 +384,8 @@ public class APEConfig {
 		}
 
 		try {
-			JSONArray jsonModuleInputs = jsonObject.getJSONArray(PROGRAM_INPUTS_TAG);
-			for (int i = 0; i < jsonModuleInputs.length(); i++) {
-				JSONObject jsonModuleInput = jsonModuleInputs.getJSONObject(i);
-
+			for (JSONObject jsonModuleInput : APEUtils.getListFromJson(jsonObject, PROGRAM_INPUTS_TAG, JSONObject.class)) {
+				
 				DataInstance input = new DataInstance();
 				for (String typeSubntology : jsonModuleInput.keySet()) {
 					String inputType = jsonModuleInput.getString(typeSubntology);
@@ -410,10 +408,8 @@ public class APEConfig {
 		}
 
 		try {
-			JSONArray jsonModuleOutputs = jsonObject.getJSONArray(PROGRAM_OUTPUTS_TAG);
-			for (int i = 0; i < jsonModuleOutputs.length(); i++) {
-				JSONObject jsonModuleOutput = jsonModuleOutputs.getJSONObject(i);
-
+			for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(jsonObject, PROGRAM_OUTPUTS_TAG, JSONObject.class)) {
+				
 				DataInstance output = new DataInstance();
 				for (String typeSubntology : jsonModuleOutput.keySet()) {
 					String outputType = jsonModuleOutput.getString(typeSubntology);

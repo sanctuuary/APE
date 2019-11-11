@@ -11,7 +11,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		
-		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase2/";
+		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/";
 		String fileName = "ape.configuration";
 		if(!APEUtils.isValidReadFile(path + fileName)) {
 			System.err.println("Bad path.");
