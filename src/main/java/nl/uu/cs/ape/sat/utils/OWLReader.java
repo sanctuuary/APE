@@ -153,8 +153,7 @@ public class OWLReader {
 	private void exploreModuleOntologyRec(OWLReasoner reasoner, OWLOntology ontology, OWLClass currClass,
 			OWLClass superClass, OWLClass rootClass) {
 		
-		AbstractModule superModule, subModule;
-		superModule = allModules.get(getLabel(superClass));
+		AbstractModule superModule = allModules.get(getLabel(superClass));
 		/*
 		 * Defining the Node Type based on the node.
 		 */
@@ -163,22 +162,16 @@ public class OWLReader {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		}
-		subModule = AbstractModule.generateModule(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, allModules,superModule);
+		if(superModule != null) {
+			superModule.addSubModule(getLabel(currClass));
+		}
+		/* Generate the ABstractModule that corresponds to the taxonomy class. */
+		allModules.addModule(new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType));
 
-		/*
-		 * Define the counter to check whether all the subclasses are empty / owl:Nothing
-		 */
-		int unsatSubClasses = 0,subClasses = reasoner.getSubClasses(currClass, true).getFlattened().size();
 		for (OWLClass child : reasoner.getSubClasses(currClass, true).getFlattened()) {
 			if (reasoner.isSatisfiable(child)) { 		// in case that the child is not node owl:Nothing
 				exploreModuleOntologyRec(reasoner, ontology, child, currClass, rootClass);
-			} else { 									// make the module a tool in case of not having subModules
-				subModule.setToTool();	
-				unsatSubClasses ++;
 			}
-		}
-		if(unsatSubClasses == subClasses) {
-			subModule.setToTool();			// make the module a tool in case of not having subTypes
 		}
 	}
 

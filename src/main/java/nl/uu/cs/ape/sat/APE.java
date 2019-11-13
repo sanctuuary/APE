@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.Graph;
@@ -46,10 +49,26 @@ public class APE {
 	 * Create instance of the APE solver.
 	 * @param configPath - path to the APE configuration file. If the string is null the default './ape.config' value is assumed.
 	 * @throws IOException error in reading the configuration file
-	 * @throws ExceptionInInitializerError error in initializing the configuration object
+	 * @throws JSONException error in reading the configuration file
 	 */
-	public APE(String configPath) throws ExceptionInInitializerError, IOException{
+	public APE(String configPath) throws IOException, JSONException{
 		config = APEConfig.getConfig(configPath);
+		if (config == null || config.getConfigJsonObj() == null) {
+			new ExceptionInInitializerError();
+		}
+		
+		if (!config.defaultConfigSetup()) {
+			new ExceptionInInitializerError();
+		}
+	}
+	
+	/**
+	 * Create instance of the APE solver.
+	 * @param configPath - the APE configuration JSONObject{@link JSONObject}.
+	 * @throws JSONException error in reading the configuration object
+	 */
+	public APE(JSONObject configObject) throws JSONException{
+		config = APEConfig.getConfig(configObject);
 		if (config == null || config.getConfigJsonObj() == null) {
 			new ExceptionInInitializerError();
 		}
@@ -63,7 +82,7 @@ public class APE {
 	 * Write textual "human readable" version on workflow solutions to a file.
 	 * @param allSolutions
 	 */
-	private void writeToFile() {
+	private void writeSolutionToFile() {
 		StringBuilder solutions2write = new StringBuilder();
 
 		for (int i = 0; i < allSolutions.getNumberOfSolutions(); i++) {
@@ -120,7 +139,7 @@ public class APE {
 	 * @param allSolutions
 	 * @throws IOException
 	 */
-	private void getGraphOutput() throws IOException {
+	private void generateGraphOutput() throws IOException {
 		String graphsFolder = config.getSolution_graphs_folder();
 		Integer noGraphs = config.getNo_graphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -189,8 +208,7 @@ public class APE {
 		/*
 		 * Update allModules and allTypes sets based on the module.xml file
 		 */
-		AllModules annotated_modules = new AllModules(
-				APEUtils.readModuleJson(config.getTool_annotations_path(), allModules, allTypes));
+		APEUtils.readModuleJson(config.getTool_annotations_path(), allModules, allTypes);
 
 		/*
 		 * Define set of all constraint formats
@@ -203,7 +221,7 @@ public class APE {
 		
 
 		/** Print the setup information when necessary. */
-		APEUtils.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory, unformattedConstr, annotated_modules);
+		APEUtils.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory, unformattedConstr);
 
 		/**
 		 * Loop over different lengths of the workflow until either, max workflow length
@@ -215,8 +233,7 @@ public class APE {
 		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
 				&& solutionLength <= config.getSolution_max_length()) {
 
-			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(allModules, allTypes, allSolutions, config,
-					annotated_modules, constraintFactory, unformattedConstr, solutionLength);
+			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(allModules, allTypes, allSolutions, config, constraintFactory, unformattedConstr, solutionLength);
 
 			APEUtils.printHeader(implSATsynthesis.getSolutionSize(), "Workflow discovery - length");
 
@@ -244,8 +261,8 @@ public class APE {
 			System.out.println("UNSAT");
 		} else {
 
-			writeToFile();
-			getGraphOutput();
+			writeSolutionToFile();
+			generateGraphOutput();
 			executeWorkflows();
 
 		}

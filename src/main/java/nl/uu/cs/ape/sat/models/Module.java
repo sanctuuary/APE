@@ -1,7 +1,9 @@
 package nl.uu.cs.ape.sat.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.dom4j.Node;
 import org.json.JSONException;
@@ -148,159 +150,11 @@ public class Module extends AbstractModule {
 
 	static int id = 1;
 
-	/**
-	 * Creates a module from a tool annotation instance represented in XML.
-	 * 
-	 * @param xmlModule  - xml representation of a module
-	 * @param allModules - list of all the modules
-	 * @param allTypes   - list of all the types
-	 * @return Module object.
-	 */
-	public static Module moduleFromXML(Node xmlModule, AllModules allModules, AllTypes allTypes) {
-
-		String superModuleID = xmlModule.selectSingleNode("operation").getText();
-		/** Determines whether the superModule exists in the tool taxonomy */
-		boolean superModuleExists = allModules.get(superModuleID) != null;
-		/** Determines whether the superModule is the root or an abstract tool. */
-		boolean superModuleIsRoot;
-		String moduleName = xmlModule.valueOf("@name");
-		String moduleID = moduleName;
-
-		/* If the superModule exists in the taxonomy */
-		if (superModuleExists) {
-			/*
-			 * and the module name was not uniquely specified. The name is defined based on
-			 * the "operation" specified
-			 */
-			if (moduleID == null || moduleID.matches("") || superModuleID.matches(moduleID)) {
-				moduleID = superModuleID + "_ID:" + (id++);
-				moduleName = superModuleID;
-			}
-			superModuleIsRoot = false;
-		} /* If the superModule does not exist in the taxonomy */
-		else {
-			/**
-			 * but is distinguished from the tool implementation. The superModule should be
-			 * created.
-			 */
-			if (!superModuleID.matches(moduleID)) {
-				superModuleIsRoot = false;
-			}
-			/**
-			 * and is not distinguished from the tool implementation. The superModule should
-			 * not be created, and the root is considered to be the superModule.
-			 */
-			else {
-				moduleID = superModuleID;
-				moduleName = superModuleID;
-				superModuleIsRoot = true;
-			}
-		}
-		if (moduleID == null || moduleID.matches("") || (superModuleExists && superModuleID.matches(moduleID))) {
-			moduleID = superModuleID + "_ID:" + (id++);
-			moduleName = superModuleID;
-		}
-		String executionCode = xmlModule.selectSingleNode("implementation").selectSingleNode("code").getText();
-
-//		BIO tools 
-//		String moduleName = xmlModule.selectSingleNode("displayName").getText();
-//		String moduleID = xmlModule.selectSingleNode("displayName").getText();
-		List<Node> xmlModuleInput = xmlModule.selectNodes("inputs/input");
-		List<Node> xmlModuleOutput = xmlModule.selectNodes("outputs/output");
-
-		List<DataInstance> inputs = new ArrayList<DataInstance>();
-		List<DataInstance> outputs = new ArrayList<DataInstance>();
-
-		for (Node xmlInput : xmlModuleInput) {
-			if (xmlInput.hasContent()) {
-				DataInstance input = new DataInstance();
-				for (Node xmlType : xmlInput.selectNodes("*")) {
-					if (allTypes.get(xmlType.getText()) == null) {
-						System.err.println("Data format \"" + xmlType.getText()
-								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
-					}
-					Type tmpType = allTypes.addType(xmlType.getText(), xmlType.getText(),
-							allTypes.getRootID(), NodeType.UNKNOWN, allTypes.getRootType());
-					if (tmpType != null) {
-						input.addType(tmpType);
-						allTypes.addAnnotatedType(tmpType.getPredicateID());
-					}
-				}
-				inputs.add(input);
-			}
-		}
-
-		for (Node xmlOutput : xmlModuleOutput) {
-			if (xmlOutput.hasContent()) {
-				DataInstance output = new DataInstance();
-				for (Node xmlType : xmlOutput.selectNodes("*")) {
-					if (allTypes.get(xmlType.getText()) == null) {
-						System.err.println("Data format \"" + xmlType.getText()
-								+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
-					}
-					Type tmpType = allTypes.addType(xmlType.getText(), xmlType.getText(),
-							allTypes.getRootID(), NodeType.UNKNOWN, allTypes.getRootType());
-					if (tmpType != null) {
-						output.addType(tmpType);
-						allTypes.addAnnotatedType(tmpType.getPredicateID());
-					}
-				}
-				outputs.add(output);
-			}
-		}
-
-		Module_Execution moduleExecutionImpl = null;
-		if (executionCode != null && !executionCode.matches("")) {
-			moduleExecutionImpl = new Module_Execution_Code(executionCode);
-		}
-
-		AbstractModule currSuperModule;
-
-		if (!superModuleExists) {
-			System.err.println("Annotated tool \"" + superModuleID
-					+ "\" does not exists in the Tool Taxonomy. It is added as a direct subclass of the root in the Tool Taxonomy.");
-		}
-		/*
-		 * In case of the tool is an instance of the abstract superModule, add it as a
-		 * sub module (enrich the ontology). Depending of the superModuleID.
-		 * currSuperModule is an AbstractModule or the Module Taxonomy root. In case
-		 * that the
-		 */
-		if (!superModuleIsRoot) {
-			AbstractModule superModule = AbstractModule.generateModule(superModuleID, superModuleID,
-					allModules.getRootID(), NodeType.ABSTRACT, allModules,
-					allModules.getRootModule());
-			/*
-			 * If the super module is represented as a tool, convert it to abstract module
-			 */
-			if (superModule instanceof Module) {
-				AbstractModule newSuperModule = new AbstractModule(superModule, NodeType.ABSTRACT);
-				allModules.swapAbstractModule2Module(newSuperModule, superModule);
-				currSuperModule = newSuperModule;
-			} else {
-				superModule.setNodeType(NodeType.ABSTRACT);
-				currSuperModule = superModule;
-			}
-		} else {
-			currSuperModule = allModules.getRootModule();
-		}
-
-		/*
-		 * Add the module and make it sub module of the currSuperModule (if it was not
-		 * previously defined)
-		 */
-		Module currModule = Module.generateModule(moduleName, moduleID, allModules.getRootID(),
-				allModules, currSuperModule, moduleExecutionImpl);
-		currModule.setModuleInput(inputs);
-		currModule.setModuleOutput(outputs);
-
-		return currModule;
-	}
 
 	/**
 	 * Creates a module from a tool annotation instance from a Json file.
 	 * 
-	 * @param jsonModule - Json representation of a module
+	 * @param jsonModule - JSON representation of a module
 	 * @param allModules - list of all the modules
 	 * @param allTypes   - list of all the types
 	 * @return New Module object.
@@ -308,60 +162,33 @@ public class Module extends AbstractModule {
 	public static Module moduleFromJson(JSONObject jsonModule, AllModules allModules, AllTypes allTypes)
 			throws JSONException {
 
-		String superModuleID = jsonModule.getString(APEConfig.getConstraintTags("id"));
-		/** Determines whether the superModule exists in the tool taxonomy */
-		boolean superModuleExists = allModules.get(superModuleID) != null;
-		/** Determines whether the superModule is the root or an abstract tool. */
-		boolean superModuleIsRoot;
-		String moduleName = jsonModule.getString(APEConfig.getConstraintTags("label"));
-		String moduleID = moduleName;
-
-		/* If the superModule exists in the taxonomy */
-		if (superModuleExists) {
-			/*
-			 * and the module name was not uniquely specified. The name is defined based on
-			 * the "operation" specified
-			 */
-			if (moduleID == null || moduleID.matches("") || superModuleID.matches(moduleID)) {
-				moduleID = superModuleID + "_ID:" + (id++);
-				moduleName = superModuleID;
-			}
-			superModuleIsRoot = false;
-		} /* If the superModule does not exist in the taxonomy */
-		else {
-			/**
-			 * but is distinguished from the tool implementation. The superModule should be
-			 * created.
-			 */
-			if (!superModuleID.matches(moduleID)) {
-				superModuleIsRoot = false;
-			}
-			/**
-			 * and is not distinguished from the tool implementation. The superModule should
-			 * not be created, and the root is considered to be the superModule.
-			 */
-			else {
-				moduleID = superModuleID;
-				moduleName = superModuleID;
-				superModuleIsRoot = true;
+		String moduleID = jsonModule.getString(APEConfig.getJsonTags("id"));
+		String moduleLabel = jsonModule.getString(APEConfig.getJsonTags("label"));
+		Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("taxonomyTerms"), String.class));
+		
+		/** Check if the referenced module taxonomy classes exist. */
+		for(String taxonomyModule : taxonomyModules) {
+			if(allModules.get(taxonomyModule) == null) {
+				taxonomyModules.remove(taxonomyModule);
 			}
 		}
-		if (moduleID == null || moduleID.matches("") || (superModuleExists && superModuleID.matches(moduleID))) {
-			moduleID = superModuleID + "_ID:" + (id++);
-			moduleName = superModuleID;
+		/* If the taxonomy terms were not properly specified the tool taxonomy root is used as superclass of the tool. */
+		if(taxonomyModules.isEmpty() && (allModules.get(moduleID) == null)) {
+				System.err.println("Annotated tool \"" + moduleID
+						+ "\" cannot be found in the Tool Taxonomy. It is added as a direct subclass of the root in the Tool Taxonomy.");
+				taxonomyModules.add(allModules.getRootID());
 		}
+		
 		String executionCode = null;
 		try {
-			executionCode = jsonModule.getJSONObject(APEConfig.getConstraintTags("implementation"))
-					.getString(APEConfig.getConstraintTags("code"));
+			executionCode = jsonModule.getJSONObject(APEConfig.getJsonTags("implementation"))
+					.getString(APEConfig.getJsonTags("code"));
 		} catch (JSONException e) {
 			/* Skip the execution code */}
-//		BIO tools 
-//		String moduleName = xmlModule.selectSingleNode("displayName").getText();
-//		String moduleID = xmlModule.selectSingleNode("displayName").getText();
-		List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APEConfig.getConstraintTags("inputs"),
+		
+		List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("inputs"),
 				JSONObject.class);
-		List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APEConfig.getConstraintTags("outputs"),
+		List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("outputs"),
 				JSONObject.class);
 
 		List<DataInstance> inputs = new ArrayList<DataInstance>();
@@ -426,43 +253,19 @@ public class Module extends AbstractModule {
 			moduleExecutionImpl = new Module_Execution_Code(executionCode);
 		}
 
-		AbstractModule currSuperModule;
-
-		if (!superModuleExists) {
-			System.err.println("Annotated tool \"" + superModuleID
-					+ "\" does not exists in the Tool Taxonomy. It is added as a direct subclass of the root in the Tool Taxonomy.");
-		}
-		/*
-		 * In case of the tool is an instance of the abstract superModule, add it as a
-		 * sub module (enrich the ontology). Depending of the superModuleID.
-		 * currSuperModule is an AbstractModule or the Module Taxonomy root. In case
-		 * that the
-		 */
-		if (!superModuleIsRoot) {
-			AbstractModule superModule = AbstractModule.generateModule(superModuleID, superModuleID,
-					allModules.getRootID(), NodeType.ABSTRACT, allModules,
-					allModules.getRootModule());
-			/*
-			 * If the super module is represented as a tool, convert it to abstract module
-			 */
-			if (superModule instanceof Module) {
-				AbstractModule newSuperModule = new AbstractModule(superModule, NodeType.ABSTRACT);
-				allModules.swapAbstractModule2Module(newSuperModule, superModule);
-				currSuperModule = newSuperModule;
-			} else {
-				superModule.setNodeType(NodeType.ABSTRACT);
-				currSuperModule = superModule;
+		/*	For each supermodule add the curent module as a subset. */
+		for(String superModuleID : taxonomyModules) {
+			AbstractModule superModule = allModules.get(superModuleID);
+			if(superModule != null) {
+				superModule.addSubModule(moduleID);
 			}
-		} else {
-			currSuperModule = allModules.getRootModule();
 		}
-
+		
 		/*
 		 * Add the module and make it sub module of the currSuperModule (if it was not
 		 * previously defined)
 		 */
-		Module currModule = Module.generateModule(moduleName, moduleID, allModules.getRootID(),
-				allModules, currSuperModule, moduleExecutionImpl);
+		Module currModule =  (Module) allModules.addModule(new Module(moduleLabel, moduleID, allModules.getRootID(), moduleExecutionImpl));
 		currModule.setModuleInput(inputs);
 		currModule.setModuleOutput(outputs);
 
@@ -512,34 +315,4 @@ public class Module extends AbstractModule {
 	public String getType() {
 		return "module";
 	}
-
-	/**
-	 * The class is used to check weather the Module with @moduleID was already
-	 * introduced earlier on in @allModules. In case it was defined as
-	 * {@literalModule} it returns the item, in case of it being introduced as an
-	 * AbstractModule, it is extended to a Module and returned, otherwise the new
-	 * element is generated and returned. <br>
-	 * <br>
-	 * In case of generating a new Module, the object is added to the set of all the
-	 * Modules and added as a subModule to the parent Module.
-	 * 
-	 * @param moduleName - Module name.
-	 * @param moduleID   - Unique module identifier.
-	 * @param rootNode   - ID of the Taxonomy Root node corresponding to the Module.
-	 * @param allModules - Set of all the modules created so far.
-	 * @return The Module representing the item.
-	 */
-	public static Module generateModule(String moduleName, String moduleID, String rootNode, AllModules allModules,
-			AbstractModule superModule, Module_Execution moduleExecution) {
-
-		// In case of generating a new Module, the object is added as a subModule to the
-		// parent Module.
-		if (superModule != null) {
-			superModule.addSubModule(moduleID);
-		}
-		AbstractModule currModule = allModules.addModule(new Module(moduleName, moduleID, rootNode, moduleExecution));
-
-		return (Module) currModule;
-	}
-
 }

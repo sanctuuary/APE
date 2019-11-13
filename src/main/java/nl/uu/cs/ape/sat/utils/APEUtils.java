@@ -8,10 +8,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -38,9 +40,7 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
-import nl.uu.cs.ape.sat.models.Type;
-import nl.uu.cs.ape.sat.models.DataInstance;
-import nl.uu.cs.ape.sat.models.enums.NodeType;
+import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
 
 /**
  * The {@code StaticFunctions} class is used for storing {@code Static} methods.
@@ -48,19 +48,19 @@ import nl.uu.cs.ape.sat.models.enums.NodeType;
  * @author Vedran Kasalica
  *
  */
-public class APEUtils {
+public final class APEUtils {
 
-	private final static String ROOT_TOOL_XML_path = "/functions/function";
-	private final static String ROOT_CONSTR_XML_path = "/constraints/constraint";
 	private final static String TOOLS_JSOM_TAG = "functions";
 	private final static String CONSTR_JSON_TAG = "constraints";
 	private final static String CONSTR_ID_TAG = "constraintid";
 	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
-	private final static String PROGRAM_IO_TYPE_TAG = "type";
-	private final static String PROGRAM_IO_FORMAT_TAG = "format";
 	private final static Map<String, Long> timers = new HashMap<String, Long>();
 
 	
+	/** Private constructor is used to to prevent instantiation. */
+    private APEUtils() {
+        throw new UnsupportedOperationException();
+    }
 	
 	public static List<ConstraintData> readConstraints(String constraintsPath){
 		List<ConstraintData> unformattedConstr = new ArrayList<ConstraintData>();
@@ -69,26 +69,13 @@ public class APEUtils {
 		}
 		String constraintID;
 		int currNode = 0;
-		boolean jsonFile;
 		List<String> parameters;
-		List<? extends Object> constraints;
-		if (constraintsPath.toLowerCase().endsWith(".xml")) {
-			System.err.println("Constraints file is XML format. It should be transformed into a JSON file.");
-			jsonFile = false;
-			constraints = getListFromXML(constraintsPath, ROOT_CONSTR_XML_path);
-		} else {
-			jsonFile = true;
-			constraints = getListFromJson(constraintsPath, CONSTR_JSON_TAG);
+		List<JSONObject> constraints = getListFromJson(constraintsPath, CONSTR_JSON_TAG);
 
-		}
-		
-
-		for (Object constraint : safe(constraints)) {
+		for (JSONObject jsonConstraint : safe(constraints)) {
 			currNode++;
 			/* READ THE CONSTRAINT */
 			try {
-				if (jsonFile) {
-					JSONObject jsonConstraint = (JSONObject) constraint;
 					constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
 
 					List<String> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG, String.class);
@@ -96,15 +83,6 @@ public class APEUtils {
 					for (String jsonParam : jsonConstParam) {
 						parameters.add(jsonParam.toString());
 					}
-				} else {
-					Node xmlConstraint = (Node) constraint;
-					constraintID = xmlConstraint.selectSingleNode(CONSTR_ID_TAG).getText();
-					List<Node> xmlConstParam = xmlConstraint.selectNodes("parameters/parameter");
-					parameters = new ArrayList<String>();
-					for (Node xmlParam : xmlConstParam) {
-						parameters.add(xmlParam.getText());
-					}
-				}
 			} catch (Exception e) {
 				System.err.println("Error in file: " + constraintsPath + ", at constraint no: " + currNode
 						+ ". Constraint skipped.");
@@ -119,8 +97,7 @@ public class APEUtils {
 	/**
 	 * Returns the CNF representation of the SLTL constraints in our project
 	 * 
-	 * @param constraintsPath  - path to the Json file (xml files are only partially
-	 *                         supported)
+	 * @param constraintsPath  - path to the Json file
 	 * @param allConsTemplates
 	 * @param allModules
 	 * @param allTypes
@@ -203,32 +180,6 @@ public class APEUtils {
 	 * non-existing) using the I/O DataInstance from the @file. Returns the list of Updated
 	 * Modules.
 	 * 
-	 * @param file       - path to the .XML file containing tool annotations
-	 * @param allModules - list of all existing modules
-	 * @param allTypes   - list of all existing types
-	 * @return the list of all annotated Modules in the process (possibly empty
-	 *         list)
-	 */
-	public static List<Module> readModuleXML(String file, AllModules allModules, AllTypes allTypes) {
-		List<Module> modulesNew = new ArrayList<Module>();
-
-		for (Node xmlModule : getListFromXML(file, ROOT_TOOL_XML_path)) {
-			Module tmpModule = Module.moduleFromXML(xmlModule, allModules, allTypes);
-			if (tmpModule != null) {
-				modulesNew.add(tmpModule);
-				allModules.addAnnotatedModule(tmpModule.getPredicateID());
-			}
-
-		}
-
-		return modulesNew;
-	}
-
-	/**
-	 * Updates the list of All Modules by annotating the existing ones (or adding
-	 * non-existing) using the I/O DataInstance from the @file. Returns the list of Updated
-	 * Modules.
-	 * 
 	 * @param file       - path to the .json file containing tool annotations
 	 * @param allModules - list of all existing modules
 	 * @param allTypes   - list of all existing types
@@ -236,16 +187,12 @@ public class APEUtils {
 	 *         list)
 	 */
 	public static List<Module> readModuleJson(String file, AllModules allModules, AllTypes allTypes) {
-		if (file.toLowerCase().endsWith(".xml")) {
-			System.err.println("Tool annotation file is in XML format. It should be transformed into a JSON file.");
-			return readModuleXML(file, allModules, allTypes);
-		}
 		List<Module> modulesNew = new ArrayList<Module>();
 		int currModule = 0;
-		for (JSONObject xmlModule : safe(getListFromJson(file, TOOLS_JSOM_TAG))) {
+		for (JSONObject jsonModule : safe(getListFromJson(file, TOOLS_JSOM_TAG))) {
 			currModule++;
 			try {
-				Module tmpModule = Module.moduleFromJson(xmlModule, allModules, allTypes);
+				Module tmpModule = Module.moduleFromJson(jsonModule, allModules, allTypes);
 				if (tmpModule != null) {
 					modulesNew.add(tmpModule);
 					allModules.addAnnotatedModule(tmpModule.getPredicateID());
@@ -333,10 +280,10 @@ public class APEUtils {
 	}
 
 	/**
-	 * The method return a list of {@link JSONObject} elements that correspond to a
+	 * The method return a list of {@code <T>} elements that correspond to a
 	 * given key in the given json object. If the key corresponds to a
 	 * {@link JSONArray} all the elements are put in a {@link List}, otherwise if
-	 * the key corresponds to a {@link JSONObject} list will contain only that
+	 * the key corresponds to a {@code <T>} list will contain only that
 	 * object.
 	 * 
 	 * @param jsonObject - Json object that is being explored
@@ -398,43 +345,6 @@ public class APEUtils {
 		return true;
 	}
 
-//	/**
-//	 * TODO Read the list of inputs or outputs presented in json format and format
-//	 * them in a list of {@link DataInstance}.
-//	 * 
-//	 * @param jsonListIO - {@link JSONArray} of the elements
-//	 * @return {@link List} of {@link DataInstance}.
-//	 */
-//	public static List<DataInstance> readModuleIO(JSONArray jsonListIO) throws JSONException {
-//		List<DataInstance> listIO = new ArrayList<DataInstance>();
-//
-//		for (int i = 0; i < jsonListIO.length(); i++) {
-//			JSONObject moduleIO = jsonListIO.getJSONObject(i);
-//
-//			DataInstance output = new DataInstance();
-//			try {
-//				List<JSONObject> jsonIOTypes = getListFromJson(moduleIO, PROGRAM_IO_TYPE_TAG, JSONObject.class);
-//				for (JSONObject jsonIOType : jsonIOTypes) {
-//					String jsonOutputType = moduleIO.getString(PROGRAM_IO_TYPE_TAG);
-//					output.addType(new Type(jsonOutputType, jsonOutputType,
-//							APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
-//				}
-//			} catch (JSONException JSONException) {
-//				/* Configuration output does not have the type */}
-//			try {
-//				String jsonOutputFormat = moduleIO.getString(PROGRAM_IO_FORMAT_TAG);
-//				output.addType(new Type(jsonOutputFormat, jsonOutputFormat,
-//						APEConfig.getConfig().getData_taxonomy_root(), NodeType.UNKNOWN));
-//			} catch (JSONException JSONException) {
-//				/* Configuration output does not have the type */}
-//			if (!output.getTypes().isEmpty()) {
-//				listIO.add(output);
-//			}
-//		}
-//
-//		return listIO;
-//	}
-
 	/**
 	 * In case that the debug mode is on, print the constraint templates and tool
 	 * and data taxonomy trees.
@@ -445,7 +355,7 @@ public class APEUtils {
 	 * @param unformattedConstr 
 	 */
 	public static void debugPrintout(boolean debug, AllModules allModules, AllTypes allTypes,
-			ConstraintFactory constraintFactory, List<ConstraintData> unformattedConstr, AllModules annotated_tools) {
+			ConstraintFactory constraintFactory, List<ConstraintData> unformattedConstr) {
 		if (debug) {
 
 			/*
@@ -471,13 +381,17 @@ public class APEUtils {
 			/*
 			 * Printing the tool annotations
 			 */
+			boolean noTools = true;
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tAnnotated tools:");
 			System.out.println("-------------------------------------------------------------");
-			for(AbstractModule module : annotated_tools.getModules()) {
-				System.out.println(module.print());
+			for(AbstractModule module : allModules.getModules()) {
+				if(module instanceof Module) {
+					System.out.println(module.print());
+					noTools = false;
+				}
 			}
-			if(annotated_tools.getModules().isEmpty()) {
+			if(noTools) {
 				System.out.println("\tNo annotated tools.");
 			}
 			/*
@@ -511,14 +425,14 @@ public class APEUtils {
 	}
 
 	/**
-	 * Provide a safe interface for iteration trough a list.
+	 * Provide a safe interface for iteration trough a list/set.
 	 * 
 	 * @param          <E>
-	 * @param currList - list that is being evaluated
+	 * @param currList - list/set that is being evaluated
 	 * @return An empty list in case of {@code currList == null}, or
 	 *         {@code currList} otherwise.
 	 */
-	public static <E> List<E> safe(List<E> currList) {
+	public static <E> Collection<E> safe(Collection<E> currList) {
 		return currList == null ? Collections.EMPTY_LIST : currList;
 	}
 
@@ -629,5 +543,133 @@ public class APEUtils {
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
 		System.out.println("\n" + text + " Running time: " + (printTime / 1000F) + " sec.");
 	}
+	
+	/**
+	 * Method converts tools annotated using 'bio.tools' standard (see <a href="https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools API</a>), 
+	 * into standard supported by the APE library. <br>
+	 * In practice, the method takes a {@link JSONArray} as an argument, where each {@link JSONObject} in the array represents a tool annotated using
+	 * 'bio.tools' standard, and returns a {@link JSONObject} that represents tool annotations that can be used by the APE library.
+	 * 
+	 * @param bioToolsAnotation - a {@link JSONArray} object, that contains list of annotated tools ({@link JSONObject}s) according
+	 * the bio.tools specification (see <a href="https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools API</a>)
+	 * @return {@link JSONObject} that represents the tool annotation supported by the APE library.
+	 */
+	public static JSONObject convertBioTools2Ape(JSONArray bioToolsAnotation) throws JSONException{
+		
+		JSONArray apeToolsAnnotations = new JSONArray();
+		
+		for (int i = 0; i < bioToolsAnotation.length(); i++) {
+			JSONObject apeJsonTool = new JSONObject();
+			JSONObject bioJsonTool = bioToolsAnotation.getJSONObject(i);
+			apeJsonTool.put("name", bioJsonTool.getString("name"));
+			apeJsonTool.put("operation", bioJsonTool.getString("biotoolsID"));
+			
+			JSONArray apeTaxonomyTerms = new JSONArray();
+			List<JSONObject> functions = APEUtils.getListFromJson(bioJsonTool, "function", JSONObject.class);
+			JSONObject function = null;
+			if(functions.size() == 1) {
+				function = bioJsonTool.getJSONArray("function").getJSONObject(0);
+			} else {
+				new JSONException("A 'bio.tools' tool annotation cannot contain more than one function.");
+				return null;
+			}
+			
+			
+			JSONArray operations = function.getJSONArray("operation");
+			for (int j = 0; j < operations.length(); j++) {
+				JSONObject bioOperation = operations.getJSONObject(j);
+				apeTaxonomyTerms.put(bioOperation.get("term"));
+			}
+			apeJsonTool.put("taxonomyTerms", apeTaxonomyTerms);
+//			reading inputs
+			JSONArray apeInputs = new JSONArray();
+			JSONArray bioInputs = function.getJSONArray("input");
+//			for each input
+			for (int j = 0; j < bioInputs.length(); j++) {
+				JSONObject bioInput = bioInputs.getJSONObject(j);
+				JSONObject apeInput = new JSONObject();
+				JSONArray apeInputTypes = new JSONArray();
+				JSONArray apeInputFormats = new JSONArray();
+//				add all data types
+				for(JSONObject bioType : APEUtils.getListFromJson(bioInput, "data", JSONObject.class)) {
+					apeInputTypes.put(bioType.getString("term"));
+				}
+				apeInput.put("Data", apeInputTypes);
+//				add all data formats
+				for(JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
+					apeInputFormats.put(bioType.getString("term"));
+				}
+				apeInput.put("Format", apeInputFormats);
+				
+				apeInputs.put(apeInput);
+			}
+			apeJsonTool.put("inputs", apeInputs);
+			
+//			reading inputs
+			JSONArray apeOutputs = new JSONArray();
+			JSONArray bioOutputs = function.getJSONArray("output");
+//			for each output
+			for (int j = 0; j < bioOutputs.length(); j++) {
+				
+				JSONObject bioOutput = bioOutputs.getJSONObject(j);
+				JSONObject apeOutput = new JSONObject();
+				JSONArray apeOutputTypes = new JSONArray();
+				JSONArray apeOutputFormats = new JSONArray();
+//				add all data types
+				for(JSONObject bioType : APEUtils.getListFromJson(bioOutput, "data", JSONObject.class)) {
+					apeOutputTypes.put(bioType.getString("term"));
+				}
+				apeOutput.put("Data", apeOutputTypes);
+//				add all data formats
+				for(JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
+					apeOutputFormats.put(bioType.getString("term"));
+				}
+				apeOutput.put("Format", apeOutputFormats);
+				
+				apeOutputs.put(apeOutput);
+			}
+			apeJsonTool.put("outputs", apeOutputs);
+			
+			apeToolsAnnotations.put(apeJsonTool);
+		}
+		
+		
+		return new JSONObject().put("functions", apeToolsAnnotations);
+	}
 
+	/**
+	 * @param temp_sat_input
+	 * @param mappings 
+	 * @return
+	 */
+	public static String convert2humanReadable(InputStream temp_sat_input, AtomMapping mappings) {
+		StringBuffer humanReadable = new StringBuffer();
+		Scanner scanner = new Scanner(temp_sat_input); 
+		scanner.nextLine();
+		while(scanner.hasNextInt()) {
+			int intAtom = scanner.nextInt();
+			
+			if(intAtom > 0) {
+				Atom atom = mappings.findOriginal(intAtom);
+				humanReadable = humanReadable.append(atom.getPredicate().getPredicateID()).append("[").append(atom.getUsedInStateArgument().getPredicateID()).append("] ");
+			} else if (intAtom < 0) {
+				Atom atom = mappings.findOriginal(-intAtom);
+				humanReadable = humanReadable.append("~").append(atom.getPredicate().getPredicateID()).append("[").append(atom.getUsedInStateArgument().getPredicateID()).append("] ");
+			} else {
+				humanReadable = humanReadable.append("\n");
+			}
+		}
+		scanner.close();
+		
+		
+		return humanReadable.toString();
+	}
+
+	
+	
+	
+	
+	
+	
+	
 }

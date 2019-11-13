@@ -153,13 +153,14 @@ public class APEConfig {
 	private Boolean debug_mode;
 
 	/** Configurations used to read/update the "ape.configuration" file. */
-	private Document document;
 	private JSONObject jsonObject;
 
 	/**
 	 * Initialize the configuration of the project.
+	 * @throws IOException error in reading the configuration file
+	 * @throws JSONException error in parsing the configuration file
 	 */
-	private APEConfig(String congifPath) throws IOException {
+	private APEConfig(String congifPath) throws IOException, JSONException {
 		if (congifPath == null) {
 			congifPath = CONFIGURATION_FILE;
 		}
@@ -176,6 +177,24 @@ public class APEConfig {
 		jsonObject = new JSONObject(content);
 
 	}
+	
+	/**
+	 * Initialize the configuration of the project.
+	 * @throws JSONException error in parsing the configuration object
+	 */
+	private APEConfig(JSONObject configObject) throws JSONException {
+		if (configObject == null) {
+			new JSONException("Configuration error. The provided JSON object is null.");
+		}
+		
+		data_taxonomy_subroots = new ArrayList<String>();
+		program_inputs = new ArrayList<DataInstance>(); 
+		program_outputs = new ArrayList<DataInstance>();
+		
+		// Convert JSON string to JSONObject
+		jsonObject = configObject;
+
+	}
 
 	/**
 	 * Returns the singleton class representing the library configuration.
@@ -183,10 +202,27 @@ public class APEConfig {
 	 * @param configPath - path to the configuration file
 	 * @return object that represent the configuration.
 	 * @throws IOException - error in case of a bad configuration file
+	 * @throws JSONException error in parsing the configuration object
 	 */
-	public static APEConfig getConfig(String configPath) throws IOException {
+	public static APEConfig getConfig(String configPath) throws IOException, JSONException {
 		if (configAPE == null) {
 			configAPE = new APEConfig(configPath);
+			return configAPE;
+		} else {
+			return configAPE;
+		}
+	}
+	
+	/**
+	 * Returns the singleton class representing the library configuration.
+	 * 
+	 * @param configPath - path to the configuration file
+	 * @return object that represent the configuration.
+	 * @throws JSONException - error in case of a bad configuration object
+	 */
+	public static APEConfig getConfig(JSONObject configObject) throws JSONException {
+		if (configAPE == null) {
+			configAPE = new APEConfig(configObject);
 			return configAPE;
 		} else {
 			return configAPE;
@@ -631,13 +667,6 @@ public class APEConfig {
 	}
 
 	/**
-	 * @return the {@link #document}
-	 */
-	public Document getDocument() {
-		return document;
-	}
-
-	/**
 	 * @return the {@link #configNode}
 	 */
 	public JSONObject getConfigJsonObj() {
@@ -645,13 +674,13 @@ public class APEConfig {
 	}
 
 	/**
-	 * Function that returns the tags that are used in the Constraint file. Function
+	 * Function that returns the tags that are used in the JSON files. Function
 	 * can be used to rename the tags.
 	 * 
-	 * @param tag
+	 * @param tag that is used
 	 * @return
 	 */
-	public static String getConstraintTags(String tag) {
+	public static String getJsonTags(String tag) {
 		switch (tag) {
 		case "id":
 			return "operation";
@@ -659,6 +688,8 @@ public class APEConfig {
 			return "name";
 		case "inputs":
 			return "inputs";
+		case "taxonomyTerms":
+			return "taxonomyTerms";
 		case "outputs":
 			return "outputs";
 		case "implementation":

@@ -32,6 +32,7 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -55,10 +56,6 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	private final AllTypes allTypes;
 	/** APE library configuration object. */
 	private final APEConfig config;
-	/**
-	 * List of tools that were annotated in the domain (Input/Output annotation).
-	 */
-	private final AllModules annotated_modules;
 	/** Mapping of all the predicates to integers. */
 	private final AtomMapping mappings;
 	/** Factory object used to generate constraints. */
@@ -95,13 +92,12 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	 * @param unformattedConstr
 	 */
 	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, All_SAT_solutions allSolutions,
-			APEConfig config, AllModules annotated_modules, ConstraintFactory allConsTemplates,
+			APEConfig config, ConstraintFactory allConsTemplates,
 			List<ConstraintData> unformattedConstr, int size) {
 		this.allModules = allModules;
 		this.allTypes = allTypes;
 		this.allSolutions = allSolutions;
 		this.config = config;
-		this.annotated_modules = annotated_modules;
 		allSolutions.newEncoding();
 		this.mappings = allSolutions.getMappings();
 		this.allConsTemplates = allConsTemplates;
@@ -138,7 +134,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Create constraints from the module.xml file regarding the Inputs/Outputs
 		 */
-		cnfEncoding = cnfEncoding.append(annotated_modules.modulesConstraints(this));
+		cnfEncoding = cnfEncoding.append(ModuleUtils.modulesConstraints(this));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
 		/*
@@ -151,11 +147,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * Mandatory usage of the tools - from taxonomy. 3. Adding the constraints
 		 * enforcing the taxonomy structure.
 		 */
-		cnfEncoding = cnfEncoding.append(allModules.moduleMutualExclusion(moduleAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(ModuleUtils.moduleMutualExclusion(allModules,moduleAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions enfocements");
-		cnfEncoding = cnfEncoding.append(allModules.moduleMandatoryUsage(annotated_modules, moduleAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(ModuleUtils.moduleMandatoryUsage(allModules, moduleAutomaton, mappings));
 		cnfEncoding = cnfEncoding.append(
-				allModules.moduleEnforceTaxonomyStructure(rootModule.getPredicateID(), moduleAutomaton, mappings));
+				ModuleUtils.moduleEnforceTaxonomyStructure(allModules, rootModule.getPredicateID(), moduleAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage enfocements");
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the types/formats 2.
@@ -219,15 +215,23 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		APEUtils.write2file(sat_input_header + cnfEncoding, temp_sat_input, false);
 		*/
 		StringBuilder mknfEncoding = sat_input_header.append(cnfEncoding);
-//		testing sat input
-//		APEUtils.write2file(mknfEncoding.toString(), new File("~/Desktop/tmp"), false);
+
+		
+
 		temp_sat_input = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
 		temp_sat_input.close();
+//		testing sat input
+//		InputStream tmpSat = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
+//		tmpSat.close();
+//		String encoding = APEUtils.convert2humanReadable(tmpSat, mappings);
+//		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp"), false);
+
 		long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
 		System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");
 
 		return true;
 	}
+	
 
 	/**
 	 * Using the SAT input generated from SAT encoding and running MiniSAT solver to
@@ -319,10 +323,6 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 
 	public APEConfig getConfig() {
 		return config;
-	}
-
-	public AllModules getAnnotated_modules() {
-		return annotated_modules;
 	}
 
 	public AtomMapping getMappings() {
