@@ -25,19 +25,6 @@ public class AllModules extends AllPredicates {
 	}
 
 	/**
-	 * Create a map-set containing all modules from @modules, omitting the
-	 * duplicates.
-	 * 
-	 * @param modules
-	
-	public AllModules(Collection<? extends AbstractModule> modules) {
-		super();
-		for (AbstractModule module : modules) {
-			this.addModule(module);
-		}
-	} */
-
-	/**
 	 * Return the set of currently defined modules (both {@link AbstractModule} and {@link Module}).
 	 * @return
 	 */
@@ -106,6 +93,30 @@ public class AllModules extends AllPredicates {
 		return (AbstractModule) super.get(moduleID);
 	}
 
+	/**
+	 * Returns a list of pairs of tools from modules. Note that the abstract modules
+	 * are not returned, only the unique pairs of modules that are representing
+	 * actual tools.
+	 * 
+	 * @return list of pairs of modules
+	 */
+	public List<Pair> getSimplePairs() {
+		List<Pair> pairs = new ArrayList<Pair>();
+
+		List<TaxonomyPredicate> iterator = new ArrayList<TaxonomyPredicate>();
+		for (TaxonomyPredicate module : this.values()) {
+			if(module.isSimplePredicate()) {
+				iterator.add(module);
+			}
+		}
+
+		for (int i = 0; i < iterator.size() - 1; i++) {
+			for (int j = i + 1; j < iterator.size(); j++) {
+				pairs.add(new Pair(iterator.get(i), iterator.get(j)));
+			}
+		}
+		return pairs;
+	}
 
 	/**
 	 * Returns true if this set contains the specified element. More formally,
@@ -121,33 +132,6 @@ public class AllModules extends AllPredicates {
 
 	public int size() {
 		return this.size();
-	}
-
-	/**
-	 * Returns a list of pairs of tools from modules. Note that the abstract modules
-	 * are not returned, only the unique pairs of modules that are representing
-	 * actual tools.
-	 * 
-	 * @return list of pairs of modules
-	 */
-	public List<Pair> getToolPairs() {
-		List<Pair> pairs = new ArrayList<Pair>();
-
-		List<TaxonomyPredicate> iterator = new ArrayList<TaxonomyPredicate>();
-		for (TaxonomyPredicate module : this.values()) {
-			if(module.isSimplePredicate()) {
-				iterator.add(module);
-			}
-		}
-
-//		System.out.println(APEConfig.getConfig().getTool_taxonomy_root() + ": " + iterator.size());
-
-		for (int i = 0; i < iterator.size() - 1; i++) {
-			for (int j = i + 1; j < iterator.size(); j++) {
-				pairs.add(new Pair(iterator.get(i), iterator.get(j)));
-			}
-		}
-		return pairs;
 	}
 
 }

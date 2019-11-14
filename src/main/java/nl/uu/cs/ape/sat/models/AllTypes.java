@@ -139,33 +139,6 @@ public class AllTypes extends AllPredicates {
 	}
 
 	/**
-	 * Returns a list of pairs of simple types. Note that the abstract types are not
-	 * returned, only the unique pairs of types that are representing leaf types in
-	 * the taxonomy tree.
-	 * 
-	 * @return list of pairs of types
-	 */
-	private List<Pair> getTypePairs() {
-		List<Pair> pairs = new ArrayList<Pair>();
-
-		List<TaxonomyPredicate> iterator = new ArrayList<TaxonomyPredicate>();
-		for (TaxonomyPredicate type : this.values()) {
-			if (type.isSimplePredicate() || type.isEmptyPredicate()) {
-				iterator.add(type);
-			}
-		}
-
-		for (int i = 0; i < iterator.size() - 1; i++) {
-			for (int j = i + 1; j < iterator.size(); j++) {
-
-				pairs.add(new Pair(iterator.get(i), iterator.get(j)));
-			}
-		}
-
-		return pairs;
-	}
-
-	/**
 	 * Returns a list of pairs of simple types, pairing the types based on the
 	 * taxonomy subtree they belong to. Note that the abstract types are not
 	 * returned, only the unique pairs of types that are representing leaf types in
@@ -221,23 +194,6 @@ public class AllTypes extends AllPredicates {
 		return pairs;
 	}
 
-	/**
-	 * Returns a list of final types. Note that the abstract types are not returned,
-	 * only the types that are representing leaf types in the taxonomy tree.
-	 * 
-	 * @return list of types
-	 */
-	private List<TaxonomyPredicate> getAllNonEmptyTypes() {
-
-		List<TaxonomyPredicate> allNonEmptyTypes = new ArrayList<TaxonomyPredicate>();
-		for (TaxonomyPredicate type : this.values()) {
-			if (!(type.isEmptyPredicate() || type.isRootPredicate())) {
-				allNonEmptyTypes.add(type);
-			}
-		}
-
-		return allNonEmptyTypes;
-	}
 
 	/**
 	 * Return the list of dimensions that represent the data. Each dimension represents a node in the data taxonomy and the root for the corresponding sub-taxonomy.

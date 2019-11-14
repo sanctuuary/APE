@@ -211,6 +211,7 @@ public class APE {
 		APEUtils.readModuleJson(config.getTool_annotations_path(), allModules, allTypes);
 		
 		allModules.trimTaxonomy();
+		allTypes.trimTaxonomy();
 		
 		/*
 		 * Define set of all constraint formats

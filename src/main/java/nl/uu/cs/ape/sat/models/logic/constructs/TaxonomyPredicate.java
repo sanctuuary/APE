@@ -1,5 +1,6 @@
 package nl.uu.cs.ape.sat.models.logic.constructs;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -302,6 +303,14 @@ public abstract class TaxonomyPredicate implements Predicate {
 	 */
 	public Set<String> getSubPredicates() {
 		return subPredicates;
+	}
+	
+	public boolean removeSubPredicate(String subPredicate) {
+		return subPredicates.remove(subPredicate);
+	}
+	
+	public boolean removeAllSubPredicates(Collection<String> subPredicates) {
+		return subPredicates.removeAll(subPredicates);
 	}
 	
 	/**
