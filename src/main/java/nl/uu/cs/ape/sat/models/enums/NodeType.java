@@ -21,7 +21,7 @@ public enum NodeType{
 	/**
 	 * Non-leaf node in the taxonomy. Usually represents an abstraction over the actual implementation of a tool or data type/format. 
 	 */
-	ABSTRACT, 
+	ABSTRACT,
 	/**
 	 * Leaf in the taxonomy. Usually represent the implementation of the tool, simple data type or format, etc.
 	 */

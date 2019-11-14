@@ -83,7 +83,7 @@ public class ModuleNode extends SolutionWorkflowNode {
 	 * @param abstractModule - abstract type that describes the instance.
 	 */
 	public void addAbstractDescriptionOfUsedType(AbstractModule abstractModule) {
-		if (!abstractModule.isTool()) {
+		if (!abstractModule.isSimplePredicate()) {
 			this.abstractModules.add(abstractModule);
 		} else {
 			System.err.println("Actual tool cannot be uset to describe a module in an abstract way.");

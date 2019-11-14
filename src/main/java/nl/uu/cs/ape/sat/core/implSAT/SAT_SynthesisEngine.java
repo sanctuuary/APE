@@ -33,6 +33,8 @@ import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
+import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -120,8 +122,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	public boolean synthesisEncoding() throws IOException {
 
 		long problemSetupStartTime = System.currentTimeMillis();
-		AbstractModule rootModule = allModules.getRootModule();
-		Type rootType = allTypes.getRootType();
+		TaxonomyPredicate rootModule = allModules.getRootPredicate();
+		TaxonomyPredicate rootType = allTypes.getRootPredicate();
 
 		/*
 		 * Generate the automaton
@@ -159,11 +161,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * considered a type) 3. Adding the constraints enforcing the taxonomy
 		 * structure.
 		 */
-		cnfEncoding = cnfEncoding.append(allTypes.typeMutualExclusion(typeAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(TypeUtils.typeMutualExclusion(allTypes, typeAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions enfocements");
-		cnfEncoding = cnfEncoding.append(allTypes.typeMandatoryUsage(rootType, typeAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(TypeUtils.typeMandatoryUsage(allTypes, rootType, typeAutomaton, mappings));
 		cnfEncoding = cnfEncoding
-				.append(allTypes.typeEnforceTaxonomyStructure(rootType.getPredicateID(), typeAutomaton, mappings));
+				.append(TypeUtils.typeEnforceTaxonomyStructure(allTypes, rootType.getPredicateID(), typeAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage enfocements");
 		/*
 		 * Encode the constraints from the file based on the templates (manual
@@ -180,7 +182,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * reuse the mappings for states, instead of introducing new ones, using the I/O
 		 * types of NodeType.UNKNOWN.
 		 */
-		String inputDataEncoding = allTypes.encodeInputData(config.getProgram_inputs(), typeAutomaton, mappings);
+		String inputDataEncoding = TypeUtils.encodeInputData(allTypes, config.getProgram_inputs(), typeAutomaton, mappings);
 		if (inputDataEncoding == null) {
 			return false;
 		}
@@ -188,7 +190,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Encode the workflow output
 		 */
-		String outputDataEncoding = allTypes.encodeOutputData(config.getProgram_outputs(), typeAutomaton, mappings);
+		String outputDataEncoding = TypeUtils.encodeOutputData(allTypes, config.getProgram_outputs(), typeAutomaton, mappings);
 		if (outputDataEncoding == null) {
 			return false;
 		}

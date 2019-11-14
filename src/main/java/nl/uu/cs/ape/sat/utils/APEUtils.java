@@ -41,6 +41,7 @@ import nl.uu.cs.ape.sat.models.AtomMapping;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 /**
  * The {@code StaticFunctions} class is used for storing {@code Static} methods.
@@ -195,7 +196,6 @@ public final class APEUtils {
 				Module tmpModule = Module.moduleFromJson(jsonModule, allModules, allTypes);
 				if (tmpModule != null) {
 					modulesNew.add(tmpModule);
-					allModules.addAnnotatedModule(tmpModule.getPredicateID());
 				}
 			} catch (JSONException e) {
 				System.err.println("Error in file: " + file + ", at tool no: " + currModule + ". Tool skipped.");
@@ -372,11 +372,11 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tTool Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
-			allModules.getRootModule().printTree(" ", allModules);
+			allModules.getRootPredicate().printTree(" ", allModules);
 			System.out.println("\n-------------------------------------------------------------");
 			System.out.println("\tData Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
-			allTypes.getRootType().printTree(" ", allTypes);
+			allTypes.getRootPredicate().printTree(" ", allTypes);
 			
 			/*
 			 * Printing the tool annotations
@@ -385,9 +385,9 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tAnnotated tools:");
 			System.out.println("-------------------------------------------------------------");
-			for(AbstractModule module : allModules.getModules()) {
+			for(TaxonomyPredicate module : allModules.getModules()) {
 				if(module instanceof Module) {
-					System.out.println(module.print());
+					System.out.println(module.toString());
 					noTools = false;
 				}
 			}
@@ -557,21 +557,23 @@ public final class APEUtils {
 	public static JSONObject convertBioTools2Ape(JSONArray bioToolsAnotation) throws JSONException{
 		
 		JSONArray apeToolsAnnotations = new JSONArray();
-		
 		for (int i = 0; i < bioToolsAnotation.length(); i++) {
 			JSONObject apeJsonTool = new JSONObject();
 			JSONObject bioJsonTool = bioToolsAnotation.getJSONObject(i);
 			apeJsonTool.put("name", bioJsonTool.getString("name"));
 			apeJsonTool.put("operation", bioJsonTool.getString("biotoolsID"));
 			
+			System.out.println("tool:" + bioJsonTool.getString("name"));
+			
 			JSONArray apeTaxonomyTerms = new JSONArray();
 			List<JSONObject> functions = APEUtils.getListFromJson(bioJsonTool, "function", JSONObject.class);
 			JSONObject function = null;
+			System.out.println("Size: " + functions.size());
 			if(functions.size() == 1) {
 				function = bioJsonTool.getJSONArray("function").getJSONObject(0);
 			} else {
 				new JSONException("A 'bio.tools' tool annotation cannot contain more than one function.");
-				return null;
+				continue;
 			}
 			
 			

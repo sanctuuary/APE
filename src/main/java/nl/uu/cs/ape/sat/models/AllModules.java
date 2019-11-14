@@ -3,21 +3,11 @@ package nl.uu.cs.ape.sat.models;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
-import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
-import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
-import nl.uu.cs.ape.sat.automaton.Block;
-import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
-import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
-import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
  * The {@code AllModules} class represent the set of all modules/tools that can
@@ -27,17 +17,11 @@ import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
  * @author Vedran Kasalica
  *
  */
-public class AllModules extends HashMap<String, AbstractModule>{
+public class AllModules extends AllPredicates {
 
-	/** Set of all the module IDs of the annotated modules in the domain. */
-	private Set<String> annotatedModules;
-	/** Root of the data taxonomy. */
-	private String moduleTaxonomyRoot;
 
 	public AllModules() {
-		super();
-		this.annotatedModules = new HashSet<String>();
-		this.moduleTaxonomyRoot = APEConfig.getConfig().getTool_taxonomy_root();
+		super(APEConfig.getConfig().getTool_taxonomy_root());
 	}
 
 	/**
@@ -45,19 +29,19 @@ public class AllModules extends HashMap<String, AbstractModule>{
 	 * duplicates.
 	 * 
 	 * @param modules
-	 */
+	
 	public AllModules(Collection<? extends AbstractModule> modules) {
 		super();
 		for (AbstractModule module : modules) {
 			this.addModule(module);
 		}
-	}
+	} */
 
 	/**
 	 * Return the set of currently defined modules (both {@link AbstractModule} and {@link Module}).
 	 * @return
 	 */
-	public Collection<AbstractModule> getModules() {
+	public Collection<TaxonomyPredicate> getModules() {
 		return super.values();
 	}
 
@@ -74,10 +58,10 @@ public class AllModules extends HashMap<String, AbstractModule>{
 	 *         contains the specified element.
 	 */
 	public AbstractModule addModule(AbstractModule module) {
-		AbstractModule tmpModule = super.get(module.getPredicateID());
+		TaxonomyPredicate tmpModule = super.get(module.getPredicateID());
 		if (module instanceof Module && (tmpModule != null)) {
 			if (tmpModule instanceof Module) {
-				return tmpModule;
+				return (Module) tmpModule;
 			} else {
 				Module newModule = new Module(((Module) module), tmpModule);
 				/*
@@ -88,7 +72,7 @@ public class AllModules extends HashMap<String, AbstractModule>{
 			}
 		} else {
 			if (tmpModule != null) {
-				return tmpModule;
+				return (AbstractModule) tmpModule;
 			} else {
 				this.put(module.getPredicateID(), module);
 				return module;
@@ -105,7 +89,7 @@ public class AllModules extends HashMap<String, AbstractModule>{
 	 * @param newModule - object that will be added
 	 * @param oldModule - object that will be removed
 	 */
-	public void swapAbstractModule2Module(Module newModule, AbstractModule oldModule) {
+	public void swapAbstractModule2Module(Module newModule, TaxonomyPredicate oldModule) {
 		this.remove(oldModule.getPredicateID());
 		this.put(newModule.getPredicateID(), newModule);
 	}
@@ -119,26 +103,9 @@ public class AllModules extends HashMap<String, AbstractModule>{
 	 *         is mapped to, or {@code null} if the moduleID has no mappings
 	 */
 	public AbstractModule get(String moduleID) {
-		return super.get(moduleID);
+		return (AbstractModule) super.get(moduleID);
 	}
 
-	/**
-	 * Returns the root module of the taxonomy.
-	 * 
-	 * @return The root module.
-	 */
-	public AbstractModule getRootModule() {
-		return this.get(moduleTaxonomyRoot);
-	}
-	
-	/**
-	 * Returns the ID of the root module of the taxonomy.
-	 * 
-	 * @return The root module.
-	 */
-	public String getRootID() {
-		return moduleTaxonomyRoot;
-	}
 
 	/**
 	 * Returns true if this set contains the specified element. More formally,
@@ -166,42 +133,21 @@ public class AllModules extends HashMap<String, AbstractModule>{
 	public List<Pair> getToolPairs() {
 		List<Pair> pairs = new ArrayList<Pair>();
 
-		List<AbstractModule> iterator = new ArrayList<AbstractModule>();
-		for (AbstractModule module : this.values()) {
-			if (module.isTool())
+		List<TaxonomyPredicate> iterator = new ArrayList<TaxonomyPredicate>();
+		for (TaxonomyPredicate module : this.values()) {
+			if(module.isSimplePredicate()) {
 				iterator.add(module);
+			}
 		}
 
 //		System.out.println(APEConfig.getConfig().getTool_taxonomy_root() + ": " + iterator.size());
 
 		for (int i = 0; i < iterator.size() - 1; i++) {
 			for (int j = i + 1; j < iterator.size(); j++) {
-
 				pairs.add(new Pair(iterator.get(i), iterator.get(j)));
 			}
 		}
-
 		return pairs;
 	}
 
-
-	/**
-	 * Return {@code true} if the module is annotated.
-	 * 
-	 * @param moduleID - ID of the module that is evaluated.
-	 * @return {@code true} if the module is annotated, {@code false} otherwise.
-	 */
-	public boolean getIsAnnotatedModule(String moduleID) {
-		return annotatedModules.contains(moduleID);
-	}
-
-	/**
-	 * Adds the module to the set of annotated modules.
-	 * 
-	 * @param moduleID - ID of the module that is annotated.
-	 */
-	public void addAnnotatedModule(String moduleID) {
-		annotatedModules.add(moduleID);
-	}
-	
 }

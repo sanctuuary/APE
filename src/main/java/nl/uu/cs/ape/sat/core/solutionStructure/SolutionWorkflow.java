@@ -139,13 +139,13 @@ public class SolutionWorkflow {
 						}
 					} else if (currLiteral.isWorkflowElementType(WorkflowElement.MEMORY_TYPE)) {
 						TypeNode currNode = this.allMemoryTypeNodes.get(currLiteral.getUsedInStateArgument());
-						if(((Type) currLiteral.getPredicate()).isSimpleType()) {
+						if(((Type) currLiteral.getPredicate()).isSimplePredicate()) {
 							currNode.addUsedType((Type) currLiteral.getPredicate());
 						} else {
 							currNode.addAbstractDescriptionOfUsedType((Type) currLiteral.getPredicate());
 						}
 					} else if (currLiteral.isWorkflowElementType(WorkflowElement.USED_TYPE)
-							&& ((Type) currLiteral.getPredicate()).isSimpleType()) {
+							&& ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
 						continue;
 					} else if(currLiteral.isWorkflowElementType(WorkflowElement.MEM_TYPE_REFERENCE) &&
 							((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {

@@ -162,12 +162,17 @@ public class OWLReader {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		}
+		/* Add the current module as a sub-module of the super module.*/
 		if(superModule != null) {
-			superModule.addSubModule(getLabel(currClass));
+			superModule.addSubPredicate(getLabel(currClass));
 		}
-		/* Generate the ABstractModule that corresponds to the taxonomy class. */
-		allModules.addModule(new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType));
-
+		/* Generate the AbstractModule that corresponds to the taxonomy class. */
+		AbstractModule currModule = allModules.addModule(new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType));
+		/* Add the super-type for the current type */
+		if(currNodeType != NodeType.ROOT) {
+			currModule.addSuperPredicate(superModule);
+		}
+		
 		for (OWLClass child : reasoner.getSubClasses(currClass, true).getFlattened()) {
 			if (reasoner.isSatisfiable(child)) { 		// in case that the child is not node owl:Nothing
 				exploreModuleOntologyRec(reasoner, ontology, child, currClass, rootClass);
@@ -190,6 +195,9 @@ public class OWLReader {
 	 */
 	private void exploreTypeOntologyRec(OWLReasoner reasoner, OWLOntology ontology, OWLClass currClass,
 			OWLClass superClass, OWLClass rootClass) {
+		if(currClass == null) {
+			return;
+		}
 		Type superType, subType;
 		superType = allTypes.get(getLabel(superClass));
 		/*
@@ -207,24 +215,33 @@ public class OWLReader {
 				}
 			}
 		}
-		subType = allTypes.addType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType, superType);
-
+		/* Add the current type as a sub-type of the super type.*/
+		if (superType != null) {
+			superType.addSubPredicate(getLabel(currClass));
+		}
+		
+		/* Generate the Type that corresponds to the taxonomy class. */
+		subType = allTypes.addType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType);
+		
+		/* Add the super-type for the current type */
+		if(currNodeType != NodeType.ROOT) {
+			subType.addSuperPredicate(superType);
+		}
 		/*
 		 * Define the counter to check whether all the subclasses are empty / owl:Nothing
 		 */
-//		System.out.println("-> " + subType.getTypeID());
-		int unsatSubClasses = 0,subClasses = reasoner.getSubClasses(currClass, true).getFlattened().size();
+		int unsatSubClasses = 0, subClasses = reasoner.getSubClasses(currClass, true).getFlattened().size();
 		for (OWLClass child : reasoner.getSubClasses(currClass, true).getFlattened()) {
-//			System.out.println(" - -> " + getLabel(currClass) + "_OF_" + getLabel(child));
-			if (reasoner.isSatisfiable(child)) { // in case that the child is not node owl:Nothing
-//				System.out.println(" - - +");
+			if (reasoner.isSatisfiable(child)) { 
+				/* in case that the child is not node owl:Nothing */
 				exploreTypeOntologyRec(reasoner, ontology, child, currClass, rootClass);
 			} else {
 				unsatSubClasses ++;
 			}
 		}
 		if(unsatSubClasses == subClasses) {
-			subType.setToSimpleType();		// make the type a simple type in case of not having subTypes
+			/* make the type a simple type in case of not having subTypes */
+			subType.setToSimplePredicate();;		
 		}
 	}
 

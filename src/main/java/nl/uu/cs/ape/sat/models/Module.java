@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import nl.uu.cs.ape.sat.models.enums.NodeType;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -68,7 +69,7 @@ public class Module extends AbstractModule {
 	 * @param abstractModule - Existing AbstractModule that is to be extended with
 	 *                       all the fields from the Module.
 	 */
-	public Module(Module module, AbstractModule abstractModule) {
+	public Module(Module module, TaxonomyPredicate abstractModule) {
 		super(abstractModule, NodeType.LEAF);
 		this.moduleInput = module.getModuleInput();
 		this.moduleOutput = module.getModuleOutput();
@@ -198,22 +199,22 @@ public class Module extends AbstractModule {
 			if (!jsonInput.isEmpty()) {
 				DataInstance input = new DataInstance();
 				for (String typeSubntology : jsonInput.keySet()) {
-					for (String currType : APEUtils.getListFromJson(jsonInput, typeSubntology, String.class)) {
-						if (allTypes.get(currType) == null) {
-							System.err.println("Data format \"" + currType
+					for (String currTypeID : APEUtils.getListFromJson(jsonInput, typeSubntology, String.class)) {
+						if (allTypes.get(currTypeID) == null) {
+							System.err.println("Data format \"" + currTypeID
 									+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
 						}
 						if (allTypes.getDataTaxonomyDimensions().contains(typeSubntology)) {
-							Type tmpType = allTypes.addType(currType, currType, typeSubntology, NodeType.UNKNOWN,
-									allTypes.getRootType());
-							if (tmpType != null) {
-								input.addType(tmpType);
-								allTypes.addAnnotatedType(tmpType.getPredicateID());
+							Type currType = allTypes.addType(currTypeID, currTypeID, typeSubntology, NodeType.UNKNOWN);
+							if (currType != null) {
+								/* if the type exists, make it relevant from the taxonomy perspective and add it to the inputs */
+								currType.setAsRelevantTaxonomyTerm(allTypes);
+								input.addType(currType);
 							}
 						} else {
 							new JSONException(
 									"Error in the tool annotation file . The data subtaxonomy '" + typeSubntology
-											+ "' was not defined, but it was used for input type '" + currType + "'.");
+											+ "' was not defined, but it was used as annotation for input type '" + currTypeID + "'.");
 						}
 					}
 				}
@@ -225,22 +226,23 @@ public class Module extends AbstractModule {
 			if (!jsonOutput.isEmpty()) {
 				DataInstance output = new DataInstance();
 				for (String typeSubntology : jsonOutput.keySet()) {
-					for (String currType : APEUtils.getListFromJson(jsonOutput, typeSubntology, String.class)) {
-						if (allTypes.get(currType.toString()) == null) {
-							System.err.println("Data format \"" + currType.toString()
+					for (String currTypeID : APEUtils.getListFromJson(jsonOutput, typeSubntology, String.class)) {
+						if (allTypes.get(currTypeID) == null) {
+							System.err.println("Data format \"" + currTypeID.toString()
 									+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
 						}
 						if (allTypes.getDataTaxonomyDimensions().contains(typeSubntology)) {
-							Type tmpType = allTypes.addType(currType.toString(), currType.toString(), typeSubntology,
-									NodeType.UNKNOWN, allTypes.getRootType());
-							if (tmpType != null) {
-								output.addType(tmpType);
-								allTypes.addAnnotatedType(tmpType.getPredicateID());
+							Type currType = allTypes.addType(currTypeID, currTypeID, typeSubntology,
+									NodeType.UNKNOWN);
+							if (currType != null) {
+								/* if the type exists, make it relevant from the taxonomy perspective and add it to the inputs */
+								currType.setAsRelevantTaxonomyTerm(allTypes);
+								output.addType(currType);
 							}
 						} else {
 							new JSONException(
 									"Error in the tool annotation file . The data subtaxonomy '" + typeSubntology
-											+ "' was not defined, but it was used for output type '" + currType + "'.");
+											+ "' was not defined, but it was used as annotation for output type '" + currTypeID + "'.");
 						}
 					}
 				}
@@ -253,22 +255,25 @@ public class Module extends AbstractModule {
 			moduleExecutionImpl = new Module_Execution_Code(executionCode);
 		}
 
-		/*	For each supermodule add the curent module as a subset. */
-		for(String superModuleID : taxonomyModules) {
-			AbstractModule superModule = allModules.get(superModuleID);
-			if(superModule != null) {
-				superModule.addSubModule(moduleID);
-			}
-		}
-		
 		/*
 		 * Add the module and make it sub module of the currSuperModule (if it was not
 		 * previously defined)
 		 */
 		Module currModule =  (Module) allModules.addModule(new Module(moduleLabel, moduleID, allModules.getRootID(), moduleExecutionImpl));
+		
+		/*	For each supermodule add the current module as a subset and vice versa. */
+		for(String superModuleID : taxonomyModules) {
+			AbstractModule superModule = allModules.get(superModuleID);
+			if(superModule != null) {
+				superModule.addSubPredicate(moduleID);
+				currModule.addSuperPredicate(superModuleID);
+			}
+		}
+		
 		currModule.setModuleInput(inputs);
 		currModule.setModuleOutput(outputs);
-
+		currModule.setAsRelevantTaxonomyTerm(allModules);
+		
 		return currModule;
 	}
 
@@ -278,7 +283,7 @@ public class Module extends AbstractModule {
 	 * @return module as printable String
 	 */
 	@Override
-	public String print() {
+	public String toString() {
 		StringBuilder inputs = new StringBuilder();
 		StringBuilder outputs = new StringBuilder();
 
@@ -297,7 +302,7 @@ public class Module extends AbstractModule {
 			outputs = outputs.append("} ");
 		}
 
-		return "______________________________________\n|" + super.print() + ",\n|IN:\t" + inputs + ",\n|OUT\t"
+		return "______________________________________\n|" + super.toString() + ",\n|IN:\t" + inputs + ",\n|OUT\t"
 				+ outputs + "\n|______________________________________";
 	}
 
@@ -307,8 +312,8 @@ public class Module extends AbstractModule {
 	 * @return Module ID
 	 */
 	@Override
-	public String printShort() {
-		return super.printShort() + "[T]";
+	public String toShortString() {
+		return super.toShortString() + "[T]";
 	}
 
 	@Override

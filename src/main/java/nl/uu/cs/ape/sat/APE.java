@@ -203,13 +203,15 @@ public class APE {
 		 * Set the the empty type (representing the absence of types) as a direct child
 		 * of root type
 		 */
-		allTypes.getRootType().addSubType(allTypes.getEmptyType().getPredicateID());
+		allTypes.getRootPredicate().addSubPredicate(allTypes.getEmptyType().getPredicateID());
 
 		/*
-		 * Update allModules and allTypes sets based on the module.xml file
+		 * Update allModules and allTypes sets based on the module.json file
 		 */
 		APEUtils.readModuleJson(config.getTool_annotations_path(), allModules, allTypes);
-
+		
+		allModules.trimTaxonomy();
+		
 		/*
 		 * Define set of all constraint formats
 		 */

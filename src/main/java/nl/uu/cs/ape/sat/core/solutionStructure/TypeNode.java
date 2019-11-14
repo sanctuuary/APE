@@ -64,7 +64,7 @@ public class TypeNode extends SolutionWorkflowNode {
 	 */
 	public void addUsedType(Type simpleType) {
 		/* Check if the type is simple */
-		if (simpleType.isSimpleType()) {
+		if (simpleType.isSimplePredicate()) {
 			this.usedTypes.add(simpleType);
 		} else {
 			System.err.println("Abstract and Empty Type cannot be used to define an instance.");
@@ -77,7 +77,7 @@ public class TypeNode extends SolutionWorkflowNode {
 	 * @param abstractType - abstract type that describes the instance.
 	 */
 	public void addAbstractDescriptionOfUsedType(Type abstractType) {
-		if (!abstractType.isSimpleType()) {
+		if (!abstractType.isSimplePredicate()) {
 			this.abstractTypes.add(abstractType);
 		} else {
 			System.err.println("Simple Type cannot be uset to describe an instance.");
