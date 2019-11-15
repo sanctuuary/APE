@@ -246,8 +246,7 @@ public abstract class TaxonomyPredicate implements Predicate {
 	 * @return Predicate ID as a {@link String}
 	 */
 	public String toShortString() {
-		String relevant = isRelevant ? "_!" : "";
-		return getPredicateID() + relevant;
+		return getPredicateID();
 	}
 
 
@@ -302,27 +301,34 @@ public abstract class TaxonomyPredicate implements Predicate {
 	 * @return List of the sub-predicates or null in case of a leaf predicate
 	 */
 	public Set<String> getSubPredicates() {
-		return subPredicates;
+		return this.subPredicates;
 	}
 	
 	public boolean removeSubPredicate(String subPredicate) {
-		return subPredicates.remove(subPredicate);
+		return this.subPredicates.remove(subPredicate);
 	}
 	
 	public boolean removeAllSubPredicates(Collection<String> subPredicates) {
-		return subPredicates.removeAll(subPredicates);
+		boolean done = true;
+		if(subPredicates != null && !subPredicates.isEmpty()) {
+			done = done && this.subPredicates.removeAll(subPredicates);
+		}
+		return done;
 	}
 	
 	/**
 	 * Adds a super-predicate to the current one, if it was not added present
 	 * already.
 	 * 
-	 * @param Predicate - predicate that will be added as a superclass
+	 * @param predicate - predicate that will be added as a superclass
 	 * @return {@code true} if super-predicate was added, false otherwise.
 	 */
-	public boolean addSuperPredicate(TaxonomyPredicate Predicate) {
+	public boolean addSuperPredicate(TaxonomyPredicate predicate) {
+		if(predicate == null) {
+			return false;
+		}
 		if (nodeType != NodeType.ROOT) {
-			superPredicates.add(Predicate.getPredicateID());
+			superPredicates.add(predicate.getPredicateID());
 			return true;
 		} else {
 			System.err.println("Cannot add super-predicate to a root taxonomy term!");

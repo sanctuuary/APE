@@ -168,11 +168,14 @@ public class Module extends AbstractModule {
 		Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("taxonomyTerms"), String.class));
 		
 		/** Check if the referenced module taxonomy classes exist. */
+		List<String> toRemove = new ArrayList<String>();
 		for(String taxonomyModule : taxonomyModules) {
 			if(allModules.get(taxonomyModule) == null) {
-				taxonomyModules.remove(taxonomyModule);
+				toRemove.add(taxonomyModule);
 			}
 		}
+		taxonomyModules.removeAll(toRemove);
+		
 		/* If the taxonomy terms were not properly specified the tool taxonomy root is used as superclass of the tool. */
 		if(taxonomyModules.isEmpty() && (allModules.get(moduleID) == null)) {
 				System.err.println("Annotated tool \"" + moduleID

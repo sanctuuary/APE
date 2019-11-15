@@ -162,12 +162,12 @@ public class OWLReader {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		}
-		/* Add the current module as a sub-module of the super module.*/
-		if(superModule != null) {
-			superModule.addSubPredicate(getLabel(currClass));
-		}
 		/* Generate the AbstractModule that corresponds to the taxonomy class. */
 		AbstractModule currModule = allModules.addModule(new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType));
+		/* Add the current module as a sub-module of the super module.*/
+		if(superModule != null && currModule != null) {
+			superModule.addSubPredicate(getLabel(currClass));
+		}
 		/* Add the super-type for the current type */
 		if(currNodeType != NodeType.ROOT) {
 			currModule.addSuperPredicate(superModule);
@@ -215,14 +215,15 @@ public class OWLReader {
 				}
 			}
 		}
-		/* Add the current type as a sub-type of the super type.*/
-		if (superType != null) {
-			superType.addSubPredicate(getLabel(currClass));
-		}
+		
 		
 		/* Generate the Type that corresponds to the taxonomy class. */
 		subType = allTypes.addType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType);
 		
+		/* Add the current type as a sub-type of the super type.*/
+		if (superType != null && subType != null) {
+			superType.addSubPredicate(getLabel(currClass));
+		}
 		/* Add the super-type for the current type */
 		if(currNodeType != NodeType.ROOT) {
 			subType.addSuperPredicate(superType);

@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.models;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
@@ -45,6 +46,18 @@ public class AtomMapping {
 		Atom atom = new Atom(predicate, usedInState, elementType);
 		
 		Integer id;
+		if(predicate == null) {
+			System.out.println("!!!!");
+		}
+//		System.out.println(">>>");
+//		System.out.println("1: " + mappings.size());
+//		System.out.println("2: " + usedInState.getPredicateID());
+//		System.out.println("3.0 " + (predicate == null));
+//		System.out.println("3.1 " + predicate);
+//		System.out.println("3.2 " + predicate.toString());
+//		System.out.println("3: " + predicate.getPredicateID());
+//		System.out.println("4: " + atom.toString());
+//		System.out.println("<<<");
 		if ((id = mappings.get(atom)) == null) {
 			size++;
 			mappings.put(atom, size);
