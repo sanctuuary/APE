@@ -2,12 +2,10 @@ package nl.uu.cs.ape.sat.models;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
-import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
  * The {@code AllModules} class represent the set of all modules/tools that can

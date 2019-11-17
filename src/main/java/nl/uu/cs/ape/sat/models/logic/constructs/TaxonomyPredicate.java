@@ -2,9 +2,10 @@ package nl.uu.cs.ape.sat.models.logic.constructs;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
+
+import nl.uu.cs.ape.sat.models.AllPredicates;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -141,7 +142,7 @@ public abstract class TaxonomyPredicate implements Predicate {
 	 * @param allPredicates - Map of all the predicates of the given type.
 	 * @return {@code true} if the predicates were successfully set to be relevant.
 	 */
-	public boolean setAsRelevantTaxonomyTerm(Map<String, ? extends TaxonomyPredicate> allPredicates) {
+	public boolean setAsRelevantTaxonomyTerm(AllPredicates allPredicates) {
 		if(this.isRelevant) {
 			return true;
 		}
@@ -149,6 +150,8 @@ public abstract class TaxonomyPredicate implements Predicate {
 		if(allPredicates == null) {
 			return false;
 		}
+		boolean here = this.getPredicateID().equals("Sequence set (protein)");
+		if(here) System.out.println("Here!");
 		this.setIsRelevant();
 		for(String superPredicate : APEUtils.safe(this.superPredicates)) {
 			TaxonomyPredicate superTaxPred = null;
@@ -170,7 +173,7 @@ public abstract class TaxonomyPredicate implements Predicate {
 	 * @param allPredicates - Map of all the predicates of the given type.
 	 * @return {@code true} if the predicates were successfully set to be relevant.
 	 */
-	private boolean setAsRelevantTaxonomyTermTopDown(Map<String, ? extends TaxonomyPredicate> allPredicates) {
+	private boolean setAsRelevantTaxonomyTermTopDown(AllPredicates allPredicates) {
 		if(this.isRelevant) {
 			return true;
 		}
@@ -194,7 +197,7 @@ public abstract class TaxonomyPredicate implements Predicate {
 	 * @param allPredicates - Map of all the predicates of the given type.
 	 * @return {@code true} if the predicates were successfully set to be relevant.
 	 */
-	private boolean setAsRelevantTaxonomyTermBottomUp(Map<String, ? extends TaxonomyPredicate> allPredicates) {
+	private boolean setAsRelevantTaxonomyTermBottomUp(AllPredicates allPredicates) {
 		if(this.isRelevant) {
 			return true;
 		}
@@ -257,9 +260,10 @@ public abstract class TaxonomyPredicate implements Predicate {
 	 *                   distinguish between the tree levels
 	 * @param allPredicates - set of all the predicates
 	 */
-	public void printTree(String str, Map<String, ? extends TaxonomyPredicate> allPredicates) {
+	public void printTree(String str, AllPredicates allPredicates) {
 		System.out.println(str + toShortString() + "[" + getNodeType() + "]");
 		for (String predicateID : APEUtils.safe(this.subPredicates)) {
+//			System.out.println(predicateID + " is found: " + (allPredicates.get(predicateID)!= null));
 			allPredicates.get(predicateID).printTree(str + ". ", allPredicates);
 		}
 	}

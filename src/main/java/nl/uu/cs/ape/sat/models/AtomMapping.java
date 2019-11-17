@@ -2,7 +2,6 @@ package nl.uu.cs.ape.sat.models;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;

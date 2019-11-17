@@ -232,25 +232,6 @@ public final class APEUtils {
 	 *         }
 	 */
 
-	/**
-	 * Get List of nodes that correspond to the elements of the structured XML file.
-	 * 
-	 * @param xmlPath     - path to the XML file
-	 * @param rootXMLpath - root structure of the elements within the path.
-	 * @return List of {@link Node} elements of the XML.
-	 */
-	public static List<Node> getListFromXML(String xmlPath, String rootXMLpath) {
-		SAXReader reader = new SAXReader();
-		Document document;
-		try {
-			document = reader.read(xmlPath);
-			List<Node> functionList = document.selectNodes(rootXMLpath);
-			return functionList;
-		} catch (DocumentException e) {
-			System.err.println("Error parsing the XML file: " + xmlPath);
-			return null;
-		}
-	}
 
 	/**
 	 * The method return a list of {@link JSONObject} elements that correspond to a
@@ -394,6 +375,7 @@ public final class APEUtils {
 			if(noTools) {
 				System.out.println("\tNo annotated tools.");
 			}
+			
 			/*
 			 * Print out the constraints
 			 */

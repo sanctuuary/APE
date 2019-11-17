@@ -36,12 +36,10 @@ public class Type extends TaxonomyPredicate {
 		this.typeID = typeID;
 	}
 
-	@Override
 	public String getPredicateLabel() {
 		return typeName;
 	}
 
-	@Override
 	public String getPredicateID() {
 		return typeID;
 	}

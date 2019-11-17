@@ -42,7 +42,7 @@ public class SLTL_formula_G extends SLTL_formula {
 		}
 		// Distinguishing whether the formula under the modal operator is type
 		// or module.
-		if (super.getSubFormula().getType().matches("type")) {
+		if (super.getSubFormula().getType().equals("type")) {
 			for (Block typeBlock : typeStateBlocks) {
 				for (State  typeState : typeBlock.getStates()) {
 					constraints += negSign

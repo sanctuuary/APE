@@ -153,7 +153,7 @@ public class Module extends AbstractModule {
 
 
 	/**
-	 * Creates a module from a tool annotation instance from a Json file.
+	 * Creates and returns a module from a tool annotation instance from a Json file.
 	 * 
 	 * @param jsonModule - JSON representation of a module
 	 * @param allModules - list of all the modules
@@ -238,7 +238,7 @@ public class Module extends AbstractModule {
 							Type currType = allTypes.addType(currTypeID, currTypeID, typeSubntology,
 									NodeType.UNKNOWN);
 							if (currType != null) {
-								/* if the type exists, make it relevant from the taxonomy perspective and add it to the inputs */
+								/* if the type exists, make it relevant from the taxonomy perspective and add it to the outputs */
 								currType.setAsRelevantTaxonomyTerm(allTypes);
 								output.addType(currType);
 							}
@@ -254,7 +254,7 @@ public class Module extends AbstractModule {
 		}
 
 		Module_Execution moduleExecutionImpl = null;
-		if (executionCode != null && !executionCode.matches("")) {
+		if (executionCode != null && !executionCode.equals("")) {
 			moduleExecutionImpl = new Module_Execution_Code(executionCode);
 		}
 

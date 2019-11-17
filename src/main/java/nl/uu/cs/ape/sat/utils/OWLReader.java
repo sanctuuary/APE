@@ -1,16 +1,23 @@
 package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.models.AbstractModule;
@@ -31,6 +38,8 @@ public class OWLReader {
 	private final String ONTOLOGY_PATH;
 	private final AllModules allModules;
 	private final AllTypes allTypes;
+	private OWLOntology ontology;
+	private OWLDataFactory factory = OWLManager.getOWLDataFactory();
 
 	/**
 	 * Setting up the reader that will populate the provided module and type sets
@@ -48,6 +57,7 @@ public class OWLReader {
 		this.allModules = allModules;
 		this.allTypes = allTypes;
 	}
+	
 
 	/**
 	 * Method used to read separately <b>ModulesTaxonomy</b> and
@@ -61,7 +71,6 @@ public class OWLReader {
 	public boolean readOntology() {
 
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology ontology = null;
 		try {
 			File tempOntology = new File(ONTOLOGY_PATH);
 			if (tempOntology.exists()) {
@@ -113,7 +122,7 @@ public class OWLReader {
 	private OWLClass getModuleClass(Set<OWLClass> subClasses) {
 		OWLClass moduleClass = null;
 		for (OWLClass currClass : subClasses) {
-			if (getLabel(currClass).matches(allModules.getRootID())) {
+			if (getLabel(currClass).equals(allModules.getRootID())) {
 				moduleClass = currClass;
 			}
 		}
@@ -130,7 +139,7 @@ public class OWLReader {
 	private OWLClass getTypeClass(Set<OWLClass> subClasses) {
 		OWLClass typeClass = null;
 		for (OWLClass currClass : subClasses) {
-			if (getLabel(currClass).matches(allTypes.getRootID())) {
+			if (getLabel(currClass).equals(allTypes.getRootID())) {
 				typeClass = currClass;
 			}
 		}
@@ -158,7 +167,7 @@ public class OWLReader {
 		 * Defining the Node Type based on the node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if(getLabel(currClass).matches(allModules.getRootID())) {
+		if(getLabel(currClass).equals(allModules.getRootID())) {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		}
@@ -204,12 +213,12 @@ public class OWLReader {
 		 * Check whether the current node is a root or subRoot node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if(getLabel(currClass).matches(allTypes.getRootID())) {
+		if(getLabel(currClass).equals(allTypes.getRootID())) {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		} else {
 			for(String dataTaxonomySubRoot : allTypes.getDataTaxonomyDimensions()) {
-				if(getLabel(currClass).matches(dataTaxonomySubRoot)) {
+				if(getLabel(currClass).equals(dataTaxonomySubRoot)) {
 					currNodeType = NodeType.SUBROOT;
 					rootClass = currClass;
 				}
@@ -247,7 +256,7 @@ public class OWLReader {
 	}
 
 	/**
-	 * Printing the label of the provided OWL class.
+	 * Returning the label of the provided OWL class.
 	 * 
 	 * @param currClass
 	 *            - provided OWL class
@@ -257,10 +266,44 @@ public class OWLReader {
 		if(currClass == null) {
 			return null;
 		}
-		String classID = currClass.toStringID();
-		String label = classID.substring(classID.indexOf('#') + 1);
-		label = label.replace(" ", "_");
-		return label;
+		String label, classID = currClass.toStringID();
+		List<OWLAnnotation> labels = EntitySearcher.getAnnotations(currClass, ontology, factory.getRDFSLabel()).collect(Collectors.toList());
+		/* sometimes optional is empty */
+		if(labels.size() > 0) {
+			label = labels.get(0).toString();
+			label = label.substring(label.indexOf("\"")+1, label.lastIndexOf("\""));
+			return label;
+		} else if(classID.contains("#")) {
+			label = classID.substring(classID.indexOf('#') + 1);
+			label = label.replace(" ", "_");
+			return label;
+		} else {
+			System.out.println("Class '" + classID + "' has no label.");
+			label = classID;
+		}
+		
+		System.out.println(label);
+		return classID;
+//		for(OWLAnnotation a : ) {
+//		    OWLAnnotationValue val = a.getValue();
+//		    if(value instanceof OWLLiteral) {
+//		        System.out.println(currClass + " labelled " + ((OWLLiteral) value).getLiteral());   
+//		    }
+//		}
+	}
+	
+	/**
+	 * Returning the IRI of the provided OWL class.
+	 * 
+	 * @param currClass
+	 *            - provided OWL class
+	 * @return String representation of the class name.
+	 */
+	private String getIRI(OWLClass currClass) {
+		if(currClass == null) {
+			return null;
+		}
+		return currClass.toStringID();
 	}
 
 }
