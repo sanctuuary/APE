@@ -30,7 +30,7 @@ public class SLTL_formula_G extends SLTL_formula {
 	 * @return CNF representation of the SLTL formula
 	 */
 	@Override
-	public String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement workflowElement, AtomMapping mappings) {
+	public String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement workflowElement, AtomMappings mappings) {
 
 		String constraints = "";
 		String negSign;

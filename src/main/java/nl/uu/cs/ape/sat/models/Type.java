@@ -1,6 +1,8 @@
 package nl.uu.cs.ape.sat.models;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import nl.uu.cs.ape.sat.models.enums.NodeType;
@@ -63,6 +65,5 @@ public class Type extends TaxonomyPredicate {
 		Type other = (Type) obj;
 		return this.typeID.equals(other.getPredicateID());
 	}
-
 
 }

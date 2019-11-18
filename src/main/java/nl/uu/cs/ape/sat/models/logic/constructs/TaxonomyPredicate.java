@@ -1,7 +1,9 @@
 package nl.uu.cs.ape.sat.models.logic.constructs;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -10,13 +12,13 @@ import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
- * The {@code Predicate} class (interface) represents a single predicate/label used to depict a predicate or a data type/format. <br> <br>
+ * The {@code PredicateLabel} class (interface) represents a single predicate/label used to depict an operation or a data type/format. <br> <br>
  * Note: In order to be an atom, a relation needs to be added.
 
  * @author Vedran Kasalica
  *
  */
-public abstract class TaxonomyPredicate implements Predicate {
+public abstract class TaxonomyPredicate implements PredicateLabel {
 	
 	/**
 	 * Describes the node in from the taxonomy hierarchy. The type can represent a root type, subroot type, an abstract or a simple (implemented leaf) term, or be an empty term.
@@ -137,6 +139,17 @@ public abstract class TaxonomyPredicate implements Predicate {
 	}
 	
 	/**
+	 * Transform the main 2 characteristics of the term into a map.
+	 * @return
+	 */
+	public Map<String, String> toMap() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("value", this.getPredicateID());
+		map.put("label", this.getPredicateLabel());
+		return map;
+	}
+	
+	/**
 	 * Set the current predicate as a relevant part of the taxonomy and all the corresponding subClasses and superClasses.
 	 * 
 	 * @param allPredicates - Map of all the predicates of the given type.
@@ -150,8 +163,6 @@ public abstract class TaxonomyPredicate implements Predicate {
 		if(allPredicates == null) {
 			return false;
 		}
-		boolean here = this.getPredicateID().equals("Sequence set (protein)");
-		if(here) System.out.println("Here!");
 		this.setIsRelevant();
 		for(String superPredicate : APEUtils.safe(this.superPredicates)) {
 			TaxonomyPredicate superTaxPred = null;
@@ -246,7 +257,7 @@ public abstract class TaxonomyPredicate implements Predicate {
 	/**
 	 * Print the ID of the current predicate.
 	 * 
-	 * @return Predicate ID as a {@link String}
+	 * @return PredicateLabel ID as a {@link String}
 	 */
 	public String toShortString() {
 		return getPredicateID();

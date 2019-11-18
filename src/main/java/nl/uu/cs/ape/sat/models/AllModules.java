@@ -18,8 +18,8 @@ import nl.uu.cs.ape.sat.utils.APEConfig;
 public class AllModules extends AllPredicates {
 
 
-	public AllModules() {
-		super(APEConfig.getConfig().getTool_taxonomy_root());
+	public AllModules(APEConfig config) {
+		super(config.getTool_taxonomy_root());
 	}
 
 	/**

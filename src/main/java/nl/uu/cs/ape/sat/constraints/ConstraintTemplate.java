@@ -12,7 +12,7 @@ import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.AtomMappings;
 
 /**
  * The {@code ConstraintTemplate} class is an abstract class used to represent a
@@ -86,7 +86,7 @@ public abstract class ConstraintTemplate {
 	 *         case of incorrect number of constraint parameters.
 	 */
 	public abstract String getConstraint(String[] parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton, AtomMapping mappings);
+			TypeAutomaton typeAutomaton, AtomMappings mappings);
 
 	/**
 	 * Print the template for encoding the constraint, containing the template ID, description and required number of parameters.

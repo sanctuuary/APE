@@ -8,7 +8,7 @@ import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.AbstractModule;
-import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 
@@ -70,7 +70,7 @@ public abstract class SLTL_formula {
 	 * Function returns the formula that was specified under the SLTL operator.<br/>
 	 * Currently only predicates.
 	 * 
-	 * @return Predicate ({@link AbstractModule}, {@link Module} or {@link Type}).
+	 * @return PredicateLabel ({@link AbstractModule}, {@link Module} or {@link Type}).
 	 */
 	public TaxonomyPredicate getSubFormula() {
 		return predicate;
@@ -92,7 +92,7 @@ public abstract class SLTL_formula {
 	 * @param typeAutomaton   - automaton of all the type states
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
-	public abstract String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement workflowElement, AtomMapping mappings);
+	public abstract String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement workflowElement, AtomMappings mappings);
 
 	/**
 	 * Creates a CNF representation of the Constraint::<br/>
@@ -109,7 +109,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
 	public static String ite_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate, ModuleAutomaton moduleAutomaton,
-		AtomMapping mappings) {
+		AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 		int automatonSize = moduleAutomaton.getModuleStates().size();
 		for (int i = 0; i < automatonSize; i++) {
@@ -140,7 +140,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
 	public static String ite_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate, WorkflowElement typeElement, ModuleAutomaton moduleAutomaton,
-			List<Block> typeBlocks, AtomMapping mappings) {
+			List<Block> typeBlocks, AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 		int numberOfBlocks = typeBlocks.size();
 		int numberOfStates = typeBlocks.get(0).getBlockSize();
@@ -182,7 +182,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
 	public static String itn_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate,
-			ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
+			ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 		int automatonSize = moduleAutomaton.getModuleStates().size();
 		for (int i = 0; i < automatonSize - 1; i++) {
@@ -216,7 +216,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
 	public static String itn_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate, WorkflowElement typeElement, ModuleAutomaton moduleAutomaton,
-			List<Block> typeBlocks, AtomMapping mappings) {
+			List<Block> typeBlocks, AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 		int numberOfBlocks = typeBlocks.size();
 		int numberOfStates = typeBlocks.get(0).getBlockSize();
@@ -258,7 +258,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
 	public static String depend_module(TaxonomyPredicate second_module_in_sequence, TaxonomyPredicate first_module_in_sequence,
-			ModuleAutomaton moduleAutomaton,AtomMapping mappings) {
+			ModuleAutomaton moduleAutomaton,AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 		int automatonSize = moduleAutomaton.getModuleStates().size();
 		for (int i = 0; i < automatonSize; i++) {
@@ -289,7 +289,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the constraint
 	 */
 	public static String next_module(TaxonomyPredicate first_module_in_sequence, TaxonomyPredicate second_module_in_sequence,
-			ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
+			ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 		int automatonSize = moduleAutomaton.getModuleStates().size();
 		for (int i = 0; i < automatonSize; i++) {
@@ -323,7 +323,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the constraint
 	 */
 	public static String prev_module(TaxonomyPredicate second_module_in_sequence, TaxonomyPredicate first_module_in_sequence,
-			ModuleAutomaton moduleAutomaton, AtomMapping mappings) {
+			ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 		int automatonSize = moduleAutomaton.getModuleStates().size();
 		for (int i = 0; i < automatonSize; i++) {
@@ -353,7 +353,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
 	public static String useAsLastModule(AbstractModule last_module, ModuleAutomaton moduleAutomaton,
-			AtomMapping mappings) {
+			AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 
 		List<State> moduleAutomatonStates = moduleAutomaton.getModuleStates();
@@ -375,7 +375,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
 	public static String useAsNthModule(AbstractModule module, int n, ModuleAutomaton moduleAutomaton,
-			AtomMapping mappings) {
+			AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 
 		List<State> moduleAutomatonStates = moduleAutomaton.getModuleStates();
@@ -398,7 +398,7 @@ public abstract class SLTL_formula {
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
 	public static String useModuleNtimes(AbstractModule module, int n, ModuleAutomaton moduleAutomaton,
-			AtomMapping mappings) {
+			AtomMappings mappings) {
 //		StringBuilder constraints = new StringBuilder();
 //
 //		List<State> moduleAutomatonStates = moduleAutomaton.getModuleStates();

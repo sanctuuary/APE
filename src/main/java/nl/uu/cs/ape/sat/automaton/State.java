@@ -1,17 +1,17 @@
 package nl.uu.cs.ape.sat.automaton;
 
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
-import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 
 /***
- * Class is used to represent the states in module and type automatons. Automaton corresponds to the structure of the possible solutions of the synthesis, i.e. it represents the structure that the provided solutions will follow.
+ * The {@code State} class is used to represent the states in module and type automatons. Automaton corresponds to the structure of the possible solutions of the synthesis, i.e. it represents the structure that the provided solutions will follow.
  * <br><br>
  * Labeling of the automaton is provided in /APE/res/WorkflowAutomaton_Implementation.png
  * 
  * @author Vedran Kasalica
  *
  */
-public class State implements Predicate {
+public class State implements PredicateLabel {
 	
 
 

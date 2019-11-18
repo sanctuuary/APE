@@ -2,10 +2,10 @@ package nl.uu.cs.ape.sat.models.logic.constructs;
 
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
-import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 
 /**
- *  The {@code Atom} class represents elements of the workflow, that consists of the tool or type used, state where it is used
+ *  The {@code Atom} class represents elements of the workflow, that consists of the operation or type used, state where it is used
  *  and potentially a state that it refers to, i.e. input type elements refer to a state when the type was created.
  * 
  * @author Vedran Kasalica
@@ -13,10 +13,10 @@ import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
  */
 public class Atom {
 
-	/**  Predicate that is referred (tool or type). */
-	private final Predicate predicate;
-	/**  State in which the type/tool was used. */
-	private final State usedInStateArgument;
+	/**  PredicateLabel that is referred (tool or type). */
+	private final PredicateLabel predicate;
+	/**  State in which the type/operation was used. */
+	private final State argumentState;
 	/**  Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.) */
 	private WorkflowElement elementType;
 	
@@ -27,9 +27,9 @@ public class Atom {
 	 * @param usedInState - state in the automaton it was used/created in
 	 * @param elementType - element that describes what type of a predicate is described
 	 */
-	public Atom(Predicate predicate, State usedInState, WorkflowElement elementType) {
+	public Atom(PredicateLabel predicate, State usedInState, WorkflowElement elementType) {
 		this.predicate = predicate;
-		this.usedInStateArgument = usedInState;
+		this.argumentState = usedInState;
 		this.elementType = elementType;
 	}
 	
@@ -40,19 +40,19 @@ public class Atom {
 	 */
 	public Atom(Atom atom) {
 		this.predicate = atom.predicate;
-		this.usedInStateArgument = atom.usedInStateArgument;
+		this.argumentState = atom.argumentState;
 		this.elementType = atom.elementType;
 	}
 	
     
 	/** @return Object {@link #predicate}. */
-	public Predicate getPredicate() {
+	public PredicateLabel getPredicate() {
 		return predicate;
 	}
 
 	@Override
 	public int hashCode() {
-		return predicate.hashCode() + usedInStateArgument.hashCode();
+		return predicate.hashCode() + argumentState.hashCode();
 	}
 
 
@@ -66,12 +66,12 @@ public class Atom {
 			return false;
 		Atom other = (Atom) obj;
 		
-		return this.predicate.equals(other.getPredicate()) && this.usedInStateArgument.equals(other.getUsedInStateArgument());
+		return this.predicate.equals(other.getPredicate()) && this.argumentState.equals(other.getUsedInStateArgument());
 	}
 	
-	/** @return Object {@link #usedInStateArgument}. */
+	/** @return Object {@link #argumentState}. */
 	public State getUsedInStateArgument() {
-		return usedInStateArgument;
+		return argumentState;
 	}
 
 	/**
@@ -90,9 +90,9 @@ public class Atom {
 	 */
 	public String toString() {
 		if(this.elementType == WorkflowElement.MEM_TYPE_REFERENCE) {
-			return "[" + predicate.getPredicateID() + "] <- ("+ usedInStateArgument.getPredicateID() + ")";
+			return "[" + predicate.getPredicateID() + "] <- ("+ argumentState.getPredicateID() + ")";
 		} else {
-			return predicate.getPredicateID() + "(" + usedInStateArgument.getPredicateID() + ")";
+			return predicate.getPredicateID() + "(" + argumentState.getPredicateID() + ")";
 		}
 	}
 	

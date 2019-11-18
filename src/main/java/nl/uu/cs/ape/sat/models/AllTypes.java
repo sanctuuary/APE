@@ -13,9 +13,10 @@ import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
-import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
  * The {@code AllTypes} class represent the set of all data dimensions (e.g. types,formats, etc.) that
@@ -32,9 +33,9 @@ public class AllTypes extends AllPredicates {
 	/** List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).*/
 	private List<String> dataTaxonomyDimensions;
 
-	public AllTypes() {
-		super(APEConfig.getConfig().getData_taxonomy_root());
-		dataTaxonomyDimensions = APEConfig.getConfig().getData_taxonomy_subroots();
+	public AllTypes(APEConfig config) {
+		super(config.getData_taxonomy_root());
+		dataTaxonomyDimensions = config.getData_taxonomy_subroots();
 		emptyType = new Type("empty", "empty", getRootID(), NodeType.EMPTY);
 		emptyType.setIsRelevant();
 		this.put(emptyType);
@@ -159,7 +160,7 @@ public class AllTypes extends AllPredicates {
 		// Add general data taxonomy root to the list
 		subTreesMap.put(super.getRootID(), new ArrayList<TaxonomyPredicate>());
 		// Add each of the subtree roots (type and format taxonomy) to the list
-		for (String subRoot : dataTaxonomyDimensions) {
+		for (String subRoot : APEUtils.safe(dataTaxonomyDimensions)) {
 			subTreesMap.put(subRoot, new ArrayList<TaxonomyPredicate>());
 		}
 
@@ -202,5 +203,26 @@ public class AllTypes extends AllPredicates {
 	public List<String> getDataTaxonomyDimensions(){
 		return dataTaxonomyDimensions;
 	}
-
+	
+	/**
+	 * Method return all the element that belong to the subTree.
+	 * @param subTreeRoot - root of the subTree
+	 * @return List of data types.
+	 */
+	public List<Type> getElementsFromSubTaxonomy(Type subTreeRoot){
+		if(subTreeRoot == null) {
+			System.err.println("Given subtaxonomy type does not exist.");
+			return null;
+		}
+		List<Type> elements = new ArrayList<>();
+		elements.add(subTreeRoot);
+		
+		for(String subTypeID : APEUtils.safe(subTreeRoot.getSubPredicates())) {
+			Type subType = this.get(subTypeID);
+			elements.addAll(getElementsFromSubTaxonomy(subType));
+		}
+		
+		return elements;
+	}
+	
 }

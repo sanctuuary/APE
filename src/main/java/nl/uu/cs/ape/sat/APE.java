@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,13 +20,14 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
-import nl.uu.cs.ape.sat.core.implSAT.All_SAT_solutions;
+import nl.uu.cs.ape.sat.core.implSAT.AllSATsolutions;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import nl.uu.cs.ape.sat.utils.OWLReader;
@@ -37,13 +39,19 @@ import nl.uu.cs.ape.sat.utils.OWLReader;
  *
  */
 public class APE {
-	/**
-	 * Configuration class and the tag used in the config file
-	 */
-	private static APEConfig config;
-	private All_SAT_solutions allSolutions;
+	/** Configuration object defined from the configuration file. */
+	private APEConfig config;
+	/** All solutions that were found so far. */
+	private AllSATsolutions allSolutions;
+	/** All modules/operations used in the domain. */
 	private AllModules allModules;
+	/** All data types defined in the domain. */
 	private AllTypes allTypes;
+	/** Object used to create temporal constraints. */ 
+	ConstraintFactory constraintFactory;
+	/** List of data gathered from the constraint file. */
+	private List<ConstraintData> unformattedConstr;
+	
 	
 	/**
 	 * Create instance of the APE solver.
@@ -52,13 +60,18 @@ public class APE {
 	 * @throws JSONException error in reading the configuration file
 	 */
 	public APE(String configPath) throws IOException, JSONException{
-		config = APEConfig.getConfig(configPath);
+		try{
+			config = new APEConfig(configPath);
+		} catch (ExceptionInInitializerError e) {
+			System.err.println("DDDDDDDDDD");
+		}
 		if (config == null || config.getConfigJsonObj() == null) {
-			new ExceptionInInitializerError();
+			System.err.println("Configuration failed. Error in configuration file.");
+			throw new ExceptionInInitializerError();
 		}
 		
-		if (!config.defaultConfigSetup()) {
-			new ExceptionInInitializerError();
+		if(!setupDomain()) {
+			System.err.println("Error in settin up the domain.");
 		}
 	}
 	
@@ -68,28 +81,165 @@ public class APE {
 	 * @throws JSONException error in reading the configuration object
 	 */
 	public APE(JSONObject configObject) throws JSONException{
-		config = APEConfig.getConfig(configObject);
-		if (config == null || config.getConfigJsonObj() == null) {
-			new ExceptionInInitializerError();
+		config = new APEConfig(configObject);
+		if (config == null) {
+			System.err.println("Configuration failed. Error in configuration object.");
+			throw new ExceptionInInitializerError();
+		}
+		if(!setupDomain()) {
+			System.err.println("Error in settin up the domain.");
+		}
+	}
+	
+	
+	
+	/** 
+	 * The method returns the configuration file of the APE instance.
+	 * @return the field {@link config}. */
+	public APEConfig getConfig() {
+		return config;
+	}
+	
+	/**
+	 * Method used to setup the domain using the configuration file and the corresponding annotation and constraints files.
+	 * @return {@code true} if the setup was successfully performed, {@code false} otherwise.
+	 */
+	public boolean setupDomain() {
+		/** Variable that describes a successful run of the program. */
+		boolean succRun = true;
+		/**
+		 * List of all the solutions
+		 */
+		allSolutions = new AllSATsolutions(config);
+
+		/*
+		 * Encode the taxonomies as objects - generate the list of all types / modules
+		 * occurring in the taxonomies defining their submodules/subtypes
+		 */
+		allModules = new AllModules(config);
+		allTypes = new AllTypes(config);
+
+		OWLReader owlReader = new OWLReader(allModules, allTypes, config.getOntology_path());
+		Boolean ontologyRead = owlReader.readOntology(); // true if the ontology file is well-formatted
+
+		if (ontologyRead == false) {
+			System.out.println("Error occured while reading the provided ontology.");
+			return false;
+		}
+
+		/*
+		 * Set the the empty type (representing the absence of types) as a direct child
+		 * of root type
+		 */
+		succRun &= allTypes.getRootPredicate().addSubPredicate(allTypes.getEmptyType().getPredicateID());
+
+		/*
+		 * Update allModules and allTypes sets based on the module.json file
+		 */
+		APEUtils.readModuleJson(config.getTool_annotations_path(), allModules, allTypes);
+		
+		succRun &= allModules.trimTaxonomy();
+		succRun &= allTypes.trimTaxonomy();
+		
+		/*
+		 * Define set of all constraint formats
+		 */
+		constraintFactory = new ConstraintFactory();
+		succRun &= constraintFactory.initializeConstraints();
+		unformattedConstr = new ArrayList<ConstraintData>();
+		
+		unformattedConstr = APEUtils.readConstraints(config.getConstraints_path());
+		
+		return succRun;
+	}
+	
+	/**
+	 * Function used to return all the elements of one data type dimension (e.g. all data types or all data formats).
+	 * @param dimensionRootID - root of the data taxonomy subtree that corresponds to the list of elements that should be returned.
+	 * @return List where each element correspond to a map that can be transformed into JSON objects.
+	 */
+	public List<Map<String, String>> getTypeElements(String dimensionRootID) {
+		List<Type> types = allTypes.getElementsFromSubTaxonomy(allTypes.get(dimensionRootID));
+		List<Map<String, String>> transformedTypes = new ArrayList<>();
+		for(Type currType : types) {
+			transformedTypes.add(currType.toMap());
 		}
 		
-		if (!config.defaultConfigSetup()) {
-			new ExceptionInInitializerError();
+		return transformedTypes;
+	}
+	
+	/**
+	 * Run the synthesis for the given workflow specification.
+	 * 
+	 * @return {@code true} if the synthesis was successfully performed, {@code false} otherwise.
+	 * @throws IOException error in case of not providing a proper configuration file.
+	 */
+	public boolean runSynthesis() throws IOException {
+		/** Variable that describes a successful run of the program. */
+		boolean succRun = true;
+		
+		/** Print the setup information when necessary. */
+		APEUtils.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory, unformattedConstr);
+
+		/**
+		 * Loop over different lengths of the workflow until either, max workflow length
+		 * or max number of solutions has been found.
+		 */
+		String globalTimerID = "globalTimer";
+		APEUtils.timerStart(globalTimerID, true);
+		int solutionLength = config.getSolution_min_length();
+		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
+				&& solutionLength <= config.getSolution_max_length()) {
+
+			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(allModules, allTypes, allSolutions, config, constraintFactory, unformattedConstr, solutionLength);
+
+			APEUtils.printHeader(implSATsynthesis.getSolutionSize(), "Workflow discovery - length");
+
+			/** Encoding of the synthesis problem */
+			if (!implSATsynthesis.synthesisEncoding()) {
+				System.err.println("Internal error in problem encoding.");
+				return false;
+			}
+			/** Execution of the synthesis */
+			succRun &= implSATsynthesis.synthesisExecution();
+
+			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
+					|| solutionLength == config.getSolution_max_length()) {
+				APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
+			}
+
+			/** Increase the size of the workflow for the next depth iteration */
+			solutionLength++;
 		}
+
+		/*
+		 * Writing solutions to the specified file in human readable format
+		 */
+		if (allSolutions.isEmpty()) {
+			System.out.println("UNSAT");
+		} else {
+
+			succRun &= writeSolutionToFile();
+			succRun &= generateGraphOutput();
+			succRun &= executeWorkflows();
+
+		}
+		return succRun;
 	}
 	
 	/**
 	 * Write textual "human readable" version on workflow solutions to a file.
 	 * @param allSolutions
+	 * @return {@code true} if the writing was successfully performed, {@code false} otherwise.
 	 */
-	private void writeSolutionToFile() {
+	private boolean writeSolutionToFile() {
 		StringBuilder solutions2write = new StringBuilder();
 
 		for (int i = 0; i < allSolutions.getNumberOfSolutions(); i++) {
 			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getRelevantSolution())
 					.append("\n");
 		}
-		APEUtils.write2file(solutions2write.toString(), new File(config.getSolution_path()), false);
+		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolution_path()), false);
 	}
 
 	/**
@@ -97,13 +247,14 @@ public class APE {
 	 * Generating scripts that represent executable versions of the workflow solutions and executing them. 
 	 * @param allSolutions
 	 * @param allModules
+	 * @return {@code true} if the execution was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	private void executeWorkflows() throws IOException {
+	private boolean executeWorkflows() throws IOException {
 		String executionsFolder = config.getExecution_scripts_folder();
 		Integer noExecutions = config.getNo_executions();
 		if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
-			return;
+			return false;
 		}
 		APEUtils.printHeader(null, "Executing first " + noExecutions + " solution");
 		APEUtils.timerStart("executingWorkflows", true);
@@ -132,18 +283,20 @@ public class APE {
 			}
 		}
 		APEUtils.timerPrintText("executingWorkflows", "\nWorkflows have been executed.");
+		return true;
 	}
 
 	/**
 	 * Generate the graphical representations of the workflow solutions.
 	 * @param allSolutions
+	 *@return {@code true} if the generating was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	private void generateGraphOutput() throws IOException {
+	private boolean generateGraphOutput() throws IOException {
 		String graphsFolder = config.getSolution_graphs_folder();
 		Integer noGraphs = config.getNo_graphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
-			return;
+			return false;
 		}
 		APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
@@ -169,106 +322,6 @@ public class APE {
 		}
 		APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
 
-	}
-	
-	/**
-	 * Run the synthesis for the given workflow specification.
-	 * 
-	 * @return {@code true} if the synthesis was successfully performed, {@code false} otherwise.
-	 * @throws IOException error in case of not providing a proper configuration file.
-	 */
-	public boolean runSynthesis() throws IOException {
-
-		/**
-		 * List of all the solutions
-		 */
-		allSolutions = new All_SAT_solutions(config);
-
-		/*
-		 * Encode the taxonomies as objects - generate the list of all types / modules
-		 * occurring in the taxonomies defining their submodules/subtypes
-		 */
-		allModules = new AllModules();
-		allTypes = new AllTypes();
-
-		OWLReader owlReader = new OWLReader(allModules, allTypes);
-		Boolean ontologyRead = owlReader.readOntology(); // true if the ontology file is well-formatted
-
-		if (ontologyRead == false) {
-			System.out.println("Error occured while reading the provided ontology.");
-			return false;
-		}
-
-		/*
-		 * Set the the empty type (representing the absence of types) as a direct child
-		 * of root type
-		 */
-		allTypes.getRootPredicate().addSubPredicate(allTypes.getEmptyType().getPredicateID());
-
-		/*
-		 * Update allModules and allTypes sets based on the module.json file
-		 */
-		APEUtils.readModuleJson(config.getTool_annotations_path(), allModules, allTypes);
-		
-		allModules.trimTaxonomy();
-		allTypes.trimTaxonomy();
-		
-		/*
-		 * Define set of all constraint formats
-		 */
-		ConstraintFactory constraintFactory = new ConstraintFactory();
-		constraintFactory.initializeConstraints();
-		List<ConstraintData> unformattedConstr = new ArrayList<ConstraintData>();
-		
-		unformattedConstr = APEUtils.readConstraints(config.getConstraints_path());
-		
-
-		/** Print the setup information when necessary. */
-		APEUtils.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory, unformattedConstr);
-
-		/**
-		 * Loop over different lengths of the workflow until either, max workflow length
-		 * or max number of solutions has been found.
-		 */
-		String globalTimerID = "globalTimer";
-		APEUtils.timerStart(globalTimerID, true);
-		int solutionLength = config.getSolution_min_length();
-		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
-				&& solutionLength <= config.getSolution_max_length()) {
-
-			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(allModules, allTypes, allSolutions, config, constraintFactory, unformattedConstr, solutionLength);
-
-			APEUtils.printHeader(implSATsynthesis.getSolutionSize(), "Workflow discovery - length");
-
-			/** Encoding of the synthesis problem */
-			if (!implSATsynthesis.synthesisEncoding()) {
-				System.err.println("Internal error in problem encoding.");
-				return false;
-			}
-			/** Execution of the synthesis */
-			implSATsynthesis.synthesisExecution();
-
-			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
-					|| solutionLength == config.getSolution_max_length()) {
-				APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
-			}
-
-			/** Increase the size of the workflow for the next depth iteration */
-			solutionLength++;
-		}
-
-		/*
-		 * Writing solutions to the specified file in human readable format
-		 */
-		if (allSolutions.isEmpty()) {
-			System.out.println("UNSAT");
-		} else {
-
-			writeSolutionToFile();
-			generateGraphOutput();
-			executeWorkflows();
-
-		}
 		return true;
 	}
 	

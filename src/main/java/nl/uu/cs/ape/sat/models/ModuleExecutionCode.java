@@ -5,10 +5,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class Module_Execution_Code implements Module_Execution {
+public class ModuleExecutionCode implements ModuleExecution {
 	String code;
 
-	Module_Execution_Code(String code) {
+	ModuleExecutionCode(String code) {
 		this.code = code;
 	}
 

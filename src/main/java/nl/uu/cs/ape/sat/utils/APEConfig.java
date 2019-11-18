@@ -26,10 +26,6 @@ import nl.uu.cs.ape.sat.models.enums.NodeType;
 public class APEConfig {
 
 	/**
-	 * Singleton instance of the class.
-	 */
-	private static APEConfig configAPE = null;
-	/**
 	 * Tags used in the ape.config file
 	 */
 	private static final String CONFIGURATION_FILE = "ape.configuration";
@@ -155,7 +151,7 @@ public class APEConfig {
 	 * @throws IOException error in reading the configuration file
 	 * @throws JSONException error in parsing the configuration file
 	 */
-	private APEConfig(String congifPath) throws IOException, JSONException {
+	public APEConfig(String congifPath) throws IOException, JSONException {
 		if (congifPath == null) {
 			congifPath = CONFIGURATION_FILE;
 		}
@@ -171,15 +167,18 @@ public class APEConfig {
 		// Convert JSON string to JSONObject
 		jsonObject = new JSONObject(content);
 
+		if(!defaultConfigSetup()) {
+			throw new JSONException("Configuration failed.");
+		}
 	}
 	
 	/**
 	 * Initialize the configuration of the project.
 	 * @throws JSONException error in parsing the configuration object
 	 */
-	private APEConfig(JSONObject configObject) throws JSONException {
+	public APEConfig(JSONObject configObject) throws JSONException {
 		if (configObject == null) {
-			new JSONException("Configuration error. The provided JSON object is null.");
+			throw new JSONException("Configuration error. The provided JSON object is null.");
 		}
 		
 		data_taxonomy_subroots = new ArrayList<String>();
@@ -188,60 +187,11 @@ public class APEConfig {
 		
 		// Convert JSON string to JSONObject
 		jsonObject = configObject;
-
-	}
-
-	/**
-	 * Returns the singleton class representing the library configuration.
-	 * 
-	 * @param configPath - path to the configuration file
-	 * @return object that represent the configuration.
-	 * @throws IOException - error in case of a bad configuration file
-	 * @throws JSONException error in parsing the configuration object
-	 */
-	public static APEConfig getConfig(String configPath) throws IOException, JSONException {
-		if (configAPE == null) {
-			configAPE = new APEConfig(configPath);
-			return configAPE;
-		} else {
-			return configAPE;
+		
+		if(!defaultConfigSetup()) {
+			throw new JSONException("Configuration failed.");
 		}
-	}
-	
-	/**
-	 * Returns the singleton class representing the library configuration.
-	 * 
-	 * @param configPath - path to the configuration file
-	 * @return object that represent the configuration.
-	 * @throws JSONException - error in case of a bad configuration object
-	 */
-	public static APEConfig getConfig(JSONObject configObject) throws JSONException {
-		if (configAPE == null) {
-			configAPE = new APEConfig(configObject);
-			return configAPE;
-		} else {
-			return configAPE;
-		}
-	}
 
-	/**
-	 * TODO: Not safe! Returns the singleton class representing the library
-	 * configuration.
-	 * 
-	 * @return object that represent the configuration.
-	 * @throws IOException - error in case of a bad configuration file
-	 */
-	public static APEConfig getConfig() {
-		if (configAPE == null) {
-			try {
-				configAPE = new APEConfig(CONFIGURATION_FILE);
-			} catch (IOException e) {
-				System.err.println("Configuration file ./" + CONFIGURATION_FILE + "is not provided correctly.");
-			}
-			return configAPE;
-		} else {
-			return configAPE;
-		}
 	}
 
 	/**
@@ -250,7 +200,7 @@ public class APEConfig {
 	 * @return {@code true} if the method successfully set-up the configuration,
 	 *         {@code false} otherwise.
 	 */
-	public boolean defaultConfigSetup() {
+	private boolean defaultConfigSetup() {
 
 		try {
 			ontology_path = jsonObject.getString(ONTOLOGY_TAG);
@@ -498,13 +448,6 @@ public class APEConfig {
 		}
 
 		return true;
-	}
-
-	/**
-	 * @return the {@link #configAPE}
-	 */
-	public static APEConfig getConfigura() {
-		return configAPE;
 	}
 
 	/**

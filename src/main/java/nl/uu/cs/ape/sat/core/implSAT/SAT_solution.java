@@ -12,12 +12,12 @@ import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.core.SolutionInterpreter;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.Literal;
-import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 
 /**
  * The {@code SAT_solution} class describes the solution produced by the SAT
@@ -44,7 +44,7 @@ public class SAT_solution extends SolutionInterpreter {
 	private final List<Literal> relevantElements;
 	/** List of all the references for the types in the memory, when used as tool inputs.  */
 	private final List<Literal> references2MemTypes;
-	private final Set<Predicate> usedTypeStates;
+	private final Set<PredicateLabel> usedTypeStates;
 	/** True if the there is no solution to the problem. Problem is UNASATISFIABLE. */
 	private final boolean unsat;
 	/** Lengths of the current solution. */
@@ -68,7 +68,7 @@ public class SAT_solution extends SolutionInterpreter {
 		relevantTypes = new ArrayList<Literal>();
 		relevantElements = new ArrayList<Literal>();
 		references2MemTypes = new ArrayList<Literal>();
-		usedTypeStates = new HashSet<Predicate>();
+		usedTypeStates = new HashSet<PredicateLabel>();
 		for (int mappedLiteral : satSolution) {
 			if (mappedLiteral > synthesisInstance.getMappings().getMaxNumOfMappedAuxVar()) {
 				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisInstance.getMappings());

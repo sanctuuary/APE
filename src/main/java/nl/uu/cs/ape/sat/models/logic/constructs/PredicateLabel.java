@@ -1,6 +1,12 @@
 package nl.uu.cs.ape.sat.models.logic.constructs;
 
-public interface Predicate {
+/**
+ * The {@code PredicateLabel} class is used to represent a label that describes predicates, such as data types, operations or states in the system. 
+ *
+ * @author Vedran Kasalica
+ *
+ */
+public interface PredicateLabel {
 
 	/** 
 	 * Get string that corresponds to the predicate.

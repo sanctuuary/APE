@@ -29,7 +29,7 @@ import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
@@ -59,13 +59,13 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	/** APE library configuration object. */
 	private final APEConfig config;
 	/** Mapping of all the predicates to integers. */
-	private final AtomMapping mappings;
+	private final AtomMappings mappings;
 	/** Factory object used to generate constraints. */
 	private final ConstraintFactory allConsTemplates;
 	/** Representation of the constraint file. */
 	private final List<ConstraintData> unformattedConstr;
 	/** Set of all the solutions found by the library. */
-	private final All_SAT_solutions allSolutions;
+	private final AllSATsolutions allSolutions;
 	/** CNF encoding of the problem. */
 	private StringBuilder cnfEncoding;
 	/** String used as an input for the SAT solver. */
@@ -93,7 +93,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	 * @param allConsTemplates
 	 * @param unformattedConstr
 	 */
-	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, All_SAT_solutions allSolutions,
+	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, AllSATsolutions allSolutions,
 			APEConfig config, ConstraintFactory allConsTemplates,
 			List<ConstraintData> unformattedConstr, int size) {
 		this.allModules = allModules;
@@ -327,7 +327,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		return config;
 	}
 
-	public AtomMapping getMappings() {
+	public AtomMappings getMappings() {
 		return mappings;
 	}
 
@@ -342,7 +342,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		return unformattedConstr;
 	}
 
-	public All_SAT_solutions getAllSolutions() {
+	public AllSATsolutions getAllSolutions() {
 		return allSolutions;
 	}
 

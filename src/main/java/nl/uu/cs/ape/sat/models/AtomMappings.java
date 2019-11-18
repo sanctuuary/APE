@@ -6,16 +6,16 @@ import java.util.Map;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
-import nl.uu.cs.ape.sat.models.logic.constructs.Predicate;
+import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 
 /**
- * Class is used to store the data used for representing the atoms with integer numbers. Atoms are not a separate data structure, 
+ *  The {@code AtomMappings} class is used to store the data used for representing the atoms with integer numbers. Atoms are not a separate data structure, 
  * but a string combination of a {@link TaxonomyPredicate} and a {@link State} as am argument.<br/>
  * Required for the SAT representation of the CNF formula.
  * @author Vedran Kasalica
  *
  */
-public class AtomMapping {
+public class AtomMappings {
 
 	private Map<Atom, Integer> mappings;
 	private Map<Integer, Atom> reverseMapping;
@@ -26,7 +26,7 @@ public class AtomMapping {
 	/** Number of all auxiliary variables */
 	private int auxMax = 100000;
 
-	public AtomMapping() {
+	public AtomMappings() {
 		mappings = new HashMap<Atom, Integer>();
 		reverseMapping = new HashMap<Integer, Atom>();
 		/** First {@link #auxMax} variables are reserved for auxiliary variables */
@@ -41,7 +41,7 @@ public class AtomMapping {
 	 * @param usedInState - argument of the mapped atom (usually name of the type/module state)
 	 * @return Mapping number of the atom (number is always > 0)
 	 */
-	public Integer add(Predicate predicate, State usedInState, WorkflowElement elementType) {
+	public Integer add(PredicateLabel predicate, State usedInState, WorkflowElement elementType) {
 		Atom atom = new Atom(predicate, usedInState, elementType);
 		
 		Integer id;

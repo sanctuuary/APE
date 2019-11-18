@@ -4,7 +4,7 @@ import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.formulas.*;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
@@ -27,7 +27,7 @@ public class Constraint_gen_type extends ConstraintTemplate {
 
 	@Override
 	public String getConstraint(String[] parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
-			TypeAutomaton typeAutomaton, AtomMapping mappings) {
+			TypeAutomaton typeAutomaton, AtomMappings mappings) {
 		if (parameters.length != 1) {
 			super.throwParametersError(parameters.length);
 			return null;

@@ -3,13 +3,13 @@ package nl.uu.cs.ape.sat.models.logic.constructs;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
  * The {@code Literal} class represents literals (atoms that can be negated) corresponding to the usage of the modules 
- * and types in the solution. It is of the form {@code Predicate(Attribute)} where
- * {@code Predicate} represents a single predicate/label used to depict {@code AbstractModule, Module} 
+ * and types in the solution. It is of the form {@code PredicateLabel(Attribute)} where
+ * {@code PredicateLabel} represents a single predicate/label used to depict {@code AbstractModule, Module} 
  * or {@code Type}, while {@code State} represents the state in the module/type automaton where the 
  * module/type is used (or not used if the literal is negative). The second attribute (referedStateArgument) is optional and used when
  * the Literal represent the type that is used as tool input - referred state is the state when the type was created.<br><br>
@@ -35,7 +35,7 @@ public class Literal implements Comparable<Literal>{
 	 * @param allModules - list of all the modules
 	 * @param allTypes - list of all the types
 	 */
-	public Literal(String mappedLiteral, AtomMapping atomMapping) {
+	public Literal(String mappedLiteral, AtomMappings atomMapping) {
 		super();
 		if (mappedLiteral.startsWith("-")) {
 			negated = true;
@@ -120,10 +120,10 @@ public class Literal implements Comparable<Literal>{
 	}
 	
 	/**
-	 * Returns the predicate/label used to depict {@code AbstractModule, Module, Type} or {@code State}. Each of those refers to the element that is described by the Literal (e.g. Predicate(State)).
-	 * @return Predicate object that is referred by the literal.
+	 * Returns the predicate/label used to depict {@code AbstractModule, Module, Type} or {@code State}. Each of those refers to the element that is described by the Literal (e.g. PredicateLabel(State)).
+	 * @return PredicateLabel object that is referred by the literal.
 	 */
-	public Predicate getPredicate() {
+	public PredicateLabel getPredicate() {
 		return atom.getPredicate();
 	}
 	

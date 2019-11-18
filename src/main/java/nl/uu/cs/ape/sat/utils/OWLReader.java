@@ -1,11 +1,13 @@
 package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -20,6 +22,7 @@ import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
 import nl.uu.cs.ape.sat.utils.APEConfig;
+import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
@@ -35,11 +38,12 @@ import nl.uu.cs.ape.sat.models.enums.NodeType;
  */
 public class OWLReader {
 
-	private final String ONTOLOGY_PATH;
+	private final String ontologyPath;
 	private final AllModules allModules;
 	private final AllTypes allTypes;
 	private OWLOntology ontology;
-	private OWLDataFactory factory = OWLManager.getOWLDataFactory();
+	private OWLDataFactory factory;
+	private boolean typeRootExists;
 
 	/**
 	 * Setting up the reader that will populate the provided module and type sets
@@ -52,10 +56,12 @@ public class OWLReader {
 	 * @param allTypes
 	 *            - set of all the types in our system
 	 */
-	public OWLReader(AllModules allModules, AllTypes allTypes) {
-		this.ONTOLOGY_PATH = APEConfig.getConfig().getOntology_path();
+	public OWLReader(AllModules allModules, AllTypes allTypes, String ontologyPath) {
+		this.ontologyPath = ontologyPath;
 		this.allModules = allModules;
 		this.allTypes = allTypes;
+		this.factory = OWLManager.getOWLDataFactory();
+		typeRootExists = false;
 	}
 	
 
@@ -72,7 +78,7 @@ public class OWLReader {
 
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		try {
-			File tempOntology = new File(ONTOLOGY_PATH);
+			File tempOntology = new File(ontologyPath);
 			if (tempOntology.exists()) {
 				ontology = manager.loadOntologyFromOntologyDocument(tempOntology);
 			} else {
@@ -90,21 +96,33 @@ public class OWLReader {
 		Set<OWLClass> subClasses = reasoner.getSubClasses(thingClass, true).getFlattened();
 
 		OWLClass moduleClass = getModuleClass(subClasses);
-		OWLClass typeClass = getTypeClass(subClasses);
+		List<OWLClass> typeClasses = getTypeClasses(subClasses);
 
 		if (moduleClass != null) {
 			exploreModuleOntologyRec(reasoner, ontology, moduleClass, thingClass, thingClass);
 		} else {
-			System.err.println("Provided ontology does not contain the "+allModules.getRootID()+" class.");
+			System.err.println("Provided ontology does not contain the "+allModules.getRootID()+" class as a root for operation taxonomy.");
 		}
 
-		if (typeClass != null) {
-			exploreTypeOntologyRec(reasoner, ontology, typeClass, thingClass, thingClass);
+		if (typeClasses != null && !typeClasses.isEmpty()) {
+			OWLClass superClass;
+			if(typeRootExists) {
+				superClass = thingClass;
+			} else {
+				/* If the main root of the data type taxonomy does not exist, create one artificially. */
+				Type root = allTypes.addType("DataTaxonomy", "DataTaxonomy", "DataTaxonomy", NodeType.ROOT);
+				allTypes.setRootPredicate(root);
+				superClass = new OWLClassImpl(IRI.create("http://www.w3.org#DataTaxonomy"));
+			}
+			
+			for(OWLClass typeClass : typeClasses) {
+				exploreTypeOntologyRec(reasoner, ontology, typeClass, superClass, superClass);
+			}
 		} else {
-			System.err.println("Provided ontology does not contain the "+allTypes.getRootID()+" class.");
+			System.err.println("Provided ontology does not contain the provided data type taxonomy root class(es).");
 		}
 
-		if (moduleClass == null || typeClass == null) {
+		if (moduleClass == null || typeClasses == null || typeClasses.isEmpty()) {
 			System.err.println("Ontology was not loaded because of the bad formatting.");
 			return false;
 		}
@@ -136,14 +154,21 @@ public class OWLReader {
 	 *            - set of OWL classes
 	 * @return <b>TypesTaxonomy</b> OWL class.
 	 */
-	private OWLClass getTypeClass(Set<OWLClass> subClasses) {
-		OWLClass typeClass = null;
+	private List<OWLClass> getTypeClasses(Set<OWLClass> subClasses) {
+		List<OWLClass> typeClasses = new ArrayList<OWLClass>();
 		for (OWLClass currClass : subClasses) {
 			if (getLabel(currClass).equals(allTypes.getRootID())) {
-				typeClass = currClass;
+				typeClasses.add(currClass);
+				typeRootExists = true;
+			} else {
+				for(String dataTaxonomySubRoot : APEUtils.safe(allTypes.getDataTaxonomyDimensions())) {
+					if(getLabel(currClass).equals(dataTaxonomySubRoot)) {
+						typeClasses.add(currClass);
+					}
+				}
 			}
 		}
-		return typeClass;
+		return typeClasses;
 	}
 
 	/**
@@ -217,14 +242,13 @@ public class OWLReader {
 			currNodeType = NodeType.ROOT;
 			rootClass = currClass;
 		} else {
-			for(String dataTaxonomySubRoot : allTypes.getDataTaxonomyDimensions()) {
+			for(String dataTaxonomySubRoot : APEUtils.safe(allTypes.getDataTaxonomyDimensions())) {
 				if(getLabel(currClass).equals(dataTaxonomySubRoot)) {
 					currNodeType = NodeType.SUBROOT;
 					rootClass = currClass;
 				}
 			}
 		}
-		
 		
 		/* Generate the Type that corresponds to the taxonomy class. */
 		subType = allTypes.addType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType);
@@ -281,15 +305,7 @@ public class OWLReader {
 			System.out.println("Class '" + classID + "' has no label.");
 			label = classID;
 		}
-		
-		System.out.println(label);
 		return classID;
-//		for(OWLAnnotation a : ) {
-//		    OWLAnnotationValue val = a.getValue();
-//		    if(value instanceof OWLLiteral) {
-//		        System.out.println(currClass + " labelled " + ((OWLLiteral) value).getLiteral());   
-//		    }
-//		}
 	}
 	
 	/**

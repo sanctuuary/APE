@@ -47,20 +47,24 @@ public class Test {
 			return;
 		}
 		
+		
+		String d = apeFramework.getTypeElements("Data").toString();
+		String f = apeFramework.getTypeElements("Format").toString();
+		
+		System.out.println(d);
 
-		AllModules allModules = new AllModules();
-		AllTypes allTypes = new AllTypes();
-
-		OWLReader owlReader = new OWLReader(allModules, allTypes);
-		Boolean ontologyRead = owlReader.readOntology();
+//		AllModules allModules = new AllModules(apeFramework.getConfig());
+//		AllTypes allTypes = new AllTypes(apeFramework.getConfig());
+//
+//		OWLReader owlReader = new OWLReader(allModules, allTypes, apeFramework.getConfig().getOntology_path());
+//		Boolean ontologyRead = owlReader.readOntology();
 		
 		
 //		APEUtils.readModuleJson(toolsPath, allModules, allTypes);
 //		allModules.trimTaxonomy();
 //		allTypes.trimTaxonomy();
 		
-		
-		print(allModules, allTypes);
+//		print(allModules, allTypes);
 	}
 
 	private static void print(AllModules allModules, AllTypes allTypes) {

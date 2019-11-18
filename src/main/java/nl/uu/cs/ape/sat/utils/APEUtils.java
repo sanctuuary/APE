@@ -37,7 +37,7 @@ import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.AtomMapping;
+import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
@@ -108,7 +108,7 @@ public final class APEUtils {
 	 * @return
 	 */
 	public static String encodeAPEConstraints(List<ConstraintData> constraintData, ConstraintFactory allConsTemplates,
-			AllModules allModules, AllTypes allTypes, AtomMapping mappings, ModuleAutomaton moduleAutomaton,
+			AllModules allModules, AllTypes allTypes, AtomMappings mappings, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton) {
 
 		String cnf_SLTL = "";
@@ -147,7 +147,7 @@ public final class APEUtils {
 	 */
 	public static String constraintSATEncoding(String constraintID, String[] parameters,
 			ConstraintFactory allConsTemplates, AllModules allModules, AllTypes allTypes,
-			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMapping mappings) {
+			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMappings mappings) {
 		String constraint = allConsTemplates.getConstraintTamplate(constraintID).getConstraint(parameters, allModules,
 				allTypes, moduleAutomaton, typeAutomaton, mappings);
 
@@ -163,17 +163,18 @@ public final class APEUtils {
 	 * @param append - if true, then bytes will be written to the end of the file
 	 *               rather than the beginning
 	 */
-	public static void write2file(String text, File file, boolean append) {
+	public static boolean write2file(String text, File file, boolean append) {
 
 		try {
 			FileWriter fw = new FileWriter(file, append);
 			fw.write(text);
 			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
-
+		
+		return true;
 	}
 
 	/**
@@ -213,7 +214,7 @@ public final class APEUtils {
 	 * @return CNF representation of the formula
 	 * 
 	 *         public static String convert2CNF(String propositionalFormula,
-	 *         AtomMapping mappings) { final FormulaFactory f = new
+	 *         AtomMappings mappings) { final FormulaFactory f = new
 	 *         FormulaFactory(); final PropositionalParser p = new
 	 *         PropositionalParser(f);
 	 * 
@@ -626,7 +627,7 @@ public final class APEUtils {
 	 * @param mappings 
 	 * @return
 	 */
-	public static String convert2humanReadable(InputStream temp_sat_input, AtomMapping mappings) {
+	public static String convert2humanReadable(InputStream temp_sat_input, AtomMappings mappings) {
 		StringBuffer humanReadable = new StringBuffer();
 		Scanner scanner = new Scanner(temp_sat_input); 
 		scanner.nextLine();
@@ -649,9 +650,6 @@ public final class APEUtils {
 		return humanReadable.toString();
 	}
 
-	
-	
-	
 	
 	
 	

@@ -6,7 +6,7 @@ import java.io.IOException;
  * @author Vedran Kasalica
  *
  */
-public interface Module_Execution {
+public interface ModuleExecution {
 	
 	String getContent();
 	void run(String path) throws IOException;
