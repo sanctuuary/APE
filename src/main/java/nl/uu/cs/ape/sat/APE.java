@@ -59,13 +59,9 @@ public class APE {
 	 * @throws IOException error in reading the configuration file
 	 * @throws JSONException error in reading the configuration file
 	 */
-	public APE(String configPath) throws IOException, JSONException{
-		try{
-			config = new APEConfig(configPath);
-		} catch (ExceptionInInitializerError e) {
-			System.err.println("DDDDDDDDDD");
-		}
-		if (config == null || config.getConfigJsonObj() == null) {
+	public APE(String configPath) throws IOException, JSONException {
+		config = new APEConfig(configPath);
+		if (config == null || config.getCoreConfigJsonObj() == null) {
 			System.err.println("Configuration failed. Error in configuration file.");
 			throw new ExceptionInInitializerError();
 		}
@@ -107,11 +103,6 @@ public class APE {
 	public boolean setupDomain() {
 		/** Variable that describes a successful run of the program. */
 		boolean succRun = true;
-		/**
-		 * List of all the solutions
-		 */
-		allSolutions = new AllSATsolutions(config);
-
 		/*
 		 * Encode the taxonomies as objects - generate the list of all types / modules
 		 * occurring in the taxonomies defining their submodules/subtypes
@@ -141,15 +132,6 @@ public class APE {
 		succRun &= allModules.trimTaxonomy();
 		succRun &= allTypes.trimTaxonomy();
 		
-		/*
-		 * Define set of all constraint formats
-		 */
-		constraintFactory = new ConstraintFactory();
-		succRun &= constraintFactory.initializeConstraints();
-		unformattedConstr = new ArrayList<ConstraintData>();
-		
-		unformattedConstr = APEUtils.readConstraints(config.getConstraints_path());
-		
 		return succRun;
 	}
 	
@@ -168,15 +150,58 @@ public class APE {
 		return transformedTypes;
 	}
 	
+	/** Setup a new run instance of the APE solver and run the synthesis algorithm.
+	 * 
+	 * @param configObject - run configurations
+	 * @return {@code true} if the synthesis was successfully performed, {@code false} otherwise.
+	 * @throws JSONException
+	 */
+	public boolean runSynthesis(JSONObject configObject) throws IOException, JSONException {
+		/** Variable that describes a successful execution. */
+		boolean succRun = true; 
+		succRun &= config.setupRunConfiguration(configObject);
+		if (config == null || config.getRunConfigJsonObj() == null) {
+			throw new JSONException("Run configuration failed. Error in configuration object.");
+		}
+		succRun &= executeSynthesis();
+		
+		return succRun;
+	}
+	
+	
+	public boolean runSynthesis(String configPath) throws IOException, JSONException {
+		/** Variable that describes a successful execution. */
+		boolean succRun = true; 
+		succRun &= config.setupRunConfiguration(configPath);
+		if (config == null || config.getRunConfigJsonObj() == null) {
+			throw new JSONException("Run configuration failed. Error in configuration file.");
+		}
+		succRun &= executeSynthesis();
+		
+		return succRun;
+	}
 	/**
 	 * Run the synthesis for the given workflow specification.
 	 * 
 	 * @return {@code true} if the synthesis was successfully performed, {@code false} otherwise.
 	 * @throws IOException error in case of not providing a proper configuration file.
 	 */
-	public boolean runSynthesis() throws IOException {
+	private boolean executeSynthesis() throws IOException {
 		/** Variable that describes a successful run of the program. */
 		boolean succRun = true;
+		
+		/**
+		 * List of all the solutions
+		 */
+		allSolutions = new AllSATsolutions(config);
+		/*
+		 * Define set of all constraint formats
+		 */
+		constraintFactory = new ConstraintFactory();
+		succRun &= constraintFactory.initializeConstraints();
+		unformattedConstr = new ArrayList<ConstraintData>();
+		
+		unformattedConstr = APEUtils.readConstraints(config.getConstraints_path());
 		
 		/** Print the setup information when necessary. */
 		APEUtils.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory, unformattedConstr);

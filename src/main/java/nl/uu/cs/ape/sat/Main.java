@@ -19,6 +19,18 @@ public class Main {
 			return;
 		}
 
+		File fileTmp = null;
+		try {
+			fileTmp = File.createTempFile("temp", null);
+			fileTmp.deleteOnExit();
+			String content = APEUtils.readFile(path + "apeConfigHardcoded.txt", Charset.defaultCharset());
+			content = content.replace("./", path);
+			APEUtils.write2file(content, fileTmp, false);
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
 		File file = null;
 		try {
 			file = File.createTempFile("temp", null);
@@ -33,7 +45,7 @@ public class Main {
 
 		APE apeFramework = null;
 		try {
-			apeFramework = new APE(file.getAbsolutePath());
+			apeFramework = new APE(fileTmp.getAbsolutePath());
 		} catch (JSONException e) {
 			System.err.println("Error in parsing the configuration file.");
 			return;
@@ -43,7 +55,7 @@ public class Main {
 		}
 		
 		try {
-			apeFramework.runSynthesis();
+			apeFramework.runSynthesis(file.getAbsolutePath());
 		} catch (IOException e) {
 			System.err.println("Error in synthesis execution. Writing to the file system failed.");
 			return;

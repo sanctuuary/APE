@@ -57,15 +57,14 @@ public final class APEUtils {
 	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
 	private final static Map<String, Long> timers = new HashMap<String, Long>();
 
-	
 	/** Private constructor is used to to prevent instantiation. */
-    private APEUtils() {
-        throw new UnsupportedOperationException();
-    }
-	
-	public static List<ConstraintData> readConstraints(String constraintsPath){
+	private APEUtils() {
+		throw new UnsupportedOperationException();
+	}
+
+	public static List<ConstraintData> readConstraints(String constraintsPath) {
 		List<ConstraintData> unformattedConstr = new ArrayList<ConstraintData>();
-		if(constraintsPath == null) {
+		if (constraintsPath == null) {
 			return unformattedConstr;
 		}
 		String constraintID;
@@ -77,13 +76,13 @@ public final class APEUtils {
 			currNode++;
 			/* READ THE CONSTRAINT */
 			try {
-					constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
+				constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
 
-					List<String> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG, String.class);
-					parameters = new ArrayList<String>();
-					for (String jsonParam : jsonConstParam) {
-						parameters.add(jsonParam.toString());
-					}
+				List<String> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG, String.class);
+				parameters = new ArrayList<String>();
+				for (String jsonParam : jsonConstParam) {
+					parameters.add(jsonParam.toString());
+				}
 			} catch (Exception e) {
 				System.err.println("Error in file: " + constraintsPath + ", at constraint no: " + currNode
 						+ ". Constraint skipped.");
@@ -94,7 +93,7 @@ public final class APEUtils {
 		}
 		return unformattedConstr;
 	}
-	
+
 	/**
 	 * Returns the CNF representation of the SLTL constraints in our project
 	 * 
@@ -118,15 +117,16 @@ public final class APEUtils {
 			currConst++;
 			/* ENCODE THE CONSTRAINT */
 			if (allConsTemplates.getConstraintTamplate(constraint.getConstraintID()) == null) {
-				System.err.println("Constraint ID provided: '" + constraint.getConstraintID() + "' is not valid. Constraint skipped.");
+				System.err.println("Constraint ID provided: '" + constraint.getConstraintID()
+						+ "' is not valid. Constraint skipped.");
 				continue;
 			} else {
 				String currConstrEncoding = constraintSATEncoding(constraint.getConstraintID(),
-						constraint.getParameters(), allConsTemplates, allModules, allTypes,
-						moduleAutomaton, typeAutomaton, mappings);
+						constraint.getParameters(), allConsTemplates, allModules, allTypes, moduleAutomaton,
+						typeAutomaton, mappings);
 				if (currConstrEncoding == null) {
-					System.err.println("Error in constraint file. Constraint no: " + currConst
-							+ ". Constraint skipped.");
+					System.err
+							.println("Error in constraint file. Constraint no: " + currConst + ". Constraint skipped.");
 				} else {
 					cnf_SLTL += currConstrEncoding;
 				}
@@ -141,7 +141,7 @@ public final class APEUtils {
 	 * ID specified and provided parameters.
 	 * 
 	 * @param constraintID - ID of the constraint
-	 * @param parameters parameters for the constraint template
+	 * @param parameters   parameters for the constraint template
 	 * @return String representation of the SAT encoding for the specified
 	 *         constraint.
 	 */
@@ -173,14 +173,14 @@ public final class APEUtils {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
 
 	/**
 	 * Updates the list of All Modules by annotating the existing ones (or adding
-	 * non-existing) using the I/O DataInstance from the @file. Returns the list of Updated
-	 * Modules.
+	 * non-existing) using the I/O DataInstance from the @file. Returns the list of
+	 * Updated Modules.
 	 * 
 	 * @param file       - path to the .json file containing tool annotations
 	 * @param allModules - list of all existing modules
@@ -233,7 +233,6 @@ public final class APEUtils {
 	 *         }
 	 */
 
-
 	/**
 	 * The method return a list of {@link JSONObject} elements that correspond to a
 	 * given key in a Json file. If the key corresponds to a {@link JSONArray} all
@@ -262,11 +261,10 @@ public final class APEUtils {
 	}
 
 	/**
-	 * The method return a list of {@code <T>} elements that correspond to a
-	 * given key in the given json object. If the key corresponds to a
-	 * {@link JSONArray} all the elements are put in a {@link List}, otherwise if
-	 * the key corresponds to a {@code <T>} list will contain only that
-	 * object.
+	 * The method return a list of {@code <T>} elements that correspond to a given
+	 * key in the given json object. If the key corresponds to a {@link JSONArray}
+	 * all the elements are put in a {@link List}, otherwise if the key corresponds
+	 * to a {@code <T>} list will contain only that object.
 	 * 
 	 * @param jsonObject - Json object that is being explored
 	 * @param key        - key label that corresponds to the elements
@@ -331,10 +329,10 @@ public final class APEUtils {
 	 * In case that the debug mode is on, print the constraint templates and tool
 	 * and data taxonomy trees.
 	 * 
-	 * @param allModules         - set of all tools
-	 * @param allTypes           - set of all data types
+	 * @param allModules        - set of all tools
+	 * @param allTypes          - set of all data types
 	 * @param constraintFactory - String list of all constraint templates
-	 * @param unformattedConstr 
+	 * @param unformattedConstr
 	 */
 	public static void debugPrintout(boolean debug, AllModules allModules, AllTypes allTypes,
 			ConstraintFactory constraintFactory, List<ConstraintData> unformattedConstr) {
@@ -359,7 +357,7 @@ public final class APEUtils {
 			System.out.println("\tData Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
 			allTypes.getRootPredicate().printTree(" ", allTypes);
-			
+
 			/*
 			 * Printing the tool annotations
 			 */
@@ -367,26 +365,26 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tAnnotated tools:");
 			System.out.println("-------------------------------------------------------------");
-			for(TaxonomyPredicate module : allModules.getModules()) {
-				if(module instanceof Module) {
+			for (TaxonomyPredicate module : allModules.getModules()) {
+				if (module instanceof Module) {
 					System.out.println(module.toString());
 					noTools = false;
 				}
 			}
-			if(noTools) {
+			if (noTools) {
 				System.out.println("\tNo annotated tools.");
 			}
-			
+
 			/*
 			 * Print out the constraints
 			 */
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tConstraints:");
 			System.out.println("-------------------------------------------------------------");
-			for(ConstraintData constr : unformattedConstr) {
+			for (ConstraintData constr : unformattedConstr) {
 				System.out.println(constraintFactory.getDescription(constr));
 			}
-			if(unformattedConstr.isEmpty()) {
+			if (unformattedConstr.isEmpty()) {
 				System.out.println("\tNo constraints.");
 			}
 			System.out.println("-------------------------------------------------------------");
@@ -401,7 +399,7 @@ public final class APEUtils {
 
 		System.out.println("\n-------------------------------------------------------------");
 		System.out.println("\t" + title[0] + arg);
-		if(title.length > 1) {
+		if (title.length > 1) {
 			System.out.println("\t" + title[1] + arg);
 		}
 		System.out.println("-------------------------------------------------------------");
@@ -437,9 +435,10 @@ public final class APEUtils {
 
 	/**
 	 * Count number of new lines in a Sting.
+	 * 
 	 * @param inputString - string that is evaluated.
 	 * @return Number of lines in the String.
-	 * @throws IOException - error in case that the string 
+	 * @throws IOException - error in case that the string
 	 */
 	public static int countNewLines(String inputString) throws IOException {
 		InputStream stream = IOUtils.toInputStream(inputString, "UTF-8");
@@ -478,19 +477,19 @@ public final class APEUtils {
 			stream.close();
 		}
 	}
+
 	/**
 	 * Get file content as a string.
+	 * 
 	 * @param path
 	 * @param encoding
 	 * @return
 	 * @throws IOException
 	 */
-	public static String readFile(String path, Charset encoding) 
-			  throws IOException 
-			{
-			  byte[] encoded = Files.readAllBytes(Paths.get(path));
-			  return new String(encoded, encoding);
-			}
+	public static String readFile(String path, Charset encoding) throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		return new String(encoded, encoding);
+	}
 
 	public static void timerStart(String timerID, Boolean debugMode) {
 		if (debugMode) {
@@ -526,40 +525,46 @@ public final class APEUtils {
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
 		System.out.println("\n" + text + " Running time: " + (printTime / 1000F) + " sec.");
 	}
-	
+
 	/**
-	 * Method converts tools annotated using 'bio.tools' standard (see <a href="https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools API</a>), 
-	 * into standard supported by the APE library. <br>
-	 * In practice, the method takes a {@link JSONArray} as an argument, where each {@link JSONObject} in the array represents a tool annotated using
-	 * 'bio.tools' standard, and returns a {@link JSONObject} that represents tool annotations that can be used by the APE library.
+	 * Method converts tools annotated using 'bio.tools' standard (see <a href=
+	 * "https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools
+	 * API</a>), into standard supported by the APE library. <br>
+	 * In practice, the method takes a {@link JSONArray} as an argument, where each
+	 * {@link JSONObject} in the array represents a tool annotated using 'bio.tools'
+	 * standard, and returns a {@link JSONObject} that represents tool annotations
+	 * that can be used by the APE library.
 	 * 
-	 * @param bioToolsAnotation - a {@link JSONArray} object, that contains list of annotated tools ({@link JSONObject}s) according
-	 * the bio.tools specification (see <a href="https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools API</a>)
-	 * @return {@link JSONObject} that represents the tool annotation supported by the APE library.
+	 * @param bioToolsAnotation - a {@link JSONArray} object, that contains list of
+	 *                          annotated tools ({@link JSONObject}s) according the
+	 *                          bio.tools specification (see <a href=
+	 *                          "https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools
+	 *                          API</a>)
+	 * @return {@link JSONObject} that represents the tool annotation supported by
+	 *         the APE library.
 	 */
-	public static JSONObject convertBioTools2Ape(JSONArray bioToolsAnotation) throws JSONException{
-		
+	public static JSONObject convertBioTools2Ape(JSONArray bioToolsAnotation) throws JSONException {
+
 		JSONArray apeToolsAnnotations = new JSONArray();
 		for (int i = 0; i < bioToolsAnotation.length(); i++) {
 			JSONObject apeJsonTool = new JSONObject();
 			JSONObject bioJsonTool = bioToolsAnotation.getJSONObject(i);
 			apeJsonTool.put("name", bioJsonTool.getString("name"));
 			apeJsonTool.put("operation", bioJsonTool.getString("biotoolsID"));
-			
-			System.out.println("tool:" + bioJsonTool.getString("name"));
-			
+
 			JSONArray apeTaxonomyTerms = new JSONArray();
 			List<JSONObject> functions = APEUtils.getListFromJson(bioJsonTool, "function", JSONObject.class);
 			JSONObject function = null;
-			System.out.println("Size: " + functions.size());
-			if(functions.size() == 1) {
+			if (functions.size() == 1) {
+				function = bioJsonTool.getJSONArray("function").getJSONObject(0);
+			} else if (functions.size() > 1){
+				System.err.println("A 'bio.tools' tool annotation '" + bioJsonTool.getString("biotoolsID")
+						+ "' cannot contain more than one function.");
 				function = bioJsonTool.getJSONArray("function").getJSONObject(0);
 			} else {
-				new JSONException("A 'bio.tools' tool annotation cannot contain more than one function.");
 				continue;
 			}
-			
-			
+
 			JSONArray operations = function.getJSONArray("operation");
 			for (int j = 0; j < operations.length(); j++) {
 				JSONObject bioOperation = operations.getJSONObject(j);
@@ -576,82 +581,86 @@ public final class APEUtils {
 				JSONArray apeInputTypes = new JSONArray();
 				JSONArray apeInputFormats = new JSONArray();
 //				add all data types
-				for(JSONObject bioType : APEUtils.getListFromJson(bioInput, "data", JSONObject.class)) {
+				for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "data", JSONObject.class)) {
 					apeInputTypes.put(bioType.getString("term"));
 				}
 				apeInput.put("Data", apeInputTypes);
 //				add all data formats
-				for(JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
-					apeInputFormats.put(bioType.getString("term"));
+				boolean oneFormat = true;
+				for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
+					if (oneFormat) {
+						apeInputFormats.put(bioType.getString("term"));
+						oneFormat = false;
+					}
 				}
 				apeInput.put("Format", apeInputFormats);
-				
+
 				apeInputs.put(apeInput);
 			}
 			apeJsonTool.put("inputs", apeInputs);
-			
+
 //			reading inputs
 			JSONArray apeOutputs = new JSONArray();
 			JSONArray bioOutputs = function.getJSONArray("output");
 //			for each output
 			for (int j = 0; j < bioOutputs.length(); j++) {
-				
+
 				JSONObject bioOutput = bioOutputs.getJSONObject(j);
 				JSONObject apeOutput = new JSONObject();
 				JSONArray apeOutputTypes = new JSONArray();
 				JSONArray apeOutputFormats = new JSONArray();
 //				add all data types
-				for(JSONObject bioType : APEUtils.getListFromJson(bioOutput, "data", JSONObject.class)) {
+				boolean oneFormat = true;
+				for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "data", JSONObject.class)) {
 					apeOutputTypes.put(bioType.getString("term"));
 				}
 				apeOutput.put("Data", apeOutputTypes);
 //				add all data formats
-				for(JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
-					apeOutputFormats.put(bioType.getString("term"));
+				for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
+					if (oneFormat) {
+						apeOutputFormats.put(bioType.getString("term"));
+						oneFormat = false;
+					}
 				}
 				apeOutput.put("Format", apeOutputFormats);
-				
+
 				apeOutputs.put(apeOutput);
 			}
 			apeJsonTool.put("outputs", apeOutputs);
-			
+
 			apeToolsAnnotations.put(apeJsonTool);
 		}
-		
-		
+
 		return new JSONObject().put("functions", apeToolsAnnotations);
 	}
 
 	/**
 	 * @param temp_sat_input
-	 * @param mappings 
+	 * @param mappings
 	 * @return
 	 */
-	public static String convert2humanReadable(InputStream temp_sat_input, AtomMappings mappings) {
+	public static String convertCNF2humanReadable(InputStream temp_sat_input, AtomMappings mappings) {
 		StringBuffer humanReadable = new StringBuffer();
-		Scanner scanner = new Scanner(temp_sat_input); 
+		Scanner scanner = new Scanner(temp_sat_input);
 		scanner.nextLine();
-		while(scanner.hasNextInt()) {
+		while (scanner.hasNextInt()) {
 			int intAtom = scanner.nextInt();
-			
-			if(intAtom > 0) {
+
+			if (intAtom > 0) {
 				Atom atom = mappings.findOriginal(intAtom);
-				humanReadable = humanReadable.append(atom.getPredicate().getPredicateID()).append("[").append(atom.getUsedInStateArgument().getPredicateID()).append("] ");
+				humanReadable = humanReadable.append(atom.getPredicate().getPredicateID()).append("[")
+						.append(atom.getUsedInStateArgument().getPredicateID()).append("] ");
 			} else if (intAtom < 0) {
 				Atom atom = mappings.findOriginal(-intAtom);
-				humanReadable = humanReadable.append("~").append(atom.getPredicate().getPredicateID()).append("[").append(atom.getUsedInStateArgument().getPredicateID()).append("] ");
+				humanReadable = humanReadable.append("~").append(atom.getPredicate().getPredicateID()).append("[")
+						.append(atom.getUsedInStateArgument().getPredicateID()).append("] ");
 			} else {
 				humanReadable = humanReadable.append("\n");
 			}
 		}
 		scanner.close();
-		
-		
+
 		return humanReadable.toString();
 	}
 
-	
-	
-	
-	
 }

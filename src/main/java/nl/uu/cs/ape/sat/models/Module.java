@@ -204,7 +204,7 @@ public class Module extends AbstractModule {
 				for (String typeSubntology : jsonInput.keySet()) {
 					for (String currTypeID : APEUtils.getListFromJson(jsonInput, typeSubntology, String.class)) {
 						if (allTypes.get(currTypeID) == null) {
-							System.err.println("Data format \"" + currTypeID
+							System.err.println("Data type \"" + currTypeID
 									+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
 						}
 						if (allTypes.getDataTaxonomyDimensions().contains(typeSubntology)) {
@@ -231,7 +231,7 @@ public class Module extends AbstractModule {
 				for (String typeSubntology : jsonOutput.keySet()) {
 					for (String currTypeID : APEUtils.getListFromJson(jsonOutput, typeSubntology, String.class)) {
 						if (allTypes.get(currTypeID) == null) {
-							System.err.println("Data format \"" + currTypeID.toString()
+							System.err.println("Data type \"" + currTypeID.toString()
 									+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
 						}
 						if (allTypes.getDataTaxonomyDimensions().contains(typeSubntology)) {

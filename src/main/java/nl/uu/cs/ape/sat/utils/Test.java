@@ -15,8 +15,31 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 
 public class Test {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
+//		runJsonConversionTest();
+		
+		runSynthesisTest();
+		
+
+//		AllModules allModules = new AllModules(apeFramework.getConfig());
+//		AllTypes allTypes = new AllTypes(apeFramework.getConfig());
+//
+//		OWLReader owlReader = new OWLReader(allModules, allTypes, apeFramework.getConfig().getOntology_path());
+//		Boolean ontologyRead = owlReader.readOntology();
+		
+		
+//		APEUtils.readModuleJson(toolsPath, allModules, allTypes);
+//		allModules.trimTaxonomy();
+//		allTypes.trimTaxonomy();
+		
+//		print(allModules, allTypes);
+	}
+
+	/**
+	 * 
+	 */
+	private static void runSynthesisTest() {
 		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase6/";
 		String fileName = "ape.configuration";
 		if (!APEUtils.isValidReadFile(path + fileName)) {
@@ -52,19 +75,19 @@ public class Test {
 		String f = apeFramework.getTypeElements("Format").toString();
 		
 		System.out.println(d);
+		
+	}
 
-//		AllModules allModules = new AllModules(apeFramework.getConfig());
-//		AllTypes allTypes = new AllTypes(apeFramework.getConfig());
-//
-//		OWLReader owlReader = new OWLReader(allModules, allTypes, apeFramework.getConfig().getOntology_path());
-//		Boolean ontologyRead = owlReader.readOntology();
+	/**
+	 * @throws IOException 
+	 * 
+	 */
+	private static void runJsonConversionTest() throws IOException {
+		String text = APEUtils.readFile("/home/vedran/eclipse-workspace/Test/test.json", Charset.defaultCharset());
+		JSONObject toolAnnnotations = APEUtils.convertBioTools2Ape(new JSONArray(text));
 		
+		System.out.println(toolAnnnotations.toString());
 		
-//		APEUtils.readModuleJson(toolsPath, allModules, allTypes);
-//		allModules.trimTaxonomy();
-//		allTypes.trimTaxonomy();
-		
-//		print(allModules, allTypes);
 	}
 
 	private static void print(AllModules allModules, AllTypes allTypes) {
