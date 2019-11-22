@@ -58,6 +58,10 @@ public class SolutionWorkflow {
 	private Map<State, ModuleNode> usedType2ToolMap;
 	/** Non-structured solution obtained directly from the SAT output. */
 	private SAT_solution nativeSolution;
+	/** Graph representation of the data-flow workflow solution. */
+	private Graph dataflowGraph;
+	/** Graph representation of the control-flow workflow solution. */
+	private Graph controlflowGraph;
 	
 	/**
 	 * Create the structure of the {@link SolutionWorkflow} based on the {@link ModuleAutomaton} and {@link TypeAutomaton} provided.
@@ -168,21 +172,33 @@ public class SolutionWorkflow {
 		
 	}
 
+	/**
+	 * Method returns the list of nodes that represent operations in the workflow, in order in which they should be executed.
+	 * @return List of {@link ModuleNode} objects, in order in which they should be executed.
+	 */
 	public List<ModuleNode> getModuleNodes() {
 		return this.moduleNodes;
 	}
 
+	/**
+	 * Method returns the set of initial data types that are given as an input to the workflow.
+	 * @return List of {@link TypeNode} objects, where each node describes a specific data instance.
+	 */
 	public Set<TypeNode> getWorkflowInputTypeStates() {
 		return this.workflowInputTypeStates;
 	}
 
+	/**
+	 * Method returns the set of final data types that are given as an output of the workflow.
+	 * @return List of {@link TypeNode} objects, where each node describes a specific data instance.
+	 */
 	public Set<TypeNode> getWorkflowOutputTypeStates() {
 		return this.workflowOutputTypeStates;
 	}
 	
 	/**
 	 * Get non-structured solution obtained directly from the SAT output.
-	 * @return Object of class {@link SAT_solution}
+	 * @return A {@link SAT_solution} object, that contains information about the native SAT encoding, and how it translates into human
 	 */
 	public SAT_solution getnativeSATsolution() {
 		return this.nativeSolution;
@@ -301,14 +317,16 @@ public class SolutionWorkflow {
 	}
 	
 	/**
-	 * Get a graph that represent the solution.
+	 * Get a graph that represent the data-flow solution.
 	 * @param title - title of the graph
 	 * @return {@link Graph} object that represents the solution workflow.
 	 */
-	public Graph getSolutionGraph(String title) {
-		
+	public Graph getDataFlowGraph(String title, RankDir orientation) {
+		if(this.dataflowGraph != null) {
+			return this.dataflowGraph;
+		}
 		Graph workflowGraph = graph(title).directed()
-		        .graphAttr().with(RankDir.TOP_TO_BOTTOM);
+		        .graphAttr().with(orientation);
 		
 		String input = "Workflow INPUT" + "     ";
 		String output = "Workflow OUTPUT" + "     ";
@@ -326,14 +344,12 @@ public class SolutionWorkflow {
 		
 		for(ModuleNode currTool : this.moduleNodes) {
 			workflowGraph = currTool.addModuleToGraph(workflowGraph);
-//			index = 0;
 			for(TypeNode toolInput : currTool.getInputTypes()) {
 				if(!toolInput.isEmpty()) {
 					index++;
 					workflowGraph = workflowGraph.with(node(toolInput.getDotID()).link(to(node(currTool.getDotID())).with(Label.of("in   "), Color.ORANGE, LinkAttr.weight(index))));
 				}
 			}
-//			index = 0;
 			for(TypeNode toolOutput : currTool.getOutputTypes()) {
 				if(!toolOutput.isEmpty()) {
 					index++;
@@ -342,7 +358,6 @@ public class SolutionWorkflow {
 				}
 			}
 		}
-//		index = 0;
 		for(TypeNode workflowOutput : this.workflowOutputTypeStates) {
 			index++;
 			if(!outputDefined) {
@@ -352,7 +367,36 @@ public class SolutionWorkflow {
 			workflowGraph = workflowOutput.addTypeToGraph(workflowGraph);
 			workflowGraph = workflowGraph.with(node(workflowOutput.getDotID()).link(to(node(output)).with(LinkAttr.weight(index), Style.DOTTED)));
 		}
+		this.dataflowGraph = workflowGraph;
+		return workflowGraph;
+	}
+	
+	/**
+	 * Get a graph that represent the c-flow solution.
+	 * @param title - title of the graph
+	 * @return {@link Graph} object that represents the solution workflow.
+	 */
+	public Graph getControlFlowGraph(String title, RankDir orientation) {
+		if(this.controlflowGraph != null) {
+			
+			return graph(title).with(this.controlflowGraph);
+		}
+		Graph workflowGraph = graph(title).directed()
+		        .graphAttr().with(orientation);
 		
+		String input = "START" + "     ";
+		String output = "END" + "     ";
+		workflowGraph = workflowGraph.with(node(input).with(Color.BLACK, Style.BOLD));
+		String prevNode = input;
+		for(ModuleNode currTool : this.moduleNodes) {
+			workflowGraph = currTool.addModuleToGraph(workflowGraph);
+			workflowGraph = workflowGraph.with(node(prevNode).link(to(node(currTool.getDotID())).with(Label.of("next   "), Color.RED)));
+			prevNode = currTool.getDotID();
+		}
+		workflowGraph = workflowGraph.with(node(output).with(Color.BLACK, Style.BOLD));
+		workflowGraph = workflowGraph.with(node(prevNode).link(to(node(output)).with(Label.of("next   "), Color.RED)));
+		
+		this.controlflowGraph = workflowGraph;
 		return workflowGraph;
 	}
 	

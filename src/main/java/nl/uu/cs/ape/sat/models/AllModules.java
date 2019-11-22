@@ -121,11 +121,23 @@ public class AllModules extends AllPredicates {
 	 * returns true if and only if this set contains an element e such that (o==null
 	 * ? e==null : o.equals(e)).
 	 * 
-	 * @param module
+	 * @param module that is searched for
 	 * @return true if this set contains the specified element
 	 */
 	public boolean existsModule(AbstractModule module) {
 		return this.containsKey(module.getPredicateID());
+	}
+	
+	/**
+	 * Returns true if this set contains the specified element. More formally,
+	 * returns true if and only if this set contains an element e such that (o==null
+	 * ? e==null : o.equals(e)).
+	 * 
+	 * @param ID of the module that is searched for
+	 * @return true if this set contains the specified element
+	 */
+	public boolean existsModule(String moduleID) {
+		return this.containsKey(moduleID);
 	}
 
 	public int size() {

@@ -8,15 +8,12 @@ import java.util.Set;
 import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
-import guru.nidi.graphviz.attribute.Shape.Polygon;
 import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.Module;
-import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 
 /**
@@ -114,8 +111,19 @@ public class ModuleNode extends SolutionWorkflowNode {
 		return abstractModules;
 	}
 
+	/** Method returns the next operation that should be per in the workflow structure.*/
 	public ModuleNode getNextModuleNode() {
 		return nextModuleNode;
+	}
+	
+	/** Method returns {@code true} if the current operation is not the last one in the workflow, {@code false} otherwise. */
+	public boolean hasNextModule() {
+		return nextModuleNode != null;
+	}
+	
+	/** Method returns {@code true} if the current operation is not the first one in the workflow, {@code false} otherwise. */
+	public boolean hasPrevModule() {
+		return prevModuleNode != null;
 	}
 
 	public ModuleNode getPrevModuleNode() {

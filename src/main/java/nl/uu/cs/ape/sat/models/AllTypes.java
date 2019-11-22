@@ -130,6 +130,18 @@ public class AllTypes extends AllPredicates {
 	public boolean existsType(Type type) {
 		return this.containsKey(type.getPredicateID());
 	}
+	
+	/**
+	 * Returns true if this set contains the specified type element. More formally,
+	 * returns true if and only if this set contains an element e such that (o==null
+	 * ? e==null : o.equals(e)).
+	 * 
+	 * @param type - ID of the type that is searched for
+	 * @return {@code true} if the type exists in the set.
+	 */
+	public boolean existsType(String typeID) {
+		return this.containsKey(typeID);
+	}
 
 	/**
 	 * Returns number of types currently defined.

@@ -16,13 +16,15 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import guru.nidi.graphviz.attribute.RankDir;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
-import nl.uu.cs.ape.sat.core.implSAT.AllSATsolutions;
+import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
+import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.ConstraintData;
@@ -41,8 +43,6 @@ import nl.uu.cs.ape.sat.utils.OWLReader;
 public class APE {
 	/** Configuration object defined from the configuration file. */
 	private APEConfig config;
-	/** All solutions that were found so far. */
-	private AllSATsolutions allSolutions;
 	/** All modules/operations used in the domain. */
 	private AllModules allModules;
 	/** All data types defined in the domain. */
@@ -142,7 +142,7 @@ public class APE {
 	 */
 	public List<Map<String, String>> getTypeElements(String dimensionRootID) {
 		List<Type> types = allTypes.getElementsFromSubTaxonomy(allTypes.get(dimensionRootID));
-		List<Map<String, String>> transformedTypes = new ArrayList<>();
+		List<Map<String, String>> transformedTypes = new ArrayList<Map<String, String>>();
 		for(Type currType : types) {
 			transformedTypes.add(currType.toMap());
 		}
@@ -152,53 +152,51 @@ public class APE {
 	
 	/** Setup a new run instance of the APE solver and run the synthesis algorithm.
 	 * 
-	 * @param configObject - run configurations
-	 * @return {@code true} if the synthesis was successfully performed, {@code false} otherwise.
+	 * @param configObject - JSON object that contains run configurations
+	 * @return The list of all the solutions.
 	 * @throws JSONException
 	 */
-	public boolean runSynthesis(JSONObject configObject) throws IOException, JSONException {
-		/** Variable that describes a successful execution. */
-		boolean succRun = true; 
-		succRun &= config.setupRunConfiguration(configObject);
+	public List<SolutionWorkflow> runSynthesis(JSONObject configObject) throws IOException, JSONException {
+		config.setupRunConfiguration(configObject);
 		if (config == null || config.getRunConfigJsonObj() == null) {
 			throw new JSONException("Run configuration failed. Error in configuration object.");
 		}
-		succRun &= executeSynthesis();
+		List<SolutionWorkflow> solutions = executeSynthesis();
 		
-		return succRun;
+		return solutions;
 	}
 	
-	
-	public boolean runSynthesis(String configPath) throws IOException, JSONException {
-		/** Variable that describes a successful execution. */
-		boolean succRun = true; 
-		succRun &= config.setupRunConfiguration(configPath);
+	/** Setup a new run instance of the APE solver and run the synthesis algorithm.
+	 * 
+	 * @param configPath - path to the JSON that contains run configurations
+	 * @return The list of all the solutions.
+	 * @throws JSONException
+	 */
+	public List<SolutionWorkflow> runSynthesis(String configPath) throws IOException, JSONException {
+		config.setupRunConfiguration(configPath);
 		if (config == null || config.getRunConfigJsonObj() == null) {
 			throw new JSONException("Run configuration failed. Error in configuration file.");
 		}
-		succRun &= executeSynthesis();
+		List<SolutionWorkflow> solutions = executeSynthesis();
 		
-		return succRun;
+		return solutions;
 	}
 	/**
 	 * Run the synthesis for the given workflow specification.
 	 * 
-	 * @return {@code true} if the synthesis was successfully performed, {@code false} otherwise.
+	 * @return The list of all the solutions.
 	 * @throws IOException error in case of not providing a proper configuration file.
 	 */
-	private boolean executeSynthesis() throws IOException {
-		/** Variable that describes a successful run of the program. */
-		boolean succRun = true;
-		
+	private List<SolutionWorkflow> executeSynthesis() throws IOException {
 		/**
 		 * List of all the solutions
 		 */
-		allSolutions = new AllSATsolutions(config);
+		SATsolutionsList allSolutions = new SATsolutionsList(config);
 		/*
 		 * Define set of all constraint formats
 		 */
 		constraintFactory = new ConstraintFactory();
-		succRun &= constraintFactory.initializeConstraints();
+		constraintFactory.initializeConstraints();
 		unformattedConstr = new ArrayList<ConstraintData>();
 		
 		unformattedConstr = APEUtils.readConstraints(config.getConstraints_path());
@@ -223,10 +221,10 @@ public class APE {
 			/** Encoding of the synthesis problem */
 			if (!implSATsynthesis.synthesisEncoding()) {
 				System.err.println("Internal error in problem encoding.");
-				return false;
+				return null;
 			}
 			/** Execution of the synthesis */
-			succRun &= implSATsynthesis.synthesisExecution();
+			implSATsynthesis.synthesisExecution();
 
 			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
 					|| solutionLength == config.getSolution_max_length()) {
@@ -237,30 +235,20 @@ public class APE {
 			solutionLength++;
 		}
 
-		/*
-		 * Writing solutions to the specified file in human readable format
-		 */
-		if (allSolutions.isEmpty()) {
-			System.out.println("UNSAT");
-		} else {
-
-			succRun &= writeSolutionToFile();
-			succRun &= generateGraphOutput();
-			succRun &= executeWorkflows();
-
-		}
-		return succRun;
+		
+		return allSolutions;
 	}
 	
 	/**
 	 * Write textual "human readable" version on workflow solutions to a file.
+	 * @param allSolutions 
 	 * @param allSolutions
 	 * @return {@code true} if the writing was successfully performed, {@code false} otherwise.
 	 */
-	private boolean writeSolutionToFile() {
+	public boolean writeSolutionToFile(List<SolutionWorkflow> allSolutions) {
 		StringBuilder solutions2write = new StringBuilder();
 
-		for (int i = 0; i < allSolutions.getNumberOfSolutions(); i++) {
+		for (int i = 0; i < allSolutions.size(); i++) {
 			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getRelevantSolution())
 					.append("\n");
 		}
@@ -275,7 +263,7 @@ public class APE {
 	 * @return {@code true} if the execution was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	private boolean executeWorkflows() throws IOException {
+	public boolean executeWorkflows(List<SolutionWorkflow> allSolutions) throws IOException {
 		String executionsFolder = config.getExecution_scripts_folder();
 		Integer noExecutions = config.getNo_executions();
 		if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
@@ -288,7 +276,7 @@ public class APE {
 				new File(executionsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
 				.forEach(File::delete);
 		System.out.print("Loading");
-		for (int i = 0; i < noExecutions && i < allSolutions.getNumberOfSolutions(); i++) {
+		for (int i = 0; i < noExecutions && i < allSolutions.size(); i++) {
 
 			PrintWriter out = new PrintWriter(
 					new BufferedWriter(new FileWriter(executionsFolder + "/workflowSolution_" + i + ".sh", false)));
@@ -312,12 +300,13 @@ public class APE {
 	}
 
 	/**
-	 * Generate the graphical representations of the workflow solutions.
+	 * Generate the graphical representations of the workflow solutions. Each graph is shown in data-flow representation, i.e. transformation of data is in focus.
 	 * @param allSolutions
-	 *@return {@code true} if the generating was successfully performed, {@code false} otherwise.
+	 * @param orientation - orientation in which the graph will be presented
+	 * @return {@code true} if the generating was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	private boolean generateGraphOutput() throws IOException {
+	public boolean generateDataFlowGraphs(List<SolutionWorkflow> allSolutions, RankDir orientation) throws IOException {
 		String graphsFolder = config.getSolution_graphs_folder();
 		Integer noGraphs = config.getNo_graphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -331,16 +320,85 @@ public class APE {
 				new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
 				.forEach(File::delete);
 		System.out.print("Loading");
-		for (int i = 0; i < noGraphs && i < allSolutions.getNumberOfSolutions(); i++) {
+		for (int i = 0; i < noGraphs && i < allSolutions.size(); i++) {
 
 			String currTitle = "SolutionNo_" + i + "_length_" + allSolutions.get(i).getSolutionlength();
 			String filePath = graphsFolder + "/" + currTitle;
 
-			Graph workflowGraph = allSolutions.get(i).getSolutionGraph(currTitle);
+			int currIndex = i;
+			/* Parallel execution of graphs. */
+			Runnable generateGraph = () -> {
+				Graph workflowGraph = allSolutions.get(currIndex).getDataFlowGraph(currTitle, orientation);
 
-			Graphviz.fromGraph(workflowGraph).render(Format.PNG).toFile(new File(filePath));
-			images.add(filePath);
-			System.out.print(".");
+				try {
+					Graphviz.fromGraph(workflowGraph).render(Format.PNG).toFile(new File(filePath));
+				} catch (IOException e) {
+					System.err.println("Error occured while generating a graph.");
+					e.printStackTrace();
+				}
+				images.add(filePath);
+				System.out.print(".");
+			};
+
+			generateGraph.run();
+
+			Thread thread = new Thread(generateGraph);
+			thread.start();
+			if (i > 0 && i % 60 == 0) {
+				System.out.println();
+			}
+		}
+		APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
+
+		return true;
+	}
+	
+	/**
+	 * Generate the graphical representations of the workflow solutions. Each graph is shown in control-flow representation, i.e. order of the operations is in focus.
+	 * @param allSolutions
+	 * @param orientation - orientation in which the graph will be presented
+	 * @return {@code true} if the generating was successfully performed, {@code false} otherwise.
+	 * @throws IOException
+	 */
+	public boolean generateControlFlowGraphs(List<SolutionWorkflow> allSolutions, RankDir orientation) throws IOException {
+		String graphsFolder = config.getSolution_graphs_folder();
+		Integer noGraphs = config.getNo_graphs();
+		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
+			return false;
+		}
+		APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.timerStart("drawingGraphs", true);
+		System.out.println();
+		List<String> images = new ArrayList<String>();
+		Arrays.stream(
+				new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
+				.forEach(File::delete);
+		System.out.print("Loading");
+		for (int i = 0; i < noGraphs && i < allSolutions.size(); i++) {
+
+			String currTitle = "SolutionNo_" + i + "_length_" + allSolutions.get(i).getSolutionlength();
+			String filePath = graphsFolder + "/" + currTitle;
+			int currIndex = i;
+			/* Parallel execution of graphs. */
+			Runnable generateGraph = () -> {
+				Graph workflowGraph = allSolutions.get(currIndex).getControlFlowGraph(currTitle, orientation);
+
+				try {
+					Graphviz.fromGraph(workflowGraph).render(Format.PNG).toFile(new File(filePath));
+				} catch (IOException e) {
+					System.err.println("Error occured while generating a graph.");
+					e.printStackTrace();
+				}
+				images.add(filePath);
+				System.out.print(".");
+			};
+
+			generateGraph.run();
+
+			Thread thread = new Thread(generateGraph);
+			thread.start();
+			
+			
 			if (i > 0 && i % 60 == 0) {
 				System.out.println();
 			}

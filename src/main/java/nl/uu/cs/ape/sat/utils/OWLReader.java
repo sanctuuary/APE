@@ -1,18 +1,17 @@
 package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Supplier;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -21,13 +20,12 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
-import nl.uu.cs.ape.sat.utils.APEConfig;
-import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
+import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 
 /**
  * The {@code OWLReader} class is used to extract the classification information
@@ -44,17 +42,15 @@ public class OWLReader {
 	private OWLOntology ontology;
 	private OWLDataFactory factory;
 	private boolean typeRootExists;
+	private Logger logger = Logger.getLogger("MyLog");
 
 	/**
 	 * Setting up the reader that will populate the provided module and type sets
 	 * with objects from the ontology.
 	 * 
-	 * @param ontologyPath
-	 *            - path to the OWL file
-	 * @param allModules
-	 *            - set of all the modules in our system
-	 * @param allTypes
-	 *            - set of all the types in our system
+	 * @param ontologyPath - path to the OWL file
+	 * @param allModules   - set of all the modules in our system
+	 * @param allTypes     - set of all the types in our system
 	 */
 	public OWLReader(AllModules allModules, AllTypes allTypes, String ontologyPath) {
 		this.ontologyPath = ontologyPath;
@@ -63,7 +59,6 @@ public class OWLReader {
 		this.factory = OWLManager.getOWLDataFactory();
 		typeRootExists = false;
 	}
-	
 
 	/**
 	 * Method used to read separately <b>ModulesTaxonomy</b> and
@@ -82,48 +77,55 @@ public class OWLReader {
 			if (tempOntology.exists()) {
 				ontology = manager.loadOntologyFromOntologyDocument(tempOntology);
 			} else {
-				System.err.println("Provided ontology does not exist.");
+				logger.info("Provided ontology does not exist.");
 				return false;
 			}
 		} catch (OWLOntologyCreationException e) {
-			System.err.println("Ontology is not properly provided.");
+			logger.info("Ontology is not properly provided.");
 			return false;
 		}
 		OWLClass thingClass = manager.getOWLDataFactory().getOWLThing();
 		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
 
-		Set<OWLClass> subClasses = reasoner.getSubClasses(thingClass, true).getFlattened();
+		Supplier<Stream<OWLClass>> subClasses = () -> reasoner.getSubClasses(thingClass, true).entities();
 
-		OWLClass moduleClass = getModuleClass(subClasses);
-		List<OWLClass> typeClasses = getTypeClasses(subClasses);
+		OWLClass moduleClass = subClasses.get().filter(currClass -> isModuleClass(currClass)).findFirst()
+				.orElse(thingClass);
+		List<OWLClass> typeClasses = subClasses.get().filter(currClass -> isTypeClass(currClass))
+				.collect(Collectors.toList());
 
-		if (moduleClass != null) {
+		/* Handle scenario when the tool taxonomy root was not defined properly. */
+		if (!moduleClass.equals(thingClass)) {
 			exploreModuleOntologyRec(reasoner, ontology, moduleClass, thingClass, thingClass);
 		} else {
-			System.err.println("Provided ontology does not contain the "+allModules.getRootID()+" class as a root for operation taxonomy.");
+			logger.info("Provided ontology does not contain the " + allModules.getRootID()
+					+ " class as a root for operation taxonomy.");
 		}
-
-		if (typeClasses != null && !typeClasses.isEmpty()) {
+		
+		/* Handle scenario when the type taxonomy root was not defined properly. */
+		if (!typeClasses.isEmpty()) {
 			OWLClass superClass;
-			if(typeRootExists) {
+			if (typeRootExists) {
 				superClass = thingClass;
 			} else {
-				/* If the main root of the data type taxonomy does not exist, create one artificially. */
+				/*
+				 * If the main root of the data type taxonomy does not exist, create one
+				 * artificially.
+				 */
 				Type root = allTypes.addType("DataTaxonomy", "DataTaxonomy", "DataTaxonomy", NodeType.ROOT);
 				allTypes.setRootPredicate(root);
 				superClass = new OWLClassImpl(IRI.create("http://www.w3.org#DataTaxonomy"));
 			}
-			
-			for(OWLClass typeClass : typeClasses) {
-				exploreTypeOntologyRec(reasoner, ontology, typeClass, superClass, superClass);
-			}
+
+			typeClasses.forEach(
+					typeClass -> exploreTypeOntologyRec(reasoner, ontology, typeClass, superClass, superClass));
 		} else {
-			System.err.println("Provided ontology does not contain the provided data type taxonomy root class(es).");
+			logger.info("Provided ontology does not contain the provided data type taxonomy root class(es).");
 		}
 
-		if (moduleClass == null || typeClasses == null || typeClasses.isEmpty()) {
-			System.err.println("Ontology was not loaded because of the bad formatting.");
+		if (moduleClass.equals(thingClass) || typeClasses.isEmpty()) {
+			logger.info("Ontology was not loaded because of the bad formatting.");
 			return false;
 		}
 
@@ -133,190 +135,164 @@ public class OWLReader {
 	/**
 	 * Method returns the <b>ModulesTaxonomy</b> class from the set of OWL classes.
 	 * 
-	 * @param subClasses
-	 *            - set of OWL classes
+	 * @param subClasses - set of OWL classes
 	 * @return <b>ModulesTaxonomy</b> OWL class.
 	 */
-	private OWLClass getModuleClass(Set<OWLClass> subClasses) {
-		OWLClass moduleClass = null;
-		for (OWLClass currClass : subClasses) {
-			if (getLabel(currClass).equals(allModules.getRootID())) {
-				moduleClass = currClass;
-			}
-		}
-		return moduleClass;
+	private boolean isModuleClass(OWLClass currClass) {
+		return getLabel(currClass).equals(allModules.getRootID());
 	}
 
 	/**
-	 * Method returns the <b>TypesTaxonomy</b> class from the set of OWL classes.
+	 * Method returns {@code true} of the given OWL class belong to the roots of the
+	 * <b>TypesTaxonomy</b>.
 	 * 
-	 * @param subClasses
-	 *            - set of OWL classes
-	 * @return <b>TypesTaxonomy</b> OWL class.
+	 * @param currClass - class that is evaluated
+	 * @return {@code true} if the current class belong to the type taxonomy roots,
+	 *         {@code false} otherwise.
 	 */
-	private List<OWLClass> getTypeClasses(Set<OWLClass> subClasses) {
-		List<OWLClass> typeClasses = new ArrayList<OWLClass>();
-		for (OWLClass currClass : subClasses) {
-			if (getLabel(currClass).equals(allTypes.getRootID())) {
-				typeClasses.add(currClass);
-				typeRootExists = true;
-			} else {
-				for(String dataTaxonomySubRoot : APEUtils.safe(allTypes.getDataTaxonomyDimensions())) {
-					if(getLabel(currClass).equals(dataTaxonomySubRoot)) {
-						typeClasses.add(currClass);
-					}
-				}
-			}
+	private boolean isTypeClass(OWLClass currClass) {
+		if (getLabel(currClass).equals(allTypes.getRootID())) {
+			typeRootExists = true;
+			return true;
+		} else {
+			return allTypes.getDataTaxonomyDimensions().contains(getLabel(currClass));
 		}
-		return typeClasses;
 	}
 
 	/**
 	 * Recursively exploring the hierarchy of the ontology and defining objects
 	 * ({@ling AbstractModule}) on each step of the way.
 	 * 
-	 * @param reasoner
-	 *            - reasoner used to provide subclasses
-	 * @param ontology
-	 *            - our current ontology
-	 * @param currClass
-	 *            - the class (node) currently explored
-	 * @param superClass
-	 *            - the superclass of the currClass
+	 * @param reasoner   - reasoner used to provide subclasses
+	 * @param ontology   - our current ontology
+	 * @param currClass  - the class (node) currently explored
+	 * @param superClass - the superclass of the currClass
 	 */
 	private void exploreModuleOntologyRec(OWLReasoner reasoner, OWLOntology ontology, OWLClass currClass,
 			OWLClass superClass, OWLClass rootClass) {
-		
+//		if(allModules.existsModule(getLabel(currClass))) {
+//			return;
+//		}
 		AbstractModule superModule = allModules.get(getLabel(superClass));
+		final OWLClass currRootClass;
 		/*
 		 * Defining the Node Type based on the node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if(getLabel(currClass).equals(allModules.getRootID())) {
+		if (getLabel(currClass).equals(allModules.getRootID())) {
 			currNodeType = NodeType.ROOT;
-			rootClass = currClass;
+			currRootClass = currClass;
+		} else {
+			currRootClass = rootClass;
 		}
 		/* Generate the AbstractModule that corresponds to the taxonomy class. */
-		AbstractModule currModule = allModules.addModule(new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType));
-		/* Add the current module as a sub-module of the super module.*/
-		if(superModule != null && currModule != null) {
+		AbstractModule currModule = allModules.addModule(
+				new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(currRootClass), currNodeType));
+		/* Add the current module as a sub-module of the super module. */
+		if (superModule != null && currModule != null) {
 			superModule.addSubPredicate(getLabel(currClass));
 		}
 		/* Add the super-type for the current type */
-		if(currNodeType != NodeType.ROOT) {
+		if (currNodeType != NodeType.ROOT) {
 			currModule.addSuperPredicate(superModule);
 		}
-		
-		for (OWLClass child : reasoner.getSubClasses(currClass, true).getFlattened()) {
-			if (reasoner.isSatisfiable(child)) { 		// in case that the child is not node owl:Nothing
-				exploreModuleOntologyRec(reasoner, ontology, child, currClass, rootClass);
-			}
-		}
+		reasoner.getSubClasses(currClass, true).entities().filter(child -> reasoner.isSatisfiable(child))
+				.forEach(child -> exploreModuleOntologyRec(reasoner, ontology, child, currClass, currRootClass));
 	}
 
 	/**
 	 * Recursively exploring the hierarchy of the ontology and defining objects
 	 * ({@link Type}) on each step of the way.
 	 * 
-	 * @param reasoner
-	 *            - reasoner used to provide subclasses
-	 * @param ontology
-	 *            - our current ontology
-	 * @param currClass
-	 *            - the class (node) currently explored
-	 * @param superClass
-	 *            - the superclass of the currClass
+	 * @param reasoner   - reasoner used to provide subclasses
+	 * @param ontology   - our current ontology
+	 * @param currClass  - the class (node) currently explored
+	 * @param superClass - the superclass of the currClass
 	 */
 	private void exploreTypeOntologyRec(OWLReasoner reasoner, OWLOntology ontology, OWLClass currClass,
 			OWLClass superClass, OWLClass rootClass) {
-		if(currClass == null) {
-			return;
-		}
-		Type superType, subType;
+//		if(allTypes.existsType(getLabel(currClass))) {
+//			return;
+//		}
+		
+		final OWLClass currRoot;
+		Type superType, currType;
 		superType = allTypes.get(getLabel(superClass));
 		/*
 		 * Check whether the current node is a root or subRoot node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if(getLabel(currClass).equals(allTypes.getRootID())) {
+		if (getLabel(currClass).equals(allTypes.getRootID())) {
 			currNodeType = NodeType.ROOT;
-			rootClass = currClass;
+			currRoot = currClass;
+		} else if (APEUtils.safe(allTypes.getDataTaxonomyDimensions()).contains(getLabel(currClass))) {
+			currNodeType = NodeType.SUBROOT;
+			currRoot = currClass;
 		} else {
-			for(String dataTaxonomySubRoot : APEUtils.safe(allTypes.getDataTaxonomyDimensions())) {
-				if(getLabel(currClass).equals(dataTaxonomySubRoot)) {
-					currNodeType = NodeType.SUBROOT;
-					rootClass = currClass;
-				}
-			}
+			currRoot = rootClass;
 		}
-		
+
 		/* Generate the Type that corresponds to the taxonomy class. */
-		subType = allTypes.addType(getLabel(currClass), getLabel(currClass), getLabel(rootClass), currNodeType);
-		
-		/* Add the current type as a sub-type of the super type.*/
-		if (superType != null && subType != null) {
+		currType = allTypes.addType(getLabel(currClass), getLabel(currClass), getLabel(currRoot), currNodeType);
+
+		/* Add the current type as a sub-type of the super type. */
+		if (superType != null && currType != null) {
 			superType.addSubPredicate(getLabel(currClass));
 		}
 		/* Add the super-type for the current type */
-		if(currNodeType != NodeType.ROOT) {
-			subType.addSuperPredicate(superType);
+		if (currNodeType != NodeType.ROOT) {
+			currType.addSuperPredicate(superType);
 		}
-		/*
-		 * Define the counter to check whether all the subclasses are empty / owl:Nothing
-		 */
-		int unsatSubClasses = 0, subClasses = reasoner.getSubClasses(currClass, true).getFlattened().size();
-		for (OWLClass child : reasoner.getSubClasses(currClass, true).getFlattened()) {
-			if (reasoner.isSatisfiable(child)) { 
-				/* in case that the child is not node owl:Nothing */
-				exploreTypeOntologyRec(reasoner, ontology, child, currClass, rootClass);
-			} else {
-				unsatSubClasses ++;
-			}
-		}
-		if(unsatSubClasses == subClasses) {
-			/* make the type a simple type in case of not having subTypes */
-			subType.setToSimplePredicate();;		
+
+		List<OWLClass> subClasses = reasoner.getSubClasses(currClass, true).entities()
+											.filter(child -> reasoner.isSatisfiable(child))
+											.collect(Collectors.toList());
+		
+		subClasses.forEach(child -> exploreTypeOntologyRec(reasoner, ontology, child, currClass, currRoot));
+
+		if (subClasses.isEmpty()) {
+			currType.setToSimplePredicate();
+			;
 		}
 	}
 
 	/**
 	 * Returning the label of the provided OWL class.
 	 * 
-	 * @param currClass
-	 *            - provided OWL class
+	 * @param currClass - provided OWL class
 	 * @return String representation of the class name.
 	 */
 	private String getLabel(OWLClass currClass) {
-		if(currClass == null) {
+		if (currClass == null) {
 			return null;
 		}
 		String label, classID = currClass.toStringID();
-		List<OWLAnnotation> labels = EntitySearcher.getAnnotations(currClass, ontology, factory.getRDFSLabel()).collect(Collectors.toList());
+		List<OWLAnnotation> labels = EntitySearcher.getAnnotations(currClass, ontology, factory.getRDFSLabel())
+				.collect(Collectors.toList());
 		/* sometimes optional is empty */
-		if(labels.size() > 0) {
+		if (labels.size() > 0) {
 			label = labels.get(0).toString();
-			label = label.substring(label.indexOf("\"")+1, label.lastIndexOf("\""));
+			label = label.substring(label.indexOf("\"") + 1, label.lastIndexOf("\""));
 			return label;
-		} else if(classID.contains("#")) {
+		} else if (classID.contains("#")) {
 			label = classID.substring(classID.indexOf('#') + 1);
 			label = label.replace(" ", "_");
 			return label;
 		} else {
-			System.out.println("Class '" + classID + "' has no label.");
+			logger.fine("Class '" + classID + "' has no label.");
 			label = classID;
 		}
 		return classID;
 	}
-	
+
 	/**
 	 * Returning the IRI of the provided OWL class.
 	 * 
-	 * @param currClass
-	 *            - provided OWL class
+	 * @param currClass - provided OWL class
 	 * @return String representation of the class name.
 	 */
 	private String getIRI(OWLClass currClass) {
-		if(currClass == null) {
+		if (currClass == null) {
 			return null;
 		}
 		return currClass.toStringID();

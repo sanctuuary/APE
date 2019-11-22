@@ -1,10 +1,8 @@
 package nl.uu.cs.ape.sat.core.implSAT;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import nl.uu.cs.ape.sat.core.SolutionInterpreter;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.utils.APEConfig;
@@ -15,10 +13,8 @@ import nl.uu.cs.ape.sat.utils.APEConfig;
  * @author Vedran Kasalica
  *
  */
-public class AllSATsolutions {
+public class SATsolutionsList extends ArrayList<SolutionWorkflow> {
 
-	/** List representing all solution workflows. */
-	private List<SolutionWorkflow> solutionWorkflows;
 	/** Max number of solutions that should be found. */
 	private int maxSolutions;
 	/** Mapping of predicates into integers (for SAT encoding). */
@@ -28,9 +24,8 @@ public class AllSATsolutions {
 	 * Create an object that will contain all the solutions of the synthesis.
 	 * @param config - setup configuration for the synthesis.
 	 */
-	public AllSATsolutions(APEConfig config) {
-		solutionWorkflows = new ArrayList<SolutionWorkflow>();
-		
+	public SATsolutionsList(APEConfig config) {
+		super();
 		/** Provides mapping from each atom to a number, and vice versa */
 		mappings = new AtomMappings();
 		/*
@@ -42,20 +37,12 @@ public class AllSATsolutions {
 		}
 	}
 
-	/**
-	 * Get all the solutions that are currently found.
-	 * @return List of {@link SolutionWorkflow solution} objects
-	 */
-	public List<SolutionWorkflow> getSolutions() {
-		return solutionWorkflows;
-	}
-
 	/** 
 	 * Get the number of solutions that are currently found.
 	 * @return Number of solutions in the solutions set.
 	 */
 	public int getNumberOfSolutions() {
-		return solutionWorkflows.size();
+		return super.size();
 	}
 
 	/**
@@ -70,7 +57,7 @@ public class AllSATsolutions {
 	 * Get object that contains mappings of all the atoms.
 	 * @return {@link AtomMappings} object.
 	 */
-	public AtomMappings getMappings() {
+	protected AtomMappings getMappings() {
 		return mappings;
 	}
 	/**
@@ -78,13 +65,13 @@ public class AllSATsolutions {
 	 * @return {@code true} if the list contains no elements
 	 */
 	public boolean isEmpty() {
-		return solutionWorkflows.isEmpty();
+		return super.isEmpty();
 	}
 	
 	/**
 	 * The procedure resets the encodings specific for a synthesis run (such as auxiliary variables).
 	 */
-	public void newEncoding() {
+	protected void newEncoding() {
 		mappings.resetAuxVariables();
 	}
 
@@ -95,7 +82,7 @@ public class AllSATsolutions {
 	 * @return {@code true} if this list changed as a result of the call
 	 */
 	public boolean addSolutions(List<SolutionWorkflow> currSolutions) {
-		if(solutionWorkflows.addAll(currSolutions)) {
+		if(super.addAll(currSolutions)) {
 			return true;
 		}
 		return false;
@@ -103,6 +90,6 @@ public class AllSATsolutions {
 
 
 	public SolutionWorkflow get(int index) {
-		return solutionWorkflows.get(index);
+		return super.get(index);
 	}
 }

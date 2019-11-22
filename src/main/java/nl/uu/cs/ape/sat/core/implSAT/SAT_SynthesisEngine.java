@@ -65,7 +65,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	/** Representation of the constraint file. */
 	private final List<ConstraintData> unformattedConstr;
 	/** Set of all the solutions found by the library. */
-	private final AllSATsolutions allSolutions;
+	private final SATsolutionsList allSolutions;
 	/** CNF encoding of the problem. */
 	private StringBuilder cnfEncoding;
 	/** String used as an input for the SAT solver. */
@@ -93,7 +93,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	 * @param allConsTemplates
 	 * @param unformattedConstr
 	 */
-	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, AllSATsolutions allSolutions,
+	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, SATsolutionsList allSolutions,
 			APEConfig config, ConstraintFactory allConsTemplates,
 			List<ConstraintData> unformattedConstr, int size) {
 		this.allModules = allModules;
@@ -247,7 +247,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 
 		List<SolutionWorkflow> currSolutions = runMiniSAT(temp_sat_input,
 				allSolutions.getNumberOfSolutions(), allSolutions.getMaxNumberOfSolutions());
-		/** Add current solutions to list of all solutions. */
+		/* Add current solutions to list of all solutions. */
 		return allSolutions.addSolutions(currSolutions);
 	}
 
@@ -342,7 +342,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		return unformattedConstr;
 	}
 
-	public AllSATsolutions getAllSolutions() {
+	public SATsolutionsList getAllSolutions() {
 		return allSolutions;
 	}
 
