@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.dom4j.Node;
 import org.json.JSONException;
 import org.json.JSONObject;
 

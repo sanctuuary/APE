@@ -1,11 +1,7 @@
 package nl.uu.cs.ape.sat.core.implSAT;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +22,10 @@ import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.core.SynthesisEngine;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
-import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintData;
-import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;

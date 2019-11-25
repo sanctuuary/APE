@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 
@@ -17,6 +18,8 @@ import nl.uu.cs.ape.sat.utils.APEConfig;
  */
 public class AllModules extends AllPredicates {
 
+
+	private static final long serialVersionUID = 1L;
 
 	public AllModules(APEConfig config) {
 		super(config.getTool_taxonomy_root());
@@ -98,8 +101,8 @@ public class AllModules extends AllPredicates {
 	 * 
 	 * @return list of pairs of modules
 	 */
-	public List<Pair> getSimplePairs() {
-		List<Pair> pairs = new ArrayList<Pair>();
+	public List<Pair<PredicateLabel>> getSimplePairs() {
+		List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();
 
 		List<TaxonomyPredicate> iterator = new ArrayList<TaxonomyPredicate>();
 		for (TaxonomyPredicate module : this.values()) {
@@ -110,7 +113,7 @@ public class AllModules extends AllPredicates {
 
 		for (int i = 0; i < iterator.size() - 1; i++) {
 			for (int j = i + 1; j < iterator.size(); j++) {
-				pairs.add(new Pair(iterator.get(i), iterator.get(j)));
+				pairs.add(new Pair<PredicateLabel>(iterator.get(i), iterator.get(j)));
 			}
 		}
 		return pairs;

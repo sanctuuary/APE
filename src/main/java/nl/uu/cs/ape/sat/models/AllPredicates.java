@@ -18,6 +18,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  */
 public abstract class AllPredicates extends HashMap<String, TaxonomyPredicate>{
 
+	private static final long serialVersionUID = 1L;
 	/** Root of the taxonomy. */
 	private String taxonomyRoot;
 	

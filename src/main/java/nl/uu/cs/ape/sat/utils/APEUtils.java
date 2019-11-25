@@ -17,10 +17,6 @@ import java.util.Scanner;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +30,6 @@ import org.json.JSONObject;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
-import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
@@ -414,7 +409,7 @@ public final class APEUtils {
 	 *         {@code currList} otherwise.
 	 */
 	public static <E> Collection<E> safe(Collection<E> currList) {
-		return currList == null ? Collections.EMPTY_LIST : currList;
+		return currList == null ? Collections.emptyList() : currList;
 	}
 
 	/**

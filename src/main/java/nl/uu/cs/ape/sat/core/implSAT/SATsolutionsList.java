@@ -15,6 +15,7 @@ import nl.uu.cs.ape.sat.utils.APEConfig;
  */
 public class SATsolutionsList extends ArrayList<SolutionWorkflow> {
 
+	private static final long serialVersionUID = 1L;
 	/** Max number of solutions that should be found. */
 	private int maxSolutions;
 	/** Mapping of predicates into integers (for SAT encoding). */

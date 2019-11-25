@@ -1,16 +1,8 @@
 package nl.uu.cs.ape.sat.constraints;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.dom4j.Node;
-
-import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
-import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.models.AllModules;
-import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 
 /**

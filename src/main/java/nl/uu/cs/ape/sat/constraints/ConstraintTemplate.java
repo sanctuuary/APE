@@ -6,8 +6,6 @@ package nl.uu.cs.ape.sat.constraints;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AllModules;

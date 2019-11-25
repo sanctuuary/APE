@@ -5,7 +5,6 @@ package nl.uu.cs.ape.sat.models.SATEncodingUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;

@@ -6,13 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
-import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.core.SolutionInterpreter;
 import nl.uu.cs.ape.sat.models.AllModules;
-import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
@@ -47,8 +43,6 @@ public class SAT_solution extends SolutionInterpreter {
 	private final Set<PredicateLabel> usedTypeStates;
 	/** True if the there is no solution to the problem. Problem is UNASATISFIABLE. */
 	private final boolean unsat;
-	/** Lengths of the current solution. */
-	private final int solutionLength;
 
 
 	/**
@@ -97,7 +91,6 @@ public class SAT_solution extends SolutionInterpreter {
 		Collections.sort(relevantTypes);
 		Collections.sort(references2MemTypes);
 		Collections.sort(relevantElements);
-		this.solutionLength = synthesisInstance.getSolutionSize();
 	}
 
 	/**
@@ -106,7 +99,6 @@ public class SAT_solution extends SolutionInterpreter {
 	 */
 	public SAT_solution() {
 		unsat = true;
-		solutionLength = 0;
 		literals = null;
 		postitiveLiterals = null;
 		relevantModules = null;

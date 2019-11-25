@@ -3,16 +3,10 @@ package nl.uu.cs.ape.sat.models;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.automaton.Block;
-import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
-import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
@@ -28,6 +22,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 public class AllTypes extends AllPredicates {
 
 
+	private static final long serialVersionUID = 1L;
 	/** {@link Type} object representing the "empty type". */
 	private Type emptyType;
 	/** List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).*/
@@ -160,8 +155,8 @@ public class AllTypes extends AllPredicates {
 	 * 
 	 * @return list of pairs of types
 	 */
-	public List<Pair> getTypePairsForEachSubTaxonomy() {
-		List<Pair> pairs = new ArrayList<Pair>();
+	public List<Pair<PredicateLabel>> getTypePairsForEachSubTaxonomy() {
+		List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();
 
 		/*
 		 * Create a list for each subtree of the Data Taxonomy (e.g. TypeSubTaxonomy,
@@ -199,7 +194,7 @@ public class AllTypes extends AllPredicates {
 		for (List<TaxonomyPredicate> iterator : subTreesMap.values()) {
 			for (int i = 0; i < iterator.size() - 1; i++) {
 				for (int j = i + 1; j < iterator.size(); j++) {
-					pairs.add(new Pair(iterator.get(i), iterator.get(j)));
+					pairs.add(new Pair<PredicateLabel>(iterator.get(i), iterator.get(j)));
 				}
 			}
 		}

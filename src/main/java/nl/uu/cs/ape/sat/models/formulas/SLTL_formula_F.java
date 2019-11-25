@@ -8,7 +8,6 @@ import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.AtomMappings;
-import nl.uu.cs.ape.sat.models.Type;
 
 public class SLTL_formula_F extends SLTL_formula {
 

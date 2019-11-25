@@ -3,7 +3,7 @@ package nl.uu.cs.ape.sat.models.logic.constructs;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/**TODO
  * An ordered collection of Literals. In practice it 
  * @author vedran
  *
