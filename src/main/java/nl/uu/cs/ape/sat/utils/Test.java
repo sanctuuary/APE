@@ -3,6 +3,7 @@ package nl.uu.cs.ape.sat.utils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
@@ -21,7 +22,6 @@ public class Test {
 		
 		runSynthesisTest();
 		
-
 //		AllModules allModules = new AllModules(apeFramework.getConfig());
 //		AllTypes allTypes = new AllTypes(apeFramework.getConfig());
 //

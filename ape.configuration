@@ -1,21 +1,30 @@
 {
-  "ontology_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/BioTools_full_taxonomy.owl",
-  "toolsTaxonomyRoot": "Operation",
-  "dataTaxonomyRoot": "DataType",
-  "typesTaxonomyRoot": "Data",
-  "formatsTaxonomyRoot": "Format",
-  "tool_annotations_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/modules.json",
-  "constraints_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/constraints.json",
+  "ontology_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/demo_use_case/GMT_Demo_UseCase.owl",
+  "toolsTaxonomyRoot": "ToolsTaxonomy",
+  "dataTaxonomyRoot": "DataTaxonomy",
+  "dataSubTaxonomyRoot": "TypesTaxonomy",
+  "tool_annotations_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/demo_use_case/tool_annotations.json",
+  "constraints_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/demo_use_case/constraints.json",
   "shared_memory": "true",
-  "solutions_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/sat_solutions.txt",
+  "solutions_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/demo_use_case/sat_solutions.txt",
   "solution_min_length": "1",
-  "solution_max_length": "18",
+  "solution_max_length": "8",
   "max_solutions": "100",
-  "execution_scripts_folder": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/Implementations/",
+  "execution_scripts_folder": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/demo_use_case/Implementations/",
   "number_of_execution_scripts": "6",
-  "solution_graphs_folder": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/Figures",
-  "number_of_generated_graphs": "20",
+  "solution_graphs_folder": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/demo_use_case/Figures",
+  "number_of_generated_graphs": "100",
+  "inputs": [
+    {
+      "TypesTaxonomy": "XYZ_table_file"
+    }
+  ],
+  "outputs": [
+    {
+      "TypesTaxonomy": "PostScript"
+    }
+  ],
   "debug_mode": "true",
-  "use_workflow_input": "none",
-  "use_all_generated_data": "none"
+  "use_workflow_input": "all",
+  "use_all_generated_data": "one"
 }
