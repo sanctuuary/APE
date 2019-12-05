@@ -19,11 +19,13 @@ import org.json.JSONObject;
 import guru.nidi.graphviz.attribute.RankDir;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.engine.Renderer;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
+import nl.uu.cs.ape.sat.core.solutionStructure.SolutionGraph;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
@@ -48,7 +50,7 @@ public class APE {
 	/** All data types defined in the domain. */
 	private AllTypes allTypes;
 	/** Object used to create temporal constraints. */ 
-	ConstraintFactory constraintFactory;
+	private ConstraintFactory constraintFactory;
 	/** List of data gathered from the constraint file. */
 	private List<ConstraintData> unformattedConstr;
 	
@@ -156,12 +158,12 @@ public class APE {
 	 * @return The list of all the solutions.
 	 * @throws JSONException
 	 */
-	public List<SolutionWorkflow> runSynthesis(JSONObject configObject) throws IOException, JSONException {
+	public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, JSONException {
 		config.setupRunConfiguration(configObject);
 		if (config == null || config.getRunConfigJsonObj() == null) {
 			throw new JSONException("Run configuration failed. Error in configuration object.");
 		}
-		List<SolutionWorkflow> solutions = executeSynthesis();
+		SATsolutionsList solutions = executeSynthesis();
 		
 		return solutions;
 	}
@@ -172,12 +174,12 @@ public class APE {
 	 * @return The list of all the solutions.
 	 * @throws JSONException
 	 */
-	public List<SolutionWorkflow> runSynthesis(String configPath) throws IOException, JSONException {
+	public SATsolutionsList runSynthesis(String configPath) throws IOException, JSONException {
 		config.setupRunConfiguration(configPath);
 		if (config == null || config.getRunConfigJsonObj() == null) {
 			throw new JSONException("Run configuration failed. Error in configuration file.");
 		}
-		List<SolutionWorkflow> solutions = executeSynthesis();
+		SATsolutionsList solutions = executeSynthesis();
 		
 		return solutions;
 	}
@@ -187,7 +189,7 @@ public class APE {
 	 * @return The list of all the solutions.
 	 * @throws IOException error in case of not providing a proper configuration file.
 	 */
-	private List<SolutionWorkflow> executeSynthesis() throws IOException {
+	private SATsolutionsList executeSynthesis() throws IOException {
 		/**
 		 * List of all the solutions
 		 */
@@ -245,7 +247,7 @@ public class APE {
 	 * @param allSolutions
 	 * @return {@code true} if the writing was successfully performed, {@code false} otherwise.
 	 */
-	public boolean writeSolutionToFile(List<SolutionWorkflow> allSolutions) {
+	public boolean writeSolutionToFile(SATsolutionsList allSolutions) {
 		StringBuilder solutions2write = new StringBuilder();
 
 		for (int i = 0; i < allSolutions.size(); i++) {
@@ -263,7 +265,7 @@ public class APE {
 	 * @return {@code true} if the execution was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	public boolean executeWorkflows(List<SolutionWorkflow> allSolutions) throws IOException {
+	public boolean executeWorkflows(SATsolutionsList allSolutions) throws IOException {
 		String executionsFolder = config.getExecution_scripts_folder();
 		Integer noExecutions = config.getNo_executions();
 		if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
@@ -300,13 +302,13 @@ public class APE {
 	}
 
 	/**
-	 * Generate the graphical representations of the workflow solutions. Each graph is shown in data-flow representation, i.e. transformation of data is in focus.
+	 * Generate the graphical representations of the workflow solutions and write them to the file system. Each graph is shown in data-flow representation, i.e. transformation of data is in focus.
 	 * @param allSolutions
 	 * @param orientation - orientation in which the graph will be presented
 	 * @return {@code true} if the generating was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	public boolean generateDataFlowGraphs(List<SolutionWorkflow> allSolutions, RankDir orientation) throws IOException {
+	public boolean generateAndWriteDataFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
 		String graphsFolder = config.getSolution_graphs_folder();
 		Integer noGraphs = config.getNo_graphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -315,52 +317,39 @@ public class APE {
 		APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 		System.out.println();
-		List<String> images = new ArrayList<String>();
+		/* Removing the existing files from the file system. */
 		Arrays.stream(
 				new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
 				.forEach(File::delete);
 		System.out.print("Loading");
-		for (int i = 0; i < noGraphs && i < allSolutions.size(); i++) {
-
-			String currTitle = "SolutionNo_" + i + "_length_" + allSolutions.get(i).getSolutionlength();
-			String filePath = graphsFolder + "/" + currTitle;
-
-			int currIndex = i;
-			/* Parallel execution of graphs. */
-			Runnable generateGraph = () -> {
-				Graph workflowGraph = allSolutions.get(currIndex).getDataFlowGraph(currTitle, orientation);
-
-				try {
-					Graphviz.fromGraph(workflowGraph).render(Format.PNG).toFile(new File(filePath));
-				} catch (IOException e) {
-					System.err.println("Error occured while generating a graph.");
-					e.printStackTrace();
-				}
-				images.add(filePath);
+		/* Creating the requested graphs in parallel. */
+		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs)
+										.forEach(solution -> {
+			try {
+				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
+				String path = graphsFolder + "/" + title;
+				solution.getDataflowGraph(title, orientation)
+						.getWrite2File(new File(path));
 				System.out.print(".");
-			};
-
-			generateGraph.run();
-
-			Thread thread = new Thread(generateGraph);
-			thread.start();
-			if (i > 0 && i % 60 == 0) {
-				System.out.println();
+			} catch (IOException e) {
+				System.err.println("Error occured while writing a graph to the file system.");
+				e.printStackTrace();
 			}
-		}
+		});
+		
 		APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
 
 		return true;
 	}
 	
 	/**
-	 * Generate the graphical representations of the workflow solutions. Each graph is shown in control-flow representation, i.e. order of the operations is in focus.
+	 * Generate the graphical representations of the workflow solutions and write them to the file system. Each graph is shown in control-flow representation, i.e. order of the operations is in focus.
 	 * @param allSolutions
 	 * @param orientation - orientation in which the graph will be presented
 	 * @return {@code true} if the generating was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	public boolean generateControlFlowGraphs(List<SolutionWorkflow> allSolutions, RankDir orientation) throws IOException {
+	public boolean generateAndWriteControlFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
 		String graphsFolder = config.getSolution_graphs_folder();
 		Integer noGraphs = config.getNo_graphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -369,40 +358,24 @@ public class APE {
 		APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 		System.out.println();
-		List<String> images = new ArrayList<String>();
+		/* Removing the existing files from the file system. */
 		Arrays.stream(
 				new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
 				.forEach(File::delete);
 		System.out.print("Loading");
-		for (int i = 0; i < noGraphs && i < allSolutions.size(); i++) {
-
-			String currTitle = "SolutionNo_" + i + "_length_" + allSolutions.get(i).getSolutionlength();
-			String filePath = graphsFolder + "/" + currTitle;
-			int currIndex = i;
-			/* Parallel execution of graphs. */
-			Runnable generateGraph = () -> {
-				Graph workflowGraph = allSolutions.get(currIndex).getControlFlowGraph(currTitle, orientation);
-
-				try {
-					Graphviz.fromGraph(workflowGraph).render(Format.PNG).toFile(new File(filePath));
-				} catch (IOException e) {
-					System.err.println("Error occured while generating a graph.");
-					e.printStackTrace();
-				}
-				images.add(filePath);
+		/* Creating the requested graphs in parallel. */
+		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
+			try {
+				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
+				String path = graphsFolder + "/" + title;
+				solution.getControlflowGraph(title, orientation)
+						.getWrite2File(new File(path));
 				System.out.print(".");
-			};
-
-			generateGraph.run();
-
-			Thread thread = new Thread(generateGraph);
-			thread.start();
-			
-			
-			if (i > 0 && i % 60 == 0) {
-				System.out.println();
+			} catch (IOException e) {
+				System.err.println("Error occured while writing a graph to the file system.");
+				e.printStackTrace();
 			}
-		}
+		});
 		APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
 
 		return true;

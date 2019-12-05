@@ -1,5 +1,7 @@
 package nl.uu.cs.ape.sat.constraints;
 
+import java.util.List;
+
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AbstractModule;
@@ -20,8 +22,8 @@ import nl.uu.cs.ape.sat.models.formulas.*;
 public class Constraint_if_then_module extends ConstraintTemplate {
 
 
-	public Constraint_if_then_module(String id, int parametersNo, String description) {
-		super(id, parametersNo, description);
+	public Constraint_if_then_module(String id, List<ConstraintParameter> parameterTypes, String description) {
+		super(id, parameterTypes, description);
 	}
 
 	@Override

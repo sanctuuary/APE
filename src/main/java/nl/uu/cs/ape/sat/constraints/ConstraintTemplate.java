@@ -3,6 +3,8 @@
  */
 package nl.uu.cs.ape.sat.constraints;
 
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,13 +28,13 @@ public abstract class ConstraintTemplate {
 	 */
 	String constraintID;
 	/**
-	 * Number of parameters the constraint requires.
-	 */
-	int parametersNo;
-	/**
 	 * Description of the constraint.
 	 */
 	String description;
+	/**
+	 * List of all the parameters of the constraint.
+	 */
+	List<ConstraintParameter> parameters;
 
 	/**
 	 * 
@@ -43,9 +45,9 @@ public abstract class ConstraintTemplate {
 	 * @param description
 	 *            - Description of the constraint.
 	 */
-	public ConstraintTemplate(String id, int parametersNo, String description) {
+	public ConstraintTemplate(String id, List<ConstraintParameter> parameters, String description) {
 		this.constraintID = id;
-		this.parametersNo = parametersNo;
+		this.parameters = parameters;
 		this.description = description;
 	}
 
@@ -58,7 +60,7 @@ public abstract class ConstraintTemplate {
 	}
 
 	public int getNoOfParameters() {
-		return this.parametersNo;
+		return this.parameters.size();
 	}
 
 	public String getConstraintID() {
@@ -92,8 +94,8 @@ public abstract class ConstraintTemplate {
 	 */
 	public String printConstraintCode() {
 		JSONArray params = new JSONArray();
-		for(int i = 0; i < parametersNo; i++) {
-			params.put("parameters[" + i + "]");
+		for(int i = 1; i <= parameters.size(); i++) {
+			params.put("${parameter_" + i + "}");
 		}
 		JSONObject constJson = new JSONObject();
 		constJson.put("constraintid", constraintID);
@@ -108,7 +110,7 @@ public abstract class ConstraintTemplate {
 	 * @param givenParameters Provided number of parameters
 	 */
 	public void throwParametersError(int givenParameters) {
-		System.err.println("Error in the constraints file.\nConstraint: " + this.description + "\nExpected number of parameters: " + parametersNo + ".\nProvided number of parameters: " + givenParameters);
+		System.err.println("Error in the constraints file.\nConstraint: " + this.description + "\nExpected number of parameters: " + parameters.size() + ".\nProvided number of parameters: " + givenParameters);
 		
 	}
 	

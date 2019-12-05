@@ -8,6 +8,7 @@ import java.util.List;
 import org.json.JSONException;
 
 import guru.nidi.graphviz.attribute.RankDir;
+import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -15,7 +16,7 @@ public class LocalRun {
 
 	public static void main(String[] args) {
 
-		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase4/";
+		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase1/";
 		String fileName = "ape.configuration";
 		if (!APEUtils.isValidReadFile(path + fileName)) {
 			System.err.println("Bad path.");
@@ -44,14 +45,14 @@ public class LocalRun {
 			System.err.println("Error in reading the configuration file.");
 			return;
 		}
-		List<SolutionWorkflow> solutions;
+		SATsolutionsList solutions;
 		try {
 			solutions = apeFramework.runSynthesis(file.getAbsolutePath());
 		} catch (IOException e) {
 			System.err.println("Error in synthesis execution. Writing to the file system failed.");
 			return;
 		}
-
+		
 		/*
 		 * Writing solutions to the specified file in human readable format
 		 */
@@ -60,8 +61,8 @@ public class LocalRun {
 		} else {
 			try {
 				apeFramework.writeSolutionToFile(solutions);
-				apeFramework.generateDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
-//				apeFramework.generateControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
+				apeFramework.generateAndWriteDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
+//				apeFramework.generateAndWriteControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
 				apeFramework.executeWorkflows(solutions);
 			} catch (IOException e) {
 				System.err.println("Error in writing the solutions. to the file system.");

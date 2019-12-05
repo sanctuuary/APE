@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -10,8 +11,10 @@ import java.util.stream.Stream;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -263,26 +266,22 @@ public class OWLReader {
 	 * @return String representation of the class name.
 	 */
 	private String getLabel(OWLClass currClass) {
-		if (currClass == null) {
-			return null;
+		if (currClass == null || currClass.isOWLNothing()) {
+			return "N/A";
 		}
 		String label, classID = currClass.toStringID();
-		List<OWLAnnotation> labels = EntitySearcher.getAnnotations(currClass, ontology, factory.getRDFSLabel())
-				.collect(Collectors.toList());
-		/* sometimes optional is empty */
-		if (labels.size() > 0) {
-			label = labels.get(0).toString();
-			label = label.substring(label.indexOf("\"") + 1, label.lastIndexOf("\""));
-			return label;
+		Optional<OWLAnnotation> classLabel = EntitySearcher.getAnnotations(currClass, ontology, factory.getRDFSLabel()).findFirst();
+		if (classLabel.isPresent()) {
+			OWLAnnotationValue val = classLabel.get().getValue();
+			if (val instanceof OWLLiteral) return ((OWLLiteral) val).getLiteral().replace(" ", "_");
 		} else if (classID.contains("#")) {
 			label = classID.substring(classID.indexOf('#') + 1);
 			label = label.replace(" ", "_");
 			return label;
-		} else {
-			logger.fine("Class '" + classID + "' has no label.");
-			label = classID;
 		}
-		return classID;
+		logger.fine("Class '" + classID + "' has no label.");
+		return classID.replace(" ", "_");
+		
 	}
 
 	/**

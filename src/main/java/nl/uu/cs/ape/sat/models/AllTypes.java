@@ -22,7 +22,6 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 public class AllTypes extends AllPredicates {
 
 
-	private static final long serialVersionUID = 1L;
 	/** {@link Type} object representing the "empty type". */
 	private Type emptyType;
 	/** List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).*/
@@ -41,7 +40,7 @@ public class AllTypes extends AllPredicates {
 	 * @return {@link Collection} of {@link Type}s
 	 */
 	public Collection<? extends TaxonomyPredicate> getTypes() {
-		Collection<? extends TaxonomyPredicate> types = this.values();
+		Collection<? extends TaxonomyPredicate> types = getPredicates().values();
 		return types;
 	}
 
@@ -63,7 +62,7 @@ public class AllTypes extends AllPredicates {
 		if ((tmpType = this.get(type.getPredicateID())) != null) {
 			return tmpType;
 		} else {
-			super.put(type.getPredicateID(), type);
+			getPredicates().put(type.getPredicateID(), type);
 			return type;
 		}
 	}
@@ -102,7 +101,7 @@ public class AllTypes extends AllPredicates {
 	 *         if the typeID has no mappings
 	 */
 	public Type get(String typeID) {
-		return (Type) super.get(typeID);
+		return (Type) getPredicates().get(typeID);
 	}
 
 	/**
@@ -123,7 +122,7 @@ public class AllTypes extends AllPredicates {
 	 * @return {@code true} if the type exists in the set.
 	 */
 	public boolean existsType(Type type) {
-		return this.containsKey(type.getPredicateID());
+		return getPredicates().containsKey(type.getPredicateID());
 	}
 	
 	/**
@@ -135,7 +134,7 @@ public class AllTypes extends AllPredicates {
 	 * @return {@code true} if the type exists in the set.
 	 */
 	public boolean existsType(String typeID) {
-		return this.containsKey(typeID);
+		return getPredicates().containsKey(typeID);
 	}
 
 	/**
@@ -143,7 +142,7 @@ public class AllTypes extends AllPredicates {
 	 * @return Number of types.
 	 */
 	public int size() {
-		return super.size();
+		return getPredicates().size();
 	}
 
 	/**
@@ -175,7 +174,7 @@ public class AllTypes extends AllPredicates {
 		 * Allocate each simple type to the corresponding subtree, according to the
 		 * field Type.rootNode
 		 */
-		for (TaxonomyPredicate type : this.values()) {
+		for (TaxonomyPredicate type : getPredicates().values()) {
 			if (type.isSimplePredicate()) {
 				// If the root type for the curr type exists in our list, add the type to it
 				if (subTreesMap.get(type.getRootNode()) != null) {

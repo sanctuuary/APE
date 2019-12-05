@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.core.implSAT;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AtomMappings;
@@ -13,20 +14,21 @@ import nl.uu.cs.ape.sat.utils.APEConfig;
  * @author Vedran Kasalica
  *
  */
-public class SATsolutionsList extends ArrayList<SolutionWorkflow> {
+public class SATsolutionsList {
 
-	private static final long serialVersionUID = 1L;
+	private List<SolutionWorkflow> solutions;
 	/** Max number of solutions that should be found. */
 	private int maxSolutions;
 	/** Mapping of predicates into integers (for SAT encoding). */
 	private AtomMappings mappings;
+	private int solutionIndex = 0;
 
 	/**
 	 * Create an object that will contain all the solutions of the synthesis.
 	 * @param config - setup configuration for the synthesis.
 	 */
 	public SATsolutionsList(APEConfig config) {
-		super();
+		this.solutions = new ArrayList<SolutionWorkflow>();
 		/** Provides mapping from each atom to a number, and vice versa */
 		mappings = new AtomMappings();
 		/*
@@ -43,7 +45,7 @@ public class SATsolutionsList extends ArrayList<SolutionWorkflow> {
 	 * @return Number of solutions in the solutions set.
 	 */
 	public int getNumberOfSolutions() {
-		return super.size();
+		return this.solutions.size();
 	}
 
 	/**
@@ -66,7 +68,7 @@ public class SATsolutionsList extends ArrayList<SolutionWorkflow> {
 	 * @return {@code true} if the list contains no elements
 	 */
 	public boolean isEmpty() {
-		return super.isEmpty();
+		return this.solutions.isEmpty();
 	}
 	
 	/**
@@ -83,14 +85,39 @@ public class SATsolutionsList extends ArrayList<SolutionWorkflow> {
 	 * @return {@code true} if this list changed as a result of the call
 	 */
 	public boolean addSolutions(List<SolutionWorkflow> currSolutions) {
-		if(super.addAll(currSolutions)) {
-			return true;
+		for(SolutionWorkflow solution : currSolutions) {
+			solution.setIndex(solutionIndex++);
+			this.solutions.add(solution);
 		}
 		return false;
 	}
 
 
 	public SolutionWorkflow get(int index) {
-		return super.get(index);
+		return this.solutions.get(index);
+	}
+
+	/**
+	 * Returns the number of elements in this list. If this list contains more than Integer.MAX_VALUE elements, returns Integer.MAX_VALUE.
+	 * @return the number of elements in this list
+	 */
+	public int size() {
+		return this.solutions.size();
+	}
+
+	/**
+	 * Return the stream that represent the solutions.
+	 * @return list of solutions.
+	 */
+	public Stream<SolutionWorkflow> getStream() {
+		return this.solutions.stream();
+	}
+	
+	/**
+	 * Return a potentially parallel stream that represent the solutions.
+	 * @return list of solutions.
+	 */
+	public Stream<SolutionWorkflow> getParallelStream() {
+		return this.solutions.parallelStream();
 	}
 }

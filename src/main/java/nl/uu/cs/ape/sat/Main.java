@@ -6,6 +6,7 @@ import java.util.List;
 import org.json.JSONException;
 
 import guru.nidi.graphviz.attribute.RankDir;
+import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -34,7 +35,7 @@ public class Main {
 			System.err.println("Error in reading the configuration file.");
 			return;
 		}
-		List<SolutionWorkflow> solutions;
+		SATsolutionsList solutions;
 		try {
 			solutions = apeFramework.runSynthesis(path);
 		} catch (IOException e) {
@@ -50,8 +51,8 @@ public class Main {
 		} else {
 			try {
 				apeFramework.writeSolutionToFile(solutions);
-				apeFramework.generateDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
-//				apeFramework.generateControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
+				apeFramework.generateAndWriteDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
+//				apeFramework.generateAndWriteControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
 				apeFramework.executeWorkflows(solutions);
 			} catch (IOException e) {
 				System.err.println("Error in writing the solutions. to the file system.");

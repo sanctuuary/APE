@@ -6,6 +6,7 @@ package nl.uu.cs.ape.sat.models;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEUtils;
@@ -16,14 +17,15 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  * @author Vedran Kasalica
  *
  */
-public abstract class AllPredicates extends HashMap<String, TaxonomyPredicate>{
+public abstract class AllPredicates {
 
-	private static final long serialVersionUID = 1L;
+	private Map<String, TaxonomyPredicate> predicates;
 	/** Root of the taxonomy. */
 	private String taxonomyRoot;
 	
 	public AllPredicates(String dataTaxonomyRoot) {
 		this.taxonomyRoot = dataTaxonomyRoot;
+		this.predicates = new HashMap<String, TaxonomyPredicate> ();
 	}
 	
 	/**
@@ -32,7 +34,7 @@ public abstract class AllPredicates extends HashMap<String, TaxonomyPredicate>{
 	 * @return The root predicate.
 	 */
 	public TaxonomyPredicate getRootPredicate() {
-		return this.get(taxonomyRoot);
+		return get(taxonomyRoot);
 	}
 	
 	/**
@@ -60,12 +62,11 @@ public abstract class AllPredicates extends HashMap<String, TaxonomyPredicate>{
 	private List<TaxonomyPredicate> getAllNonEmptyPredicates() {
 
 		List<TaxonomyPredicate> allNonEmptyTypes = new ArrayList<TaxonomyPredicate>();
-		for (TaxonomyPredicate type : this.values()) {
+		for (TaxonomyPredicate type : this.predicates.values()) {
 			if (!(type.isEmptyPredicate() || type.isRootPredicate())) {
 				allNonEmptyTypes.add(type);
 			}
 		}
-
 		return allNonEmptyTypes;
 	}
 	
@@ -73,10 +74,10 @@ public abstract class AllPredicates extends HashMap<String, TaxonomyPredicate>{
 	 * 
 	 */
 	public boolean trimTaxonomy() {
-		TaxonomyPredicate root = this.get(taxonomyRoot);
+		TaxonomyPredicate root = get(taxonomyRoot);
 		List<String> toRemove = new ArrayList<String>();
 		for(String subClassID : APEUtils.safe(root.getSubPredicates())) {
-			TaxonomyPredicate subClass = this.get(subClassID);
+			TaxonomyPredicate subClass = get(subClassID);
 			if(subClass == null) {
 				toRemove.add(subClassID);
 				continue;
@@ -98,7 +99,7 @@ public abstract class AllPredicates extends HashMap<String, TaxonomyPredicate>{
 		}
 		List<String> toRemove = new ArrayList<String>();
 		for(String subClassID : APEUtils.safe(subTaxRoot.getSubPredicates())) {
-			TaxonomyPredicate subClass = this.get(subClassID);
+			TaxonomyPredicate subClass = get(subClassID);
 			if(subClass == null) {
 				toRemove.add(subClassID);
 				continue;
@@ -113,14 +114,28 @@ public abstract class AllPredicates extends HashMap<String, TaxonomyPredicate>{
 		if(subTaxRoot.getIsRelevant()) {
 			subTaxRoot.removeAllSubPredicates(toRemove);
 		} else {
-			this.remove(subTaxRoot.getPredicateID());
+			this.predicates.remove(subTaxRoot.getPredicateID());
 		}
 		
 		return true;
 	}
 	
-	
-	
+	/**
+	 * Return the predicates from the domain.
+	 * @return
+	 */
+	protected Map<String, TaxonomyPredicate> getPredicates(){
+		return this.predicates;
+	}
+
+	/**
+	 * Returns the Predicate to which the specified key is mapped, or null if this map contains no mapping for the key.
+	 * @param predicateID - the key whose associated Predicate is to be returned
+	 * @return the Predicate to which the specified key is mapped, or null if this map contains no mapping for the key
+	 */
+	public TaxonomyPredicate get(String predicateID) {
+		return this.predicates.get(predicateID);
+	}
 	
 	
 }

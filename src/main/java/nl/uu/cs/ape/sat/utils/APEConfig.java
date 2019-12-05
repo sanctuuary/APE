@@ -414,13 +414,14 @@ public class APEConfig {
 				
 				DataInstance input = new DataInstance();
 				for (String typeSubntology : jsonModuleInput.keySet()) {
-					String inputType = jsonModuleInput.getString(typeSubntology);
-					if (data_taxonomy_subroots.contains(typeSubntology)) {
-						input.addType(new Type(inputType, inputType, typeSubntology, NodeType.UNKNOWN));
-					} else {
-						System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
-								+ "' was not defined, but it was used for input type '" + inputType + "'.");
-						return false;
+					for (String currTypeID : APEUtils.getListFromJson(jsonModuleInput, typeSubntology, String.class)) {
+						if (data_taxonomy_subroots.contains(typeSubntology)) {
+							input.addType(new Type(currTypeID, currTypeID, typeSubntology, NodeType.UNKNOWN));
+						} else {
+							System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
+									+ "' was not defined, but it was used for input type '" + currTypeID + "'.");
+							return false;
+						}
 					}
 				}
 
@@ -438,13 +439,14 @@ public class APEConfig {
 				
 				DataInstance output = new DataInstance();
 				for (String typeSubntology : jsonModuleOutput.keySet()) {
-					String outputType = jsonModuleOutput.getString(typeSubntology);
-					if (data_taxonomy_subroots.contains(typeSubntology)) {
-						output.addType(new Type(outputType, outputType, typeSubntology, NodeType.UNKNOWN));
-					} else {
-						System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
-								+ "' was not defined, but it was used for output type '" + outputType + "'.");
-						return false;
+					for (String currTypeID : APEUtils.getListFromJson(jsonModuleOutput, typeSubntology, String.class)) {
+						if (data_taxonomy_subroots.contains(typeSubntology)) {
+							output.addType(new Type(currTypeID, currTypeID, typeSubntology, NodeType.UNKNOWN));
+						} else {
+							System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
+									+ "' was not defined, but it was used for input type '" + currTypeID + "'.");
+							return false;
+						}
 					}
 				}
 				if (!output.getTypes().isEmpty()) {

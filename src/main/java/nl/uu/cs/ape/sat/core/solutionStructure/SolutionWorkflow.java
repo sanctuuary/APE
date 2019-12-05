@@ -17,6 +17,7 @@ import guru.nidi.graphviz.attribute.LinkAttr;
 import guru.nidi.graphviz.attribute.RankDir;
 import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Style;
+import guru.nidi.graphviz.engine.Renderer;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
@@ -56,9 +57,13 @@ public class SolutionWorkflow {
 	/** Non-structured solution obtained directly from the SAT output. */
 	private SAT_solution nativeSolution;
 	/** Graph representation of the data-flow workflow solution. */
-	private Graph dataflowGraph;
+	private SolutionGraph dataflowGraph;
 	/** Graph representation of the control-flow workflow solution. */
-	private Graph controlflowGraph;
+	private SolutionGraph controlflowGraph;
+	/** Index of the solution. */
+	private int index;
+	/** 
+	private Renderer renderedGraph;
 	
 	/**
 	 * Create the structure of the {@link SolutionWorkflow} based on the {@link ModuleAutomaton} and {@link TypeAutomaton} provided.
@@ -202,6 +207,59 @@ public class SolutionWorkflow {
 	}
 	
 	/**
+	 * Get the graphical representation of the data-flow diagram in default {@link RankDir#TOP_TO_BOTTOM} direction.
+	 * @return the field {@link dataflowGraph}. 
+	 * */
+	public SolutionGraph getDataflowGraph() {
+		if (this.dataflowGraph != null) {
+			return this.dataflowGraph;
+		} else {
+			return generateFieldDataflowGraph("", RankDir.TOP_TO_BOTTOM);
+		}
+	}
+	
+	/**
+	 * Get the graphical representation of the data-flow diagram with the required title and in the defined orientation.
+	 * @param title - the title of the SolutionGraph
+	 * @param orientation - orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}
+	 * @return the solution graph
+	 */
+	public SolutionGraph getDataflowGraph(String title, RankDir orientation) {
+		if (this.dataflowGraph != null) {
+			return this.dataflowGraph;
+		} else {
+			return generateFieldDataflowGraph(title, orientation);
+		}
+	}
+	
+	/**
+	 * Get the graphical representation of the control-flow diagram in default {@link RankDir#TOP_TO_BOTTOM} direction.
+	 * @return the field {@link controlflowGraph}. 
+	 * */
+	public SolutionGraph getControlflowGraph() {
+		if (this.controlflowGraph != null) {
+			return this.controlflowGraph;
+		} else {
+			return generateFieldControlflowGraph("", RankDir.TOP_TO_BOTTOM);
+		}
+	}
+	
+	/**
+	/**
+	 * Get the graphical representation of the control-flow diagram with the required title and in the defined orientation.
+	 * @param title - the title of the SolutionGraph
+	 * @param orientation - orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}
+	 * @return the solution graph
+	 * */
+	public SolutionGraph getControlflowGraph(String title, RankDir orientation) {
+		if (this.controlflowGraph != null) {
+			return this.controlflowGraph;
+		} else {
+			return generateFieldControlflowGraph(title, orientation);
+		}
+	}
+
+	/**
 	 * Returns the negated solution in mapped format. Negating the original solution
 	 * created by the SAT solver. Usually used to add to the solver to find new
 	 * solutions.
@@ -314,14 +372,11 @@ public class SolutionWorkflow {
 	}
 	
 	/**
-	 * Get a graph that represent the data-flow solution.
+	 * Generate a graph that represent the data-flow solution and set is as the field {@link #dataflowGraph} of the current object .
 	 * @param title - title of the graph
 	 * @return {@link Graph} object that represents the solution workflow.
 	 */
-	public Graph getDataFlowGraph(String title, RankDir orientation) {
-		if(this.dataflowGraph != null) {
-			return this.dataflowGraph;
-		}
+	private SolutionGraph generateFieldDataflowGraph(String title, RankDir orientation) {
 		Graph workflowGraph = graph(title).directed()
 		        .graphAttr().with(orientation);
 		
@@ -364,20 +419,16 @@ public class SolutionWorkflow {
 			workflowGraph = workflowOutput.addTypeToGraph(workflowGraph);
 			workflowGraph = workflowGraph.with(node(workflowOutput.getDotID()).link(to(node(output)).with(LinkAttr.weight(index), Style.DOTTED)));
 		}
-		this.dataflowGraph = workflowGraph;
-		return workflowGraph;
+		this.dataflowGraph = new SolutionGraph(workflowGraph);
+		return this.dataflowGraph;
 	}
 	
 	/**
-	 * Get a graph that represent the c-flow solution.
+	 * Generate a graph that represent the control-flow solution  and set is as the field {@link #controlflowGraph} of the current object .
 	 * @param title - title of the graph
 	 * @return {@link Graph} object that represents the solution workflow.
 	 */
-	public Graph getControlFlowGraph(String title, RankDir orientation) {
-		if(this.controlflowGraph != null) {
-			
-			return graph(title).with(this.controlflowGraph);
-		}
+	private SolutionGraph generateFieldControlflowGraph(String title, RankDir orientation) {
 		Graph workflowGraph = graph(title).directed()
 		        .graphAttr().with(orientation);
 		
@@ -393,11 +444,28 @@ public class SolutionWorkflow {
 		workflowGraph = workflowGraph.with(node(output).with(Color.BLACK, Style.BOLD));
 		workflowGraph = workflowGraph.with(node(prevNode).link(to(node(output)).with(Label.of("next   "), Color.RED)));
 		
-		this.controlflowGraph = workflowGraph;
-		return workflowGraph;
+		this.controlflowGraph = new SolutionGraph(workflowGraph);
+		return this.controlflowGraph;
 	}
 	
 	public int getSolutionlength() {
 		return this.moduleNodes.size();
+	}
+	
+	/**
+	 * Sets the index of the solution in all the solutions.
+	 * @param i
+	 */
+	public void setIndex(int i) {
+		this.index = i;
+		
+	}
+	
+	/**
+	 * Returns the index of the solution in all the solutions.
+	 */
+	public int getIndex() {
+		return this.index;
+		
 	}
 }

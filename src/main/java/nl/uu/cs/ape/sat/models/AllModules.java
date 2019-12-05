@@ -19,8 +19,6 @@ import nl.uu.cs.ape.sat.utils.APEConfig;
 public class AllModules extends AllPredicates {
 
 
-	private static final long serialVersionUID = 1L;
-
 	public AllModules(APEConfig config) {
 		super(config.getTool_taxonomy_root());
 	}
@@ -30,7 +28,7 @@ public class AllModules extends AllPredicates {
 	 * @return
 	 */
 	public Collection<TaxonomyPredicate> getModules() {
-		return super.values();
+		return getPredicates().values();
 	}
 
 	/**
@@ -46,7 +44,7 @@ public class AllModules extends AllPredicates {
 	 *         contains the specified element.
 	 */
 	public AbstractModule addModule(AbstractModule module) {
-		TaxonomyPredicate tmpModule = super.get(module.getPredicateID());
+		TaxonomyPredicate tmpModule = getPredicates().get(module.getPredicateID());
 		if (module instanceof Module && (tmpModule != null)) {
 			if (tmpModule instanceof Module) {
 				return (Module) tmpModule;
@@ -62,7 +60,7 @@ public class AllModules extends AllPredicates {
 			if (tmpModule != null) {
 				return (AbstractModule) tmpModule;
 			} else {
-				this.put(module.getPredicateID(), module);
+				getPredicates().put(module.getPredicateID(), module);
 				return module;
 			}
 		}
@@ -78,8 +76,8 @@ public class AllModules extends AllPredicates {
 	 * @param oldModule - object that will be removed
 	 */
 	public void swapAbstractModule2Module(Module newModule, TaxonomyPredicate oldModule) {
-		this.remove(oldModule.getPredicateID());
-		this.put(newModule.getPredicateID(), newModule);
+		getPredicates().remove(oldModule.getPredicateID());
+		getPredicates().put(newModule.getPredicateID(), newModule);
 	}
 
 	/**
@@ -91,7 +89,7 @@ public class AllModules extends AllPredicates {
 	 *         is mapped to, or {@code null} if the moduleID has no mappings
 	 */
 	public AbstractModule get(String moduleID) {
-		return (AbstractModule) super.get(moduleID);
+		return (AbstractModule) getPredicates().get(moduleID);
 	}
 
 	/**
@@ -105,7 +103,7 @@ public class AllModules extends AllPredicates {
 		List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();
 
 		List<TaxonomyPredicate> iterator = new ArrayList<TaxonomyPredicate>();
-		for (TaxonomyPredicate module : this.values()) {
+		for (TaxonomyPredicate module : getPredicates().values()) {
 			if(module.isSimplePredicate()) {
 				iterator.add(module);
 			}
@@ -128,7 +126,7 @@ public class AllModules extends AllPredicates {
 	 * @return true if this set contains the specified element
 	 */
 	public boolean existsModule(AbstractModule module) {
-		return this.containsKey(module.getPredicateID());
+		return getPredicates().containsKey(module.getPredicateID());
 	}
 	
 	/**
@@ -140,7 +138,7 @@ public class AllModules extends AllPredicates {
 	 * @return true if this set contains the specified element
 	 */
 	public boolean existsModule(String moduleID) {
-		return this.containsKey(moduleID);
+		return getPredicates().containsKey(moduleID);
 	}
 
 	public int size() {

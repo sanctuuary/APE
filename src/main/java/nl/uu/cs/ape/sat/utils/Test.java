@@ -1,12 +1,17 @@
 package nl.uu.cs.ape.sat.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.kitfox.svg.Path;
 
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.models.AllModules;
@@ -19,6 +24,28 @@ public class Test {
 //		runJsonConversionTest();
 		
 		runSynthesisTest();
+		
+		
+		StringBuilder sb = new StringBuilder();
+
+        try (BufferedReader br = Files.newBufferedReader(Paths.get("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/new_modules.json"))) {
+
+            // read line by line
+            String line;
+            while ((line = br.readLine()) != null) {
+            	
+            	if (line.contains("taxonomyTerms")) {
+            		sb.append(line.replace("taxonomyTerms", "name")).append("\n");
+            	}
+            	
+                sb.append(line).append("\n");
+            }
+
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+        }
+		APEUtils.write2file(sb.toString(), new File("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/new_modules1.json"), false);
+		
 		
 //		AllModules allModules = new AllModules(apeFramework.getConfig());
 //		AllTypes allTypes = new AllTypes(apeFramework.getConfig());
