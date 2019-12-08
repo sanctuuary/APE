@@ -67,6 +67,18 @@ public abstract class ConstraintTemplate {
 		return this.constraintID;
 	}
 
+	/** @return the field {@link parameters}. */
+	public List<ConstraintParameter> getParameters() {
+		return parameters;
+	}
+	/** Returns the Constraint parameter at the specified position in this list.
+	 *  @param index - index of the element to return
+	 *  @return the Constraint parameter at the specified position in this list
+	 */
+	public ConstraintParameter getParameter(int index) {
+		return parameters.get(index);
+	}
+
 	/**
 	 * Method will return a CNF representation of the constraint in DIMACS format.
 	 * It will use predefined mapping function and all the atoms will be mapped to
@@ -85,7 +97,7 @@ public abstract class ConstraintTemplate {
 	 * @return {@link String} CNF representation of the constraint. {@code NULL} in
 	 *         case of incorrect number of constraint parameters.
 	 */
-	public abstract String getConstraint(String[] parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
+	public abstract String getConstraint(List<ConstraintParameter> parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMappings mappings);
 
 	/**

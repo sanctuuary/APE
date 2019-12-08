@@ -16,7 +16,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  * @author Vedran Kasalica
  *
  */
-public class ModuleAutomaton {
+public class ModuleAutomaton implements Automaton {
 
 	private List<State> moduleStates;
 
@@ -42,7 +42,7 @@ public class ModuleAutomaton {
 //		this.moduleStates = moduleStates;
 //	}
 
-	/**
+	/**TODO: REMOVE-duplicate
 	 * Return all Module States from the Module automaton
 	 * 
 	 * @return {@link List} <{@link State}>
@@ -79,6 +79,13 @@ public class ModuleAutomaton {
 		return moduleStates.get(i);
 	}
 
+	/* (non-Javadoc)
+	 * @see nl.uu.cs.ape.sat.automaton.Automaton#getAllStates()
+	 */
+	@Override
+	public List<State> getAllStates() {
+		return moduleStates;
+	}
 	
 	public void print() {
 		System.out.println("-------------------------------------------------------------");

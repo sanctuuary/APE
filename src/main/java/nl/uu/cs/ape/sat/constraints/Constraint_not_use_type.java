@@ -1,5 +1,7 @@
 package nl.uu.cs.ape.sat.constraints;
 
+import java.util.List;
+
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
@@ -7,7 +9,10 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.formulas.*;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.SATEncodingUtils.GeneralEncodingUtils;
+import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;
 
 /**
  * Implements constraints of the form:<br/>
@@ -21,20 +26,25 @@ import nl.uu.cs.ape.sat.models.Type;
 public class Constraint_not_use_type extends ConstraintTemplate {
 
 
-	public Constraint_not_use_type(String id, int parametersNo, String description) {
+	public Constraint_not_use_type(String id,  List<ConstraintParameter> parametersNo, String description) {
 		super(id, parametersNo, description);
 	}
 
 	@Override
-	public String getConstraint(String[] parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
+	public String getConstraint(List<ConstraintParameter> parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMappings mappings) {
-		if (parameters.length != 1) {
-			super.throwParametersError(parameters.length);
+		if (parameters.size() != 1) {
+			super.throwParametersError(parameters.size());
 			return null;
 		}
 		String constraint = "";
 
-		Type type = allTypes.get(parameters[0]);
+		/* working on first parameter */
+		List<TaxonomyPredicate> parameterDimensions = parameters.get(0).getParameterTypes();
+		Type type  = (Type) TypeUtils.getConjunctType(parameterDimensions, allTypes);
+		GeneralEncodingUtils.getConjunctConstraints(type, parameterDimensions, mappings, typeAutomaton, WorkflowElement.USED_TYPE);
+		
+
 		if (type == null) {
 			System.err.println("Constraint argument does not exist in the type taxonomy.");
 			return null;

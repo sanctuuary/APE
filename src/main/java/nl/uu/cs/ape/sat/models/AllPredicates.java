@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -53,6 +54,11 @@ public abstract class AllPredicates {
 	public String getRootID() {
 		return taxonomyRoot;
 	}
+	
+	public abstract TaxonomyPredicate addPredicate(TaxonomyPredicate newPredicate) throws Exception;
+	
+	/** Returns the runtime class of the predicates that belong to the Object. */
+	public abstract Class<?> getPredicateClass();
 	
 	/**
 	 * Returns a list of final predicates.

@@ -20,6 +20,7 @@ import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Pair;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -693,5 +694,51 @@ public final class ModuleUtils {
 		return pairs;
 	}
 
+	/**
+	 * Method creates a new abstract module based on the list of modules. The module is added to the list of modules, but no constraints regarding the new predicate were defined.
+	 * @param disjointModule - list of modules that are disjunct
+	 * @param allModules - list of all the modules
+	 * @return a new abstract module
+	 * @throws Exception
+	 */
+	public static TaxonomyPredicate getDisjunctModule(List<TaxonomyPredicate> disjointModule, AllModules allModules) {
+		if(disjointModule.isEmpty()) {
+			return null;
+		}
+		if(disjointModule.size() == 1) {
+			return disjointModule.get(0);
+		}
+		StringBuilder abstractLabel = new StringBuilder("disjunct_");
+		for(TaxonomyPredicate label : disjointModule) {
+			abstractLabel = abstractLabel.append(label.getPredicateID());
+		}
+		
+		TaxonomyPredicate newAbsModule = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), disjointModule.get(0).getRootNode(), NodeType.ABSTRACT));
+		return newAbsModule;
+	}
+	
+	/**
+	 * Method creates a new abstract module based on the list of modules. The module is added to the list of modules, but no constraints regarding the new predicate were defined.
+	 * @param conjunctModule - list of modules that are conjunct
+	 * @param allModules - list of all the modules
+	 * @return a new abstract module
+	 * @throws Exception
+	 */
+	public static TaxonomyPredicate getConjunctModule(List<TaxonomyPredicate> conjunctModule, AllModules allModules) {
+		if(conjunctModule.isEmpty()) {
+			return null;
+		}
+		if(conjunctModule.size() == 1) {
+			return conjunctModule.get(0);
+		}
+		StringBuilder abstractLabel = new StringBuilder("conjunct_");
+		for(TaxonomyPredicate label : conjunctModule) {
+			abstractLabel = abstractLabel.append(label.getPredicateID());
+		}
+		
+		TaxonomyPredicate newAbsModule = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), conjunctModule.get(0).getRootNode(), NodeType.ABSTRACT));
+		return newAbsModule;
+	}
+	
 	
 }

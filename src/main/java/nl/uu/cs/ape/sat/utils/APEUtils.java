@@ -21,15 +21,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/*
- * import org.logicng.formulas.Formula;
- * import org.logicng.formulas.FormulaFactory;
- * import org.logicng.io.parsers.ParserException;
- * import org.logicng.io.parsers.PropositionalParser;
- */
+import com.fasterxml.jackson.databind.deser.std.JsonLocationInstantiator;
+
+//import org.logicng.formulas.Formula;
+//import org.logicng.formulas.FormulaFactory;
+//import org.logicng.io.parsers.ParserException;
+//import org.logicng.io.parsers.PropositionalParser;
+
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
+import nl.uu.cs.ape.sat.constraints.ConstraintParameter;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
@@ -57,14 +59,14 @@ public final class APEUtils {
 		throw new UnsupportedOperationException();
 	}
 
-	public static List<ConstraintData> readConstraints(String constraintsPath) {
+	public static List<ConstraintData> readConstraints(String constraintsPath, AllTypes allTypes, AllModules allModules) {
 		List<ConstraintData> unformattedConstr = new ArrayList<ConstraintData>();
 		if (constraintsPath == null) {
 			return unformattedConstr;
 		}
 		String constraintID;
 		int currNode = 0;
-		List<String> parameters;
+		List<ConstraintParameter> parameters;
 		List<JSONObject> constraints = getListFromJson(constraintsPath, CONSTR_JSON_TAG);
 
 		for (JSONObject jsonConstraint : safe(constraints)) {
@@ -73,10 +75,20 @@ public final class APEUtils {
 			try {
 				constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
 
-				List<String> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG, String.class);
-				parameters = new ArrayList<String>();
-				for (String jsonParam : jsonConstParam) {
-					parameters.add(jsonParam.toString());
+				List<JSONArray> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG, JSONArray.class);
+				parameters = new ArrayList<ConstraintParameter>();
+				/* for each constraint parameter */
+				for (JSONArray jsonParam : jsonConstParam) {
+					ConstraintParameter currParameter = new ConstraintParameter();
+					for(String paramLabel : getListFromJsonList(jsonParam, String.class)) {
+						/* generate the corresponding ConstraintParameter object */
+						TaxonomyPredicate currLabel = allModules.get(paramLabel.toString());
+						if(currLabel == null) {
+							currLabel = allTypes.get(paramLabel.toString());
+						}
+						currParameter.addParameter(currLabel);
+					}
+					parameters.add(currParameter);
 				}
 			} catch (Exception e) {
 				System.err.println("Error in file: " + constraintsPath + ", at constraint no: " + currNode
@@ -140,7 +152,7 @@ public final class APEUtils {
 	 * @return String representation of the SAT encoding for the specified
 	 *         constraint.
 	 */
-	public static String constraintSATEncoding(String constraintID, String[] parameters,
+	public static String constraintSATEncoding(String constraintID, List<ConstraintParameter> parameters,
 			ConstraintFactory allConsTemplates, AllModules allModules, AllTypes allTypes,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMappings mappings) {
 		String constraint = allConsTemplates.getConstraintTamplate(constraintID).getConstraint(parameters, allModules,
@@ -207,26 +219,36 @@ public final class APEUtils {
 	 * 
 	 * @param propositionalFormula - propositional formula
 	 * @return CNF representation of the formula
-	 * 
-	 *         public static String convert2CNF(String propositionalFormula,
-	 *         AtomMappings mappings) { final FormulaFactory f = new
-	 *         FormulaFactory(); final PropositionalParser p = new
-	 *         PropositionalParser(f);
-	 * 
-	 *         Formula formula; try { formula =
-	 *         p.parse(propositionalFormula.replace('-', '~')); final Formula cnf =
-	 *         formula.cnf(); String transformedCNF = cnf.toString().replace('~',
-	 *         '-').replace(") & (", " 0\n").replace(" | ", " ") .replace("(",
-	 *         "").replace(")", "") + " 0\n"; boolean exists = true; int counter =
-	 *         0; String auxVariable = ""; while (exists) { auxVariable =
-	 *         "@RESERVED_CNF_" + counter + " "; if
-	 *         (transformedCNF.contains("@RESERVED_CNF_")) { transformedCNF =
-	 *         transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
-	 *         } else { exists = false; } counter++; } return transformedCNF; }
-	 *         catch (ParserException e) { e.printStackTrace(); return null; }
-	 * 
-	 *         }
 	 */
+//	public static String convert2CNF(String propositionalFormula, AtomMappings mappings) {
+//		final FormulaFactory f = new FormulaFactory();
+//		final PropositionalParser p = new PropositionalParser(f);
+//
+//		Formula formula;
+//		try {
+//			formula = p.parse(propositionalFormula.replace('-', '~'));
+//			final Formula cnf = formula.cnf();
+//			String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ")
+//					.replace("(", "").replace(")", "") + " 0\n";
+//			boolean exists = true;
+//			int counter = 0;
+//			String auxVariable = "";
+//			while (exists) {
+//				auxVariable = "@RESERVED_CNF_" + counter + " ";
+//				if (transformedCNF.contains("@RESERVED_CNF_")) {
+//					transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
+//				} else {
+//					exists = false;
+//				}
+//				counter++;
+//			}
+//			return transformedCNF;
+//		} catch (ParserException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//
+//	}
 
 	/**
 	 * The method return a list of {@link JSONObject} elements that correspond to a
@@ -273,11 +295,7 @@ public final class APEUtils {
 			Object tmp = jsonObject.get(key);
 			try {
 				if (tmp instanceof JSONArray) {
-					JSONArray elements = (JSONArray) tmp;
-					for (int i = 0; i < elements.length(); i++) {
-						T element = (T) elements.get(i);
-						jsonList.add(element);
-					}
+					jsonList = getListFromJsonList((JSONArray) tmp, clazz);
 				} else {
 					T element = (T) tmp;
 					jsonList.add(element);
@@ -292,6 +310,20 @@ public final class APEUtils {
 			return jsonList;
 		}
 
+	}
+	/**
+	 * The method converts the {@link JSONArray} object to {@link List} of objects of the given structure.
+	 * @param jsonArray - given json array object
+	 * @param clazz - class type that the elements of the array are
+	 * @return List of objects of type clazz
+	 */
+	public static <T> List<T> getListFromJsonList(JSONArray jsonArray, Class<T> clazz){
+		List<T> newList = new ArrayList<T>();
+		for (int i = 0; i < jsonArray.length(); i++) {
+			T element = (T) jsonArray.get(i);
+			newList.add(element);
+		}
+		return newList;
 	}
 
 	/**

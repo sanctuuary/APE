@@ -16,7 +16,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  * @author Vedran Kasalica
  *
  */
-public class TypeAutomaton {
+public class TypeAutomaton implements Automaton {
 
 	/**
 	 * Blocks of data types that are being added to the memory (usually outputs from
@@ -261,6 +261,20 @@ public class TypeAutomaton {
 			
 		System.out.println("-------------------------------------------------------------");
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see nl.uu.cs.ape.sat.automaton.Automaton#getAllStates()
+	 */
+	@Override
+	public List<State> getAllStates() {
+		List<State> allStates = new ArrayList<State>();
+		for(Block currBlock : getAllBlocks()) {
+			for(State currState : currBlock.getStates()) {
+				allStates.add(currState);
+			}
+		}
+		return allStates;
 	}
 
 }

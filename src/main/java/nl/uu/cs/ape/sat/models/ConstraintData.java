@@ -5,6 +5,8 @@ package nl.uu.cs.ape.sat.models;
 
 import java.util.List;
 
+import nl.uu.cs.ape.sat.constraints.ConstraintParameter;
+
 /**
  * The {#code ConstraintData} class is used to store the data describing each constrain.
  *
@@ -14,22 +16,11 @@ import java.util.List;
 public class ConstraintData {
 
 	private String constraintID;
-	private String[] parameters;
+	private List<ConstraintParameter> parameters;
 	
-	public ConstraintData(String constraintID,  String[] parameters) {
+	public ConstraintData(String constraintID,  List<ConstraintParameter> parameters) {
 		this.constraintID = constraintID;
-		this.parameters = new String[parameters.length];
-		for(int i=0; i < parameters.length; i++) {
-			this.parameters[i] = parameters[i];
-		}
-	}
-	
-	public ConstraintData(String constraintID,  List<String> parameters) {
-		this.constraintID = constraintID;
-		this.parameters = new String[parameters.size()];
-		for(int i=0; i < parameters.size(); i++) {
-			this.parameters[i] = parameters.get(i);
-		}
+		this.parameters = parameters;
 	}
 
 	/**
@@ -42,7 +33,7 @@ public class ConstraintData {
 	/**
 	 * @return the parameters
 	 */
-	public String[] getParameters() {
+	public List<ConstraintParameter> getParameters() {
 		return parameters;
 	}
 	

@@ -274,7 +274,6 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	public void printTree(String str, AllPredicates allPredicates) {
 		System.out.println(str + toShortString() + "[" + getNodeType() + "]");
 		for (String predicateID : APEUtils.safe(this.subPredicates)) {
-//			System.out.println(predicateID + " is found: " + (allPredicates.get(predicateID)!= null));
 			allPredicates.get(predicateID).printTree(str + ". ", allPredicates);
 		}
 	}
@@ -290,7 +289,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 			subPredicates.add(predicate.getPredicateID());
 			return true;
 		} else {
-			System.err.println("Cannot add subpredicate to a leaf or empty taxonomy term!");
+			System.err.println("Cannot add subpredicate to a leaf or empty taxonomy term: " + getPredicateID() + ".");
 			return false;
 		}
 	}
@@ -305,7 +304,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
 			return subPredicates.add(predicateID);
 		} else {
-			System.err.println("Cannot add subpredicate to a leaf or empty taxonomy term!");
+			System.err.println("Cannot add subpredicate to a leaf or empty taxonomy term: " + getPredicateID() + ".");
 			return false;
 		}
 	}

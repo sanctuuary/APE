@@ -42,8 +42,9 @@ public class AllModules extends AllPredicates {
 	 * @param module - The AbstractModule/Module that needs to be added.
 	 * @return The element if it's a new one or the existing element if this set
 	 *         contains the specified element.
+	 * @throws ExceptionInInitializerError 
 	 */
-	public AbstractModule addModule(AbstractModule module) {
+	public AbstractModule addPredicate(TaxonomyPredicate module) throws ExceptionInInitializerError {
 		TaxonomyPredicate tmpModule = getPredicates().get(module.getPredicateID());
 		if (module instanceof Module && (tmpModule != null)) {
 			if (tmpModule instanceof Module) {
@@ -59,9 +60,11 @@ public class AllModules extends AllPredicates {
 		} else {
 			if (tmpModule != null) {
 				return (AbstractModule) tmpModule;
-			} else {
+			} else if(module instanceof AbstractModule){
 				getPredicates().put(module.getPredicateID(), module);
-				return module;
+				return (AbstractModule) module;
+			} else {
+				throw new ExceptionInInitializerError("Type error. Only AbstractModule PredicateLabel can be added to AllModules.");
 			}
 		}
 	}
@@ -143,6 +146,10 @@ public class AllModules extends AllPredicates {
 
 	public int size() {
 		return this.size();
+	}
+	
+	public Class<?> getPredicateClass(){
+		return AbstractModule.class;
 	}
 
 }

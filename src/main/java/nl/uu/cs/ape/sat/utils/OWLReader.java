@@ -71,8 +71,9 @@ public class OWLReader {
 	 * 
 	 * @return {@code true} is the ontology was read correctly, {@code false}
 	 *         otherwise.
+	 * @throws ExceptionInInitializerError 
 	 */
-	public boolean readOntology() {
+	public boolean readOntology() throws ExceptionInInitializerError {
 
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		try {
@@ -116,7 +117,7 @@ public class OWLReader {
 				 * If the main root of the data type taxonomy does not exist, create one
 				 * artificially.
 				 */
-				Type root = allTypes.addType("DataTaxonomy", "DataTaxonomy", "DataTaxonomy", NodeType.ROOT);
+				Type root = allTypes.addPredicate(new Type("DataTaxonomy", "DataTaxonomy", "DataTaxonomy", NodeType.ROOT));
 				allTypes.setRootPredicate(root);
 				superClass = new OWLClassImpl(IRI.create("http://www.w3.org#DataTaxonomy"));
 			}
@@ -158,7 +159,7 @@ public class OWLReader {
 			typeRootExists = true;
 			return true;
 		} else {
-			return allTypes.getDataTaxonomyDimensions().contains(getLabel(currClass));
+			return allTypes.getDataTaxonomyDimensionIDs().contains(getLabel(currClass));
 		}
 	}
 
@@ -189,8 +190,13 @@ public class OWLReader {
 			currRootClass = rootClass;
 		}
 		/* Generate the AbstractModule that corresponds to the taxonomy class. */
-		AbstractModule currModule = allModules.addModule(
-				new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(currRootClass), currNodeType));
+		AbstractModule currModule = null;
+		try {
+			currModule = allModules.addPredicate(
+					new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(currRootClass), currNodeType));
+		} catch (ExceptionInInitializerError e) {
+			e.printStackTrace();
+		}
 		/* Add the current module as a sub-module of the super module. */
 		if (superModule != null && currModule != null) {
 			superModule.addSubPredicate(getLabel(currClass));
@@ -219,7 +225,7 @@ public class OWLReader {
 //		}
 		
 		final OWLClass currRoot;
-		Type superType, currType;
+		Type superType, currType = null;
 		superType = allTypes.get(getLabel(superClass));
 		/*
 		 * Check whether the current node is a root or subRoot node.
@@ -228,7 +234,7 @@ public class OWLReader {
 		if (getLabel(currClass).equals(allTypes.getRootID())) {
 			currNodeType = NodeType.ROOT;
 			currRoot = currClass;
-		} else if (APEUtils.safe(allTypes.getDataTaxonomyDimensions()).contains(getLabel(currClass))) {
+		} else if (APEUtils.safe(allTypes.getDataTaxonomyDimensionIDs()).contains(getLabel(currClass))) {
 			currNodeType = NodeType.SUBROOT;
 			currRoot = currClass;
 		} else {
@@ -236,7 +242,11 @@ public class OWLReader {
 		}
 
 		/* Generate the Type that corresponds to the taxonomy class. */
-		currType = allTypes.addType(getLabel(currClass), getLabel(currClass), getLabel(currRoot), currNodeType);
+		try {
+			currType = allTypes.addPredicate(new Type(getLabel(currClass), getLabel(currClass), getLabel(currRoot), currNodeType));
+		} catch (ExceptionInInitializerError e) {
+			e.printStackTrace();
+		}
 
 		/* Add the current type as a sub-type of the super type. */
 		if (superType != null && currType != null) {

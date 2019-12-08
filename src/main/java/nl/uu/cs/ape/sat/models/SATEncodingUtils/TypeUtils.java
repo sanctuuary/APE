@@ -9,11 +9,14 @@ import java.util.List;
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.models.AbstractModule;
+import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Pair;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -250,6 +253,55 @@ public class TypeUtils {
 		}
 
 		return encoding.toString();
+	}
+	
+	
+	/**
+	 * Method creates a new abstract type based on the list of disjunct types. The type is added to the list of type, 
+	 * but no constraints regarding the new predicate were defined.<br>
+	 * @param disjointType - list of type that are disjunct
+	 * @param allTypes - list of all the type
+	 * @return a new abstract type
+	 * @throws Exception
+	 */
+	public static TaxonomyPredicate getDisjunctType(List<TaxonomyPredicate> disjointType, AllTypes allTypes) {
+		if(disjointType.isEmpty()) {
+			return null;
+		}
+		if(disjointType.size() == 1) {
+			return disjointType.get(0);
+		}
+		StringBuilder abstractLabel = new StringBuilder("disjunct_");
+		for(TaxonomyPredicate label : disjointType) {
+			abstractLabel = abstractLabel.append(label.getPredicateID());
+		}
+		
+		TaxonomyPredicate newAbsType = allTypes.addPredicate(new Type(abstractLabel.toString(), abstractLabel.toString(), disjointType.get(0).getRootNode(), NodeType.ABSTRACT));
+		return newAbsType;
+	}
+	
+	/**
+	 * Method creates a new abstract type based on the list of conjunct types. The type is added to the list of type, 
+	 * but no constraints regarding the new predicate were defined.<br>
+	 * @param conjunctType - list of type that are conjunct
+	 * @param allTypes - list of all the type
+	 * @return a new abstract type
+	 * @throws Exception
+	 */
+	public static TaxonomyPredicate getConjunctType(List<TaxonomyPredicate> conjunctType, AllTypes allTypes) {
+		if(conjunctType.isEmpty()) {
+			return null;
+		}
+		if(conjunctType.size() == 1) {
+			return conjunctType.get(0);
+		}
+		StringBuilder abstractLabel = new StringBuilder("conjunct_");
+		for(TaxonomyPredicate label : conjunctType) {
+			abstractLabel = abstractLabel.append(label.getPredicateID());
+		}
+		
+		TaxonomyPredicate newAbsType = allTypes.addPredicate(new Type(abstractLabel.toString(), abstractLabel.toString(), conjunctType.get(0).getRootNode(), NodeType.ABSTRACT));
+		return newAbsType;
 	}
 	
 }

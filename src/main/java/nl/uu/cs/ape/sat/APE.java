@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.engine.Renderer;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
+import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
@@ -67,7 +69,6 @@ public class APE {
 			System.err.println("Configuration failed. Error in configuration file.");
 			throw new ExceptionInInitializerError();
 		}
-		
 		if(!setupDomain()) {
 			System.err.println("Error in settin up the domain.");
 		}
@@ -76,9 +77,9 @@ public class APE {
 	/**
 	 * Create instance of the APE solver.
 	 * @param configPath - the APE configuration JSONObject{@link JSONObject}.
-	 * @throws JSONException error in reading the configuration object
+	 * @throws ExceptionInInitializerError 
 	 */
-	public APE(JSONObject configObject) throws JSONException{
+	public APE(JSONObject configObject) throws ExceptionInInitializerError{
 		config = new APEConfig(configObject);
 		if (config == null) {
 			System.err.println("Configuration failed. Error in configuration object.");
@@ -89,6 +90,13 @@ public class APE {
 		}
 	}
 	
+	/**
+	 * Method that return all the supported constraint templates.
+	 * @return list of {@link ConstraintTemplate} objects.
+	 */
+	public Collection<ConstraintTemplate> getConstraintTemplates() {
+		return constraintFactory.getConstraintTamplates();
+	}
 	
 	
 	/** 
@@ -101,8 +109,9 @@ public class APE {
 	/**
 	 * Method used to setup the domain using the configuration file and the corresponding annotation and constraints files.
 	 * @return {@code true} if the setup was successfully performed, {@code false} otherwise.
+	 * @throws ExceptionInInitializerError 
 	 */
-	public boolean setupDomain() {
+	public boolean setupDomain() throws ExceptionInInitializerError {
 		/** Variable that describes a successful run of the program. */
 		boolean succRun = true;
 		/*
@@ -133,6 +142,12 @@ public class APE {
 		
 		succRun &= allModules.trimTaxonomy();
 		succRun &= allTypes.trimTaxonomy();
+		
+		/*
+		 * Define set of all constraint formats
+		 */
+		constraintFactory = new ConstraintFactory();
+		constraintFactory.initializeConstraints(allModules, allTypes);
 		
 		return succRun;
 	}
@@ -194,14 +209,10 @@ public class APE {
 		 * List of all the solutions
 		 */
 		SATsolutionsList allSolutions = new SATsolutionsList(config);
-		/*
-		 * Define set of all constraint formats
-		 */
-		constraintFactory = new ConstraintFactory();
-		constraintFactory.initializeConstraints();
+
 		unformattedConstr = new ArrayList<ConstraintData>();
 		
-		unformattedConstr = APEUtils.readConstraints(config.getConstraints_path());
+		unformattedConstr = APEUtils.readConstraints(config.getConstraints_path(), allTypes, allModules);
 		
 		/** Print the setup information when necessary. */
 		APEUtils.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory, unformattedConstr);

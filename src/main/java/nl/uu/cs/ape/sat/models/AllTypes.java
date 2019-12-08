@@ -79,14 +79,17 @@ public class AllTypes extends AllPredicates {
 	 * @param typeID    - Unique Type identifier
 	 * @param rootType  - Determines whether the Type is a simple/leaf type
 	 * @return The Type object.
+	 * @throws Exception - exception in case of a type mismatch
 	 */
-	public Type addType(String typeName, String typeID, String rootType, NodeType nodeType) {
-
+	public Type addPredicate(TaxonomyPredicate newType) throws ExceptionInInitializerError {
 		Type tmpType;
-		if ((tmpType = this.get(typeID)) == null) {
-			tmpType = new Type(typeName, typeID, rootType, nodeType);
-			this.put(tmpType);
-
+		if ((tmpType = this.get(newType.getPredicateID())) == null) {
+			if(newType instanceof Type) {
+				this.put((Type)newType);
+				tmpType = (Type) newType;
+			} else {
+				throw new ExceptionInInitializerError("Type error. Only Type PredicateLabel can be added to AllTypes.");
+			}
 		}
 		return tmpType;
 
@@ -143,6 +146,10 @@ public class AllTypes extends AllPredicates {
 	 */
 	public int size() {
 		return getPredicates().size();
+	}
+	
+	public Class<?> getPredicateClass(){
+		return Type.class;
 	}
 
 	/**
@@ -206,8 +213,19 @@ public class AllTypes extends AllPredicates {
 	 * Return the list of dimensions that represent the data. Each dimension represents a node in the data taxonomy and the root for the corresponding sub-taxonomy.
 	 * @return List of abstract types that represent dimensions.
 	 */
-	public List<String> getDataTaxonomyDimensions(){
+	public List<String> getDataTaxonomyDimensionIDs(){
 		return dataTaxonomyDimensions;
+	}
+	
+	/**
+	 * Return the list of dimensions that represent the data. Each dimension represents a node in the data taxonomy and the root for the corresponding sub-taxonomy.
+	 * @return List of abstract types that represent dimensions.
+	 */
+	public List<TaxonomyPredicate> getDataTaxonomyDimensions(){
+		List<TaxonomyPredicate> dimensionTypes = new ArrayList<>();
+		this.dataTaxonomyDimensions.stream().filter(dimensionID -> get(dimensionID) != null)
+											.forEach(dimensionID -> dimensionTypes.add(get(dimensionID)));
+		return dimensionTypes;
 	}
 	
 	/**
@@ -230,5 +248,5 @@ public class AllTypes extends AllPredicates {
 		
 		return elements;
 	}
-	
+
 }

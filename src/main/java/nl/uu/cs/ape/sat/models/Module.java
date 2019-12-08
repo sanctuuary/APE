@@ -206,8 +206,8 @@ public class Module extends AbstractModule {
 							System.err.println("Data type \"" + currTypeID
 									+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
 						}
-						if (allTypes.getDataTaxonomyDimensions().contains(typeSubntology)) {
-							Type currType = allTypes.addType(currTypeID, currTypeID, typeSubntology, NodeType.UNKNOWN);
+						if (allTypes.getDataTaxonomyDimensionIDs().contains(typeSubntology)) {
+							Type currType = allTypes.addPredicate(new Type(currTypeID, currTypeID, typeSubntology, NodeType.UNKNOWN));
 							if (currType != null) {
 								/* if the type exists, make it relevant from the taxonomy perspective and add it to the inputs */
 								currType.setAsRelevantTaxonomyTerm(allTypes);
@@ -233,9 +233,9 @@ public class Module extends AbstractModule {
 							System.err.println("Data type \"" + currTypeID.toString()
 									+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
 						}
-						if (allTypes.getDataTaxonomyDimensions().contains(typeSubntology)) {
-							Type currType = allTypes.addType(currTypeID, currTypeID, typeSubntology,
-									NodeType.UNKNOWN);
+						if (allTypes.getDataTaxonomyDimensionIDs().contains(typeSubntology)) {
+							Type currType = allTypes.addPredicate(new Type(currTypeID, currTypeID, typeSubntology,
+									NodeType.UNKNOWN));
 							if (currType != null) {
 								/* if the type exists, make it relevant from the taxonomy perspective and add it to the outputs */
 								currType.setAsRelevantTaxonomyTerm(allTypes);
@@ -261,7 +261,7 @@ public class Module extends AbstractModule {
 		 * Add the module and make it sub module of the currSuperModule (if it was not
 		 * previously defined)
 		 */
-		Module currModule =  (Module) allModules.addModule(new Module(moduleLabel, moduleID, allModules.getRootID(), moduleExecutionImpl));
+		Module currModule =  (Module) allModules.addPredicate(new Module(moduleLabel, moduleID, allModules.getRootID(), moduleExecutionImpl));
 		
 		/*	For each supermodule add the current module as a subset and vice versa. */
 		for(String superModuleID : taxonomyModules) {
