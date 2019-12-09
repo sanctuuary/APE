@@ -10,6 +10,7 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.GeneralEncodingUtils;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.formulas.*;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -39,8 +40,8 @@ public class Constraint_last_module extends ConstraintTemplate {
 		String constraint = "";
 		/* working on first parameter */
 		List<TaxonomyPredicate> seondInSeq = parameters.get(0).getParameterTypes();
-		AbstractModule module  = (AbstractModule) ModuleUtils.getConjunctModule(seondInSeq, allModules);
-		GeneralEncodingUtils.getConjunctConstraints(module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE);
+		AbstractModule module  = (AbstractModule) ModuleUtils.generateAbstractmodule(seondInSeq, allModules, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE, LogicOperation.AND);
 		
 		if (module == null) {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");

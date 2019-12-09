@@ -10,6 +10,7 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.GeneralEncodingUtils;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.formulas.*;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -42,12 +43,12 @@ public class Constraint_next_module extends ConstraintTemplate {
 		
 		/* working on first parameter */
 		List<TaxonomyPredicate> seondInSeq = parameters.get(0).getParameterTypes();
-		AbstractModule first_module  = (AbstractModule) ModuleUtils.getConjunctModule(seondInSeq, allModules);
-		GeneralEncodingUtils.getConjunctConstraints(first_module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE);
+		AbstractModule first_module  = (AbstractModule) ModuleUtils.generateAbstractmodule(seondInSeq, allModules, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(first_module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE, LogicOperation.AND);
 		/* working on second parameter */
 		List<TaxonomyPredicate> firstdInSeq = parameters.get(1).getParameterTypes();
-		AbstractModule second_module  = (AbstractModule) ModuleUtils.getConjunctModule(firstdInSeq, allModules);
-		GeneralEncodingUtils.getConjunctConstraints(second_module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE);
+		AbstractModule second_module  = (AbstractModule) ModuleUtils.generateAbstractmodule(firstdInSeq, allModules, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(second_module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE, LogicOperation.AND);
 
 		
 		if (first_module == null || second_module == null) {

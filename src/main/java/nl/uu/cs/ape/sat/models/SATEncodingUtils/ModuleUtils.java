@@ -20,10 +20,12 @@ import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Pair;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
@@ -62,7 +64,7 @@ public final class ModuleUtils {
 		constraints = constraints.append(inputCons(synthesisInstance));
 		if (!synthesisInstance.getConfig().getShared_memory()) {
 			/* Case when the using message passing memory system. */
-			constraints = constraints.append(inputMsgPassingCons(synthesisInstance.getAllModules(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+			constraints = constraints.append(inputMsgPassingCons(synthesisInstance.getDomainSetup().getAllModules(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
 			constraints = constraints.append(enforcingUsageOfGeneratedTypesMsgPassingCons(synthesisInstance));
 		} else {
 			/* Case when the using shared memory system. */
@@ -70,7 +72,7 @@ public final class ModuleUtils {
 			constraints = constraints.append(enforcingUsageOfGeneratedTypesSharedMemCons(synthesisInstance));
 		}
 
-		constraints = constraints.append(generalReferenceCons(synthesisInstance.getAllModules(), synthesisInstance.getAllTypes(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+		constraints = constraints.append(generalReferenceCons(synthesisInstance.getDomainSetup(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
 
 		constraints = constraints.append(outputCons(synthesisInstance));
 		return constraints.toString();
@@ -93,7 +95,7 @@ public final class ModuleUtils {
 
 		StringBuilder constraints = new StringBuilder();
 		AtomMappings mappings = synthesisInstance.getMappings();
-		for (TaxonomyPredicate potentialModule : synthesisInstance.getAllModules().getModules()) {
+		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
 			/* ..which is a Tool.. */
 			if ((potentialModule instanceof Module)) {
 				Module module = (Module) potentialModule;
@@ -127,7 +129,7 @@ public final class ModuleUtils {
 							constraints = constraints.append("-")
 									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
 							constraints = constraints
-									.append(mappings.add(synthesisInstance.getAllTypes().getEmptyType(), currInputState, WorkflowElement.USED_TYPE))
+									.append(mappings.add(synthesisInstance.getEmptyType(), currInputState, WorkflowElement.USED_TYPE))
 									.append(" 0\n");
 						}
 					}
@@ -150,11 +152,11 @@ public final class ModuleUtils {
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static String generalReferenceCons(AllModules allModules, AllTypes allTypes, TypeAutomaton typeAutomaton, AtomMappings mappings) {
+	private static String generalReferenceCons(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton, AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 
 		/* For each type instance */
-		for (TaxonomyPredicate currType : allTypes.getTypes()) {
+		for (TaxonomyPredicate currType : domainSetup.getAllTypes().getTypes()) {
 			if (currType.isSimplePredicate() || currType.isEmptyPredicate()) {
 				/* ..for each state in which type can be used .. */
 				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
@@ -283,7 +285,7 @@ public final class ModuleUtils {
 	private static String enforcingUsageOfGeneratedTypesMsgPassingCons(SAT_SynthesisEngine synthesisInstance) {
 
 		AtomMappings mappings = synthesisInstance.getMappings();
-		Type emptyType = synthesisInstance.getAllTypes().getEmptyType();
+		Type emptyType = synthesisInstance.getEmptyType();
 		
 		
 		StringBuilder constraints = new StringBuilder();
@@ -414,7 +416,7 @@ public final class ModuleUtils {
 	private static String enforcingUsageOfGeneratedTypesSharedMemCons(SAT_SynthesisEngine synthesisInstance) {
 
 		AtomMappings mappings = synthesisInstance.getMappings();
-		Type emptyType = synthesisInstance.getAllTypes().getEmptyType();
+		Type emptyType = synthesisInstance.getEmptyType();
 		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
 		StringBuilder constraints = new StringBuilder();
 		/*
@@ -513,7 +515,7 @@ public final class ModuleUtils {
 		StringBuilder constraints = new StringBuilder();
 
 		// for each module
-		for (TaxonomyPredicate potentialModule : synthesisInstance.getAllModules().getModules()) {
+		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
 			// that is a Tool
 			if ((potentialModule instanceof Module)) {
 				Module module = (Module) potentialModule;
@@ -541,7 +543,7 @@ public final class ModuleUtils {
 							constraints = constraints.append("-")
 									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
 							constraints = constraints.append(
-									mappings.add(synthesisInstance.getAllTypes().getEmptyType(), currOutputStates.get(i), WorkflowElement.MEMORY_TYPE))
+									mappings.add(synthesisInstance.getEmptyType(), currOutputStates.get(i), WorkflowElement.MEMORY_TYPE))
 									.append(" 0\n");
 						}
 					}
@@ -695,50 +697,27 @@ public final class ModuleUtils {
 	}
 
 	/**
-	 * Method creates a new abstract module based on the list of modules. The module is added to the list of modules, but no constraints regarding the new predicate were defined.
-	 * @param disjointModule - list of modules that are disjunct
+	 * Method creates a new abstract module based on the list of modules. The list of modules is connected using the provided logical operator.
+	 * The type is added to the list of module, but no constraints regarding the new predicate were defined.<br>
+	 * @param relatedModules - list of modules that are logically related to the new abstract module
 	 * @param allModules - list of all the modules
+	 * @param logicOp - logical operation that is used to group the types (e.g. {@link LogicOperation.OR})
 	 * @return a new abstract module
-	 * @throws Exception
 	 */
-	public static TaxonomyPredicate getDisjunctModule(List<TaxonomyPredicate> disjointModule, AllModules allModules) {
-		if(disjointModule.isEmpty()) {
+	public static TaxonomyPredicate generateAbstractmodule(List<TaxonomyPredicate> relatedModules, AllModules allModules, LogicOperation logicOp) {
+		if(relatedModules.isEmpty()) {
 			return null;
 		}
-		if(disjointModule.size() == 1) {
-			return disjointModule.get(0);
+		if(relatedModules.size() == 1) {
+			return relatedModules.get(0);
 		}
-		StringBuilder abstractLabel = new StringBuilder("disjunct_");
-		for(TaxonomyPredicate label : disjointModule) {
+		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
+		for(TaxonomyPredicate label : relatedModules) {
 			abstractLabel = abstractLabel.append(label.getPredicateID());
 		}
 		
-		TaxonomyPredicate newAbsModule = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), disjointModule.get(0).getRootNode(), NodeType.ABSTRACT));
+		TaxonomyPredicate newAbsModule = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), relatedModules.get(0).getRootNode(), NodeType.ABSTRACT));
 		return newAbsModule;
 	}
-	
-	/**
-	 * Method creates a new abstract module based on the list of modules. The module is added to the list of modules, but no constraints regarding the new predicate were defined.
-	 * @param conjunctModule - list of modules that are conjunct
-	 * @param allModules - list of all the modules
-	 * @return a new abstract module
-	 * @throws Exception
-	 */
-	public static TaxonomyPredicate getConjunctModule(List<TaxonomyPredicate> conjunctModule, AllModules allModules) {
-		if(conjunctModule.isEmpty()) {
-			return null;
-		}
-		if(conjunctModule.size() == 1) {
-			return conjunctModule.get(0);
-		}
-		StringBuilder abstractLabel = new StringBuilder("conjunct_");
-		for(TaxonomyPredicate label : conjunctModule) {
-			abstractLabel = abstractLabel.append(label.getPredicateID());
-		}
-		
-		TaxonomyPredicate newAbsModule = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), conjunctModule.get(0).getRootNode(), NodeType.ABSTRACT));
-		return newAbsModule;
-	}
-	
 	
 }

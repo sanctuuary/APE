@@ -59,10 +59,14 @@ public final class APEUtils {
 		throw new UnsupportedOperationException();
 	}
 
-	public static List<ConstraintData> readConstraints(String constraintsPath, AllTypes allTypes, AllModules allModules) {
-		List<ConstraintData> unformattedConstr = new ArrayList<ConstraintData>();
+	/**
+	 * Method read the constraints from a JSON file and updates the {@link APEDomainSetup} object accordingly.
+	 * @param constraintsPath - path to the constraint file
+	 * @param domainSetup - object that represents the domain variables
+	 */
+	public static void readConstraints(String constraintsPath, APEDomainSetup domainSetup) {
 		if (constraintsPath == null) {
-			return unformattedConstr;
+			return;
 		}
 		String constraintID;
 		int currNode = 0;
@@ -82,9 +86,9 @@ public final class APEUtils {
 					ConstraintParameter currParameter = new ConstraintParameter();
 					for(String paramLabel : getListFromJsonList(jsonParam, String.class)) {
 						/* generate the corresponding ConstraintParameter object */
-						TaxonomyPredicate currLabel = allModules.get(paramLabel.toString());
+						TaxonomyPredicate currLabel = domainSetup.getAllModules().get(paramLabel.toString());
 						if(currLabel == null) {
-							currLabel = allTypes.get(paramLabel.toString());
+							currLabel = domainSetup.getAllTypes().get(paramLabel.toString());
 						}
 						currParameter.addParameter(currLabel);
 					}
@@ -96,40 +100,34 @@ public final class APEUtils {
 				continue;
 			}
 			ConstraintData currConstr = new ConstraintData(constraintID, parameters);
-			unformattedConstr.add(currConstr);
+			domainSetup.addConstraintData(currConstr);
 		}
-		return unformattedConstr;
 	}
 
 	/**
 	 * Returns the CNF representation of the SLTL constraints in our project
-	 * 
-	 * @param constraintsPath  - path to the Json file
-	 * @param allConsTemplates
-	 * @param allModules
-	 * @param allTypes
+	 * @param domainSetup
 	 * @param mappings
 	 * @param moduleAutomaton
 	 * @param typeAutomaton
 	 * @return
 	 */
-	public static String encodeAPEConstraints(List<ConstraintData> constraintData, ConstraintFactory allConsTemplates,
-			AllModules allModules, AllTypes allTypes, AtomMappings mappings, ModuleAutomaton moduleAutomaton,
+	public static String encodeAPEConstraints(APEDomainSetup domainSetup, AtomMappings mappings, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton) {
 
 		String cnf_SLTL = "";
 		int currConst = 0;
 
-		for (ConstraintData constraint : constraintData) {
+		for (ConstraintData constraint : domainSetup.getUnformattedConstr()) {
 			currConst++;
 			/* ENCODE THE CONSTRAINT */
-			if (allConsTemplates.getConstraintTamplate(constraint.getConstraintID()) == null) {
+			if (domainSetup.getConstraintTamplate(constraint.getConstraintID()) == null) {
 				System.err.println("Constraint ID provided: '" + constraint.getConstraintID()
 						+ "' is not valid. Constraint skipped.");
 				continue;
 			} else {
 				String currConstrEncoding = constraintSATEncoding(constraint.getConstraintID(),
-						constraint.getParameters(), allConsTemplates, allModules, allTypes, moduleAutomaton,
+						constraint.getParameters(), domainSetup, moduleAutomaton,
 						typeAutomaton, mappings);
 				if (currConstrEncoding == null) {
 					System.err
@@ -153,10 +151,10 @@ public final class APEUtils {
 	 *         constraint.
 	 */
 	public static String constraintSATEncoding(String constraintID, List<ConstraintParameter> parameters,
-			ConstraintFactory allConsTemplates, AllModules allModules, AllTypes allTypes,
+			APEDomainSetup domainSetup,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMappings mappings) {
-		String constraint = allConsTemplates.getConstraintTamplate(constraintID).getConstraint(parameters, allModules,
-				allTypes, moduleAutomaton, typeAutomaton, mappings);
+		String constraint = domainSetup.getConstraintTamplate(constraintID).getConstraint(parameters, domainSetup.getAllModules(),
+				domainSetup.getAllTypes(), moduleAutomaton, typeAutomaton, mappings);
 
 		return constraint;
 	}
@@ -195,13 +193,13 @@ public final class APEUtils {
 	 * @return the list of all annotated Modules in the process (possibly empty
 	 *         list)
 	 */
-	public static List<Module> readModuleJson(String file, AllModules allModules, AllTypes allTypes) {
+	public static List<Module> readModuleJson(String file, APEDomainSetup domainSetup) {
 		List<Module> modulesNew = new ArrayList<Module>();
 		int currModule = 0;
 		for (JSONObject jsonModule : safe(getListFromJson(file, TOOLS_JSOM_TAG))) {
 			currModule++;
 			try {
-				Module tmpModule = Module.moduleFromJson(jsonModule, allModules, allTypes);
+				Module tmpModule = Module.moduleFromJson(jsonModule, domainSetup);
 				if (tmpModule != null) {
 					modulesNew.add(tmpModule);
 				}
@@ -361,8 +359,7 @@ public final class APEUtils {
 	 * @param constraintFactory - String list of all constraint templates
 	 * @param unformattedConstr
 	 */
-	public static void debugPrintout(boolean debug, AllModules allModules, AllTypes allTypes,
-			ConstraintFactory constraintFactory, List<ConstraintData> unformattedConstr) {
+	public static void debugPrintout(boolean debug, APEDomainSetup domainSetup) {
 		if (debug) {
 
 			/*
@@ -371,7 +368,7 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tConstraint templates:");
 			System.out.println("-------------------------------------------------------------");
-			System.out.println(constraintFactory.printConstraintsCodes() + "\n");
+			System.out.println(domainSetup.getConstraintFactory().printConstraintsCodes() + "\n");
 
 			/*
 			 * Printing the Module and Taxonomy Tree
@@ -379,11 +376,11 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tTool Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
-			allModules.getRootPredicate().printTree(" ", allModules);
+			domainSetup.getAllModules().getRootPredicate().printTree(" ", domainSetup.getAllModules());
 			System.out.println("\n-------------------------------------------------------------");
 			System.out.println("\tData Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
-			allTypes.getRootPredicate().printTree(" ", allTypes);
+			domainSetup.getAllTypes().getRootPredicate().printTree(" ", domainSetup.getAllTypes());
 
 			/*
 			 * Printing the tool annotations
@@ -392,7 +389,7 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tAnnotated tools:");
 			System.out.println("-------------------------------------------------------------");
-			for (TaxonomyPredicate module : allModules.getModules()) {
+			for (TaxonomyPredicate module : domainSetup.getAllModules().getModules()) {
 				if (module instanceof Module) {
 					System.out.println(module.toString());
 					noTools = false;
@@ -408,10 +405,10 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tConstraints:");
 			System.out.println("-------------------------------------------------------------");
-			for (ConstraintData constr : unformattedConstr) {
-				System.out.println(constraintFactory.getDescription(constr));
+			for (ConstraintData constr : domainSetup.getUnformattedConstr()) {
+				System.out.println(domainSetup.getConstraintFactory().getDescription(constr));
 			}
-			if (unformattedConstr.isEmpty()) {
+			if (domainSetup.getUnformattedConstr().isEmpty()) {
 				System.out.println("\tNo constraints.");
 			}
 			System.out.println("-------------------------------------------------------------");
@@ -612,21 +609,20 @@ public final class APEUtils {
 					apeInputTypes.put(bioType.getString("term"));
 				}
 				apeInput.put("Data", apeInputTypes);
-//				add all data formats
+//				add all data formats (or just the first one)
 				boolean oneFormat = true;
 				for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
-					if (oneFormat) {
+//					if (oneFormat) {
 						apeInputFormats.put(bioType.getString("term"));
-						oneFormat = false;
-					}
+//						oneFormat = false; }
 				}
-				apeInput.put("Format", apeInputFormats);
+				apeInput.put("Format$OR$", apeInputFormats);
 
 				apeInputs.put(apeInput);
 			}
 			apeJsonTool.put("inputs", apeInputs);
 
-//			reading inputs
+//			reading outputs
 			JSONArray apeOutputs = new JSONArray();
 			JSONArray bioOutputs = function.getJSONArray("output");
 //			for each output
@@ -644,12 +640,11 @@ public final class APEUtils {
 				apeOutput.put("Data", apeOutputTypes);
 //				add all data formats
 				for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
-					if (oneFormat) {
+//					if (oneFormat) {
 						apeOutputFormats.put(bioType.getString("term"));
-						oneFormat = false;
-					}
+//						oneFormat = false; }
 				}
-				apeOutput.put("Format", apeOutputFormats);
+				apeOutput.put("Format$OR$", apeOutputFormats);
 
 				apeOutputs.put(apeOutput);
 			}

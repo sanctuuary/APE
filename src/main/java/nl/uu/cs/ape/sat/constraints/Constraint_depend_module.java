@@ -12,6 +12,7 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.GeneralEncodingUtils;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.formulas.*;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;;
@@ -43,12 +44,12 @@ public class Constraint_depend_module extends ConstraintTemplate {
 		String constraint = "";
 		/* working on first parameter */
 		List<TaxonomyPredicate> seondInSeq = parameters.get(0).getParameterTypes();
-		AbstractModule secondModuleInSequence  = (AbstractModule) ModuleUtils.getConjunctModule(seondInSeq, allModules);
-		GeneralEncodingUtils.getConjunctConstraints(secondModuleInSequence, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE);
+		AbstractModule secondModuleInSequence  = (AbstractModule) ModuleUtils.generateAbstractmodule(seondInSeq, allModules, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(secondModuleInSequence, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE, LogicOperation.AND);
 		/* working on second parameter */
 		List<TaxonomyPredicate> firstdInSeq = parameters.get(1).getParameterTypes();
-		AbstractModule firstModuleInSequence  = (AbstractModule) ModuleUtils.getConjunctModule(firstdInSeq, allModules);
-		GeneralEncodingUtils.getConjunctConstraints(secondModuleInSequence, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE);
+		AbstractModule firstModuleInSequence  = (AbstractModule) ModuleUtils.generateAbstractmodule(firstdInSeq, allModules, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(secondModuleInSequence, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE, LogicOperation.AND);
 
 		if (secondModuleInSequence == null || firstModuleInSequence == null) {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");

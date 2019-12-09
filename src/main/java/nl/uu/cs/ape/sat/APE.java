@@ -35,6 +35,7 @@ import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import nl.uu.cs.ape.sat.utils.OWLReader;
 
@@ -46,15 +47,10 @@ import nl.uu.cs.ape.sat.utils.OWLReader;
  */
 public class APE {
 	/** Configuration object defined from the configuration file. */
-	private APEConfig config;
-	/** All modules/operations used in the domain. */
-	private AllModules allModules;
-	/** All data types defined in the domain. */
-	private AllTypes allTypes;
-	/** Object used to create temporal constraints. */ 
-	private ConstraintFactory constraintFactory;
-	/** List of data gathered from the constraint file. */
-	private List<ConstraintData> unformattedConstr;
+	private final APEConfig config;
+	/** Object containing general APE encoding */
+	private APEDomainSetup apeDomainSetup;
+	
 	
 	
 	/**
@@ -95,7 +91,7 @@ public class APE {
 	 * @return list of {@link ConstraintTemplate} objects.
 	 */
 	public Collection<ConstraintTemplate> getConstraintTemplates() {
-		return constraintFactory.getConstraintTamplates();
+		return apeDomainSetup.getConstraintFactory().getConstraintTamplates();
 	}
 	
 	
@@ -118,11 +114,10 @@ public class APE {
 		 * Encode the taxonomies as objects - generate the list of all types / modules
 		 * occurring in the taxonomies defining their submodules/subtypes
 		 */
-		allModules = new AllModules(config);
-		allTypes = new AllTypes(config);
+		apeDomainSetup = new APEDomainSetup(config);
 
-		OWLReader owlReader = new OWLReader(allModules, allTypes, config.getOntology_path());
-		Boolean ontologyRead = owlReader.readOntology(); // true if the ontology file is well-formatted
+		OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntology_path());
+		Boolean ontologyRead = owlReader.readOntology();
 
 		if (ontologyRead == false) {
 			System.out.println("Error occured while reading the provided ontology.");
@@ -133,21 +128,19 @@ public class APE {
 		 * Set the the empty type (representing the absence of types) as a direct child
 		 * of root type
 		 */
-		succRun &= allTypes.getRootPredicate().addSubPredicate(allTypes.getEmptyType().getPredicateID());
+		succRun &= apeDomainSetup.getAllTypes().getRootPredicate().addSubPredicate(apeDomainSetup.getAllTypes().getEmptyType().getPredicateID());
 
 		/*
 		 * Update allModules and allTypes sets based on the module.json file
 		 */
-		APEUtils.readModuleJson(config.getTool_annotations_path(), allModules, allTypes);
+		APEUtils.readModuleJson(config.getTool_annotations_path(), apeDomainSetup);
 		
-		succRun &= allModules.trimTaxonomy();
-		succRun &= allTypes.trimTaxonomy();
+		succRun &= apeDomainSetup.trimTaxonomy();
 		
 		/*
 		 * Define set of all constraint formats
 		 */
-		constraintFactory = new ConstraintFactory();
-		constraintFactory.initializeConstraints(allModules, allTypes);
+		apeDomainSetup.initializeConstraints();
 		
 		return succRun;
 	}
@@ -158,7 +151,7 @@ public class APE {
 	 * @return List where each element correspond to a map that can be transformed into JSON objects.
 	 */
 	public List<Map<String, String>> getTypeElements(String dimensionRootID) {
-		List<Type> types = allTypes.getElementsFromSubTaxonomy(allTypes.get(dimensionRootID));
+		List<Type> types = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(apeDomainSetup.getAllTypes().get(dimensionRootID));
 		List<Map<String, String>> transformedTypes = new ArrayList<Map<String, String>>();
 		for(Type currType : types) {
 			transformedTypes.add(currType.toMap());
@@ -210,12 +203,11 @@ public class APE {
 		 */
 		SATsolutionsList allSolutions = new SATsolutionsList(config);
 
-		unformattedConstr = new ArrayList<ConstraintData>();
 		
-		unformattedConstr = APEUtils.readConstraints(config.getConstraints_path(), allTypes, allModules);
+		APEUtils.readConstraints(config.getConstraints_path(), apeDomainSetup);
 		
 		/** Print the setup information when necessary. */
-		APEUtils.debugPrintout(config.getDebug_mode(), allModules, allTypes, constraintFactory, unformattedConstr);
+		APEUtils.debugPrintout(config.getDebug_mode(), apeDomainSetup);
 
 		/**
 		 * Loop over different lengths of the workflow until either, max workflow length
@@ -227,7 +219,7 @@ public class APE {
 		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
 				&& solutionLength <= config.getSolution_max_length()) {
 
-			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(allModules, allTypes, allSolutions, config, constraintFactory, unformattedConstr, solutionLength);
+			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, config, solutionLength);
 
 			APEUtils.printHeader(implSATsynthesis.getSolutionSize(), "Workflow discovery - length");
 
@@ -296,8 +288,8 @@ public class APE {
 			out.println("");
 			out.close();
 			SAT_solution currSol = allSolutions.get(i).getnativeSATsolution();
-			currSol.getRelevantSolutionModules(allModules);
-			for (Module curr : currSol.getRelevantSolutionModules(allModules)) {
+			currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules());
+			for (Module curr : currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules())) {
 				if (curr.getModuleExecution() != null) {
 					curr.getModuleExecution()
 							.run(config.getExecution_scripts_folder() + "/workflowSolution_" + i + ".sh");

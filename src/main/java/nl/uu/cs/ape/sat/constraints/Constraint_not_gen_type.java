@@ -4,6 +4,7 @@ import java.util.List;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
@@ -41,8 +42,8 @@ public class Constraint_not_gen_type extends ConstraintTemplate {
 
 		/* working on first parameter */
 		List<TaxonomyPredicate> parameterDimensions = parameters.get(0).getParameterTypes();
-		Type type  = (Type) TypeUtils.getConjunctType(parameterDimensions, allTypes);
-		GeneralEncodingUtils.getConjunctConstraints(type, parameterDimensions, mappings, typeAutomaton, WorkflowElement.MEMORY_TYPE);
+		Type type  = (Type) TypeUtils.generateAbstractType(parameterDimensions, allTypes, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(type, parameterDimensions, mappings, typeAutomaton, WorkflowElement.MEMORY_TYPE, LogicOperation.AND);
 		
 
 		if (type == null) {

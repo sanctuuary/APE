@@ -167,7 +167,7 @@ public class SAT_solution extends SolutionInterpreter {
 
 	/**
 	 * Returns the list of modules, corresponding to their position in the workflow.
-	 * 
+	 * @param allModules - list of all the modules in the domain
 	 * @return List of {@link Module}s in the order they appear in the solution
 	 *         workflow.
 	 */

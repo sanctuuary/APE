@@ -8,9 +8,12 @@ import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
@@ -159,9 +162,10 @@ public class Module extends AbstractModule {
 	 * @param allTypes   - list of all the types
 	 * @return New Module object.
 	 */
-	public static Module moduleFromJson(JSONObject jsonModule, AllModules allModules, AllTypes allTypes)
+	public static Module moduleFromJson(JSONObject jsonModule, APEDomainSetup domainSetup)
 			throws JSONException {
-
+		AllModules allModules = domainSetup.getAllModules();
+		AllTypes allTypes = domainSetup.getAllTypes();
 		String moduleID = jsonModule.getString(APEConfig.getJsonTags("id"));
 		String moduleLabel = jsonModule.getString(APEConfig.getJsonTags("label"));
 		Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("taxonomyTerms"), String.class));
@@ -197,10 +201,23 @@ public class Module extends AbstractModule {
 		List<DataInstance> inputs = new ArrayList<DataInstance>();
 		List<DataInstance> outputs = new ArrayList<DataInstance>();
 
+		/* For each input */
 		for (JSONObject jsonInput : jsonModuleInput) {
 			if (!jsonInput.isEmpty()) {
 				DataInstance input = new DataInstance();
+				/* explore all dimensions of the data type */
 				for (String typeSubntology : jsonInput.keySet()) {
+					/* Logical connective that determines the semantics of the list notion, i.e. whether all the types in the list have to be satisfied or at least one of them. */
+					LogicOperation logConn = LogicOperation.AND;
+					List<TaxonomyPredicate> logConnectedPredicates = new ArrayList<TaxonomyPredicate>();
+					if(typeSubntology.endsWith("$OR$")) {
+						logConn = LogicOperation.OR;
+						typeSubntology = typeSubntology.replace("$OR$", "");
+					} else if(typeSubntology.endsWith("$AND$")) {
+						logConn = LogicOperation.AND;
+						typeSubntology = typeSubntology.replace("$AND$", "");
+					} 
+					/* for each dimension explore all the types specified */
 					for (String currTypeID : APEUtils.getListFromJson(jsonInput, typeSubntology, String.class)) {
 						if (allTypes.get(currTypeID) == null) {
 							System.err.println("Data type \"" + currTypeID
@@ -211,7 +228,7 @@ public class Module extends AbstractModule {
 							if (currType != null) {
 								/* if the type exists, make it relevant from the taxonomy perspective and add it to the inputs */
 								currType.setAsRelevantTaxonomyTerm(allTypes);
-								input.addType(currType);
+								logConnectedPredicates.add(currType);
 							}
 						} else {
 							throw new JSONException(
@@ -219,7 +236,11 @@ public class Module extends AbstractModule {
 											+ "' was not defined, but it was used as annotation for input type '" + currTypeID + "'.");
 						}
 					}
+					Type newAbsType = (Type) domainSetup.generateHelperPredicate(logConnectedPredicates, logConn);
+					input.addType(newAbsType);
 				}
+				
+				
 				inputs.add(input);
 			}
 		}
@@ -228,6 +249,16 @@ public class Module extends AbstractModule {
 			if (!jsonOutput.isEmpty()) {
 				DataInstance output = new DataInstance();
 				for (String typeSubntology : jsonOutput.keySet()) {
+					/* Logical connective that determines the semantics of the list notion, i.e. whether all the types in the list have to be satisfied or at least one of them. */
+					LogicOperation logConn = LogicOperation.AND;
+					List<TaxonomyPredicate> logConnectedPredicates = new ArrayList<TaxonomyPredicate>();
+					if(typeSubntology.endsWith("$OR$")) {
+						logConn = LogicOperation.OR;
+						typeSubntology = typeSubntology.replace("$OR$", "");
+					} else if(typeSubntology.endsWith("$AND$")) {
+						logConn = LogicOperation.AND;
+						typeSubntology = typeSubntology.replace("$AND$", "");
+					} 
 					for (String currTypeID : APEUtils.getListFromJson(jsonOutput, typeSubntology, String.class)) {
 						if (allTypes.get(currTypeID) == null) {
 							System.err.println("Data type \"" + currTypeID.toString()
@@ -239,7 +270,7 @@ public class Module extends AbstractModule {
 							if (currType != null) {
 								/* if the type exists, make it relevant from the taxonomy perspective and add it to the outputs */
 								currType.setAsRelevantTaxonomyTerm(allTypes);
-								output.addType(currType);
+								logConnectedPredicates.add(currType);
 							}
 						} else {
 							throw new JSONException(
@@ -247,6 +278,8 @@ public class Module extends AbstractModule {
 											+ "' was not defined, but it was used as annotation for output type '" + currTypeID + "'.");
 						}
 					}
+					Type newAbsType = (Type) domainSetup.generateHelperPredicate(logConnectedPredicates, logConn);
+					output.addType(newAbsType);
 				}
 				outputs.add(output);
 			}

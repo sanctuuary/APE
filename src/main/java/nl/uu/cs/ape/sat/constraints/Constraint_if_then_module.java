@@ -10,6 +10,7 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.GeneralEncodingUtils;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.formulas.*;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -42,12 +43,12 @@ public class Constraint_if_then_module extends ConstraintTemplate {
 		
 		/* working on first parameter */
 		List<TaxonomyPredicate> seondInSeq = parameters.get(0).getParameterTypes();
-		AbstractModule if_module  = (AbstractModule) ModuleUtils.getConjunctModule(seondInSeq, allModules);
-		GeneralEncodingUtils.getConjunctConstraints(if_module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE);
+		AbstractModule if_module  = (AbstractModule) ModuleUtils.generateAbstractmodule(seondInSeq, allModules, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(if_module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE, LogicOperation.AND);
 		/* working on second parameter */
 		List<TaxonomyPredicate> firstdInSeq = parameters.get(1).getParameterTypes();
-		AbstractModule then_module  = (AbstractModule) ModuleUtils.getConjunctModule(firstdInSeq, allModules);
-		GeneralEncodingUtils.getConjunctConstraints(then_module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE);
+		AbstractModule then_module  = (AbstractModule) ModuleUtils.generateAbstractmodule(firstdInSeq, allModules, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(then_module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE, LogicOperation.AND);
 
 		if (if_module == null || then_module == null) {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");

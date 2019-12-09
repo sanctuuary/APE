@@ -4,6 +4,7 @@ import java.util.List;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
@@ -40,13 +41,13 @@ public class Constraint_if_use_then_type extends ConstraintTemplate {
 		String constraint = "";
 		/* working on first parameter */
 		List<TaxonomyPredicate> parameterDimensions1 = parameters.get(0).getParameterTypes();
-		Type ifType  = (Type) TypeUtils.getConjunctType(parameterDimensions1, allTypes);
-		GeneralEncodingUtils.getConjunctConstraints(ifType, parameterDimensions1, mappings, typeAutomaton, WorkflowElement.USED_TYPE);
+		Type ifType  = (Type) TypeUtils.generateAbstractType(parameterDimensions1, allTypes, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(ifType, parameterDimensions1, mappings, typeAutomaton, WorkflowElement.USED_TYPE, LogicOperation.AND);
 		
 		/* working on second parameter */
 		List<TaxonomyPredicate> parameterDimensions2 = parameters.get(1).getParameterTypes();
-		Type thenType  = (Type) TypeUtils.getConjunctType(parameterDimensions2, allTypes);
-		GeneralEncodingUtils.getConjunctConstraints(thenType, parameterDimensions2, mappings, typeAutomaton, WorkflowElement.USED_TYPE);
+		Type thenType  = (Type) TypeUtils.generateAbstractType(parameterDimensions2, allTypes, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(thenType, parameterDimensions2, mappings, typeAutomaton, WorkflowElement.USED_TYPE, LogicOperation.AND);
 
 		if (ifType == null || thenType == null) {
 			System.err.println("Constraint argument does not exist in the type taxonomy.");

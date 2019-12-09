@@ -26,10 +26,12 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintData;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
@@ -46,18 +48,12 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  */
 public class SAT_SynthesisEngine implements SynthesisEngine {
 
-	/** Hierarchy of all the modules in the domain. */
-	private final AllModules allModules;
-	/** Hierarchy of all the data types annotated in the domain. */
-	private final AllTypes allTypes;
+	/** Object that contains all the domain information. */
+	private final APEDomainSetup domainSetup;
 	/** APE library configuration object. */
 	private final APEConfig config;
 	/** Mapping of all the predicates to integers. */
 	private final AtomMappings mappings;
-	/** Factory object used to generate constraints. */
-	private final ConstraintFactory allConsTemplates;
-	/** Representation of the constraint file. */
-	private final List<ConstraintData> unformattedConstr;
 	/** Set of all the solutions found by the library. */
 	private final SATsolutionsList allSolutions;
 	/** CNF encoding of the problem. */
@@ -79,25 +75,17 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	/**
 	 * Setup of an instance of the SAT synthesis engine.
 	 * 
-	 * @param allModules
-	 * @param allTypes
+	 * @param domainSetup
 	 * @param allSolutions
 	 * @param config
-	 * @param annotated_modules
-	 * @param allConsTemplates
-	 * @param unformattedConstr
 	 */
-	public SAT_SynthesisEngine(AllModules allModules, AllTypes allTypes, SATsolutionsList allSolutions,
-			APEConfig config, ConstraintFactory allConsTemplates,
-			List<ConstraintData> unformattedConstr, int size) {
-		this.allModules = allModules;
-		this.allTypes = allTypes;
+	public SAT_SynthesisEngine(APEDomainSetup domainSetup, SATsolutionsList allSolutions,
+			APEConfig config, int size) {
+		this.domainSetup = domainSetup;
 		this.allSolutions = allSolutions;
 		this.config = config;
 		allSolutions.newEncoding();
 		this.mappings = allSolutions.getMappings();
-		this.allConsTemplates = allConsTemplates;
-		this.unformattedConstr = unformattedConstr;
 		this.temp_sat_input = null;
 		this.cnfEncoding = new StringBuilder();
 
@@ -116,8 +104,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	public boolean synthesisEncoding() throws IOException {
 
 		long problemSetupStartTime = System.currentTimeMillis();
-		TaxonomyPredicate rootModule = allModules.getRootPredicate();
-		TaxonomyPredicate rootType = allTypes.getRootPredicate();
+		TaxonomyPredicate rootModule = domainSetup.getAllModules().getRootPredicate();
+		TaxonomyPredicate rootType = domainSetup.getAllTypes().getRootPredicate();
 
 		/*
 		 * Generate the automaton
@@ -136,18 +124,18 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Create the constraints that provide distinction of data instances.
 		 */
-//		cnfEncoding = cnfEncoding.append(allTypes.endoceInstances(typeAutomaton));
+//		cnfEncoding = cnfEncoding.append(domainSetup.getAllTypes().endoceInstances(typeAutomaton));
 
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the tools 2.
 		 * Mandatory usage of the tools - from taxonomy. 3. Adding the constraints
 		 * enforcing the taxonomy structure.
 		 */
-		cnfEncoding = cnfEncoding.append(ModuleUtils.moduleMutualExclusion(allModules,moduleAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(ModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(),moduleAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions enfocements");
-		cnfEncoding = cnfEncoding.append(ModuleUtils.moduleMandatoryUsage(allModules, moduleAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(ModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton, mappings));
 		cnfEncoding = cnfEncoding.append(
-				ModuleUtils.moduleEnforceTaxonomyStructure(allModules, rootModule.getPredicateID(), moduleAutomaton, mappings));
+				ModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule.getPredicateID(), moduleAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage enfocements");
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the types/formats 2.
@@ -155,20 +143,19 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * considered a type) 3. Adding the constraints enforcing the taxonomy
 		 * structure.
 		 */
-		cnfEncoding = cnfEncoding.append(TypeUtils.typeMutualExclusion(allTypes, typeAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(TypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions enfocements");
-		cnfEncoding = cnfEncoding.append(TypeUtils.typeMandatoryUsage(allTypes, rootType, typeAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(TypeUtils.typeMandatoryUsage(domainSetup.getAllTypes(), rootType, typeAutomaton, mappings));
 		cnfEncoding = cnfEncoding
-				.append(TypeUtils.typeEnforceTaxonomyStructure(allTypes, rootType.getPredicateID(), typeAutomaton, mappings));
+				.append(TypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), rootType.getPredicateID(), typeAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage enfocements");
 		/*
 		 * Encode the constraints from the file based on the templates (manual
 		 * templates)
 		 */
-		if (unformattedConstr != null && !unformattedConstr.isEmpty()) {
+		if (domainSetup.getUnformattedConstr() != null && !domainSetup.getUnformattedConstr().isEmpty()) {
 			cnfEncoding = cnfEncoding
-					.append(APEUtils.encodeAPEConstraints(unformattedConstr, allConsTemplates,
-							allModules, allTypes, mappings, moduleAutomaton, typeAutomaton));
+					.append(APEUtils.encodeAPEConstraints(domainSetup, mappings, moduleAutomaton, typeAutomaton));
 			APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
 		}
 		/*
@@ -176,7 +163,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * reuse the mappings for states, instead of introducing new ones, using the I/O
 		 * types of NodeType.UNKNOWN.
 		 */
-		String inputDataEncoding = TypeUtils.encodeInputData(allTypes, config.getProgram_inputs(), typeAutomaton, mappings);
+		String inputDataEncoding = TypeUtils.encodeInputData(domainSetup.getAllTypes(), config.getProgram_inputs(), typeAutomaton, mappings);
 		if (inputDataEncoding == null) {
 			return false;
 		}
@@ -184,12 +171,14 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Encode the workflow output
 		 */
-		String outputDataEncoding = TypeUtils.encodeOutputData(allTypes, config.getProgram_outputs(), typeAutomaton, mappings);
+		String outputDataEncoding = TypeUtils.encodeOutputData(domainSetup.getAllTypes(), config.getProgram_outputs(), typeAutomaton, mappings);
 		if (outputDataEncoding == null) {
 			return false;
 		}
 		cnfEncoding = cnfEncoding.append(outputDataEncoding);
 
+		cnfEncoding = cnfEncoding.append(domainSetup.getConstraintsForHelperPredicates(mappings, moduleAutomaton, typeAutomaton));
+		
 		/*
 		 * Counting the number of variables and clauses that will be given to the SAT
 		 * solver TODO Improve thi-s approach, no need to read the whole String again.
@@ -199,12 +188,6 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		StringBuilder sat_input_header = new StringBuilder("p cnf " + variables + " " + clauses + "\n");
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
 		System.out.println();
-		/*
-		 * Create a temp file that will be used as input for the SAT solver.
-		
-		temp_sat_input = File.createTempFile("sat_input_" + this.getSolutionSize() + "_len_", ".cnf");
-		temp_sat_input.deleteOnExit();
-		 */
 		/*
 		 * Fixing the input and output files for easier testing.
 		 
@@ -255,8 +238,6 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	 * 
 	 * @param sat_input   		- CNF formula in dimacs form
 	 * @param mappings          - atom mappings
-	 * @param allModules        - list of all the modules
-	 * @param allTypes          - list of all the types
 	 * @param solutionsFoundMax
 	 * @return List of {@link SAT_solution SAT_solutions}. Possibly empty list.
 	 */
@@ -309,31 +290,17 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		return solutions;
 	}
 
-	public AllModules getAllModules() {
-		return allModules;
-	}
-
-	public AllTypes getAllTypes() {
-		return allTypes;
-	}
 
 	public APEConfig getConfig() {
 		return config;
 	}
+	
+	public APEDomainSetup getDomainSetup() {
+		return domainSetup;
+	}
 
 	public AtomMappings getMappings() {
 		return mappings;
-	}
-
-	public ConstraintFactory getAllConsTemplates() {
-		return allConsTemplates;
-	}
-
-	/**
-	 * @return the field {@link unformattedConstr}
-	 */
-	public List<ConstraintData> getUnformattedConstr() {
-		return unformattedConstr;
 	}
 
 	public SATsolutionsList getAllSolutions() {
@@ -346,6 +313,14 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 
 	public TypeAutomaton getTypeAutomaton() {
 		return typeAutomaton;
+	}
+	
+	/** 
+	 * Return the {@link Type} object that represents the empty type, i.e. absence of types.
+	 * @return
+	 */
+	public Type getEmptyType() {
+		return domainSetup.getAllTypes().getEmptyType();
 	}
 
 	/**

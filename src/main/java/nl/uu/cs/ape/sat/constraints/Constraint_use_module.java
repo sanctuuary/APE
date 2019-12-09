@@ -4,6 +4,7 @@ import java.util.List;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
@@ -40,8 +41,8 @@ public class Constraint_use_module extends ConstraintTemplate {
 		String constraint = "";
 		/* working on first parameter */
 		List<TaxonomyPredicate> seondInSeq = parameters.get(0).getParameterTypes();
-		AbstractModule module  = (AbstractModule) ModuleUtils.getConjunctModule(seondInSeq, allModules);
-		GeneralEncodingUtils.getConjunctConstraints(module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE);
+		AbstractModule module  = (AbstractModule) ModuleUtils.generateAbstractmodule(seondInSeq, allModules, LogicOperation.AND);
+		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(module, seondInSeq, mappings, moduleAutomaton, WorkflowElement.MODULE, LogicOperation.AND);
 		
 		if (module == null) {
 			System.err.println("Constraint argument does not exist in the tool taxonomy.");

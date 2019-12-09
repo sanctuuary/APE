@@ -68,7 +68,6 @@ public class ConstraintFactory {
 	/**
 	 * Adding each constraint format in the set of all cons. formats
 	 * 
-	 * @param allConsTemplates - set that represents all the cons. formats
 	 * @return String description of all the formats (ID, description and number of
 	 *         parameters for each).
 	 */

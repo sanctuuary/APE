@@ -55,10 +55,10 @@ public class OWLReader {
 	 * @param allModules   - set of all the modules in our system
 	 * @param allTypes     - set of all the types in our system
 	 */
-	public OWLReader(AllModules allModules, AllTypes allTypes, String ontologyPath) {
+	public OWLReader(APEDomainSetup domain, String ontologyPath) {
 		this.ontologyPath = ontologyPath;
-		this.allModules = allModules;
-		this.allTypes = allTypes;
+		this.allModules = domain.getAllModules();
+		this.allTypes = domain.getAllTypes();
 		this.factory = OWLManager.getOWLDataFactory();
 		typeRootExists = false;
 	}
