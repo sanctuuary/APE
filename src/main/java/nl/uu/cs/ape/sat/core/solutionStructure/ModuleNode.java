@@ -50,14 +50,14 @@ public class ModuleNode extends SolutionWorkflowNode {
 	 *                   a State in ModuleAutomaton that does not correspond to a
 	 *                   {@code WorkflowElement#MODULE}..
 	 */
-	public ModuleNode(State automatonState) throws Exception {
+	public ModuleNode(State automatonState) throws ExceptionInInitializerError {
 		super(automatonState);
 		this.usedModule = null;
 		this.abstractModules = new HashSet<AbstractModule>();
 		this.prevModuleNode = null;
 		this.nextModuleNode = null;
 		if (automatonState.getWorkflowStateType() != WorkflowElement.MODULE) {
-			throw new Exception(
+			throw new ExceptionInInitializerError(
 					"Class ModuleNode can only be instantiated using State that is of type WorkflowElement.MODULE, as a parameter.");
 		}
 		inputTypes = new HashSet<TypeNode>();

@@ -156,11 +156,14 @@ public class APEDomainSetup {
 	public String getConstraintsForHelperPredicates(AtomMappings mappings, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
 		StringBuilder constraints = new StringBuilder();
 		Automaton automaton;
+		WorkflowElement workflowElem;
 		for (TaxonomyPredicateHelper helperPredicate : helperPredicates) {
 			if(helperPredicate.getSubPredicates().get(0) instanceof Type) {
 				automaton = typeAutomaton;
+				workflowElem = WorkflowElement.MEMORY_TYPE;
 			} else {
 				automaton = moduleAutomaton;
+				workflowElem = WorkflowElement.MODULE;
 			}
 			for (State currState : automaton.getAllStates()) {
 				if (helperPredicate.getLogicOp() == LogicOperation.OR) {
@@ -169,10 +172,10 @@ public class APEDomainSetup {
 					 * disjointLabels has to be used.
 					 */
 					constraints = constraints.append("-")
-							.append(mappings.add(helperPredicate, currState, null)).append(" ");
+							.append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
 
 					for (TaxonomyPredicate subLabel : helperPredicate.getSubPredicates()) {
-						constraints = constraints.append(mappings.add(subLabel, currState, null)).append(" ");
+						constraints = constraints.append(mappings.add(subLabel, currState, workflowElem)).append(" ");
 					}
 					constraints = constraints.append(" 0\n");
 
@@ -181,9 +184,9 @@ public class APEDomainSetup {
 					 * predicate has to be used as well.
 					 */
 					for (TaxonomyPredicate subLabel : helperPredicate.getSubPredicates()) {
-						constraints = constraints.append("-").append(mappings.add(subLabel, currState, null))
+						constraints = constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
 								.append(" ");
-						constraints = constraints.append(mappings.add(helperPredicate, currState, null))
+						constraints = constraints.append(mappings.add(helperPredicate, currState, workflowElem))
 								.append(" 0\n");
 					}
 				} else if (helperPredicate.getLogicOp() == LogicOperation.AND) {
@@ -194,9 +197,9 @@ public class APEDomainSetup {
 					 */
 					for (TaxonomyPredicate subLabel : helperPredicate.getSubPredicates()) {
 						constraints = constraints.append("-")
-								.append(mappings.add(helperPredicate, currState, null)).append(" ");
+								.append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
 
-						constraints = constraints.append(mappings.add(subLabel, currState, null))
+						constraints = constraints.append(mappings.add(subLabel, currState, workflowElem))
 								.append(" 0\n");
 					}
 
@@ -205,10 +208,10 @@ public class APEDomainSetup {
 					 * has to be used as well.
 					 */
 					for (TaxonomyPredicate subLabel : helperPredicate.getSubPredicates()) {
-						constraints = constraints.append("-").append(mappings.add(subLabel, currState, null))
+						constraints = constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
 								.append(" ");
 					}
-					constraints = constraints.append(mappings.add(helperPredicate, currState, null))
+					constraints = constraints.append(mappings.add(helperPredicate, currState, workflowElem))
 							.append(" 0\n");
 				}
 			}

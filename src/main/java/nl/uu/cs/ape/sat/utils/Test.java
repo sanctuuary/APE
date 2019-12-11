@@ -12,8 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.kitfox.svg.Path;
-
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.models.AllModules;
@@ -27,9 +25,9 @@ public class Test {
 //		runSynthesisSetup();
 
 //		runSynthesisTest();
-
-		APE apeFramework = runSynthesisSetup();
-		testConstraintTemplates(apeFramework);
+		runJsonConversionTest();
+//		APE apeFramework = runSynthesisSetup();
+//		testConstraintTemplates(apeFramework);
 	}
 
 	/**

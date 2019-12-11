@@ -13,6 +13,7 @@ import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 /**
  * The {@code ConstraintTemplate} class is an abstract class used to represent a
@@ -115,6 +116,22 @@ public abstract class ConstraintTemplate {
 		constJson.put("description", description);
 		
 		return constJson.toString(3) + ",\n";
+	}
+	
+	public JSONObject toJSON() {
+		JSONObject currJson = new JSONObject();
+		currJson.put("constraintID", constraintID);
+		currJson.put("description", description);
+		JSONArray params = new JSONArray();
+		for(ConstraintParameter param : parameters) {
+			JSONArray oneParamDimensions = new JSONArray();
+			for(TaxonomyPredicate pred : param.getParameterTypes()) {
+				oneParamDimensions.put(pred.getPredicateID());
+			}
+			params.put(oneParamDimensions);
+		}
+		currJson.put("parameters", params);
+		return currJson; 
 	}
 
 	/**

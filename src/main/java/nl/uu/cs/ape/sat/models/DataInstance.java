@@ -33,7 +33,11 @@ public class DataInstance {
 	 * @param type - data type that characterizes the data instance.
 	 */
 	public void addType(Type type) {
-		types.add(type);
+		if(type == null) {
+			System.err.println("Cannot add null as data instance!");
+		} else {
+			types.add(type);
+		}
 	}
 	
 	/**

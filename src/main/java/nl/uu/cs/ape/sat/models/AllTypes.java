@@ -228,25 +228,4 @@ public class AllTypes extends AllPredicates {
 		return dimensionTypes;
 	}
 	
-	/**
-	 * Method return all the element that belong to the subTree.
-	 * @param subTreeRoot - root of the subTree
-	 * @return List of data types.
-	 */
-	public List<Type> getElementsFromSubTaxonomy(Type subTreeRoot){
-		if(subTreeRoot == null) {
-			System.err.println("Given subtaxonomy type does not exist.");
-			return null;
-		}
-		List<Type> elements = new ArrayList<>();
-		elements.add(subTreeRoot);
-		
-		for(String subTypeID : APEUtils.safe(subTreeRoot.getSubPredicates())) {
-			Type subType = this.get(subTypeID);
-			elements.addAll(getElementsFromSubTaxonomy(subType));
-		}
-		
-		return elements;
-	}
-
 }

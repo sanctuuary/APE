@@ -277,8 +277,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 			System.err.println("Unsatisfiable");
 		} catch (TimeoutException e) {
 			System.err.println("Timeout. Solving took longer than default timeout: " + timeout + " seconds.");
+		} catch (IOException e) {
+			System.err.println("Internal error while parsing the encoding.");
 		} catch (Exception e) {
-			System.err.println("Internal error while creating an object of SolutionWorkflow class.");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		if (solutionsFound == 0 || solutionsFound % 500 != 0) {

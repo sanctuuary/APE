@@ -45,14 +45,14 @@ public class TypeNode extends SolutionWorkflowNode {
 	 * @param automatonState - state in the {@link TypeAutomaton} that corresponds to the workflow node.
 	 * @throws Exception Exception when the Type Workflow Node is instantiated using a State in TypeAutomaton that does not correspond to a {@code WorkflowElement#MEMORY_TYPE}.
 	 */
-	public TypeNode(State automatonState) throws Exception {
+	public TypeNode(State automatonState) throws ExceptionInInitializerError {
 		super(automatonState);
 		this.usedTypes = new HashSet<Type>();
 		this.abstractTypes = new HashSet<Type>();
 		this.createdByModule = null;
 		usedByModules = new HashSet<ModuleNode>();
 		if (automatonState.getWorkflowStateType() != WorkflowElement.MEMORY_TYPE) {
-			throw new Exception(
+			throw new ExceptionInInitializerError(
 					"Class MemTypeNode can only be instantiated using State that is of type WorkflowElement.MEMORY_TYPE, as a parameter.");
 		}
 	}

@@ -283,14 +283,14 @@ public class OWLReader {
 		Optional<OWLAnnotation> classLabel = EntitySearcher.getAnnotations(currClass, ontology, factory.getRDFSLabel()).findFirst();
 		if (classLabel.isPresent()) {
 			OWLAnnotationValue val = classLabel.get().getValue();
-			if (val instanceof OWLLiteral) return ((OWLLiteral) val).getLiteral().replace(" ", "_");
+			if (val instanceof OWLLiteral) return ((OWLLiteral) val).getLiteral();
 		} else if (classID.contains("#")) {
 			label = classID.substring(classID.indexOf('#') + 1);
-			label = label.replace(" ", "_");
+//			label = label.replace(" ", "_");
 			return label;
 		}
 		logger.fine("Class '" + classID + "' has no label.");
-		return classID.replace(" ", "_");
+		return classID;
 		
 	}
 

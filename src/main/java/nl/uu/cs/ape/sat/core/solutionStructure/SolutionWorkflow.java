@@ -72,7 +72,7 @@ public class SolutionWorkflow {
 	 * @param typeAutomaton
 	 * @throws Exception exception in case of a mismatch between the type of automaton states and workflow nodes.
 	 */
-	public SolutionWorkflow(ModuleAutomaton toolAutomaton, TypeAutomaton typeAutomaton) throws Exception {
+	public SolutionWorkflow(ModuleAutomaton toolAutomaton, TypeAutomaton typeAutomaton) throws ExceptionInInitializerError {
 		this.moduleNodes = new ArrayList<ModuleNode>();
 		this.workflowInputTypeStates = new HashSet<TypeNode>();
 		this.workflowOutputTypeStates = new HashSet<TypeNode>();
@@ -125,7 +125,7 @@ public class SolutionWorkflow {
 	 * @param synthesisIntance - current synthesis instance
 	 * @throws Exception in case of a mismatch between the type of automaton states and workflow nodes.
 	 */
-	public SolutionWorkflow(int[] satSolution, SAT_SynthesisEngine synthesisIntance) throws Exception {
+	public SolutionWorkflow(int[] satSolution, SAT_SynthesisEngine synthesisIntance) {
 		/** Call for the default constructor. */
 		this(synthesisIntance.getModuleAutomaton(), synthesisIntance.getTypeAutomaton());
 		
@@ -145,9 +145,9 @@ public class SolutionWorkflow {
 						}
 					} else if (currLiteral.isWorkflowElementType(WorkflowElement.MEMORY_TYPE)) {
 						TypeNode currNode = this.allMemoryTypeNodes.get(currLiteral.getUsedInStateArgument());
-						if(((Type) currLiteral.getPredicate()).isSimplePredicate()) {
+						if(currLiteral.getPredicate() instanceof Type && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
 							currNode.addUsedType((Type) currLiteral.getPredicate());
-						} else {
+						} else if (currLiteral.getPredicate() instanceof Type){
 							currNode.addAbstractDescriptionOfUsedType((Type) currLiteral.getPredicate());
 						}
 					} else if (currLiteral.isWorkflowElementType(WorkflowElement.USED_TYPE)

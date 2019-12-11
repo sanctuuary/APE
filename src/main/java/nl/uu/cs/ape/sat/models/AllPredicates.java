@@ -143,5 +143,24 @@ public abstract class AllPredicates {
 		return this.predicates.get(predicateID);
 	}
 	
-	
+	/**
+	 * Method return all the element that belong to the subTree.
+	 * @param subTreeRoot - root of the subTree
+	 * @return List of data types.
+	 */
+	public List<TaxonomyPredicate> getElementsFromSubTaxonomy(TaxonomyPredicate subTreeRoot){
+		if(subTreeRoot == null) {
+			System.err.println("Given subtaxonomy type does not exist.");
+			return null;
+		}
+		List<TaxonomyPredicate> elements = new ArrayList<>();
+		elements.add(subTreeRoot);
+		
+		for(String subTypeID : APEUtils.safe(subTreeRoot.getSubPredicates())) {
+			TaxonomyPredicate subType = this.get(subTypeID);
+			elements.addAll(getElementsFromSubTaxonomy(subType));
+		}
+		
+		return elements;
+	}
 }

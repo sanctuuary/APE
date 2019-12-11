@@ -33,7 +33,9 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.TaxonomyPredicateHelper;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
@@ -102,6 +104,10 @@ public class APE {
 		return config;
 	}
 	
+	public APEDomainSetup getDomainSetup() {
+		return apeDomainSetup;
+	}
+	
 	/**
 	 * Method used to setup the domain using the configuration file and the corresponding annotation and constraints files.
 	 * @return {@code true} if the setup was successfully performed, {@code false} otherwise.
@@ -150,10 +156,13 @@ public class APE {
 	 * @param dimensionRootID - root of the data taxonomy subtree that corresponds to the list of elements that should be returned.
 	 * @return List where each element correspond to a map that can be transformed into JSON objects.
 	 */
-	public List<Map<String, String>> getTypeElements(String dimensionRootID) {
-		List<Type> types = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(apeDomainSetup.getAllTypes().get(dimensionRootID));
+	public List<Map<String, String>> getTaxonomyElements(String dimensionRootID) {
+		List<? extends TaxonomyPredicate> types = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(apeDomainSetup.getAllTypes().get(dimensionRootID));
+		if(types == null) {
+			types = apeDomainSetup.getAllModules().getElementsFromSubTaxonomy(apeDomainSetup.getAllModules().get(dimensionRootID));
+		}
 		List<Map<String, String>> transformedTypes = new ArrayList<Map<String, String>>();
-		for(Type currType : types) {
+		for(TaxonomyPredicate currType : types) {
 			transformedTypes.add(currType.toMap());
 		}
 		

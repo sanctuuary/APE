@@ -212,16 +212,19 @@ public class Module extends AbstractModule {
 					List<TaxonomyPredicate> logConnectedPredicates = new ArrayList<TaxonomyPredicate>();
 					if(typeSubntology.endsWith("$OR$")) {
 						logConn = LogicOperation.OR;
-						typeSubntology = typeSubntology.replace("$OR$", "");
 					} else if(typeSubntology.endsWith("$AND$")) {
 						logConn = LogicOperation.AND;
-						typeSubntology = typeSubntology.replace("$AND$", "");
 					} 
 					/* for each dimension explore all the types specified */
 					for (String currTypeID : APEUtils.getListFromJson(jsonInput, typeSubntology, String.class)) {
+						if(typeSubntology.endsWith("$OR$")) {
+							typeSubntology = typeSubntology.replace("$OR$", "");
+						} else if(typeSubntology.endsWith("$AND$")) {
+							typeSubntology = typeSubntology.replace("$AND$", "");
+						}
 						if (allTypes.get(currTypeID) == null) {
 							System.err.println("Data type \"" + currTypeID
-									+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
+									+ "\" used in the tool annotations does not exist in the " + typeSubntology + " taxonomy. This might influence the validity of the solutions.");
 						}
 						if (allTypes.getDataTaxonomyDimensionIDs().contains(typeSubntology)) {
 							Type currType = allTypes.addPredicate(new Type(currTypeID, currTypeID, typeSubntology, NodeType.UNKNOWN));
@@ -237,7 +240,11 @@ public class Module extends AbstractModule {
 						}
 					}
 					Type newAbsType = (Type) domainSetup.generateHelperPredicate(logConnectedPredicates, logConn);
-					input.addType(newAbsType);
+					if(newAbsType != null) {
+						newAbsType.setAsRelevantTaxonomyTerm(allTypes);
+						input.addType(newAbsType);
+					}
+					
 				}
 				
 				
@@ -254,15 +261,18 @@ public class Module extends AbstractModule {
 					List<TaxonomyPredicate> logConnectedPredicates = new ArrayList<TaxonomyPredicate>();
 					if(typeSubntology.endsWith("$OR$")) {
 						logConn = LogicOperation.OR;
-						typeSubntology = typeSubntology.replace("$OR$", "");
 					} else if(typeSubntology.endsWith("$AND$")) {
 						logConn = LogicOperation.AND;
-						typeSubntology = typeSubntology.replace("$AND$", "");
 					} 
 					for (String currTypeID : APEUtils.getListFromJson(jsonOutput, typeSubntology, String.class)) {
+						if(typeSubntology.endsWith("$OR$")) {
+							typeSubntology = typeSubntology.replace("$OR$", "");
+						} else if(typeSubntology.endsWith("$AND$")) {
+							typeSubntology = typeSubntology.replace("$AND$", "");
+						}
 						if (allTypes.get(currTypeID) == null) {
 							System.err.println("Data type \"" + currTypeID.toString()
-									+ "\" used in the tool annotations does not exist in the data taxonomy. This might influence the validity of the solutions.");
+									+ "\" used in the tool annotations does not exist in the " + typeSubntology + " taxonomy. This might influence the validity of the solutions.");
 						}
 						if (allTypes.getDataTaxonomyDimensionIDs().contains(typeSubntology)) {
 							Type currType = allTypes.addPredicate(new Type(currTypeID, currTypeID, typeSubntology,
@@ -279,7 +289,10 @@ public class Module extends AbstractModule {
 						}
 					}
 					Type newAbsType = (Type) domainSetup.generateHelperPredicate(logConnectedPredicates, logConn);
-					output.addType(newAbsType);
+					if(newAbsType != null) {
+						newAbsType.setAsRelevantTaxonomyTerm(allTypes);
+						output.addType(newAbsType);
+					}
 				}
 				outputs.add(output);
 			}
