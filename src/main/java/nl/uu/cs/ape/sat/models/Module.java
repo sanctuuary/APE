@@ -288,6 +288,7 @@ public class Module extends AbstractModule {
 											+ "' was not defined, but it was used as annotation for output type '" + currTypeID + "'.");
 						}
 					}
+					/* Create a new type, that represents a disjunction/conjunction of the types, that can be used to abstract over each of the tools individually. */
 					Type newAbsType = (Type) domainSetup.generateHelperPredicate(logConnectedPredicates, logConn);
 					if(newAbsType != null) {
 						newAbsType.setAsRelevantTaxonomyTerm(allTypes);

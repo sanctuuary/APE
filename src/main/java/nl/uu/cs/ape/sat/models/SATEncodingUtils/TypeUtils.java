@@ -265,7 +265,7 @@ public class TypeUtils {
 	 * @param logicOp - logical operation that is used to group the types (e.g. {@link LogicOperation.OR})
 	 * @return a new abstract type
 	 */
-	public static TaxonomyPredicate generateAbstractType(List<TaxonomyPredicate> relatedTypes, AllTypes allTypes, LogicOperation logicOp) {
+	public static TaxonomyPredicate generateAbstractTypeX(List<TaxonomyPredicate> relatedTypes, AllTypes allTypes, LogicOperation logicOp) {
 		if(relatedTypes.isEmpty()) {
 			return null;
 		}

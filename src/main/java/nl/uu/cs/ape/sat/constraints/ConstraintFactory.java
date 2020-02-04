@@ -9,7 +9,7 @@ import java.util.Map;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.ConstraintData;
+import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
@@ -215,7 +215,7 @@ public class ConstraintFactory {
 	 * @param constr
 	 * @return
 	 */
-	public String getDescription(ConstraintData constr) {
+	public String getDescription(ConstraintTemplateData constr) {
 		ConstraintTemplate currTmpl = this.constraintTamplates.get(constr.getConstraintID());
 		List<ConstraintParameter> params = constr.getParameters();
 		String description = currTmpl.getDescription();

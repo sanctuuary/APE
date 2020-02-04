@@ -16,7 +16,7 @@ import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
-import nl.uu.cs.ape.sat.models.ConstraintData;
+import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.TaxonomyPredicateHelper;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
@@ -39,12 +39,12 @@ public class APEDomainSetup {
 	/** Object used to create temporal constraints. */ 
 	private ConstraintFactory constraintFactory;
 	/** List of data gathered from the constraint file. */
-	private List<ConstraintData> unformattedConstr;
+	private List<ConstraintTemplateData> unformattedConstr;
 	private List<TaxonomyPredicateHelper> helperPredicates;
 	
 	
 	public APEDomainSetup(APEConfig config) {
-		unformattedConstr = new ArrayList<ConstraintData>();
+		unformattedConstr = new ArrayList<ConstraintTemplateData>();
 		allModules = new AllModules(config);
 		allTypes = new AllTypes(config);
 		constraintFactory = new ConstraintFactory();
@@ -60,12 +60,12 @@ public class APEDomainSetup {
 	/**
 	 * Add a constraint to the list of constraints, that should be encoded during the execution of the synthesis.
 	 */
-	public void addConstraintData(ConstraintData constr) {
+	public void addConstraintData(ConstraintTemplateData constr) {
 		this.unformattedConstr.add(constr);
 	}
 	
 	/** @return the field {@link unformattedConstr}. */
-	public List<ConstraintData> getUnformattedConstr() {
+	public List<ConstraintTemplateData> getUnformattedConstr() {
 		return unformattedConstr;
 	}
 
@@ -125,35 +125,41 @@ public class APEDomainSetup {
 		return newAbsType;
 	}
 	
-	
-	public TaxonomyPredicate generateHelperPredicate(List<TaxonomyPredicate> relatedTypes, LogicOperation logicOp) {
-		if(relatedTypes.isEmpty()) {
+	/**
+	 * Method used to generate a new predicate that should provide an interface for handling multiple predicates.
+	 * New predicated is used to simplify interaction with a set of related tools/types.
+	 * @param relatedPredicates - list of types/tools that are related to each other
+	 * @param logicOp -logical operation that describes the relation between the types
+	 * @return an abstract predicate that provides abstraction over a disjunction/conjunction of the labels
+	 */
+	public TaxonomyPredicate generateHelperPredicateX(List<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
+		if(relatedPredicates.isEmpty()) {
 			return null;
 		}
-		if(relatedTypes.size() == 1) {
-			return relatedTypes.get(0);
+		if(relatedPredicates.size() == 1) {
+			return relatedPredicates.get(0);
 		}
 		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
-		for(TaxonomyPredicate label : relatedTypes) {
+		for(TaxonomyPredicate label : relatedPredicates) {
 			abstractLabel = abstractLabel.append(label.getPredicateID());
 		}
 		TaxonomyPredicate newAbsType; 
-		if(relatedTypes.get(0) instanceof Type) {
-			newAbsType = allTypes.addPredicate(new Type(abstractLabel.toString(), abstractLabel.toString(), relatedTypes.get(0).getRootNode(), NodeType.ABSTRACT));
+		if(relatedPredicates.get(0) instanceof Type) {
+			newAbsType = allTypes.addPredicate(new Type(abstractLabel.toString(), abstractLabel.toString(), relatedPredicates.get(0).getRootNode(), NodeType.ABSTRACT));
 		} else {
-			newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), relatedTypes.get(0).getRootNode(), NodeType.ABSTRACT));
+			newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), relatedPredicates.get(0).getRootNode(), NodeType.ABSTRACT));
 		}
 		TaxonomyPredicateHelper helperPredicate = new TaxonomyPredicateHelper(newAbsType, logicOp);
 		
-		for(TaxonomyPredicate predicate : relatedTypes) {
+		for(TaxonomyPredicate predicate : relatedPredicates) {
 			helperPredicate.addSubPredicate(predicate);
 		}
 		helperPredicates.add(helperPredicate);
-		return newAbsType;
+		return helperPredicate.getTaxonomyPredicate();
 	}
 	
 	
-	public String getConstraintsForHelperPredicates(AtomMappings mappings, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
+	public String getConstraintsForHelperPredicatesX(AtomMappings mappings, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
 		StringBuilder constraints = new StringBuilder();
 		Automaton automaton;
 		WorkflowElement workflowElem;

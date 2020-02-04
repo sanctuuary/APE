@@ -8,17 +8,17 @@ import java.util.List;
 import nl.uu.cs.ape.sat.constraints.ConstraintParameter;
 
 /**
- * The {#code ConstraintData} class is used to store the data describing each constrain.
+ * The {#code ConstraintTemplateData} class is used to store the data describing each constrain.
  *
  * @author Vedran Kasalica
  *
  */
-public class ConstraintData {
+public class ConstraintTemplateData {
 
 	private String constraintID;
 	private List<ConstraintParameter> parameters;
 	
-	public ConstraintData(String constraintID,  List<ConstraintParameter> parameters) {
+	public ConstraintTemplateData(String constraintID,  List<ConstraintParameter> parameters) {
 		this.constraintID = constraintID;
 		this.parameters = parameters;
 	}

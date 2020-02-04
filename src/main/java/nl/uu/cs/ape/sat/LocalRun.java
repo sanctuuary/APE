@@ -16,8 +16,8 @@ public class LocalRun {
 
 	public static void main(String[] args) {
 
-		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase6/";
-		String fileName = "ape.configuration";
+		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/Simon_Han_paper/";
+		String fileName = "q3_full/ape.configuration";
 		if (!APEUtils.isValidReadFile(path + fileName)) {
 			System.err.println("Bad path.");
 			return;

@@ -35,7 +35,7 @@ import nl.uu.cs.ape.sat.constraints.ConstraintParameter;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
-import nl.uu.cs.ape.sat.models.ConstraintData;
+import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -94,12 +94,12 @@ public final class APEUtils {
 					}
 					parameters.add(currParameter);
 				}
-			} catch (Exception e) {
+			} catch (JSONException e) {
 				System.err.println("Error in file: " + constraintsPath + ", at constraint no: " + currNode
-						+ ". Constraint skipped.");
+						+ ". Bad format. Constraint skipped.");
 				continue;
 			}
-			ConstraintData currConstr = new ConstraintData(constraintID, parameters);
+			ConstraintTemplateData currConstr = new ConstraintTemplateData(constraintID, parameters);
 			domainSetup.addConstraintData(currConstr);
 		}
 	}
@@ -118,7 +118,7 @@ public final class APEUtils {
 		String cnf_SLTL = "";
 		int currConst = 0;
 
-		for (ConstraintData constraint : domainSetup.getUnformattedConstr()) {
+		for (ConstraintTemplateData constraint : domainSetup.getUnformattedConstr()) {
 			currConst++;
 			/* ENCODE THE CONSTRAINT */
 			if (domainSetup.getConstraintTamplate(constraint.getConstraintID()) == null) {
@@ -405,7 +405,7 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tConstraints:");
 			System.out.println("-------------------------------------------------------------");
-			for (ConstraintData constr : domainSetup.getUnformattedConstr()) {
+			for (ConstraintTemplateData constr : domainSetup.getUnformattedConstr()) {
 				System.out.println(domainSetup.getConstraintFactory().getDescription(constr));
 			}
 			if (domainSetup.getUnformattedConstr().isEmpty()) {

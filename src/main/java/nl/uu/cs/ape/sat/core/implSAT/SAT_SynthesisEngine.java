@@ -25,7 +25,7 @@ import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
-import nl.uu.cs.ape.sat.models.ConstraintData;
+import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;

@@ -31,7 +31,7 @@ import nl.uu.cs.ape.sat.core.solutionStructure.SolutionGraph;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.ConstraintData;
+import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.TaxonomyPredicateHelper;
 import nl.uu.cs.ape.sat.models.Type;

@@ -1,48 +1,71 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>nl.uu.cs</groupId>
+	<groupId>nl.uu.sanctuuary</groupId>
 	<artifactId>APE</artifactId>
 	<version>0.9.1</version>
 	<packaging>jar</packaging>
+	<name>nl.uu.cs:APE</name>
+	<description>APE is a command line tool and API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools.</description>
+	<url>https://github.com/sanctuuary/APE</url>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Vedran Kasalica</name>
+			<email>v.kasalica@uu.nl</email>
+			<organization>Utrecht University</organization>
+			<organizationUrl>https://www.uu.nl/</organizationUrl>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:git:git://github.com/sanctuuary/APE.git</connection>
+		<developerConnection>scm:git:ssh://github.com:sanctuuary/APE.git</developerConnection>
+		<url>https://github.com/sanctuuary/APE/tree/master</url>
+	</scm>
 	<build>
-		
-  <plugins>
-        <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-      <configuration>
-        <descriptorRefs>
-          <descriptorRef>jar-with-dependencies</descriptorRef>
-        </descriptorRefs>
-        <archive>
-          <manifest>
-            <mainClass>nl.uu.cs.ape.sat.Main</mainClass>
-          </manifest>
-        </archive>
-      </configuration>
-            <executions>
-        <execution>
-          <phase>package</phase>
-          <goals>
-            <goal>single</goal>
-          </goals>
-        </execution>
-      </executions>
-        </plugin>
-        <plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-source-plugin</artifactId>
-  <executions>
-    <execution>
-      <id>attach-sources</id>
-      <goals>
-        <goal>jar</goal>
-      </goals>
-    </execution>
-  </executions>
-</plugin>
-     </plugins>
-</build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>nl.uu.cs.ape.sat.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencies>
 		<dependency>
@@ -50,50 +73,36 @@
 			<artifactId>org.sat4j.core</artifactId>
 			<version>2.3.1</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.logicng</groupId>
-			<artifactId>logicng</artifactId>
-			<version>1.5.0</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>4.1</version>
-		</dependency>
-		-->
+		<!-- <dependency> <groupId>org.logicng</groupId> <artifactId>logicng</artifactId> 
+			<version>1.5.0</version> </dependency> <dependency> <groupId>com.opencsv</groupId> 
+			<artifactId>opencsv</artifactId> <version>4.1</version> </dependency> -->
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
 			<version>5.1.5</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-lang3</artifactId>
-		    <version>3.8.1</version>
-		</dependency> 
-		<dependency>
-		    <groupId>org.apache.logging.log4j</groupId>
-		    <artifactId>log4j-core</artifactId>
-		    <version>2.12.0</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.8.1</version>
 		</dependency>
 		<dependency>
-		    <groupId>guru.nidi</groupId>
-		    <artifactId>graphviz-java</artifactId>
-   			<version>0.10.0</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.12.0</version>
 		</dependency>
-		<!--https://mvnrepository.com/artifact/org.dom4j/dom4j -->
 		<dependency>
-		    <groupId>org.dom4j</groupId>
-		    <artifactId>dom4j</artifactId>
-		    <version>2.0.0</version>
+			<groupId>guru.nidi</groupId>
+			<artifactId>graphviz-java</artifactId>
+			<version>0.10.0</version>
 		</dependency>
-		<!--  https://mvnrepository.com/artifact/org.json/json -->
+		<!--https://mvnrepository.com/artifact/org.dom4j/dom4j <dependency> <groupId>org.dom4j</groupId> 
+			<artifactId>dom4j</artifactId> <version>2.0.0</version> </dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
-		    <groupId>org.json</groupId>
-		    <artifactId>json</artifactId>
-		    <version>20190722</version>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20190722</version>
 		</dependency>
 	</dependencies>
 </project>

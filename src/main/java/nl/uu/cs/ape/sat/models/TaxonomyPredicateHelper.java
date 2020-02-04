@@ -19,17 +19,12 @@ import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
  * @author Vedran Kasalica
  *
  */
-public class TaxonomyPredicateHelper implements PredicateLabel {
+public class TaxonomyPredicateHelper {
 
-	private final String predicateName;
-	private final String predicateID;
+	/** Corresponding TaxonomyPredicate */
+	private final TaxonomyPredicate taxonomyPredicate;
 	/** Field defines the connective between the subclasses of the predicate. */
 	private final LogicOperation logicOp;
-	/**
-	 * Set of all the predicates that are subsumed by the abstract predicate (null
-	 * if the predicate is a leaf)
-	 */
-	private List<TaxonomyPredicate> subPredicates;
 
 	/**
 	 * Creates an abstract module from @predicateName and @predicateID. If @isTool
@@ -44,33 +39,13 @@ public class TaxonomyPredicateHelper implements PredicateLabel {
 	 *                      Module Taxonomy.
 	 */
 	public TaxonomyPredicateHelper(TaxonomyPredicate predicate, LogicOperation logicOp) {
-		this.predicateName = predicate.getPredicateLabel();
-		this.predicateID = predicate.getPredicateID();
+		this.taxonomyPredicate = predicate;
 		this.logicOp = logicOp;
-		subPredicates = new ArrayList<TaxonomyPredicate>();
 	}
 
-	@Override
-	public int hashCode() {
-		return predicateID.hashCode();
-	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (getClass() != obj.getClass())
-			return false;
-		TaxonomyPredicateHelper other = (TaxonomyPredicateHelper) obj;
-		return this.predicateID.equals(other.getPredicateID());
-	}
-
-	public String getPredicateID() {
-		return predicateID;
-	}
-
-	public String getPredicateLabel() {
-		return predicateName;
+	public TaxonomyPredicate getTaxonomyPredicate() {
+		return taxonomyPredicate;
 	}
 
 
@@ -86,11 +61,11 @@ public class TaxonomyPredicateHelper implements PredicateLabel {
 	 * @return True if sub-predicate was added, false otherwise.
 	 */
 	public void addSubPredicate(TaxonomyPredicate predicate) {
-		subPredicates.add(predicate);
+		taxonomyPredicate.addSubPredicate(predicate);
 	}
 	
-	public List<TaxonomyPredicate> getSubPredicates(){
-		return subPredicates;
+	public Set<String> getSubPredicates(){
+		return taxonomyPredicate.getSubPredicates();
 	}
 
 }

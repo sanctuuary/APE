@@ -28,15 +28,15 @@ public class GeneralEncodingUtils {
 	/**
 	 * Method generates constraints that relate the abstractPredicate to the list of the conjunct/disjoint labels. In essence, the constraints preserves that if the abstract predicate
 	 * is used, at least one of the conjunct/disjoint labels has to be used, and vice versa.
-	 * @param abstractPred - abstract predicate that should represent the disjunction of the disjointLabels
-	 * @param disjointLabels - list of labels out of which one should hold
+	 * @param abstractPred - abstract predicate that should represent the disjunction/conjunction of the allabels
+	 * @param allLabels - list of labels out of which one/all should hold
 	 * @param mappings - mapping of the labels
 	 * @param automaton - state automaton
 	 * @param elementType - type of the predicates
 	 * @param logicOp - logical operation that is used to group the types (e.g. {@link LogicOperation.OR})                                     
 	 * @return constraints that encode the conjunct/disjoint dependency between the list of predicates and the abstract predicate, i.e. if at least one of the disjointLabels is true, the abstract pred should be true, and vice versa. 
 	 */
-	public static String getConstraintGroupLogicallyPredicates(TaxonomyPredicate abstractPred, List<TaxonomyPredicate> disjointLabels, AtomMappings mappings, Automaton automaton, WorkflowElement elementType,  LogicOperation logicOp) {
+	public static String getConstraintGroupLogicallyPredicatesX(TaxonomyPredicate abstractPred, List<TaxonomyPredicate> disjointLabels, AtomMappings mappings, Automaton automaton, WorkflowElement elementType,  LogicOperation logicOp) {
 		
 		StringBuilder constraints = new StringBuilder();
 		for (State currState : automaton.getAllStates()) {

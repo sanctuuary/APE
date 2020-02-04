@@ -704,7 +704,7 @@ public final class ModuleUtils {
 	 * @param logicOp - logical operation that is used to group the types (e.g. {@link LogicOperation.OR})
 	 * @return a new abstract module
 	 */
-	public static TaxonomyPredicate generateAbstractmodule(List<TaxonomyPredicate> relatedModules, AllModules allModules, LogicOperation logicOp) {
+	public static TaxonomyPredicate generateAbstractmoduleX(List<TaxonomyPredicate> relatedModules, AllModules allModules, LogicOperation logicOp) {
 		if(relatedModules.isEmpty()) {
 			return null;
 		}
