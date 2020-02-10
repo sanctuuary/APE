@@ -9,8 +9,10 @@ Internally, APE uses a component-based program synthesis approach. It translates
 ## Installation
 ...
 
-## Demo Project 
-...
+## Demo 
+Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS). Multiple predefined scenarios of scientific workflow synthesis can be found at:
+https://github.com/sanctuuary/APE_UseCases
+
 
 ## Domain Model
 Taxonomies/ontologies and tool annotations.
