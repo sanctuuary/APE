@@ -241,7 +241,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	 * @param solutionsFoundMax
 	 * @return List of {@link SAT_solution SAT_solutions}. Possibly empty list.
 	 */
-	public List<SolutionWorkflow> runMiniSAT(InputStream sat_input, int solutionsFound, int solutionsFoundMax) {
+	private List<SolutionWorkflow> runMiniSAT(InputStream sat_input, int solutionsFound, int solutionsFoundMax) {
 		List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
 		ISolver solver = SolverFactory.newDefault();
 		int timeout = 3600;

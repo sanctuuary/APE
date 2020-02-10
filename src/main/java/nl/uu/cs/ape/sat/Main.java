@@ -51,9 +51,9 @@ public class Main {
 		} else {
 			try {
 				apeFramework.writeSolutionToFile(solutions);
-				apeFramework.generateAndWriteDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
+				apeFramework.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
 //				apeFramework.generateAndWriteControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
-				apeFramework.executeWorkflows(solutions);
+				apeFramework.writeExecutableWorkflows(solutions);
 			} catch (IOException e) {
 				System.err.println("Error in writing the solutions. to the file system.");
 				e.printStackTrace();
