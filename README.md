@@ -33,14 +33,12 @@ We thank our brave first-generation users for their patience and constructive fe
 ## License
 APE is licensed under the Apache 2.0 license.
 
-####Dependencies
+#### Dependencies
 
 1. **OWL API**	-	LGPL or Apache 2.0
+2. **SAT4J**	-	EPL or GNu LGPL
+3. **apache-common-lang**	-	Apache 2.0
+4. **DOM4J**-	BSD
+5. **graphviz-java** - Apache 2.0
+6. **org.json** - [JSON license](https://www.json.org/license.html)
 
-3. **OpenCSV**	-	Apache 2.0
-
-5. **SAT4J**	-	EPL or GNu LGPL
-
-7. **apache-common-lang**	-	Apache 2.0
-
-9. **DOM4J**-	BSD
