@@ -1,6 +1,6 @@
-# APE (Automated Pipeline Explorer)
-
 <img src="./res/ape_logo_sqare.png" alt="logo" width="150"/>
+
+# APE (Automated Pipeline Explorer)
 
 APE is a command line tool and API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools. 
 
@@ -16,6 +16,12 @@ When running APE-&lt;version>.jar from the command line, it requires a JSON conf
 1. *Domain model* - annotation of the types and tools in the domain in form of an **ontology** (see [ontology example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/GMT_Demo_UseCase.owl) in OWL) and a **tool annotation file** (see [tool annotations example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/tool_annotations.json) in JSON).
 2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraints.json))
 3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc.
+
+To run the APE CLI use:
+
+```shell
+ java -jar APE-<version>.jar SimpleDemo/ape.configuration
+```
 
 For more details check a [simple demo](https://github.com/sanctuuary/APE_UseCases/tree/master/SimpleDemo).
 
