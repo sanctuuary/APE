@@ -12,10 +12,12 @@ Internally, APE uses a component-based program synthesis approach. It translates
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
 ### Command Line Interface (CLI)
-When running APE-&lt;version>.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly. This configuration file (see [ape cofiguration example](https://github.com/sanctuuary/APE_UseCases/)) provides references to all therefor required information:
-1. *Domain model* - annotation of the types and tools in the domain in form of an **ontology** (see [ontology example](https://github.com/sanctuuary/APE_UseCases/) in OWL) and a **tool annotation file** (see [tool annotations example](https://github.com/sanctuuary/APE_UseCases/) in JSON).
-2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/))
+When running APE-&lt;version>.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly. This configuration file (see [ape cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/ape.configuration)) provides references to all therefor required information:
+1. *Domain model* - annotation of the types and tools in the domain in form of an **ontology** (see [ontology example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/GMT_Demo_UseCase.owl) in OWL) and a **tool annotation file** (see [tool annotations example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/tool_annotations.json) in JSON).
+2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraints.json))
 3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc.
+
+For more details check a [simple demo](https://github.com/sanctuuary/APE_UseCases/tree/master/SimpleDemo).
 
 ### Application Programming Interface (API)
 
