@@ -277,7 +277,7 @@ public class APE {
 	 * @return {@code true} if the execution was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	public boolean executeWorkflows(SATsolutionsList allSolutions) throws IOException {
+	public boolean writeExecutableWorkflows(SATsolutionsList allSolutions) throws IOException {
 		String executionsFolder = config.getExecution_scripts_folder();
 		Integer noExecutions = config.getNo_executions();
 		if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
@@ -320,7 +320,7 @@ public class APE {
 	 * @return {@code true} if the generating was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	public boolean generateAndWriteDataFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
+	public boolean writeDataFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
 		String graphsFolder = config.getSolution_graphs_folder();
 		Integer noGraphs = config.getNo_graphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -361,7 +361,7 @@ public class APE {
 	 * @return {@code true} if the generating was successfully performed, {@code false} otherwise.
 	 * @throws IOException
 	 */
-	public boolean generateAndWriteControlFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
+	public boolean writeControlFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
 		String graphsFolder = config.getSolution_graphs_folder();
 		Integer noGraphs = config.getNo_graphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {

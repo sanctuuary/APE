@@ -16,8 +16,8 @@ public class LocalRun {
 
 	public static void main(String[] args) {
 
-		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/Simon_Han_paper/";
-		String fileName = "q3_full/ape.configuration";
+		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5_no1/";
+		String fileName = "ape.configuration";
 		if (!APEUtils.isValidReadFile(path + fileName)) {
 			System.err.println("Bad path.");
 			return;
@@ -61,9 +61,9 @@ public class LocalRun {
 		} else {
 			try {
 				apeFramework.writeSolutionToFile(solutions);
-				apeFramework.generateAndWriteDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
-//				apeFramework.generateAndWriteControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
-				apeFramework.executeWorkflows(solutions);
+//				apeFramework.generateAndWriteDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
+				apeFramework.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
+				apeFramework.writeExecutableWorkflows(solutions);
 			} catch (IOException e) {
 				System.err.println("Error in writing the solutions. to the file system.");
 				e.printStackTrace();

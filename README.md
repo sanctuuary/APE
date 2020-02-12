@@ -1,100 +1,51 @@
-# APE
+<img src="./res/ape_logo_sqare.png" alt="logo" width="150"/>
 
-Automated Pipeline Program Synthesis and Execution
+# APE (Automated Pipeline Explorer)
 
+APE is a command line tool and API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools. 
 
-## Motivation
-A short description of the motivation behind the creation and maintenance of the project. This should explain **why** the project exists.
+APE relies on a semantic domain model that includes tool and type taxonomies as controlled vocabularies for the description of computational tools, and functional tool annotations (inputs, outputs, operations performed) using terms from these taxonomies. Based on this domain model and a specification of the available workflow inputs, the intended workflow outputs and possibly additional constraints, APE then computes possible workflows. 
 
-## Build status
-Build status of continus integration i.e. travis, appveyor etc. Ex. - 
+Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. 
 
-[![Build Status](https://travis-ci.org/akashnimare/foco.svg?branch=master)](https://travis-ci.org/akashnimare/foco)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/akashnimare/foco?branch=master&svg=true)](https://ci.appveyor.com/project/akashnimare/foco/branch/master)
+## CLI & API
+Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
-## Code style
-If you're using any code style like xo, standard etc. That will help others while contributing to your project. Ex. -
+### Command Line Interface (CLI)
+When running APE-&lt;version>.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly. This configuration file (see [ape cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/ape.configuration)) provides references to all therefor required information:
+1. *Domain model* - annotation of the types and tools in the domain in form of an **ontology** (see [ontology example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/GMT_Demo_UseCase.owl) in OWL) and a **tool annotation file** (see [tool annotations example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/tool_annotations.json) in JSON).
+2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraints.json))
+3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc.
 
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
- 
-## Screenshots
-Include logo/demo screenshot etc.
+To run the APE CLI use:
 
-## Tech/framework used
-Ex. -
+```shell
+ java -jar APE-<version>.jar SimpleDemo/ape.configuration
+```
 
-<b>Built with</b>
-- [Electron](https://electron.atom.io)
+For more details check a [simple demo](https://github.com/sanctuuary/APE_UseCases/tree/master/SimpleDemo).
 
-## Features
-What makes your project stand out?
+### Application Programming Interface (API)
 
-## Code Example
-Show what the library does as concisely as possible, developers should be able to figure out **how** your project solves their problem by looking at the code example. Make sure the API you are showing off is obvious, and that your code is short and concise.
+Like the CLI, the APE API relies on a configuration file that references the domain ontology, tool annotations, workflow specification and execution parameters. However, the API allows to edit this file programmatically, and thus for instance add constraints or change execution parameters dynamically.
 
-## Installation
-Provide step by step series of examples and explanations about how to get a development env running.
+## Demo 
+Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS). Multiple predefined scenarios of scientific workflow synthesis can be found at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
-## API Reference
-
-Depending on the size of the project, if it is small and simple enough the reference docs can be added to the README. For medium size to larger projects it is important to at least provide a link to where the API reference docs live.
-
-## Tests
-Describe and show how to run the tests with code examples.
-
-## How to use?
-In order to specify the constraints, one of the following approaches should be followed:
-
-* Use terminal to specify the constraints one at the time
-* Import a file with all the constraints
-
-Each of the constrains has to be of the following format:
-
-`constraintID par1 par2 par3 ... parN`
-
-where the number of parameters depends on the constraint specified. Constrains that can be used are specified in the following section.
-
-### Constraint formats
-
-ID: 1___desc: If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> consequently.___no. of parameters: 2
-
-ID: 2___desc: If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b> consequently.___no. of parameters: 2
-
-ID: 3___desc: If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it.___no. of parameters: 2
-
-ID: 4___desc: If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a next module in the sequence.___no. of parameters: 2
-
-ID: 5___desc: Use module <b>parameters[0]</b> in the solution.___no. of parameters: 2
-
-ID: 6___desc: Do not use module <b>parameters[0]</b> in the solution.___no. of parameters: 2
-
-ID: 7___desc: Use <b>parameters[0]</b> as last module in the solution.___no. of parameters: 2
-
-ID: 8___desc: Use type <b>parameters[0]</b> in the solution.___no. of parameters: 2
-
-ID: 9___desc: Do not use type <b>parameters[0]</b> in the solution.___no. of parameters: 2
-
-## Contribute
-
-Let people know how they can contribute into your project. A [contributing guideline](https://github.com/zulip/zulip-electron/blob/master/CONTRIBUTING.md) will be a big plus.
 
 ## Credits
-Give proper credits. This could be a link to any repo which inspired you to build this project, any blogposts or links to people who contrbuted in this project. 
+APE has been inspired by the [Loose Programming framework PROPHETS](http://ls5-www.cs.tu-dortmund.de/projects/prophets/index.php). It uses similar mechanisms for semantic domain modeling, workflow specification and synthesis, but strives to provide the automated composition functionality independent from a concrete workflow system.
 
+We thank our brave first-generation users for their patience and constructive feedback that helped us to get APE into shape. 
 
 ## License
-A short snippet describing the license (MIT, Apache etc)
+APE is licensed under the Apache 2.0 license.
 
-MIT © [Yourname]()
+#### Dependencies
 
-####Dependencies
+1. **OWL API**	-	LGPL or Apache 2.0
+2. **SAT4J**	-	EPL or GNu LGPL
+3. **apache-common-lang**	-	Apache 2.0
+4. **graphviz-java** - Apache 2.0
+5. **org.json** - [JSON license](https://www.json.org/license.html)
 
-**OWL API**	-	LGPL or Apache 2.0
-
-**OpenCSV**	-	Apache 2.0
-
-**SAT4J**	-	EPL or GNu LGPL
-
-**apache-common-lang**	-	Apache 2.0
-
-**DOM4J**-	BSD
