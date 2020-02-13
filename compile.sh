@@ -1,4 +1,4 @@
 #!/bin/sh
 
-mvn clean install
+mvn clean -DskipTests=true install
 
