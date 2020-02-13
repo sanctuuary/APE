@@ -8,6 +8,10 @@ APE relies on a semantic domain model that includes tool and type taxonomies as 
 
 Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. 
 
+## Requirements
+
+In order to run APE you need to have Java 1.8 (or higher) installed on the system.
+
 ## CLI & API
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
@@ -32,6 +36,14 @@ Like the CLI, the APE API relies on a configuration file that references the dom
 ## Demo 
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS). Multiple predefined scenarios of scientific workflow synthesis can be found at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
+## How to build APE from source
+
+### Using Maven
+Simply launch
+```shell
+$ mvn -DskipTests=true install
+```
+to build the APE modules from the source tree and the built files will be generated under /target directory. All the dependencies will be gathered by Maven.
 
 ## Credits
 APE has been inspired by the [Loose Programming framework PROPHETS](http://ls5-www.cs.tu-dortmund.de/projects/prophets/index.php). It uses similar mechanisms for semantic domain modeling, workflow specification and synthesis, but strives to provide the automated composition functionality independent from a concrete workflow system.
