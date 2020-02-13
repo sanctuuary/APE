@@ -1,19 +1,17 @@
 package nl.uu.cs.ape.sat.constraints;
 
 import java.util.List;
+import java.util.TreeSet;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
-import nl.uu.cs.ape.sat.models.AllModules;
-import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.formulas.*;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.models.Type;
-import nl.uu.cs.ape.sat.models.SATEncodingUtils.GeneralEncodingUtils;
-import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;
 
 /**
  * Implements constraints of the form:<br/>
@@ -32,7 +30,7 @@ public class Constraint_use_type extends ConstraintTemplate {
 	}
 
 	@Override
-	public String getConstraint(List<ConstraintParameter> parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
+	public String getConstraint(List<ConstraintParameter> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMappings mappings) {
 		if (parameters.size() != 1) {
 			super.throwParametersError(parameters.size());
@@ -42,8 +40,7 @@ public class Constraint_use_type extends ConstraintTemplate {
 
 		/* working on first parameter */
 		List<TaxonomyPredicate> parameterDimensions = parameters.get(0).getParameterTypes();
-		Type type  = (Type) TypeUtils.generateAbstractType(parameterDimensions, allTypes, LogicOperation.AND);
-		GeneralEncodingUtils.getConstraintGroupLogicallyPredicates(type, parameterDimensions, mappings, typeAutomaton, WorkflowElement.USED_TYPE, LogicOperation.AND);
+		Type type  = (Type) domainSetup.generateHelperPredicate(new TreeSet<TaxonomyPredicate>(parameterDimensions), LogicOperation.AND);
 		
 		if (type == null) {
 			System.err.println("Constraint argument does not exist in the type taxonomy.");

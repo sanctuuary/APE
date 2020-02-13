@@ -217,12 +217,35 @@ public class ConstraintFactory {
 	 */
 	public String getDescription(ConstraintTemplateData constr) {
 		ConstraintTemplate currTmpl = this.constraintTamplates.get(constr.getConstraintID());
-		List<ConstraintParameter> params = constr.getParameters();
+		List<TaxonomyPredicate> params = constr.getParameters();
 		String description = currTmpl.getDescription();
 		for(int i = 0; i < params.size(); i++) {
 			description = description.replace("${parameter_" + i + "}", params.get(i).toString());
 		}
 		return description;
+	}
+
+	/**
+	 * Returns {@link ConstraintTemplateData} if the format is correct, {null} otherwise. 
+	 * @param constraintID
+	 * @param parameters
+	 * @return {@link ConstraintTemplateData} if the format is correct, {null} otherwise.
+	 */
+	public ConstraintTemplateData addConstraintTemplateData(String constraintID, List<TaxonomyPredicate> parameters) {
+		if(isGoodConstraintFormat(constraintID, parameters)) {
+			return new ConstraintTemplateData(constraintID,parameters);
+		}
+		return null;
+	}
+	
+	/**
+	 * TODO: Needs to be implemented. Input should be compared with the constraint templates, wrt the types of parameters and dimensions of each.
+	 * @param constraintID
+	 * @param parameters
+	 * @return
+	 */
+	public boolean isGoodConstraintFormat(String constraintID, List<TaxonomyPredicate> parameters) {
+		return true;
 	}
 
 }

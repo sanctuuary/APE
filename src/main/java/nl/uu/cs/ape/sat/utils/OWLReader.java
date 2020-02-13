@@ -137,10 +137,12 @@ public class OWLReader {
 	}
 
 	/**
-	 * Method returns the <b>ModulesTaxonomy</b> class from the set of OWL classes.
+	 * Method returns {@code true} of the given OWL class belong to the roots of the
+	 * <b>ModulesTaxonomy</b>.
 	 * 
-	 * @param subClasses - set of OWL classes
-	 * @return <b>ModulesTaxonomy</b> OWL class.
+	 * @param currClass - class that is evaluated
+	 * @return {@code true} if the current class belong to the module taxonomy roots,
+	 *         {@code false} otherwise.
 	 */
 	private boolean isModuleClass(OWLClass currClass) {
 		return getLabel(currClass).equals(allModules.getRootID());
@@ -193,13 +195,13 @@ public class OWLReader {
 		AbstractModule currModule = null;
 		try {
 			currModule = allModules.addPredicate(
-					new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(currRootClass), currNodeType));
+					new AbstractModule(getLabel(currClass), getIRI(currClass), getLabel(currRootClass), currNodeType));
 		} catch (ExceptionInInitializerError e) {
 			e.printStackTrace();
 		}
 		/* Add the current module as a sub-module of the super module. */
 		if (superModule != null && currModule != null) {
-			superModule.addSubPredicate(getLabel(currClass));
+			superModule.addSubPredicate(currModule);
 		}
 		/* Add the super-type for the current type */
 		if (currNodeType != NodeType.ROOT) {
@@ -243,14 +245,14 @@ public class OWLReader {
 
 		/* Generate the Type that corresponds to the taxonomy class. */
 		try {
-			currType = allTypes.addPredicate(new Type(getLabel(currClass), getLabel(currClass), getLabel(currRoot), currNodeType));
+			currType = allTypes.addPredicate(new Type(getLabel(currClass), getIRI(currClass), getLabel(currRoot), currNodeType));
 		} catch (ExceptionInInitializerError e) {
 			e.printStackTrace();
 		}
 
 		/* Add the current type as a sub-type of the super type. */
 		if (superType != null && currType != null) {
-			superType.addSubPredicate(getLabel(currClass));
+			superType.addSubPredicate(currType);
 		}
 		/* Add the super-type for the current type */
 		if (currNodeType != NodeType.ROOT) {

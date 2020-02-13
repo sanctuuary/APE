@@ -81,17 +81,16 @@ public abstract class AllPredicates {
 	 */
 	public boolean trimTaxonomy() {
 		TaxonomyPredicate root = get(taxonomyRoot);
-		List<String> toRemove = new ArrayList<String>();
-		for(String subClassID : APEUtils.safe(root.getSubPredicates())) {
-			TaxonomyPredicate subClass = get(subClassID);
+		List<TaxonomyPredicate> toRemove = new ArrayList<TaxonomyPredicate>();
+		for(TaxonomyPredicate subClass : APEUtils.safe(root.getSubPredicates())) {
 			if(subClass == null) {
-				toRemove.add(subClassID);
+				toRemove.add(subClass);
 				continue;
 			}
 			if(subClass.getIsRelevant()) {
 				trimSubTaxonomy(subClass);
 			} else {
-				toRemove.add(subClassID);
+				toRemove.add(subClass);
 				trimSubTaxonomy(subClass);
 			}
 		}
@@ -103,17 +102,16 @@ public abstract class AllPredicates {
 		if(subTaxRoot == null) {
 			return true;
 		}
-		List<String> toRemove = new ArrayList<String>();
-		for(String subClassID : APEUtils.safe(subTaxRoot.getSubPredicates())) {
-			TaxonomyPredicate subClass = get(subClassID);
+		List<TaxonomyPredicate> toRemove = new ArrayList<TaxonomyPredicate>();
+		for(TaxonomyPredicate subClass : APEUtils.safe(subTaxRoot.getSubPredicates())) {
 			if(subClass == null) {
-				toRemove.add(subClassID);
+				toRemove.add(subClass);
 				continue;
 			}
 			if(subClass.getIsRelevant()) {
 				trimSubTaxonomy(subClass);
 			} else {
-				toRemove.add(subClassID);
+				toRemove.add(subClass);
 				trimSubTaxonomy(subClass);
 			}
 		}
@@ -156,8 +154,7 @@ public abstract class AllPredicates {
 		List<TaxonomyPredicate> elements = new ArrayList<>();
 		elements.add(subTreeRoot);
 		
-		for(String subTypeID : APEUtils.safe(subTreeRoot.getSubPredicates())) {
-			TaxonomyPredicate subType = this.get(subTypeID);
+		for(TaxonomyPredicate subType : APEUtils.safe(subTreeRoot.getSubPredicates())) {
 			elements.addAll(getElementsFromSubTaxonomy(subType));
 		}
 		

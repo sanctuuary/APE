@@ -18,7 +18,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  * @author Vedran Kasalica
  *
  */
-public abstract class TaxonomyPredicate implements PredicateLabel {
+public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<TaxonomyPredicate> {
 	
 	/**
 	 * Describes the node in from the taxonomy hierarchy. The type can represent a root type, subroot type, an abstract or a simple (implemented leaf) term, or be an empty term.
@@ -38,12 +38,12 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	 * Set of all the predicates that are subsumed by the abstract predicate (null if the
 	 * predicate is a leaf)
 	 */
-	private Set<String> subPredicates;
+	private Set<TaxonomyPredicate> subPredicates;
 	/**
 	 * Set of all the predicates that contain the current predicate (null if the
 	 * predicate is a root)
 	 */
-	private Set<String> superPredicates;
+	private Set<TaxonomyPredicate> superPredicates;
 	
 	/**
 	 * Create a taxonomy predicate.
@@ -56,10 +56,10 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 		this.nodeType = nodeType;
 		this.isRelevant = false;
 		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
-			this.subPredicates = new HashSet<String>();
+			this.subPredicates = new HashSet<TaxonomyPredicate>();
 		} 
 		if(nodeType != NodeType.ROOT) {
-			this.superPredicates = new HashSet<String>();
+			this.superPredicates = new HashSet<TaxonomyPredicate>();
 		}
 		
 	}
@@ -164,17 +164,11 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 			return false;
 		}
 		this.setIsRelevant();
-		for(String superPredicate : APEUtils.safe(this.superPredicates)) {
-			TaxonomyPredicate superTaxPred = null;
-			if((superTaxPred = allPredicates.get(superPredicate)) != null) {
-				succExe = succExe && superTaxPred.setAsRelevantTaxonomyTermBottomUp(allPredicates);
-			}
+		for(TaxonomyPredicate superPredicate : APEUtils.safe(this.superPredicates)) {
+				succExe = succExe && superPredicate.setAsRelevantTaxonomyTermBottomUp(allPredicates);
 		}
-		for(String subPredicate : APEUtils.safe(this.subPredicates)) {
-			TaxonomyPredicate subTaxPred = null;
-			if((subTaxPred = allPredicates.get(subPredicate)) != null) {
-				succExe = succExe && subTaxPred.setAsRelevantTaxonomyTermTopDown(allPredicates);
-			}
+		for(TaxonomyPredicate subPredicate : APEUtils.safe(this.subPredicates)) {
+				succExe = succExe && subPredicate.setAsRelevantTaxonomyTermTopDown(allPredicates);
 		}
 		return succExe;
 	}
@@ -193,11 +187,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 			return false;
 		}
 		this.setIsRelevant();
-		for(String subPredicate : APEUtils.safe(this.subPredicates)) {
-			TaxonomyPredicate subTaxPred = null;
-			if((subTaxPred = allPredicates.get(subPredicate)) != null) {
-				succExe = succExe && subTaxPred.setAsRelevantTaxonomyTermTopDown(allPredicates);
-			}
+		for(TaxonomyPredicate subPredicate : APEUtils.safe(this.subPredicates)) {
+				succExe = succExe && subPredicate.setAsRelevantTaxonomyTermTopDown(allPredicates);
 		}
 		return succExe;
 	}
@@ -217,11 +208,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 			return false;
 		}
 		this.setIsRelevant();
-		for(String superPredicate : APEUtils.safe(this.superPredicates)) {
-			TaxonomyPredicate superTaxPred = null;
-			if((superTaxPred = allPredicates.get(superPredicate)) != null) {
-				succExe = succExe && superTaxPred.setAsRelevantTaxonomyTermBottomUp(allPredicates);
-			}
+		for(TaxonomyPredicate superPredicate : APEUtils.safe(this.superPredicates)) {
+				succExe = succExe && superPredicate.setAsRelevantTaxonomyTermBottomUp(allPredicates);
 		}
 		return succExe;
 	}
@@ -273,8 +261,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	 */
 	public void printTree(String str, AllPredicates allPredicates) {
 		System.out.println(str + toShortString() + "[" + getNodeType() + "]");
-		for (String predicateID : APEUtils.safe(this.subPredicates)) {
-			allPredicates.get(predicateID).printTree(str + ". ", allPredicates);
+		for (TaxonomyPredicate predicate : APEUtils.safe(this.subPredicates)) {
+			predicate.printTree(str + ". ", allPredicates);
 		}
 	}
 	
@@ -286,23 +274,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	 */
 	public boolean addSubPredicate(TaxonomyPredicate predicate) {
 		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
-			subPredicates.add(predicate.getPredicateID());
+			subPredicates.add(predicate);
 			return true;
-		} else {
-			System.err.println("Cannot add subpredicate to a leaf or empty taxonomy term: " + getPredicateID() + ".");
-			return false;
-		}
-	}
-
-	/**
-	 * Adds a sub-predicate to the current one, if they are not defined already.
-	 * 
-	 * @param predicateID - ID of the predicate that will be added as a subclass
-	 * @return True if sub-predicate was added, false otherwise.
-	 */
-	public boolean addSubPredicate(String predicateID) {
-		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
-			return subPredicates.add(predicateID);
 		} else {
 			System.err.println("Cannot add subpredicate to a leaf or empty taxonomy term: " + getPredicateID() + ".");
 			return false;
@@ -314,15 +287,15 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	 * 
 	 * @return List of the sub-predicates or null in case of a leaf predicate
 	 */
-	public Set<String> getSubPredicates() {
+	public Set<TaxonomyPredicate> getSubPredicates() {
 		return this.subPredicates;
 	}
 	
-	public boolean removeSubPredicate(String subPredicate) {
+	public boolean removeSubPredicate(TaxonomyPredicate subPredicate) {
 		return this.subPredicates.remove(subPredicate);
 	}
 	
-	public boolean removeAllSubPredicates(Collection<String> subPredicates) {
+	public boolean removeAllSubPredicates(Collection<TaxonomyPredicate> subPredicates) {
 		boolean done = true;
 		if(subPredicates != null && !subPredicates.isEmpty()) {
 			done = done && this.subPredicates.removeAll(subPredicates);
@@ -342,7 +315,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 			return false;
 		}
 		if (nodeType != NodeType.ROOT) {
-			superPredicates.add(predicate.getPredicateID());
+			superPredicates.add(predicate);
 			return true;
 		} else {
 			System.err.println("Cannot add super-predicate to a root taxonomy term!");
@@ -350,28 +323,28 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 		}
 	}
 
-	/**
-	 * Adds a super-predicate to the current one, if it was not added present
-	 * already.
-	 * 
-	 * @param predicateID - ID of the predicate that will be added as a superclass
-	 *@return {@code true} if super-predicate was added, false otherwise.
-	 */
-	public boolean addSuperPredicate(String predicateID) {
-		if (nodeType != NodeType.ROOT) {
-			return superPredicates.add(predicateID);
-		} else {
-			System.err.println("Cannot add super-predicate to a root taxonomy term!");
-			return false;
-		}
-	}
+//	/**
+//	 * Adds a super-predicate to the current one, if it was not added present
+//	 * already.
+//	 * 
+//	 * @param predicateID - ID of the predicate that will be added as a superclass
+//	 *@return {@code true} if super-predicate was added, false otherwise.
+//	 */
+//	public boolean addSuperPredicate(String predicateID) {
+//		if (nodeType != NodeType.ROOT) {
+//			return superPredicates.add(predicateID);
+//		} else {
+//			System.err.println("Cannot add super-predicate to a root taxonomy term!");
+//			return false;
+//		}
+//	}
 
 	/**
 	 * Returns the list of the predicates that contain the current predicate.
 	 * 
 	 * @return List of the super-predicates or null in case of a leaf predicate
 	 */
-	public Set<String> getSuperPredicates() {
+	public Set<TaxonomyPredicate> getSuperPredicates() {
 		return superPredicates;
 	}
 	
@@ -448,6 +421,12 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	public void setNodePredicate(NodeType nodeType) {
 		this.nodeType = nodeType;
 	}
+	
+	@Override
+    public int compareTo(TaxonomyPredicate otherPredicate) 
+    {
+        return this.getPredicateID().compareTo(otherPredicate.getPredicateID());
+    }
 	
 }
 

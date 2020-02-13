@@ -5,7 +5,7 @@ package nl.uu.cs.ape.sat.models;
 
 import java.util.List;
 
-import nl.uu.cs.ape.sat.constraints.ConstraintParameter;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 /**
  * The {#code ConstraintTemplateData} class is used to store the data describing each constrain.
@@ -16,9 +16,9 @@ import nl.uu.cs.ape.sat.constraints.ConstraintParameter;
 public class ConstraintTemplateData {
 
 	private String constraintID;
-	private List<ConstraintParameter> parameters;
+	private List<TaxonomyPredicate> parameters;
 	
-	public ConstraintTemplateData(String constraintID,  List<ConstraintParameter> parameters) {
+	public ConstraintTemplateData(String constraintID,  List<TaxonomyPredicate> parameters) {
 		this.constraintID = constraintID;
 		this.parameters = parameters;
 	}
@@ -33,7 +33,7 @@ public class ConstraintTemplateData {
 	/**
 	 * @return the parameters
 	 */
-	public List<ConstraintParameter> getParameters() {
+	public List<TaxonomyPredicate> getParameters() {
 		return parameters;
 	}
 	

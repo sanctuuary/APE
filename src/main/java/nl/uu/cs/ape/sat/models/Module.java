@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -209,7 +211,7 @@ public class Module extends AbstractModule {
 				for (String typeSubntology : jsonInput.keySet()) {
 					/* Logical connective that determines the semantics of the list notion, i.e. whether all the types in the list have to be satisfied or at least one of them. */
 					LogicOperation logConn = LogicOperation.AND;
-					List<TaxonomyPredicate> logConnectedPredicates = new ArrayList<TaxonomyPredicate>();
+					SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
 					if(typeSubntology.endsWith("$OR$")) {
 						logConn = LogicOperation.OR;
 					} else if(typeSubntology.endsWith("$AND$")) {
@@ -258,7 +260,7 @@ public class Module extends AbstractModule {
 				for (String typeSubntology : jsonOutput.keySet()) {
 					/* Logical connective that determines the semantics of the list notion, i.e. whether all the types in the list have to be satisfied or at least one of them. */
 					LogicOperation logConn = LogicOperation.AND;
-					List<TaxonomyPredicate> logConnectedPredicates = new ArrayList<TaxonomyPredicate>();
+					SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
 					if(typeSubntology.endsWith("$OR$")) {
 						logConn = LogicOperation.OR;
 					} else if(typeSubntology.endsWith("$AND$")) {
@@ -314,8 +316,8 @@ public class Module extends AbstractModule {
 		for(String superModuleID : taxonomyModules) {
 			AbstractModule superModule = allModules.get(superModuleID);
 			if(superModule != null) {
-				superModule.addSubPredicate(moduleID);
-				currModule.addSuperPredicate(superModuleID);
+				superModule.addSubPredicate(currModule);
+				currModule.addSuperPredicate(superModule);
 			}
 		}
 		

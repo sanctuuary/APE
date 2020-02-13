@@ -135,7 +135,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions enfocements");
 		cnfEncoding = cnfEncoding.append(ModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton, mappings));
 		cnfEncoding = cnfEncoding.append(
-				ModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule.getPredicateID(), moduleAutomaton, mappings));
+				ModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage enfocements");
 		/*
 		 * Create the constraints enforcing: 1. Mutual exclusion of the types/formats 2.
@@ -147,7 +147,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions enfocements");
 		cnfEncoding = cnfEncoding.append(TypeUtils.typeMandatoryUsage(domainSetup.getAllTypes(), rootType, typeAutomaton, mappings));
 		cnfEncoding = cnfEncoding
-				.append(TypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), rootType.getPredicateID(), typeAutomaton, mappings));
+				.append(TypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), rootType, typeAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage enfocements");
 		/*
 		 * Encode the constraints from the file based on the templates (manual

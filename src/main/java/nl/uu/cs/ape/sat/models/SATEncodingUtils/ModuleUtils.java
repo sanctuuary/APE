@@ -623,13 +623,13 @@ public final class ModuleUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications
 	 */
-	public static String moduleEnforceTaxonomyStructure(AllModules allModules, String rootModuleID, ModuleAutomaton moduleAutomaton,
+	public static String moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule, ModuleAutomaton moduleAutomaton,
 			AtomMappings mappings) {
 
 		StringBuilder constraints = new StringBuilder();
 		for (State moduleState : moduleAutomaton.getModuleStates()) {
 			constraints = constraints.append(
-					moduleEnforceTaxonomyStructureForState(allModules, rootModuleID, mappings, moduleState));
+					moduleEnforceTaxonomyStructureForState(allModules, currModule, mappings, moduleState));
 		}
 		return constraints.toString();
 	}
@@ -639,9 +639,8 @@ public final class ModuleUtils {
 	 * {@link #moduleEnforceTaxonomyStructure(String, ModuleAutomaton, AtomMappings)
 	 * moduleEnforceTaxonomyStructure}.
 	 */
-	private static String moduleEnforceTaxonomyStructureForState(AllModules allModules, String rootModuleID,
+	private static String moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule,
 			AtomMappings mappings, State moduleState) {
-		AbstractModule currModule = allModules.get(rootModuleID);
 		String superModule_state = mappings.add(currModule, moduleState, WorkflowElement.MODULE).toString();
 
 		StringBuilder constraints = new StringBuilder();
@@ -652,15 +651,14 @@ public final class ModuleUtils {
 			/*
 			 * Ensuring the TOP-DOWN taxonomy tree dependency
 			 */
-			for (String subModuleID : APEUtils.safe(currModule.getSubPredicates())) {
-				AbstractModule subModule = allModules.get(subModuleID);
+			for (TaxonomyPredicate subModule : APEUtils.safe(currModule.getSubPredicates())) {
 				if(subModule == null) {
 					System.out.println("Null error: " + currModule.getPredicateID() + " ->" + currModule.getSubPredicates().toString());
 				}
 				String subModule_State = mappings.add(subModule, moduleState, WorkflowElement.MODULE).toString();
 				currConstraint = currConstraint.append(subModule_State).append(" ");
 				subModules_States.add(subModule_State);
-				constraints = constraints.append(moduleEnforceTaxonomyStructureForState(allModules, subModuleID, mappings, moduleState));
+				constraints = constraints.append(moduleEnforceTaxonomyStructureForState(allModules, subModule, mappings, moduleState));
 			}
 			currConstraint = currConstraint.append("0\n");
 			/*

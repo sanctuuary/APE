@@ -134,7 +134,7 @@ public class APE {
 		 * Set the the empty type (representing the absence of types) as a direct child
 		 * of root type
 		 */
-		succRun &= apeDomainSetup.getAllTypes().getRootPredicate().addSubPredicate(apeDomainSetup.getAllTypes().getEmptyType().getPredicateID());
+		succRun &= apeDomainSetup.getAllTypes().getRootPredicate().addSubPredicate(apeDomainSetup.getAllTypes().getEmptyType());
 
 		/*
 		 * Update allModules and allTypes sets based on the module.json file

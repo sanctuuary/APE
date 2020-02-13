@@ -5,6 +5,7 @@ package nl.uu.cs.ape.sat.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 import nl.uu.cs.ape.sat.automaton.Automaton;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
@@ -109,62 +110,69 @@ public class APEDomainSetup {
 		return constraintFactory.getConstraintTamplate(constraintID);
 	}
 	
-	TaxonomyPredicate generateAbstractType(List<TaxonomyPredicate> relatedTypes, AllTypes allTypes, LogicOperation logicOp) {
-		if(relatedTypes.isEmpty()) {
-			return null;
-		}
-		if(relatedTypes.size() == 1) {
-			return relatedTypes.get(0);
-		}
-		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
-		for(TaxonomyPredicate label : relatedTypes) {
-			abstractLabel = abstractLabel.append(label.getPredicateID());
-		}
-		
-		TaxonomyPredicate newAbsType = allTypes.addPredicate(new Type(abstractLabel.toString(), abstractLabel.toString(), relatedTypes.get(0).getRootNode(), NodeType.ABSTRACT));
-		return newAbsType;
-	}
+//	TaxonomyPredicate generateAbstractType(List<TaxonomyPredicate> relatedTypes, AllTypes allTypes, LogicOperation logicOp) {
+//		if(relatedTypes.isEmpty()) {
+//			return null;
+//		}
+//		if(relatedTypes.size() == 1) {
+//			return relatedTypes.get(0);
+//		}
+//		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
+//		for(TaxonomyPredicate label : relatedTypes) {
+//			abstractLabel = abstractLabel.append(label.getPredicateID());
+//		}
+//		
+//		TaxonomyPredicate newAbsType = allTypes.addPredicate(new Type(abstractLabel, abstractLabel, relatedTypes.get(0).getRootNode(), NodeType.ABSTRACT));
+//		return newAbsType;
+//	}
 	
 	/**
 	 * Method used to generate a new predicate that should provide an interface for handling multiple predicates.
-	 * New predicated is used to simplify interaction with a set of related tools/types.
-	 * @param relatedPredicates - list of types/tools that are related to each other
+	 * New predicated is used to simplify interaction with a set of related tools/types.<br><br>
+	 * 
+	 * The original predicates are available as consumed predicates(see {@link TaxonomyPredicateHelper#getGeneralizedPredicates()}) of the new {@link TaxonomyPredicate}
+	 * @param relatedPredicates - set of sorted type that are logically related to the new abstract type (label of the equivalent sets is always the same due to its ordering)
 	 * @param logicOp -logical operation that describes the relation between the types
 	 * @return an abstract predicate that provides abstraction over a disjunction/conjunction of the labels
 	 */
-	public TaxonomyPredicate generateHelperPredicateX(List<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
+	public TaxonomyPredicate generateHelperPredicate(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
 		if(relatedPredicates.isEmpty()) {
 			return null;
 		}
 		if(relatedPredicates.size() == 1) {
-			return relatedPredicates.get(0);
+			return relatedPredicates.first();
 		}
-		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
-		for(TaxonomyPredicate label : relatedPredicates) {
-			abstractLabel = abstractLabel.append(label.getPredicateID());
-		}
+		String abstractLabel = APEUtils.getLabelFromList(relatedPredicates, logicOp);
+		
 		TaxonomyPredicate newAbsType; 
-		if(relatedPredicates.get(0) instanceof Type) {
-			newAbsType = allTypes.addPredicate(new Type(abstractLabel.toString(), abstractLabel.toString(), relatedPredicates.get(0).getRootNode(), NodeType.ABSTRACT));
+		if(relatedPredicates.first() instanceof Type) {
+			newAbsType = allTypes.addPredicate(new Type(abstractLabel, abstractLabel, relatedPredicates.first().getRootNode(), NodeType.ABSTRACT));
 		} else {
-			newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), relatedPredicates.get(0).getRootNode(), NodeType.ABSTRACT));
+			newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel, abstractLabel, relatedPredicates.first().getRootNode(), NodeType.ABSTRACT));
 		}
 		TaxonomyPredicateHelper helperPredicate = new TaxonomyPredicateHelper(newAbsType, logicOp);
 		
 		for(TaxonomyPredicate predicate : relatedPredicates) {
-			helperPredicate.addSubPredicate(predicate);
+			helperPredicate.addConcretePredicate(predicate);
 		}
 		helperPredicates.add(helperPredicate);
 		return helperPredicate.getTaxonomyPredicate();
 	}
 	
-	
-	public String getConstraintsForHelperPredicatesX(AtomMappings mappings, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
+	/**
+	 * Encoding all the required constraints for the given program length, in order to ensure that helper predicates are used properly.
+	 * 
+	 * @param mappings - current atom mappings
+	 * @param moduleAutomaton - graph representing all the tool states in the current workflow (one synthesis run might iterate though workflows of different lengths)
+	 * @param typeAutomaton - graph representing all the type states in the current workflow (one synthesis run might iterate though workflows of different lengths)
+	 * @return CNF encoding of that ensures the correctness of the helper predicates.
+	 */
+	public String getConstraintsForHelperPredicates(AtomMappings mappings, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
 		StringBuilder constraints = new StringBuilder();
-		Automaton automaton;
-		WorkflowElement workflowElem;
+		Automaton automaton = null;
+		WorkflowElement workflowElem = null;
 		for (TaxonomyPredicateHelper helperPredicate : helperPredicates) {
-			if(helperPredicate.getSubPredicates().get(0) instanceof Type) {
+			if(helperPredicate.getGeneralizedPredicates().first() instanceof Type) {
 				automaton = typeAutomaton;
 				workflowElem = WorkflowElement.MEMORY_TYPE;
 			} else {
@@ -180,7 +188,7 @@ public class APEDomainSetup {
 					constraints = constraints.append("-")
 							.append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
 
-					for (TaxonomyPredicate subLabel : helperPredicate.getSubPredicates()) {
+					for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
 						constraints = constraints.append(mappings.add(subLabel, currState, workflowElem)).append(" ");
 					}
 					constraints = constraints.append(" 0\n");
@@ -189,7 +197,7 @@ public class APEDomainSetup {
 					 * Ensures that if at least one of the disjointLabels was used, the abstract
 					 * predicate has to be used as well.
 					 */
-					for (TaxonomyPredicate subLabel : helperPredicate.getSubPredicates()) {
+					for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
 						constraints = constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
 								.append(" ");
 						constraints = constraints.append(mappings.add(helperPredicate, currState, workflowElem))
@@ -201,7 +209,7 @@ public class APEDomainSetup {
 					 * Ensures that if the abstract predicate is used, all of the disjointLabels
 					 * have to be used.
 					 */
-					for (TaxonomyPredicate subLabel : helperPredicate.getSubPredicates()) {
+					for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
 						constraints = constraints.append("-")
 								.append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
 
@@ -213,7 +221,7 @@ public class APEDomainSetup {
 					 * Ensures that if all of the disjointLabels were used, the abstract predicate
 					 * has to be used as well.
 					 */
-					for (TaxonomyPredicate subLabel : helperPredicate.getSubPredicates()) {
+					for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
 						constraints = constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
 								.append(" ");
 					}

@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -31,12 +33,12 @@ import com.fasterxml.jackson.databind.deser.std.JsonLocationInstantiator;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
-import nl.uu.cs.ape.sat.constraints.ConstraintParameter;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
@@ -70,7 +72,7 @@ public final class APEUtils {
 		}
 		String constraintID;
 		int currNode = 0;
-		List<ConstraintParameter> parameters;
+		List<TaxonomyPredicate> parameters;
 		List<JSONObject> constraints = getListFromJson(constraintsPath, CONSTR_JSON_TAG);
 
 		for (JSONObject jsonConstraint : safe(constraints)) {
@@ -80,27 +82,32 @@ public final class APEUtils {
 				constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
 
 				List<JSONArray> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG, JSONArray.class);
-				parameters = new ArrayList<ConstraintParameter>();
+				parameters = new ArrayList<TaxonomyPredicate>();
 				/* for each constraint parameter */
 				for (JSONArray jsonParam : jsonConstParam) {
-					ConstraintParameter currParameter = new ConstraintParameter();
+					List<TaxonomyPredicate> currParameter = new ArrayList<TaxonomyPredicate>();
 					for(String paramLabel : getListFromJsonList(jsonParam, String.class)) {
 						/* generate the corresponding ConstraintParameter object */
 						TaxonomyPredicate currLabel = domainSetup.getAllModules().get(paramLabel.toString());
 						if(currLabel == null) {
 							currLabel = domainSetup.getAllTypes().get(paramLabel.toString());
 						}
-						currParameter.addParameter(currLabel);
+						currParameter.add(currLabel);
 					}
-					parameters.add(currParameter);
+					/* Generate an abstract term to generalize over the set of predicates that describe the parameter. */
+					parameters.add(domainSetup.generateHelperPredicate(new TreeSet<TaxonomyPredicate>(currParameter), LogicOperation.AND));
 				}
 			} catch (JSONException e) {
 				System.err.println("Error in file: " + constraintsPath + ", at constraint no: " + currNode
 						+ ". Bad format. Constraint skipped.");
 				continue;
 			}
-			ConstraintTemplateData currConstr = new ConstraintTemplateData(constraintID, parameters);
-			domainSetup.addConstraintData(currConstr);
+			ConstraintTemplateData currConstr = domainSetup.getConstraintFactory().addConstraintTemplateData(constraintID, parameters);
+			if(parameters.stream().anyMatch(null)){
+				System.err.println("Constraint argument does not exist in the tool taxonomy.");
+			} else {
+				domainSetup.addConstraintData(currConstr);
+			}
 		}
 	}
 
@@ -150,11 +157,10 @@ public final class APEUtils {
 	 * @return String representation of the SAT encoding for the specified
 	 *         constraint.
 	 */
-	public static String constraintSATEncoding(String constraintID, List<ConstraintParameter> parameters,
+	public static String constraintSATEncoding(String constraintID, List<TaxonomyPredicate> parameters,
 			APEDomainSetup domainSetup,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMappings mappings) {
-		String constraint = domainSetup.getConstraintTamplate(constraintID).getConstraint(parameters, domainSetup.getAllModules(),
-				domainSetup.getAllTypes(), moduleAutomaton, typeAutomaton, mappings);
+		String constraint = domainSetup.getConstraintTamplate(constraintID).getConstraint(parameters, domainSetup, moduleAutomaton, typeAutomaton, mappings);
 
 		return constraint;
 	}
@@ -683,6 +689,20 @@ public final class APEUtils {
 		scanner.close();
 
 		return humanReadable.toString();
+	}
+
+	/**
+	 * Method creates a label based on the list of predicates and the logical operator.
+	 * @param relatedPredicates - list of predicates that should be used to create the new label.
+	 * @param logicOp - logical operator that configures the label.
+	 * @return - String representing a new label made based on the predicates and the logical operator.
+	 */
+	public static String getLabelFromList(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
+		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
+		for(TaxonomyPredicate label : relatedPredicates) {
+			abstractLabel = abstractLabel.append(label.getPredicateID());
+		}
+		return abstractLabel.toString();
 	}
 
 }
