@@ -1,0 +1,11 @@
+nl.uu.cs.ape.sat
+nl.uu.cs.ape.sat.automaton
+nl.uu.cs.ape.sat.constraints
+nl.uu.cs.ape.sat.core
+nl.uu.cs.ape.sat.core.implSAT
+nl.uu.cs.ape.sat.core.solutionStructure
+nl.uu.cs.ape.sat.models
+nl.uu.cs.ape.sat.models.enums
+nl.uu.cs.ape.sat.models.formulas
+nl.uu.cs.ape.sat.models.logic.constructs
+nl.uu.cs.ape.sat.utils
