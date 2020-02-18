@@ -36,7 +36,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 	
 	/**
 	 * Set of all the predicates that are subsumed by the abstract predicate (null if the
-	 * predicate is a leaf)
+	 * predicate is a leaf).  
 	 */
 	private Set<TaxonomyPredicate> subPredicates;
 	/**
@@ -172,6 +172,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 		}
 		return succExe;
 	}
+	
 	/**
 	 * Set the current predicate as a relevant part of the taxonomy and all the corresponding subClasses.
 	 * 

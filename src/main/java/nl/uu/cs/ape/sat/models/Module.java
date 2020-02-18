@@ -10,7 +10,7 @@ import java.util.TreeSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;
+import nl.uu.cs.ape.sat.models.SATEncodingUtils.SATTypeUtils;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -169,22 +169,26 @@ public class Module extends AbstractModule {
 		AllModules allModules = domainSetup.getAllModules();
 		AllTypes allTypes = domainSetup.getAllTypes();
 		String moduleID = jsonModule.getString(APEConfig.getJsonTags("id"));
+		if(allModules.get(moduleID) != null) {
+			moduleID = moduleID + "[tool]";
+		}
 		String moduleLabel = jsonModule.getString(APEConfig.getJsonTags("label"));
-		Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("taxonomyTerms"), String.class));
-		
+		Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("taxonomyOperations"), String.class));
 		/** Check if the referenced module taxonomy classes exist. */
 		List<String> toRemove = new ArrayList<String>();
 		for(String taxonomyModule : taxonomyModules) {
 			if(allModules.get(taxonomyModule) == null) {
+				System.err.println("Tool [" + moduleID + "] annotation issue. "
+						+ "Referenced '"+APEConfig.getJsonTags("taxonomyOperations")+"': '" + taxonomyModule + "' cannot be found in the Tool Taxonomy.");
 				toRemove.add(taxonomyModule);
 			}
 		}
 		taxonomyModules.removeAll(toRemove);
 		
 		/* If the taxonomy terms were not properly specified the tool taxonomy root is used as superclass of the tool. */
-		if(taxonomyModules.isEmpty() && (allModules.get(moduleID) == null)) {
-				System.err.println("Annotated tool \"" + moduleID
-						+ "\" cannot be found in the Tool Taxonomy. It is added as a direct subclass of the root in the Tool Taxonomy.");
+		if(taxonomyModules.isEmpty()) {
+				System.err.println("Tool [" + moduleID + "] annotation issue. "
+						+ "None of the referenced '"+APEConfig.getJsonTags("taxonomyOperations")+"' can be found in the Tool Taxonomy.");
 				taxonomyModules.add(allModules.getRootID());
 		}
 		
@@ -241,7 +245,7 @@ public class Module extends AbstractModule {
 											+ "' was not defined, but it was used as annotation for input type '" + currTypeID + "'.");
 						}
 					}
-					Type newAbsType = (Type) domainSetup.generateHelperPredicate(logConnectedPredicates, logConn);
+					Type newAbsType = (Type) domainSetup.generateAuxiliaryPredicate(logConnectedPredicates, logConn);
 					if(newAbsType != null) {
 						newAbsType.setAsRelevantTaxonomyTerm(allTypes);
 						input.addType(newAbsType);
@@ -291,7 +295,7 @@ public class Module extends AbstractModule {
 						}
 					}
 					/* Create a new type, that represents a disjunction/conjunction of the types, that can be used to abstract over each of the tools individually. */
-					Type newAbsType = (Type) domainSetup.generateHelperPredicate(logConnectedPredicates, logConn);
+					Type newAbsType = (Type) domainSetup.generateAuxiliaryPredicate(logConnectedPredicates, logConn);
 					if(newAbsType != null) {
 						newAbsType.setAsRelevantTaxonomyTerm(allTypes);
 						output.addType(newAbsType);
@@ -364,7 +368,7 @@ public class Module extends AbstractModule {
 	 */
 	@Override
 	public String toShortString() {
-		return super.toShortString() + "[T]";
+		return super.toShortString(); //+ "[T]";
 	}
 
 	@Override

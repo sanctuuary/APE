@@ -77,7 +77,8 @@ public abstract class AllPredicates {
 	}
 	
 	/**
-	 * 
+	 * Remove the parts of the taxonomy that are not in use for the given set of available tools and types in the domain.
+	 * @return {@code true} if the trimming finished successfully, {@code false} otherwise.
 	 */
 	public boolean trimTaxonomy() {
 		TaxonomyPredicate root = get(taxonomyRoot);
@@ -98,6 +99,11 @@ public abstract class AllPredicates {
 		return true;
 	}
 	
+	/**
+	 * Remove the parts of the given subtaxonomy that are not in use for the given set of available tools and types in the domain.
+	 * @param subTaxRoot - subtaxonomy that is to be trimmed
+	 * @return {@code true} if the trimming finished successfully, {@code false} otherwise.
+	 */
 	public boolean trimSubTaxonomy(TaxonomyPredicate subTaxRoot) {
 		if(subTaxRoot == null) {
 			return true;

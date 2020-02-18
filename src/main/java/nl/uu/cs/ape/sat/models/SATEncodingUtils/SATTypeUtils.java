@@ -24,15 +24,15 @@ import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 /**
- * The {@code TypeUtils} class is used to encode SAT constraints  based on the type annotations.
+ * The {@code SATTypeUtils} class is used to encode SAT constraints  based on the type annotations.
  *
  * @author Vedran Kasalica
  *
  */
-public class TypeUtils {
+public class SATTypeUtils {
 
 	/** Private constructor is used to to prevent instantiation. */
-	private TypeUtils() {
+	private SATTypeUtils() {
 		throw new UnsupportedOperationException();
 	}
 	

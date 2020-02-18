@@ -34,10 +34,10 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  * @author Vedran Kasalica
  *
  */
-public final class ModuleUtils {
+public final class SATModuleUtils {
 
 	/** Private constructor is used to to prevent instantiation. */
-	private ModuleUtils() {
+	private SATModuleUtils() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -47,34 +47,40 @@ public final class ModuleUtils {
 	 * Depending on the parameter pipeline, the INPUT constraints will be based on a
 	 * pipeline or general memory approach.
 	 * 
-	 * @param moduleAutomaton      - represents the module automaton
-	 * @param typeAutomaton        - represent the type automaton
-	 * @param shared_memory        - if false pipeline approach, otherwise the
-	 *                             general memory approach is used
-	 * @param emptyType            - represents absence of types
-	 * @param mappings
-	 * @param useAllWorkflowInputs - true if all the inputs given to the workflow
-	 *                             should be used
-	 * @param useAllGeneratedTypes - true if all the generated types have to be used
-	 * @return {@link String} representation of constraints regarding the required
+	 *  @param synthesisInstance - a specific synthesis run that contains all the information specific for it
+	 * @return {@link String} representation of CNF constraints regarding the required
 	 *         INPUT and OUTPUT types of the modules
 	 */
-	public static String modulesConstraints(SAT_SynthesisEngine synthesisInstance) {
+	public static String encodeModuleAnnotations(SAT_SynthesisEngine synthesisInstance) {
 		StringBuilder constraints = new StringBuilder();
 		constraints = constraints.append(inputCons(synthesisInstance));
-		if (!synthesisInstance.getConfig().getShared_memory()) {
-			/* Case when the using message passing memory system. */
-			constraints = constraints.append(inputMsgPassingCons(synthesisInstance.getDomainSetup().getAllModules(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
-			constraints = constraints.append(enforcingUsageOfGeneratedTypesMsgPassingCons(synthesisInstance));
-		} else {
+		
+		constraints = constraints.append(outputCons(synthesisInstance));
+		return constraints.toString();
+	}
+	
+	/**
+	 * Return a CNF formula that preserves the memory structure that is being used (e.g. 'shared memory'), i.e. ensures that the 
+	 * referenced items are available according to the mem. structure and that the input type and the referenced type from the memory
+	 * represent the same data.
+	 * 
+	 * @param synthesisInstance - a specific synthesis run that contains all the information specific for it
+	 * @return {@link String} representation of CNF constraints regarding the required memory structure implementation
+	 */
+	public static String encodeMemoryStructure(SAT_SynthesisEngine synthesisInstance) {
+		StringBuilder constraints = new StringBuilder();
+		
+		if (synthesisInstance.getConfig().getShared_memory()) {
 			/* Case when the using shared memory system. */
 			constraints = constraints.append(inputSharedMemCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
 			constraints = constraints.append(enforcingUsageOfGeneratedTypesSharedMemCons(synthesisInstance));
+		} else {
+			/* Case when the using message passing memory system. */
+			constraints = constraints.append(inputMsgPassingCons(synthesisInstance.getDomainSetup().getAllModules(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+			constraints = constraints.append(enforcingUsageOfGeneratedTypesMsgPassingCons(synthesisInstance));
 		}
 
 		constraints = constraints.append(generalReferenceCons(synthesisInstance.getDomainSetup(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
-
-		constraints = constraints.append(outputCons(synthesisInstance));
 		return constraints.toString();
 	}
 	
@@ -95,6 +101,7 @@ public final class ModuleUtils {
 
 		StringBuilder constraints = new StringBuilder();
 		AtomMappings mappings = synthesisInstance.getMappings();
+		/* For each module.. */
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
 			/* ..which is a Tool.. */
 			if ((potentialModule instanceof Module)) {

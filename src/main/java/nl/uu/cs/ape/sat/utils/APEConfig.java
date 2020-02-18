@@ -70,7 +70,7 @@ public class APEConfig {
 
 	/**
 	 * {@code true} if the shared memory structure should be used, {@code false} in
-	 * case of a restrictive pipeline structure.
+	 * case of a restrictive message passing structure.
 	 */
 	private Boolean shared_memory;
 
@@ -540,7 +540,10 @@ public class APEConfig {
 	}
 
 	/**
-	 * @return the {@link #shared_memory}
+	 * Returns {@code true} if the shared memory structure should be used, i.e. if the generated data is available in memory to all the tools used subsequently,
+	 *  or {@code false} in case of a restrictive message passing structure, i.e. if the generated data is available only to the tool next in sequence..
+	 * @return {@code true} if the shared memory structure should be used, {@code false} in
+	 * case of a restrictive message passing structure.
 	 */
 	public Boolean getShared_memory() {
 		return shared_memory;
@@ -675,13 +678,13 @@ public class APEConfig {
 	public static String getJsonTags(String tag) {
 		switch (tag) {
 		case "id":
-			return "operation";
+			return "id";
 		case "label":
-			return "name";
+			return "label";
 		case "inputs":
 			return "inputs";
-		case "taxonomyTerms":
-			return "taxonomyTerms";
+		case "taxonomyOperations":
+			return "taxonomyOperations";
 		case "outputs":
 			return "outputs";
 		case "implementation":

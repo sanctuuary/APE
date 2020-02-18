@@ -18,23 +18,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import guru.nidi.graphviz.attribute.RankDir;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.engine.Renderer;
-import guru.nidi.graphviz.model.Graph;
-import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
-import nl.uu.cs.ape.sat.core.solutionStructure.SolutionGraph;
-import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
-import nl.uu.cs.ape.sat.models.AllModules;
-import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
+import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.models.Module;
-import nl.uu.cs.ape.sat.models.TaxonomyPredicateHelper;
-import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
@@ -263,7 +251,7 @@ public class APE {
 		StringBuilder solutions2write = new StringBuilder();
 
 		for (int i = 0; i < allSolutions.size(); i++) {
-			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getRelevantSolution())
+			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getSolution())
 					.append("\n");
 		}
 		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolution_path()), false);

@@ -306,7 +306,7 @@ public class OWLReader {
 		if (currClass == null) {
 			return null;
 		}
-		return currClass.toStringID();
+		return getLabel(currClass);
 	}
 
 }

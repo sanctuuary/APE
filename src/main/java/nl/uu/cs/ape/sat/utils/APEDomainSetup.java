@@ -18,7 +18,7 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
-import nl.uu.cs.ape.sat.models.TaxonomyPredicateHelper;
+import nl.uu.cs.ape.sat.models.AuxTaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
@@ -41,7 +41,7 @@ public class APEDomainSetup {
 	private ConstraintFactory constraintFactory;
 	/** List of data gathered from the constraint file. */
 	private List<ConstraintTemplateData> unformattedConstr;
-	private List<TaxonomyPredicateHelper> helperPredicates;
+	private List<AuxTaxonomyPredicate> helperPredicates;
 	
 	
 	public APEDomainSetup(APEConfig config) {
@@ -49,7 +49,7 @@ public class APEDomainSetup {
 		allModules = new AllModules(config);
 		allTypes = new AllTypes(config);
 		constraintFactory = new ConstraintFactory();
-		helperPredicates =new ArrayList<TaxonomyPredicateHelper>();
+		helperPredicates =new ArrayList<AuxTaxonomyPredicate>();
 	}
 
 
@@ -130,12 +130,12 @@ public class APEDomainSetup {
 	 * Method used to generate a new predicate that should provide an interface for handling multiple predicates.
 	 * New predicated is used to simplify interaction with a set of related tools/types.<br><br>
 	 * 
-	 * The original predicates are available as consumed predicates(see {@link TaxonomyPredicateHelper#getGeneralizedPredicates()}) of the new {@link TaxonomyPredicate}
+	 * The original predicates are available as consumed predicates(see {@link AuxTaxonomyPredicate#getGeneralizedPredicates()}) of the new {@link TaxonomyPredicate}
 	 * @param relatedPredicates - set of sorted type that are logically related to the new abstract type (label of the equivalent sets is always the same due to its ordering)
 	 * @param logicOp -logical operation that describes the relation between the types
 	 * @return an abstract predicate that provides abstraction over a disjunction/conjunction of the labels
 	 */
-	public TaxonomyPredicate generateHelperPredicate(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
+	public TaxonomyPredicate generateAuxiliaryPredicate(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
 		if(relatedPredicates.isEmpty()) {
 			return null;
 		}
@@ -150,7 +150,7 @@ public class APEDomainSetup {
 		} else {
 			newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel, abstractLabel, relatedPredicates.first().getRootNode(), NodeType.ABSTRACT));
 		}
-		TaxonomyPredicateHelper helperPredicate = new TaxonomyPredicateHelper(newAbsType, logicOp);
+		AuxTaxonomyPredicate helperPredicate = new AuxTaxonomyPredicate(newAbsType, logicOp);
 		
 		for(TaxonomyPredicate predicate : relatedPredicates) {
 			helperPredicate.addConcretePredicate(predicate);
@@ -167,11 +167,11 @@ public class APEDomainSetup {
 	 * @param typeAutomaton - graph representing all the type states in the current workflow (one synthesis run might iterate though workflows of different lengths)
 	 * @return CNF encoding of that ensures the correctness of the helper predicates.
 	 */
-	public String getConstraintsForHelperPredicates(AtomMappings mappings, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
+	public String getConstraintsForAuxiliaryPredicates(AtomMappings mappings, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
 		StringBuilder constraints = new StringBuilder();
 		Automaton automaton = null;
 		WorkflowElement workflowElem = null;
-		for (TaxonomyPredicateHelper helperPredicate : helperPredicates) {
+		for (AuxTaxonomyPredicate helperPredicate : helperPredicates) {
 			if(helperPredicate.getGeneralizedPredicates().first() instanceof Type) {
 				automaton = typeAutomaton;
 				workflowElem = WorkflowElement.MEMORY_TYPE;

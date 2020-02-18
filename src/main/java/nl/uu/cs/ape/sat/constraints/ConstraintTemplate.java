@@ -50,11 +50,11 @@ public abstract class ConstraintTemplate {
 	 * @param description
 	 *            - Description of the constraint.
 	 */
-	public ConstraintTemplate(String id, List<ConstraintParameter> parameters, String description, Runnable function) {
+	public ConstraintTemplate(String id, List<ConstraintParameter> parameters, String description) {
 		this.constraintID = id;
 		this.parameters = parameters;
 		this.description = description;
-		this.function = function;
+//		this.function = function;
 	}
 
 	public void setConstraintID(String constraintID) {

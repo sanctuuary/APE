@@ -22,7 +22,7 @@ public class ConstraintImpl extends ConstraintTemplate {
 
 
 	public ConstraintImpl(String id, List<ConstraintParameter> parametersNo, String description, Runnable function) {
-		super(id, parametersNo, description, function);
+		super(id, parametersNo, description);
 	}
 	
 

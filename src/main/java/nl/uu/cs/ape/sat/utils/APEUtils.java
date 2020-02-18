@@ -70,7 +70,7 @@ public final class APEUtils {
 		if (constraintsPath == null) {
 			return;
 		}
-		String constraintID;
+		String constraintID = null;
 		int currNode = 0;
 		List<TaxonomyPredicate> parameters;
 		List<JSONObject> constraints = getListFromJson(constraintsPath, CONSTR_JSON_TAG);
@@ -85,25 +85,31 @@ public final class APEUtils {
 				parameters = new ArrayList<TaxonomyPredicate>();
 				/* for each constraint parameter */
 				for (JSONArray jsonParam : jsonConstParam) {
-					List<TaxonomyPredicate> currParameter = new ArrayList<TaxonomyPredicate>();
+					SortedSet<TaxonomyPredicate> currParameter = new TreeSet<TaxonomyPredicate>();
 					for(String paramLabel : getListFromJsonList(jsonParam, String.class)) {
 						/* generate the corresponding ConstraintParameter object */
-						TaxonomyPredicate currLabel = domainSetup.getAllModules().get(paramLabel.toString());
+						TaxonomyPredicate currLabel = domainSetup.getAllModules().get(paramLabel);
 						if(currLabel == null) {
-							currLabel = domainSetup.getAllTypes().get(paramLabel.toString());
+							currLabel = domainSetup.getAllTypes().get(paramLabel);
 						}
-						currParameter.add(currLabel);
+						if(currLabel == null) {
+							System.err.println("Constraint parameter '" + paramLabel + "' is not defined in the domain.");
+							throw new JSONException("JSON constrains semnatics error.");
+						} else {
+							currParameter.add(currLabel);
+						}
 					}
 					/* Generate an abstract term to generalize over the set of predicates that describe the parameter. */
-					parameters.add(domainSetup.generateHelperPredicate(new TreeSet<TaxonomyPredicate>(currParameter), LogicOperation.AND));
+					TaxonomyPredicate absCurrParam = domainSetup.generateAuxiliaryPredicate(currParameter, LogicOperation.AND);
+					parameters.add(absCurrParam);
 				}
 			} catch (JSONException e) {
 				System.err.println("Error in file: " + constraintsPath + ", at constraint no: " + currNode
-						+ ". Bad format. Constraint skipped.");
+						+ " (" + constraintID + "). Bad format. Constraint skipped.");
 				continue;
 			}
 			ConstraintTemplateData currConstr = domainSetup.getConstraintFactory().addConstraintTemplateData(constraintID, parameters);
-			if(parameters.stream().anyMatch(null)){
+			if(parameters.stream().filter(predicate -> predicate == null).count() > 0){
 				System.err.println("Constraint argument does not exist in the tool taxonomy.");
 			} else {
 				domainSetup.addConstraintData(currConstr);
@@ -214,7 +220,6 @@ public final class APEUtils {
 				continue;
 			}
 		}
-
 		return modulesNew;
 	}
 
@@ -616,11 +621,8 @@ public final class APEUtils {
 				}
 				apeInput.put("Data", apeInputTypes);
 //				add all data formats (or just the first one)
-				boolean oneFormat = true;
 				for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
-//					if (oneFormat) {
 						apeInputFormats.put(bioType.getString("term"));
-//						oneFormat = false; }
 				}
 				apeInput.put("Format$OR$", apeInputFormats);
 
@@ -639,16 +641,13 @@ public final class APEUtils {
 				JSONArray apeOutputTypes = new JSONArray();
 				JSONArray apeOutputFormats = new JSONArray();
 //				add all data types
-				boolean oneFormat = true;
 				for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "data", JSONObject.class)) {
 					apeOutputTypes.put(bioType.getString("term"));
 				}
 				apeOutput.put("Data", apeOutputTypes);
 //				add all data formats
 				for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
-//					if (oneFormat) {
 						apeOutputFormats.put(bioType.getString("term"));
-//						oneFormat = false; }
 				}
 				apeOutput.put("Format$OR$", apeOutputFormats);
 

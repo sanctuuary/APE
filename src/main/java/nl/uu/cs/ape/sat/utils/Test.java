@@ -25,7 +25,7 @@ public class Test {
 //		runSynthesisSetup();
 
 //		runSynthesisTest();
-		runJsonConversionTest();
+		customParseJson();
 //		APE apeFramework = runSynthesisSetup();
 //		testConstraintTemplates(apeFramework);
 	}
@@ -112,24 +112,35 @@ public class Test {
 	public static void customParseJson() {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader br = Files.newBufferedReader(
-				Paths.get("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/new_modules.json"))) {
+				Paths.get("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/SimpleDemo/tool_annotations.json"))) {
 
 			// read line by line
 			String line;
 			while ((line = br.readLine()) != null) {
-
-				if (line.contains("taxonomyTerms")) {
-					sb.append(line.replace("taxonomyTerms", "name")).append("\n");
+				
+				if (line.contains("name")) {
+					sb.append(line.replace("name", "label")).append("\n");
+				} else if (line.contains("taxonomyTerms")) {
+					sb.append(line.replace("taxonomyTerms", "taxonomyOperations")).append("\n");
+				} else if (line.contains("operation")) {
+					sb.append(line.replace("operation", "id")).append("\n");
+				} else {
+					sb.append(line).append("\n");
 				}
-
-				sb.append(line).append("\n");
+				
+				if (line.contains("operation")) {
+					sb.append(line.replace("operation", "taxonomyOperations").replace(": \"", ": [\"")
+							.replace("\",", "\"],")).append("\n");
+				}
+				
+				
 			}
 
 		} catch (IOException e) {
 			System.err.format("IOException: %s%n", e);
 		}
 		APEUtils.write2file(sb.toString(),
-				new File("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase5/new_modules1.json"), false);
+				new File("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/SimpleDemo/tool_annotations1.json"), false);
 	}
 
 	public static void cnfTransformationTesting() {

@@ -17,7 +17,7 @@ import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
  * @author Vedran Kasalica
  *
  */
-public class TaxonomyPredicateHelper extends TaxonomyPredicate {
+public class AuxTaxonomyPredicate extends TaxonomyPredicate {
 
 	/** Corresponding TaxonomyPredicate */
 	private final TaxonomyPredicate taxonomyPredicate;
@@ -39,7 +39,7 @@ public class TaxonomyPredicateHelper extends TaxonomyPredicate {
 	 * @param nodeType      - {@link NodeType} object describing the type w.r.t. the
 	 *                      Module Taxonomy.
 	 */
-	public TaxonomyPredicateHelper(TaxonomyPredicate predicate, LogicOperation logicOp) {
+	public AuxTaxonomyPredicate(TaxonomyPredicate predicate, LogicOperation logicOp) {
 		super(predicate.getRootNode(), predicate.getNodeType());
 		this.taxonomyPredicate = predicate;
 		this.logicOp = logicOp;

@@ -192,7 +192,7 @@ public class TypeNode extends SolutionWorkflowNode {
 	 * @return {@link Graph} extended with the current {@link TypeNode}
 	 */
 	public Graph addTypeToGraph(Graph workflowGraph) {
-		return workflowGraph = workflowGraph.with(node(getDotID()).with(Label.of(getDotLabel() + "   "), Shape.NONE));
+		return workflowGraph = workflowGraph.with(node(getDotID()).with(Label.of(getDotLabel() + "   ")));
 	}
 
 	/** Get label of the current workflow node in .dot representation. */
