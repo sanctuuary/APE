@@ -1,4 +1,4 @@
-<img src="./res/ape_logo_sqare.png" alt="logo" width="150"/>
+<img src="./res/ape_logo_sqare.png" alt="logo" width=20% align="left" />
 
 # APE (Automated Pipeline Explorer)
 
