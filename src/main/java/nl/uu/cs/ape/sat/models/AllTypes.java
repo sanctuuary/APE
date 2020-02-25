@@ -28,8 +28,8 @@ public class AllTypes extends AllPredicates {
 	private List<String> dataTaxonomyDimensions;
 
 	public AllTypes(APEConfig config) {
-		super(config.getData_taxonomy_root());
-		dataTaxonomyDimensions = config.getData_taxonomy_subroots();
+		super(config.getDataTaxonomyRoot());
+		dataTaxonomyDimensions = config.getDataTaxonomySubroots();
 		emptyType = new Type("empty", "empty", getRootID(), NodeType.EMPTY);
 		emptyType.setIsRelevant();
 		this.put(emptyType);

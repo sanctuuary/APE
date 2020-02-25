@@ -33,7 +33,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 /**
  * The {@code SAT_SynthesisEngine} class represents a <b>synthesis instance</b>,
  * i.e. it is represented with the set of inputs (tools, types, constraints and
- * workflow lenght that is being explored).<br>
+ * workflow length that is being explored).<br>
  * It is used to execute synthesis algorithm over the given input, implemented
  * using MiniSAT solver. <br>
  * <br>
@@ -85,8 +85,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		this.temp_sat_input = null;
 		this.cnfEncoding = new StringBuilder();
 
-		moduleAutomaton = new ModuleAutomaton(size, config.getMax_no_tool_outputs());
-		typeAutomaton = new TypeAutomaton(size, config.getMax_no_tool_inputs(), config.getMax_no_tool_outputs());
+		moduleAutomaton = new ModuleAutomaton(size, config.getMaxNoToolOutputs());
+		typeAutomaton = new TypeAutomaton(size, config.getMaxNoToolInputs(), config.getMaxNoToolOutputs());
 
 	}
 
@@ -107,7 +107,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * Generate the automaton
 		 */
 		String currLengthTimer = "length" + this.getSolutionSize();
-		APEUtils.timerStart(currLengthTimer, config.getDebug_mode());
+		APEUtils.timerStart(currLengthTimer, config.getDebugMode());
 
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
@@ -161,7 +161,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * reuse the mappings for states, instead of introducing new ones, using the I/O
 		 * types of NodeType.UNKNOWN.
 		 */
-		String inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), config.getProgram_inputs(), typeAutomaton, mappings);
+		String inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), config.getProgramInputs(), typeAutomaton, mappings);
 		if (inputDataEncoding == null) {
 			return false;
 		}
@@ -181,18 +181,14 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		cnfEncoding = cnfEncoding.append(domainSetup.getConstraintsForAuxiliaryPredicates(mappings, moduleAutomaton, typeAutomaton));
 		
 		/*
-		 * Counting the number of variables and clauses that will be given to the SAT
-		 * solver TODO Improve this approach, no need to read the whole String again to cound lines.
+		 * Counting the number of variables and clauses that will be given to the SAT solver 
+		 * TODO Improve this approach, no need to read the whole String again to cound lines.
 		 */
 		int variables = mappings.getSize();
 		int clauses = APEUtils.countNewLines(cnfEncoding.toString());
 		StringBuilder sat_input_header = new StringBuilder("p cnf " + variables + " " + clauses + "\n");
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
 		System.out.println();
-		/*
-		 * Fixing the input and output files for easier testing.
-		*/
-
 		
 		StringBuilder mknfEncoding = sat_input_header.append(cnfEncoding);
 //		APEUtils.write2file(mknfEncoding.toString(), new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime), false);
@@ -246,15 +242,14 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
 		ISolver solver = SolverFactory.newDefault();
 		int timeout = 3600;
-		// ISolver solver = new ModelIterator(SolverFactory.newDefault(),
-		// no_of_solutions); // iteration through at most
-		// no_of_solutions solutions
-		solver.setTimeout(timeout); // 1 hour timeout
+		// 1 hour timeout
+		solver.setTimeout(timeout); 
 		long realStartTime = 0;
 		long realTimeElapsedMillis;
 		Reader reader = new DimacsReader(solver);
 		try {
-			IProblem problem = reader.parseInstance(sat_input); // loading CNF encoding of the problem
+			// loading CNF encoding of the problem
+			IProblem problem = reader.parseInstance(sat_input); 
 			realStartTime = System.currentTimeMillis();
 			while (solutionsFound < solutionsFoundMax && problem.isSatisfiable()) {
 				SolutionWorkflow sat_solution = new SolutionWorkflow(problem.model(), this);
@@ -277,12 +272,9 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		} catch (ContradictionException e) {
 			System.err.println("Unsatisfiable");
 		} catch (TimeoutException e) {
-			System.err.println("Timeout. Solving took longer than default timeout: " + timeout + " seconds.");
+			System.err.println("Timeout. Solving took longer than the default timeout: " + timeout + " seconds.");
 		} catch (IOException e) {
 			System.err.println("Internal error while parsing the encoding.");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		if (solutionsFound == 0 || solutionsFound % 500 != 0) {

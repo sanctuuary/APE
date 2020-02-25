@@ -86,9 +86,7 @@ public abstract class AllPredicates {
 		for(TaxonomyPredicate subClass : APEUtils.safe(root.getSubPredicates())) {
 			if(subClass == null) {
 				toRemove.add(subClass);
-				continue;
-			}
-			if(subClass.getIsRelevant()) {
+			} else if(subClass.getIsRelevant()) {
 				trimSubTaxonomy(subClass);
 			} else {
 				toRemove.add(subClass);
@@ -112,21 +110,17 @@ public abstract class AllPredicates {
 		for(TaxonomyPredicate subClass : APEUtils.safe(subTaxRoot.getSubPredicates())) {
 			if(subClass == null) {
 				toRemove.add(subClass);
-				continue;
-			}
-			if(subClass.getIsRelevant()) {
+			} else if(subClass.getIsRelevant()) {
 				trimSubTaxonomy(subClass);
 			} else {
 				toRemove.add(subClass);
 				trimSubTaxonomy(subClass);
 			}
 		}
-		if(subTaxRoot.getIsRelevant()) {
-			subTaxRoot.removeAllSubPredicates(toRemove);
-		} else {
+		if(!subTaxRoot.getIsRelevant()) {
 			this.predicates.remove(subTaxRoot.getPredicateID());
 		}
-		
+		subTaxRoot.removeAllSubPredicates(toRemove);
 		return true;
 	}
 	

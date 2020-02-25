@@ -110,7 +110,7 @@ public class APE {
 		 */
 		apeDomainSetup = new APEDomainSetup(config);
 
-		OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntology_path());
+		OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntologyPath());
 		Boolean ontologyRead = owlReader.readOntology();
 
 		if (ontologyRead == false) {
@@ -127,7 +127,7 @@ public class APE {
 		/*
 		 * Update allModules and allTypes sets based on the module.json file
 		 */
-		APEUtils.readModuleJson(config.getTool_annotations_path(), apeDomainSetup);
+		APEUtils.readModuleJson(config.getToolAnnotationsPath(), apeDomainSetup);
 		
 		succRun &= apeDomainSetup.trimTaxonomy();
 		
@@ -201,10 +201,10 @@ public class APE {
 		SATsolutionsList allSolutions = new SATsolutionsList(config);
 
 		
-		APEUtils.readConstraints(config.getConstraints_path(), apeDomainSetup);
+		APEUtils.readConstraints(config.getConstraintsPath(), apeDomainSetup);
 		
 		/** Print the setup information when necessary. */
-		APEUtils.debugPrintout(config.getDebug_mode(), apeDomainSetup);
+		APEUtils.debugPrintout(config.getDebugMode(), apeDomainSetup);
 
 		/**
 		 * Loop over different lengths of the workflow until either, max workflow length
@@ -212,9 +212,9 @@ public class APE {
 		 */
 		String globalTimerID = "globalTimer";
 		APEUtils.timerStart(globalTimerID, true);
-		int solutionLength = config.getSolution_min_length();
+		int solutionLength = config.getSolutionMinLength();
 		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
-				&& solutionLength <= config.getSolution_max_length()) {
+				&& solutionLength <= config.getSolutionMaxLength()) {
 
 			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, config, solutionLength);
 
@@ -229,7 +229,7 @@ public class APE {
 			implSATsynthesis.synthesisExecution();
 
 			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
-					|| solutionLength == config.getSolution_max_length()) {
+					|| solutionLength == config.getSolutionMaxLength()) {
 				APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
 			}
 
@@ -254,7 +254,7 @@ public class APE {
 			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getSolution())
 					.append("\n");
 		}
-		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolution_path()), false);
+		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolutionPath()), false);
 	}
 
 	/**
@@ -266,8 +266,8 @@ public class APE {
 	 * @throws IOException
 	 */
 	public boolean writeExecutableWorkflows(SATsolutionsList allSolutions) throws IOException {
-		String executionsFolder = config.getExecution_scripts_folder();
-		Integer noExecutions = config.getNo_executions();
+		String executionsFolder = config.getExecutionScriptsFolder();
+		Integer noExecutions = config.getNoExecutions();
 		if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
@@ -289,7 +289,7 @@ public class APE {
 			for (Module curr : currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules())) {
 				if (curr.getModuleExecution() != null) {
 					curr.getModuleExecution()
-							.run(config.getExecution_scripts_folder() + "/workflowSolution_" + i + ".sh");
+							.run(config.getExecutionScriptsFolder() + "/workflowSolution_" + i + ".sh");
 				}
 			}
 			System.out.print(".");
@@ -309,8 +309,8 @@ public class APE {
 	 * @throws IOException
 	 */
 	public boolean writeDataFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
-		String graphsFolder = config.getSolution_graphs_folder();
-		Integer noGraphs = config.getNo_graphs();
+		String graphsFolder = config.getSolutionGraphsFolder();
+		Integer noGraphs = config.getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
@@ -350,8 +350,8 @@ public class APE {
 	 * @throws IOException
 	 */
 	public boolean writeControlFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
-		String graphsFolder = config.getSolution_graphs_folder();
-		Integer noGraphs = config.getNo_graphs();
+		String graphsFolder = config.getSolutionGraphsFolder();
+		Integer noGraphs = config.getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}

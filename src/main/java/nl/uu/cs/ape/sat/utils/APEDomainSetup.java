@@ -37,6 +37,8 @@ public class APEDomainSetup {
 	private AllModules allModules;
 	/** All data types defined in the domain. */
 	private AllTypes allTypes;
+	/** Prefix used to define OWL class IDs */
+	private String ontologyPrexifIRI;
 	/** Object used to create temporal constraints. */ 
 	private ConstraintFactory constraintFactory;
 	/** List of data gathered from the constraint file. */
@@ -49,7 +51,8 @@ public class APEDomainSetup {
 		allModules = new AllModules(config);
 		allTypes = new AllTypes(config);
 		constraintFactory = new ConstraintFactory();
-		helperPredicates =new ArrayList<AuxTaxonomyPredicate>();
+		helperPredicates = new ArrayList<AuxTaxonomyPredicate>();
+		ontologyPrexifIRI = config.getOntologyPrefixIRI();
 	}
 
 
@@ -232,6 +235,14 @@ public class APEDomainSetup {
 
 		}
 		return constraints.toString();
+	}
+
+
+	/**
+	 * @return
+	 */
+	public String getOntologyPrefixIRI() {
+		return ontologyPrexifIRI;
 	}
 	
 }

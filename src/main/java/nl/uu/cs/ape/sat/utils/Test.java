@@ -25,9 +25,11 @@ public class Test {
 //		runSynthesisSetup();
 
 //		runSynthesisTest();
-		customParseJson();
+//		customParseConfig("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/gis_workflow_generation/q5_sota_constrained");
 //		APE apeFramework = runSynthesisSetup();
 //		testConstraintTemplates(apeFramework);
+		
+		runJsonConversionTest();
 	}
 
 	/**
@@ -91,8 +93,9 @@ public class Test {
 	 * 
 	 */
 	private static void runJsonConversionTest() throws IOException {
-		String text = APEUtils.readFile("/home/vedran/eclipse-workspace/Test/test.json", Charset.defaultCharset());
-		JSONObject toolAnnnotations = APEUtils.convertBioTools2Ape(new JSONArray(text));
+		String text = APEUtils.readFile("/home/vedran/git/biotoolcomposedemo/apeInputs/bio.tools_original.json", Charset.defaultCharset());
+		JSONArray tmp = new JSONArray(text);
+		JSONObject toolAnnnotations = APEUtils.convertBioTools2Ape(tmp);
 
 		System.out.println(toolAnnnotations.toString());
 
@@ -109,10 +112,34 @@ public class Test {
 		allTypes.getRootPredicate().printTree(" ", allTypes);
 	}
 
-	public static void customParseJson() {
+	public static void customParseConfig(String path) {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader br = Files.newBufferedReader(
-				Paths.get("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/SimpleDemo/tool_annotations.json"))) {
+				Paths.get(path + "/ape.configuration"))) {
+
+			// read line by line
+			String line;
+			while ((line = br.readLine()) != null) {
+				
+				if(line.contains("DType")) {
+					sb.append(line.replaceFirst("[\"]$", "\"]").replace("\"DType\": \"", "\"DType\": [\"")).append("\n");
+				} else {
+				sb.append(line).append("\n");
+				}
+				
+			}
+
+		} catch (IOException e) {
+			System.err.format("IOException: %s%n", e);
+		}
+		APEUtils.write2file(sb.toString(),
+				new File(path + "/ape.configuration"), false);
+	}
+	
+	public static void customParseJson(String path) {
+		StringBuilder sb = new StringBuilder();
+		try (BufferedReader br = Files.newBufferedReader(
+				Paths.get(path + ".json"))) {
 
 			// read line by line
 			String line;
@@ -127,12 +154,10 @@ public class Test {
 				} else {
 					sb.append(line).append("\n");
 				}
-				
-				if (line.contains("operation")) {
-					sb.append(line.replace("operation", "taxonomyOperations").replace(": \"", ": [\"")
-							.replace("\",", "\"],")).append("\n");
-				}
-				
+//				if (line.contains("operation")) {
+//					sb.append(line.replace("operation", "taxonomyOperations").replace(": \"", ": [\"")
+//							.replace("\",", "\"],")).append("\n");
+//				}
 				
 			}
 
@@ -140,7 +165,43 @@ public class Test {
 			System.err.format("IOException: %s%n", e);
 		}
 		APEUtils.write2file(sb.toString(),
-				new File("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/SimpleDemo/tool_annotations1.json"), false);
+				new File(path + "New.json"), false);
+	}
+	
+	public static void customAdvancedParseJson(String path) {
+		StringBuilder sb = new StringBuilder();
+		try (BufferedReader br = Files.newBufferedReader(
+				Paths.get(path + ".json"))) {
+
+			// read line by line
+			String line;
+			while ((line = br.readLine()) != null) {
+				
+				if (line.contains("name")) {
+					sb.append(line.replace("name", "label").replaceFirst("[\"]$", "\"]").replace("\"DType\": \"", "\"DType\": [\"")).append("\n");
+				} else if (line.contains("taxonomyTerms")) {
+					sb.append(line.replace("taxonomyTerms", "taxonomyOperations")).append("\n");
+				} else if (line.contains("operation")) {
+					sb.append(line.replace("operation", "id")).append("\n");
+				} else {
+					if(line.contains("DType")) {
+						sb.append(line.replaceFirst("[\"]$", "\"]").replace("\"DType\": \"", "\"DType\": [\"")).append("\n");
+					} else {
+					sb.append(line).append("\n");
+					}
+				}
+				
+				if (line.contains("operation")) {
+					sb.append(line.replace("operation", "taxonomyOperations").replace(": \"", ": [\"")
+							.replace("\",", "\"],")).append("\n");
+				}
+			}
+
+		} catch (IOException e) {
+			System.err.format("IOException: %s%n", e);
+		}
+		APEUtils.write2file(sb.toString(),
+				new File(path + "New.json"), false);
 	}
 
 	public static void cnfTransformationTesting() {

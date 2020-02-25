@@ -20,7 +20,7 @@ public class AllModules extends AllPredicates {
 
 
 	public AllModules(APEConfig config) {
-		super(config.getTool_taxonomy_root());
+		super(config.getToolTaxonomyRoot());
 	}
 
 	/**

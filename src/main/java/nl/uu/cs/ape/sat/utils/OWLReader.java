@@ -145,7 +145,7 @@ public class OWLReader {
 	 *         {@code false} otherwise.
 	 */
 	private boolean isModuleClass(OWLClass currClass) {
-		return getLabel(currClass).equals(allModules.getRootID());
+		return getIRI(currClass).equals(allModules.getRootID());
 	}
 
 	/**
@@ -157,11 +157,11 @@ public class OWLReader {
 	 *         {@code false} otherwise.
 	 */
 	private boolean isTypeClass(OWLClass currClass) {
-		if (getLabel(currClass).equals(allTypes.getRootID())) {
+		if (getIRI(currClass).equals(allTypes.getRootID())) {
 			typeRootExists = true;
 			return true;
 		} else {
-			return allTypes.getDataTaxonomyDimensionIDs().contains(getLabel(currClass));
+			return allTypes.getDataTaxonomyDimensionIDs().contains(getIRI(currClass));
 		}
 	}
 
@@ -179,13 +179,13 @@ public class OWLReader {
 //		if(allModules.existsModule(getLabel(currClass))) {
 //			return;
 //		}
-		AbstractModule superModule = allModules.get(getLabel(superClass));
+		AbstractModule superModule = allModules.get(getIRI(superClass));
 		final OWLClass currRootClass;
 		/*
 		 * Defining the Node Type based on the node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if (getLabel(currClass).equals(allModules.getRootID())) {
+		if (getIRI(currClass).equals(allModules.getRootID())) {
 			currNodeType = NodeType.ROOT;
 			currRootClass = currClass;
 		} else {
@@ -195,7 +195,7 @@ public class OWLReader {
 		AbstractModule currModule = null;
 		try {
 			currModule = allModules.addPredicate(
-					new AbstractModule(getLabel(currClass), getIRI(currClass), getLabel(currRootClass), currNodeType));
+					new AbstractModule(getLabel(currClass), getIRI(currClass), getIRI(currRootClass), currNodeType));
 		} catch (ExceptionInInitializerError e) {
 			e.printStackTrace();
 		}
@@ -228,15 +228,15 @@ public class OWLReader {
 		
 		final OWLClass currRoot;
 		Type superType, currType = null;
-		superType = allTypes.get(getLabel(superClass));
+		superType = allTypes.get(getIRI(superClass));
 		/*
 		 * Check whether the current node is a root or subRoot node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if (getLabel(currClass).equals(allTypes.getRootID())) {
+		if (getIRI(currClass).equals(allTypes.getRootID())) {
 			currNodeType = NodeType.ROOT;
 			currRoot = currClass;
-		} else if (APEUtils.safe(allTypes.getDataTaxonomyDimensionIDs()).contains(getLabel(currClass))) {
+		} else if (APEUtils.safe(allTypes.getDataTaxonomyDimensionIDs()).contains(getIRI(currClass))) {
 			currNodeType = NodeType.SUBROOT;
 			currRoot = currClass;
 		} else {
@@ -245,7 +245,7 @@ public class OWLReader {
 
 		/* Generate the Type that corresponds to the taxonomy class. */
 		try {
-			currType = allTypes.addPredicate(new Type(getLabel(currClass), getIRI(currClass), getLabel(currRoot), currNodeType));
+			currType = allTypes.addPredicate(new Type(getLabel(currClass), getIRI(currClass), getIRI(currRoot), currNodeType));
 		} catch (ExceptionInInitializerError e) {
 			e.printStackTrace();
 		}
@@ -306,7 +306,7 @@ public class OWLReader {
 		if (currClass == null) {
 			return null;
 		}
-		return getLabel(currClass);
+		return currClass.toStringID();
 	}
 
 }

@@ -16,9 +16,10 @@ public class LocalRun {
 
 	public static void main(String[] args) {
 
-		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/SimpleDemo/";
+		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/New Use Cases/";
+		String subPath = "SimpleDemo/";
 		String fileName = "ape.configuration";
-		if (!APEUtils.isValidReadFile(path + fileName)) {
+		if (!APEUtils.isValidReadFile(path + subPath + fileName)) {
 			System.err.println("Bad path.");
 			return;
 		}
@@ -27,7 +28,7 @@ public class LocalRun {
 		try {
 			file = File.createTempFile("temp", null);
 			file.deleteOnExit();
-			String content = APEUtils.readFile(path + fileName, Charset.defaultCharset());
+			String content = APEUtils.readFile(path + subPath + fileName, Charset.defaultCharset());
 			content = content.replace("./", path);
 			APEUtils.write2file(content, file, false);
 
@@ -56,7 +57,9 @@ public class LocalRun {
 		/*
 		 * Writing solutions to the specified file in human readable format
 		 */
-		if (solutions.isEmpty()) {
+		if (solutions == null) {
+			
+		} else if (solutions.isEmpty()) {
 			System.out.println("UNSAT");
 		} else {
 			try {

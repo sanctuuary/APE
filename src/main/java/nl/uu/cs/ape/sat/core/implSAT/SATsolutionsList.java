@@ -34,7 +34,7 @@ public class SATsolutionsList {
 		/*
 		 * Variables defining the current and maximum lengths and solutions count.
 		 */
-		maxSolutions = config.getMax_no_solutions();
+		maxSolutions = config.getMaxNoSolutions();
 		if(maxSolutions > 1000) {
 			System.out.println("Looking for " + maxSolutions + " solutions might take some time.");
 		}

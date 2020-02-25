@@ -70,7 +70,7 @@ public final class SATModuleUtils {
 	public static String encodeMemoryStructure(SAT_SynthesisEngine synthesisInstance) {
 		StringBuilder constraints = new StringBuilder();
 		
-		if (synthesisInstance.getConfig().getShared_memory()) {
+		if (synthesisInstance.getConfig().getSharedMemory()) {
 			/* Case when the using shared memory system. */
 			constraints = constraints.append(inputSharedMemCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
 			constraints = constraints.append(enforcingUsageOfGeneratedTypesSharedMemCons(synthesisInstance));
@@ -168,7 +168,7 @@ public final class SATModuleUtils {
 				/* ..for each state in which type can be used .. */
 				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
 					for (State currUsedTypeState : currUsedBlock.getStates()) {
-						if (currType.isSimplePredicate()) {
+						if (!currType.isEmptyPredicate()) {
 							/* ..the referenced memory state cannot be null.. */
 							constraints = constraints.append("-")
 									.append(mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
@@ -298,11 +298,11 @@ public final class SATModuleUtils {
 		StringBuilder constraints = new StringBuilder();
 		String usageOfAllTypes = " ", usageOfAllWorkflowInputType = " ";
 		String usageOfOneType = " 0\n", usageOfWorkflowInputType = " 0\n";
-		if (synthesisInstance.getConfig().getUse_workflow_input() == ConfigEnum.ALL) {
+		if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ALL) {
 			usageOfAllWorkflowInputType = " 0\n";
 			usageOfWorkflowInputType = " ";
 		}
-		if (synthesisInstance.getConfig().getUse_all_generated_data()  == ConfigEnum.ALL) {
+		if (synthesisInstance.getConfig().getUseAllGeneratedData()  == ConfigEnum.ALL) {
 			
 			usageOfAllTypes = " 0\n";
 			usageOfOneType = " ";
@@ -317,7 +317,7 @@ public final class SATModuleUtils {
 			for (State currMemoryState : currBlock.getStates()) {
 				/* If the memory is provided as input */
 				if (blockNumber == 0) {
-					if(synthesisInstance.getConfig().getUse_workflow_input()  == ConfigEnum.NONE) {
+					if(synthesisInstance.getConfig().getUseWorkflowInput()  == ConfigEnum.NONE) {
 						continue;
 					}
 					constraints = constraints
@@ -329,7 +329,7 @@ public final class SATModuleUtils {
 					}
 					constraints = constraints.append(usageOfWorkflowInputType);
 				} else {
-					if(synthesisInstance.getConfig().getUse_all_generated_data()  == ConfigEnum.NONE) {
+					if(synthesisInstance.getConfig().getUseAllGeneratedData()  == ConfigEnum.NONE) {
 						break;
 					}
 					constraints = constraints
@@ -436,7 +436,7 @@ public final class SATModuleUtils {
 			/* If the memory is provided as input */
 			if (blockNumber == 0) {
 				/* In case that all workflow inputs need to be used */
-				if (synthesisInstance.getConfig().getUse_workflow_input() == ConfigEnum.ALL) {
+				if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
 						constraints = constraints
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
@@ -449,7 +449,7 @@ public final class SATModuleUtils {
 						constraints = constraints.append(" 0\n");
 					}
 					/* In case that at least one workflow input need to be used */
-				} else if (synthesisInstance.getConfig().getUse_workflow_input() == ConfigEnum.ONE) {
+				} else if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ONE) {
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getStateNumber() == 0) {
 							constraints = constraints
@@ -468,7 +468,7 @@ public final class SATModuleUtils {
 				/* In case that none of the workflow input has to be used, do nothing. */
 			} else {
 				/* In case that all generated data need to be used. */
-				if (synthesisInstance.getConfig().getUse_all_generated_data() == ConfigEnum.ALL) {
+				if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
 						constraints = constraints
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
@@ -481,7 +481,7 @@ public final class SATModuleUtils {
 						constraints = constraints.append(" 0\n");
 					}
 					/* In case that at least one of the generated data instances per tool need to be used. */
-				} else if (synthesisInstance.getConfig().getUse_all_generated_data() == ConfigEnum.ONE) {
+				} else if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ONE) {
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getStateNumber() == 0) {
 							constraints = constraints

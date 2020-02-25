@@ -48,7 +48,7 @@ public class Type extends TaxonomyPredicate {
 
 	@Override
 	public int hashCode() {
-		return this.typeID.hashCode() + getNodeType().hashCode();
+		return this.typeID.hashCode() * 11;
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class Type extends TaxonomyPredicate {
 		if (getClass() != obj.getClass())
 			return false;
 		Type other = (Type) obj;
-		return this.typeID.equals(other.getPredicateID())  && this.getNodeType().equals(other.getNodeType());
+		return this.typeID.equals(other.getPredicateID());
 	}
 
 }

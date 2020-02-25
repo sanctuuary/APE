@@ -257,7 +257,7 @@ public class ConstraintFactory {
 	}
 
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it
 	 *  using the function {@link #getConstraint}.
 
@@ -279,7 +279,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * Generate type <b>parameters[0]</b> in the solution
 	 * using the function {@link #getConstraint}.
 	 */
@@ -301,7 +301,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * If we have generated data module <b>parameters[0]</b>,  then do not generate type <b>parameters[1]</b> subsequently
 	 * using the function {@link #getConstraint}.
 	 */
@@ -321,7 +321,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * If we have generated data module <b>parameters[0]</b>, then generate <b>parameters[1]</b>
 	 * subsequently using the function {@link #getConstraint}.
 	 */
@@ -341,7 +341,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b>
 	 * subsequently using the function {@link #getConstraint}.
 	 */
@@ -361,7 +361,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b>
 	 * subsequently using the function {@link #getConstraint}.
 	 */
@@ -382,7 +382,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * If we have used data module <b>parameters[0]</b>,  then do not use type <b>parameters[1]</b> subsequently
 	 * using the function {@link #getConstraint}.
 	 */
@@ -402,7 +402,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * If we have used data module <b>parameters[0]</b>, then use <b>parameters[1]</b>
 	 * subsequently using the function {@link #getConstraint}.
 	 */
@@ -422,7 +422,7 @@ public class ConstraintFactory {
 	}
 
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * Use <b>parameters[0]</b> as last module in the solution.
 	 * using the function {@link #getConstraint}.
 	 */
@@ -441,7 +441,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a next module in the sequence
 	 * using the function {@link #getConstraint}.
 	 */
@@ -461,7 +461,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * Do not generate type <b>parameters[0]</b> in the solution
 	 * using the function {@link #getConstraint}.
 	 */
@@ -483,7 +483,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * Do not use module <b>parameters[0]</b> in the solution
 	 * using the function {@link #getConstraint}.
 	 */
@@ -505,7 +505,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * Do not use type <b>parameters[0]</b> in the solution
 	 * using the function {@link #getConstraint}.
 	 */
@@ -527,7 +527,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> as a previous module in the sequence.
 	 * using the function {@link #getConstraint}.
 	 */
@@ -547,7 +547,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * Use module <b>parameters[0]</b> in the solution
 	 * using the function {@link #getConstraint}.
 	 */
@@ -569,7 +569,7 @@ public class ConstraintFactory {
 	}
 	
 	/**
-	 * Implements constraints of the form:<br/> <br/>
+	 * Implements constraints of the form:<br> <br>
 	 * Use type <b>parameters[0]</b> in the solution
 	 * using the function {@link #getConstraint}.
 	 */

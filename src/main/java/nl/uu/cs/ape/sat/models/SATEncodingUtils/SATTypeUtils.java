@@ -219,12 +219,10 @@ public class SATTypeUtils {
 	 * Encoding the workflow output. The provided output files have to occur as the
 	 * final set of "used" data types.
 	 * 
-	 * @param program_outputs - input types for the program
-	 * @param typeAutomaton
-	 * @param solutionLength
-	 * @param emptyType
-	 * @param mappings
 	 * @param allTypes
+	 * @param program_outputs
+	 * @param typeAutomaton
+	 * @param mappings
 	 * @return String representation of the workflow output encoding.
 	 */
 	public static String encodeOutputData(AllTypes allTypes, List<DataInstance> program_outputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {
