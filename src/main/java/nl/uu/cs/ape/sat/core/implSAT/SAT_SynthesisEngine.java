@@ -103,6 +103,10 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		TaxonomyPredicate rootModule = domainSetup.getAllModules().getRootPredicate();
 		TaxonomyPredicate rootType = domainSetup.getAllTypes().getRootPredicate();
 
+		if(rootModule == null || rootType == null) {
+			System.err.println("Taxonomies have not been setup properly.");
+			return false;
+		}
 		/*
 		 * Generate the automaton
 		 */
@@ -257,7 +261,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 				solutionsFound++;
 				if (solutionsFound % 500 == 0) {
 					realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-					System.out.println("Found " + solutionsFound + " solutions. Solving time: "
+					System.out.println("Found in total " + solutionsFound + " solutions. Solving time: "
 							+ (realTimeElapsedMillis / 1000F) + " sec.");
 				}
 				/*
@@ -270,7 +274,9 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		} catch (ParseFormatException e) {
 			System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
 		} catch (ContradictionException e) {
-			System.err.println("Unsatisfiable");
+			if(solutionsFound == 0) {
+				System.err.println("Unsatisfiable");
+			}
 		} catch (TimeoutException e) {
 			System.err.println("Timeout. Solving took longer than the default timeout: " + timeout + " seconds.");
 		} catch (IOException e) {

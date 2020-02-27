@@ -93,12 +93,12 @@ public class Test {
 	 * 
 	 */
 	private static void runJsonConversionTest() throws IOException {
-		String text = APEUtils.readFile("/home/vedran/git/biotoolcomposedemo/apeInputs/bio.tools_original.json", Charset.defaultCharset());
+		String text = APEUtils.readFile("/home/vedran/git/biotoolcomposedemo/apeInputs/bio.tool.original.json", Charset.defaultCharset());
 		JSONArray tmp = new JSONArray(text);
 		JSONObject toolAnnnotations = APEUtils.convertBioTools2Ape(tmp);
 
-		System.out.println(toolAnnnotations.toString());
-
+		APEUtils.write2file(toolAnnnotations.toString(), new File("/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/New Use Cases/MassPectometry/bio.tools_fragment.json"), false);
+		System.out.println("Done.");
 	}
 
 	private static void print(AllModules allModules, AllTypes allTypes) {

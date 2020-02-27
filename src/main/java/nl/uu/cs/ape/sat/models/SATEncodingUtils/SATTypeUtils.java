@@ -254,29 +254,4 @@ public class SATTypeUtils {
 	}
 	
 	
-	/**
-	 * Method creates a new abstract type based on the list of types. The list of types is connected using the provided logical operator.
-	 * The type is added to the list of type, but no constraints regarding the new predicate were defined.<br>
-	 * @param relatedTypes - set of sorted type that are logically related to the new abstract type (label of the equivalent sets is always the same due to its ordering)
-	 * @param allTypes - list of all the type
-	 * @param logicOp - logical operation that is used to group the types (e.g. {@link LogicOperation.OR})
-	 * @return a new abstract type
-	 */
-	public static TaxonomyPredicate generateAbstractTypeX(SortedSet<TaxonomyPredicate> relatedTypes, AllTypes allTypes, LogicOperation logicOp) {
-		if(relatedTypes.isEmpty()) {
-			return null;
-		}
-		if(relatedTypes.size() == 1) {
-			return relatedTypes.first();
-		}
-		/* Sort the list in order to always have the same label for the same set of elements. */
-		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
-		for(TaxonomyPredicate label : relatedTypes) {
-			abstractLabel = abstractLabel.append(label.getPredicateID());
-		}
-		
-		TaxonomyPredicate newAbsType = allTypes.addPredicate(new Type(abstractLabel.toString(), abstractLabel.toString(), relatedTypes.first().getRootNode(), NodeType.ABSTRACT));
-		return newAbsType;
-	}
-	
 }

@@ -31,7 +31,7 @@ public class AllTypes extends AllPredicates {
 		super(config.getDataTaxonomyRoot());
 		dataTaxonomyDimensions = config.getDataTaxonomySubroots();
 		emptyType = new Type("empty", "empty", getRootID(), NodeType.EMPTY);
-		emptyType.setIsRelevant();
+		emptyType.setAsRelevantTaxonomyTerm(this);
 		this.put(emptyType);
 	}
 

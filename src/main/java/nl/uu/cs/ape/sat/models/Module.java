@@ -164,18 +164,19 @@ public class Module extends AbstractModule {
 	 */
 	public static Module moduleFromJson(JSONObject jsonModule, APEDomainSetup domainSetup)
 			throws JSONException {
+		String ontologyPrefixURI = domainSetup.getOntologyPrefixURI();
 		AllModules allModules = domainSetup.getAllModules();
-		String moduleURI = APEUtils.createClassURI(jsonModule.getString(APEConfig.getJsonTags("id")), domainSetup);
+		String moduleURI = APEUtils.createClassURI(jsonModule.getString(APEConfig.getJsonTags("id")), ontologyPrefixURI);
 		if(allModules.get(moduleURI) != null) {
 			moduleURI = moduleURI + "[tool]";
 		}
 		String moduleLabel = jsonModule.getString(APEConfig.getJsonTags("label"));
 		Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("taxonomyOperations"), String.class));
-		taxonomyModules = APEUtils.createURIsFromLabels(taxonomyModules, domainSetup);
+		taxonomyModules = APEUtils.createURIsFromLabels(taxonomyModules, ontologyPrefixURI);
 		/** Check if the referenced module taxonomy classes exist. */
 		List<String> toRemove = new ArrayList<String>();
 		for(String taxonomyModule : taxonomyModules) {
-			String taxonomyModuleURI =  APEUtils.createClassURI(taxonomyModule, domainSetup);
+			String taxonomyModuleURI =  APEUtils.createClassURI(taxonomyModule, ontologyPrefixURI);
 			if(allModules.get(taxonomyModuleURI) == null) {
 				System.err.println("Tool '" + moduleURI + "' annotation issue. "
 						+ "Referenced '"+APEConfig.getJsonTags("taxonomyOperations")+"': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy.");
@@ -254,7 +255,7 @@ public class Module extends AbstractModule {
 	private static DataInstance createInstance(APEDomainSetup domainSetup, JSONObject jsonDataInstance) {
 		DataInstance dataInstance = new DataInstance();
 		for (String typeSuperClassLabel : jsonDataInstance.keySet()) {
-			String typeSuperClassURI =  APEUtils.createClassURI(typeSuperClassLabel, domainSetup);
+			String typeSuperClassURI =  APEUtils.createClassURI(typeSuperClassLabel, domainSetup.getOntologyPrefixURI());
 			/* Logical connective that determines the semantics of the list notion, i.e. whether all the types in the list have to be satisfied or at least one of them. */
 			LogicOperation logConn = LogicOperation.AND;
 			SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
@@ -264,7 +265,7 @@ public class Module extends AbstractModule {
 				logConn = LogicOperation.AND;
 			} 
 			for (String currTypeLabel : APEUtils.getListFromJson(jsonDataInstance, typeSuperClassLabel, String.class)) {
-				String currTypeURI = APEUtils.createClassURI(currTypeLabel, domainSetup);
+				String currTypeURI = APEUtils.createClassURI(currTypeLabel, domainSetup.getOntologyPrefixURI());
 				if(typeSuperClassURI.endsWith("$OR$")) {
 					typeSuperClassURI = typeSuperClassURI.replace("$OR$", "");
 				} else if(typeSuperClassURI.endsWith("$AND$")) {

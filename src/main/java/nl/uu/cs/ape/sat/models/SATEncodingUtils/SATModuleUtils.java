@@ -701,28 +701,4 @@ public final class SATModuleUtils {
 		return pairs;
 	}
 
-	/**
-	 * Method creates a new abstract module based on the list of modules. The list of modules is connected using the provided logical operator.
-	 * The type is added to the list of module, but no constraints regarding the new predicate were defined.<br>
-	 * @param relatedModules - list of modules that are logically related to the new abstract module
-	 * @param allModules - list of all the modules
-	 * @param logicOp - logical operation that is used to group the types (e.g. {@link LogicOperation.OR})
-	 * @return a new abstract module
-	 */
-	public static TaxonomyPredicate generateAbstractmoduleX(List<TaxonomyPredicate> relatedModules, AllModules allModules, LogicOperation logicOp) {
-		if(relatedModules.isEmpty()) {
-			return null;
-		}
-		if(relatedModules.size() == 1) {
-			return relatedModules.get(0);
-		}
-		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
-		for(TaxonomyPredicate label : relatedModules) {
-			abstractLabel = abstractLabel.append(label.getPredicateID());
-		}
-		
-		TaxonomyPredicate newAbsModule = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), relatedModules.get(0).getRootNode(), NodeType.ABSTRACT));
-		return newAbsModule;
-	}
-	
 }

@@ -64,7 +64,9 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
 	 * @return True if predicate was added, false otherwise.
 	 */
 	public void addConcretePredicate(TaxonomyPredicate predicate) {
-		this.containingPredicates.add(predicate);
+		if(predicate != null) {
+			this.containingPredicates.add(predicate);
+		}
 	}
 	
 	/**

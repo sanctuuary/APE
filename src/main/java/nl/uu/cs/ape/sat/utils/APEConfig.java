@@ -53,7 +53,7 @@ public class APEConfig {
 	/** Path to the taxonomy file */
 	private String ontologyPath;
 	/** Prefix used to define OWL class IDs */
-	private String ontologyPrefixIRI;
+	private String ontologyPrefixURI;
 	/**
 	 * Nodes in the ontology that correspond to the roots of module and data
 	 * taxonomies.
@@ -248,12 +248,12 @@ public class APEConfig {
 			return false;
 		}
 		try {
-			ontologyPrefixIRI = coreConfiguration.getString(ONTOLOGY_PREFIX);
+			ontologyPrefixURI = coreConfiguration.getString(ONTOLOGY_PREFIX);
 		} catch (JSONException JSONException) {
-			ontologyPrefixIRI="";
+			ontologyPrefixURI="";
 		}
 		try {
-			toolTaxonomyRoot = getOntologyPrefixIRI() + coreConfiguration.getString(TOOL_ONTOLOGY_TAG);
+			toolTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(TOOL_ONTOLOGY_TAG), getOntologyPrefixURI());
 			if (toolTaxonomyRoot == null || toolTaxonomyRoot == "") {
 				System.err.println("Incorrect format of " + TOOL_ONTOLOGY_TAG + " tag in the config file.");
 				return false;
@@ -264,7 +264,7 @@ public class APEConfig {
 		}
 
 		try {
-			this.dataTaxonomyRoot = getOntologyPrefixIRI() + coreConfiguration.getString(DATA_ONTOLOGY_TAG);
+			this.dataTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(DATA_ONTOLOGY_TAG), getOntologyPrefixURI());
 			if (dataTaxonomyRoot == null || this.dataTaxonomyRoot == "") {
 				System.err.println("Incorrect format of " + DATA_ONTOLOGY_TAG + " tag in the config file.");
 				return false;
@@ -277,7 +277,7 @@ public class APEConfig {
 		try {
 			List<String> tmpDataSubontology = APEUtils.getListFromJson(coreConfiguration, SUBONTOLOGY_TAG, String.class);
 			for (String subTaxonomy : tmpDataSubontology) {
-				dataTaxonomySubroots.add(getOntologyPrefixIRI() + subTaxonomy);
+				dataTaxonomySubroots.add(APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()));
 			}
 		} catch (JSONException JSONException) {
 			/* Configuration does not have the type sub-ontology */
@@ -352,8 +352,8 @@ public class APEConfig {
 			this.sharedMemory = runConfiguration.getBoolean(SHARED_MEMORY_TAG);
 		} catch (JSONException JSONException) {
 			System.out.println("Tag '" + SHARED_MEMORY_TAG
-					+ "' in the configuration file is not provided correctly. Default value is: false.");
-			this.sharedMemory = false;
+					+ "' in the configuration file is not provided correctly. Default value is: true.");
+			this.sharedMemory = true;
 		}
 
 		try {
@@ -418,21 +418,8 @@ public class APEConfig {
 
 		try {
 			for (JSONObject jsonModuleInput : APEUtils.getListFromJson(runConfiguration, PROGRAM_INPUTS_TAG, JSONObject.class)) {
-				
-				DataInstance input = new DataInstance();
-				for (String typeSubntology : jsonModuleInput.keySet()) {
-					for (String currTypeID : APEUtils.getListFromJson(jsonModuleInput, typeSubntology, String.class)) {
-						if (dataTaxonomySubroots.contains(typeSubntology)) {
-							input.addType(new Type(currTypeID, ontologyPrefixIRI + currTypeID, typeSubntology, NodeType.UNKNOWN));
-						} else {
-							System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
-									+ "' was not defined, but it was used for input type '" + currTypeID + "'.");
-							return false;
-						}
-					}
-				}
-
-				if (!input.getTypes().isEmpty()) {
+				DataInstance input;
+				if((input = getDataInstance(jsonModuleInput)) != null) {
 					programInputs.add(input);
 				}
 			}
@@ -443,20 +430,8 @@ public class APEConfig {
 
 		try {
 			for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(runConfiguration, PROGRAM_OUTPUTS_TAG, JSONObject.class)) {
-				
-				DataInstance output = new DataInstance();
-				for (String typeSubntology : jsonModuleOutput.keySet()) {
-					for (String currTypeID : APEUtils.getListFromJson(jsonModuleOutput, typeSubntology, String.class)) {
-						if (dataTaxonomySubroots.contains(typeSubntology)) {
-							output.addType(new Type(currTypeID, ontologyPrefixIRI + currTypeID, typeSubntology, NodeType.UNKNOWN));
-						} else {
-							System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
-									+ "' was not defined, but it was used for input type '" + currTypeID + "'.");
-							return false;
-						}
-					}
-				}
-				if (!output.getTypes().isEmpty()) {
+				DataInstance output;
+				if((output = getDataInstance(jsonModuleOutput)) != null) {
 					program_outputs.add(output);
 				}
 			}
@@ -503,6 +478,29 @@ public class APEConfig {
 
 		return true;
 	}
+	
+	private DataInstance getDataInstance(JSONObject jsonModuleInput) {
+	DataInstance dataInstances = new DataInstance();
+	for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
+		String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel, getOntologyPrefixURI());
+		for (String currTypeID : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
+			if (dataTaxonomySubroots.contains(typeSuperClassURI)) {
+				dataInstances.addType(new Type(currTypeID, ontologyPrefixURI + currTypeID, typeSuperClassURI, NodeType.UNKNOWN));
+			} else {
+				System.err.println("Error in the configuration file. The data subtaxonomy '" + typeSuperClassLabel
+						+ "' was not defined, but it was used for input type '" + currTypeID + "'.");
+				return null;
+			}
+		}
+	}
+
+	if (!dataInstances.getTypes().isEmpty()) {
+		return dataInstances;
+	}
+	
+	return null;
+	
+	}
 
 	/**
 	 * @return the {@link #ontologyPath}
@@ -512,10 +510,10 @@ public class APEConfig {
 	}
 	
 	/**
-	 * @return the {@link #ontologyPrefixIRI}
+	 * @return the {@link #ontologyPrefixURI}
 	 */
-	public String getOntologyPrefixIRI() {
-		return (ontologyPrefixIRI != null) ? ontologyPrefixIRI : "";
+	public String getOntologyPrefixURI() {
+		return (ontologyPrefixURI != null) ? ontologyPrefixURI : "";
 	}
 
 	/**

@@ -27,9 +27,9 @@ public enum LogicOperation {
 	/** Get a simple sign corresponding to the logical operation. */
 	public String toStringSign() {
 		if(this == LogicOperation.OR) {
-			return "disjunction";
+			return "|";
 		} else {
-			return "conjunction";
+			return "&";
 		}
 	}
 }

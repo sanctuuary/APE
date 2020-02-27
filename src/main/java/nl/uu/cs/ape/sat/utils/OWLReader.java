@@ -81,11 +81,11 @@ public class OWLReader {
 			if (tempOntology.exists()) {
 				ontology = manager.loadOntologyFromOntologyDocument(tempOntology);
 			} else {
-				logger.info("Provided ontology does not exist.");
+				logger.warning("Provided ontology does not exist.");
 				return false;
 			}
 		} catch (OWLOntologyCreationException e) {
-			logger.info("Ontology is not properly provided.");
+			logger.warning("Ontology is not properly provided.");
 			return false;
 		}
 		OWLClass thingClass = manager.getOWLDataFactory().getOWLThing();
@@ -117,7 +117,7 @@ public class OWLReader {
 				 * If the main root of the data type taxonomy does not exist, create one
 				 * artificially.
 				 */
-				Type root = allTypes.addPredicate(new Type("DataTaxonomy", "DataTaxonomy", "DataTaxonomy", NodeType.ROOT));
+				Type root = allTypes.addPredicate(new Type("DataTaxonomy", "http://www.w3.org#DataTaxonomy", "http://www.w3.org#DataTaxonomy", NodeType.ROOT));
 				allTypes.setRootPredicate(root);
 				superClass = new OWLClassImpl(IRI.create("http://www.w3.org#DataTaxonomy"));
 			}
@@ -161,7 +161,8 @@ public class OWLReader {
 			typeRootExists = true;
 			return true;
 		} else {
-			return allTypes.getDataTaxonomyDimensionIDs().contains(getIRI(currClass));
+			boolean tmp = allTypes.getDataTaxonomyDimensionIDs().contains(getIRI(currClass));
+			return tmp;
 		}
 	}
 

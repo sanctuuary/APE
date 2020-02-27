@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.uu.sanctuuary</groupId>
 	<artifactId>APE</artifactId>
-	<version>0.9.2</version>
+	<version>0.9.3</version>
 	<packaging>jar</packaging>
 	<name>nl.uu.cs:APE</name>
-	<description>APE is a command line tool and API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools.</description>
+	<description>APE is a command line tool and an API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools.</description>
 	<url>https://github.com/sanctuuary/APE</url>
 	<licenses>
 		<license>

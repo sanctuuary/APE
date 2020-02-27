@@ -22,6 +22,7 @@ import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
+import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
@@ -56,7 +57,7 @@ public class APE {
 			throw new ExceptionInInitializerError();
 		}
 		if(!setupDomain()) {
-			System.err.println("Error in settin up the domain.");
+			throw new IOException("Error in settin up the domain.");
 		}
 	}
 	
@@ -64,15 +65,16 @@ public class APE {
 	 * Create instance of the APE solver.
 	 * @param configPath - the APE configuration JSONObject{@link JSONObject}.
 	 * @throws ExceptionInInitializerError 
+	 * @throws IOException 
 	 */
-	public APE(JSONObject configObject) throws ExceptionInInitializerError{
+	public APE(JSONObject configObject) throws ExceptionInInitializerError, IOException{
 		config = new APEConfig(configObject);
 		if (config == null) {
 			System.err.println("Configuration failed. Error in configuration object.");
 			throw new ExceptionInInitializerError();
 		}
 		if(!setupDomain()) {
-			System.err.println("Error in settin up the domain.");
+			throw new IOException("Error in settin up the domain.");
 		}
 	}
 	
@@ -131,6 +133,11 @@ public class APE {
 		
 		succRun &= apeDomainSetup.trimTaxonomy();
 		
+		for(TaxonomyPredicate tmp : apeDomainSetup.getAllTypes().getTypes()) {
+			if(!tmp.getIsRelevant()) {
+				System.out.println("-> " + tmp);
+			}
+		}
 		/*
 		 * Define set of all constraint formats
 		 */

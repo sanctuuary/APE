@@ -85,7 +85,6 @@ public abstract class AllPredicates {
 		List<TaxonomyPredicate> toRemove = new ArrayList<TaxonomyPredicate>();
 		for(TaxonomyPredicate subClass : APEUtils.safe(root.getSubPredicates())) {
 			if(subClass == null) {
-				toRemove.add(subClass);
 			} else if(subClass.getIsRelevant()) {
 				trimSubTaxonomy(subClass);
 			} else {
@@ -109,7 +108,6 @@ public abstract class AllPredicates {
 		List<TaxonomyPredicate> toRemove = new ArrayList<TaxonomyPredicate>();
 		for(TaxonomyPredicate subClass : APEUtils.safe(subTaxRoot.getSubPredicates())) {
 			if(subClass == null) {
-				toRemove.add(subClass);
 			} else if(subClass.getIsRelevant()) {
 				trimSubTaxonomy(subClass);
 			} else {

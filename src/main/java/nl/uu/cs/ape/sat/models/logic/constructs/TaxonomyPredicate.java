@@ -127,7 +127,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 	/**
 	 * Sets the node to be relevant.
 	 */
-	public void setIsRelevant() {
+	private void setIsRelevant() {
 		this.isRelevant = true;
 	}
 
@@ -263,7 +263,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 	 * @return PredicateLabel ID as a {@link String}
 	 */
 	public String toShortString() {
-		return getPredicateID();
+		return getPredicateLabel();
 	}
 
 	/**
