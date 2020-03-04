@@ -72,6 +72,11 @@ public class APEDomainSetup {
 	public List<ConstraintTemplateData> getUnformattedConstr() {
 		return unformattedConstr;
 	}
+	
+	/** Removes all of the unformatted constraints, in order to start a new synthesis run. */
+	public void clearConstraints() {
+		this.unformattedConstr.clear();
+	}
 
 
 	/** @return the field {@link allTypes}. */

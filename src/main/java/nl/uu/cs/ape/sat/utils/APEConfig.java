@@ -415,7 +415,7 @@ public class APEConfig {
 					+ "' in the configuration file is not provided correctly. Default value is: 0.");
 			this.noGraphs = 0;
 		}
-
+		programInputs.clear();
 		try {
 			for (JSONObject jsonModuleInput : APEUtils.getListFromJson(runConfiguration, PROGRAM_INPUTS_TAG, JSONObject.class)) {
 				DataInstance input;
@@ -426,8 +426,10 @@ public class APEConfig {
 		} catch (JSONException JSONException) {
 			System.out.println("Tag '" + PROGRAM_INPUTS_TAG
 					+ "' is not provided in the configuration file. Program will have no inputs.");
+			programInputs.clear();
 		}
 
+		program_outputs.clear();
 		try {
 			for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(runConfiguration, PROGRAM_OUTPUTS_TAG, JSONObject.class)) {
 				DataInstance output;
@@ -438,6 +440,7 @@ public class APEConfig {
 		} catch (JSONException JSONException) {
 			System.out.println("Tag '" + PROGRAM_OUTPUTS_TAG
 					+ "' is not provided in the configuration file. Program will have no outputs.");
+			program_outputs.clear();
 		}
 
 		try {
@@ -483,12 +486,13 @@ public class APEConfig {
 	DataInstance dataInstances = new DataInstance();
 	for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
 		String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel, getOntologyPrefixURI());
-		for (String currTypeID : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
+		for (String currTypeLabel : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
+			String currTypeURI = APEUtils.createClassURI(currTypeLabel, getOntologyPrefixURI());
 			if (dataTaxonomySubroots.contains(typeSuperClassURI)) {
-				dataInstances.addType(new Type(currTypeID, ontologyPrefixURI + currTypeID, typeSuperClassURI, NodeType.UNKNOWN));
+				dataInstances.addType(new Type(currTypeLabel, currTypeURI, typeSuperClassURI, NodeType.UNKNOWN));
 			} else {
 				System.err.println("Error in the configuration file. The data subtaxonomy '" + typeSuperClassLabel
-						+ "' was not defined, but it was used for input type '" + currTypeID + "'.");
+						+ "' was not defined, but it was used as a root ot the input type '" + currTypeURI + "'.");
 				return null;
 			}
 		}

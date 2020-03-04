@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,7 +68,7 @@ public class APE {
 	 * @throws ExceptionInInitializerError 
 	 * @throws IOException 
 	 */
-	public APE(JSONObject configObject) throws ExceptionInInitializerError, IOException{
+	public APE(JSONObject configObject) throws ExceptionInInitializerError, IOException {
 		config = new APEConfig(configObject);
 		if (config == null) {
 			System.err.println("Configuration failed. Error in configuration object.");
@@ -133,11 +134,6 @@ public class APE {
 		
 		succRun &= apeDomainSetup.trimTaxonomy();
 		
-		for(TaxonomyPredicate tmp : apeDomainSetup.getAllTypes().getTypes()) {
-			if(!tmp.getIsRelevant()) {
-				System.out.println("-> " + tmp);
-			}
-		}
 		/*
 		 * Define set of all constraint formats
 		 */
@@ -151,13 +147,22 @@ public class APE {
 	 * @param dimensionRootID - root of the data taxonomy subtree that corresponds to the list of elements that should be returned.
 	 * @return List where each element correspond to a map that can be transformed into JSON objects.
 	 */
-	public List<Map<String, String>> getTaxonomyElements(String dimensionRootID) {
-		List<? extends TaxonomyPredicate> types = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(apeDomainSetup.getAllTypes().get(dimensionRootID));
-		if(types == null) {
-			types = apeDomainSetup.getAllModules().getElementsFromSubTaxonomy(apeDomainSetup.getAllModules().get(dimensionRootID));
+	public List<Map<String, String>> getTaxonomyElements(String dimensionRootID) throws NullPointerException {
+		SortedSet<? extends TaxonomyPredicate> elements = null;
+		TaxonomyPredicate root = apeDomainSetup.getAllTypes().get(dimensionRootID);
+		if(root != null) {
+			elements = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(root);
+		} else {
+			root = apeDomainSetup.getAllModules().get(dimensionRootID);
+			if(root != null) {
+				elements = apeDomainSetup.getAllModules().getElementsFromSubTaxonomy(root);
+			} else {
+				throw new NullPointerException();
+			}
 		}
+		
 		List<Map<String, String>> transformedTypes = new ArrayList<Map<String, String>>();
-		for(TaxonomyPredicate currType : types) {
+		for(TaxonomyPredicate currType : elements) {
 			transformedTypes.add(currType.toMap());
 		}
 		
@@ -171,6 +176,7 @@ public class APE {
 	 * @throws JSONException
 	 */
 	public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, JSONException {
+		apeDomainSetup.clearConstraints();
 		config.setupRunConfiguration(configObject);
 		if (config == null || config.getRunConfigJsonObj() == null) {
 			throw new JSONException("Run configuration failed. Error in configuration object.");

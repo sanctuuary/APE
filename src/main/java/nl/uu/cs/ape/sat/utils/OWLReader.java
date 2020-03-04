@@ -18,6 +18,7 @@ import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
@@ -92,11 +93,11 @@ public class OWLReader {
 		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
 
-		Supplier<Stream<OWLClass>> subClasses = () -> reasoner.getSubClasses(thingClass, true).entities();
+		List<OWLClass> subClasses = reasoner.getSubClasses(thingClass, true).entities().collect(Collectors.toList());
 
-		OWLClass moduleClass = subClasses.get().filter(currClass -> isModuleClass(currClass)).findFirst()
+		OWLClass moduleClass = subClasses.stream().filter(currClass -> isModuleClass(currClass)).findFirst()
 				.orElse(thingClass);
-		List<OWLClass> typeClasses = subClasses.get().filter(currClass -> isTypeClass(currClass))
+		List<OWLClass> typeClasses = subClasses.stream().filter(currClass -> isTypeClass(currClass))
 				.collect(Collectors.toList());
 
 		/* Handle scenario when the tool taxonomy root was not defined properly. */

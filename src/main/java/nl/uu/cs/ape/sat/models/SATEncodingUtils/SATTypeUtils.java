@@ -235,7 +235,7 @@ public class SATTypeUtils {
 				for (Type currType : currTypes) {
 					if (allTypes.get(currType.getPredicateID()) == null) {
 						System.err.println(
-								"Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
+								"Program output '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
 						return null;
 					}
 					encoding = encoding.append(mappings.add(currType, workflowOutputStates.get(i), WorkflowElement.USED_TYPE))

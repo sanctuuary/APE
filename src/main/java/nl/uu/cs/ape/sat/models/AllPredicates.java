@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -144,12 +146,11 @@ public abstract class AllPredicates {
 	 * @param subTreeRoot - root of the subTree
 	 * @return List of data types.
 	 */
-	public List<TaxonomyPredicate> getElementsFromSubTaxonomy(TaxonomyPredicate subTreeRoot){
+	public SortedSet<TaxonomyPredicate> getElementsFromSubTaxonomy(TaxonomyPredicate subTreeRoot) throws NullPointerException{
 		if(subTreeRoot == null) {
-			System.err.println("Given subtaxonomy type does not exist.");
-			return null;
+			throw new NullPointerException("Given subtaxonomy type does not exist.");
 		}
-		List<TaxonomyPredicate> elements = new ArrayList<>();
+		SortedSet<TaxonomyPredicate> elements = new TreeSet<>();
 		elements.add(subTreeRoot);
 		
 		for(TaxonomyPredicate subType : APEUtils.safe(subTreeRoot.getSubPredicates())) {
