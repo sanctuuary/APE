@@ -1,3 +1,4 @@
 language: java
 notifications:
-  webhooks: ${MS_WEBHOOK}
+  webhooks: 
+    - url = ${MS_WEBHOOK}
