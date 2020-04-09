@@ -29,6 +29,7 @@ public class APEConfig {
 	 * Tags used in the ape.config file
 	 */
 	private final String ONTOLOGY_TAG = "ontology_path";
+	private final String ONTOLOGY_PREFIX = "ontologyPrexifIRI";
 	private final String TOOL_ONTOLOGY_TAG = "toolsTaxonomyRoot";
 	private final String DATA_ONTOLOGY_TAG = "dataTaxonomyRoot";
 	private final String SUBONTOLOGY_TAG = "dataSubTaxonomyRoot";
@@ -38,87 +39,88 @@ public class APEConfig {
 	private final String SOLUTION_PATH_TAG = "solutions_path";
 	private final String SOLUTION_MIN_LENGTH_TAG = "solution_min_length";
 	private final String SOLUTION_MAX_LENGTH_TAG = "solution_max_length";
-	private final String MAX_NO_SOLUTIONS_TAG = "max_solutions";
-	private final String EXECUTION_SCRIPTS_FOLDER_TAG = "execution_scripts_folder";
-	private final String NO_EXECUTIONS_TAG = "number_of_execution_scripts";
+	private final String MAX_NOSOLUTIONS_TAG = "max_solutions";
+	private final String EXECUTIONSCRIPTS_FOLDER_TAG = "execution_scripts_folder";
+	private final String NOEXECUTIONS_TAG = "number_of_execution_scripts";
 	private final String SOLUTION_GRAPS_FOLDER_TAG = "solution_graphs_folder";
 	private final String NO_GRAPHS_TAG = "number_of_generated_graphs";
 	private final String PROGRAM_INPUTS_TAG = "inputs";
 	private final String PROGRAM_OUTPUTS_TAG = "outputs";
-	private final String USE_WORKFLOW_INPUT = "use_workflow_input";
+	private final String USEWORKFLOW_INPUT = "use_workflow_input";
 	private final String USE_ALL_GENERATED_DATA = "use_all_generated_data";
 	private final String DEBUG_MODE_TAG = "debug_mode";
 
 	/** Path to the taxonomy file */
-	private String ontology_path;
+	private String ontologyPath;
+	/** Prefix used to define OWL class IDs */
+	private String ontologyPrefixURI;
 	/**
 	 * Nodes in the ontology that correspond to the roots of module and data
 	 * taxonomies.
 	 */
-	private String tool_taxonomy_root, data_taxonomy_root;
-
+	private String toolTaxonomyRoot, dataTaxonomyRoot;
 	/**
 	 * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each respresents a data dimension (e.g. data type, data format, etc.).
 	 */
-	private List<String> data_taxonomy_subroots;
+	private List<String> dataTaxonomySubroots;
 
 	/** Path to the XML file with all tool annotations. */
-	private String tool_annotations_path;
+	private String toolAnnotationsPath;
 
 	/** Path to the file with all workflow constraints. */
-	private String constraints_path;
+	private String constraintsPath;
 
 	/**
 	 * {@code true} if the shared memory structure should be used, {@code false} in
-	 * case of a restrictive pipeline structure.
+	 * case of a restrictive message passing structure.
 	 */
-	private Boolean shared_memory;
+	private Boolean sharedMemory;
 
 	/**
 	 * Path to the file that will contain all the solutions to the problem in human
 	 * readable representation.
 	 */
-	private String solution_path;
+	private String solutionPath;
 
 	/**
 	 * Min and Max possible length of the solutions (length of the automaton). For
 	 * no upper limit, max length should be set to 0.
 	 */
-	private Integer solution_min_length, solution_max_length;
+	private Integer solutionMinLength, solutionMaxLength;
 
 	/** Max number of solution that the solver will return. */
-	private Integer max_no_solutions;
+	private Integer maxNoSolutions;
 
 	/**
 	 * Path to the folder that will contain all the scripts generated based on the
 	 * candidate workflows.
 	 */
-	private String execution_scripts_folder;
+	private String executionScriptsFolder;
 	/**
 	 * Number of the workflow scripts that should be generated from candidate
 	 * workflows. Default is 0.
 	 */
-	private Integer no_executions;
+	private Integer noExecutions;
 
 	/**
 	 * Path to the folder that will contain all the figures/graphs generated based
 	 * on the candidate workflows.
 	 */
-	private String solution_graphs_folder;
+	private String solutionGraphsFolder;
 	/**
 	 * Number of the solution graphs that should be generated from candidate
 	 * workflows. Default is 0.
 	 */
-	private Integer no_graphs;
+	private Integer noGraphs;
 
 	/** Output branching factor (max number of outputs per tool). */
-	private Integer max_no_tool_outputs = 3;
+	private Integer maxNoTool_outputs = 3;
 
 	/** Input branching factor (max number of inputs per tool). */
-	private Integer max_no_tool_inputs = 3;
+	private Integer maxNoToolInputs = 3;
 
 	/** Input types of the workflow. */
-	private List<DataInstance> program_inputs;
+	private List<DataInstance> programInputs;
 	/** Output types of the workflow. */
 	private List<DataInstance> program_outputs;
 
@@ -129,7 +131,7 @@ public class APEConfig {
 	 * {@link ConfigEnum#ONE} if one of the workflow inputs should be used or <br>
 	 * {@link ConfigEnum#NONE} if none of the workflow inputs has to be used
 	 */
-	private ConfigEnum use_workflow_input;
+	private ConfigEnum useWorkflowInput;
 	/**
 	 * Determines the required usage for the generated data instances:<br>
 	 * {@link ConfigEnum#ALL} if all the generated data has to be used,<br>
@@ -137,9 +139,9 @@ public class APEConfig {
 	 * output, per tool, has to be used or <br>
 	 * {@link ConfigEnum#NONE} if none of the data instances is obligatory to use.
 	 */
-	private ConfigEnum use_all_generated_data;
+	private ConfigEnum useAllGeneratedData;
 	/** {@code true} if debug mode is turned on. */
-	private Boolean debug_mode;
+	private Boolean debugMode;
 
 	/** Configurations used to read "ape.configuration" file. */
 	private JSONObject coreConfiguration;
@@ -157,8 +159,8 @@ public class APEConfig {
 			throw new IOException("The configuration file path is not provided correctly.");
 		}
 		
-		data_taxonomy_subroots = new ArrayList<String>();
-		program_inputs = new ArrayList<DataInstance>(); 
+		dataTaxonomySubroots = new ArrayList<String>();
+		programInputs = new ArrayList<DataInstance>(); 
 		program_outputs = new ArrayList<DataInstance>();
 		
 		File file = new File(congifPath);
@@ -182,8 +184,8 @@ public class APEConfig {
 			throw new JSONException("Core configuration error. The provided JSON object is null.");
 		}
 		
-		data_taxonomy_subroots = new ArrayList<String>();
-		program_inputs = new ArrayList<DataInstance>(); 
+		dataTaxonomySubroots = new ArrayList<String>();
+		programInputs = new ArrayList<DataInstance>(); 
 		program_outputs = new ArrayList<DataInstance>();
 		
 		// Convert JSON string to JSONObject
@@ -237,8 +239,8 @@ public class APEConfig {
 	private boolean coreConfigSetup() {
 
 		try {
-			ontology_path = coreConfiguration.getString(ONTOLOGY_TAG);
-			if (!isValidConfigReadFile(ONTOLOGY_TAG, ontology_path)) {
+			ontologyPath = coreConfiguration.getString(ONTOLOGY_TAG);
+			if (!isValidConfigReadFile(ONTOLOGY_TAG, ontologyPath)) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
@@ -246,8 +248,13 @@ public class APEConfig {
 			return false;
 		}
 		try {
-			tool_taxonomy_root = coreConfiguration.getString(TOOL_ONTOLOGY_TAG);
-			if (tool_taxonomy_root == null || tool_taxonomy_root == "") {
+			ontologyPrefixURI = coreConfiguration.getString(ONTOLOGY_PREFIX);
+		} catch (JSONException JSONException) {
+			ontologyPrefixURI="";
+		}
+		try {
+			toolTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(TOOL_ONTOLOGY_TAG), getOntologyPrefixURI());
+			if (toolTaxonomyRoot == null || toolTaxonomyRoot == "") {
 				System.err.println("Incorrect format of " + TOOL_ONTOLOGY_TAG + " tag in the config file.");
 				return false;
 			}
@@ -257,8 +264,8 @@ public class APEConfig {
 		}
 
 		try {
-			this.data_taxonomy_root = coreConfiguration.getString(DATA_ONTOLOGY_TAG);
-			if (data_taxonomy_root == null || this.data_taxonomy_root == "") {
+			this.dataTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(DATA_ONTOLOGY_TAG), getOntologyPrefixURI());
+			if (dataTaxonomyRoot == null || this.dataTaxonomyRoot == "") {
 				System.err.println("Incorrect format of " + DATA_ONTOLOGY_TAG + " tag in the config file.");
 				return false;
 			}
@@ -270,15 +277,15 @@ public class APEConfig {
 		try {
 			List<String> tmpDataSubontology = APEUtils.getListFromJson(coreConfiguration, SUBONTOLOGY_TAG, String.class);
 			for (String subTaxonomy : tmpDataSubontology) {
-				data_taxonomy_subroots.add(subTaxonomy);
+				dataTaxonomySubroots.add(APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()));
 			}
 		} catch (JSONException JSONException) {
 			/* Configuration does not have the type sub-ontology */
 		}
 
 		try {
-			this.tool_annotations_path = coreConfiguration.getString(TOOL_ANNOTATIONS_TAG);
-			if (!isValidConfigReadFile(TOOL_ANNOTATIONS_TAG, this.tool_annotations_path)) {
+			this.toolAnnotationsPath = coreConfiguration.getString(TOOL_ANNOTATIONS_TAG);
+			if (!isValidConfigReadFile(TOOL_ANNOTATIONS_TAG, this.toolAnnotationsPath)) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
@@ -288,8 +295,8 @@ public class APEConfig {
 		}
 
 		try {
-			this.solution_path = coreConfiguration.getString(SOLUTION_PATH_TAG);
-			if (!isValidConfigWriteFile(SOLUTION_PATH_TAG, this.solution_path)) {
+			this.solutionPath = coreConfiguration.getString(SOLUTION_PATH_TAG);
+			if (!isValidConfigWriteFile(SOLUTION_PATH_TAG, this.solutionPath)) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
@@ -298,25 +305,25 @@ public class APEConfig {
 		}
 
 		try {
-			this.execution_scripts_folder = coreConfiguration.getString(EXECUTION_SCRIPTS_FOLDER_TAG);
-			if (!isValidConfigWriteFolder(EXECUTION_SCRIPTS_FOLDER_TAG, this.execution_scripts_folder)) {
+			this.executionScriptsFolder = coreConfiguration.getString(EXECUTIONSCRIPTS_FOLDER_TAG);
+			if (!isValidConfigWriteFolder(EXECUTIONSCRIPTS_FOLDER_TAG, this.executionScriptsFolder)) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + EXECUTION_SCRIPTS_FOLDER_TAG
-					+ "' in the configuration file is not provided correctly. Solution workflows will not be executed.");
-			this.execution_scripts_folder = null;
+			System.err.println("Tag '" + EXECUTIONSCRIPTS_FOLDER_TAG
+					+ "' in the configuration file is not provided. Solution workflows will not be executable.");
+			this.executionScriptsFolder = null;
 		}
 
 		try {
-			this.solution_graphs_folder = coreConfiguration.getString(SOLUTION_GRAPS_FOLDER_TAG);
-			if (!isValidConfigWriteFolder(SOLUTION_GRAPS_FOLDER_TAG, this.solution_graphs_folder)) {
+			this.solutionGraphsFolder = coreConfiguration.getString(SOLUTION_GRAPS_FOLDER_TAG);
+			if (!isValidConfigWriteFolder(SOLUTION_GRAPS_FOLDER_TAG, this.solutionGraphsFolder)) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
 			System.err.println("Tag '" + SOLUTION_GRAPS_FOLDER_TAG
-					+ "' in the configuration file is not provided correctly. Solution graphs will not be generated.");
-			this.solution_graphs_folder = null;
+					+ "' in the configuration file is not provided. Solution graphs will not be generated.");
+			this.solutionGraphsFolder = null;
 		}
 
 		return true;
@@ -331,27 +338,27 @@ public class APEConfig {
 	private boolean runConfigSetup() {
 
 		try {
-			this.constraints_path = runConfiguration.getString(CONSTRAINTS_TAG);
-			if (!isValidConfigReadFile(CONSTRAINTS_TAG, this.constraints_path)) {
+			this.constraintsPath = runConfiguration.getString(CONSTRAINTS_TAG);
+			if (!isValidConfigReadFile(CONSTRAINTS_TAG, this.constraintsPath)) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
 			System.out.println("Tag '" + CONSTRAINTS_TAG
 					+ "' in the configuration file is not provided correctly. No constraints will be applied.");
-			this.constraints_path = null;
+			this.constraintsPath = null;
 		}
 
 		try {
-			this.shared_memory = runConfiguration.getBoolean(SHARED_MEMORY_TAG);
+			this.sharedMemory = runConfiguration.getBoolean(SHARED_MEMORY_TAG);
 		} catch (JSONException JSONException) {
 			System.out.println("Tag '" + SHARED_MEMORY_TAG
-					+ "' in the configuration file is not provided correctly. Default value is: false.");
-			this.shared_memory = false;
+					+ "' in the configuration file is not provided correctly. Default value is: true.");
+			this.sharedMemory = true;
 		}
 
 		try {
-			this.solution_min_length = runConfiguration.getInt(SOLUTION_MIN_LENGTH_TAG);
-			if (this.solution_min_length < 1) {
+			this.solutionMinLength = runConfiguration.getInt(SOLUTION_MIN_LENGTH_TAG);
+			if (this.solutionMinLength < 1) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
@@ -361,8 +368,8 @@ public class APEConfig {
 		}
 
 		try {
-			this.solution_max_length = runConfiguration.getInt(SOLUTION_MAX_LENGTH_TAG);
-			if (this.solution_max_length < 1) {
+			this.solutionMaxLength = runConfiguration.getInt(SOLUTION_MAX_LENGTH_TAG);
+			if (this.solutionMaxLength < 1) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
@@ -371,111 +378,89 @@ public class APEConfig {
 			return false;
 		}
 
-		if (solution_max_length != 0 && solution_max_length < solution_min_length) {
+		if (solutionMaxLength != 0 && solutionMaxLength < solutionMinLength) {
 			System.err.println("MAX solution length cannot be smaller than MIN solution length.");
 			return false;
 		}
 
 		try {
-			this.max_no_solutions = runConfiguration.getInt(MAX_NO_SOLUTIONS_TAG);
-			if (this.max_no_solutions < 0) {
+			this.maxNoSolutions = runConfiguration.getInt(MAX_NOSOLUTIONS_TAG);
+			if (this.maxNoSolutions < 0) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
 			System.err
-					.println("Tag '" + MAX_NO_SOLUTIONS_TAG + "' in the configuration file is not provided correctly.");
+					.println("Tag '" + MAX_NOSOLUTIONS_TAG + "' in the configuration file is not provided correctly.");
 			return false;
 		}
 
 		try {
-			this.no_executions = runConfiguration.getInt(NO_EXECUTIONS_TAG);
-			if (this.no_executions < 0) {
+			this.noExecutions = runConfiguration.getInt(NOEXECUTIONS_TAG);
+			if (this.noExecutions < 0) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + NO_EXECUTIONS_TAG
+			System.err.println("Tag '" + NOEXECUTIONS_TAG
 					+ "' in the configuration file is not provided correctly. Default value is: 0.");
-			this.no_executions = 0;
+			this.noExecutions = 0;
 		}
 
 		try {
-			this.no_graphs = runConfiguration.getInt(NO_GRAPHS_TAG);
-			if (this.no_executions < 0) {
+			this.noGraphs = runConfiguration.getInt(NO_GRAPHS_TAG);
+			if (this.noExecutions < 0) {
 				return false;
 			}
 		} catch (JSONException JSONException) {
 			System.err.println("Tag '" + NO_GRAPHS_TAG
 					+ "' in the configuration file is not provided correctly. Default value is: 0.");
-			this.no_graphs = 0;
+			this.noGraphs = 0;
 		}
-
+		programInputs.clear();
 		try {
 			for (JSONObject jsonModuleInput : APEUtils.getListFromJson(runConfiguration, PROGRAM_INPUTS_TAG, JSONObject.class)) {
-				
-				DataInstance input = new DataInstance();
-				for (String typeSubntology : jsonModuleInput.keySet()) {
-					for (String currTypeID : APEUtils.getListFromJson(jsonModuleInput, typeSubntology, String.class)) {
-						if (data_taxonomy_subroots.contains(typeSubntology)) {
-							input.addType(new Type(currTypeID, currTypeID, typeSubntology, NodeType.UNKNOWN));
-						} else {
-							System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
-									+ "' was not defined, but it was used for input type '" + currTypeID + "'.");
-							return false;
-						}
-					}
-				}
-
-				if (!input.getTypes().isEmpty()) {
-					program_inputs.add(input);
+				DataInstance input;
+				if((input = getDataInstance(jsonModuleInput)) != null) {
+					programInputs.add(input);
 				}
 			}
 		} catch (JSONException JSONException) {
 			System.out.println("Tag '" + PROGRAM_INPUTS_TAG
 					+ "' is not provided in the configuration file. Program will have no inputs.");
+			programInputs.clear();
 		}
 
+		program_outputs.clear();
 		try {
 			for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(runConfiguration, PROGRAM_OUTPUTS_TAG, JSONObject.class)) {
-				
-				DataInstance output = new DataInstance();
-				for (String typeSubntology : jsonModuleOutput.keySet()) {
-					for (String currTypeID : APEUtils.getListFromJson(jsonModuleOutput, typeSubntology, String.class)) {
-						if (data_taxonomy_subroots.contains(typeSubntology)) {
-							output.addType(new Type(currTypeID, currTypeID, typeSubntology, NodeType.UNKNOWN));
-						} else {
-							System.err.println("Error in the configuration file . The data subtaxonomy '" + typeSubntology
-									+ "' was not defined, but it was used for input type '" + currTypeID + "'.");
-							return false;
-						}
-					}
-				}
-				if (!output.getTypes().isEmpty()) {
+				DataInstance output;
+				if((output = getDataInstance(jsonModuleOutput)) != null) {
 					program_outputs.add(output);
 				}
 			}
 		} catch (JSONException JSONException) {
 			System.out.println("Tag '" + PROGRAM_OUTPUTS_TAG
 					+ "' is not provided in the configuration file. Program will have no outputs.");
+			program_outputs.clear();
 		}
 
 		try {
-			String tempUseWInput = runConfiguration.getString(USE_WORKFLOW_INPUT);
-			this.use_workflow_input = isValidConfigEnum(USE_WORKFLOW_INPUT, tempUseWInput);
-			if (this.use_workflow_input == null) {
-				this.use_workflow_input = ConfigEnum.ALL;
-				System.out.println("Tag " + USE_WORKFLOW_INPUT
+			String tempUseWInput = runConfiguration.getString(USEWORKFLOW_INPUT);
+			this.useWorkflowInput = isValidConfigEnum(USEWORKFLOW_INPUT, tempUseWInput);
+			if (this.useWorkflowInput == null) {
+				this.useWorkflowInput = ConfigEnum.ALL;
+				System.out.println("Tag " + USEWORKFLOW_INPUT
 						+ "' in the configuration file is not provided. Default value is: ALL.");
 			}
 		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + USE_WORKFLOW_INPUT + "' in the configuration file is not provided correctly.");
+			System.err.println("Tag '" + USEWORKFLOW_INPUT + "' in the configuration file is not provided correctly.");
 			return false;
 		}
 
 		try {
 			String tempUseGenData = runConfiguration.getString(USE_ALL_GENERATED_DATA);
-			this.use_all_generated_data = isValidConfigEnum(USE_ALL_GENERATED_DATA, tempUseGenData);
-			if (this.use_workflow_input == null) {
-				this.use_workflow_input = ConfigEnum.ONE;
+			this.useAllGeneratedData = isValidConfigEnum(USE_ALL_GENERATED_DATA, tempUseGenData);
+			if (this.useWorkflowInput == null) {
+				this.useWorkflowInput = ConfigEnum.ONE;
 				System.out.println("Tag " + USE_ALL_GENERATED_DATA
 						+ "' in the configuration file is not provided. Default value is: ONE.");
 			}
@@ -487,140 +472,174 @@ public class APEConfig {
 		}
 
 		try {
-			this.debug_mode = runConfiguration.getBoolean(DEBUG_MODE_TAG);
+			this.debugMode = runConfiguration.getBoolean(DEBUG_MODE_TAG);
 		} catch (JSONException JSONException) {
 			System.out.println("Tag '" + DEBUG_MODE_TAG
 					+ "' in the configuration file is not provided correctly. Default value is: false.");
-			this.debug_mode = false;
+			this.debugMode = false;
 		}
 
 		return true;
 	}
+	
+	private DataInstance getDataInstance(JSONObject jsonModuleInput) {
+	DataInstance dataInstances = new DataInstance();
+	for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
+		String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel, getOntologyPrefixURI());
+		for (String currTypeLabel : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
+			String currTypeURI = APEUtils.createClassURI(currTypeLabel, getOntologyPrefixURI());
+			if (dataTaxonomySubroots.contains(typeSuperClassURI)) {
+				dataInstances.addType(new Type(currTypeLabel, currTypeURI, typeSuperClassURI, NodeType.UNKNOWN));
+			} else {
+				System.err.println("Error in the configuration file. The data subtaxonomy '" + typeSuperClassLabel
+						+ "' was not defined, but it was used as a root ot the input type '" + currTypeURI + "'.");
+				return null;
+			}
+		}
+	}
 
-	/**
-	 * @return the {@link #ontology_path}
-	 */
-	public String getOntology_path() {
-		return ontology_path;
+	if (!dataInstances.getTypes().isEmpty()) {
+		return dataInstances;
+	}
+	
+	return null;
+	
 	}
 
 	/**
-	 * @return the {@link #tool_taxonomy_root}
+	 * @return the {@link #ontologyPath}
 	 */
-	public String getTool_taxonomy_root() {
-		return tool_taxonomy_root;
+	public String getOntologyPath() {
+		return ontologyPath;
+	}
+	
+	/**
+	 * @return the {@link #ontologyPrefixURI}
+	 */
+	public String getOntologyPrefixURI() {
+		return (ontologyPrefixURI != null) ? ontologyPrefixURI : "";
 	}
 
 	/**
-	 * @return the {@link #data_taxonomy_root}
+	 * @return the {@link #toolTaxonomyRoot}
 	 */
-	public String getData_taxonomy_root() {
-		return data_taxonomy_root;
+	public String getToolTaxonomyRoot() {
+		return toolTaxonomyRoot;
 	}
 
 	/**
-	 * @return the {@link #data_taxonomy_subroots}
+	 * @return the {@link #dataTaxonomyRoot}
 	 */
-	public List<String> getData_taxonomy_subroots() {
-		return data_taxonomy_subroots;
+	public String getDataTaxonomyRoot() {
+		return dataTaxonomyRoot;
 	}
 
 	/**
-	 * @return the {@link #tool_annotations_path}
+	 * @return the {@link #dataTaxonomySubroots}
 	 */
-	public String getTool_annotations_path() {
-		return tool_annotations_path;
+	public List<String> getDataTaxonomySubroots() {
+		return dataTaxonomySubroots;
 	}
 
 	/**
-	 * @return the {@link #constraints_path}
+	 * @return the {@link #toolAnnotationsPath}
 	 */
-	public String getConstraints_path() {
-		return constraints_path;
+	public String getToolAnnotationsPath() {
+		return toolAnnotationsPath;
 	}
 
 	/**
-	 * @return the {@link #shared_memory}
+	 * @return the {@link #constraintsPath}
 	 */
-	public Boolean getShared_memory() {
-		return shared_memory;
+	public String getConstraintsPath() {
+		return constraintsPath;
 	}
 
 	/**
-	 * @return the {@link #solution_path}
+	 * Returns {@code true} if the shared memory structure should be used, i.e. if the generated data is available in memory to all the tools used subsequently,
+	 *  or {@code false} in case of a restrictive message passing structure, i.e. if the generated data is available only to the tool next in sequence..
+	 * @return {@code true} if the shared memory structure should be used, {@code false} in
+	 * case of a restrictive message passing structure.
 	 */
-	public String getSolution_path() {
-		return solution_path;
+	public Boolean getSharedMemory() {
+		return sharedMemory;
 	}
 
 	/**
-	 * @return the {@link #solution_min_length}
+	 * @return the {@link #solutionPath}
 	 */
-	public Integer getSolution_min_length() {
-		return solution_min_length;
+	public String getSolutionPath() {
+		return solutionPath;
 	}
 
 	/**
-	 * @return the {@link #solution_max_length}
+	 * @return the {@link #solutionMinLength}
 	 */
-	public Integer getSolution_max_length() {
-		return solution_max_length;
+	public Integer getSolutionMinLength() {
+		return solutionMinLength;
 	}
 
 	/**
-	 * @return the {@link #max_no_solutions}
+	 * @return the {@link #solutionMaxLength}
 	 */
-	public Integer getMax_no_solutions() {
-		return max_no_solutions;
+	public Integer getSolutionMaxLength() {
+		return solutionMaxLength;
 	}
 
 	/**
-	 * @return the {@link #execution_scripts_folder}
+	 * @return the {@link #maxNoSolutions}
 	 */
-	public String getExecution_scripts_folder() {
-		return execution_scripts_folder;
+	public Integer getMaxNoSolutions() {
+		return maxNoSolutions;
 	}
 
 	/**
-	 * @return the {@link #no_executions}
+	 * @return the {@link #executionScriptsFolder}
 	 */
-	public Integer getNo_executions() {
-		return no_executions;
+	public String getExecutionScriptsFolder() {
+		return executionScriptsFolder;
 	}
 
 	/**
-	 * @return the {@link #solution_graphs_folder}
+	 * @return the {@link #noExecutions}
 	 */
-	public String getSolution_graphs_folder() {
-		return solution_graphs_folder;
+	public Integer getNoExecutions() {
+		return noExecutions;
 	}
 
 	/**
-	 * @return the {@link #no_graphs}
+	 * @return the {@link #solutionGraphsFolder}
 	 */
-	public Integer getNo_graphs() {
-		return no_graphs;
+	public String getSolutionGraphsFolder() {
+		return solutionGraphsFolder;
 	}
 
 	/**
-	 * @return the {@link #max_no_tool_outputs}
+	 * @return the {@link #noGraphs}
 	 */
-	public Integer getMax_no_tool_outputs() {
-		return max_no_tool_outputs;
+	public Integer getNoGraphs() {
+		return noGraphs;
 	}
 
 	/**
-	 * @return the {@link #max_no_tool_inputs}
+	 * @return the {@link #maxNoTool_outputs}
 	 */
-	public Integer getMax_no_tool_inputs() {
-		return max_no_tool_inputs;
+	public Integer getMaxNoToolOutputs() {
+		return maxNoTool_outputs;
 	}
 
 	/**
-	 * @return the {@link #program_inputs}
+	 * @return the {@link #maxNoToolInputs}
 	 */
-	public List<DataInstance> getProgram_inputs() {
-		return program_inputs;
+	public Integer getMaxNoToolInputs() {
+		return maxNoToolInputs;
+	}
+
+	/**
+	 * @return the {@link #programInputs}
+	 */
+	public List<DataInstance> getProgramInputs() {
+		return programInputs;
 	}
 
 	/**
@@ -631,24 +650,24 @@ public class APEConfig {
 	}
 
 	/**
-	 * @return the {@link #use_workflow_input}
+	 * @return the {@link #useWorkflowInput}
 	 */
-	public ConfigEnum getUse_workflow_input() {
-		return use_workflow_input;
+	public ConfigEnum getUseWorkflowInput() {
+		return useWorkflowInput;
 	}
 
 	/**
-	 * @return the {@link #use_all_generated_data}
+	 * @return the {@link #useAllGeneratedData}
 	 */
-	public ConfigEnum getUse_all_generated_data() {
-		return use_all_generated_data;
+	public ConfigEnum getUseAllGeneratedData() {
+		return useAllGeneratedData;
 	}
 
 	/**
-	 * @return the {@link #debug_mode}
+	 * @return the {@link #debugMode}
 	 */
-	public Boolean getDebug_mode() {
-		return debug_mode;
+	public Boolean getDebugMode() {
+		return debugMode;
 	}
 
 	/**
@@ -675,13 +694,13 @@ public class APEConfig {
 	public static String getJsonTags(String tag) {
 		switch (tag) {
 		case "id":
-			return "operation";
+			return "id";
 		case "label":
-			return "name";
+			return "label";
 		case "inputs":
 			return "inputs";
-		case "taxonomyTerms":
-			return "taxonomyTerms";
+		case "taxonomyOperations":
+			return "taxonomyOperations";
 		case "outputs":
 			return "outputs";
 		case "implementation":

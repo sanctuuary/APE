@@ -11,7 +11,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  * It comprises blocks of data types that are added to the memory and those that are being used by tools, as
  * input.
  * <br><br>
- * Labeling of the automaton is provided in /APE/res/WorkflowAutomaton_Implementation.png
+ * Labeling of the automaton is provided in {@code /APE/res/WorkflowAutomaton_Implementation.png}
  * 
  * @author Vedran Kasalica
  *

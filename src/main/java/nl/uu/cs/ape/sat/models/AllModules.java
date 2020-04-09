@@ -20,7 +20,7 @@ public class AllModules extends AllPredicates {
 
 
 	public AllModules(APEConfig config) {
-		super(config.getTool_taxonomy_root());
+		super(config.getToolTaxonomyRoot());
 	}
 
 	/**
@@ -32,8 +32,8 @@ public class AllModules extends AllPredicates {
 	}
 
 	/**
-	 * The class is used to check weather the module with @moduleID was already
-	 * introduced earlier on in @allModules. In case it was it returns the item,
+	 * The class is used to check weather the module with <b>moduleID</b> was already
+	 * introduced earlier on in <b>allModules</b>. In case it was it returns the item,
 	 * otherwise the new element is generated and returned. <br>
 	 * <br>
 	 * In case of generating a new Module, the object is added to the set of all the
@@ -42,7 +42,7 @@ public class AllModules extends AllPredicates {
 	 * @param module - The AbstractModule/Module that needs to be added.
 	 * @return The element if it's a new one or the existing element if this set
 	 *         contains the specified element.
-	 * @throws ExceptionInInitializerError 
+	 * @throws ExceptionInInitializerError - if the given TaxonomyPredicate <b>module</b> is not an {@link AbtractModule}.
 	 */
 	public AbstractModule addPredicate(TaxonomyPredicate module) throws ExceptionInInitializerError {
 		TaxonomyPredicate tmpModule = getPredicates().get(module.getPredicateID());
@@ -55,6 +55,7 @@ public class AllModules extends AllPredicates {
 				 * swap the AbstractModule with the Module
 				 */
 				swapAbstractModule2Module(newModule, tmpModule);
+				
 				return newModule;
 			}
 		} else {

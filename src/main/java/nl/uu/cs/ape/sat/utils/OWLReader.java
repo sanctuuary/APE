@@ -18,6 +18,7 @@ import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
@@ -81,22 +82,22 @@ public class OWLReader {
 			if (tempOntology.exists()) {
 				ontology = manager.loadOntologyFromOntologyDocument(tempOntology);
 			} else {
-				logger.info("Provided ontology does not exist.");
+				logger.warning("Provided ontology does not exist.");
 				return false;
 			}
 		} catch (OWLOntologyCreationException e) {
-			logger.info("Ontology is not properly provided.");
+			logger.warning("Ontology is not properly provided.");
 			return false;
 		}
 		OWLClass thingClass = manager.getOWLDataFactory().getOWLThing();
 		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
 
-		Supplier<Stream<OWLClass>> subClasses = () -> reasoner.getSubClasses(thingClass, true).entities();
+		List<OWLClass> subClasses = reasoner.getSubClasses(thingClass, true).entities().collect(Collectors.toList());
 
-		OWLClass moduleClass = subClasses.get().filter(currClass -> isModuleClass(currClass)).findFirst()
+		OWLClass moduleClass = subClasses.stream().filter(currClass -> isModuleClass(currClass)).findFirst()
 				.orElse(thingClass);
-		List<OWLClass> typeClasses = subClasses.get().filter(currClass -> isTypeClass(currClass))
+		List<OWLClass> typeClasses = subClasses.stream().filter(currClass -> isTypeClass(currClass))
 				.collect(Collectors.toList());
 
 		/* Handle scenario when the tool taxonomy root was not defined properly. */
@@ -117,7 +118,7 @@ public class OWLReader {
 				 * If the main root of the data type taxonomy does not exist, create one
 				 * artificially.
 				 */
-				Type root = allTypes.addPredicate(new Type("DataTaxonomy", "DataTaxonomy", "DataTaxonomy", NodeType.ROOT));
+				Type root = allTypes.addPredicate(new Type("DataTaxonomy", "http://www.w3.org#DataTaxonomy", "http://www.w3.org#DataTaxonomy", NodeType.ROOT));
 				allTypes.setRootPredicate(root);
 				superClass = new OWLClassImpl(IRI.create("http://www.w3.org#DataTaxonomy"));
 			}
@@ -137,13 +138,15 @@ public class OWLReader {
 	}
 
 	/**
-	 * Method returns the <b>ModulesTaxonomy</b> class from the set of OWL classes.
+	 * Method returns {@code true} of the given OWL class belong to the roots of the
+	 * <b>ModulesTaxonomy</b>.
 	 * 
-	 * @param subClasses - set of OWL classes
-	 * @return <b>ModulesTaxonomy</b> OWL class.
+	 * @param currClass - class that is evaluated
+	 * @return {@code true} if the current class belong to the module taxonomy roots,
+	 *         {@code false} otherwise.
 	 */
 	private boolean isModuleClass(OWLClass currClass) {
-		return getLabel(currClass).equals(allModules.getRootID());
+		return getIRI(currClass).equals(allModules.getRootID());
 	}
 
 	/**
@@ -155,11 +158,12 @@ public class OWLReader {
 	 *         {@code false} otherwise.
 	 */
 	private boolean isTypeClass(OWLClass currClass) {
-		if (getLabel(currClass).equals(allTypes.getRootID())) {
+		if (getIRI(currClass).equals(allTypes.getRootID())) {
 			typeRootExists = true;
 			return true;
 		} else {
-			return allTypes.getDataTaxonomyDimensionIDs().contains(getLabel(currClass));
+			boolean tmp = allTypes.getDataTaxonomyDimensionIDs().contains(getIRI(currClass));
+			return tmp;
 		}
 	}
 
@@ -177,13 +181,13 @@ public class OWLReader {
 //		if(allModules.existsModule(getLabel(currClass))) {
 //			return;
 //		}
-		AbstractModule superModule = allModules.get(getLabel(superClass));
+		AbstractModule superModule = allModules.get(getIRI(superClass));
 		final OWLClass currRootClass;
 		/*
 		 * Defining the Node Type based on the node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if (getLabel(currClass).equals(allModules.getRootID())) {
+		if (getIRI(currClass).equals(allModules.getRootID())) {
 			currNodeType = NodeType.ROOT;
 			currRootClass = currClass;
 		} else {
@@ -193,13 +197,13 @@ public class OWLReader {
 		AbstractModule currModule = null;
 		try {
 			currModule = allModules.addPredicate(
-					new AbstractModule(getLabel(currClass), getLabel(currClass), getLabel(currRootClass), currNodeType));
+					new AbstractModule(getLabel(currClass), getIRI(currClass), getIRI(currRootClass), currNodeType));
 		} catch (ExceptionInInitializerError e) {
 			e.printStackTrace();
 		}
 		/* Add the current module as a sub-module of the super module. */
 		if (superModule != null && currModule != null) {
-			superModule.addSubPredicate(getLabel(currClass));
+			superModule.addSubPredicate(currModule);
 		}
 		/* Add the super-type for the current type */
 		if (currNodeType != NodeType.ROOT) {
@@ -226,15 +230,15 @@ public class OWLReader {
 		
 		final OWLClass currRoot;
 		Type superType, currType = null;
-		superType = allTypes.get(getLabel(superClass));
+		superType = allTypes.get(getIRI(superClass));
 		/*
 		 * Check whether the current node is a root or subRoot node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if (getLabel(currClass).equals(allTypes.getRootID())) {
+		if (getIRI(currClass).equals(allTypes.getRootID())) {
 			currNodeType = NodeType.ROOT;
 			currRoot = currClass;
-		} else if (APEUtils.safe(allTypes.getDataTaxonomyDimensionIDs()).contains(getLabel(currClass))) {
+		} else if (APEUtils.safe(allTypes.getDataTaxonomyDimensionIDs()).contains(getIRI(currClass))) {
 			currNodeType = NodeType.SUBROOT;
 			currRoot = currClass;
 		} else {
@@ -243,14 +247,14 @@ public class OWLReader {
 
 		/* Generate the Type that corresponds to the taxonomy class. */
 		try {
-			currType = allTypes.addPredicate(new Type(getLabel(currClass), getLabel(currClass), getLabel(currRoot), currNodeType));
+			currType = allTypes.addPredicate(new Type(getLabel(currClass), getIRI(currClass), getIRI(currRoot), currNodeType));
 		} catch (ExceptionInInitializerError e) {
 			e.printStackTrace();
 		}
 
 		/* Add the current type as a sub-type of the super type. */
 		if (superType != null && currType != null) {
-			superType.addSubPredicate(getLabel(currClass));
+			superType.addSubPredicate(currType);
 		}
 		/* Add the super-type for the current type */
 		if (currNodeType != NodeType.ROOT) {

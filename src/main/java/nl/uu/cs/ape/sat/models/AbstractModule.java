@@ -51,7 +51,7 @@ public class AbstractModule extends TaxonomyPredicate {
 
 	@Override
 	public int hashCode() {
-		return moduleID.hashCode();
+		return moduleID.hashCode() * 11;
 	}
 
 	@Override

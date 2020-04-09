@@ -14,6 +14,7 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 
 /**
  * The {@code ConstraintTemplate} class is an abstract class used to represent a
@@ -36,6 +37,9 @@ public abstract class ConstraintTemplate {
 	 * List of all the parameters of the constraint.
 	 */
 	List<ConstraintParameter> parameters;
+	
+	/** Implementation function of the constraint. */
+	Runnable function;
 
 	/**
 	 * 
@@ -50,6 +54,7 @@ public abstract class ConstraintTemplate {
 		this.constraintID = id;
 		this.parameters = parameters;
 		this.description = description;
+//		this.function = function;
 	}
 
 	public void setConstraintID(String constraintID) {
@@ -98,24 +103,17 @@ public abstract class ConstraintTemplate {
 	 * @return {@link String} CNF representation of the constraint. {@code NULL} in
 	 *         case of incorrect number of constraint parameters.
 	 */
-	public abstract String getConstraint(List<ConstraintParameter> parameters, AllModules allModules, AllTypes allTypes, ModuleAutomaton moduleAutomaton,
+	public abstract String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
 			TypeAutomaton typeAutomaton, AtomMappings mappings);
 
 	/**
 	 * Print the template for encoding the constraint, containing the template ID, description and required number of parameters.
+	 * 
 	 * @return String representing the description.
 	 */
 	public String printConstraintCode() {
-		JSONArray params = new JSONArray();
-		for(int i = 1; i <= parameters.size(); i++) {
-			params.put("${parameter_" + i + "}");
-		}
-		JSONObject constJson = new JSONObject();
-		constJson.put("constraintid", constraintID);
-		constJson.put("parameters", params);
-		constJson.put("description", description);
 		
-		return constJson.toString(3) + ",\n";
+		return toJSON().toString(3) + ",\n";
 	}
 	
 	public JSONObject toJSON() {

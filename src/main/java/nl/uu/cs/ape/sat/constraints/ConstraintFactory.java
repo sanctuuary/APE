@@ -6,12 +6,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
+import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.ConstraintData;
+import nl.uu.cs.ape.sat.models.AtomMappings;
+import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.formulas.SLTL_formula;
+import nl.uu.cs.ape.sat.models.formulas.SLTL_formula_F;
+import nl.uu.cs.ape.sat.models.formulas.SLTL_formula_G;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 
 /**
  * The  {@code ConstraintFactory} class represents the Factory Method Pattern for generating and mapping {@link ConstraintTemplate} classes the set of constraint formats that can be used to describe the desired synthesis output.
@@ -215,9 +223,9 @@ public class ConstraintFactory {
 	 * @param constr
 	 * @return
 	 */
-	public String getDescription(ConstraintData constr) {
+	public String getDescription(ConstraintTemplateData constr) {
 		ConstraintTemplate currTmpl = this.constraintTamplates.get(constr.getConstraintID());
-		List<ConstraintParameter> params = constr.getParameters();
+		List<TaxonomyPredicate> params = constr.getParameters();
 		String description = currTmpl.getDescription();
 		for(int i = 0; i < params.size(); i++) {
 			description = description.replace("${parameter_" + i + "}", params.get(i).toString());
@@ -225,4 +233,361 @@ public class ConstraintFactory {
 		return description;
 	}
 
+	/**
+	 * Returns {@link ConstraintTemplateData} if the format is correct, {null} otherwise. 
+	 * @param constraintID
+	 * @param parameters
+	 * @return {@link ConstraintTemplateData} if the format is correct, {null} otherwise.
+	 */
+	public ConstraintTemplateData addConstraintTemplateData(String constraintID, List<TaxonomyPredicate> parameters) {
+		if(isGoodConstraintFormat(constraintID, parameters)) {
+			return new ConstraintTemplateData(constraintID,parameters);
+		}
+		return null;
+	}
+	
+	/**
+	 * TODO: Needs to be implemented. Input should be compared with the constraint templates, wrt the types of parameters and dimensions of each.
+	 * @param constraintID
+	 * @param parameters
+	 * @return
+	 */
+	public boolean isGoodConstraintFormat(String constraintID, List<TaxonomyPredicate> parameters) {
+		return true;
+	}
+
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it
+	 *  using the function {@link #getConstraint}.
+
+	 *
+	 */
+	public class Constraint_depend_module extends ConstraintTemplate {
+		public Constraint_depend_module(String id, List<ConstraintParameter> parameterTypes, String description) {
+			super(id, parameterTypes, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.depend_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * Generate type <b>parameters[0]</b> in the solution
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_gen_type extends ConstraintTemplate {
+		public Constraint_gen_type(String id,  List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+
+			SLTL_formula_F formula = new SLTL_formula_F(parameters.get(0));
+			return formula.getCNF(moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), WorkflowElement.MEMORY_TYPE, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * If we have generated data module <b>parameters[0]</b>,  then do not generate type <b>parameters[1]</b> subsequently
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_if_gen_then_not_type extends ConstraintTemplate {
+		public Constraint_if_gen_then_not_type(String id,  List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.itn_type(parameters.get(0), parameters.get(1), WorkflowElement.MEMORY_TYPE, moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * If we have generated data module <b>parameters[0]</b>, then generate <b>parameters[1]</b>
+	 * subsequently using the function {@link #getConstraint}.
+	 */
+	public class Constraint_if_gen_then_type extends ConstraintTemplate {
+		public Constraint_if_gen_then_type(String id,  List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.ite_type(parameters.get(0), parameters.get(1), WorkflowElement.MEMORY_TYPE, moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b>
+	 * subsequently using the function {@link #getConstraint}.
+	 */
+	public class Constraint_if_then_module extends ConstraintTemplate {
+		public Constraint_if_then_module(String id, List<ConstraintParameter> parameterTypes, String description) {
+			super(id, parameterTypes, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.ite_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b>
+	 * subsequently using the function {@link #getConstraint}.
+	 */
+	public class Constraint_if_then_not_module extends ConstraintTemplate {
+		public Constraint_if_then_not_module(String id, List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.itn_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * If we have used data module <b>parameters[0]</b>,  then do not use type <b>parameters[1]</b> subsequently
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_if_use_then_not_type extends ConstraintTemplate {
+		public Constraint_if_use_then_not_type(String id, List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+				@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.itn_type(parameters.get(0), parameters.get(1), WorkflowElement.USED_TYPE, moduleAutomaton, typeAutomaton.getUsedTypesBlocks(), mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * If we have used data module <b>parameters[0]</b>, then use <b>parameters[1]</b>
+	 * subsequently using the function {@link #getConstraint}.
+	 */
+	public class Constraint_if_use_then_type extends ConstraintTemplate {
+		public Constraint_if_use_then_type(String id, List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+				@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.ite_type(parameters.get(0), parameters.get(1), WorkflowElement.USED_TYPE, moduleAutomaton, typeAutomaton.getUsedTypesBlocks(), mappings);
+		}
+	}
+
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * Use <b>parameters[0]</b> as last module in the solution.
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_last_module extends ConstraintTemplate {
+		public Constraint_last_module(String id, List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.useAsLastModule(parameters.get(0), moduleAutomaton, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a next module in the sequence
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_next_module extends ConstraintTemplate {
+		public Constraint_next_module(String id, List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.next_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * Do not generate type <b>parameters[0]</b> in the solution
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_not_gen_type extends ConstraintTemplate {
+		public Constraint_not_gen_type(String id, List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+
+			SLTL_formula_G formula = new SLTL_formula_G(false, parameters.get(0));
+			return formula.getCNF(moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), WorkflowElement.MEMORY_TYPE, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * Do not use module <b>parameters[0]</b> in the solution
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_not_use_module extends ConstraintTemplate {
+		public Constraint_not_use_module(String id, List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+
+			SLTL_formula_G formula = new SLTL_formula_G(false, parameters.get(0));
+			return formula.getCNF(moduleAutomaton, null, WorkflowElement.MODULE, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * Do not use type <b>parameters[0]</b> in the solution
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_not_use_type extends ConstraintTemplate {
+		public Constraint_not_use_type(String id,  List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+
+			SLTL_formula_G formula = new SLTL_formula_G(false, parameters.get(0));
+			return formula.getCNF(null, typeAutomaton.getUsedTypesBlocks(), WorkflowElement.USED_TYPE, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> as a previous module in the sequence.
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_prev_module extends ConstraintTemplate {
+		public Constraint_prev_module(String id, List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTL_formula.prev_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * Use module <b>parameters[0]</b> in the solution
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_use_module extends ConstraintTemplate {
+		public Constraint_use_module(String id,  List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+
+			SLTL_formula_F formula = new SLTL_formula_F(parameters.get(0));
+			return formula.getCNF(moduleAutomaton, null, WorkflowElement.MODULE, mappings);
+		}
+	}
+	
+	/**
+	 * Implements constraints of the form:<br> <br>
+	 * Use type <b>parameters[0]</b> in the solution
+	 * using the function {@link #getConstraint}.
+	 */
+	public class Constraint_use_type extends ConstraintTemplate {
+		public Constraint_use_type(String id,  List<ConstraintParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+				TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+
+			SLTL_formula_F formula = new SLTL_formula_F(parameters.get(0));
+			return formula.getCNF(null, typeAutomaton.getUsedTypesBlocks(), WorkflowElement.USED_TYPE, mappings);
+		}
+	}
 }
+

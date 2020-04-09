@@ -13,28 +13,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import guru.nidi.graphviz.attribute.RankDir;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.engine.Renderer;
-import guru.nidi.graphviz.model.Graph;
-import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
-import nl.uu.cs.ape.sat.core.solutionStructure.SolutionGraph;
-import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
-import nl.uu.cs.ape.sat.models.AllModules;
+import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.models.AllTypes;
-import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Module;
-import nl.uu.cs.ape.sat.models.TaxonomyPredicateHelper;
-import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
@@ -68,7 +58,7 @@ public class APE {
 			throw new ExceptionInInitializerError();
 		}
 		if(!setupDomain()) {
-			System.err.println("Error in settin up the domain.");
+			throw new IOException("Error in settin up the domain.");
 		}
 	}
 	
@@ -76,15 +66,16 @@ public class APE {
 	 * Create instance of the APE solver.
 	 * @param configPath - the APE configuration JSONObject{@link JSONObject}.
 	 * @throws ExceptionInInitializerError 
+	 * @throws IOException 
 	 */
-	public APE(JSONObject configObject) throws ExceptionInInitializerError{
+	public APE(JSONObject configObject) throws ExceptionInInitializerError, IOException {
 		config = new APEConfig(configObject);
 		if (config == null) {
 			System.err.println("Configuration failed. Error in configuration object.");
 			throw new ExceptionInInitializerError();
 		}
 		if(!setupDomain()) {
-			System.err.println("Error in settin up the domain.");
+			throw new IOException("Error in settin up the domain.");
 		}
 	}
 	
@@ -122,7 +113,7 @@ public class APE {
 		 */
 		apeDomainSetup = new APEDomainSetup(config);
 
-		OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntology_path());
+		OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntologyPath());
 		Boolean ontologyRead = owlReader.readOntology();
 
 		if (ontologyRead == false) {
@@ -134,12 +125,12 @@ public class APE {
 		 * Set the the empty type (representing the absence of types) as a direct child
 		 * of root type
 		 */
-		succRun &= apeDomainSetup.getAllTypes().getRootPredicate().addSubPredicate(apeDomainSetup.getAllTypes().getEmptyType().getPredicateID());
+		succRun &= apeDomainSetup.getAllTypes().getRootPredicate().addSubPredicate(apeDomainSetup.getAllTypes().getEmptyType());
 
 		/*
 		 * Update allModules and allTypes sets based on the module.json file
 		 */
-		APEUtils.readModuleJson(config.getTool_annotations_path(), apeDomainSetup);
+		APEUtils.readModuleJson(config.getToolAnnotationsPath(), apeDomainSetup);
 		
 		succRun &= apeDomainSetup.trimTaxonomy();
 		
@@ -156,13 +147,22 @@ public class APE {
 	 * @param dimensionRootID - root of the data taxonomy subtree that corresponds to the list of elements that should be returned.
 	 * @return List where each element correspond to a map that can be transformed into JSON objects.
 	 */
-	public List<Map<String, String>> getTaxonomyElements(String dimensionRootID) {
-		List<? extends TaxonomyPredicate> types = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(apeDomainSetup.getAllTypes().get(dimensionRootID));
-		if(types == null) {
-			types = apeDomainSetup.getAllModules().getElementsFromSubTaxonomy(apeDomainSetup.getAllModules().get(dimensionRootID));
+	public List<Map<String, String>> getTaxonomyElements(String dimensionRootID) throws NullPointerException {
+		SortedSet<? extends TaxonomyPredicate> elements = null;
+		TaxonomyPredicate root = apeDomainSetup.getAllTypes().get(dimensionRootID);
+		if(root != null) {
+			elements = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(root);
+		} else {
+			root = apeDomainSetup.getAllModules().get(dimensionRootID);
+			if(root != null) {
+				elements = apeDomainSetup.getAllModules().getElementsFromSubTaxonomy(root);
+			} else {
+				throw new NullPointerException();
+			}
 		}
+		
 		List<Map<String, String>> transformedTypes = new ArrayList<Map<String, String>>();
-		for(TaxonomyPredicate currType : types) {
+		for(TaxonomyPredicate currType : elements) {
 			transformedTypes.add(currType.toMap());
 		}
 		
@@ -176,6 +176,7 @@ public class APE {
 	 * @throws JSONException
 	 */
 	public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, JSONException {
+		apeDomainSetup.clearConstraints();
 		config.setupRunConfiguration(configObject);
 		if (config == null || config.getRunConfigJsonObj() == null) {
 			throw new JSONException("Run configuration failed. Error in configuration object.");
@@ -213,10 +214,10 @@ public class APE {
 		SATsolutionsList allSolutions = new SATsolutionsList(config);
 
 		
-		APEUtils.readConstraints(config.getConstraints_path(), apeDomainSetup);
+		APEUtils.readConstraints(config.getConstraintsPath(), apeDomainSetup);
 		
 		/** Print the setup information when necessary. */
-		APEUtils.debugPrintout(config.getDebug_mode(), apeDomainSetup);
+		APEUtils.debugPrintout(config.getDebugMode(), apeDomainSetup);
 
 		/**
 		 * Loop over different lengths of the workflow until either, max workflow length
@@ -224,9 +225,9 @@ public class APE {
 		 */
 		String globalTimerID = "globalTimer";
 		APEUtils.timerStart(globalTimerID, true);
-		int solutionLength = config.getSolution_min_length();
+		int solutionLength = config.getSolutionMinLength();
 		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
-				&& solutionLength <= config.getSolution_max_length()) {
+				&& solutionLength <= config.getSolutionMaxLength()) {
 
 			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, config, solutionLength);
 
@@ -241,7 +242,7 @@ public class APE {
 			implSATsynthesis.synthesisExecution();
 
 			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
-					|| solutionLength == config.getSolution_max_length()) {
+					|| solutionLength == config.getSolutionMaxLength()) {
 				APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
 			}
 
@@ -266,7 +267,7 @@ public class APE {
 			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getRelevantSolution())
 					.append("\n");
 		}
-		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolution_path()), false);
+		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolutionPath()), false);
 	}
 
 	/**
@@ -278,8 +279,8 @@ public class APE {
 	 * @throws IOException
 	 */
 	public boolean writeExecutableWorkflows(SATsolutionsList allSolutions) throws IOException {
-		String executionsFolder = config.getExecution_scripts_folder();
-		Integer noExecutions = config.getNo_executions();
+		String executionsFolder = config.getExecutionScriptsFolder();
+		Integer noExecutions = config.getNoExecutions();
 		if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
@@ -301,7 +302,7 @@ public class APE {
 			for (Module curr : currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules())) {
 				if (curr.getModuleExecution() != null) {
 					curr.getModuleExecution()
-							.run(config.getExecution_scripts_folder() + "/workflowSolution_" + i + ".sh");
+							.run(config.getExecutionScriptsFolder() + "/workflowSolution_" + i + ".sh");
 				}
 			}
 			System.out.print(".");
@@ -321,8 +322,8 @@ public class APE {
 	 * @throws IOException
 	 */
 	public boolean writeDataFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
-		String graphsFolder = config.getSolution_graphs_folder();
-		Integer noGraphs = config.getNo_graphs();
+		String graphsFolder = config.getSolutionGraphsFolder();
+		Integer noGraphs = config.getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
@@ -362,8 +363,8 @@ public class APE {
 	 * @throws IOException
 	 */
 	public boolean writeControlFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
-		String graphsFolder = config.getSolution_graphs_folder();
-		Integer noGraphs = config.getNo_graphs();
+		String graphsFolder = config.getSolutionGraphsFolder();
+		Integer noGraphs = config.getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}

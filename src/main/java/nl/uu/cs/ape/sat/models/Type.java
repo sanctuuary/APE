@@ -48,7 +48,7 @@ public class Type extends TaxonomyPredicate {
 
 	@Override
 	public int hashCode() {
-		return this.typeID.hashCode();
+		return this.typeID.hashCode() * 11;
 	}
 
 	@Override

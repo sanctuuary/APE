@@ -5,6 +5,7 @@ package nl.uu.cs.ape.sat.models.SATEncodingUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.State;
@@ -23,15 +24,15 @@ import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 /**
- * The {@code TypeUtils} class is used to encode SAT constraints  based on the type annotations.
+ * The {@code SATTypeUtils} class is used to encode SAT constraints  based on the type annotations.
  *
  * @author Vedran Kasalica
  *
  */
-public class TypeUtils {
+public class SATTypeUtils {
 
 	/** Private constructor is used to to prevent instantiation. */
-	private TypeUtils() {
+	private SATTypeUtils() {
 		throw new UnsupportedOperationException();
 	}
 	
@@ -117,7 +118,7 @@ public class TypeUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications
 	 */
-	public static String typeEnforceTaxonomyStructure(AllTypes allTypes, String rootTypeID, TypeAutomaton typeAutomaton, AtomMappings mappings) {
+	public static String typeEnforceTaxonomyStructure(AllTypes allTypes, TaxonomyPredicate currType, TypeAutomaton typeAutomaton, AtomMappings mappings) {
 
 		StringBuilder constraints = new StringBuilder();
 		// taxonomy enforcement of types in in all the states (those that represent
@@ -125,12 +126,12 @@ public class TypeUtils {
 		for (Block memTypeBlock : typeAutomaton.getMemoryTypesBlocks()) {
 			for (State memTypeState : memTypeBlock.getStates()) {
 				constraints = constraints
-						.append(typeEnforceTaxonomyStructureForState(allTypes,rootTypeID, mappings, memTypeState, WorkflowElement.MEMORY_TYPE));
+						.append(typeEnforceTaxonomyStructureForState(allTypes,currType, mappings, memTypeState, WorkflowElement.MEMORY_TYPE));
 			}
 		}
 		for (Block usedTypeBlock : typeAutomaton.getUsedTypesBlocks()) {
 			for (State usedTypeState : usedTypeBlock.getStates()) {
-				constraints = constraints.append(typeEnforceTaxonomyStructureForState(allTypes, rootTypeID, mappings, usedTypeState, WorkflowElement.USED_TYPE));
+				constraints = constraints.append(typeEnforceTaxonomyStructureForState(allTypes, currType, mappings, usedTypeState, WorkflowElement.USED_TYPE));
 			}
 		}
 		return constraints.toString();
@@ -140,10 +141,9 @@ public class TypeUtils {
 	 * Supporting recursive method for typeEnforceTaxonomyStructure.
 	 * @param typeElement 
 	 */
-	private static String typeEnforceTaxonomyStructureForState(AllTypes allTypes, String rootTypeID,
+	private static String typeEnforceTaxonomyStructureForState(AllTypes allTypes, TaxonomyPredicate currType,
 			AtomMappings mappings, State typeState, WorkflowElement typeElement) {
 
-		Type currType = allTypes.get(rootTypeID);
 		String superType_State = mappings.add(currType, typeState, typeElement).toString();
 
 		StringBuilder constraints = new StringBuilder();
@@ -154,14 +154,13 @@ public class TypeUtils {
 			/*
 			 * Ensuring the TOP-DOWN taxonomy tree dependency
 			 */
-			for (String subTypeeID : currType.getSubPredicates()) {
-				Type subType = allTypes.get(subTypeeID);
+			for (TaxonomyPredicate subType : currType.getSubPredicates()) {
 
 				String subType_State = mappings.add(subType, typeState, typeElement).toString();
 				currConstraint = currConstraint.append(subType_State).append(" ");
 				subTypes_States.add(subType_State);
 
-				constraints = constraints.append(typeEnforceTaxonomyStructureForState(allTypes, subTypeeID, mappings, typeState, typeElement));
+				constraints = constraints.append(typeEnforceTaxonomyStructureForState(allTypes, subType, mappings, typeState, typeElement));
 			}
 			currConstraint = currConstraint.append("0\n");
 			/*
@@ -220,12 +219,10 @@ public class TypeUtils {
 	 * Encoding the workflow output. The provided output files have to occur as the
 	 * final set of "used" data types.
 	 * 
-	 * @param program_outputs - input types for the program
-	 * @param typeAutomaton
-	 * @param solutionLength
-	 * @param emptyType
-	 * @param mappings
 	 * @param allTypes
+	 * @param program_outputs
+	 * @param typeAutomaton
+	 * @param mappings
 	 * @return String representation of the workflow output encoding.
 	 */
 	public static String encodeOutputData(AllTypes allTypes, List<DataInstance> program_outputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {
@@ -238,7 +235,7 @@ public class TypeUtils {
 				for (Type currType : currTypes) {
 					if (allTypes.get(currType.getPredicateID()) == null) {
 						System.err.println(
-								"Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
+								"Program output '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
 						return null;
 					}
 					encoding = encoding.append(mappings.add(currType, workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
@@ -256,29 +253,5 @@ public class TypeUtils {
 		return encoding.toString();
 	}
 	
-	
-	/**
-	 * Method creates a new abstract type based on the list of types. The list of types is connected using the provided logical operator.
-	 * The type is added to the list of type, but no constraints regarding the new predicate were defined.<br>
-	 * @param relatedTypes - list of type that are logically related to the new abstract type
-	 * @param allTypes - list of all the type
-	 * @param logicOp - logical operation that is used to group the types (e.g. {@link LogicOperation.OR})
-	 * @return a new abstract type
-	 */
-	public static TaxonomyPredicate generateAbstractType(List<TaxonomyPredicate> relatedTypes, AllTypes allTypes, LogicOperation logicOp) {
-		if(relatedTypes.isEmpty()) {
-			return null;
-		}
-		if(relatedTypes.size() == 1) {
-			return relatedTypes.get(0);
-		}
-		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
-		for(TaxonomyPredicate label : relatedTypes) {
-			abstractLabel = abstractLabel.append(label.getPredicateID());
-		}
-		
-		TaxonomyPredicate newAbsType = allTypes.addPredicate(new Type(abstractLabel.toString(), abstractLabel.toString(), relatedTypes.get(0).getRootNode(), NodeType.ABSTRACT));
-		return newAbsType;
-	}
 	
 }

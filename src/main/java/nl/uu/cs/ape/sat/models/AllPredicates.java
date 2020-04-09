@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -77,21 +79,18 @@ public abstract class AllPredicates {
 	}
 	
 	/**
-	 * 
+	 * Remove the parts of the taxonomy that are not in use for the given set of available tools and types in the domain.
+	 * @return {@code true} if the trimming finished successfully, {@code false} otherwise.
 	 */
 	public boolean trimTaxonomy() {
 		TaxonomyPredicate root = get(taxonomyRoot);
-		List<String> toRemove = new ArrayList<String>();
-		for(String subClassID : APEUtils.safe(root.getSubPredicates())) {
-			TaxonomyPredicate subClass = get(subClassID);
+		List<TaxonomyPredicate> toRemove = new ArrayList<TaxonomyPredicate>();
+		for(TaxonomyPredicate subClass : APEUtils.safe(root.getSubPredicates())) {
 			if(subClass == null) {
-				toRemove.add(subClassID);
-				continue;
-			}
-			if(subClass.getIsRelevant()) {
+			} else if(subClass.getIsRelevant()) {
 				trimSubTaxonomy(subClass);
 			} else {
-				toRemove.add(subClassID);
+				toRemove.add(subClass);
 				trimSubTaxonomy(subClass);
 			}
 		}
@@ -99,30 +98,29 @@ public abstract class AllPredicates {
 		return true;
 	}
 	
+	/**
+	 * Remove the parts of the given subtaxonomy that are not in use for the given set of available tools and types in the domain.
+	 * @param subTaxRoot - subtaxonomy that is to be trimmed
+	 * @return {@code true} if the trimming finished successfully, {@code false} otherwise.
+	 */
 	public boolean trimSubTaxonomy(TaxonomyPredicate subTaxRoot) {
 		if(subTaxRoot == null) {
 			return true;
 		}
-		List<String> toRemove = new ArrayList<String>();
-		for(String subClassID : APEUtils.safe(subTaxRoot.getSubPredicates())) {
-			TaxonomyPredicate subClass = get(subClassID);
+		List<TaxonomyPredicate> toRemove = new ArrayList<TaxonomyPredicate>();
+		for(TaxonomyPredicate subClass : APEUtils.safe(subTaxRoot.getSubPredicates())) {
 			if(subClass == null) {
-				toRemove.add(subClassID);
-				continue;
-			}
-			if(subClass.getIsRelevant()) {
+			} else if(subClass.getIsRelevant()) {
 				trimSubTaxonomy(subClass);
 			} else {
-				toRemove.add(subClassID);
+				toRemove.add(subClass);
 				trimSubTaxonomy(subClass);
 			}
 		}
-		if(subTaxRoot.getIsRelevant()) {
-			subTaxRoot.removeAllSubPredicates(toRemove);
-		} else {
+		if(!subTaxRoot.getIsRelevant()) {
 			this.predicates.remove(subTaxRoot.getPredicateID());
 		}
-		
+		subTaxRoot.removeAllSubPredicates(toRemove);
 		return true;
 	}
 	
@@ -148,16 +146,14 @@ public abstract class AllPredicates {
 	 * @param subTreeRoot - root of the subTree
 	 * @return List of data types.
 	 */
-	public List<TaxonomyPredicate> getElementsFromSubTaxonomy(TaxonomyPredicate subTreeRoot){
+	public SortedSet<TaxonomyPredicate> getElementsFromSubTaxonomy(TaxonomyPredicate subTreeRoot) throws NullPointerException{
 		if(subTreeRoot == null) {
-			System.err.println("Given subtaxonomy type does not exist.");
-			return null;
+			throw new NullPointerException("Given subtaxonomy type does not exist.");
 		}
-		List<TaxonomyPredicate> elements = new ArrayList<>();
+		SortedSet<TaxonomyPredicate> elements = new TreeSet<>();
 		elements.add(subTreeRoot);
 		
-		for(String subTypeID : APEUtils.safe(subTreeRoot.getSubPredicates())) {
-			TaxonomyPredicate subType = this.get(subTypeID);
+		for(TaxonomyPredicate subType : APEUtils.safe(subTreeRoot.getSubPredicates())) {
 			elements.addAll(getElementsFromSubTaxonomy(subType));
 		}
 		

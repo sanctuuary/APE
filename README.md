@@ -62,7 +62,6 @@ APE is licensed under the Apache 2.0 license.
 1. **OWL API**	-	LGPL or Apache 2.0
 2. **SAT4J**	-	EPL or GNu LGPL
 3. **apache-common-lang**	-	Apache 2.0
-4. **DOM4J**-	BSD
-5. **graphviz-java** - Apache 2.0
-6. **org.json** - [JSON license](https://www.json.org/license.html)
+4. **graphviz-java** - Apache 2.0
+5. **org.json** - [JSON license](https://www.json.org/license.html)
 

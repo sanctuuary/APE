@@ -352,7 +352,7 @@ public abstract class SLTL_formula {
 	 * @param mappings
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
-	public static String useAsLastModule(AbstractModule last_module, ModuleAutomaton moduleAutomaton,
+	public static String useAsLastModule(TaxonomyPredicate last_module, ModuleAutomaton moduleAutomaton,
 			AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 
@@ -374,7 +374,7 @@ public abstract class SLTL_formula {
 	 * @param mappings
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
-	public static String useAsNthModule(AbstractModule module, int n, ModuleAutomaton moduleAutomaton,
+	public static String useAsNthModule(TaxonomyPredicate module, int n, ModuleAutomaton moduleAutomaton,
 			AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 
@@ -397,7 +397,7 @@ public abstract class SLTL_formula {
 	 * @param mappings
 	 * @return {@link String} CNF representation of the SLTL formula
 	 */
-	public static String useModuleNtimes(AbstractModule module, int n, ModuleAutomaton moduleAutomaton,
+	public static String useModuleNtimes(TaxonomyPredicate module, int n, ModuleAutomaton moduleAutomaton,
 			AtomMappings mappings) {
 //		StringBuilder constraints = new StringBuilder();
 //

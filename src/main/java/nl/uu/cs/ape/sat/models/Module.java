@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -158,31 +159,36 @@ public class Module extends AbstractModule {
 	 * Creates and returns a module from a tool annotation instance from a Json file.
 	 * 
 	 * @param jsonModule - JSON representation of a module
-	 * @param allModules - list of all the modules
-	 * @param allTypes   - list of all the types
+	 * @param domainSetup - domain information, including all the existing tools and types
 	 * @return New Module object.
 	 */
 	public static Module moduleFromJson(JSONObject jsonModule, APEDomainSetup domainSetup)
 			throws JSONException {
+		String ontologyPrefixURI = domainSetup.getOntologyPrefixURI();
 		AllModules allModules = domainSetup.getAllModules();
-		AllTypes allTypes = domainSetup.getAllTypes();
-		String moduleID = jsonModule.getString(APEConfig.getJsonTags("id"));
+		String moduleURI = APEUtils.createClassURI(jsonModule.getString(APEConfig.getJsonTags("id")), ontologyPrefixURI);
+		if(allModules.get(moduleURI) != null) {
+			moduleURI = moduleURI + "[tool]";
+		}
 		String moduleLabel = jsonModule.getString(APEConfig.getJsonTags("label"));
-		Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("taxonomyTerms"), String.class));
-		
+		Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("taxonomyOperations"), String.class));
+		taxonomyModules = APEUtils.createURIsFromLabels(taxonomyModules, ontologyPrefixURI);
 		/** Check if the referenced module taxonomy classes exist. */
 		List<String> toRemove = new ArrayList<String>();
 		for(String taxonomyModule : taxonomyModules) {
-			if(allModules.get(taxonomyModule) == null) {
-				toRemove.add(taxonomyModule);
+			String taxonomyModuleURI =  APEUtils.createClassURI(taxonomyModule, ontologyPrefixURI);
+			if(allModules.get(taxonomyModuleURI) == null) {
+				System.err.println("Tool '" + moduleURI + "' annotation issue. "
+						+ "Referenced '"+APEConfig.getJsonTags("taxonomyOperations")+"': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy.");
+				toRemove.add(taxonomyModuleURI);
 			}
 		}
 		taxonomyModules.removeAll(toRemove);
 		
 		/* If the taxonomy terms were not properly specified the tool taxonomy root is used as superclass of the tool. */
-		if(taxonomyModules.isEmpty() && (allModules.get(moduleID) == null)) {
-				System.err.println("Annotated tool \"" + moduleID
-						+ "\" cannot be found in the Tool Taxonomy. It is added as a direct subclass of the root in the Tool Taxonomy.");
+		if(taxonomyModules.isEmpty()) {
+				System.err.println("Tool '" + moduleURI + "' annotation issue. "
+						+ "None of the referenced '"+APEConfig.getJsonTags("taxonomyOperations")+"' can be found in the Tool Taxonomy.");
 				taxonomyModules.add(allModules.getRootID());
 		}
 		
@@ -201,100 +207,15 @@ public class Module extends AbstractModule {
 		List<DataInstance> inputs = new ArrayList<DataInstance>();
 		List<DataInstance> outputs = new ArrayList<DataInstance>();
 
-		/* For each input */
+		/* For each input and output, allocate the corresponding abstract types. */
 		for (JSONObject jsonInput : jsonModuleInput) {
 			if (!jsonInput.isEmpty()) {
-				DataInstance input = new DataInstance();
-				/* explore all dimensions of the data type */
-				for (String typeSubntology : jsonInput.keySet()) {
-					/* Logical connective that determines the semantics of the list notion, i.e. whether all the types in the list have to be satisfied or at least one of them. */
-					LogicOperation logConn = LogicOperation.AND;
-					List<TaxonomyPredicate> logConnectedPredicates = new ArrayList<TaxonomyPredicate>();
-					if(typeSubntology.endsWith("$OR$")) {
-						logConn = LogicOperation.OR;
-					} else if(typeSubntology.endsWith("$AND$")) {
-						logConn = LogicOperation.AND;
-					} 
-					/* for each dimension explore all the types specified */
-					for (String currTypeID : APEUtils.getListFromJson(jsonInput, typeSubntology, String.class)) {
-						if(typeSubntology.endsWith("$OR$")) {
-							typeSubntology = typeSubntology.replace("$OR$", "");
-						} else if(typeSubntology.endsWith("$AND$")) {
-							typeSubntology = typeSubntology.replace("$AND$", "");
-						}
-						if (allTypes.get(currTypeID) == null) {
-							System.err.println("Data type \"" + currTypeID
-									+ "\" used in the tool annotations does not exist in the " + typeSubntology + " taxonomy. This might influence the validity of the solutions.");
-						}
-						if (allTypes.getDataTaxonomyDimensionIDs().contains(typeSubntology)) {
-							Type currType = allTypes.addPredicate(new Type(currTypeID, currTypeID, typeSubntology, NodeType.UNKNOWN));
-							if (currType != null) {
-								/* if the type exists, make it relevant from the taxonomy perspective and add it to the inputs */
-								currType.setAsRelevantTaxonomyTerm(allTypes);
-								logConnectedPredicates.add(currType);
-							}
-						} else {
-							throw new JSONException(
-									"Error in the tool annotation file . The data subtaxonomy '" + typeSubntology
-											+ "' was not defined, but it was used as annotation for input type '" + currTypeID + "'.");
-						}
-					}
-					Type newAbsType = (Type) domainSetup.generateHelperPredicate(logConnectedPredicates, logConn);
-					if(newAbsType != null) {
-						newAbsType.setAsRelevantTaxonomyTerm(allTypes);
-						input.addType(newAbsType);
-					}
-					
-				}
-				
-				
-				inputs.add(input);
+				inputs.add(createInstance(domainSetup, jsonInput));
 			}
 		}
-
 		for (JSONObject jsonOutput : jsonModuleOutput) {
 			if (!jsonOutput.isEmpty()) {
-				DataInstance output = new DataInstance();
-				for (String typeSubntology : jsonOutput.keySet()) {
-					/* Logical connective that determines the semantics of the list notion, i.e. whether all the types in the list have to be satisfied or at least one of them. */
-					LogicOperation logConn = LogicOperation.AND;
-					List<TaxonomyPredicate> logConnectedPredicates = new ArrayList<TaxonomyPredicate>();
-					if(typeSubntology.endsWith("$OR$")) {
-						logConn = LogicOperation.OR;
-					} else if(typeSubntology.endsWith("$AND$")) {
-						logConn = LogicOperation.AND;
-					} 
-					for (String currTypeID : APEUtils.getListFromJson(jsonOutput, typeSubntology, String.class)) {
-						if(typeSubntology.endsWith("$OR$")) {
-							typeSubntology = typeSubntology.replace("$OR$", "");
-						} else if(typeSubntology.endsWith("$AND$")) {
-							typeSubntology = typeSubntology.replace("$AND$", "");
-						}
-						if (allTypes.get(currTypeID) == null) {
-							System.err.println("Data type \"" + currTypeID.toString()
-									+ "\" used in the tool annotations does not exist in the " + typeSubntology + " taxonomy. This might influence the validity of the solutions.");
-						}
-						if (allTypes.getDataTaxonomyDimensionIDs().contains(typeSubntology)) {
-							Type currType = allTypes.addPredicate(new Type(currTypeID, currTypeID, typeSubntology,
-									NodeType.UNKNOWN));
-							if (currType != null) {
-								/* if the type exists, make it relevant from the taxonomy perspective and add it to the outputs */
-								currType.setAsRelevantTaxonomyTerm(allTypes);
-								logConnectedPredicates.add(currType);
-							}
-						} else {
-							throw new JSONException(
-									"Error in the tool annotation file . The data subtaxonomy '" + typeSubntology
-											+ "' was not defined, but it was used as annotation for output type '" + currTypeID + "'.");
-						}
-					}
-					Type newAbsType = (Type) domainSetup.generateHelperPredicate(logConnectedPredicates, logConn);
-					if(newAbsType != null) {
-						newAbsType.setAsRelevantTaxonomyTerm(allTypes);
-						output.addType(newAbsType);
-					}
-				}
-				outputs.add(output);
+				outputs.add(createInstance(domainSetup, jsonOutput));
 			}
 		}
 
@@ -307,14 +228,14 @@ public class Module extends AbstractModule {
 		 * Add the module and make it sub module of the currSuperModule (if it was not
 		 * previously defined)
 		 */
-		Module currModule =  (Module) allModules.addPredicate(new Module(moduleLabel, moduleID, allModules.getRootID(), moduleExecutionImpl));
+		Module currModule =  (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootID(), moduleExecutionImpl));
 		
 		/*	For each supermodule add the current module as a subset and vice versa. */
 		for(String superModuleID : taxonomyModules) {
 			AbstractModule superModule = allModules.get(superModuleID);
 			if(superModule != null) {
-				superModule.addSubPredicate(moduleID);
-				currModule.addSuperPredicate(superModuleID);
+				superModule.addSubPredicate(currModule);
+				currModule.addSuperPredicate(superModule);
 			}
 		}
 		
@@ -323,6 +244,59 @@ public class Module extends AbstractModule {
 		currModule.setAsRelevantTaxonomyTerm(allModules);
 		
 		return currModule;
+	}
+	
+	/** 
+	 * Helper function used to generate a data instance from a json annotation
+	  * @param domainSetup - domain information, including all the existing tools and types
+	 * @param jsonDataInstance - json encoding of the data instance
+	 * @return
+	 */
+	private static DataInstance createInstance(APEDomainSetup domainSetup, JSONObject jsonDataInstance) {
+		DataInstance dataInstance = new DataInstance();
+		for (String typeSuperClassLabel : jsonDataInstance.keySet()) {
+			String typeSuperClassURI =  APEUtils.createClassURI(typeSuperClassLabel, domainSetup.getOntologyPrefixURI());
+			/* Logical connective that determines the semantics of the list notion, i.e. whether all the types in the list have to be satisfied or at least one of them. */
+			LogicOperation logConn = LogicOperation.AND;
+			SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
+			if(typeSuperClassURI.endsWith("$OR$")) {
+				logConn = LogicOperation.OR;
+			} else if(typeSuperClassURI.endsWith("$AND$")) {
+				logConn = LogicOperation.AND;
+			} 
+			for (String currTypeLabel : APEUtils.getListFromJson(jsonDataInstance, typeSuperClassLabel, String.class)) {
+				String currTypeURI = APEUtils.createClassURI(currTypeLabel, domainSetup.getOntologyPrefixURI());
+				if(typeSuperClassURI.endsWith("$OR$")) {
+					typeSuperClassURI = typeSuperClassURI.replace("$OR$", "");
+				} else if(typeSuperClassURI.endsWith("$AND$")) {
+					typeSuperClassURI = typeSuperClassURI.replace("$AND$", "");
+				}
+				if (domainSetup.getAllTypes().get(currTypeURI) == null) {
+					System.err.println("Data type \"" + currTypeURI.toString()
+							+ "\" used in the tool annotations does not exist in the " + typeSuperClassLabel + " taxonomy. This might influence the validity of the solutions.");
+				}
+				if (domainSetup.getAllTypes().getDataTaxonomyDimensionIDs().contains(typeSuperClassURI)) {
+					Type currType = domainSetup.getAllTypes().addPredicate(new Type(currTypeLabel, currTypeURI, typeSuperClassURI,
+							NodeType.UNKNOWN));
+					if (currType != null) {
+						/* if the type exists, make it relevant from the taxonomy perspective and add it to the outputs */
+						currType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
+						logConnectedPredicates.add(currType);
+					}
+				} else {
+					throw new JSONException(
+							"Error in the tool annotation file. The data subtaxonomy '" + typeSuperClassURI
+									+ "' was not defined, but it was used as annotation for input/output type '" + currTypeURI + "'.");
+				}
+			}
+			/* Create a new type, that represents a disjunction/conjunction of the types, that can be used to abstract over each of the tools individually. */
+			Type newAbsType = (Type) domainSetup.generateAuxiliaryPredicate(logConnectedPredicates, logConn);
+			if(newAbsType != null) {
+				newAbsType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
+				dataInstance.addType(newAbsType);
+			}
+		}
+		return dataInstance;
 	}
 
 	/**
@@ -361,7 +335,7 @@ public class Module extends AbstractModule {
 	 */
 	@Override
 	public String toShortString() {
-		return super.toShortString() + "[T]";
+		return super.toShortString(); //+ "[T]";
 	}
 
 	@Override

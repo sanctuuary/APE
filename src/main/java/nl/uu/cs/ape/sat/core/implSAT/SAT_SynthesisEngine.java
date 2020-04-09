@@ -19,16 +19,12 @@ import org.sat4j.specs.TimeoutException;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.core.SynthesisEngine;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
-import nl.uu.cs.ape.sat.models.AllModules;
-import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
-import nl.uu.cs.ape.sat.models.ConstraintData;
 import nl.uu.cs.ape.sat.models.Type;
-import nl.uu.cs.ape.sat.models.SATEncodingUtils.ModuleUtils;
-import nl.uu.cs.ape.sat.models.SATEncodingUtils.TypeUtils;
+import nl.uu.cs.ape.sat.models.SATEncodingUtils.SATModuleUtils;
+import nl.uu.cs.ape.sat.models.SATEncodingUtils.SATTypeUtils;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
@@ -37,7 +33,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 /**
  * The {@code SAT_SynthesisEngine} class represents a <b>synthesis instance</b>,
  * i.e. it is represented with the set of inputs (tools, types, constraints and
- * workflow lenght that is being explored).<br>
+ * workflow length that is being explored).<br>
  * It is used to execute synthesis algorithm over the given input, implemented
  * using MiniSAT solver. <br>
  * <br>
@@ -89,8 +85,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		this.temp_sat_input = null;
 		this.cnfEncoding = new StringBuilder();
 
-		moduleAutomaton = new ModuleAutomaton(size, config.getMax_no_tool_outputs());
-		typeAutomaton = new TypeAutomaton(size, config.getMax_no_tool_inputs(), config.getMax_no_tool_outputs());
+		moduleAutomaton = new ModuleAutomaton(size, config.getMaxNoToolOutputs());
+		typeAutomaton = new TypeAutomaton(size, config.getMaxNoToolInputs(), config.getMaxNoToolOutputs());
 
 	}
 
@@ -107,51 +103,57 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		TaxonomyPredicate rootModule = domainSetup.getAllModules().getRootPredicate();
 		TaxonomyPredicate rootType = domainSetup.getAllTypes().getRootPredicate();
 
+		if(rootModule == null || rootType == null) {
+			System.err.println("Taxonomies have not been setup properly.");
+			return false;
+		}
 		/*
 		 * Generate the automaton
 		 */
 		String currLengthTimer = "length" + this.getSolutionSize();
-		APEUtils.timerStart(currLengthTimer, config.getDebug_mode());
+		APEUtils.timerStart(currLengthTimer, config.getDebugMode());
 
-		APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton");
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
 		/*
-		 * Create constraints from the module.xml file regarding the Inputs/Outputs
+		 * Create constraints from the module.xml file regarding the Inputs/Outputs, preserving the structure of input and output fields.
 		 */
-		cnfEncoding = cnfEncoding.append(ModuleUtils.modulesConstraints(this));
+		cnfEncoding = cnfEncoding.append(SATModuleUtils.encodeModuleAnnotations(this));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
 		/*
-		 * Create the constraints that provide distinction of data instances.
+		 * The constraints preserve the memory structure (e.g. shared memory structure), i.e. preserve the data available in memory and the
+		 * logic of referencing data from memory in case of tool inputs.
 		 */
-//		cnfEncoding = cnfEncoding.append(domainSetup.getAllTypes().endoceInstances(typeAutomaton));
-
+		cnfEncoding = cnfEncoding.append(SATModuleUtils.encodeMemoryStructure(this));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Memory structure encoding");
+		
 		/*
-		 * Create the constraints enforcing: 1. Mutual exclusion of the tools 2.
-		 * Mandatory usage of the tools - from taxonomy. 3. Adding the constraints
-		 * enforcing the taxonomy structure.
+		 * Create the constraints enforcing: 
+		 * 1. Mutual exclusion of the tools 
+		 * 2. Mandatory usage of the tools - from taxonomy. 
+		 * 3. Adding the constraints enforcing the taxonomy structure.
 		 */
-		cnfEncoding = cnfEncoding.append(ModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(),moduleAutomaton, mappings));
-		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions enfocements");
-		cnfEncoding = cnfEncoding.append(ModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(SATModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(),moduleAutomaton, mappings));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
+		cnfEncoding = cnfEncoding.append(SATModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton, mappings));
 		cnfEncoding = cnfEncoding.append(
-				ModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule.getPredicateID(), moduleAutomaton, mappings));
-		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage enfocements");
+				SATModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton, mappings));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
 		/*
-		 * Create the constraints enforcing: 1. Mutual exclusion of the types/formats 2.
-		 * Mandatory usage of the types in the transition nodes (note: "empty type" is
-		 * considered a type) 3. Adding the constraints enforcing the taxonomy
-		 * structure.
+		 * Create the constraints enforcing: 
+		 * 1. Mutual exclusion of the types/formats 
+		 * 2. Mandatory usage of the types in the transition nodes (note: "empty type" is considered a type) 
+		 * 3. Adding the constraints enforcing the taxonomy structure.
 		 */
-		cnfEncoding = cnfEncoding.append(TypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton, mappings));
-		APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions enfocements");
-		cnfEncoding = cnfEncoding.append(TypeUtils.typeMandatoryUsage(domainSetup.getAllTypes(), rootType, typeAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(SATTypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton, mappings));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
+		cnfEncoding = cnfEncoding.append(SATTypeUtils.typeMandatoryUsage(domainSetup.getAllTypes(), rootType, typeAutomaton, mappings));
 		cnfEncoding = cnfEncoding
-				.append(TypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), rootType.getPredicateID(), typeAutomaton, mappings));
-		APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage enfocements");
+				.append(SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), rootType, typeAutomaton, mappings));
+		APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
 		/*
-		 * Encode the constraints from the file based on the templates (manual
-		 * templates)
+		 * Encode the constraints from the file based on the templates (manual templates)
 		 */
 		if (domainSetup.getUnformattedConstr() != null && !domainSetup.getUnformattedConstr().isEmpty()) {
 			cnfEncoding = cnfEncoding
@@ -163,7 +165,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 * reuse the mappings for states, instead of introducing new ones, using the I/O
 		 * types of NodeType.UNKNOWN.
 		 */
-		String inputDataEncoding = TypeUtils.encodeInputData(domainSetup.getAllTypes(), config.getProgram_inputs(), typeAutomaton, mappings);
+		String inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), config.getProgramInputs(), typeAutomaton, mappings);
 		if (inputDataEncoding == null) {
 			return false;
 		}
@@ -171,30 +173,29 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		/*
 		 * Encode the workflow output
 		 */
-		String outputDataEncoding = TypeUtils.encodeOutputData(domainSetup.getAllTypes(), config.getProgram_outputs(), typeAutomaton, mappings);
+		String outputDataEncoding = SATTypeUtils.encodeOutputData(domainSetup.getAllTypes(), config.getProgram_outputs(), typeAutomaton, mappings);
 		if (outputDataEncoding == null) {
 			return false;
 		}
 		cnfEncoding = cnfEncoding.append(outputDataEncoding);
 
-		cnfEncoding = cnfEncoding.append(domainSetup.getConstraintsForHelperPredicates(mappings, moduleAutomaton, typeAutomaton));
+		/*
+		 * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
+		 */
+		cnfEncoding = cnfEncoding.append(domainSetup.getConstraintsForAuxiliaryPredicates(mappings, moduleAutomaton, typeAutomaton));
 		
 		/*
-		 * Counting the number of variables and clauses that will be given to the SAT
-		 * solver TODO Improve thi-s approach, no need to read the whole String again.
+		 * Counting the number of variables and clauses that will be given to the SAT solver 
+		 * TODO Improve this approach, no need to read the whole String again to cound lines.
 		 */
 		int variables = mappings.getSize();
 		int clauses = APEUtils.countNewLines(cnfEncoding.toString());
 		StringBuilder sat_input_header = new StringBuilder("p cnf " + variables + " " + clauses + "\n");
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
 		System.out.println();
-		/*
-		 * Fixing the input and output files for easier testing.
-		 
-		APEUtils.write2file(sat_input_header + cnfEncoding, temp_sat_input, false);
-		*/
+		
 		StringBuilder mknfEncoding = sat_input_header.append(cnfEncoding);
-
+//		APEUtils.write2file(mknfEncoding.toString(), new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime), false);
 		
 
 		temp_sat_input = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
@@ -202,7 +203,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 //		testing sat input
 //		InputStream tmpSat = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
 //		tmpSat.close();
-//		String encoding = APEUtils.convert2humanReadable(tmpSat, mappings);
+//		String encoding = APEUtils.convertCNF2humanReadable(tmpSat, mappings);
 //		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp"), false);
 
 		long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
@@ -245,15 +246,14 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
 		ISolver solver = SolverFactory.newDefault();
 		int timeout = 3600;
-		// ISolver solver = new ModelIterator(SolverFactory.newDefault(),
-		// no_of_solutions); // iteration through at most
-		// no_of_solutions solutions
-		solver.setTimeout(timeout); // 1 hour timeout
+		// 1 hour timeout
+		solver.setTimeout(timeout); 
 		long realStartTime = 0;
 		long realTimeElapsedMillis;
 		Reader reader = new DimacsReader(solver);
 		try {
-			IProblem problem = reader.parseInstance(sat_input); // loading CNF encoding of the problem
+			// loading CNF encoding of the problem
+			IProblem problem = reader.parseInstance(sat_input); 
 			realStartTime = System.currentTimeMillis();
 			while (solutionsFound < solutionsFoundMax && problem.isSatisfiable()) {
 				SolutionWorkflow sat_solution = new SolutionWorkflow(problem.model(), this);
@@ -261,7 +261,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 				solutionsFound++;
 				if (solutionsFound % 500 == 0) {
 					realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-					System.out.println("Found " + solutionsFound + " solutions. Solving time: "
+					System.out.println("Found in total " + solutionsFound + " solutions. Solving time: "
 							+ (realTimeElapsedMillis / 1000F) + " sec.");
 				}
 				/*
@@ -274,14 +274,13 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		} catch (ParseFormatException e) {
 			System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
 		} catch (ContradictionException e) {
-			System.err.println("Unsatisfiable");
+			if(solutionsFound == 0) {
+				System.err.println("Unsatisfiable");
+			}
 		} catch (TimeoutException e) {
-			System.err.println("Timeout. Solving took longer than default timeout: " + timeout + " seconds.");
+			System.err.println("Timeout. Solving took longer than the default timeout: " + timeout + " seconds.");
 		} catch (IOException e) {
 			System.err.println("Internal error while parsing the encoding.");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		if (solutionsFound == 0 || solutionsFound % 500 != 0) {

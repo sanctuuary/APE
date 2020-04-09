@@ -34,10 +34,10 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  * @author Vedran Kasalica
  *
  */
-public final class ModuleUtils {
+public final class SATModuleUtils {
 
 	/** Private constructor is used to to prevent instantiation. */
-	private ModuleUtils() {
+	private SATModuleUtils() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -47,34 +47,40 @@ public final class ModuleUtils {
 	 * Depending on the parameter pipeline, the INPUT constraints will be based on a
 	 * pipeline or general memory approach.
 	 * 
-	 * @param moduleAutomaton      - represents the module automaton
-	 * @param typeAutomaton        - represent the type automaton
-	 * @param shared_memory        - if false pipeline approach, otherwise the
-	 *                             general memory approach is used
-	 * @param emptyType            - represents absence of types
-	 * @param mappings
-	 * @param useAllWorkflowInputs - true if all the inputs given to the workflow
-	 *                             should be used
-	 * @param useAllGeneratedTypes - true if all the generated types have to be used
-	 * @return {@link String} representation of constraints regarding the required
+	 *  @param synthesisInstance - a specific synthesis run that contains all the information specific for it
+	 * @return {@link String} representation of CNF constraints regarding the required
 	 *         INPUT and OUTPUT types of the modules
 	 */
-	public static String modulesConstraints(SAT_SynthesisEngine synthesisInstance) {
+	public static String encodeModuleAnnotations(SAT_SynthesisEngine synthesisInstance) {
 		StringBuilder constraints = new StringBuilder();
 		constraints = constraints.append(inputCons(synthesisInstance));
-		if (!synthesisInstance.getConfig().getShared_memory()) {
-			/* Case when the using message passing memory system. */
-			constraints = constraints.append(inputMsgPassingCons(synthesisInstance.getDomainSetup().getAllModules(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
-			constraints = constraints.append(enforcingUsageOfGeneratedTypesMsgPassingCons(synthesisInstance));
-		} else {
+		
+		constraints = constraints.append(outputCons(synthesisInstance));
+		return constraints.toString();
+	}
+	
+	/**
+	 * Return a CNF formula that preserves the memory structure that is being used (e.g. 'shared memory'), i.e. ensures that the 
+	 * referenced items are available according to the mem. structure and that the input type and the referenced type from the memory
+	 * represent the same data.
+	 * 
+	 * @param synthesisInstance - a specific synthesis run that contains all the information specific for it
+	 * @return {@link String} representation of CNF constraints regarding the required memory structure implementation
+	 */
+	public static String encodeMemoryStructure(SAT_SynthesisEngine synthesisInstance) {
+		StringBuilder constraints = new StringBuilder();
+		
+		if (synthesisInstance.getConfig().getSharedMemory()) {
 			/* Case when the using shared memory system. */
 			constraints = constraints.append(inputSharedMemCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
 			constraints = constraints.append(enforcingUsageOfGeneratedTypesSharedMemCons(synthesisInstance));
+		} else {
+			/* Case when the using message passing memory system. */
+			constraints = constraints.append(inputMsgPassingCons(synthesisInstance.getDomainSetup().getAllModules(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+			constraints = constraints.append(enforcingUsageOfGeneratedTypesMsgPassingCons(synthesisInstance));
 		}
 
 		constraints = constraints.append(generalReferenceCons(synthesisInstance.getDomainSetup(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
-
-		constraints = constraints.append(outputCons(synthesisInstance));
 		return constraints.toString();
 	}
 	
@@ -95,6 +101,7 @@ public final class ModuleUtils {
 
 		StringBuilder constraints = new StringBuilder();
 		AtomMappings mappings = synthesisInstance.getMappings();
+		/* For each module.. */
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
 			/* ..which is a Tool.. */
 			if ((potentialModule instanceof Module)) {
@@ -161,7 +168,7 @@ public final class ModuleUtils {
 				/* ..for each state in which type can be used .. */
 				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
 					for (State currUsedTypeState : currUsedBlock.getStates()) {
-						if (currType.isSimplePredicate()) {
+						if (!currType.isEmptyPredicate()) {
 							/* ..the referenced memory state cannot be null.. */
 							constraints = constraints.append("-")
 									.append(mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
@@ -291,11 +298,11 @@ public final class ModuleUtils {
 		StringBuilder constraints = new StringBuilder();
 		String usageOfAllTypes = " ", usageOfAllWorkflowInputType = " ";
 		String usageOfOneType = " 0\n", usageOfWorkflowInputType = " 0\n";
-		if (synthesisInstance.getConfig().getUse_workflow_input() == ConfigEnum.ALL) {
+		if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ALL) {
 			usageOfAllWorkflowInputType = " 0\n";
 			usageOfWorkflowInputType = " ";
 		}
-		if (synthesisInstance.getConfig().getUse_all_generated_data()  == ConfigEnum.ALL) {
+		if (synthesisInstance.getConfig().getUseAllGeneratedData()  == ConfigEnum.ALL) {
 			
 			usageOfAllTypes = " 0\n";
 			usageOfOneType = " ";
@@ -310,7 +317,7 @@ public final class ModuleUtils {
 			for (State currMemoryState : currBlock.getStates()) {
 				/* If the memory is provided as input */
 				if (blockNumber == 0) {
-					if(synthesisInstance.getConfig().getUse_workflow_input()  == ConfigEnum.NONE) {
+					if(synthesisInstance.getConfig().getUseWorkflowInput()  == ConfigEnum.NONE) {
 						continue;
 					}
 					constraints = constraints
@@ -322,7 +329,7 @@ public final class ModuleUtils {
 					}
 					constraints = constraints.append(usageOfWorkflowInputType);
 				} else {
-					if(synthesisInstance.getConfig().getUse_all_generated_data()  == ConfigEnum.NONE) {
+					if(synthesisInstance.getConfig().getUseAllGeneratedData()  == ConfigEnum.NONE) {
 						break;
 					}
 					constraints = constraints
@@ -429,7 +436,7 @@ public final class ModuleUtils {
 			/* If the memory is provided as input */
 			if (blockNumber == 0) {
 				/* In case that all workflow inputs need to be used */
-				if (synthesisInstance.getConfig().getUse_workflow_input() == ConfigEnum.ALL) {
+				if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
 						constraints = constraints
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
@@ -442,7 +449,7 @@ public final class ModuleUtils {
 						constraints = constraints.append(" 0\n");
 					}
 					/* In case that at least one workflow input need to be used */
-				} else if (synthesisInstance.getConfig().getUse_workflow_input() == ConfigEnum.ONE) {
+				} else if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ONE) {
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getStateNumber() == 0) {
 							constraints = constraints
@@ -461,7 +468,7 @@ public final class ModuleUtils {
 				/* In case that none of the workflow input has to be used, do nothing. */
 			} else {
 				/* In case that all generated data need to be used. */
-				if (synthesisInstance.getConfig().getUse_all_generated_data() == ConfigEnum.ALL) {
+				if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
 						constraints = constraints
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
@@ -474,7 +481,7 @@ public final class ModuleUtils {
 						constraints = constraints.append(" 0\n");
 					}
 					/* In case that at least one of the generated data instances per tool need to be used. */
-				} else if (synthesisInstance.getConfig().getUse_all_generated_data() == ConfigEnum.ONE) {
+				} else if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ONE) {
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getStateNumber() == 0) {
 							constraints = constraints
@@ -623,13 +630,13 @@ public final class ModuleUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications
 	 */
-	public static String moduleEnforceTaxonomyStructure(AllModules allModules, String rootModuleID, ModuleAutomaton moduleAutomaton,
+	public static String moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule, ModuleAutomaton moduleAutomaton,
 			AtomMappings mappings) {
 
 		StringBuilder constraints = new StringBuilder();
 		for (State moduleState : moduleAutomaton.getModuleStates()) {
 			constraints = constraints.append(
-					moduleEnforceTaxonomyStructureForState(allModules, rootModuleID, mappings, moduleState));
+					moduleEnforceTaxonomyStructureForState(allModules, currModule, mappings, moduleState));
 		}
 		return constraints.toString();
 	}
@@ -639,9 +646,8 @@ public final class ModuleUtils {
 	 * {@link #moduleEnforceTaxonomyStructure(String, ModuleAutomaton, AtomMappings)
 	 * moduleEnforceTaxonomyStructure}.
 	 */
-	private static String moduleEnforceTaxonomyStructureForState(AllModules allModules, String rootModuleID,
+	private static String moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule,
 			AtomMappings mappings, State moduleState) {
-		AbstractModule currModule = allModules.get(rootModuleID);
 		String superModule_state = mappings.add(currModule, moduleState, WorkflowElement.MODULE).toString();
 
 		StringBuilder constraints = new StringBuilder();
@@ -652,15 +658,14 @@ public final class ModuleUtils {
 			/*
 			 * Ensuring the TOP-DOWN taxonomy tree dependency
 			 */
-			for (String subModuleID : APEUtils.safe(currModule.getSubPredicates())) {
-				AbstractModule subModule = allModules.get(subModuleID);
+			for (TaxonomyPredicate subModule : APEUtils.safe(currModule.getSubPredicates())) {
 				if(subModule == null) {
 					System.out.println("Null error: " + currModule.getPredicateID() + " ->" + currModule.getSubPredicates().toString());
 				}
 				String subModule_State = mappings.add(subModule, moduleState, WorkflowElement.MODULE).toString();
 				currConstraint = currConstraint.append(subModule_State).append(" ");
 				subModules_States.add(subModule_State);
-				constraints = constraints.append(moduleEnforceTaxonomyStructureForState(allModules, subModuleID, mappings, moduleState));
+				constraints = constraints.append(moduleEnforceTaxonomyStructureForState(allModules, subModule, mappings, moduleState));
 			}
 			currConstraint = currConstraint.append("0\n");
 			/*
@@ -696,28 +701,4 @@ public final class ModuleUtils {
 		return pairs;
 	}
 
-	/**
-	 * Method creates a new abstract module based on the list of modules. The list of modules is connected using the provided logical operator.
-	 * The type is added to the list of module, but no constraints regarding the new predicate were defined.<br>
-	 * @param relatedModules - list of modules that are logically related to the new abstract module
-	 * @param allModules - list of all the modules
-	 * @param logicOp - logical operation that is used to group the types (e.g. {@link LogicOperation.OR})
-	 * @return a new abstract module
-	 */
-	public static TaxonomyPredicate generateAbstractmodule(List<TaxonomyPredicate> relatedModules, AllModules allModules, LogicOperation logicOp) {
-		if(relatedModules.isEmpty()) {
-			return null;
-		}
-		if(relatedModules.size() == 1) {
-			return relatedModules.get(0);
-		}
-		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
-		for(TaxonomyPredicate label : relatedModules) {
-			abstractLabel = abstractLabel.append(label.getPredicateID());
-		}
-		
-		TaxonomyPredicate newAbsModule = allModules.addPredicate(new AbstractModule(abstractLabel.toString(), abstractLabel.toString(), relatedModules.get(0).getRootNode(), NodeType.ABSTRACT));
-		return newAbsModule;
-	}
-	
 }
