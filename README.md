@@ -2,10 +2,6 @@
 
 # APE (Automated Pipeline Explorer)
 
-Demo: http://ape.science.uu.nl/
-
-Demo (docker): https://github.com/sanctuuary/Burke_Docker
-
 APE is a command line tool and API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools. 
 
 APE relies on a semantic domain model that includes tool and type taxonomies as controlled vocabularies for the description of computational tools, and functional tool annotations (inputs, outputs, operations performed) using terms from these taxonomies. Based on this domain model and a specification of the available workflow inputs, the intended workflow outputs and possibly additional constraints, APE then computes possible workflows. 
@@ -38,6 +34,9 @@ For more details check a [simple demo](https://github.com/sanctuuary/APE_UseCase
 Like the CLI, the APE API relies on a configuration file that references the domain ontology, tool annotations, workflow specification and execution parameters. However, the API allows to edit this file programmatically, and thus for instance add constraints or change execution parameters dynamically.
 
 ## Demo 
+A web browser demonstrator (beta) of can be found at: http://ape.science.uu.nl/
+Docker version of the demonstrator is available at: https://github.com/sanctuuary/Burke_Docker
+
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS). Multiple predefined scenarios of scientific workflow synthesis can be found at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
 ## How to build APE from source
@@ -57,7 +56,7 @@ We thank our brave first-generation users for their patience and constructive fe
 ## License
 APE is licensed under the Apache 2.0 license.
 
-#### Dependencies
+#### Maven dependencies
 
 1. **OWL API**	-	LGPL or Apache 2.0
 2. **SAT4J**	-	EPL or GNu LGPL
