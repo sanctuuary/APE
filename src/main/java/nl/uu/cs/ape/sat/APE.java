@@ -264,7 +264,7 @@ public class APE {
 		StringBuilder solutions2write = new StringBuilder();
 
 		for (int i = 0; i < allSolutions.size(); i++) {
-			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getSolution())
+			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getRelevantSolution())
 					.append("\n");
 		}
 		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolutionPath()), false);
