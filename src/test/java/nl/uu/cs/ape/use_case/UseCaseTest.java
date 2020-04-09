@@ -8,7 +8,7 @@ class UseCaseTest {
 
 	@Test
 	void test() {
-		fail(">>> This test should fail <<<");
+		System.out.println("First unit test!");
 	}
 
 }
