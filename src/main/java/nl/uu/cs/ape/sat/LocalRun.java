@@ -16,8 +16,8 @@ public class LocalRun {
 
 	public static void main(String[] args) {
 
-		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/New Use Cases/";
-		String subPath = "MassPectometry/No1/";
+		String path = "/home/vedran/git/QuAnGIS/WorkflowSynthesis/";
+		String subPath = "test/";
 		String fileName = "ape.configuration";
 		if (!APEUtils.isValidReadFile(path + subPath + fileName)) {
 			System.err.println("Bad path.");
@@ -40,10 +40,10 @@ public class LocalRun {
 		try {
 			apeFramework = new APE(file.getAbsolutePath());
 		} catch (JSONException e) {
-			System.err.println("Error in parsing the configuration file.");
+			System.err.println(e.getMessage());
 			return;
 		} catch (IOException e) {
-			System.err.println("Error in reading the configuration file.");
+			System.err.println(e.getMessage());
 			return;
 		}
 		SATsolutionsList solutions;

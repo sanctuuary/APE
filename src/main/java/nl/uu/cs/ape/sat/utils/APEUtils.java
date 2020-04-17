@@ -203,7 +203,7 @@ public final class APEUtils {
 	 * @return the list of all annotated Modules in the process (possibly empty
 	 *         list)
 	 */
-	public static List<Module> readModuleJson(String file, APEDomainSetup domainSetup) {
+	public static boolean readModuleJson(String file, APEDomainSetup domainSetup) {
 		List<Module> modulesNew = new ArrayList<Module>();
 		int currModule = 0;
 		for (JSONObject jsonModule : safe(getListFromJson(file, TOOLS_JSOM_TAG))) {
@@ -219,7 +219,11 @@ public final class APEUtils {
 				continue;
 			}
 		}
-		return modulesNew;
+		if(currModule == 0) {
+			System.err.println("No tools were anntoated.");
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -300,15 +304,16 @@ public final class APEUtils {
 	public static List<JSONObject> getListFromJson(String jsonPath, String key) {
 		try {
 			String content = FileUtils.readFileToString(new File(jsonPath), "utf-8");
-			// Convert JSON string to JSONObject
 			JSONObject jsonObject = new JSONObject(content);
-
 			List<JSONObject> jsonArray = getListFromJson(jsonObject, key, JSONObject.class);
 
 			return jsonArray;
 
-		} catch (Exception e1) {
+		} catch (JSONException e1) {
 			System.err.println("Error parsing the Json file: " + jsonPath);
+			return null;
+		} catch (IOException e) {
+			System.err.println("Error reading the Json file: " + jsonPath);
 			return null;
 		}
 	}

@@ -130,7 +130,7 @@ public class APE {
 		/*
 		 * Update allModules and allTypes sets based on the module.json file
 		 */
-		APEUtils.readModuleJson(config.getToolAnnotationsPath(), apeDomainSetup);
+		succRun &= APEUtils.readModuleJson(config.getToolAnnotationsPath(), apeDomainSetup);
 		
 		succRun &= apeDomainSetup.trimTaxonomy();
 		
@@ -264,7 +264,7 @@ public class APE {
 		StringBuilder solutions2write = new StringBuilder();
 
 		for (int i = 0; i < allSolutions.size(); i++) {
-			solutions2write = solutions2write.append(allSolutions.get(i).getnativeSATsolution().getRelevantSolution())
+			solutions2write = solutions2write.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution())
 					.append("\n");
 		}
 		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolutionPath()), false);
@@ -297,7 +297,7 @@ public class APE {
 					new BufferedWriter(new FileWriter(executionsFolder + "/workflowSolution_" + i + ".sh", false)));
 			out.println("");
 			out.close();
-			SAT_solution currSol = allSolutions.get(i).getnativeSATsolution();
+			SAT_solution currSol = allSolutions.get(i).getNativeSATsolution();
 			currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules());
 			for (Module curr : currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules())) {
 				if (curr.getModuleExecution() != null) {

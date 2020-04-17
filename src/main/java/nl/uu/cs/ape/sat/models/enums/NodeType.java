@@ -8,7 +8,7 @@ package nl.uu.cs.ape.sat.models.enums;
  * <br>
  * {@code ROOT, SUBROOT, ABSTRACT, LEAF, INSTANCE, EMPTY}
  */
-public enum NodeType{
+public enum NodeType {
 	
 	/**
 	 * Root node of the (tool or data) taxonomy.
