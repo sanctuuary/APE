@@ -125,12 +125,23 @@ public class Literal implements Comparable<Literal>{
 		return atom.getPredicate();
 	}
 	
+	
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
-		return atom.hashCode() + atom.getUsedInStateArgument().hashCode() + negated.hashCode();
+		final int prime = 31;
+		int result = atom.hashCode();
+		result = prime * result + ((negated == null) ? 0 : negated.hashCode());
+		return result;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -140,10 +151,15 @@ public class Literal implements Comparable<Literal>{
 		if (getClass() != obj.getClass())
 			return false;
 		Literal other = (Literal) obj;
-		
-		return this.getPredicate().equals(other.getPredicate()) && this.getUsedInStateArgument().equals(other.getUsedInStateArgument());
+		if (negated == null) {
+			if (other.negated != null)
+				return false;
+		} else if (!negated.equals(other.negated))
+			return false;
+		return atom.equals(other.atom);
 	}
-	
+
+
 	/**
 	 *	Compare the two Literals according to the state they are used in. Returns a negative integer, zero, or a positive integer as this Literal's state comes before than, is equal to, or comes after than the @otherLiteral's state.
 	 * 

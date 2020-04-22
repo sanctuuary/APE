@@ -37,12 +37,22 @@ public class State implements PredicateLabel {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
-		return stateName.hashCode() + absoluteStateNumber;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + absoluteStateNumber;
+		result = prime * result + ((stateName == null) ? 0 : stateName.hashCode());
+		return result;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -52,7 +62,14 @@ public class State implements PredicateLabel {
 		if (getClass() != obj.getClass())
 			return false;
 		State other = (State) obj;
-		return this.stateName.equals(other.getPredicateID()) && (this.absoluteStateNumber == other.absoluteStateNumber);
+		if (absoluteStateNumber != other.absoluteStateNumber)
+			return false;
+		if (stateName == null) {
+			if (other.stateName != null)
+				return false;
+		} else if (!stateName.equals(other.stateName))
+			return false;
+		return true;
 	}
 
 

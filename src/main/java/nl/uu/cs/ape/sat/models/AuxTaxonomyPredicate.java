@@ -88,20 +88,43 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
 
 
 	/* (non-Javadoc)
-	 * @see nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate#hashCode()
+	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
-		return taxonomyPredicate.hashCode();
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((containingPredicates == null) ? 0 : containingPredicates.hashCode());
+		result = prime * result + ((logicOp == null) ? 0 : logicOp.hashCode());
+		result = prime * result + ((taxonomyPredicate == null) ? 0 : taxonomyPredicate.hashCode());
+		return result;
 	}
 
-
 	/* (non-Javadoc)
-	 * @see nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate#equals(java.lang.Object)
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		return taxonomyPredicate.equals(obj);
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AuxTaxonomyPredicate other = (AuxTaxonomyPredicate) obj;
+		if (containingPredicates == null) {
+			if (other.containingPredicates != null)
+				return false;
+		} else if (!containingPredicates.equals(other.containingPredicates))
+			return false;
+		if (logicOp != other.logicOp)
+			return false;
+		if (taxonomyPredicate == null) {
+			if (other.taxonomyPredicate != null)
+				return false;
+		} else if (!taxonomyPredicate.equals(other.taxonomyPredicate))
+			return false;
+		return true;
 	}
 
 

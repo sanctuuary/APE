@@ -91,21 +91,46 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 
 	}
 
+	
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
-		return this.getPredicateID().hashCode() * 11;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((getPredicateID() == null) ? 0 : getPredicateID().hashCode());
+		result = prime * result + ((rootNode == null) ? 0 : rootNode.hashCode());
+		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
+		if (obj == null)
+			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		TaxonomyPredicate other = (TaxonomyPredicate) obj;
-		return this.getPredicateID().equals(other.getPredicateID());
+		if (getPredicateID() == null) {
+			if (other.getPredicateID() != null)
+				return false;
+		} else if (getPredicateID().equals(other.getPredicateID())) {
+			return false;
+		}
+		if (rootNode == null) {
+			if (other.rootNode != null)
+				return false;
+		} else if (!rootNode.equals(other.rootNode))
+			return false;
+		return true;
 	}
-	
+
 	public int compareTo(PredicateLabel other) {
 		if(!(other instanceof TaxonomyPredicate)) {
 			return this.getPredicateID().compareTo(other.getPredicateID());

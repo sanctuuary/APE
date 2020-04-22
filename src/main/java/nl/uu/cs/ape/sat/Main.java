@@ -29,12 +29,15 @@ public class Main {
 		try {
 			apeFramework = new APE(path);
 		} catch (JSONException e) {
-			System.err.println("Error in parsing the configuration file.");
+			System.err.println(e.getMessage());
 			return;
 		} catch (IOException e) {
-			System.err.println("Error in reading the configuration file.");
+			System.err.println(e.getMessage());
 			return;
+		} catch (ExceptionInInitializerError e) {
+			System.err.println(e.getMessage());
 		}
+		
 		SATsolutionsList solutions;
 		try {
 			solutions = apeFramework.runSynthesis(path);
