@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.uu.cs.ape.sat.models.AllPredicates;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -92,10 +93,19 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 	}
 
 	@Override
-	public abstract int hashCode();
+	public int hashCode() {
+		return this.getPredicateID().hashCode() * 11;
+	}
 
 	@Override
-	public abstract boolean equals(Object obj);
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (getClass() != obj.getClass())
+			return false;
+		TaxonomyPredicate other = (TaxonomyPredicate) obj;
+		return this.getPredicateID().equals(other.getPredicateID());
+	}
 
 	/**
 	 * Get root of the Ontology tree that this node belongs to. Used to distinguish
@@ -340,22 +350,6 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 		}
 	}
 
-//	/**
-//	 * Adds a super-predicate to the current one, if it was not added present
-//	 * already.
-//	 * 
-//	 * @param predicateID - ID of the predicate that will be added as a superclass
-//	 *@return {@code true} if super-predicate was added, false otherwise.
-//	 */
-//	public boolean addSuperPredicate(String predicateID) {
-//		if (nodeType != NodeType.ROOT) {
-//			return superPredicates.add(predicateID);
-//		} else {
-//			System.err.println("Cannot add super-predicate to a root taxonomy term!");
-//			return false;
-//		}
-//	}
-
 	/**
 	 * Returns the list of the predicates that contain the current predicate.
 	 * 
@@ -441,7 +435,12 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 
 	@Override
 	public int compareTo(TaxonomyPredicate otherPredicate) {
-		return this.getPredicateID().compareTo(otherPredicate.getPredicateID());
+		int diff = 0;
+		if((diff = this.getRootNode().compareTo(otherPredicate.getRootNode())) != 0) {
+			return diff;
+		} else {
+			return this.getPredicateID().compareTo(otherPredicate.getPredicateID());
+		}
 	}
 
 }

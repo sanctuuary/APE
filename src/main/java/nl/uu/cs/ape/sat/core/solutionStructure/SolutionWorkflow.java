@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
@@ -43,9 +45,9 @@ public class SolutionWorkflow {
 	/** List of module nodes ordered according to their position in the workflow. */
 	private List<ModuleNode> moduleNodes;
 	/** List of memory type nodes provided as the initial workflow input, ordered according the initial description (ape.config file). */
-	private Set<TypeNode> workflowInputTypeStates;
+	private List<TypeNode> workflowInputTypeStates;
 	/** List of used type nodes provided as the final workflow output, ordered according the initial description (ape.config file). */
-	private Set<TypeNode> workflowOutputTypeStates;
+	private List<TypeNode> workflowOutputTypeStates;
 	/** Map of all {@code ModuleNodes}, where key value is the {@link State} provided by the {@link ModuleAutomaton}. */
 	private Map<State, ModuleNode> allModuleNodes;
 	/** Map of all {@code MemTypeNode}, where key value is the {@link State} provided by the {@link TypeAutomaton}. */
@@ -74,8 +76,8 @@ public class SolutionWorkflow {
 	 */
 	public SolutionWorkflow(ModuleAutomaton toolAutomaton, TypeAutomaton typeAutomaton) throws ExceptionInInitializerError {
 		this.moduleNodes = new ArrayList<ModuleNode>();
-		this.workflowInputTypeStates = new HashSet<TypeNode>();
-		this.workflowOutputTypeStates = new HashSet<TypeNode>();
+		this.workflowInputTypeStates = new ArrayList<TypeNode>();
+		this.workflowOutputTypeStates = new ArrayList<TypeNode>();
 		this.allModuleNodes = new HashMap<State, ModuleNode>();
 		this.allMemoryTypeNodes = new HashMap<State, TypeNode>();
 		this.usedType2ToolMap = new HashMap<State, ModuleNode>();
@@ -134,7 +136,6 @@ public class SolutionWorkflow {
 		for (int mappedLiteral : satSolution) {
 			if (mappedLiteral > synthesisIntance.getMappings().getMaxNumOfMappedAuxVar()) {
 				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisIntance.getMappings());
-//				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
 					if (currLiteral.isWorkflowElementType(WorkflowElement.MODULE)) {
 						ModuleNode currNode = this.allModuleNodes.get(currLiteral.getUsedInStateArgument());
@@ -149,6 +150,8 @@ public class SolutionWorkflow {
 							currNode.addUsedType((Type) currLiteral.getPredicate());
 						} else if (currLiteral.getPredicate() instanceof Type){
 							currNode.addAbstractDescriptionOfUsedType((Type) currLiteral.getPredicate());
+						} else {
+							/* Memory type cannot be anything else except a Type. */
 						}
 					} else if (currLiteral.isWorkflowElementType(WorkflowElement.USED_TYPE)
 							&& ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
@@ -158,10 +161,12 @@ public class SolutionWorkflow {
 						/* Add all positive literals that describe memory type references that are not pointing to null state (NULL state has AbsoluteStateNumber == -1), i.e. that are valid. */
 						ModuleNode usedTypeNode = this.usedType2ToolMap.get(currLiteral.getUsedInStateArgument());
 						TypeNode memoryTypeNode = this.allMemoryTypeNodes.get(currLiteral.getPredicate());
+						int inputIndex = currLiteral.getUsedInStateArgument().getStateNumber();
+						/** Keep the order of inputs as they were defined in the solution file. */
 						if(usedTypeNode != null) {
-							usedTypeNode.addInputType(memoryTypeNode);
+							usedTypeNode.setInputType(inputIndex, memoryTypeNode);
 						} else {
-							this.workflowOutputTypeStates.add(memoryTypeNode);
+							APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
 						}
 						memoryTypeNode.addUsedByTool(usedTypeNode);
 					} 
@@ -186,7 +191,7 @@ public class SolutionWorkflow {
 	 * Method returns the set of initial data types that are given as an input to the workflow.
 	 * @return List of {@link TypeNode} objects, where each node describes a specific data instance.
 	 */
-	public Set<TypeNode> getWorkflowInputTypeStates() {
+	public List<TypeNode> getWorkflowInputTypeStates() {
 		return this.workflowInputTypeStates;
 	}
 
@@ -194,7 +199,7 @@ public class SolutionWorkflow {
 	 * Method returns the set of final data types that are given as an output of the workflow.
 	 * @return List of {@link TypeNode} objects, where each node describes a specific data instance.
 	 */
-	public Set<TypeNode> getWorkflowOutputTypeStates() {
+	public List<TypeNode> getWorkflowOutputTypeStates() {
 		return this.workflowOutputTypeStates;
 	}
 	
@@ -384,40 +389,40 @@ public class SolutionWorkflow {
 		String output = "Workflow OUTPUT" + "     ";
 		boolean inputDefined = false, outputDefined = false;
 		int index = 0;
+		int workflowInNo = 1;
 		for(TypeNode workflowInput : this.workflowInputTypeStates) {
-			index++;
 			if(!inputDefined) {
 				workflowGraph = workflowGraph.with(node(input).with(Color.RED, Shape.RECTANGLE, Style.BOLD));
 				inputDefined = true;
 			}
 			workflowGraph = workflowInput.addTypeToGraph(workflowGraph);
-			workflowGraph = workflowGraph.with(node(input).link(to(node(workflowInput.getDotID())).with(LinkAttr.weight(index), Style.DOTTED)));
+			workflowGraph = workflowGraph.with(node(input).link(to(node(workflowInput.getDotID())).with(Label.of((workflowInNo++) + "  "),LinkAttr.weight(index++), Style.DOTTED)));
 		}
 		
 		for(ModuleNode currTool : this.moduleNodes) {
 			workflowGraph = currTool.addModuleToGraph(workflowGraph);
+			int inputNo = 1;
 			for(TypeNode toolInput : currTool.getInputTypes()) {
 				if(!toolInput.isEmpty()) {
-					index++;
-					workflowGraph = workflowGraph.with(node(toolInput.getDotID()).link(to(node(currTool.getDotID())).with(Label.of("in   "), Color.ORANGE, LinkAttr.weight(index))));
+					workflowGraph = workflowGraph.with(node(toolInput.getDotID()).link(to(node(currTool.getDotID())).with(Label.of("in " + (inputNo++) + "  "), Color.ORANGE, LinkAttr.weight(index++))));
 				}
 			}
+			int outputNo = 1;
 			for(TypeNode toolOutput : currTool.getOutputTypes()) {
 				if(!toolOutput.isEmpty()) {
-					index++;
 					workflowGraph = toolOutput.addTypeToGraph(workflowGraph);
-					workflowGraph = workflowGraph.with(node(currTool.getDotID()).link(to(node(toolOutput.getDotID())).with(Label.of("out   "), Color.BLACK, LinkAttr.weight(index))));
+					workflowGraph = workflowGraph.with(node(currTool.getDotID()).link(to(node(toolOutput.getDotID())).with(Label.of("out " + (outputNo++) + "  "), Color.BLACK, LinkAttr.weight(index++))));
 				}
 			}
 		}
+		int workflowOutNo = 1;
 		for(TypeNode workflowOutput : this.workflowOutputTypeStates) {
-			index++;
 			if(!outputDefined) {
 				workflowGraph = workflowGraph.with(node(output).with(Color.RED, Shape.RECTANGLE, Style.BOLD));
 				outputDefined = true;
 			}
 			workflowGraph = workflowOutput.addTypeToGraph(workflowGraph);
-			workflowGraph = workflowGraph.with(node(workflowOutput.getDotID()).link(to(node(output)).with(LinkAttr.weight(index), Style.DOTTED)));
+			workflowGraph = workflowGraph.with(node(workflowOutput.getDotID()).link(to(node(output)).with(Label.of((workflowOutNo++) + "  "), LinkAttr.weight(index++), Style.DOTTED)));
 		}
 		this.dataflowGraph = new SolutionGraph(workflowGraph);
 		return this.dataflowGraph;

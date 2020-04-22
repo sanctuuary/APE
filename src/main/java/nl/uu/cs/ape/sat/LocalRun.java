@@ -3,21 +3,19 @@ package nl.uu.cs.ape.sat;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import org.json.JSONException;
 
 import guru.nidi.graphviz.attribute.RankDir;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
-import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 public class LocalRun {
 
 	public static void main(String[] args) {
 
-		String path = "/home/vedran/git/QuAnGIS/WorkflowSynthesis/";
-		String subPath = "test/";
+		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/New Use Cases/";
+		String subPath = "MassPectometry/No1/";
 		String fileName = "ape.configuration";
 		if (!APEUtils.isValidReadFile(path + subPath + fileName)) {
 			System.err.println("Bad path.");

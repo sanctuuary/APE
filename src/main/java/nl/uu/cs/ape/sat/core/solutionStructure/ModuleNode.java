@@ -2,8 +2,12 @@ package nl.uu.cs.ape.sat.core.solutionStructure;
 
 import static guru.nidi.graphviz.model.Factory.node;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
@@ -15,6 +19,7 @@ import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 /**
  * The {@code ModuleNode} class is used to represent module step in the actual
@@ -26,7 +31,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  * @author Vedran Kasalica
  *
  */
-public class ModuleNode extends SolutionWorkflowNode {
+public class ModuleNode extends SolutionWorkflowNode implements Comparable<ModuleNode>{
 
 	/** Tool that is used in the workflow step. */
 	private Module usedModule;
@@ -37,9 +42,9 @@ public class ModuleNode extends SolutionWorkflowNode {
 	/** Previous module step in the workflow. */
 	private ModuleNode prevModuleNode;
 	/** List of the data instances that are used as input for the tool. */
-	private Set<TypeNode> inputTypes;
+	private List<TypeNode> inputTypes;
 	/** List of the data instances that are generated as output of the tool. */
-	private Set<TypeNode> outputTypes;
+	private List<TypeNode> outputTypes;
 
 	/**
 	 * Creating Workflow Node that corresponds to a tool usage.
@@ -60,8 +65,8 @@ public class ModuleNode extends SolutionWorkflowNode {
 			throw new ExceptionInInitializerError(
 					"Class ModuleNode can only be instantiated using State that is of type WorkflowElement.MODULE, as a parameter.");
 		}
-		inputTypes = new HashSet<TypeNode>();
-		outputTypes = new HashSet<TypeNode>();
+		inputTypes = new ArrayList<TypeNode>();
+		outputTypes = new ArrayList<TypeNode>();
 	}
 
 	/**
@@ -89,6 +94,12 @@ public class ModuleNode extends SolutionWorkflowNode {
 
 	public void addInputType(TypeNode inputTypeNode) {
 		inputTypes.add(inputTypeNode);
+	}
+	
+	/** Set an input type in a specific input slot. */
+	public void setInputType(int inputIndex, TypeNode memoryTypeNode) {
+		APEUtils.safeSet(this.inputTypes, inputIndex, memoryTypeNode);
+		
 	}
 
 	public void addOutputType(TypeNode outputTypeNode) {
@@ -130,11 +141,11 @@ public class ModuleNode extends SolutionWorkflowNode {
 		return prevModuleNode;
 	}
 
-	public Set<TypeNode> getInputTypes() {
+	public List<TypeNode> getInputTypes() {
 		return inputTypes;
 	}
 
-	public Set<TypeNode> getOutputTypes() {
+	public List<TypeNode> getOutputTypes() {
 		return outputTypes;
 	}
 
@@ -188,6 +199,15 @@ public class ModuleNode extends SolutionWorkflowNode {
 		printString = printString.append(this.usedModule.getPredicateLabel());
 
 		return printString.toString();
+	}
+
+	/**
+	 * Compares the two ModuleNodes based on their order in the solution. {@link State} is used to evaluate the absolute position of the node in the workflow.
+	 * @return a negative integer, zero, or a positive integer as this object is before than, equal to, or after than the specified ModuleNode.
+	 */
+	@Override
+	public int compareTo(ModuleNode otherModuleNode) {
+		return this.getAutomatonState().compareTo(otherModuleNode.getAutomatonState());
 	}
 
 }

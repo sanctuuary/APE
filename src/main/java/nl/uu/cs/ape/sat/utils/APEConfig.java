@@ -122,7 +122,7 @@ public class APEConfig {
 	/** Input types of the workflow. */
 	private List<DataInstance> programInputs;
 	/** Output types of the workflow. */
-	private List<DataInstance> program_outputs;
+	private List<DataInstance> programOutputs;
 
 	/**
 	 * Determines the required usage for the data instances that are given as
@@ -161,7 +161,7 @@ public class APEConfig {
 		
 		dataTaxonomySubroots = new ArrayList<String>();
 		programInputs = new ArrayList<DataInstance>(); 
-		program_outputs = new ArrayList<DataInstance>();
+		programOutputs = new ArrayList<DataInstance>();
 		
 		File file = new File(congifPath);
 
@@ -186,7 +186,7 @@ public class APEConfig {
 		
 		dataTaxonomySubroots = new ArrayList<String>();
 		programInputs = new ArrayList<DataInstance>(); 
-		program_outputs = new ArrayList<DataInstance>();
+		programOutputs = new ArrayList<DataInstance>();
 		
 		// Convert JSON string to JSONObject
 		coreConfiguration = configObject;
@@ -429,18 +429,18 @@ public class APEConfig {
 			programInputs.clear();
 		}
 
-		program_outputs.clear();
+		programOutputs.clear();
 		try {
 			for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(runConfiguration, PROGRAM_OUTPUTS_TAG, JSONObject.class)) {
 				DataInstance output;
 				if((output = getDataInstance(jsonModuleOutput)) != null) {
-					program_outputs.add(output);
+					programOutputs.add(output);
 				}
 			}
 		} catch (JSONException JSONException) {
 			System.out.println("Tag '" + PROGRAM_OUTPUTS_TAG
 					+ "' is not provided in the configuration file. Program will have no outputs.");
-			program_outputs.clear();
+			programOutputs.clear();
 		}
 
 		try {
@@ -643,10 +643,10 @@ public class APEConfig {
 	}
 
 	/**
-	 * @return the {@link #program_outputs}
+	 * @return the {@link #programOutputs}
 	 */
 	public List<DataInstance> getProgram_outputs() {
-		return program_outputs;
+		return programOutputs;
 	}
 
 	/**

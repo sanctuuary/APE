@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.uu.cs.ape.sat;
+package nl.uu.cs.ape.sat.core.solutionStructure;
 
 /**
  * The {@code CWLCreator} class is used to 

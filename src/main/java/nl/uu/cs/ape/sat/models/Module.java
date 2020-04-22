@@ -79,14 +79,6 @@ public class Module extends AbstractModule {
 		this.moduleExecution = module.getModuleExecution();
 	}
 
-	public int hashCode() {
-		return super.hashCode();
-	}
-
-	public boolean equals(Object obj) {
-		return super.equals(obj);
-	}
-
 	/**
 	 * Returns the list (possibly empty) of required input types for the module.
 	 * Returns null in the case of abstract classes, as they do not have input

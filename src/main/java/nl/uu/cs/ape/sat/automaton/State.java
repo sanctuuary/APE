@@ -11,7 +11,7 @@ import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
  * @author Vedran Kasalica
  *
  */
-public class State implements PredicateLabel {
+public class State implements PredicateLabel, Comparable<State> {
 	
 
 
@@ -112,6 +112,16 @@ public class State implements PredicateLabel {
 		}
 		
 		return absOrderNumber;
+	}
+
+
+	/** 
+	 * Compares the two States based on their order in the solution. 
+	 * @return a negative integer, zero, or a positive integer as this object is before than, equal to, or after than the specified State.
+	 */
+	@Override
+	public int compareTo(State otherState) {
+		return this.absoluteStateNumber - otherState.absoluteStateNumber;
 	}
 
 

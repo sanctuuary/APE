@@ -4,6 +4,8 @@ import static guru.nidi.graphviz.model.Factory.node;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
@@ -24,12 +26,12 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  * @author Vedran Kasalica
  *
  */
-public class TypeNode extends SolutionWorkflowNode {
+public class TypeNode extends SolutionWorkflowNode implements Comparable<TypeNode> {
 
-	/** DataInstance that define the data instance. The set cannot contain {@code EmptyType}. */
-	private Set<Type> usedTypes;
-	/** Abstract DataInstance that describe the data instance. */
-	private Set<Type> abstractTypes;
+	/** Types that define the data instance. The set cannot contain {@code EmptyType}. */
+	private SortedSet<Type> usedTypes;
+	/** Abstract Types that describe the data instance. */
+	private SortedSet<Type> abstractTypes;
 	/**
 	 * Module/step in the workflow that generates the data instance as input. If
 	 * {@code null} data instance corresponds to the initial workflow input.
@@ -39,7 +41,7 @@ public class TypeNode extends SolutionWorkflowNode {
 	 * Modules/steps in the workflow that use this data instance as input.
 	 * {@code NULL} represents workflow output.
 	 */
-	private Set<ModuleNode> usedByModules;
+	private SortedSet<ModuleNode> usedByModules;
 
 	/**
 	 * Creating Workflow Node that corresponds to a type instance in memory.
@@ -48,10 +50,10 @@ public class TypeNode extends SolutionWorkflowNode {
 	 */
 	public TypeNode(State automatonState) throws ExceptionInInitializerError {
 		super(automatonState);
-		this.usedTypes = new HashSet<Type>();
-		this.abstractTypes = new HashSet<Type>();
+		this.usedTypes = new TreeSet<Type>();
+		this.abstractTypes = new TreeSet<Type>();
 		this.createdByModule = null;
-		usedByModules = new HashSet<ModuleNode>();
+		usedByModules = new TreeSet<ModuleNode>();
 		if (automatonState.getWorkflowStateType() != WorkflowElement.MEMORY_TYPE) {
 			throw new ExceptionInInitializerError(
 					"Class MemTypeNode can only be instantiated using State that is of type WorkflowElement.MEMORY_TYPE, as a parameter.");
@@ -93,7 +95,9 @@ public class TypeNode extends SolutionWorkflowNode {
 	 *                   instance as input
 	 */
 	public void addUsedByTool(ModuleNode usedByTool) {
-		usedByModules.add(usedByTool);
+		if(usedByTool != null) {
+			usedByModules.add(usedByTool);
+		}
 	}
 
 	/** Set the tool/workflow step that creates this data instance. */
@@ -222,5 +226,14 @@ public class TypeNode extends SolutionWorkflowNode {
 		printString = printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
 
 		return printString.toString();
+	}
+
+	/**
+	 * Compares the two TypeNodes based on their order in the solution. {@link State} is used to evaluate the absolute position of the node in the workflow.
+	 * @return a negative integer, zero, or a positive integer as this object is before than, equal to, or after than the specified TypeNode.
+	 */
+	@Override
+	public int compareTo(TypeNode otherTypeNode) {
+		return this.getAutomatonState().compareTo(otherTypeNode.getAutomatonState());
 	}
 }

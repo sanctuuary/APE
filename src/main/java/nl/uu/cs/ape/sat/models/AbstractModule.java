@@ -50,21 +50,6 @@ public class AbstractModule extends TaxonomyPredicate {
 	}
 
 	@Override
-	public int hashCode() {
-		return moduleID.hashCode() * 11;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (getClass() != obj.getClass())
-			return false;
-		AbstractModule other = (AbstractModule) obj;
-		return this.moduleID.equals(other.getPredicateID());
-	}
-
-	@Override
 	public String getPredicateID() {
 		return moduleID;
 	}

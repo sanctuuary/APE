@@ -32,6 +32,7 @@ import org.json.JSONObject;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.core.solutionStructure.TypeNode;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Module;
@@ -499,6 +500,32 @@ public final class APEUtils {
 			return currList.get(index);
 		}
 	}
+	
+	/**
+	 * Functions sets an element into the list at a specific place, if the element already exists, it overrides it. 
+	 * If the element is out of bound it creates null elements to fit the given size of the array and then adds the new element.
+	 * If the index is negative number it does not change the array.
+	 * @param list = list that is manipulated
+	 * @param index - absolute position of the new element
+	 * @param element - new element to be added to the list
+	 * @throws IndexOutOfBoundsException -  if the index is out of range (index < 0)
+	 */
+	public static <E> void safeSet(List<E> list, int index, E element) {
+		if(index < 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		if(list.size() == index) {
+			list.add(element);
+		} else  if(list.size() >= index) {
+			list.set(index, element);
+		} if(list.size() < index) {
+			for(int i = list.size(); i < index; i++) {
+				list.add(null);
+			}
+			list.add(element);
+		}
+		
+	}
 
 	/**
 	 * Count number of new lines in a Sting.
@@ -729,5 +756,6 @@ public final class APEUtils {
 		
 		return abstractLabel.toString();
 	}
+
 
 }

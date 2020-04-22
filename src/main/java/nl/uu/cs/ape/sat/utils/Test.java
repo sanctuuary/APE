@@ -14,9 +14,12 @@ import org.json.JSONObject;
 
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
+import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
+import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 
 public class Test {
 
@@ -25,7 +28,7 @@ public class Test {
 //		runSynthesisSetup();
 
 //		runSynthesisTest();
-		customParseConfig("/home/vedran/git/QuAnGIS/WorkflowSynthesis/ToolDescription.json");
+//		customParseConfig("/home/vedran/git/QuAnGIS/WorkflowSynthesis/ToolDescription.json");
 //		APE apeFramework = runSynthesisSetup();
 //		testConstraintTemplates(apeFramework);
 		

@@ -31,6 +31,10 @@ public abstract class SolutionWorkflowNode {
 	}
 
 	@Override
+	/**
+	 * Two SolutionWorkflowNodes are equal if they represent the same state in the workflow.
+	 * @return true if the state that the describe is the same.
+	 */
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
