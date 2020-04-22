@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
@@ -31,7 +29,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  * @author Vedran Kasalica
  *
  */
-public class ModuleNode extends SolutionWorkflowNode implements Comparable<ModuleNode>{
+public class ModuleNode extends SolutionWorkflowNode {
 
 	/** Tool that is used in the workflow step. */
 	private Module usedModule;
@@ -199,15 +197,6 @@ public class ModuleNode extends SolutionWorkflowNode implements Comparable<Modul
 		printString = printString.append(this.usedModule.getPredicateLabel());
 
 		return printString.toString();
-	}
-
-	/**
-	 * Compares the two ModuleNodes based on their order in the solution. {@link State} is used to evaluate the absolute position of the node in the workflow.
-	 * @return a negative integer, zero, or a positive integer as this object is before than, equal to, or after than the specified ModuleNode.
-	 */
-	@Override
-	public int compareTo(ModuleNode otherModuleNode) {
-		return this.getAutomatonState().compareTo(otherModuleNode.getAutomatonState());
 	}
 
 }

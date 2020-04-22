@@ -1,8 +1,15 @@
 package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -29,6 +36,7 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import uk.ac.manchester.cs.owl.owlapi.OWLClassImpl;
 
 /**
@@ -43,6 +51,7 @@ public class OWLReader {
 	private final String ontologyPath;
 	private final AllModules allModules;
 	private final AllTypes allTypes;
+	private Map<String, Set<String>> typeDimensions = new HashMap<String, Set<String>>();
 	private OWLOntology ontology;
 	private OWLDataFactory factory;
 	private boolean typeRootExists;
@@ -122,7 +131,7 @@ public class OWLReader {
 				allTypes.setRootPredicate(root);
 				superClass = new OWLClassImpl(IRI.create("http://www.w3.org#DataTaxonomy"));
 			}
-
+			typeClasses.forEach(typeClass -> typeDimensions.put(getIRI(typeClass), new HashSet<String>()));
 			typeClasses.forEach(
 					typeClass -> exploreTypeOntologyRec(reasoner, ontology, typeClass, superClass, superClass));
 		} else {
@@ -133,7 +142,35 @@ public class OWLReader {
 			logger.info("Ontology was not loaded because of the bad formatting.");
 			return false;
 		}
+		
+		if(!dimensionsDisjoint(typeClasses)) {
+			throw new ExceptionInInitializerError("The type dimensions cannot have common classes");
+		}
 
+		return true;
+	}
+
+	/**
+	 * Calculate whether the type dimensions are disjoint or have overlaps.
+	 * @param typeClasses 
+	 * @return {code true} if the dimensions are disjoint, {@code false} otherwise.
+	 */
+	private boolean dimensionsDisjoint(List<OWLClass> typeClasses) {
+		if(typeClasses.size() < 2) {
+			return true;
+		}
+		for(OWLClass class1 : typeClasses) {
+			for(OWLClass class2 : typeClasses) {
+				String classID1 = getIRI(class1);
+				String classID2 = getIRI(class2);
+				if(!classID1.equals(classID2)) {
+					if(!Collections.disjoint(typeDimensions.get(classID1), typeDimensions.get(classID2))) {
+						return false;
+					}
+				}
+			}
+		}
+		
 		return true;
 	}
 
@@ -248,6 +285,7 @@ public class OWLReader {
 		/* Generate the Type that corresponds to the taxonomy class. */
 		try {
 			currType = allTypes.addPredicate(new Type(getLabel(currClass), getIRI(currClass), getIRI(currRoot), currNodeType));
+			typeDimensions.get(getIRI(currRoot)).add(getIRI(currClass));
 		} catch (ExceptionInInitializerError e) {
 			e.printStackTrace();
 		}

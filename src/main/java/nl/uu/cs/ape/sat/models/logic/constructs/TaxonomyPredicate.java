@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.uu.cs.ape.sat.models.AllPredicates;
-import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -20,7 +19,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  * @author Vedran Kasalica
  *
  */
-public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<TaxonomyPredicate> {
+public abstract class TaxonomyPredicate implements PredicateLabel {
 
 	/**
 	 * Describes the node in from the taxonomy hierarchy. The type can represent a
@@ -105,6 +104,19 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 			return false;
 		TaxonomyPredicate other = (TaxonomyPredicate) obj;
 		return this.getPredicateID().equals(other.getPredicateID());
+	}
+	
+	public int compareTo(PredicateLabel other) {
+		if(!(other instanceof TaxonomyPredicate)) {
+			return this.getPredicateID().compareTo(other.getPredicateID());
+		}
+		TaxonomyPredicate otherPredicate = (TaxonomyPredicate) other;
+		int diff = 0;
+		if((diff = this.getRootNode().compareTo(otherPredicate.getRootNode())) != 0) {
+			return diff;
+		} else {
+			return this.getPredicateID().compareTo(otherPredicate.getPredicateID());
+		}
 	}
 
 	/**
@@ -433,14 +445,5 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 		this.nodeType = nodeType;
 	}
 
-	@Override
-	public int compareTo(TaxonomyPredicate otherPredicate) {
-		int diff = 0;
-		if((diff = this.getRootNode().compareTo(otherPredicate.getRootNode())) != 0) {
-			return diff;
-		} else {
-			return this.getPredicateID().compareTo(otherPredicate.getPredicateID());
-		}
-	}
 
 }

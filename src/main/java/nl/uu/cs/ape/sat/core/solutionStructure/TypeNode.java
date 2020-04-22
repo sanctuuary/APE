@@ -2,14 +2,13 @@ package nl.uu.cs.ape.sat.core.solutionStructure;
 
 import static guru.nidi.graphviz.model.Factory.node;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import guru.nidi.graphviz.attribute.Label;
-import guru.nidi.graphviz.attribute.Shape;
-import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
@@ -26,7 +25,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  * @author Vedran Kasalica
  *
  */
-public class TypeNode extends SolutionWorkflowNode implements Comparable<TypeNode> {
+public class TypeNode extends SolutionWorkflowNode {
 
 	/** Types that define the data instance. The set cannot contain {@code EmptyType}. */
 	private SortedSet<Type> usedTypes;
@@ -41,7 +40,7 @@ public class TypeNode extends SolutionWorkflowNode implements Comparable<TypeNod
 	 * Modules/steps in the workflow that use this data instance as input.
 	 * {@code NULL} represents workflow output.
 	 */
-	private SortedSet<ModuleNode> usedByModules;
+	private List<ModuleNode> usedByModules;
 
 	/**
 	 * Creating Workflow Node that corresponds to a type instance in memory.
@@ -53,7 +52,7 @@ public class TypeNode extends SolutionWorkflowNode implements Comparable<TypeNod
 		this.usedTypes = new TreeSet<Type>();
 		this.abstractTypes = new TreeSet<Type>();
 		this.createdByModule = null;
-		usedByModules = new TreeSet<ModuleNode>();
+		usedByModules = new ArrayList<ModuleNode>();
 		if (automatonState.getWorkflowStateType() != WorkflowElement.MEMORY_TYPE) {
 			throw new ExceptionInInitializerError(
 					"Class MemTypeNode can only be instantiated using State that is of type WorkflowElement.MEMORY_TYPE, as a parameter.");
@@ -88,16 +87,14 @@ public class TypeNode extends SolutionWorkflowNode implements Comparable<TypeNod
 	}
 
 	/**
-	 * Add a tool, that uses this data instance as input, to the list
+	 * Add a tool, that uses this data instance as input, to the List
 	 * {@link TypeNode#usedByModules}.
 	 * 
 	 * @param usedByTool - tool/module node in the workflow, that uses this data
 	 *                   instance as input
 	 */
 	public void addUsedByTool(ModuleNode usedByTool) {
-		if(usedByTool != null) {
 			usedByModules.add(usedByTool);
-		}
 	}
 
 	/** Set the tool/workflow step that creates this data instance. */
@@ -136,11 +133,11 @@ public class TypeNode extends SolutionWorkflowNode implements Comparable<TypeNod
 
 	/**
 	 * Get all module nodes that use the data instance in input. If {@code NULL} is
-	 * in the set,
+	 * in the list, the type is used as workflow output.
 	 * 
-	 * @return
+	 * @return List of modules that used the type instance (a {@code NULL} value represent the workflow output).
 	 */
-	public Set<ModuleNode> getUsedByModules() {
+	public List<ModuleNode> getUsedByModules() {
 		return usedByModules;
 	}
 
@@ -226,14 +223,5 @@ public class TypeNode extends SolutionWorkflowNode implements Comparable<TypeNod
 		printString = printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
 
 		return printString.toString();
-	}
-
-	/**
-	 * Compares the two TypeNodes based on their order in the solution. {@link State} is used to evaluate the absolute position of the node in the workflow.
-	 * @return a negative integer, zero, or a positive integer as this object is before than, equal to, or after than the specified TypeNode.
-	 */
-	@Override
-	public int compareTo(TypeNode otherTypeNode) {
-		return this.getAutomatonState().compareTo(otherTypeNode.getAutomatonState());
 	}
 }

@@ -50,11 +50,10 @@ public class APE {
 	 * @throws IOException error in reading the configuration file
 	 * @throws JSONException error in reading the configuration file
 	 */
-	public APE(String configPath) throws IOException, JSONException {
+	public APE(String configPath) throws IOException, JSONException, ExceptionInInitializerError {
 		config = new APEConfig(configPath);
 		if (config == null || config.getCoreConfigJsonObj() == null) {
-			System.err.println("Configuration failed. Error in configuration file.");
-			throw new ExceptionInInitializerError();
+			throw new ExceptionInInitializerError("Configuration failed. Error in configuration file.");
 		}
 		if(!setupDomain()) {
 			throw new IOException("Error in settin up the domain.");

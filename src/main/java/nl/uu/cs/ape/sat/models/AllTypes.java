@@ -151,7 +151,7 @@ public class AllTypes extends AllPredicates {
 	public Class<?> getPredicateClass(){
 		return Type.class;
 	}
-
+	
 	/**
 	 * Returns a list of pairs of simple types, pairing the types based on the
 	 * taxonomy subtree they belong to. Note that the abstract types are not

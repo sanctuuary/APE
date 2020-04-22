@@ -8,7 +8,7 @@ import nl.uu.cs.ape.sat.automaton.State;
  * @author Vedran Kasalica
  *
  */
-public abstract class SolutionWorkflowNode {
+public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflowNode> {
 	
 	/** State in the automaton that the Node refers to. */
 	private State automatonState;
@@ -29,6 +29,7 @@ public abstract class SolutionWorkflowNode {
 		result = prime * result + ((automatonState == null) ? 0 : automatonState.hashCode());
 		return result;
 	}
+	
 
 	@Override
 	/**
@@ -49,6 +50,15 @@ public abstract class SolutionWorkflowNode {
 		} else if (!automatonState.equals(other.automatonState))
 			return false;
 		return true;
+	}
+	
+	/**
+	 * Compares the two SolutionWorkflowNodes based on their order in the solution. {@link State} is used to evaluate the absolute position of the node in the workflow.
+	 * @return a negative integer, zero, or a positive integer as this object is before than, equal to, or after than the specified SolutionWorkflowNode.
+	 */
+	@Override
+	public int compareTo(SolutionWorkflowNode otherNode) {
+		return this.getAutomatonState().compareTo(otherNode.getAutomatonState());
 	}
 	
 	

@@ -6,7 +6,7 @@ package nl.uu.cs.ape.sat.models.logic.constructs;
  * @author Vedran Kasalica
  *
  */
-public interface PredicateLabel {
+public interface PredicateLabel extends Comparable<PredicateLabel>{
 
 	/** 
 	 * Get string that corresponds to the predicate.
@@ -19,4 +19,5 @@ public interface PredicateLabel {
 	
 	@Override
 	public boolean equals(Object obj);
+
 }

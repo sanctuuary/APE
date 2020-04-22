@@ -43,7 +43,10 @@ public class LocalRun {
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 			return;
+		} catch (ExceptionInInitializerError e) {
+			System.err.println(e.getMessage());
 		}
+		
 		SATsolutionsList solutions;
 		try {
 			solutions = apeFramework.runSynthesis(file.getAbsolutePath());
