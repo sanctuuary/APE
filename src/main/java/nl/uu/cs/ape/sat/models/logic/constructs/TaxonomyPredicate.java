@@ -158,6 +158,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel, Comparable<Ta
 	 * Set the current predicate as a relevant part of the taxonomy and all the
 	 * corresponding subClasses and superClasses.
 	 * 
+	 *TODO Should it be topdown??
+	 * 
 	 * @param allPredicates - Map of all the predicates of the given type.
 	 * @return {@code true} if the predicates were successfully set to be relevant.
 	 */

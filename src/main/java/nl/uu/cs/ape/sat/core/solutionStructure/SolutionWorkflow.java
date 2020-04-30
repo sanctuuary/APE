@@ -202,7 +202,7 @@ public class SolutionWorkflow {
 	 * Get non-structured solution obtained directly from the SAT output.
 	 * @return A {@link SAT_solution} object, that contains information about the native SAT encoding, and how it translates into human
 	 */
-	public SAT_solution getnativeSATsolution() {
+	public SAT_solution getNativeSATsolution() {
 		return this.nativeSolution;
 	}
 	

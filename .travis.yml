@@ -1,0 +1,3 @@
+language: java
+notifications:
+  webhooks: https://outlook.office.com/webhook/3d8e5085-15c4-4958-a6b3-2b60c8b797e4@d72758a0-a446-4e0f-a0aa-4bf95a4a10e7/TravisCI/1d6d563ba4014e34b073eab8c200d61f/8c18a7c8-be05-4398-8ba1-0d22da27a984
