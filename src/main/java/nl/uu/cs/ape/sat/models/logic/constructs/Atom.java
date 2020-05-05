@@ -50,6 +50,8 @@ public class Atom {
 		return predicate;
 	}
 
+	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -58,9 +60,11 @@ public class Atom {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((argumentState == null) ? 0 : argumentState.hashCode());
+		result = prime * result + ((elementType == null) ? 0 : elementType.hashCode());
 		result = prime * result + ((predicate == null) ? 0 : predicate.hashCode());
 		return result;
 	}
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
@@ -78,6 +82,8 @@ public class Atom {
 			if (other.argumentState != null)
 				return false;
 		} else if (!argumentState.equals(other.argumentState))
+			return false;
+		if (elementType != other.elementType)
 			return false;
 		if (predicate == null) {
 			if (other.predicate != null)

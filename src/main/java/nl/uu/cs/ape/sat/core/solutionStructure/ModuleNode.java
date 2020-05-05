@@ -168,7 +168,7 @@ public class ModuleNode extends SolutionWorkflowNode {
 	}
 
 	public String getDotDefinition() {
-		return getDotID() + " [label=\"" + getDotLabel() + "\", shape=box];\n";
+		return getNodeID() + " [label=\"" + getNodeLabel() + "\", shape=box];\n";
 	}
 
 	/**
@@ -179,11 +179,11 @@ public class ModuleNode extends SolutionWorkflowNode {
 	 */
 	public Graph addModuleToGraph(Graph workflowGraph) {
 		return workflowGraph = workflowGraph
-				.with(node(getDotID()).with(Label.of(getDotLabel() + "              "), Shape.polygon(4), Color.BLUE, Style.BOLD));
+				.with(node(getNodeID()).with(Label.of(getNodeLabel() + "              "), Shape.polygon(4), Color.BLUE, Style.BOLD));
 	}
 
-	/** Get id of the current workflow node in .dot representation. */
-	public String getDotID() {
+	/** Get id of the current workflow node. */
+	public String getNodeID() {
 		StringBuilder printString = new StringBuilder();
 		printString = printString.append("\"").append(this.usedModule.getPredicateID());
 		printString = printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
@@ -191,12 +191,9 @@ public class ModuleNode extends SolutionWorkflowNode {
 		return printString.toString();
 	}
 
-	/** Get label of the current workflow node in .dot representation. */
-	public String getDotLabel() {
-		StringBuilder printString = new StringBuilder();
-		printString = printString.append(this.usedModule.getPredicateLabel());
-
-		return printString.toString();
+	/** Get label of the current workflow node. */
+	public String getNodeLabel() {
+		return this.usedModule.getPredicateLabel();
 	}
 
 }

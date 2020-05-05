@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
@@ -28,9 +30,9 @@ public class AllTypes extends AllPredicates {
 	private List<String> dataTaxonomyDimensions;
 
 	public AllTypes(APEConfig config) {
-		super(config.getDataTaxonomyRoot());
-		dataTaxonomyDimensions = config.getDataTaxonomySubroots();
-		emptyType = new Type("empty", "empty", getRootID(), NodeType.EMPTY);
+		super(config.getDataDimensionRoots());
+		dataTaxonomyDimensions = config.getDataDimensionRoots();
+		emptyType = new Type("empty", "empty", "empty", NodeType.EMPTY);
 		emptyType.setAsRelevantTaxonomyTerm(this);
 		this.put(emptyType);
 	}
@@ -106,6 +108,25 @@ public class AllTypes extends AllPredicates {
 	public Type get(String typeID) {
 		return (Type) getPredicates().get(typeID);
 	}
+	
+
+	/**
+	 * Returns the type to which the specified key is mapped to under the given dimension, or {@code null} if
+	 * the typeID has no mappings or does not belong to the given dimension.
+	 * 
+	 * @param typeID - the key whose associated value is to be returned
+	 * @param dimensionID - the ID of the dimension to which the type belongs to
+	 * @return {@link Type} to which the specified key is mapped to, or {@code null}
+	 *         if the typeID has no mappings or does not belong to the given dimension.
+	 */
+	public Type get(String typeID, String dimensionID) {
+		Type type = (Type) getPredicates().get(typeID);;
+		if(type!= null && type.getRootNode().equals(dimensionID)) {
+			return type;
+ 		} else {
+ 			return null;
+ 		}
+	}
 
 	/**
 	 * Returns the type representation of the empty type.
@@ -170,9 +191,7 @@ public class AllTypes extends AllPredicates {
 		 * exclusive types.
 		 */
 		Map<String, List<TaxonomyPredicate>> subTreesMap = new HashMap<String, List<TaxonomyPredicate>>();
-		// Add general data taxonomy root to the list
-		subTreesMap.put(super.getRootID(), new ArrayList<TaxonomyPredicate>());
-		// Add each of the subtree roots (type and format taxonomy) to the list
+		// Add each of the dimension roots (type and format taxonomy) to the list
 		for (String subRoot : APEUtils.safe(dataTaxonomyDimensions)) {
 			subTreesMap.put(subRoot, new ArrayList<TaxonomyPredicate>());
 		}
@@ -186,10 +205,14 @@ public class AllTypes extends AllPredicates {
 				// If the root type for the curr type exists in our list, add the type to it
 				if (subTreesMap.get(type.getRootNode()) != null) {
 					subTreesMap.get(type.getRootNode()).add(type);
+				} else {
+					System.err.println("ERROR!!");
 				}
 			} else if (type.isEmptyPredicate()) {
+				
 				/*
-				 * Add empty type to each mutual exclusive class
+				 * Add empty type to each mutual exclusive class 
+				 * TODO: is it necessary to add empty type in each dimension?
 				 */
 				for (List<TaxonomyPredicate> currSubTree : subTreesMap.values()) {
 					currSubTree.add(type);
@@ -210,7 +233,7 @@ public class AllTypes extends AllPredicates {
 
 
 	/**
-	 * Return the list of dimensions that represent the data. Each dimension represents a node in the data taxonomy and the root for the corresponding sub-taxonomy.
+	 * Return the list of dimensions that represent the data. Each dimension represents a node in the data taxonomy and the root for the corresponding dimension.
 	 * @return List of abstract types that represent dimensions.
 	 */
 	public List<String> getDataTaxonomyDimensionIDs(){
@@ -218,11 +241,22 @@ public class AllTypes extends AllPredicates {
 	}
 	
 	/**
-	 * Return the list of dimensions that represent the data. Each dimension represents a node in the data taxonomy and the root for the corresponding sub-taxonomy.
+	 * Return the list of dimensions that represent the data. Each dimension represents a node in the data taxonomy and the root for the corresponding dimension.
 	 * @return List of abstract types that represent dimensions.
 	 */
 	public List<TaxonomyPredicate> getDataTaxonomyDimensions(){
-		List<TaxonomyPredicate> dimensionTypes = new ArrayList<>();
+		List<TaxonomyPredicate> dimensionTypes = new ArrayList<TaxonomyPredicate>();
+		this.dataTaxonomyDimensions.stream().filter(dimensionID -> get(dimensionID) != null)
+											.forEach(dimensionID -> dimensionTypes.add(get(dimensionID)));
+		return dimensionTypes;
+	}
+	
+	/**
+	 * Return the SortedSet of dimensions that represent the data. Each dimension represents a node in the data taxonomy and the root for the corresponding dimension.
+	 * @return SortedSet of abstract types that represent dimensions.
+	 */
+	public SortedSet<TaxonomyPredicate> getDataTaxonomyDimensionsAsSortedSet(){
+		SortedSet<TaxonomyPredicate> dimensionTypes = new TreeSet<TaxonomyPredicate>();
 		this.dataTaxonomyDimensions.stream().filter(dimensionID -> get(dimensionID) != null)
 											.forEach(dimensionID -> dimensionTypes.add(get(dimensionID)));
 		return dimensionTypes;

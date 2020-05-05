@@ -31,6 +31,7 @@ import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
 import nl.uu.cs.ape.sat.models.logic.constructs.Literal;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -41,7 +42,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  *
  */
 public class SolutionWorkflow {
-
+	private static int i = 1;
 	/** List of module nodes ordered according to their position in the workflow. */
 	private List<ModuleNode> moduleNodes;
 	/** List of memory type nodes provided as the initial workflow input, ordered according the initial description (ape.config file). */
@@ -150,6 +151,15 @@ public class SolutionWorkflow {
 							currNode.addUsedType((Type) currLiteral.getPredicate());
 						} else if (currLiteral.getPredicate() instanceof Type){
 							currNode.addAbstractDescriptionOfUsedType((Type) currLiteral.getPredicate());
+//							if(currLiteral.getPredicate().getPredicateLabel().equals("TypesTaxonomy")) {
+//								System.out.println("!--");
+//								System.out.println(currLiteral);
+//								System.out.println("---");
+//								if(currLiteral.getUsedInStateArgument().getPredicateID().equals("MemT0.0")) {
+//									System.out.println(mappedLiteral);
+//								}
+//								System.out.println("--!");
+//							}
 						} else {
 							/* Memory type cannot be anything else except a Type. */
 						}
@@ -173,9 +183,15 @@ public class SolutionWorkflow {
 				}
 			}
 		}
+		
 		/** Remove empty elements of the sets. */
 		this.workflowInputTypeStates.removeIf(node -> node.isEmpty());
-		this.workflowOutputTypeStates.removeIf(node -> node.isEmpty());
+//		System.out.println("____" + i++);
+//		if(i>96) {
+//			System.out.println(workflowOutputTypeStates.toArray());	
+//		}
+		
+		this.workflowOutputTypeStates.removeIf(node ->node.isEmpty());
 		
 	}
 
@@ -346,7 +362,7 @@ public class SolutionWorkflow {
 				System.out.println(input + " [shape=box, color = red];\n");
 				inputDefined = true;
 			}
-			solution = solution.append(input+ "->" + workflowInput.getDotID() + ";\n");
+			solution = solution.append(input+ "->" + workflowInput.getNodeID() + ";\n");
 			solution = solution.append(workflowInput.getDotDefinition());
 		}
 		
@@ -354,13 +370,13 @@ public class SolutionWorkflow {
 			solution = solution.append(currTool.getDotDefinition());
 			for(TypeNode toolInput : currTool.getInputTypes()) {
 				if(!toolInput.isEmpty()) {
-					solution = solution.append(toolInput.getDotID() + "->" + currTool.getDotID() + "[label = in, fontsize = 10];\n");
+					solution = solution.append(toolInput.getNodeID() + "->" + currTool.getNodeID() + "[label = in, fontsize = 10];\n");
 				}
 			}
 			for(TypeNode toolOutput : currTool.getOutputTypes()) {
 				if(!toolOutput.isEmpty()) {
 					solution = solution.append(toolOutput.getDotDefinition());
-					solution = solution.append(currTool.getDotID() + "->" + toolOutput.getDotID() + " [label = out, fontsize = 10];\n");
+					solution = solution.append(currTool.getNodeID() + "->" + toolOutput.getNodeID() + " [label = out, fontsize = 10];\n");
 				}
 			}
 		}
@@ -370,7 +386,7 @@ public class SolutionWorkflow {
 				outputDefined = true;
 			}
 			solution = solution.append(workflowOutput.getDotDefinition());
-			solution = solution.append(workflowOutput.getDotID() + "->" + output + ";\n");
+			solution = solution.append(workflowOutput.getNodeID() + "->" + output + ";\n");
 		}
 		
 		return solution.toString();
@@ -396,7 +412,7 @@ public class SolutionWorkflow {
 				inputDefined = true;
 			}
 			workflowGraph = workflowInput.addTypeToGraph(workflowGraph);
-			workflowGraph = workflowGraph.with(node(input).link(to(node(workflowInput.getDotID())).with(Label.of((workflowInNo++) + "  "),LinkAttr.weight(index++), Style.DOTTED)));
+			workflowGraph = workflowGraph.with(node(input).link(to(node(workflowInput.getNodeID())).with(Label.of((workflowInNo++) + "  "),LinkAttr.weight(index++), Style.DOTTED)));
 		}
 		
 		for(ModuleNode currTool : this.moduleNodes) {
@@ -404,14 +420,14 @@ public class SolutionWorkflow {
 			int inputNo = 1;
 			for(TypeNode toolInput : currTool.getInputTypes()) {
 				if(!toolInput.isEmpty()) {
-					workflowGraph = workflowGraph.with(node(toolInput.getDotID()).link(to(node(currTool.getDotID())).with(Label.of("in " + (inputNo++) + "  "), Color.ORANGE, LinkAttr.weight(index++))));
+					workflowGraph = workflowGraph.with(node(toolInput.getNodeID()).link(to(node(currTool.getNodeID())).with(Label.of("in " + (inputNo++) + "  "), Color.ORANGE, LinkAttr.weight(index++))));
 				}
 			}
 			int outputNo = 1;
 			for(TypeNode toolOutput : currTool.getOutputTypes()) {
 				if(!toolOutput.isEmpty()) {
 					workflowGraph = toolOutput.addTypeToGraph(workflowGraph);
-					workflowGraph = workflowGraph.with(node(currTool.getDotID()).link(to(node(toolOutput.getDotID())).with(Label.of("out " + (outputNo++) + "  "), Color.BLACK, LinkAttr.weight(index++))));
+					workflowGraph = workflowGraph.with(node(currTool.getNodeID()).link(to(node(toolOutput.getNodeID())).with(Label.of("out " + (outputNo++) + "  "), Color.BLACK, LinkAttr.weight(index++))));
 				}
 			}
 		}
@@ -422,7 +438,7 @@ public class SolutionWorkflow {
 				outputDefined = true;
 			}
 			workflowGraph = workflowOutput.addTypeToGraph(workflowGraph);
-			workflowGraph = workflowGraph.with(node(workflowOutput.getDotID()).link(to(node(output)).with(Label.of((workflowOutNo++) + "  "), LinkAttr.weight(index++), Style.DOTTED)));
+			workflowGraph = workflowGraph.with(node(workflowOutput.getNodeID()).link(to(node(output)).with(Label.of((workflowOutNo++) + "  "), LinkAttr.weight(index++), Style.DOTTED)));
 		}
 		this.dataflowGraph = new SolutionGraph(workflowGraph);
 		return this.dataflowGraph;
@@ -443,8 +459,8 @@ public class SolutionWorkflow {
 		String prevNode = input;
 		for(ModuleNode currTool : this.moduleNodes) {
 			workflowGraph = currTool.addModuleToGraph(workflowGraph);
-			workflowGraph = workflowGraph.with(node(prevNode).link(to(node(currTool.getDotID())).with(Label.of("next   "), Color.RED)));
-			prevNode = currTool.getDotID();
+			workflowGraph = workflowGraph.with(node(prevNode).link(to(node(currTool.getNodeID())).with(Label.of("next   "), Color.RED)));
+			prevNode = currTool.getNodeID();
 		}
 		workflowGraph = workflowGraph.with(node(output).with(Color.BLACK, Style.BOLD));
 		workflowGraph = workflowGraph.with(node(prevNode).link(to(node(output)).with(Label.of("next   "), Color.RED)));

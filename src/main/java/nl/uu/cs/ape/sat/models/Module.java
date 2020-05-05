@@ -181,7 +181,7 @@ public class Module extends AbstractModule {
 		if(taxonomyModules.isEmpty()) {
 				System.err.println("Tool '" + moduleURI + "' annotation issue. "
 						+ "None of the referenced '"+APEConfig.getJsonTags("taxonomyOperations")+"' can be found in the Tool Taxonomy.");
-				taxonomyModules.add(allModules.getRootID());
+				taxonomyModules.add(allModules.getRootID().get(0));
 		}
 		
 		String executionCode = null;
@@ -220,7 +220,7 @@ public class Module extends AbstractModule {
 		 * Add the module and make it sub module of the currSuperModule (if it was not
 		 * previously defined)
 		 */
-		Module currModule =  (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootID(), moduleExecutionImpl));
+		Module currModule =  (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootID().get(0), moduleExecutionImpl));
 		
 		/*	For each supermodule add the current module as a subset and vice versa. */
 		for(String superModuleID : taxonomyModules) {
@@ -267,18 +267,14 @@ public class Module extends AbstractModule {
 					System.err.println("Data type \"" + currTypeURI.toString()
 							+ "\" used in the tool annotations does not exist in the " + typeSuperClassLabel + " taxonomy. This might influence the validity of the solutions.");
 				}
-				if (domainSetup.getAllTypes().getDataTaxonomyDimensionIDs().contains(typeSuperClassURI)) {
-					Type currType = domainSetup.getAllTypes().addPredicate(new Type(currTypeLabel, currTypeURI, typeSuperClassURI,
-							NodeType.UNKNOWN));
-					if (currType != null) {
+				Type currType = domainSetup.getAllTypes().get(currTypeURI, typeSuperClassURI);
+				if (currType != null) {
 						/* if the type exists, make it relevant from the taxonomy perspective and add it to the outputs */
 						currType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
 						logConnectedPredicates.add(currType);
-					}
 				} else {
-					throw new JSONException(
-							"Error in the tool annotation file. The data subtaxonomy '" + typeSuperClassURI
-									+ "' was not defined, but it was used as annotation for input/output type '" + currTypeURI + "'.");
+					throw new JSONException("Error in the tool annotation file. The data type '" + currTypeURI
+							+ "', used as a operation input/output, was not defined or does not belong to the dimension '" + typeSuperClassLabel + "'.");
 				}
 			}
 			/* Create a new type, that represents a disjunction/conjunction of the types, that can be used to abstract over each of the tools individually. */

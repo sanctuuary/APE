@@ -83,6 +83,8 @@ public class Test {
 			System.err.println("Error in reading the configuration file.");
 			return null;
 		}
+		
+		apeFramework.getDomainSetup();
 
 //		String d = apeFramework.getTypeElements("Data").toString();
 //		String f = apeFramework.getTypeElements("Format").toString();
@@ -104,7 +106,7 @@ public class Test {
 		System.out.println("Done.");
 	}
 
-	private static void print(AllModules allModules, AllTypes allTypes) {
+	/*private static void print(AllModules allModules, AllTypes allTypes) {
 		System.out.println("-------------------------------------------------------------");
 		System.out.println("\tTool Taxonomy:");
 		System.out.println("-------------------------------------------------------------");
@@ -113,7 +115,7 @@ public class Test {
 		System.out.println("\tData Taxonomy:");
 		System.out.println("-------------------------------------------------------------");
 		allTypes.getRootPredicate().printTree(" ", allTypes);
-	}
+	}*/
 
 	public static void customParseConfig(String path) {
 		StringBuilder sb = new StringBuilder();

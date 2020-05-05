@@ -99,6 +99,14 @@ public class State implements PredicateLabel {
 	public String getPredicateID() {
 		return stateName;
 	}
+	
+	/**
+	 * Returns the text representing the state (e.g. M04 or T02.31)
+	 * @return String representation of the state.
+	 */
+	public String getPredicateLabel() {
+		return stateName;
+	}
 
 	/**
 	 * Returns the order number of the state in the respective array of states.

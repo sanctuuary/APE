@@ -86,7 +86,7 @@ public class ConstraintFactory {
 		 * subsequently.
 		 */
 		
-		TaxonomyPredicate rootModule = allModules.getRootPredicate();
+		TaxonomyPredicate rootModule = allModules.getRootPredicate().get(0);
 		List<TaxonomyPredicate> rootTypes = allTypes.getDataTaxonomyDimensions();
 		ConstraintParameter moduleParameter = new ConstraintParameter(Arrays.asList(rootModule));
 		ConstraintParameter typeParameter = new ConstraintParameter(rootTypes);

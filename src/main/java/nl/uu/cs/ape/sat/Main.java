@@ -40,7 +40,7 @@ public class Main {
 		
 		SATsolutionsList solutions;
 		try {
-			solutions = apeFramework.runSynthesis(path);
+			solutions = apeFramework.runSynthesis(path, apeFramework.getDomainSetup());
 		} catch (IOException e) {
 			System.err.println("Error in synthesis execution. Writing to the file system failed.");
 			return;

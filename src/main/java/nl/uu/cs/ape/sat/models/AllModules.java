@@ -1,6 +1,7 @@
 package nl.uu.cs.ape.sat.models;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class AllModules extends AllPredicates {
 
 
 	public AllModules(APEConfig config) {
-		super(config.getToolTaxonomyRoot());
+		super(Arrays.asList(config.getToolTaxonomyRoot()));
 	}
 
 	/**

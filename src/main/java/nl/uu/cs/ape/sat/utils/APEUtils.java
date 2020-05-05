@@ -420,11 +420,15 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tTool Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
-			domainSetup.getAllModules().getRootPredicate().printTree(" ", domainSetup.getAllModules());
+			domainSetup.getAllModules().getRootPredicate().get(0).printTree(" ", domainSetup.getAllModules());
 			System.out.println("\n-------------------------------------------------------------");
-			System.out.println("\tData Taxonomy:");
-			System.out.println("-------------------------------------------------------------");
-			domainSetup.getAllTypes().getRootPredicate().printTree(" ", domainSetup.getAllTypes());
+			System.out.println("\tData Taxonomy dimensions:");
+			for(TaxonomyPredicate dimension : domainSetup.getAllTypes().getRootPredicate()) {
+				System.out.println("\n-------------------------------------------------------------");
+				System.out.println("\t" + dimension.getPredicateLabel() + "Taxonomy:");
+				System.out.println("-------------------------------------------------------------");
+				dimension.printTree(" ", domainSetup.getAllTypes());
+			}
 
 			/*
 			 * Printing the tool annotations
@@ -742,6 +746,18 @@ public final class APEUtils {
 		return humanReadable.toString();
 	}
 
+	/**
+	 * Return the string without its last character.
+	 * @param str - given string
+	 * @return Given string without its last character.
+	 */
+	public static String removeLastChar(String str) {
+		 if (str != null && str.length() > 0) {
+			 str = str.substring(0, str.length() - 1);
+		 }
+		 return str;
+	}
+	
 	/**
 	 * Method creates a label based on the list of predicates and the logical operator.
 	 * @param relatedPredicates - list of predicates that should be used to create the new label.

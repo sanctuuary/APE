@@ -77,6 +77,9 @@ public class SAT_solution extends SolutionInterpreter {
 							&& (currLiteral.getPredicate() instanceof Type) && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
 						/* add all positive literals that describe simple types */
 						relevantElements.add(currLiteral);
+						if(currLiteral.getPredicate().getPredicateLabel().equals("TypesTaxonomy")) {
+							System.out.println("+++" + mappedLiteral);
+						}
 						relevantTypes.add(currLiteral);
 						usedTypeStates.add(currLiteral.getUsedInStateArgument());
 					} else if(currLiteral.getPredicate() instanceof State && ((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {

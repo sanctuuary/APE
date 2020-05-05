@@ -4,7 +4,6 @@ import static guru.nidi.graphviz.model.Factory.node;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -107,7 +106,7 @@ public class TypeNode extends SolutionWorkflowNode {
 	 * 
 	 * @return List of simple/primitive data types that define the instance.
 	 */
-	public Set<Type> getTypes() {
+	public SortedSet<Type> getTypes() {
 		return usedTypes;
 	}
 
@@ -117,7 +116,7 @@ public class TypeNode extends SolutionWorkflowNode {
 	 * 
 	 * @return List of abstract data types that describe the instance.
 	 */
-	public Set<Type> getAbstractTypes() {
+	public SortedSet<Type> getAbstractTypes() {
 		return abstractTypes;
 	}
 
@@ -173,7 +172,7 @@ public class TypeNode extends SolutionWorkflowNode {
 	}
 
 	public String getDotDefinition() {
-		return getDotID() + " [label=\"" + getDotLabel() + "\", color=blue];\n";
+		return getNodeID() + " [label=\"" + getNodeLabel() + "\", color=blue];\n";
 	}
 
 	/**
@@ -183,11 +182,11 @@ public class TypeNode extends SolutionWorkflowNode {
 	 * @return {@link Graph} extended with the current {@link TypeNode}
 	 */
 	public Graph addTypeToGraph(Graph workflowGraph) {
-		return workflowGraph = workflowGraph.with(node(getDotID()).with(Label.of(getDotLabel() + "   ")));
+		return workflowGraph = workflowGraph.with(node(getNodeID()).with(Label.of(getNodeLabel() + "   ")));
 	}
 
 	/** Get label of the current workflow node in .dot representation. */
-	public String getDotLabel() {
+	public String getNodeLabel() {
 		StringBuilder printString = new StringBuilder();
 		int i = 0;
 		for (Type type : this.usedTypes) {
@@ -200,7 +199,7 @@ public class TypeNode extends SolutionWorkflowNode {
 	}
 
 	/** Get id of the current workflow node in .dot representation. */
-	public String getDotID() {
+	public String getNodeID() {
 		StringBuilder printString = new StringBuilder("\"");
 
 		int i = 0;

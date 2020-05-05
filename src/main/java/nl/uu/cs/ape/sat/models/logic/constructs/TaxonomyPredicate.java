@@ -437,16 +437,6 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	}
 
 	/**
-	 * Returns true if the type the sub-root type, otherwise returns false - the
-	 * type is not the sub-root node of the taxonomy
-	 * 
-	 * @return true (sub-root node) or false (non-root node)
-	 */
-	public boolean isSubRootPredicate() {
-		return this.nodeType == NodeType.SUBROOT;
-	}
-
-	/**
 	 * Set the type to be a simple type (LEAF type in the Taxonomy).
 	 * 
 	 */

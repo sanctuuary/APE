@@ -6,10 +6,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -98,52 +101,42 @@ public class OWLReader {
 			logger.warning("Ontology is not properly provided.");
 			return false;
 		}
-		OWLClass thingClass = manager.getOWLDataFactory().getOWLThing();
 		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
 
-		List<OWLClass> subClasses = reasoner.getSubClasses(thingClass, true).entities().collect(Collectors.toList());
-
-		OWLClass moduleClass = subClasses.stream().filter(currClass -> isModuleClass(currClass)).findFirst()
-				.orElse(thingClass);
-		List<OWLClass> typeClasses = subClasses.stream().filter(currClass -> isTypeClass(currClass))
-				.collect(Collectors.toList());
-
-		/* Handle scenario when the tool taxonomy root was not defined properly. */
-		if (!moduleClass.equals(thingClass)) {
-			exploreModuleOntologyRec(reasoner, ontology, moduleClass, thingClass, thingClass);
-		} else {
-			logger.info("Provided ontology does not contain the " + allModules.getRootID()
-					+ " class as a root for operation taxonomy.");
-		}
-		
-		/* Handle scenario when the type taxonomy root was not defined properly. */
-		if (!typeClasses.isEmpty()) {
-			OWLClass superClass;
-			if (typeRootExists) {
-				superClass = thingClass;
-			} else {
-				/*
-				 * If the main root of the data type taxonomy does not exist, create one
-				 * artificially.
-				 */
-				Type root = allTypes.addPredicate(new Type("DataTaxonomy", "http://www.w3.org#DataTaxonomy", "http://www.w3.org#DataTaxonomy", NodeType.ROOT));
-				allTypes.setRootPredicate(root);
-				superClass = new OWLClassImpl(IRI.create("http://www.w3.org#DataTaxonomy"));
-			}
-			typeClasses.forEach(typeClass -> typeDimensions.put(getIRI(typeClass), new HashSet<String>()));
-			typeClasses.forEach(
-					typeClass -> exploreTypeOntologyRec(reasoner, ontology, typeClass, superClass, superClass));
-		} else {
-			logger.info("Provided ontology does not contain the provided data type taxonomy root class(es).");
-		}
-
-		if (moduleClass.equals(thingClass) || typeClasses.isEmpty()) {
-			logger.info("Ontology was not loaded because of the bad formatting.");
+		/* Get a root of the operations taxonomy. */
+		String moduleRootIRI = allModules.getRootID().get(0);
+		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
+		if(!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
+			/* Handle scenario when the tool taxonomy root was not defined properly. */
+			logger.warning("Provided ontology does not contain the " + moduleRootIRI
+			+ " class, intended as a root for operation taxonomy.");
 			return false;
 		}
 		
-		if(!dimensionsDisjoint(typeClasses)) {
+		/* Get roots for each of the data dimensions. */
+		List<OWLClass> dimensionRootClasses = new ArrayList<OWLClass>();
+		for(String dimensionID : allTypes.getRootID()) {
+			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionID));
+			if(!ontology.containsClassInSignature(IRI.create(dimensionID))) {
+				/* Handle scenario when the type taxonomy root was not defined properly. */
+				logger.warning("Provided ontology does not contain the " + dimensionID
+				+ " class, intended as a root for a data dimension.");
+				return false;
+			} else {
+				dimensionRootClasses.add(dimensionClass);
+			}
+		}
+
+		
+		exploreModuleOntologyRec(reasoner, moduleRootClass, null, null);
+		
+		
+			dimensionRootClasses.forEach(typeClass -> typeDimensions.put(getIRI(typeClass), new HashSet<String>()));
+			dimensionRootClasses.forEach(
+					typeClass -> exploreTypeOntologyRec(reasoner, typeClass, null, null));
+
+		if(!dimensionsDisjoint(dimensionRootClasses)) {
 			throw new ExceptionInInitializerError("The type dimensions cannot have common classes");
 		}
 
@@ -175,36 +168,6 @@ public class OWLReader {
 	}
 
 	/**
-	 * Method returns {@code true} of the given OWL class belong to the roots of the
-	 * <b>ModulesTaxonomy</b>.
-	 * 
-	 * @param currClass - class that is evaluated
-	 * @return {@code true} if the current class belong to the module taxonomy roots,
-	 *         {@code false} otherwise.
-	 */
-	private boolean isModuleClass(OWLClass currClass) {
-		return getIRI(currClass).equals(allModules.getRootID());
-	}
-
-	/**
-	 * Method returns {@code true} of the given OWL class belong to the roots of the
-	 * <b>TypesTaxonomy</b>.
-	 * 
-	 * @param currClass - class that is evaluated
-	 * @return {@code true} if the current class belong to the type taxonomy roots,
-	 *         {@code false} otherwise.
-	 */
-	private boolean isTypeClass(OWLClass currClass) {
-		if (getIRI(currClass).equals(allTypes.getRootID())) {
-			typeRootExists = true;
-			return true;
-		} else {
-			boolean tmp = allTypes.getDataTaxonomyDimensionIDs().contains(getIRI(currClass));
-			return tmp;
-		}
-	}
-
-	/**
 	 * Recursively exploring the hierarchy of the ontology and defining objects
 	 * ({@ling AbstractModule}) on each step of the way.
 	 * 
@@ -213,7 +176,7 @@ public class OWLReader {
 	 * @param currClass  - the class (node) currently explored
 	 * @param superClass - the superclass of the currClass
 	 */
-	private void exploreModuleOntologyRec(OWLReasoner reasoner, OWLOntology ontology, OWLClass currClass,
+	private void exploreModuleOntologyRec(OWLReasoner reasoner, OWLClass currClass,
 			OWLClass superClass, OWLClass rootClass) {
 //		if(allModules.existsModule(getLabel(currClass))) {
 //			return;
@@ -224,7 +187,7 @@ public class OWLReader {
 		 * Defining the Node Type based on the node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if (getIRI(currClass).equals(allModules.getRootID())) {
+		if (getIRI(currClass).equals(allModules.getRootID().get(0))) {
 			currNodeType = NodeType.ROOT;
 			currRootClass = currClass;
 		} else {
@@ -247,7 +210,7 @@ public class OWLReader {
 			currModule.addSuperPredicate(superModule);
 		}
 		reasoner.getSubClasses(currClass, true).entities().filter(child -> reasoner.isSatisfiable(child))
-				.forEach(child -> exploreModuleOntologyRec(reasoner, ontology, child, currClass, currRootClass));
+				.forEach(child -> exploreModuleOntologyRec(reasoner, child, currClass, currRootClass));
 	}
 
 	/**
@@ -259,7 +222,7 @@ public class OWLReader {
 	 * @param currClass  - the class (node) currently explored
 	 * @param superClass - the superclass of the currClass
 	 */
-	private void exploreTypeOntologyRec(OWLReasoner reasoner, OWLOntology ontology, OWLClass currClass,
+	private void exploreTypeOntologyRec(OWLReasoner reasoner, OWLClass currClass,
 			OWLClass superClass, OWLClass rootClass) {
 //		if(allTypes.existsType(getLabel(currClass))) {
 //			return;
@@ -272,11 +235,8 @@ public class OWLReader {
 		 * Check whether the current node is a root or subRoot node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if (getIRI(currClass).equals(allTypes.getRootID())) {
+		if (allTypes.getDataTaxonomyDimensionIDs().contains(getIRI(currClass))) {
 			currNodeType = NodeType.ROOT;
-			currRoot = currClass;
-		} else if (APEUtils.safe(allTypes.getDataTaxonomyDimensionIDs()).contains(getIRI(currClass))) {
-			currNodeType = NodeType.SUBROOT;
 			currRoot = currClass;
 		} else {
 			currRoot = rootClass;
@@ -303,7 +263,7 @@ public class OWLReader {
 											.filter(child -> reasoner.isSatisfiable(child))
 											.collect(Collectors.toList());
 		
-		subClasses.forEach(child -> exploreTypeOntologyRec(reasoner, ontology, child, currClass, currRoot));
+		subClasses.forEach(child -> exploreTypeOntologyRec(reasoner, child, currClass, currRoot));
 
 		if (subClasses.isEmpty()) {
 			currType.setToSimplePredicate();

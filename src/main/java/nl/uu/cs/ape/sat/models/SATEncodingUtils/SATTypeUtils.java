@@ -22,6 +22,7 @@ import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 
 /**
  * The {@code SATTypeUtils} class is used to encode SAT constraints  based on the type annotations.
@@ -77,26 +78,32 @@ public class SATTypeUtils {
 	
 	/**
 	 * Generating the mandatory usage constraints of root type @rootType in each
-	 * state of @moduleAutomaton.
+	 * state of @moduleAutomaton. It enforces that each type instance is either defined on all the dimensions or is empty. 
 	 * 
 	 * @param rootTypeID      - represent the ID of the root type in the type
 	 *                        taxonomy
 	 * @param moduleAutomaton - type automaton
 	 * @return String representation of constraints
 	 */
-	public static String typeMandatoryUsage(AllTypes allTypes, TaxonomyPredicate type, TypeAutomaton typeAutomaton, AtomMappings mappings) {
+	public static String typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton, AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
+		Type empty = domainSetup.getAllTypes().getEmptyType();
+		TaxonomyPredicate dataType = domainSetup.generateAuxiliaryPredicate(domainSetup.getAllTypes().getDataTaxonomyDimensionsAsSortedSet(), LogicOperation.AND);
 		// enforcement of types in in all the states (those that represent general
 		// memory and used data instances)
 		for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
 			for (State typeState : typeBlock.getStates()) {
-				constraints = constraints.append(mappings.add(type, typeState, WorkflowElement.MEMORY_TYPE))
+				constraints = constraints.append(mappings.add(dataType, typeState, WorkflowElement.MEMORY_TYPE))
+						.append(" ");
+				constraints = constraints.append(mappings.add(empty, typeState, WorkflowElement.MEMORY_TYPE))
 						.append(" 0\n");
 			}
 		}
 		for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
 			for (State typeState : typeBlock.getStates()) {
-				constraints = constraints.append(mappings.add(type, typeState, WorkflowElement.USED_TYPE))
+				constraints = constraints.append(mappings.add(dataType, typeState, WorkflowElement.USED_TYPE))
+						.append(" ");
+				constraints = constraints.append(mappings.add(empty, typeState, WorkflowElement.USED_TYPE))
 						.append(" 0\n");
 			}
 		}
@@ -118,21 +125,22 @@ public class SATTypeUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications
 	 */
-	public static String typeEnforceTaxonomyStructure(AllTypes allTypes, TaxonomyPredicate currType, TypeAutomaton typeAutomaton, AtomMappings mappings) {
-
+	public static String typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton, AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 		// taxonomy enforcement of types in in all the states (those that represent
 		// general memory and used data instances)
+		for(TaxonomyPredicate dimension : allTypes.getRootPredicate()) {
 		for (Block memTypeBlock : typeAutomaton.getMemoryTypesBlocks()) {
 			for (State memTypeState : memTypeBlock.getStates()) {
 				constraints = constraints
-						.append(typeEnforceTaxonomyStructureForState(allTypes,currType, mappings, memTypeState, WorkflowElement.MEMORY_TYPE));
+						.append(typeEnforceTaxonomyStructureForState(dimension, mappings, memTypeState, WorkflowElement.MEMORY_TYPE));
 			}
 		}
 		for (Block usedTypeBlock : typeAutomaton.getUsedTypesBlocks()) {
 			for (State usedTypeState : usedTypeBlock.getStates()) {
-				constraints = constraints.append(typeEnforceTaxonomyStructureForState(allTypes, currType, mappings, usedTypeState, WorkflowElement.USED_TYPE));
+				constraints = constraints.append(typeEnforceTaxonomyStructureForState(dimension, mappings, usedTypeState, WorkflowElement.USED_TYPE));
 			}
+		}
 		}
 		return constraints.toString();
 	}
@@ -141,7 +149,7 @@ public class SATTypeUtils {
 	 * Supporting recursive method for typeEnforceTaxonomyStructure.
 	 * @param typeElement 
 	 */
-	private static String typeEnforceTaxonomyStructureForState(AllTypes allTypes, TaxonomyPredicate currType,
+	private static String typeEnforceTaxonomyStructureForState(TaxonomyPredicate currType,
 			AtomMappings mappings, State typeState, WorkflowElement typeElement) {
 
 		String superType_State = mappings.add(currType, typeState, typeElement).toString();
@@ -160,7 +168,7 @@ public class SATTypeUtils {
 				currConstraint = currConstraint.append(subType_State).append(" ");
 				subTypes_States.add(subType_State);
 
-				constraints = constraints.append(typeEnforceTaxonomyStructureForState(allTypes, subType, mappings, typeState, typeElement));
+				constraints = constraints.append(typeEnforceTaxonomyStructureForState(subType, mappings, typeState, typeElement));
 			}
 			currConstraint = currConstraint.append("0\n");
 			/*
@@ -217,7 +225,7 @@ public class SATTypeUtils {
 
 	/**
 	 * Encoding the workflow output. The provided output files have to occur as the
-	 * final set of "used" data types.
+	 * final list of "used" data types. In the predefined order.
 	 * 
 	 * @param allTypes
 	 * @param program_outputs

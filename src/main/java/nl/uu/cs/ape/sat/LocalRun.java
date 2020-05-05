@@ -8,6 +8,7 @@ import org.json.JSONException;
 
 import guru.nidi.graphviz.attribute.RankDir;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
+import nl.uu.cs.ape.sat.core.solutionStructure.CWLCreator;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 public class LocalRun {
@@ -49,7 +50,7 @@ public class LocalRun {
 		
 		SATsolutionsList solutions;
 		try {
-			solutions = apeFramework.runSynthesis(file.getAbsolutePath());
+			solutions = apeFramework.runSynthesis(file.getAbsolutePath(), apeFramework.getDomainSetup());
 		} catch (IOException e) {
 			System.err.println("Error in synthesis execution. Writing to the file system failed.");
 			return;
@@ -68,6 +69,9 @@ public class LocalRun {
 				apeFramework.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
 //				apeFramework.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
 				apeFramework.writeExecutableWorkflows(solutions);
+				
+//				CWLCreator cwl = new CWLCreator(solutions.get(0), apeFramework.getConfig());
+//				APEUtils.write2file(cwl.getCWL(), new File(path + subPath + "tmp"), false);
 			} catch (IOException e) {
 				System.err.println("Error in writing the solutions. to the file system.");
 				e.printStackTrace();

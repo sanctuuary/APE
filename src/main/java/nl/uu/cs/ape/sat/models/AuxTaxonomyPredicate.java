@@ -6,13 +6,16 @@ import java.util.TreeSet;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 
 /**
- * The {@code TaxonomyPredicateHelper} class represents an abstract class used
+ * The {@code AuxTaxonomyPredicate} class represents an abstract class used
  * strictly to represent artificially generated abstract terms, used to abstract
  * over existing taxonomy terms.<br>
  * Object of this class represent disjunctions of conjunctions of existing
  * taxonomy predicates.
+ * 
+ * Class is meant to be used only by the {@link APEDomainSetup#generateAuxiliaryPredicate(SortedSet, LogicOperation)}.
  * 
  * @author Vedran Kasalica
  *
@@ -27,17 +30,11 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
 	/** Field defines the connective between the subclasses of the predicate. */
 	private final LogicOperation logicOp;
 
+
 	/**
-	 * Creates an abstract module from @predicateName and @predicateID. If @isTool
-	 * is true, module is an actual tool, otherwise it's an abstract/non-tool
-	 * module.
-	 * 
-	 * @param predicateName - module name
-	 * @param predicateID   - unique module identifier
-	 * @param rootNode      - ID of the Taxonomy Root node corresponding to the
-	 *                      Module.
-	 * @param nodeType      - {@link NodeType} object describing the type w.r.t. the
-	 *                      Module Taxonomy.
+	 * Create an auxiliary predicate.
+	 * @param predicate
+	 * @param logicOp
 	 */
 	public AuxTaxonomyPredicate(TaxonomyPredicate predicate, LogicOperation logicOp) {
 		super(predicate.getRootNode(), predicate.getNodeType());

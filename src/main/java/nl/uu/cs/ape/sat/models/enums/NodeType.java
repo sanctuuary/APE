@@ -15,10 +15,6 @@ public enum NodeType {
 	 */
 	ROOT,
 	/**
-	 * Direct children of the taxonomy root. Used to create sub taxonomies (e.g type and format data taxonomies)
-	 */
-	SUBROOT,
-	/**
 	 * Non-leaf node in the taxonomy. Usually represents an abstraction over the actual implementation of a tool or data type/format. 
 	 */
 	ABSTRACT,
@@ -33,10 +29,6 @@ public enum NodeType {
 	/**
 	 * Represents the empty predicate.
 	 */
-	EMPTY,
-	/**
-	 * Unknown Node Type. Usually used  for the undefined types used in the tool annotation file.
-	 */
-	UNKNOWN
+	EMPTY
 	
 }

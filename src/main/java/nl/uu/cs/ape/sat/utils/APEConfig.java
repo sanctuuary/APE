@@ -2,7 +2,9 @@ package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -12,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
@@ -31,8 +34,8 @@ public class APEConfig {
 	private final String ONTOLOGY_TAG = "ontology_path";
 	private final String ONTOLOGY_PREFIX = "ontologyPrexifIRI";
 	private final String TOOL_ONTOLOGY_TAG = "toolsTaxonomyRoot";
-	private final String DATA_ONTOLOGY_TAG = "dataTaxonomyRoot";
-	private final String SUBONTOLOGY_TAG = "dataSubTaxonomyRoot";
+//	private final String DATA_ONTOLOGY_TAG = "dataTaxonomyRoot";
+	private final String DIMENSIONSONTOLOGY_TAG = "dataSubTaxonomyRoot";
 	private final String TOOL_ANNOTATIONS_TAG = "tool_annotations_path";
 	private final String CONSTRAINTS_TAG = "constraints_path";
 	private final String SHARED_MEMORY_TAG = "shared_memory";
@@ -55,15 +58,14 @@ public class APEConfig {
 	/** Prefix used to define OWL class IDs */
 	private String ontologyPrefixURI;
 	/**
-	 * Nodes in the ontology that correspond to the roots of module and data
-	 * taxonomies.
+	 * Node in the ontology that corresponds to the root of the module taxonomy.
 	 */
-	private String toolTaxonomyRoot, dataTaxonomyRoot;
+	private String toolTaxonomyRoot;
 	/**
 	 * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each respresents a data dimension (e.g. data type, data format, etc.).
 	 */
-	private List<String> dataTaxonomySubroots;
-
+	private List<String> dataDimensionRoots;
+	
 	/** Path to the XML file with all tool annotations. */
 	private String toolAnnotationsPath;
 
@@ -159,7 +161,7 @@ public class APEConfig {
 			throw new IOException("The configuration file path is not provided correctly.");
 		}
 		
-		dataTaxonomySubroots = new ArrayList<String>();
+		dataDimensionRoots = new ArrayList<String>();
 		programInputs = new ArrayList<DataInstance>(); 
 		programOutputs = new ArrayList<DataInstance>();
 		
@@ -184,7 +186,7 @@ public class APEConfig {
 			throw new JSONException("Core configuration error. The provided JSON object is null.");
 		}
 		
-		dataTaxonomySubroots = new ArrayList<String>();
+		dataDimensionRoots = new ArrayList<String>();
 		programInputs = new ArrayList<DataInstance>(); 
 		programOutputs = new ArrayList<DataInstance>();
 		
@@ -198,7 +200,7 @@ public class APEConfig {
 	}
 
 	/** Setup the configuration for the current run of the synthesis. */
-	public boolean setupRunConfiguration(String congifPath) throws IOException, JSONException {
+	public boolean setupRunConfiguration(String congifPath, APEDomainSetup apeDomainSetup) throws IOException, JSONException {
 		if (congifPath == null) {
 			throw new IOException("The configuration file path is not provided correctly.");
 		}
@@ -209,14 +211,14 @@ public class APEConfig {
 		// Convert JSON string to JSONObject
 		runConfiguration = new JSONObject(content);
 		
-		if(!runConfigSetup()) {
+		if(!runConfigSetup(apeDomainSetup)) {
 			throw new JSONException("Run configuration failed.");
 		}
 		return true;
 	}
 	
 	/** Setup the configuration for the current run of the synthesis. */
-	public boolean setupRunConfiguration(JSONObject configObject) throws JSONException {
+	public boolean setupRunConfiguration(JSONObject configObject, APEDomainSetup apeDomainSetup) throws JSONException {
 		if (configObject == null) {
 			throw new JSONException("Run configuration error. The provided JSON object is null.");
 		}
@@ -224,7 +226,7 @@ public class APEConfig {
 		// Convert JSON string to JSONObject
 		runConfiguration = configObject;
 		
-		if(!runConfigSetup()) {
+		if(!runConfigSetup(apeDomainSetup)) {
 			throw new JSONException("Run configuration failed.");
 		}
 		return true;
@@ -263,24 +265,25 @@ public class APEConfig {
 			return false;
 		}
 
-		try {
-			this.dataTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(DATA_ONTOLOGY_TAG), getOntologyPrefixURI());
-			if (dataTaxonomyRoot == null || this.dataTaxonomyRoot == "") {
-				System.err.println("Incorrect format of " + DATA_ONTOLOGY_TAG + " tag in the config file.");
-				return false;
-			}
-		} catch (JSONException JSONException) {
-			System.err.println("Tag '" + DATA_ONTOLOGY_TAG + "' in the configuration file is not provided correctly.");
-			return false;
-		}
+//		try {
+//			this.dataTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(DATA_ONTOLOGY_TAG), getOntologyPrefixURI());
+//			if (dataTaxonomyRoot == null || this.dataTaxonomyRoot == "") {
+//				System.err.println("Incorrect format of " + DATA_ONTOLOGY_TAG + " tag in the config file.");
+//				return false;
+//			}
+//		} catch (JSONException JSONException) {
+//			System.err.println("Tag '" + DATA_ONTOLOGY_TAG + "' in the configuration file is not provided correctly.");
+//			return false;
+//		}
 
 		try {
-			List<String> tmpDataSubontology = APEUtils.getListFromJson(coreConfiguration, SUBONTOLOGY_TAG, String.class);
-			for (String subTaxonomy : tmpDataSubontology) {
-				dataTaxonomySubroots.add(APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()));
+			List<String> tmpDataDimensionsRoots = APEUtils.getListFromJson(coreConfiguration, DIMENSIONSONTOLOGY_TAG, String.class);
+			for (String subTaxonomy : tmpDataDimensionsRoots) {
+				dataDimensionRoots.add(APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()));
 			}
 		} catch (JSONException JSONException) {
-			/* Configuration does not have the type sub-ontology */
+			System.err.println("Tag '" + DIMENSIONSONTOLOGY_TAG + "' in the configuration file is not provided correctly.");
+			return false;
 		}
 
 		try {
@@ -335,7 +338,7 @@ public class APEConfig {
 	 * @return {@code true} if the method successfully set-up the configuration,
 	 *         {@code false} otherwise.
 	 */
-	private boolean runConfigSetup() {
+	private boolean runConfigSetup(APEDomainSetup apeDomainSetup) {
 
 		try {
 			this.constraintsPath = runConfiguration.getString(CONSTRAINTS_TAG);
@@ -419,7 +422,7 @@ public class APEConfig {
 		try {
 			for (JSONObject jsonModuleInput : APEUtils.getListFromJson(runConfiguration, PROGRAM_INPUTS_TAG, JSONObject.class)) {
 				DataInstance input;
-				if((input = getDataInstance(jsonModuleInput)) != null) {
+				if((input = getDataInstance(jsonModuleInput, apeDomainSetup.getAllTypes())) != null) {
 					programInputs.add(input);
 				}
 			}
@@ -433,7 +436,7 @@ public class APEConfig {
 		try {
 			for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(runConfiguration, PROGRAM_OUTPUTS_TAG, JSONObject.class)) {
 				DataInstance output;
-				if((output = getDataInstance(jsonModuleOutput)) != null) {
+				if((output = getDataInstance(jsonModuleOutput, apeDomainSetup.getAllTypes())) != null) {
 					programOutputs.add(output);
 				}
 			}
@@ -482,19 +485,19 @@ public class APEConfig {
 		return true;
 	}
 	
-	private DataInstance getDataInstance(JSONObject jsonModuleInput) {
+	private DataInstance getDataInstance(JSONObject jsonModuleInput, AllTypes allTypes) {
 	DataInstance dataInstances = new DataInstance();
 	for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
 		String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel, getOntologyPrefixURI());
 		for (String currTypeLabel : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
 			String currTypeURI = APEUtils.createClassURI(currTypeLabel, getOntologyPrefixURI());
-			if (dataTaxonomySubroots.contains(typeSuperClassURI)) {
-				dataInstances.addType(new Type(currTypeLabel, currTypeURI, typeSuperClassURI, NodeType.UNKNOWN));
-			} else {
-				System.err.println("Error in the configuration file. The data subtaxonomy '" + typeSuperClassLabel
-						+ "' was not defined, but it was used as a root ot the input type '" + currTypeURI + "'.");
+			Type currType = allTypes.get(currTypeURI, typeSuperClassURI);
+			if(currType == null) {
+				System.err.println("Error in the configuration file. The data type '" + currTypeURI
+						+ "' was not defined or does not belong to the dimension '" + typeSuperClassLabel + "'.");
 				return null;
 			}
+			dataInstances.addType(currType);
 		}
 	}
 
@@ -527,18 +530,18 @@ public class APEConfig {
 		return toolTaxonomyRoot;
 	}
 
-	/**
-	 * @return the {@link #dataTaxonomyRoot}
-	 */
-	public String getDataTaxonomyRoot() {
-		return dataTaxonomyRoot;
-	}
+//	/**
+//	 * @return the {@link #dataTaxonomyRoot}
+//	 */
+//	public String getDataTaxonomyRoot() {
+//		return dataTaxonomyRoot;
+//	}
 
 	/**
-	 * @return the {@link #dataTaxonomySubroots}
+	 * @return the {@link #dataDimensionRoots}
 	 */
-	public List<String> getDataTaxonomySubroots() {
-		return dataTaxonomySubroots;
+	public List<String> getDataDimensionRoots() {
+		return dataDimensionRoots;
 	}
 
 	/**
@@ -682,6 +685,10 @@ public class APEConfig {
 	 */
 	public JSONObject getRunConfigJsonObj() {
 		return runConfiguration;
+	}
+	
+	public String getCWLFormatRoot() {
+		return "format_1915";
 	}
 
 	/**

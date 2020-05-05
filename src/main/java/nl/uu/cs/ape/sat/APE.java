@@ -23,6 +23,7 @@ import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
+import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEConfig;
@@ -78,31 +79,11 @@ public class APE {
 	}
 	
 	/**
-	 * Method that return all the supported constraint templates.
-	 * @return list of {@link ConstraintTemplate} objects.
-	 */
-	public Collection<ConstraintTemplate> getConstraintTemplates() {
-		return apeDomainSetup.getConstraintFactory().getConstraintTamplates();
-	}
-	
-	
-	/** 
-	 * The method returns the configuration file of the APE instance.
-	 * @return the field {@link config}. */
-	public APEConfig getConfig() {
-		return config;
-	}
-	
-	public APEDomainSetup getDomainSetup() {
-		return apeDomainSetup;
-	}
-	
-	/**
 	 * Method used to setup the domain using the configuration file and the corresponding annotation and constraints files.
 	 * @return {@code true} if the setup was successfully performed, {@code false} otherwise.
 	 * @throws ExceptionInInitializerError 
 	 */
-	public boolean setupDomain() throws ExceptionInInitializerError {
+	private boolean setupDomain() throws ExceptionInInitializerError {
 		/** Variable that describes a successful run of the program. */
 		boolean succRun = true;
 		/*
@@ -119,11 +100,6 @@ public class APE {
 			return false;
 		}
 
-		/*
-		 * Set the the empty type (representing the absence of types) as a direct child
-		 * of root type
-		 */
-		succRun &= apeDomainSetup.getAllTypes().getRootPredicate().addSubPredicate(apeDomainSetup.getAllTypes().getEmptyType());
 
 		/*
 		 * Update allModules and allTypes sets based on the module.json file
@@ -138,6 +114,30 @@ public class APE {
 		apeDomainSetup.initializeConstraints();
 		
 		return succRun;
+	}
+
+	/**
+	 * Method that return all the supported constraint templates.
+	 * @return list of {@link ConstraintTemplate} objects.
+	 */
+	public Collection<ConstraintTemplate> getConstraintTemplates() {
+		return apeDomainSetup.getConstraintFactory().getConstraintTamplates();
+	}
+	
+	
+	/** 
+	 * The method returns the configuration file of the APE instance.
+	 * @return the field {@link config}. */
+	public APEConfig getConfig() {
+		return config;
+	}
+	
+	/**
+	 * Get the object that contains all crucial information about the domain (e.g. list of tools, data types, constraint factory, etc.)
+	 * @return
+	 */
+	public APEDomainSetup getDomainSetup() {
+		return apeDomainSetup;
 	}
 	
 	/**
@@ -173,9 +173,9 @@ public class APE {
 	 * @return The list of all the solutions.
 	 * @throws JSONException
 	 */
-	public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, JSONException {
+	public SATsolutionsList runSynthesis(JSONObject configObject, APEDomainSetup apeDomainSetup) throws IOException, JSONException {
 		apeDomainSetup.clearConstraints();
-		config.setupRunConfiguration(configObject);
+		config.setupRunConfiguration(configObject, apeDomainSetup);
 		if (config == null || config.getRunConfigJsonObj() == null) {
 			throw new JSONException("Run configuration failed. Error in configuration object.");
 		}
@@ -190,8 +190,8 @@ public class APE {
 	 * @return The list of all the solutions.
 	 * @throws JSONException
 	 */
-	public SATsolutionsList runSynthesis(String configPath) throws IOException, JSONException {
-		config.setupRunConfiguration(configPath);
+	public SATsolutionsList runSynthesis(String configPath, APEDomainSetup apeDomainSetup) throws IOException, JSONException {
+		config.setupRunConfiguration(configPath, apeDomainSetup);
 		if (config == null || config.getRunConfigJsonObj() == null) {
 			throw new JSONException("Run configuration failed. Error in configuration file.");
 		}
@@ -262,7 +262,7 @@ public class APE {
 		StringBuilder solutions2write = new StringBuilder();
 
 		for (int i = 0; i < allSolutions.size(); i++) {
-			solutions2write = solutions2write.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution())
+			solutions2write = solutions2write.append(allSolutions.get(i).getNativeSATsolution().getSolution())
 					.append("\n");
 		}
 		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolutionPath()), false);

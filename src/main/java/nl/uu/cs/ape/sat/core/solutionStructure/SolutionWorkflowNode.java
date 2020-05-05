@@ -61,5 +61,11 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
 		return this.getAutomatonState().compareTo(otherNode.getAutomatonState());
 	}
 	
+	/** Get the unique label that describes the node. */
+	public abstract String getNodeID();
+	
+	/** Get a label that describes the node. */
+	public abstract String getNodeLabel();
+	
 	
 }

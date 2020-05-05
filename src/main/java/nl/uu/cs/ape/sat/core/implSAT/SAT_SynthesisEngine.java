@@ -1,5 +1,6 @@
 package nl.uu.cs.ape.sat.core.implSAT;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -100,10 +101,9 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	public boolean synthesisEncoding() throws IOException {
 
 		long problemSetupStartTime = System.currentTimeMillis();
-		TaxonomyPredicate rootModule = domainSetup.getAllModules().getRootPredicate();
-		TaxonomyPredicate rootType = domainSetup.getAllTypes().getRootPredicate();
+		TaxonomyPredicate rootModule = domainSetup.getAllModules().getRootPredicate().get(0);
 
-		if(rootModule == null || rootType == null) {
+		if(rootModule == null) {
 			System.err.println("Taxonomies have not been setup properly.");
 			return false;
 		}
@@ -148,9 +148,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		 */
 		cnfEncoding = cnfEncoding.append(SATTypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
-		cnfEncoding = cnfEncoding.append(SATTypeUtils.typeMandatoryUsage(domainSetup.getAllTypes(), rootType, typeAutomaton, mappings));
-		cnfEncoding = cnfEncoding
-				.append(SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), rootType, typeAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(SATTypeUtils.typeMandatoryUsage(domainSetup, typeAutomaton, mappings));
+		cnfEncoding = cnfEncoding.append(SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton, mappings));
 		APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
 		/*
 		 * Encode the constraints from the file based on the templates (manual templates)
@@ -201,10 +200,10 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 		temp_sat_input = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
 		temp_sat_input.close();
 //		testing sat input
-//		InputStream tmpSat = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
-//		tmpSat.close();
-//		String encoding = APEUtils.convertCNF2humanReadable(tmpSat, mappings);
-//		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp"), false);
+		InputStream tmpSat = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
+		tmpSat.close();
+		String encoding = APEUtils.convertCNF2humanReadable(tmpSat, mappings);
+		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
 		long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
 		System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");

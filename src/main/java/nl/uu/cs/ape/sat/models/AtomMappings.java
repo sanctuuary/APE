@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.uu.cs.ape.sat.automaton.State;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 /**
  *  The {@code AtomMappings} class is used to store the data used for representing the atoms with integer numbers. Atoms are not a separate data structure, 
