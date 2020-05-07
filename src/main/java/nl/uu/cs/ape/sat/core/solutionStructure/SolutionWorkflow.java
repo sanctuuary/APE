@@ -28,6 +28,7 @@ import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
 import nl.uu.cs.ape.sat.models.AbstractModule;
+import nl.uu.cs.ape.sat.models.AuxTaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
@@ -75,7 +76,7 @@ public class SolutionWorkflow {
 	 * @param typeAutomaton
 	 * @throws Exception exception in case of a mismatch between the type of automaton states and workflow nodes.
 	 */
-	public SolutionWorkflow(ModuleAutomaton toolAutomaton, TypeAutomaton typeAutomaton) throws ExceptionInInitializerError {
+	private SolutionWorkflow(ModuleAutomaton toolAutomaton, TypeAutomaton typeAutomaton) throws ExceptionInInitializerError {
 		this.moduleNodes = new ArrayList<ModuleNode>();
 		this.workflowInputTypeStates = new ArrayList<TypeNode>();
 		this.workflowOutputTypeStates = new ArrayList<TypeNode>();
@@ -121,6 +122,7 @@ public class SolutionWorkflow {
 			}
 		}
 	}
+	
 	/**
 	 * Create a solution workflow, based on the SAT output.
 	 * 
@@ -138,7 +140,9 @@ public class SolutionWorkflow {
 			if (mappedLiteral > synthesisIntance.getMappings().getMaxNumOfMappedAuxVar()) {
 				Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisIntance.getMappings());
 				if (!currLiteral.isNegated()) {
-					if (currLiteral.isWorkflowElementType(WorkflowElement.MODULE)) {
+					if(currLiteral.getPredicate() instanceof AuxTaxonomyPredicate) {
+						continue;
+					} else if (currLiteral.isWorkflowElementType(WorkflowElement.MODULE)) {
 						ModuleNode currNode = this.allModuleNodes.get(currLiteral.getUsedInStateArgument());
 						if(currLiteral.getPredicate() instanceof Module) {
 							currNode.setUsedModule((Module) currLiteral.getPredicate());
@@ -151,15 +155,6 @@ public class SolutionWorkflow {
 							currNode.addUsedType((Type) currLiteral.getPredicate());
 						} else if (currLiteral.getPredicate() instanceof Type){
 							currNode.addAbstractDescriptionOfUsedType((Type) currLiteral.getPredicate());
-//							if(currLiteral.getPredicate().getPredicateLabel().equals("TypesTaxonomy")) {
-//								System.out.println("!--");
-//								System.out.println(currLiteral);
-//								System.out.println("---");
-//								if(currLiteral.getUsedInStateArgument().getPredicateID().equals("MemT0.0")) {
-//									System.out.println(mappedLiteral);
-//								}
-//								System.out.println("--!");
-//							}
 						} else {
 							/* Memory type cannot be anything else except a Type. */
 						}

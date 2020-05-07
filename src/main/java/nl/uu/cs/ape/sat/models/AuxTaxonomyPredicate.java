@@ -44,7 +44,7 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
 	}
 
 
-	public TaxonomyPredicate getTaxonomyPredicate() {
+	public TaxonomyPredicate getTaxonomyPredicates() {
 		return taxonomyPredicate;
 	}
 

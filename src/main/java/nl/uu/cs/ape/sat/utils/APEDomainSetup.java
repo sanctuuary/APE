@@ -159,14 +159,14 @@ public class APEDomainSetup {
 			newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel, abstractLabel, relatedPredicates.first().getRootNode(), NodeType.ABSTRACT));
 		}
 		AuxTaxonomyPredicate helperPredicate = new AuxTaxonomyPredicate(newAbsType, logicOp);
-		
+
 		for(TaxonomyPredicate predicate : relatedPredicates) {
 			helperPredicate.addConcretePredicate(predicate);
 		}
 		if(helperPredicate != null) {
 			helperPredicates.add(helperPredicate);
 		}
-		return helperPredicate.getTaxonomyPredicate();
+		return helperPredicate;
 	}
 	
 	/**
@@ -184,12 +184,12 @@ public class APEDomainSetup {
 		for (AuxTaxonomyPredicate helperPredicate : helperPredicates) {
 			if(helperPredicate.getGeneralizedPredicates().first() instanceof Type) {
 				automaton = typeAutomaton;
-				workflowElem = WorkflowElement.MEMORY_TYPE;
 			} else {
 				automaton = moduleAutomaton;
 				workflowElem = WorkflowElement.MODULE;
 			}
 			for (State currState : automaton.getAllStates()) {
+				workflowElem = currState.getWorkflowStateType();
 				if (helperPredicate.getLogicOp() == LogicOperation.OR) {
 					/*
 					 * Ensures that if the abstract predicate is used, at least one of the

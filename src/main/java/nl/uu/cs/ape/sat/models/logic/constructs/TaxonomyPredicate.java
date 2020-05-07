@@ -120,7 +120,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 		if (getPredicateID() == null) {
 			if (other.getPredicateID() != null)
 				return false;
-		} else if (getPredicateID().equals(other.getPredicateID())) {
+		} else if (!getPredicateID().equals(other.getPredicateID())) {
 			return false;
 		}
 		if (rootNode == null) {

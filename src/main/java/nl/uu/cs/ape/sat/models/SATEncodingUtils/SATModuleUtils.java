@@ -11,17 +11,13 @@ import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
-import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AllModules;
-import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Pair;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
-import nl.uu.cs.ape.sat.models.enums.LogicOperation;
-import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -120,7 +116,7 @@ public final class SATModuleUtils {
 						 */
 						if (currInputStateNo < moduleInputs.size()) {
 							/* Get input type and/or format that are/is required by the tool */
-							for (Type currInputType : moduleInputs.get(currInputStateNo).getTypes()) {
+							for (TaxonomyPredicate currInputType : moduleInputs.get(currInputStateNo).getTypes()) {
 								/* Encode: if module was used in the module state */
 								constraints = constraints.append("-")
 										.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
@@ -534,7 +530,7 @@ public final class SATModuleUtils {
 					List<DataInstance> moduleOutputs = module.getModuleOutput();
 					for (int i = 0; i < currOutputStates.size(); i++) {
 						if (i < moduleOutputs.size()) {
-							for (Type outputType : moduleOutputs.get(i).getTypes()) { // set type and format for the
+							for (TaxonomyPredicate outputType : moduleOutputs.get(i).getTypes()) { // set type and format for the
 																						// single output
 								// if module was used in the module state
 								constraints = constraints.append("-")

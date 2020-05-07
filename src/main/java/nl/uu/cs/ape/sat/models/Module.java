@@ -181,7 +181,7 @@ public class Module extends AbstractModule {
 		if(taxonomyModules.isEmpty()) {
 				System.err.println("Tool '" + moduleURI + "' annotation issue. "
 						+ "None of the referenced '"+APEConfig.getJsonTags("taxonomyOperations")+"' can be found in the Tool Taxonomy.");
-				taxonomyModules.add(allModules.getRootID().get(0));
+				taxonomyModules.add(allModules.getRootsIDs().get(0));
 		}
 		
 		String executionCode = null;
@@ -220,7 +220,7 @@ public class Module extends AbstractModule {
 		 * Add the module and make it sub module of the currSuperModule (if it was not
 		 * previously defined)
 		 */
-		Module currModule =  (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootID().get(0), moduleExecutionImpl));
+		Module currModule =  (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootsIDs().get(0), moduleExecutionImpl));
 		
 		/*	For each supermodule add the current module as a subset and vice versa. */
 		for(String superModuleID : taxonomyModules) {
@@ -278,7 +278,7 @@ public class Module extends AbstractModule {
 				}
 			}
 			/* Create a new type, that represents a disjunction/conjunction of the types, that can be used to abstract over each of the tools individually. */
-			Type newAbsType = (Type) domainSetup.generateAuxiliaryPredicate(logConnectedPredicates, logConn);
+			TaxonomyPredicate newAbsType = domainSetup.generateAuxiliaryPredicate(logConnectedPredicates, logConn);
 			if(newAbsType != null) {
 				newAbsType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
 				dataInstance.addType(newAbsType);
@@ -299,14 +299,14 @@ public class Module extends AbstractModule {
 
 		for (DataInstance types : moduleInput) {
 			inputs = inputs.append("{ ");
-			for (Type type : types.getTypes()) {
+			for (TaxonomyPredicate type : types.getTypes()) {
 				inputs = inputs.append("'").append(type.getPredicateLabel()).append("' ");
 			}
 			inputs = inputs.append("} ");
 		}
 		for (DataInstance types : moduleOutput) {
 			outputs = outputs.append("{ ");
-			for (Type type : types.getTypes()) {
+			for (TaxonomyPredicate type : types.getTypes()) {
 				outputs = outputs.append("'").append(type.getPredicateLabel()).append("' ");
 			}
 			outputs = outputs.append("} ");

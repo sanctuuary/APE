@@ -101,7 +101,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 	public boolean synthesisEncoding() throws IOException {
 
 		long problemSetupStartTime = System.currentTimeMillis();
-		TaxonomyPredicate rootModule = domainSetup.getAllModules().getRootPredicate().get(0);
+		TaxonomyPredicate rootModule = domainSetup.getAllModules().getRootPredicates().get(0);
 
 		if(rootModule == null) {
 			System.err.println("Taxonomies have not been setup properly.");
@@ -199,11 +199,12 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 
 		temp_sat_input = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
 		temp_sat_input.close();
-//		testing sat input
-		InputStream tmpSat = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
-		tmpSat.close();
-		String encoding = APEUtils.convertCNF2humanReadable(tmpSat, mappings);
-		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
+		
+		/* testing sat input */
+//		InputStream tmpSat = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
+//		tmpSat.close();
+//		String encoding = APEUtils.convertCNF2humanReadable(tmpSat, mappings);
+//		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
 		long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
 		System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");

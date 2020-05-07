@@ -420,10 +420,10 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tTool Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
-			domainSetup.getAllModules().getRootPredicate().get(0).printTree(" ", domainSetup.getAllModules());
+			domainSetup.getAllModules().getRootPredicates().get(0).printTree(" ", domainSetup.getAllModules());
 			System.out.println("\n-------------------------------------------------------------");
 			System.out.println("\tData Taxonomy dimensions:");
-			for(TaxonomyPredicate dimension : domainSetup.getAllTypes().getRootPredicate()) {
+			for(TaxonomyPredicate dimension : domainSetup.getAllTypes().getRootPredicates()) {
 				System.out.println("\n-------------------------------------------------------------");
 				System.out.println("\t" + dimension.getPredicateLabel() + "Taxonomy:");
 				System.out.println("-------------------------------------------------------------");
@@ -731,12 +731,12 @@ public final class APEUtils {
 
 			if (intAtom > 0) {
 				Atom atom = mappings.findOriginal(intAtom);
-				humanReadable = humanReadable.append(atom.getPredicate().getPredicateID()).append("[")
-						.append(atom.getUsedInStateArgument().getPredicateID()).append("] ");
+				humanReadable = humanReadable.append(atom.getPredicate().getPredicateID()).append("(")
+						.append(atom.getUsedInStateArgument().getPredicateID()).append(") ");
 			} else if (intAtom < 0) {
 				Atom atom = mappings.findOriginal(-intAtom);
-				humanReadable = humanReadable.append("~").append(atom.getPredicate().getPredicateID()).append("[")
-						.append(atom.getUsedInStateArgument().getPredicateID()).append("] ");
+				humanReadable = humanReadable.append("-").append(atom.getPredicate().getPredicateID()).append("(")
+						.append(atom.getUsedInStateArgument().getPredicateID()).append(") ");
 			} else {
 				humanReadable = humanReadable.append("\n");
 			}

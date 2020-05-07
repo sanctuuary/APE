@@ -3,6 +3,8 @@ package nl.uu.cs.ape.sat.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+
 /**
  * The {@code DataInstance} class represents a data instance characterized by one or more data dimensions. Object of this class correspond 
  * to a single data instance (e.g. to a single input or output).
@@ -19,20 +21,20 @@ import java.util.List;
 public class DataInstance {
 
 	/** List of data types that describe different data dimensions and correspond to a single data instance. */
-	private List<Type> types;
+	private List<TaxonomyPredicate> types;
 	
 	/**
 	 * Create a new data instance. The instance will be characterized by different data type dimentions.
 	 */
 	public DataInstance() {
-		this.types = new ArrayList<Type>();
+		this.types = new ArrayList<TaxonomyPredicate>();
 	}
 
 	/**
 	 * Add a new data dimension to characterize the data instance.
 	 * @param type - data type that characterizes the data instance.
 	 */
-	public void addType(Type type) {
+	public void addType(TaxonomyPredicate type) {
 		if(type == null) {
 			System.err.println("Cannot add null as data instance!");
 		} else {
@@ -42,9 +44,9 @@ public class DataInstance {
 	
 	/**
 	 *  Get a list of types/formats that correspond to the specific data instance 
-	 * @return List of {@link Type}s
+	 * @return List of {@link TaxonomyPredicate}s
 	 */
-	public List<Type> getTypes() {
+	public List<TaxonomyPredicate> getTypes() {
 		return types;
 	}
 	

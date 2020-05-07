@@ -129,7 +129,7 @@ public class SATTypeUtils {
 		StringBuilder constraints = new StringBuilder();
 		// taxonomy enforcement of types in in all the states (those that represent
 		// general memory and used data instances)
-		for(TaxonomyPredicate dimension : allTypes.getRootPredicate()) {
+		for(TaxonomyPredicate dimension : allTypes.getRootPredicates()) {
 		for (Block memTypeBlock : typeAutomaton.getMemoryTypesBlocks()) {
 			for (State memTypeState : memTypeBlock.getStates()) {
 				constraints = constraints
@@ -201,8 +201,8 @@ public class SATTypeUtils {
 		List<State> workfloInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
 		for (int i = 0; i < workfloInputStates.size(); i++) {
 			if (i < program_inputs.size()) {
-				List<Type> currTypes = program_inputs.get(i).getTypes();
-				for (Type currType : currTypes) {
+				List<TaxonomyPredicate> currTypes = program_inputs.get(i).getTypes();
+				for (TaxonomyPredicate currType : currTypes) {
 					if (allTypes.get(currType.getPredicateID()) == null) {
 						System.err.println(
 								"Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
@@ -239,8 +239,8 @@ public class SATTypeUtils {
 		List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
 		for (int i = 0; i < workflowOutputStates.size(); i++) {
 			if (i < program_outputs.size()) {
-				List<Type> currTypes = program_outputs.get(i).getTypes();
-				for (Type currType : currTypes) {
+				List<TaxonomyPredicate> currTypes = program_outputs.get(i).getTypes();
+				for (TaxonomyPredicate currType : currTypes) {
 					if (allTypes.get(currType.getPredicateID()) == null) {
 						System.err.println(
 								"Program output '" + currType.getPredicateID() + "' was not defined in the taxonomy.");

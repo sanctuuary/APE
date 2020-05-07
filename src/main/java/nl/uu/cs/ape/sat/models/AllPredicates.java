@@ -19,8 +19,6 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  *
  * @author Vedran Kasalica
  * 
- * TODO CHANGE ROOT TO PLURAL!
- *
  */
 public abstract class AllPredicates {
 
@@ -38,7 +36,7 @@ public abstract class AllPredicates {
 	 * 
 	 * @return The root predicate.
 	 */
-	public List<TaxonomyPredicate> getRootPredicate() {
+	public List<TaxonomyPredicate> getRootPredicates() {
 		List<TaxonomyPredicate> rootpredicates = new ArrayList<>();
 		for (String rootID : taxonomyRoots) {
 			rootpredicates.add(get(rootID));
@@ -59,7 +57,7 @@ public abstract class AllPredicates {
 	 * 
 	 * @return The root predicate.
 	 */
-	public List<String> getRootID() {
+	public List<String> getRootsIDs() {
 		return taxonomyRoots;
 	}
 
@@ -68,21 +66,6 @@ public abstract class AllPredicates {
 	/** Returns the runtime class of the predicates that belong to the Object. */
 	public abstract Class<?> getPredicateClass();
 
-	/**
-	 * Returns a list of final predicates.
-	 * 
-	 * @return list of types
-	 */
-	private List<TaxonomyPredicate> getAllNonEmptyPredicates() {
-
-		List<TaxonomyPredicate> allNonEmptyTypes = new ArrayList<TaxonomyPredicate>();
-		for (TaxonomyPredicate type : this.predicates.values()) {
-			if (!(type.isEmptyPredicate() || type.isRootPredicate())) {
-				allNonEmptyTypes.add(type);
-			}
-		}
-		return allNonEmptyTypes;
-	}
 
 	/**
 	 * Remove the parts of the taxonomy that are not in use for the given set of
@@ -92,7 +75,7 @@ public abstract class AllPredicates {
 	 *         otherwise.
 	 */
 	public boolean trimTaxonomy() {
-		for (TaxonomyPredicate root : getRootPredicate()) {
+		for (TaxonomyPredicate root : getRootPredicates()) {
 			List<TaxonomyPredicate> toRemove = new ArrayList<TaxonomyPredicate>();
 			for (TaxonomyPredicate subClass : APEUtils.safe(root.getSubPredicates())) {
 				if (subClass == null) {

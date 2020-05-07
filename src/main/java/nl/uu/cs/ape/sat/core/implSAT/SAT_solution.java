@@ -9,6 +9,7 @@ import java.util.Set;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.core.SolutionInterpreter;
 import nl.uu.cs.ape.sat.models.AllModules;
+import nl.uu.cs.ape.sat.models.AuxTaxonomyPredicate;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
@@ -27,23 +28,29 @@ import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
  */
 public class SAT_solution extends SolutionInterpreter {
 
-	/** List of all the literals provided by the solution.*/
+	/** List of all the literals provided by the solution. */
 	private final List<Literal> literals;
-	/** List of all the positive literals provided by the solution.*/
+	/** List of all the positive literals provided by the solution. */
 	private final List<Literal> postitiveLiterals;
-	/**List of only relevant (positive) literals that represent implemented
-	 * modules/tools.  */
+	/**
+	 * List of only relevant (positive) literals that represent implemented
+	 * modules/tools.
+	 */
 	private final List<Literal> relevantModules;
-	/** List of only relevant (positive) literals that represent simple types.*/
+	/** List of only relevant (positive) literals that represent simple types. */
 	private final List<Literal> relevantTypes;
-	/** List of all the relevant types and modules combined.  */
+	/** List of all the relevant types and modules combined. */
 	private final List<Literal> relevantElements;
-	/** List of all the references for the types in the memory, when used as tool inputs.  */
+	/**
+	 * List of all the references for the types in the memory, when used as tool
+	 * inputs.
+	 */
 	private final List<Literal> references2MemTypes;
 	private final Set<PredicateLabel> usedTypeStates;
-	/** True if the there is no solution to the problem. Problem is UNASATISFIABLE. */
+	/**
+	 * True if the there is no solution to the problem. Problem is UNASATISFIABLE.
+	 */
 	private final boolean unsat;
-
 
 	/**
 	 * Creating a list of Literals to represent the solution.
@@ -69,24 +76,29 @@ public class SAT_solution extends SolutionInterpreter {
 				literals.add(currLiteral);
 				if (!currLiteral.isNegated()) {
 					postitiveLiterals.add(currLiteral);
-					if (currLiteral.getPredicate() instanceof Module) {
+					if(currLiteral.getPredicate() instanceof AuxTaxonomyPredicate) {
+						continue;
+					} else if (currLiteral.getPredicate() instanceof Module) {
 						/* add all positive literals that describe tool implementations */
 						relevantElements.add(currLiteral);
 						relevantModules.add(currLiteral);
-					} else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE && currLiteral.getWorkflowElementType() != WorkflowElement.MEM_TYPE_REFERENCE
-							&& (currLiteral.getPredicate() instanceof Type) && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
+					} else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE
+							&& currLiteral.getWorkflowElementType() != WorkflowElement.MEM_TYPE_REFERENCE
+							&& (currLiteral.getPredicate() instanceof Type)
+							&& ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
 						/* add all positive literals that describe simple types */
 						relevantElements.add(currLiteral);
-						if(currLiteral.getPredicate().getPredicateLabel().equals("TypesTaxonomy")) {
-							System.out.println("+++" + mappedLiteral);
-						}
 						relevantTypes.add(currLiteral);
 						usedTypeStates.add(currLiteral.getUsedInStateArgument());
-					} else if(currLiteral.getPredicate() instanceof State && ((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {
-						/* add all positive literals that describe memory type references that are not pointing to null state (NULL state has AbsoluteStateNumber == -1) */
+					} else if (currLiteral.getPredicate() instanceof State
+							&& ((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {
+						/*
+						 * add all positive literals that describe memory type references that are not
+						 * pointing to null state (NULL state has AbsoluteStateNumber == -1)
+						 */
 						references2MemTypes.add(currLiteral);
 						relevantElements.add(currLiteral);
-					} 
+					}
 				}
 			}
 		}
@@ -129,6 +141,24 @@ public class SAT_solution extends SolutionInterpreter {
 	}
 
 	/**
+	 * Returns the complete solution in human readable format, including the
+	 * negative predicates.
+	 * 
+	 * @return String representing the solution positive and negative literals).
+	 */
+	public String getCompleteSolution() {
+		StringBuilder solution = new StringBuilder();
+		if (unsat) {
+			solution = new StringBuilder("UNSAT");
+		} else {
+			for (Literal literal : literals) {
+				solution = solution.append(literal.toString()).append(" ");
+			}
+		}
+		return solution.toString();
+	}
+
+	/**
 	 * Returns only the most important part of the solution in human readable
 	 * format, filtering out the information that are not required to generate the
 	 * workflow. The solution literals are sorted according the state they are used
@@ -161,7 +191,7 @@ public class SAT_solution extends SolutionInterpreter {
 		if (unsat) {
 			solution = new StringBuilder("UNSAT");
 		} else {
-			for(Literal relevantElement : relevantElements) {
+			for (Literal relevantElement : relevantElements) {
 				solution = solution.append(relevantElement.toString() + " ");
 			}
 		}
@@ -170,6 +200,7 @@ public class SAT_solution extends SolutionInterpreter {
 
 	/**
 	 * Returns the list of modules, corresponding to their position in the workflow.
+	 * 
 	 * @param allModules - list of all the modules in the domain
 	 * @return List of {@link Module}s in the order they appear in the solution
 	 *         workflow.
@@ -194,7 +225,7 @@ public class SAT_solution extends SolutionInterpreter {
 	 */
 	public String getOriginalSATSolution() {
 		StringBuilder solution = new StringBuilder();
-			if (!unsat) {
+		if (!unsat) {
 			for (Literal literal : literals) {
 				solution = solution.append(literal.toMappedString()).append(" ");
 			}
