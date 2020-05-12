@@ -37,7 +37,7 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
 	 * @param logicOp
 	 */
 	public AuxTaxonomyPredicate(TaxonomyPredicate predicate, LogicOperation logicOp) {
-		super(predicate.getRootNode(), predicate.getNodeType());
+		super(predicate.getRootNodeID(), predicate.getNodeType());
 		this.taxonomyPredicate = predicate;
 		this.logicOp = logicOp;
 		this.containingPredicates = new TreeSet<TaxonomyPredicate>();

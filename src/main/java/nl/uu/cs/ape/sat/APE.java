@@ -257,15 +257,18 @@ public class APE {
 	 * @param allSolutions 
 	 * @param allSolutions
 	 * @return {@code true} if the writing was successfully performed, {@code false} otherwise.
+	 * @throws IOException - file not found 
 	 */
-	public boolean writeSolutionToFile(SATsolutionsList allSolutions) {
+	public boolean writeSolutionToFile(SATsolutionsList allSolutions) throws IOException {
 		StringBuilder solutions2write = new StringBuilder();
 
 		for (int i = 0; i < allSolutions.size(); i++) {
 			solutions2write = solutions2write.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution())
 					.append("\n");
 		}
-		return APEUtils.write2file(solutions2write.toString(), new File(config.getSolutionPath()), false);
+		APEUtils.write2file(solutions2write.toString(), new File(config.getSolutionPath()), false);
+		
+		return true;
 	}
 
 	/**
@@ -289,25 +292,38 @@ public class APE {
 				new File(executionsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
 				.forEach(File::delete);
 		System.out.print("Loading");
-		for (int i = 0; i < noExecutions && i < allSolutions.size(); i++) {
 
-			PrintWriter out = new PrintWriter(
-					new BufferedWriter(new FileWriter(executionsFolder + "/workflowSolution_" + i + ".sh", false)));
-			out.println("");
-			out.close();
-			SAT_solution currSol = allSolutions.get(i).getNativeSATsolution();
-			currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules());
-			for (Module curr : currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules())) {
-				if (curr.getModuleExecution() != null) {
-					curr.getModuleExecution()
-							.run(config.getExecutionScriptsFolder() + "/workflowSolution_" + i + ".sh");
+//			PrintWriter out = new PrintWriter(
+//					new BufferedWriter(new FileWriter(executionsFolder + "/workflowSolution_" + i + ".sh", false)));
+//			out.println("");
+//			out.close();
+			
+			/* Creating the requested scripts in parallel. */
+			allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noExecutions)
+											.forEach(solution -> {
+				try {
+					String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength() + ".sh";
+					File script = new File(executionsFolder + "/" + title);
+					APEUtils.write2file(solution.getScriptExecution(), script, false);
+					System.out.print(".");
+				} catch (IOException e) {
+					System.err.println("Error occured while writing a graph to the file system.");
+					e.printStackTrace();
 				}
-			}
-			System.out.print(".");
-			if (i > 0 && i % 60 == 0) {
-				System.out.println();
-			}
-		}
+			});
+			
+//			SAT_solution currSol = allSolutions.get(i).getNativeSATsolution();
+//			currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules());
+//			for (Module curr : currSol.getRelevantSolutionModules(apeDomainSetup.getAllModules())) {
+//				if (curr.getModuleExecution() != null) {
+//					curr.getModuleExecution()
+//							.run(config.getExecutionScriptsFolder() + "/workflowSolution_" + i + ".sh");
+//				}
+//			}
+//			System.out.print(".");
+//			if (i > 0 && i % 60 == 0) {
+//				System.out.println();
+//			}
 		APEUtils.timerPrintText("executingWorkflows", "\nWorkflows have been executed.");
 		return true;
 	}

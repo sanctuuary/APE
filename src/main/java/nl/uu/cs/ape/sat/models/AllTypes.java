@@ -61,7 +61,7 @@ public class AllTypes extends AllPredicates {
 	 */
 	private Type put(Type type) {
 		Type tmpType;
-		if ((tmpType = this.get(type.getPredicateID())) != null) {
+		if ((tmpType = this.get(type.getPredicateID(), type.getRootNodeID())) != null) {
 			return tmpType;
 		} else {
 			getPredicates().put(type.getPredicateID(), type);
@@ -85,7 +85,7 @@ public class AllTypes extends AllPredicates {
 	 */
 	public Type addPredicate(TaxonomyPredicate newType) throws ExceptionInInitializerError {
 		Type tmpType;
-		if ((tmpType = this.get(newType.getPredicateID())) == null) {
+		if ((tmpType = this.get(newType.getPredicateID(), newType.getRootNodeID())) == null) {
 			if(newType instanceof Type) {
 				this.put((Type)newType);
 				tmpType = (Type) newType;
@@ -104,10 +104,10 @@ public class AllTypes extends AllPredicates {
 	 * @param typeID - the key whose associated value is to be returned
 	 * @return {@link Type} to which the specified key is mapped to, or {@code null}
 	 *         if the typeID has no mappings
-	 */
+	 
 	public Type get(String typeID) {
 		return (Type) getPredicates().get(typeID);
-	}
+	}*/
 	
 
 	/**
@@ -121,7 +121,7 @@ public class AllTypes extends AllPredicates {
 	 */
 	public Type get(String typeID, String dimensionID) {
 		Type type = (Type) getPredicates().get(typeID);;
-		if(type!= null && type.getRootNode().equals(dimensionID)) {
+		if(type!= null && type.getRootNodeID().equals(dimensionID)) {
 			return type;
  		} else {
  			return null;
@@ -203,8 +203,8 @@ public class AllTypes extends AllPredicates {
 		for (TaxonomyPredicate type : getPredicates().values()) {
 			if (type.isSimplePredicate()) {
 				// If the root type for the curr type exists in our list, add the type to it
-				if (subTreesMap.get(type.getRootNode()) != null) {
-					subTreesMap.get(type.getRootNode()).add(type);
+				if (subTreesMap.get(type.getRootNodeID()) != null) {
+					subTreesMap.get(type.getRootNodeID()).add(type);
 				} else {
 					System.err.println("ERROR!!");
 				}

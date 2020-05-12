@@ -31,7 +31,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	 * Root of the Ontology tree that this node belongs to. Used to distinguish
 	 * between mutually exclusive data taxonomy subtrees (type and format).
 	 */
-	private String rootNode;
+	private String rootNodeID;
 
 	/**
 	 * Describes whether the node is relevant in the described scenario. In other
@@ -59,7 +59,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	 * @param nodeType
 	 */
 	public TaxonomyPredicate(String rootNode, NodeType nodeType) {
-		this.rootNode = rootNode;
+		this.rootNodeID = rootNode;
 		this.nodeType = nodeType;
 		this.isRelevant = false;
 		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
@@ -79,7 +79,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	 * @param nodeType
 	 */
 	public TaxonomyPredicate(TaxonomyPredicate oldPredicate, NodeType nodeType) {
-		this.rootNode = oldPredicate.rootNode;
+		this.rootNodeID = oldPredicate.rootNodeID;
 		this.nodeType = nodeType;
 		this.isRelevant = oldPredicate.isRelevant;
 		if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
@@ -101,7 +101,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((getPredicateID() == null) ? 0 : getPredicateID().hashCode());
-		result = prime * result + ((rootNode == null) ? 0 : rootNode.hashCode());
+		result = prime * result + ((rootNodeID == null) ? 0 : rootNodeID.hashCode());
 		return result;
 	}
 
@@ -123,10 +123,10 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 		} else if (!getPredicateID().equals(other.getPredicateID())) {
 			return false;
 		}
-		if (rootNode == null) {
-			if (other.rootNode != null)
+		if (rootNodeID == null) {
+			if (other.rootNodeID != null)
 				return false;
-		} else if (!rootNode.equals(other.rootNode))
+		} else if (!rootNodeID.equals(other.rootNodeID))
 			return false;
 		return true;
 	}
@@ -137,7 +137,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 		}
 		TaxonomyPredicate otherPredicate = (TaxonomyPredicate) other;
 		int diff = 0;
-		if((diff = this.getRootNode().compareTo(otherPredicate.getRootNode())) != 0) {
+		if((diff = this.getRootNodeID().compareTo(otherPredicate.getRootNodeID())) != 0) {
 			return diff;
 		} else {
 			return this.getPredicateID().compareTo(otherPredicate.getPredicateID());
@@ -150,15 +150,15 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 	 * 
 	 * @return String ID of the root class.
 	 */
-	public String getRootNode() {
-		return rootNode;
+	public String getRootNodeID() {
+		return rootNodeID;
 	}
 
 	/**
 	 * Set root of the Ontology tree that this node belongs to.
 	 */
 	public void setRootNode(String rootType) {
-		this.rootNode = rootType;
+		this.rootNodeID = rootType;
 	}
 
 	/**

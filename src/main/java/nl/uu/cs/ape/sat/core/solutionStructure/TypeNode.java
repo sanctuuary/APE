@@ -200,7 +200,7 @@ public class TypeNode extends SolutionWorkflowNode {
 
 	/** Get id of the current workflow node in .dot representation. */
 	public String getNodeID() {
-		StringBuilder printString = new StringBuilder("\"");
+		StringBuilder printString = new StringBuilder();
 
 		int i = 0;
 		for (Type type : this.usedTypes) {
@@ -209,8 +209,16 @@ public class TypeNode extends SolutionWorkflowNode {
 				printString = printString.append(",");
 			}
 		}
-		printString = printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
+		printString = printString.append("_").append(super.getAutomatonState().getPredicateID());
 
 		return printString.toString();
+	}
+	
+	/**
+	 * Get a short non descriptive node ID, that can be used as a variable name.
+	 * @return
+	 */
+	public String getShortNodeID() {
+		return "node" + Math.abs(getNodeID().hashCode());
 	}
 }

@@ -154,9 +154,9 @@ public class APEDomainSetup {
 		
 		TaxonomyPredicate newAbsType; 
 		if(relatedPredicates.first() instanceof Type) {
-			newAbsType = allTypes.addPredicate(new Type(abstractLabel, abstractLabel, relatedPredicates.first().getRootNode(), NodeType.ABSTRACT));
+			newAbsType = allTypes.addPredicate(new Type(abstractLabel, abstractLabel, relatedPredicates.first().getRootNodeID(), NodeType.ABSTRACT));
 		} else {
-			newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel, abstractLabel, relatedPredicates.first().getRootNode(), NodeType.ABSTRACT));
+			newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel, abstractLabel, relatedPredicates.first().getRootNodeID(), NodeType.ABSTRACT));
 		}
 		AuxTaxonomyPredicate helperPredicate = new AuxTaxonomyPredicate(newAbsType, logicOp);
 

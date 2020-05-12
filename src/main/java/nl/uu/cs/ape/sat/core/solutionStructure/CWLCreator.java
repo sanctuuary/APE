@@ -124,7 +124,7 @@ public class CWLCreator {
 		String formatRoot = apeConfig.getCWLFormatRoot();
 		List<TaxonomyPredicate> formats = new ArrayList<TaxonomyPredicate>();
 		typeNode.getTypes().forEach(type -> {
-			if (type.getRootNode().equals(formatRoot))
+			if (type.getRootNodeID().equals(formatRoot))
 				formats.add(type);
 		});
 		cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "format: " + toYmlArray(formats) + "").append("\n");
@@ -143,7 +143,7 @@ public class CWLCreator {
 		String formatRoot = apeConfig.getCWLFormatRoot();
 		List<TaxonomyPredicate> formats = new ArrayList<TaxonomyPredicate>();
 		typeNode.getTypes().forEach(type -> {
-			if (type.getRootNode().equals(formatRoot))
+			if (type.getRootNodeID().equals(formatRoot))
 				formats.add(type);
 		});
 		cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "format: " + toYmlArray(formats) + "").append("\n");

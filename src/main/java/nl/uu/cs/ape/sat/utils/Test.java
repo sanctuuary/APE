@@ -117,7 +117,7 @@ public class Test {
 		allTypes.getRootPredicate().printTree(" ", allTypes);
 	}*/
 
-	public static void customParseConfig(String path) {
+	public static void customParseConfig(String path) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader br = Files.newBufferedReader(
 				Paths.get(path))) {
@@ -144,7 +144,7 @@ public class Test {
 				new File(path), false);
 	}
 	
-	public static void customParseJson(String path) {
+	public static void customParseJson(String path) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader br = Files.newBufferedReader(
 				Paths.get(path + ".json"))) {
@@ -176,7 +176,7 @@ public class Test {
 				new File(path + "New.json"), false);
 	}
 	
-	public static void customAdvancedParseJson(String path) {
+	public static void customAdvancedParseJson(String path) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader br = Files.newBufferedReader(
 				Paths.get(path + ".json"))) {

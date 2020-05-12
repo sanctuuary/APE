@@ -51,9 +51,9 @@ public class SolutionWorkflow {
 	/** List of used type nodes provided as the final workflow output, ordered according the initial description (ape.config file). */
 	private List<TypeNode> workflowOutputTypeStates;
 	/** Map of all {@code ModuleNodes}, where key value is the {@link State} provided by the {@link ModuleAutomaton}. */
-	private Map<State, ModuleNode> allModuleNodes;
+	private Map<State, ModuleNode> mappedModuleNodes;
 	/** Map of all {@code MemTypeNode}, where key value is the {@link State} provided by the {@link TypeAutomaton}. */
-	private Map<State, TypeNode> allMemoryTypeNodes;
+	private Map<State, TypeNode> mappedMemoryTypeNodes;
 	/** Mapping used to allow us to determine the correlation between the usage of data instances and the actual
 	 *  tools that take the instance as input. A mapping is a pair of an Automaton {@link State} that depicts 
 	 *  {@link WorkflowElement#USED_TYPE} and a {@link ModuleNode}.<br><br> If the second is NULL, the data is used as WORKFLOW OUTPUT. */
@@ -80,8 +80,8 @@ public class SolutionWorkflow {
 		this.moduleNodes = new ArrayList<ModuleNode>();
 		this.workflowInputTypeStates = new ArrayList<TypeNode>();
 		this.workflowOutputTypeStates = new ArrayList<TypeNode>();
-		this.allModuleNodes = new HashMap<State, ModuleNode>();
-		this.allMemoryTypeNodes = new HashMap<State, TypeNode>();
+		this.mappedModuleNodes = new HashMap<State, ModuleNode>();
+		this.mappedMemoryTypeNodes = new HashMap<State, TypeNode>();
 		this.usedType2ToolMap = new HashMap<State, ModuleNode>();
 		
 		ModuleNode prev = null;
@@ -92,7 +92,7 @@ public class SolutionWorkflow {
 				prev.setNextModuleNode(currNode);
 			}
 			this.moduleNodes.add(currNode);
-			this.allModuleNodes.put(currState, currNode);
+			this.mappedModuleNodes.put(currState, currNode);
 			prev = currNode;
 		}
 		
@@ -105,7 +105,7 @@ public class SolutionWorkflow {
 				if(typeGenerator != null) {
 					typeGenerator.addOutputType(currTypeNode);
 				}
-				this.allMemoryTypeNodes.put(currState, currTypeNode);
+				this.mappedMemoryTypeNodes.put(currState, currTypeNode);
 				if(currBlock.getBlockNumber()==0) {
 					this.workflowInputTypeStates.add(currTypeNode);
 				} else if(currBlock.getBlockNumber() == toolAutomaton.size()) {
@@ -143,14 +143,14 @@ public class SolutionWorkflow {
 					if(currLiteral.getPredicate() instanceof AuxTaxonomyPredicate) {
 						continue;
 					} else if (currLiteral.isWorkflowElementType(WorkflowElement.MODULE)) {
-						ModuleNode currNode = this.allModuleNodes.get(currLiteral.getUsedInStateArgument());
+						ModuleNode currNode = this.mappedModuleNodes.get(currLiteral.getUsedInStateArgument());
 						if(currLiteral.getPredicate() instanceof Module) {
 							currNode.setUsedModule((Module) currLiteral.getPredicate());
 						} else {
 							currNode.addAbstractDescriptionOfUsedType((AbstractModule) currLiteral.getPredicate());
 						}
 					} else if (currLiteral.isWorkflowElementType(WorkflowElement.MEMORY_TYPE)) {
-						TypeNode currNode = this.allMemoryTypeNodes.get(currLiteral.getUsedInStateArgument());
+						TypeNode currNode = this.mappedMemoryTypeNodes.get(currLiteral.getUsedInStateArgument());
 						if(currLiteral.getPredicate() instanceof Type && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
 							currNode.addUsedType((Type) currLiteral.getPredicate());
 						} else if (currLiteral.getPredicate() instanceof Type){
@@ -165,7 +165,7 @@ public class SolutionWorkflow {
 							((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {
 						/* Add all positive literals that describe memory type references that are not pointing to null state (NULL state has AbsoluteStateNumber == -1), i.e. that are valid. */
 						ModuleNode usedTypeNode = this.usedType2ToolMap.get(currLiteral.getUsedInStateArgument());
-						TypeNode memoryTypeNode = this.allMemoryTypeNodes.get(currLiteral.getPredicate());
+						TypeNode memoryTypeNode = this.mappedMemoryTypeNodes.get(currLiteral.getPredicate());
 						int inputIndex = currLiteral.getUsedInStateArgument().getStateNumber();
 						/** Keep the order of inputs as they were defined in the solution file. */
 						if(usedTypeNode != null) {
@@ -181,10 +181,6 @@ public class SolutionWorkflow {
 		
 		/** Remove empty elements of the sets. */
 		this.workflowInputTypeStates.removeIf(node -> node.isEmpty());
-//		System.out.println("____" + i++);
-//		if(i>96) {
-//			System.out.println(workflowOutputTypeStates.toArray());	
-//		}
 		
 		this.workflowOutputTypeStates.removeIf(node ->node.isEmpty());
 		
@@ -484,4 +480,50 @@ public class SolutionWorkflow {
 		return this.index;
 		
 	}
+
+	/**
+	 * Return the executable shell script, that corresponds to the given workflow.
+	 * @return
+	 */
+	public String getScriptExecution() {
+		StringBuffer script = new StringBuffer("#!/bin/bash\n");
+		script = script.append("if [ $# -eq " + workflowInputTypeStates.size() + " ] then\n");
+		script = script.append("echo " + workflowInputTypeStates.size() + " \" argument(s) expected. exit\"\nfi\n");
+		int in = 1;
+		for(TypeNode input : workflowInputTypeStates) {
+			script = script.append(input.getShortNodeID() + "=$" + (in++) + "\n");
+		}
+		script = script.append("\n");
+		for(ModuleNode operation : moduleNodes) {
+			String code = operation.getUsedModule().getExecutionCode();
+			for(int i = 0; i < operation.getInputTypes().size(); i++) {
+				code = code.replace("$input[" + i + "]", "$" + operation.getInputTypes().get(i).getShortNodeID());
+			}
+			for(int i = 0; i < operation.getOutputTypes().size(); i++) {
+				code = code.replace("$output[" + i + "]", "$" + operation.getOutputTypes().get(i).getShortNodeID());
+			}
+			script = script.append(code).append("\n");
+		}
+		int out = 1;
+		for(TypeNode output : workflowOutputTypeStates) {
+			script = script.append("echo \"The " + (out++) + ". output is: $" + output.getShortNodeID() + "\"");
+		}
+		
+		return script.toString();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

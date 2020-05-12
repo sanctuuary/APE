@@ -57,7 +57,6 @@ public class OWLReader {
 	private Map<String, Set<String>> typeDimensions = new HashMap<String, Set<String>>();
 	private OWLOntology ontology;
 	private OWLDataFactory factory;
-	private boolean typeRootExists;
 	private Logger logger = Logger.getLogger("MyLog");
 
 	/**
@@ -73,7 +72,6 @@ public class OWLReader {
 		this.allModules = domain.getAllModules();
 		this.allTypes = domain.getAllTypes();
 		this.factory = OWLManager.getOWLDataFactory();
-		typeRootExists = false;
 	}
 
 	/**
@@ -230,7 +228,7 @@ public class OWLReader {
 		
 		final OWLClass currRoot;
 		Type superType, currType = null;
-		superType = allTypes.get(getIRI(superClass));
+		superType = allTypes.get(getIRI(superClass), getIRI(rootClass));
 		/*
 		 * Check whether the current node is a root or subRoot node.
 		 */
