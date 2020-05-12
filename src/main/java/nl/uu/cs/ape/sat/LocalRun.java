@@ -8,15 +8,14 @@ import org.json.JSONException;
 
 import guru.nidi.graphviz.attribute.RankDir;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
-import nl.uu.cs.ape.sat.core.solutionStructure.CWLCreator;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 public class LocalRun {
 
 	public static void main(String[] args) {
 
-		String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/New Use Cases/";
-		String subPath = "SimpleDemo/";
+		String path = "/home/vedran/git/APE_UseCases/";
+		String subPath = "MassSpectometry/No1/";
 		String fileName = "ape.configuration";
 		if (!APEUtils.isValidReadFile(path + subPath + fileName)) {
 			System.err.println("Bad path.");
