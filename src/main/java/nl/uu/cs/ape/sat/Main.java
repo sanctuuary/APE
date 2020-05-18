@@ -36,6 +36,7 @@ public class Main {
 			return;
 		} catch (ExceptionInInitializerError e) {
 			System.err.println(e.getMessage());
+			return;
 		}
 		
 		SATsolutionsList solutions;

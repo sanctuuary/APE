@@ -573,7 +573,7 @@ public class SolutionWorkflow {
 		}
 		int out = 1;
 		for (TypeNode output : workflowOutputTypeStates) {
-			script = script.append("echo \"The " + (out++) + ". output is: $" + output.getShortNodeID() + "\"");
+			script = script.append("echo \"" + (out++) + ". output is: $" + output.getShortNodeID() + "\"");
 		}
 
 		return script.toString();
