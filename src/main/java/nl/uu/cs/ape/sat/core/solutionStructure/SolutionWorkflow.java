@@ -324,8 +324,8 @@ public class SolutionWorkflow {
 	 * 
 	 * @return int[] representing the negated solution
 	 */
-	public int[] getNegatedMappedSolutionArray() {
-		return this.nativeSolution.getNegatedMappedSolutionArray();
+	public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
+		return this.nativeSolution.getNegatedMappedSolutionArray(toolSeqRepeat);
 	}
 
 	/**

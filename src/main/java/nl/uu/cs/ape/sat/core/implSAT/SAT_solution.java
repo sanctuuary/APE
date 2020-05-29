@@ -240,13 +240,19 @@ public class SAT_solution extends SolutionInterpreter {
 	 * 
 	 * @return int[] representing the negated solution
 	 */
-	public int[] getNegatedMappedSolutionArray() {
+	public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
 		List<Integer> negSol = new ArrayList<Integer>();
 		if (!unsat) {
+			if(!toolSeqRepeat) {
+				for (Literal literal : relevantModules) {
+					negSol.add(literal.toNegatedMappedInt());
+				}
+			} else {
 			for (Literal literal : relevantElements) {
 				if (literal.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
 					negSol.add(literal.toNegatedMappedInt());
 				}
+			}
 			}
 		}
 		int[] negSolList = new int[negSol.size()];

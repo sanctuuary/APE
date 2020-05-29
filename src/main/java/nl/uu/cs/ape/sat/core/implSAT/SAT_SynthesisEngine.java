@@ -1,6 +1,5 @@
 package nl.uu.cs.ape.sat.core.implSAT;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -268,7 +267,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 				 * Adding the negation of the positive part of the solution as a constraint
 				 * (default negation does not work)
 				 */
-				IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray());
+				
+				IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray(config.getToolSeqRepeat()));
 				solver.addClause(negSol);
 			}
 		} catch (ParseFormatException e) {

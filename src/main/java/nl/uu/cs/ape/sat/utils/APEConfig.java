@@ -52,6 +52,7 @@ public class APEConfig {
 	private final String USEWORKFLOW_INPUT = "use_workflow_input";
 	private final String USE_ALL_GENERATED_DATA = "use_all_generated_data";
 	private final String DEBUG_MODE_TAG = "debug_mode";
+	private final String TOOL_SEQ_REPEAT = "tool_seq_repeat";
 
 	/** Path to the taxonomy file */
 	private String ontologyPath;
@@ -76,7 +77,7 @@ public class APEConfig {
 	 * {@code true} if the shared memory structure should be used, {@code false} in
 	 * case of a restrictive message passing structure.
 	 */
-	private Boolean sharedMemory;
+	private Boolean sharedMemory, toolSeqRepeat;
 
 	/**
 	 * Path to the file that will contain all the solutions to the problem in human
@@ -358,6 +359,14 @@ public class APEConfig {
 					+ "' in the configuration file is not provided correctly. Default value is: true.");
 			this.sharedMemory = true;
 		}
+		
+		try {
+			this.toolSeqRepeat = runConfiguration.getBoolean(TOOL_SEQ_REPEAT);
+		} catch (JSONException JSONException) {
+			System.out.println("Tag '" + TOOL_SEQ_REPEAT
+					+ "' in the configuration file is not provided correctly. Default value is: true.");
+			this.toolSeqRepeat = true;
+		}
 
 		try {
 			this.solutionMinLength = runConfiguration.getInt(SOLUTION_MIN_LENGTH_TAG);
@@ -566,6 +575,14 @@ public class APEConfig {
 	 */
 	public Boolean getSharedMemory() {
 		return sharedMemory;
+	}
+	
+	/**
+	 * Returns true if the provided solutions should distinguished based on the tool sequences alone, ignoring the types.
+	 * @return
+	 */
+	public Boolean getToolSeqRepeat() {
+		return toolSeqRepeat;
 	}
 
 	/**
