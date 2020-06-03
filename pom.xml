@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.uu.sanctuuary</groupId>
 	<artifactId>APE</artifactId>
-	<version>1.0.0</version>
+	<version>0.9.4</version>
 	<packaging>jar</packaging>
 	<name>nl.uu.cs:APE</name>
 	<description>APE is a command line tool and an API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools.</description>
@@ -39,8 +39,6 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-   					 <target>1.8</target>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
@@ -64,8 +62,6 @@
 				<artifactId>maven-source-plugin</artifactId>
 				<version>3.0.1</version>
 				<configuration>
-					<source>1.8</source>
-   					 <target>1.8</target>
 				</configuration>
 				<executions>
 					<execution>
@@ -81,6 +77,23 @@
           		<artifactId>maven-surefire-plugin</artifactId>
           		<version>3.0.0-M4</version>
         	</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.7.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 

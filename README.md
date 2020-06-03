@@ -10,7 +10,22 @@ Internally, APE uses a component-based program synthesis approach. It translates
 
 ## Requirements
 
-In order to run APE you need to have Java 1.8 (or higher) installed on the system.
+In order to [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html) (or higher) installed on the system. To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source) the APE module from source code, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well.
+
+## Downloads
+
+| Date       | Version | Download                                                                             |
+|------------|---------|--------------------------------------------------------------------------------------|
+| 01-06-2020 | 1.0.0   | [APE-1.0.0.jar](https://github.com/sanctuuary/APE_UseCases/raw/master/APE-1.0.0.jar) |
+
+## How to build APE from source
+
+### Using Maven
+Simply launch
+```shell
+$ mvn -DskipTests=true install
+```
+to build the APE modules from the source tree and the built files will be generated under /target directory. All the dependencies will be gathered by Maven.
 
 ## CLI & API
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
@@ -33,20 +48,13 @@ For more details check a [simple demo](https://github.com/sanctuuary/APE_UseCase
 
 Like the CLI, the APE API relies on a configuration file that references the domain ontology, tool annotations, workflow specification and execution parameters. However, the API allows to edit this file programmatically, and thus for instance add constraints or change execution parameters dynamically.
 
+
+
 ## Demo 
 A web browser demonstrator (beta) of can be found at: http://ape.science.uu.nl/
 Docker version of the demonstrator is available at: https://github.com/sanctuuary/Burke_Docker
 
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS). Multiple predefined scenarios of scientific workflow synthesis can be found at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
-
-## How to build APE from source
-
-### Using Maven
-Simply launch
-```shell
-$ mvn -DskipTests=true install
-```
-to build the APE modules from the source tree and the built files will be generated under /target directory. All the dependencies will be gathered by Maven.
 
 ## Credits
 APE has been inspired by the [Loose Programming framework PROPHETS](http://ls5-www.cs.tu-dortmund.de/projects/prophets/index.php). It uses similar mechanisms for semantic domain modeling, workflow specification and synthesis, but strives to provide the automated composition functionality independent from a concrete workflow system.
