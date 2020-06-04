@@ -38,7 +38,7 @@ When running APE-&lt;version>.jar from the command line, it requires a JSON conf
 To run the APE CLI use:
 
 ```shell
-> java -jar APE-<version>.jar configuration.json
+java -jar APE-<version>.jar configuration.json
 ```
 
 For more details check a [simple demo](https://github.com/sanctuuary/APE_UseCases/tree/master/SimpleDemo).
