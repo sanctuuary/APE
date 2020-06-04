@@ -64,11 +64,11 @@ APE ape = new APE(setupConfig);
 
 // run the synthesis
 JSONObject runConfig = ...
-SATsolutionsList solutions1 = ape.runSynthesis(runconfig);
+SATsolutionsList solutions1 = ape.runSynthesis(runConfig);
 
 // run the synthesis again with altered parameters
 runConfig.put("use_workflow_input", "ONE");
-SATsolutionsList solutions2 = ape.runSynthesis(runconfig);
+SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 ```
 
 ## Demo 
