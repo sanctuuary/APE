@@ -10,7 +10,21 @@ Internally, APE uses a component-based program synthesis approach. It translates
 
 ## Requirements
 
-In order to run APE you need to have Java 1.8 (or higher) installed on the system.
+In order to [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html) (or higher) installed on the system. To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source) the APE module from source code, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well.
+
+## Downloads
+| Date       | Version | Download                                                                             |
+|------------|---------|--------------------------------------------------------------------------------------|
+| 01-06-2020 | 1.0.0   | [APE-1.0.0.jar](https://github.com/sanctuuary/APE_UseCases/raw/master/APE-1.0.0.jar) |
+
+## How to build APE from source
+
+### Using Maven
+From the project root, simply launch
+```shell
+$ mvn -DskipTests=true install
+```
+to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-<version>-jar-with-dependencies.jar`
 
 ## CLI & API
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
@@ -24,14 +38,38 @@ When running APE-&lt;version>.jar from the command line, it requires a JSON conf
 To run the APE CLI use:
 
 ```shell
- java -jar APE-<version>.jar SimpleDemo/ape.configuration
+java -jar APE-<version>.jar configuration.json
 ```
 
 For more details check a [simple demo](https://github.com/sanctuuary/APE_UseCases/tree/master/SimpleDemo).
 
 ### Application Programming Interface (API)
 
-Like the CLI, the APE API relies on a configuration file that references the domain ontology, tool annotations, workflow specification and execution parameters. However, the API allows to edit this file programmatically, and thus for instance add constraints or change execution parameters dynamically.
+Like the CLI, the APE API relies on a configuration file that references the domain ontology, tool annotations, workflow specification and execution parameters.
+
+```java
+// set up the framework
+APE ape = new APE("path/to/setup-configuration.json");
+
+// run the synthesis
+SATsolutionsList solutions = ape.runSynthesis("path/to/run-configuration.json");
+```
+
+However, the API allows to edit this file programmatically, and thus for instance add constraints or change execution parameters dynamically. 
+
+```java
+// set up the framework
+JSONObject setupConfig = ...
+APE ape = new APE(setupConfig);
+
+// run the synthesis
+JSONObject runConfig = ...
+SATsolutionsList solutions1 = ape.runSynthesis(runconfig);
+
+// run the synthesis again with altered parameters
+runConfig.put("use_workflow_input", "ONE");
+SATsolutionsList solutions2 = ape.runSynthesis(runconfig);
+```
 
 ## Demo 
 A web browser demonstrator (beta) of can be found at: http://ape.science.uu.nl/
@@ -39,28 +77,18 @@ Docker version of the demonstrator is available at: https://github.com/sanctuuar
 
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS). Multiple predefined scenarios of scientific workflow synthesis can be found at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
-## How to build APE from source
-
-### Using Maven
-Simply launch
-```shell
-$ mvn -DskipTests=true install
-```
-to build the APE modules from the source tree and the built files will be generated under /target directory. All the dependencies will be gathered by Maven.
-
 ## Credits
 APE has been inspired by the [Loose Programming framework PROPHETS](http://ls5-www.cs.tu-dortmund.de/projects/prophets/index.php). It uses similar mechanisms for semantic domain modeling, workflow specification and synthesis, but strives to provide the automated composition functionality independent from a concrete workflow system.
 
 We thank our brave first-generation users for their patience and constructive feedback that helped us to get APE into shape. 
 
 ## License
-APE is licensed under the Apache 2.0 license.
+APE is licensed under the [Apache 2.0](https://github.com/sanctuuary/APE/blob/master/LICENSE) license.
 
 #### Maven dependencies
 
-1. **OWL API**	-	LGPL or Apache 2.0
-2. **SAT4J**	-	EPL or GNu LGPL
-3. **apache-common-lang**	-	Apache 2.0
-4. **graphviz-java** - Apache 2.0
-5. **org.json** - [JSON license](https://www.json.org/license.html)
-
+1. [**OWL API**](https://mvnrepository.com/artifact/net.sourceforge.owlapi/owlapi-distribution) - LGPL or Apache 2.0
+2. [**SAT4J**](https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core) - EPL or GNu LGPL
+3. [**apache-common-lang**](https://mvnrepository.com/artifact/org.apache.commons/commons-lang3) - Apache 2.0
+4. [**graphviz-java**](https://mvnrepository.com/artifact/guru.nidi/graphviz-java) - Apache 2.0
+5. [**org.json**](https://mvnrepository.com/artifact/org.json/json) - [JSON license](https://www.json.org/license.html)
