@@ -8,7 +8,7 @@ APE relies on a semantic domain model that includes tool and type taxonomies as 
 
 Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. 
 
-### APE Overview
+#### APE Overview (YouTube)
 
 <div align="left">
   <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="./res/youtubeThumbnail.png" alt="APE - Youtube video" width=30%></a>
