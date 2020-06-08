@@ -10,7 +10,7 @@ Internally, APE uses a component-based program synthesis approach. It translates
 
 ### APE Overview
 
-<div align="center">
+<div align="left">
   <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="./res/youtubeThumbnail.png" alt="APE - Youtube video" width=30%></a>
 </div>
 
