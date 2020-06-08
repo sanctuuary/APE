@@ -8,6 +8,12 @@ APE relies on a semantic domain model that includes tool and type taxonomies as 
 
 Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. 
 
+### APE Overview
+
+<div align="center">
+  <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="./res/youtubeThumbnail.png" alt="APE - Youtube video" width=30%></a>
+</div>
+
 ## Requirements
 
 In order to [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html) (or higher) installed on the system. To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source) the APE module from source code, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well.
