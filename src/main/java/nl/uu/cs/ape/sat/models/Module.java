@@ -32,11 +32,11 @@ public class Module extends AbstractModule {
     /**
      * Constructs a new Module with already defined lists of input and output types.
      *
-     * @param moduleName Name of the module.
-     * @param moduleID ID of the module.
-     * @param rootNode ID of the Taxonomy Root associated with the Module.
-     * @param moduleInput List of the INPUT types/formats.
-     * @param moduleOutput List of the OUTPUT types/formats.
+     * @param moduleName      Name of the module.
+     * @param moduleID        ID of the module.
+     * @param rootNode        ID of the Taxonomy Root associated with the Module.
+     * @param moduleInput     List of the INPUT types/formats.
+     * @param moduleOutput    List of the OUTPUT types/formats.
      * @param moduleExecution TODO
      */
     public Module(String moduleName, String moduleID, String rootNode, List<DataInstance> moduleInput,
@@ -50,9 +50,9 @@ public class Module extends AbstractModule {
     /**
      * Constructs a new Module with empty lists of input and output types/formats.
      *
-     * @param moduleName Name of the module.
-     * @param moduleID Unique module identifier.
-     * @param rootNode ID of the Taxonomy Root node corresponding to the Module.
+     * @param moduleName      Name of the module.
+     * @param moduleID        Unique module identifier.
+     * @param rootNode        ID of the Taxonomy Root node corresponding to the Module.
      * @param moduleExecution TODO
      */
     public Module(String moduleName, String moduleID, String rootNode, String moduleExecution) {
@@ -65,7 +65,7 @@ public class Module extends AbstractModule {
     /**
      * Constructor used to override an existing AbstractModule with a new Module.
      *
-     * @param module New created Module.
+     * @param module         New created Module.
      * @param abstractModule Existing AbstractModule that is to be extended with all the fields from the Module.
      */
     public Module(Module module, TaxonomyPredicate abstractModule) {
@@ -86,6 +86,11 @@ public class Module extends AbstractModule {
         return moduleInput;
     }
 
+    /**
+     * Sets module input.
+     *
+     * @param moduleInputs the module inputs
+     */
     public void setModuleInput(List<DataInstance> moduleInputs) {
         this.moduleInput = moduleInputs;
     }
@@ -110,6 +115,11 @@ public class Module extends AbstractModule {
         return moduleOutput;
     }
 
+    /**
+     * Sets module output.
+     *
+     * @param moduleOutput the module output
+     */
     public void setModuleOutput(List<DataInstance> moduleOutput) {
         this.moduleOutput = moduleOutput;
     }
@@ -136,9 +146,10 @@ public class Module extends AbstractModule {
     /**
      * Creates and returns a module from a tool annotation instance from a Json file.
      *
-     * @param jsonModule JSON representation of a module
+     * @param jsonModule  JSON representation of a module
      * @param domainSetup Domain information, including all the existing tools and types
      * @return New {@link Module} object.
+     * @throws JSONException the json exception
      */
     public static Module moduleFromJson(JSONObject jsonModule, APEDomainSetup domainSetup)
             throws JSONException {

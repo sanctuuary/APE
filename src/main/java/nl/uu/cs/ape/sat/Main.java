@@ -7,8 +7,18 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
+/**
+ * The entry point of application when the library is used in a Command Line Interface (CLI).
+ *
+ * @author Vedran Kasalica
+ */
 public class Main {
 
+    /**
+     * The entry point of application when the library is used in a Command Line Interface (CLI).
+     *
+     * @param args APE expects only one (1) argument: The absolute or relative path to te configuration file.
+     */
     public static void main(String[] args) {
         String path;
         if (args.length == 1) {
@@ -20,7 +30,6 @@ public class Main {
             System.err.println("Bad path.");
             return;
         }
-
 
         APE apeFramework = null;
         try {

@@ -49,6 +49,8 @@ public class Literal implements Comparable<Literal> {
     }
 
     /**
+     * To mapped string string.
+     *
      * @return The value of the mapped literal.
      */
     public String toMappedString() {
@@ -60,6 +62,8 @@ public class Literal implements Comparable<Literal> {
     }
 
     /**
+     * To negated mapped string string.
+     *
      * @return Negation of the value of the mapped literal.
      */
     public String toNegatedMappedString() {
@@ -71,6 +75,8 @@ public class Literal implements Comparable<Literal> {
     }
 
     /**
+     * To negated mapped int int.
+     *
      * @return Negation of the value of the mapped literal.
      */
     public int toNegatedMappedInt() {

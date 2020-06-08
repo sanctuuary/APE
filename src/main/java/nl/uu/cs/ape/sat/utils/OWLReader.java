@@ -37,7 +37,7 @@ public class OWLReader {
      * Setting up the reader that will populate the provided module and type sets
      * with objects from the ontology.
      *
-     * @param domain Domain information, including all the existing tools and types.
+     * @param domain       Domain information, including all the existing tools and types.
      * @param ontologyPath Path to the OWL file.
      */
     public OWLReader(APEDomainSetup domain, String ontologyPath) {

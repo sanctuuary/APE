@@ -9,6 +9,11 @@ import java.util.List;
  */
 public interface Automaton {
 
-    public List<State> getAllStates();
+    /**
+     * Gets all states as a List.
+     *
+     * @return All the States.
+     */
+    List<State> getAllStates();
 
 }

@@ -105,6 +105,12 @@ public class SATsolutionsList {
         return false;
     }
 
+    /**
+     * Get solution workflow.
+     *
+     * @param index the index
+     * @return the solution workflow
+     */
     public SolutionWorkflow get(int index) {
         return this.solutions.get(index);
     }

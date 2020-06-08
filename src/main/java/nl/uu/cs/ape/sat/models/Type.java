@@ -18,7 +18,7 @@ public class Type extends TaxonomyPredicate {
      * Constructor used to create a Type object.
      *
      * @param typeName Type name.
-     * @param typeID Type ID.
+     * @param typeID   Type ID.
      * @param rootNode ID of the Taxonomy (Sub)Root node corresponding to the Type.
      * @param nodeType {@link NodeType} object describing the type w.r.t. the TypeTaxonomy.
      */

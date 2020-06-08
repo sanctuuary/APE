@@ -64,10 +64,10 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     /**
      * Setup of an instance of the SAT synthesis engine.
      *
-     * @param domainSetup Domain information, including all the existing tools and types.
+     * @param domainSetup  Domain information, including all the existing tools and types.
      * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @param config Setup configuration for the synthesis.
-     * @param size TODO
+     * @param config       Setup configuration for the synthesis.
+     * @param size         TODO
      */
     public SAT_SynthesisEngine(APEDomainSetup domainSetup, SATsolutionsList allSolutions,
                                APEConfig config, int size) {
@@ -213,6 +213,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
         return allSolutions.addSolutions(currSolutions);
     }
 
+    /**
+     * Gets cnf encoding.
+     *
+     * @return the cnf encoding
+     */
     public String getCnfEncoding() {
         return cnfEncoding.toString();
     }
@@ -275,31 +280,63 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     }
 
 
+    /**
+     * Gets config.
+     *
+     * @return the config
+     */
     public APEConfig getConfig() {
         return config;
     }
 
+    /**
+     * Gets domain setup.
+     *
+     * @return the domain setup
+     */
     public APEDomainSetup getDomainSetup() {
         return domainSetup;
     }
 
+    /**
+     * Gets mappings.
+     *
+     * @return the mappings
+     */
     public AtomMappings getMappings() {
         return mappings;
     }
 
+    /**
+     * Gets all solutions.
+     *
+     * @return the all solutions
+     */
     public SATsolutionsList getAllSolutions() {
         return allSolutions;
     }
 
+    /**
+     * Gets module automaton.
+     *
+     * @return the module automaton
+     */
     public ModuleAutomaton getModuleAutomaton() {
         return moduleAutomaton;
     }
 
+    /**
+     * Gets type automaton.
+     *
+     * @return the type automaton
+     */
     public TypeAutomaton getTypeAutomaton() {
         return typeAutomaton;
     }
 
     /**
+     * Gets empty type.
+     *
      * @return The {@link Type} object that represents the empty type, i.e. absence of types.
      */
     public Type getEmptyType() {

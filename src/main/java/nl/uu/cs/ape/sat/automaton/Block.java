@@ -16,11 +16,22 @@ public class Block {
     /** Order number of the block in the solution. */
     private int blockNumber;
 
+    /**
+     * Instantiates a new Block.
+     *
+     * @param blockNumber The block number.
+     */
     public Block(int blockNumber) {
         typeStates = new ArrayList<State>();
         this.blockNumber = blockNumber;
     }
 
+    /**
+     * Instantiates a new Block.
+     *
+     * @param typeStates  The type states.
+     * @param blockNumber The block number.
+     */
     public Block(List<State> typeStates, int blockNumber) {
         super();
         this.typeStates = typeStates;

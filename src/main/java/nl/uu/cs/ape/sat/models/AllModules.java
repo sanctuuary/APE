@@ -17,11 +17,18 @@ import java.util.List;
  */
 public class AllModules extends AllPredicates {
 
+    /**
+     * Instantiates a new All modules.
+     *
+     * @param config the config
+     */
     public AllModules(APEConfig config) {
         super(Arrays.asList(config.getToolTaxonomyRoot()));
     }
 
     /**
+     * Gets modules.
+     *
      * @return The set of currently defined modules (both {@link AbstractModule} and {@link Module}).
      */
     public Collection<TaxonomyPredicate> getModules() {

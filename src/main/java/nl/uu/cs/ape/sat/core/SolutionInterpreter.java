@@ -12,11 +12,32 @@ import java.util.List;
  */
 public abstract class SolutionInterpreter {
 
+    /**
+     * Gets solution.
+     *
+     * @return the solution
+     */
     public abstract String getSolution();
 
+    /**
+     * Gets relevant solution.
+     *
+     * @return the relevant solution
+     */
     public abstract String getRelevantSolution();
 
+    /**
+     * Gets relevant solution modules.
+     *
+     * @param allModules the all modules
+     * @return the relevant solution modules
+     */
     public abstract List<Module> getRelevantSolutionModules(AllModules allModules);
 
+    /**
+     * Is sat boolean.
+     *
+     * @return the boolean
+     */
     public abstract boolean isSat();
 }

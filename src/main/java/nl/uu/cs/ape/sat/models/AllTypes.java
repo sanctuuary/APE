@@ -25,6 +25,11 @@ public class AllTypes extends AllPredicates {
      */
     private List<String> dataTaxonomyDimensions;
 
+    /**
+     * Instantiates a new All types.
+     *
+     * @param config the config
+     */
     public AllTypes(APEConfig config) {
         super(config.getDataDimensionRoots());
         dataTaxonomyDimensions = config.getDataDimensionRoots();
@@ -107,7 +112,7 @@ public class AllTypes extends AllPredicates {
      * Returns the type to which the specified key is mapped to under the given dimension, or null if
      * the typeID has no mappings or does not belong to the given dimension.
      *
-     * @param typeID The key whose associated value is to be returned.
+     * @param typeID      The key whose associated value is to be returned.
      * @param dimensionID The ID of the dimension to which the type belongs to.
      * @return {@link Type} to which the specified key is mapped to, or null if the typeID has no mappings or does not belong to the given dimension.
      */

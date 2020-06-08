@@ -143,7 +143,7 @@ public class SolutionWorkflow {
     /**
      * Create a solution workflow, based on the SAT output.
      *
-     * @param satSolution SAT solution, presented as array of integers.
+     * @param satSolution       SAT solution, presented as array of integers.
      * @param synthesisInstance Current synthesis instance
      */
     public SolutionWorkflow(int[] satSolution, SAT_SynthesisEngine synthesisInstance) {
@@ -238,8 +238,7 @@ public class SolutionWorkflow {
     /**
      * Get non-structured solution obtained directly from the SAT output.
      *
-     * @return A {@link SAT_solution} object, that contains information about the
-     * native SAT encoding, and how it translates into human .. ? TODO.
+     * @return A {@link SAT_solution} object, that contains information about the native SAT encoding, and how it translates into human .. ? TODO.
      */
     public SAT_solution getNativeSATsolution() {
         return this.nativeSolution;
@@ -263,7 +262,7 @@ public class SolutionWorkflow {
      * Get the graphical representation of the data-flow diagram with the required
      * title and in the defined orientation.
      *
-     * @param title The title of the SolutionGraph.
+     * @param title       The title of the SolutionGraph.
      * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}.
      * @return The solution graph.
      */
@@ -293,7 +292,7 @@ public class SolutionWorkflow {
      * /** Get the graphical representation of the control-flow diagram with the
      * required title and in the defined orientation.
      *
-     * @param title The title of the SolutionGraph.
+     * @param title       The title of the SolutionGraph.
      * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
      * @return The solution graph.
      */
@@ -503,11 +502,18 @@ public class SolutionWorkflow {
         return this.controlflowGraph;
     }
 
+    /**
+     * Gets solutionlength.
+     *
+     * @return the solutionlength
+     */
     public int getSolutionlength() {
         return this.moduleNodes.size();
     }
 
     /**
+     * Sets index.
+     *
      * @param i Sets the index of the solution in all the solutions.
      */
     public void setIndex(int i) {
@@ -515,6 +521,8 @@ public class SolutionWorkflow {
     }
 
     /**
+     * Gets index.
+     *
      * @return The index of the solution in all the solutions.
      */
     public int getIndex() {

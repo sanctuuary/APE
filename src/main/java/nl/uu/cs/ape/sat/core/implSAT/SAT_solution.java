@@ -48,7 +48,7 @@ public class SAT_solution extends SolutionInterpreter {
     /**
      * Creating a list of Literals to represent the solution.
      *
-     * @param satSolution list of mapped literals given as a list of integers (library SAT output)
+     * @param satSolution       list of mapped literals given as a list of integers (library SAT output)
      * @param synthesisInstance Mapping of the atoms.
      */
     public SAT_solution(int[] satSolution, SAT_SynthesisEngine synthesisInstance) {

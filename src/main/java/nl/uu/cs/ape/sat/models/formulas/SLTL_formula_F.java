@@ -9,12 +9,26 @@ import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 import java.util.List;
 
+/**
+ * The type Sltl formula f.
+ */
 public class SLTL_formula_F extends SLTL_formula {
 
+    /**
+     * Instantiates a new Sltl formula f.
+     *
+     * @param formula the formula
+     */
     public SLTL_formula_F(TaxonomyPredicate formula) {
         super(formula);
     }
 
+    /**
+     * Instantiates a new Sltl formula f.
+     *
+     * @param sign    the sign
+     * @param formula the formula
+     */
     public SLTL_formula_F(boolean sign, TaxonomyPredicate formula) {
         super(sign, formula);
     }

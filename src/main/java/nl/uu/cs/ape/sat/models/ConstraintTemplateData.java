@@ -14,12 +14,20 @@ public class ConstraintTemplateData {
     private String constraintID;
     private List<TaxonomyPredicate> parameters;
 
+    /**
+     * Instantiates a new Constraint template data.
+     *
+     * @param constraintID the constraint id
+     * @param parameters   the parameters
+     */
     public ConstraintTemplateData(String constraintID, List<TaxonomyPredicate> parameters) {
         this.constraintID = constraintID;
         this.parameters = parameters;
     }
 
     /**
+     * Gets constraint id.
+     *
      * @return The constraintID.
      */
     public String getConstraintID() {
@@ -27,6 +35,8 @@ public class ConstraintTemplateData {
     }
 
     /**
+     * Gets parameters.
+     *
      * @return The parameters.
      */
     public List<TaxonomyPredicate> getParameters() {

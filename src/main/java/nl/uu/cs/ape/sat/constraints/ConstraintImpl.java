@@ -18,6 +18,14 @@ import java.util.List;
  */
 public class ConstraintImpl extends ConstraintTemplate {
 
+    /**
+     * Instantiates a new Constraint.
+     *
+     * @param id           the id
+     * @param parametersNo the parameters no
+     * @param description  the description
+     * @param function     the function
+     */
     public ConstraintImpl(String id, List<ConstraintParameter> parametersNo, String description, Runnable function) {
         super(id, parametersNo, description);
     }

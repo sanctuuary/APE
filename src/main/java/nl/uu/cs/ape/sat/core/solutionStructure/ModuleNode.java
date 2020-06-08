@@ -52,9 +52,7 @@ public class ModuleNode extends SolutionWorkflowNode {
      * Creating Workflow Node that corresponds to a tool usage.
      *
      * @param automatonState state in the {@link ModuleAutomaton} that corresponds to the workflow node.
-     * @throws ExceptionInInitializerError Exception when the Tool Workflow Node is instantiated using
-     *                                     a State in ModuleAutomaton that does not correspond to a
-     *                                     {@code WorkflowElement#MODULE}..
+     * @throws ExceptionInInitializerError Exception when the Tool Workflow Node is instantiated using                                     a State in ModuleAutomaton that does not correspond to a                                     {@code WorkflowElement#MODULE}..
      */
     public ModuleNode(State automatonState) throws ExceptionInInitializerError {
         super(automatonState);
@@ -92,39 +90,73 @@ public class ModuleNode extends SolutionWorkflowNode {
         }
     }
 
+    /**
+     * Add input type.
+     *
+     * @param inputTypeNode the input type node
+     */
     public void addInputType(TypeNode inputTypeNode) {
         inputTypes.add(inputTypeNode);
     }
 
     /**
+     * Sets input type.
+     *
+     * @param inputIndex     A specific input slot.
      * @param memoryTypeNode Input type to be set.
-     * @param inputIndex A specific input slot.
      */
     public void setInputType(int inputIndex, TypeNode memoryTypeNode) {
         APEUtils.safeSet(this.inputTypes, inputIndex, memoryTypeNode);
     }
 
+    /**
+     * Add output type.
+     *
+     * @param outputTypeNode the output type node
+     */
     public void addOutputType(TypeNode outputTypeNode) {
         outputTypes.add(outputTypeNode);
     }
 
+    /**
+     * Sets next module node.
+     *
+     * @param nextModuleNode the next module node
+     */
     public void setNextModuleNode(ModuleNode nextModuleNode) {
         this.nextModuleNode = nextModuleNode;
     }
 
+    /**
+     * Sets prev module node.
+     *
+     * @param prevModuleNode the prev module node
+     */
     public void setPrevModuleNode(ModuleNode prevModuleNode) {
         this.prevModuleNode = prevModuleNode;
     }
 
+    /**
+     * Gets used module.
+     *
+     * @return the used module
+     */
     public Module getUsedModule() {
         return usedModule;
     }
 
+    /**
+     * Gets abstract modules.
+     *
+     * @return the abstract modules
+     */
     public Set<AbstractModule> getAbstractModules() {
         return abstractModules;
     }
 
     /**
+     * Gets next module node.
+     *
      * @return The next operation that should be per in the workflow structure.
      */
     public ModuleNode getNextModuleNode() {
@@ -132,6 +164,8 @@ public class ModuleNode extends SolutionWorkflowNode {
     }
 
     /**
+     * Has next module boolean.
+     *
      * @return True if the current operation is not the last one in the workflow, false otherwise.
      */
     public boolean hasNextModule() {
@@ -139,24 +173,46 @@ public class ModuleNode extends SolutionWorkflowNode {
     }
 
     /**
+     * Has prev module boolean.
+     *
      * @return True if the current operation is not the first one in the workflow, false otherwise.
      */
     public boolean hasPrevModule() {
         return prevModuleNode != null;
     }
 
+    /**
+     * Gets prev module node.
+     *
+     * @return the prev module node
+     */
     public ModuleNode getPrevModuleNode() {
         return prevModuleNode;
     }
 
+    /**
+     * Gets input types.
+     *
+     * @return the input types
+     */
     public List<TypeNode> getInputTypes() {
         return inputTypes;
     }
 
+    /**
+     * Gets output types.
+     *
+     * @return the output types
+     */
     public List<TypeNode> getOutputTypes() {
         return outputTypes;
     }
 
+    /**
+     * Is empty boolean.
+     *
+     * @return the boolean
+     */
     public boolean isEmpty() {
         return usedModule == null;
     }
@@ -176,6 +232,11 @@ public class ModuleNode extends SolutionWorkflowNode {
         return printString.toString();
     }
 
+    /**
+     * Gets dot definition.
+     *
+     * @return the dot definition
+     */
     public String getDotDefinition() {
         return getNodeID() + " [label=\"" + getNodeLabel() + "\", shape=box];\n";
     }

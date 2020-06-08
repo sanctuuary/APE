@@ -7,18 +7,34 @@ package nl.uu.cs.ape.sat.models.enums;
  */
 public enum WorkflowElement {
 
-    /** Depicts usage of a tool/module. */
+    /**
+     * Depicts usage of a tool/module.
+     */
     MODULE,
 
-    /** Depicts the creation of a new type instance to the memory. */
+    /**
+     * Depicts the creation of a new type instance to the memory.
+     */
     MEMORY_TYPE,
 
-    /** Depicts the usage of an already created type instance. Usually as an input for a tool. */
+    /**
+     * Depicts the usage of an already created type instance. Usually as an input for a tool.
+     */
     USED_TYPE,
 
-    /** Depicts the usage of an already created type instance, as an input for a tool. It references the created data type. */
+    /**
+     * Depicts the usage of an already created type instance, as an input for a tool. It references the created data type.
+     */
     MEM_TYPE_REFERENCE;
 
+    /**
+     * Gets string shortcut.
+     *
+     * @param elem        the elem
+     * @param blockNumber the block number
+     * @param stateNumber the state number
+     * @return the string shortcut
+     */
     public static String getStringShortcut(WorkflowElement elem, Integer blockNumber, int stateNumber) {
 
         if (elem == MODULE) {

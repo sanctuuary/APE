@@ -17,21 +17,31 @@ import java.util.List;
  */
 public abstract class ConstraintTemplate {
 
-    /** Identification String of the constraint template. */
+    /**
+     * Identification String of the constraint template.
+     */
     String constraintID;
 
-    /** Description of the constraint. */
+    /**
+     * Description of the constraint.
+     */
     String description;
 
-    /** List of all the parameters of the constraint. */
+    /**
+     * List of all the parameters of the constraint.
+     */
     List<ConstraintParameter> parameters;
 
-    /** Implementation function of the constraint.*/
+    /**
+     * Implementation function of the constraint.
+     */
     Runnable function;
 
     /**
-     * @param id Constraint ID.
-     * @param parameters Set of {@link ConstraintParameter} the constraint requires.
+     * Instantiates a new Constraint template.
+     *
+     * @param id          Constraint ID.
+     * @param parameters  Set of {@link ConstraintParameter} the constraint requires.
      * @param description Description of the constraint.
      */
     public ConstraintTemplate(String id, List<ConstraintParameter> parameters, String description) {
@@ -41,23 +51,45 @@ public abstract class ConstraintTemplate {
         // this.function = function;
     }
 
+    /**
+     * Sets constraint id.
+     *
+     * @param constraintID the constraint id
+     */
     public void setConstraintID(String constraintID) {
         this.constraintID = constraintID;
     }
 
+    /**
+     * Gets description.
+     *
+     * @return the description
+     */
     public String getDescription() {
         return this.description;
     }
 
+    /**
+     * Gets no of parameters.
+     *
+     * @return the no of parameters
+     */
     public int getNoOfParameters() {
         return this.parameters.size();
     }
 
+    /**
+     * Gets constraint id.
+     *
+     * @return the constraint id
+     */
     public String getConstraintID() {
         return this.constraintID;
     }
 
     /**
+     * Gets parameters.
+     *
      * @return The field {@link #parameters}.
      */
     public List<ConstraintParameter> getParameters() {
@@ -79,11 +111,11 @@ public abstract class ConstraintTemplate {
      * It will use predefined mapping function and all the atoms will be mapped to
      * numbers accordingly.
      *
-     * @param parameters Array of input parameters.
-     * @param domainSetup Domain with all the modules.
+     * @param parameters      Array of input parameters.
+     * @param domainSetup     Domain with all the modules.
      * @param moduleAutomaton Module automaton.
-     * @param typeAutomaton Type automaton.
-     * @param mappings Set of the mappings for the literals.
+     * @param typeAutomaton   Type automaton.
+     * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the constraint. null in case of incorrect number of constraint parameters.
      */
     public abstract String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
@@ -99,6 +131,11 @@ public abstract class ConstraintTemplate {
         return toJSON().toString(3) + ",\n";
     }
 
+    /**
+     * To json json object.
+     *
+     * @return the json object
+     */
     public JSONObject toJSON() {
         JSONObject currJson = new JSONObject();
         currJson.put("constraintID", constraintID);

@@ -12,10 +12,20 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
     /** State in the automaton that the Node refers to. */
     private State automatonState;
 
+    /**
+     * Instantiates a new Solution workflow node.
+     *
+     * @param automatonState the automaton state
+     */
     public SolutionWorkflowNode(State automatonState) {
         this.automatonState = automatonState;
     }
 
+    /**
+     * Gets automaton state.
+     *
+     * @return the automaton state
+     */
     public State getAutomatonState() {
         return this.automatonState;
     }
@@ -60,11 +70,15 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
     }
 
     /**
+     * Gets node id.
+     *
      * @return The unique label that describes the node.
      */
     public abstract String getNodeID();
 
     /**
+     * Gets node label.
+     *
      * @return A label that describes the node.
      */
     public abstract String getNodeLabel();

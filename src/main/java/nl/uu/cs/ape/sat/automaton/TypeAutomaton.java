@@ -31,8 +31,8 @@ public class TypeAutomaton implements Automaton {
      * Labeling of the automaton is provided in
      * <a href="https://github.com/sanctuuary/APE/blob/master/res/WorkflowAutomaton_Implementation.png">/APE/res/WorkflowAutomaton_Implementation.png</a>
      *
-     * @param automata_bound Length of the automaton
-     * @param input_branching Input branching factor (max number of inputs for modules)
+     * @param automata_bound   Length of the automaton
+     * @param input_branching  Input branching factor (max number of inputs for modules)
      * @param output_branching Output branching factor (max number of outputs for modules)
      */
     public TypeAutomaton(int automata_bound, int input_branching, int output_branching) {
@@ -100,6 +100,8 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
+     * Adds a block to the {@link #usedTypesAutomaton} list.
+     *
      * @param block Add to the automaton the Type Block that contains types used by tools.
      * @return true (as specified by {@link Collection#add}
      */
@@ -108,6 +110,8 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
+     * Adds a block to the {@link #memoryTypesAutomaton} list.
+     *
      * @param block Add to the automaton the Type Block that contains types added to the memory.
      * @return true (as specified by {@link Collection#add}
      */
@@ -234,6 +238,9 @@ public class TypeAutomaton implements Automaton {
         return untilStates;
     }
 
+    /**
+     * Prints the used types and memory types to the console.
+     */
     public void print() {
         System.out.println("-------------------------------------------------------------");
         System.out.println("\tType automaton:");

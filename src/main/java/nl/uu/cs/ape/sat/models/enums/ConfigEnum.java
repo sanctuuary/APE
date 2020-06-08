@@ -7,12 +7,18 @@ package nl.uu.cs.ape.sat.models.enums;
  */
 public enum ConfigEnum {
 
-    /** None of the cases should be covered. */
+    /**
+     * None of the cases should be covered.
+     */
     NONE,
 
-    /** One case should be covered. */
+    /**
+     * One case should be covered.
+     */
     ONE,
 
-    /** All cases should be covered. */
+    /**
+     * All cases should be covered.
+     */
     ALL
 }

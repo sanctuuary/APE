@@ -18,7 +18,9 @@ public class DataInstance {
     /** List of data types that describe different data dimensions and correspond to a single data instance. */
     private List<TaxonomyPredicate> types;
 
-    /** Create a new data instance. The instance will be characterized by different data type dimensions. */
+    /**
+     * Create a new data instance. The instance will be characterized by different data type dimensions.
+     */
     public DataInstance() {
         this.types = new ArrayList<TaxonomyPredicate>();
     }

@@ -7,18 +7,28 @@ package nl.uu.cs.ape.sat.models.enums;
  */
 public enum NodeType {
 
-    /** Root node of the (tool or data) taxonomy. */
+    /**
+     * Root node of the (tool or data) taxonomy.
+     */
     ROOT,
 
-    /** Non-leaf node in the taxonomy. Usually represents an abstraction over the actual implementation of a tool or data type/format. */
+    /**
+     * Non-leaf node in the taxonomy. Usually represents an abstraction over the actual implementation of a tool or data type/format.
+     */
     ABSTRACT,
 
-    /** Leaf in the taxonomy. Usually represent the implementation of the tool, simple data type or format, etc. */
+    /**
+     * Leaf in the taxonomy. Usually represent the implementation of the tool, simple data type or format, etc.
+     */
     LEAF,
 
-    /** Instance in the taxonomy. Usually represent an instance of a simple data type or format. It is subclass of {@link #LEAF}s. */
+    /**
+     * Instance in the taxonomy. Usually represent an instance of a simple data type or format. It is subclass of {@link #LEAF}s.
+     */
     INSTANCE,
 
-    /** Represents the empty predicate. */
+    /**
+     * Represents the empty predicate.
+     */
     EMPTY
 }

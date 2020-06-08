@@ -9,8 +9,19 @@ import java.io.IOException;
  */
 public interface SynthesisEngine {
 
+    /**
+     * Synthesis encoding boolean.
+     *
+     * @return the boolean
+     * @throws IOException the io exception
+     */
     public boolean synthesisEncoding() throws IOException;
 
+    /**
+     * Synthesis execution boolean.
+     *
+     * @return the boolean
+     */
     public boolean synthesisExecution();
 
 }

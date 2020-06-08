@@ -24,10 +24,18 @@ public class ConstraintFactory {
 
     private Map<String, ConstraintTemplate> constraintTemplates;
 
+    /**
+     * Instantiates a new Constraint factory.
+     */
     public ConstraintFactory() {
         this.constraintTemplates = new HashMap<String, ConstraintTemplate>();
     }
 
+    /**
+     * Retrieves a list of the constraint templates.
+     *
+     * @return The constraint templates.
+     */
     public Collection<ConstraintTemplate> getConstraintTemplates() {
         return this.constraintTemplates.values();
     }
@@ -74,7 +82,7 @@ public class ConstraintFactory {
      * Adding each constraint format in the set of all cons. formats.
      *
      * @param allModules TODO
-     * @param allTypes TODO
+     * @param allTypes   TODO
      * @return String description of all the formats (ID, description and number of parameters for each).
      */
     public boolean initializeConstraints(AllModules allModules, AllTypes allTypes) {
@@ -217,8 +225,10 @@ public class ConstraintFactory {
     }
 
     /**
-     * @param constr {@link ConstraintTemplateData}.
-     * @return TODO.
+     * Constructs the description of a {@link ConstraintTemplateData}.
+     *
+     * @param constr The {@link ConstraintTemplateData}.
+     * @return The description of a {@link ConstraintTemplateData}.
      */
     public String getDescription(ConstraintTemplateData constr) {
         ConstraintTemplate currTmpl = this.constraintTemplates.get(constr.getConstraintID());
@@ -231,8 +241,10 @@ public class ConstraintFactory {
     }
 
     /**
+     * Constructs {@link ConstraintTemplateData} if the taxonomy predicates are formatted correctly.
+     *
      * @param constraintID ID of the constraint.
-     * @param parameters {@link List} of {@link TaxonomyPredicate}.
+     * @param parameters   {@link List} of {@link TaxonomyPredicate}.
      * @return The {@link ConstraintTemplateData} if the format is correct, {null} otherwise.
      */
     public ConstraintTemplateData addConstraintTemplateData(String constraintID, List<TaxonomyPredicate> parameters) {
@@ -246,8 +258,8 @@ public class ConstraintFactory {
      * TODO: Needs to be implemented. Input should be compared with the constraint templates, wrt the types of parameters and dimensions of each.
      *
      * @param constraintID TODO
-     * @param parameters TODO
-     * @return TODO
+     * @param parameters   TODO
+     * @return TODO boolean
      */
     public boolean isGoodConstraintFormat(String constraintID, List<TaxonomyPredicate> parameters) {
         return true;
@@ -258,6 +270,13 @@ public class ConstraintFactory {
      * If we use module <b>parameters[0]</b>, then we must have used <b>parameters[1]</b> prior to it using the function {@link #getConstraint}.
      */
     public class Constraint_depend_module extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint depend module.
+         *
+         * @param id             the id
+         * @param parameterTypes the parameter types
+         * @param description    the description
+         */
         public Constraint_depend_module(String id, List<ConstraintParameter> parameterTypes, String description) {
             super(id, parameterTypes, description);
         }
@@ -279,6 +298,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_gen_type extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint gen type.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_gen_type(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -302,6 +328,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_if_gen_then_not_type extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint if gen then not type.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_if_gen_then_not_type(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -323,6 +356,13 @@ public class ConstraintFactory {
      * subsequently using the function {@link #getConstraint}.
      */
     public class Constraint_if_gen_then_type extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint if gen then type.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_if_gen_then_type(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -344,6 +384,13 @@ public class ConstraintFactory {
      * subsequently using the function {@link #getConstraint}.
      */
     public class Constraint_if_then_module extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint if then module.
+         *
+         * @param id             the id
+         * @param parameterTypes the parameter types
+         * @param description    the description
+         */
         public Constraint_if_then_module(String id, List<ConstraintParameter> parameterTypes, String description) {
             super(id, parameterTypes, description);
         }
@@ -365,6 +412,13 @@ public class ConstraintFactory {
      * subsequently using the function {@link #getConstraint}.
      */
     public class Constraint_if_then_not_module extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint if then not module.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_if_then_not_module(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -386,6 +440,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_if_use_then_not_type extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint if use then not type.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_if_use_then_not_type(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -407,6 +468,13 @@ public class ConstraintFactory {
      * subsequently using the function {@link #getConstraint}.
      */
     public class Constraint_if_use_then_type extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint if use then type.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_if_use_then_type(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -428,6 +496,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_last_module extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint last module.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_last_module(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -449,6 +524,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_next_module extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint next module.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_next_module(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -470,6 +552,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_not_gen_type extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint not gen type.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_not_gen_type(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -493,6 +582,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_not_use_module extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint not use module.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_not_use_module(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -516,6 +612,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_not_use_type extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint not use type.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_not_use_type(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -539,6 +642,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_prev_module extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint prev module.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_prev_module(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -560,6 +670,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_use_module extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint use module.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_use_module(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
@@ -583,6 +700,13 @@ public class ConstraintFactory {
      * using the function {@link #getConstraint}.
      */
     public class Constraint_use_type extends ConstraintTemplate {
+        /**
+         * Instantiates a new Constraint use type.
+         *
+         * @param id           the id
+         * @param parametersNo the parameters no
+         * @param description  the description
+         */
         public Constraint_use_type(String id, List<ConstraintParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }

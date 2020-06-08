@@ -39,6 +39,11 @@ public class APEDomainSetup {
     private List<ConstraintTemplateData> unformattedConstr;
     private List<AuxTaxonomyPredicate> helperPredicates;
 
+    /**
+     * Instantiates a new Ape domain setup.
+     *
+     * @param config the config
+     */
     public APEDomainSetup(APEConfig config) {
         unformattedConstr = new ArrayList<ConstraintTemplateData>();
         allModules = new AllModules(config);
@@ -49,6 +54,8 @@ public class APEDomainSetup {
     }
 
     /**
+     * Gets all modules.
+     *
      * @return The field {@link #allModules}.
      */
     public AllModules getAllModules() {
@@ -56,6 +63,8 @@ public class APEDomainSetup {
     }
 
     /**
+     * Add constraint data.
+     *
      * @param constr Add a constraint to the list of constraints, that should be encoded during the execution of the synthesis.
      */
     public void addConstraintData(ConstraintTemplateData constr) {
@@ -63,6 +72,8 @@ public class APEDomainSetup {
     }
 
     /**
+     * Gets unformatted constr.
+     *
      * @return the field {@link #unformattedConstr}.
      */
     public List<ConstraintTemplateData> getUnformattedConstr() {
@@ -77,6 +88,8 @@ public class APEDomainSetup {
     }
 
     /**
+     * Gets all types.
+     *
      * @return the field {@link #allTypes}.
      */
     public AllTypes getAllTypes() {
@@ -84,6 +97,8 @@ public class APEDomainSetup {
     }
 
     /**
+     * Gets constraint factory.
+     *
      * @return the field {@link #constraintFactory}.
      */
     public ConstraintFactory getConstraintFactory() {
@@ -98,6 +113,11 @@ public class APEDomainSetup {
         constraintFactory.initializeConstraints(allModules, allTypes);
     }
 
+    /**
+     * Trim taxonomy boolean.
+     *
+     * @return the boolean
+     */
     public boolean trimTaxonomy() {
         boolean succRun = true;
 
@@ -139,7 +159,7 @@ public class APEDomainSetup {
      * The original predicates are available as consumed predicates(see {@link AuxTaxonomyPredicate#getGeneralizedPredicates()}) of the new {@link TaxonomyPredicate}.
      *
      * @param relatedPredicates Set of sorted type that are logically related to the new abstract type (label of the equivalent sets is always the same due to its ordering).
-     * @param logicOp Logical operation that describes the relation between the types.
+     * @param logicOp           Logical operation that describes the relation between the types.
      * @return An abstract predicate that provides abstraction over a disjunction/conjunction of the labels.
      */
     public TaxonomyPredicate generateAuxiliaryPredicate(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
@@ -171,9 +191,9 @@ public class APEDomainSetup {
     /**
      * Encoding all the required constraints for the given program length, in order to ensure that helper predicates are used properly.
      *
-     * @param mappings Current atom mappings.
+     * @param mappings        Current atom mappings.
      * @param moduleAutomaton Graph representing all the tool states in the current workflow (one synthesis run might iterate though workflows of different lengths).
-     * @param typeAutomaton Graph representing all the type states in the current workflow (one synthesis run might iterate though workflows of different lengths).
+     * @param typeAutomaton   Graph representing all the type states in the current workflow (one synthesis run might iterate though workflows of different lengths).
      * @return CNF encoding of that ensures the correctness of the helper predicates.
      */
     public String getConstraintsForAuxiliaryPredicates(AtomMappings mappings, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
@@ -243,6 +263,11 @@ public class APEDomainSetup {
         return constraints.toString();
     }
 
+    /**
+     * Gets ontology prefix uri.
+     *
+     * @return the ontology prefix uri
+     */
     public String getOntologyPrefixURI() {
         return ontologyPrexifURI;
     }

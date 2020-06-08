@@ -17,6 +17,11 @@ public abstract class AllPredicates {
     /** Root of the taxonomy. */
     private List<String> taxonomyRoots;
 
+    /**
+     * Instantiates a new All predicates.
+     *
+     * @param dataTaxonomyRoots the data taxonomy roots
+     */
     public AllPredicates(List<String> dataTaxonomyRoots) {
         this.taxonomyRoots = dataTaxonomyRoots;
         this.predicates = new HashMap<String, TaxonomyPredicate>();
@@ -52,9 +57,18 @@ public abstract class AllPredicates {
         return taxonomyRoots;
     }
 
+    /**
+     * Add predicate taxonomy predicate.
+     *
+     * @param newPredicate the new predicate
+     * @return the taxonomy predicate
+     * @throws Exception the exception
+     */
     public abstract TaxonomyPredicate addPredicate(TaxonomyPredicate newPredicate) throws Exception;
 
     /**
+     * Gets predicate class.
+     *
      * @return The runtime class of the predicates that belong to the Object.
      */
     public abstract Class<?> getPredicateClass();
@@ -112,6 +126,8 @@ public abstract class AllPredicates {
     }
 
     /**
+     * Gets predicates.
+     *
      * @return The predicates from the domain.
      */
     protected Map<String, TaxonomyPredicate> getPredicates() {
@@ -134,6 +150,7 @@ public abstract class AllPredicates {
      *
      * @param subTreeRoot Root of the subTree.
      * @return List of data types.
+     * @throws NullPointerException the null pointer exception
      */
     public SortedSet<TaxonomyPredicate> getElementsFromSubTaxonomy(TaxonomyPredicate subTreeRoot)
             throws NullPointerException {

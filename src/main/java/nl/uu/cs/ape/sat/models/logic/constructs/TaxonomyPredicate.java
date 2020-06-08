@@ -66,7 +66,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Create a taxonomy predicate based on an existing one.
      *
      * @param oldPredicate Predicate that is copied
-     * @param nodeType Type of the node
+     * @param nodeType     Type of the node
      */
     public TaxonomyPredicate(TaxonomyPredicate oldPredicate, NodeType nodeType) {
         this.rootNodeID = oldPredicate.rootNodeID;
@@ -142,6 +142,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
+     * Sets root node.
+     *
      * @param rootType Set root of the Ontology tree that this node belongs to.
      */
     public void setRootNode(String rootType) {
@@ -151,8 +153,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Returns the type of the node, based on the taxonomy hierarchy.
      *
-     * @return the {@link NodeType} object that represent the type of the node (e.g.
-     * {@link NodeType#LEAF}, {@link NodeType#ROOT}).
+     * @return the {@link NodeType} object that represent the type of the node (e.g. {@link NodeType#LEAF}, {@link NodeType#ROOT}).
      */
     public NodeType getNodeType() {
         return this.nodeType;
@@ -176,6 +177,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
+     * To map map.
+     *
      * @return Transform the main 2 characteristics of the term into a map.
      */
     public Map<String, String> toMap() {
@@ -300,7 +303,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Print the tree shaped representation of the corresponding taxonomy.
      *
-     * @param str String that is helping the recursive function to distinguish between the tree levels.
+     * @param str           String that is helping the recursive function to distinguish between the tree levels.
      * @param allPredicates Set of all the predicates.
      */
     public void printTree(String str, AllPredicates allPredicates) {
@@ -335,10 +338,22 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         return this.subPredicates;
     }
 
+    /**
+     * Remove sub predicate boolean.
+     *
+     * @param subPredicateToRemove the sub predicate to remove
+     * @return the boolean
+     */
     public boolean removeSubPredicate(TaxonomyPredicate subPredicateToRemove) {
         return this.subPredicates.remove(subPredicateToRemove);
     }
 
+    /**
+     * Remove all sub predicates boolean.
+     *
+     * @param subPredicatesToRemove the sub predicates to remove
+     * @return the boolean
+     */
     public boolean removeAllSubPredicates(Collection<TaxonomyPredicate> subPredicatesToRemove) {
         boolean done = false;
         if (subPredicatesToRemove != null && !subPredicatesToRemove.isEmpty()) {
@@ -432,6 +447,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
+     * Sets node predicate.
+     *
      * @param nodeType \Sets the type of the data node, based on the taxonomy.
      */
     public void setNodePredicate(NodeType nodeType) {

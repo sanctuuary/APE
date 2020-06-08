@@ -48,7 +48,7 @@ public final class APEUtils {
      * {@link APEDomainSetup} object accordingly.
      *
      * @param constraintsPath Path to the constraint file.
-     * @param domainSetup Object that represents the domain variables.
+     * @param domainSetup     Object that represents the domain variables.
      */
     public static void readConstraints(String constraintsPath, APEDomainSetup domainSetup) {
         if (constraintsPath == null) {
@@ -109,10 +109,12 @@ public final class APEUtils {
     }
 
     /**
-     * @param domainSetup Domain information, including all the existing tools and types.
-     * @param mappings Mapping function.
+     * Encode ape constraints string.
+     *
+     * @param domainSetup     Domain information, including all the existing tools and types.
+     * @param mappings        Mapping function.
      * @param moduleAutomaton Module automaton.
-     * @param typeAutomaton Type automaton.
+     * @param typeAutomaton   Type automaton.
      * @return The CNF representation of the SLTL constraints in our project.
      */
     public static String encodeAPEConstraints(APEDomainSetup domainSetup, AtomMappings mappings,
@@ -147,12 +149,12 @@ public final class APEUtils {
      * Function used to provide SAT encoding of a constrain based on
      * the constraint ID specified and provided parameters.
      *
-     * @param constraintID ID of the constraint.
-     * @param parameters Parameters for the constraint template.
-     * @param domainSetup Domain information, including all the existing tools and types.
-     * @param mappings Mapping function.
+     * @param constraintID    ID of the constraint.
+     * @param parameters      Parameters for the constraint template.
+     * @param domainSetup     Domain information, including all the existing tools and types.
      * @param moduleAutomaton Module automaton.
-     * @param typeAutomaton Type automaton.
+     * @param typeAutomaton   Type automaton.
+     * @param mappings        Mapping function.
      * @return String representation of the SAT encoding for the specified constraint.
      */
     public static String constraintSATEncoding(String constraintID, List<TaxonomyPredicate> parameters,
@@ -168,11 +170,11 @@ public final class APEUtils {
      * Used to write the {@code text} to a file {@code file}. If @append is true, the {@code text} is
      * appended to the {@code file}, otherwise the {@code file} is rewritten.
      *
-     * @param text Text that will be written in the file.
-     * @param file The system-dependent file name.
+     * @param text   Text that will be written in the file.
+     * @param file   The system-dependent file name.
      * @param append If true, then bytes will be written to the end of the file rather than the beginning.
-     * @throws IOException Exception if file not found.
      * @return True if write to file was successful, false otherwise.
+     * @throws IOException Exception if file not found.
      */
     public static boolean write2file(String text, File file, boolean append) throws IOException {
         FileWriter fw = new FileWriter(file, append);
@@ -187,7 +189,7 @@ public final class APEUtils {
      * non-existing) using the I/O DataInstance from the @file. Returns the list of
      * Updated Modules.
      *
-     * @param file Path to the .json file containing tool annotations.
+     * @param file        Path to the .json file containing tool annotations.
      * @param domainSetup Domain information, including all the existing tools and types.
      * @return The list of all annotated Modules in the process (possibly empty list).
      */
@@ -217,7 +219,7 @@ public final class APEUtils {
     /**
      * Create the full class URI (ID) based on the label and the OWL prefix.
      *
-     * @param label Label of the current term.
+     * @param label             Label of the current term.
      * @param ontologyPrefixURI OWL prefix information.
      * @return String representing full OWL class URI.
      */
@@ -232,7 +234,7 @@ public final class APEUtils {
     /**
      * Create the fulls et of class URI's (ID) based on the labels and the OWL prefix.
      *
-     * @param taxonomyTerms Tool labels.
+     * @param taxonomyTerms     Tool labels.
      * @param ontologyPrefixURI OWL prefix information.
      * @return Set of strings representing full OWL class URI.
      */
@@ -287,7 +289,7 @@ public final class APEUtils {
      * {@link JSONObject} list will contain only that object.
      *
      * @param jsonPath Path to the Json file.
-     * @param key Key label that corresponds to the elements.
+     * @param key      Key label that corresponds to the elements.
      * @return List of elements that corresponds to the key. If the key does not exists returns empty list.
      */
     public static List<JSONObject> getListFromJson(String jsonPath, String key) {
@@ -313,10 +315,10 @@ public final class APEUtils {
      * all the elements are put in a {@link List}, otherwise if the key corresponds
      * to a {@code <T>} list will contain only that object.
      *
+     * @param <T>        Class to which the elements should belong to.
      * @param jsonObject {@link JSONObject} that is being explored.
-     * @param key Key label that corresponds to the elements.
-     * @param clazz Class to which the elements should belong to.
-     * @param <T> Class to which the elements should belong to.
+     * @param key        Key label that corresponds to the elements.
+     * @param clazz      Class to which the elements should belong to.
      * @return List of elements that corresponds to the key. If the key does not exists returns empty list.
      */
     public static <T> List<T> getListFromJson(JSONObject jsonObject, String key, Class<T> clazz) {
@@ -346,9 +348,9 @@ public final class APEUtils {
      * The method converts the {@link JSONArray} object to
      * {@link List} of objects of the given structure.
      *
+     * @param <T>       Class to which the elements should belong to.
      * @param jsonArray JSON array object.
-     * @param _class Class type that the elements of the array are.
-     * @param <T> Class to which the elements should belong to.
+     * @param _class    Class type that the elements of the array are.
      * @return List of objects of type {@link T}.
      */
     public static <T> List<T> getListFromJsonList(JSONArray jsonArray, Class<T> _class) {
@@ -386,7 +388,9 @@ public final class APEUtils {
     }
 
     /**
-     * @param debug In case that the debug mode is on, print the constraint templates and tool and data taxonomy trees.
+     * Debug printout.
+     *
+     * @param debug       In case that the debug mode is on, print the constraint templates and tool and data taxonomy trees.
      * @param domainSetup Domain information, including all the existing tools and types.
      */
     public static void debugPrintout(boolean debug, APEDomainSetup domainSetup) {
@@ -453,7 +457,7 @@ public final class APEUtils {
      * Print header to illustrate the part of the synthesis that is being performed.
      *
      * @param argument TODO
-     * @param title TODO
+     * @param title    TODO
      */
     public static void printHeader(Integer argument, String... title) {
         String arg = (argument == null) ? "" : (" " + argument);
@@ -469,8 +473,8 @@ public final class APEUtils {
     /**
      * Provide a safe interface for iteration trough a list/set.
      *
+     * @param <E>      Any type.
      * @param currList List/set that is being evaluated.
-     * @param <E> Any type.
      * @return An empty list in case of {@code currList == null}, or {@code currList} otherwise.
      */
     public static <E> Collection<E> safe(Collection<E> currList) {
@@ -481,9 +485,9 @@ public final class APEUtils {
      * Provide a safe interface for getting an element from the list. In order to
      * bypass "index out of bounds" error.
      *
+     * @param <E>      Any type.
      * @param currList List of elements.
-     * @param index Index of the element that is to be returned.
-     * @param <E> Any type.
+     * @param index    Index of the element that is to be returned.
      * @return Element of the list, or null if the index is out of bounds.
      */
     public static <E> E safeGet(List<E> currList, int index) {
@@ -500,10 +504,10 @@ public final class APEUtils {
      * null elements to fit the given size of the array and then adds the new
      * element. If the index is negative number it does not change the array.
      *
-     * @param list List that is manipulated.
-     * @param index Absolute position of the new element.
+     * @param <E>     Any type.
+     * @param list    List that is manipulated.
+     * @param index   Absolute position of the new element.
      * @param element New element to be added to the list.
-     * @param <E> Any type.
      * @throws IndexOutOfBoundsException Exception if the index is out of range (index &lt; 0).
      */
     public static <E> void safeSet(List<E> list, int index, E element) {
@@ -571,16 +575,22 @@ public final class APEUtils {
     /**
      * Read the file to a String.
      *
-     * @param path Path to the file.
+     * @param path     Path to the file.
      * @param encoding The charset encoding.
-     * @throws IOException Error while reading the file.
      * @return File content as a String.
+     * @throws IOException Error while reading the file.
      */
     public static String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
     }
 
+    /**
+     * Timer start.
+     *
+     * @param timerID   the timer id
+     * @param debugMode the debug mode
+     */
     public static void timerStart(String timerID, Boolean debugMode) {
         if (debugMode) {
             timers.put(timerID, System.currentTimeMillis());
@@ -589,6 +599,12 @@ public final class APEUtils {
         }
     }
 
+    /**
+     * Timer restart and print.
+     *
+     * @param timerID     the timer id
+     * @param printString the print string
+     */
     public static void timerRestartAndPrint(String timerID, String printString) {
         if (timers.get(timerID) == -1) {
             return;
@@ -598,6 +614,12 @@ public final class APEUtils {
         timers.put(timerID, System.currentTimeMillis());
     }
 
+    /**
+     * Timer print solutions.
+     *
+     * @param timerID        the timer id
+     * @param solutionsFound the solutions found
+     */
     public static void timerPrintSolutions(String timerID, int solutionsFound) {
         if (timers.get(timerID) == -1) {
             return;
@@ -607,6 +629,12 @@ public final class APEUtils {
                 "\nAPE found " + solutionsFound + " solutions. Total solving time: " + (printTime / 1000F) + " sec.");
     }
 
+    /**
+     * Timer print text.
+     *
+     * @param timerID the timer id
+     * @param text    the text
+     */
     public static void timerPrintText(String timerID, String text) {
         if (timers.get(timerID) == -1) {
             return;
@@ -625,9 +653,9 @@ public final class APEUtils {
      * standard, and returns a {@link JSONObject} that represents tool annotations
      * that can be used by the APE library.
      *
-     * @param bioToolsAnnotation A {@link JSONArray} object, that contains list of annotated tools ({@link JSONObject}s) according the bio.tools
-     *                           specification (see <a href="https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools API</a>)
+     * @param bioToolsAnnotation A {@link JSONArray} object, that contains list of annotated tools ({@link JSONObject}s) according the bio.tools                           specification (see <a href="https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools API</a>)
      * @return {@link JSONObject} that represents the tool annotation supported by the APE library.
+     * @throws JSONException the json exception
      */
     public static JSONObject convertBioTools2Ape(JSONArray bioToolsAnnotation) throws JSONException {
         JSONArray apeToolsAnnotations = new JSONArray();
@@ -705,6 +733,13 @@ public final class APEUtils {
         return new JSONObject().put("functions", apeToolsAnnotations);
     }
 
+    /**
+     * Convert cnf 2 human readable string.
+     *
+     * @param temp_sat_input the temp sat input
+     * @param mappings       the mappings
+     * @return the string
+     */
     public static String convertCNF2humanReadable(InputStream temp_sat_input, AtomMappings mappings) {
         StringBuffer humanReadable = new StringBuffer();
         Scanner scanner = new Scanner(temp_sat_input);
@@ -746,7 +781,7 @@ public final class APEUtils {
      * Method creates a label based on the list of predicates and the logical operator.
      *
      * @param relatedPredicates List of predicates that should be used to create the new label.
-     * @param logicOp Logical operator that configures the label.
+     * @param logicOp           Logical operator that configures the label.
      * @return String representing a new label made based on the predicates and the logical operator.
      */
     public static String getLabelFromList(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {

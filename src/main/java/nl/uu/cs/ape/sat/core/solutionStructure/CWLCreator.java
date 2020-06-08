@@ -20,12 +20,23 @@ public class CWLCreator {
 
     private final static String cwlVersion = "v1.2-dev1";
 
+    /**
+     * Instantiates a new Cwl creator.
+     *
+     * @param solution  the solution
+     * @param apeConfig the ape config
+     */
     public CWLCreator(SolutionWorkflow solution, APEConfig apeConfig) {
         cwlRepresentation = new StringBuilder(
                 "class: WorkflowNo_" + solution.getIndex() + "\ncwlVersion: " + cwlVersion + "").append("\n");
         generateCWLRepresentation(solution, apeConfig);
     }
 
+    /**
+     * Gets cwl.
+     *
+     * @return the cwl
+     */
     public String getCWL() {
         return cwlRepresentation.toString();
     }

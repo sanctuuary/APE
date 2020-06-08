@@ -38,8 +38,9 @@ public class APE {
      * Create instance of the APE solver.
      *
      * @param configPath Path to the APE configuration file. If the string is null the default './ape.config' value is assumed.
-     * @throws IOException Exception while reading the configuration file.
-     * @throws JSONException Exception while reading the configuration file.
+     * @throws IOException                 Exception while reading the configuration file.
+     * @throws JSONException               Exception while reading the configuration file.
+     * @throws ExceptionInInitializerError the exception in initializer error
      */
     public APE(String configPath) throws IOException, JSONException, ExceptionInInitializerError {
         config = new APEConfig(configPath);
@@ -56,7 +57,7 @@ public class APE {
      *
      * @param configObject The APE configuration JSONObject{@link JSONObject}.
      * @throws ExceptionInInitializerError Exception while reading the configuration file.
-     * @throws IOException Exception while reading the configuration file.
+     * @throws IOException                 Exception while reading the configuration file.
      */
     public APE(JSONObject configObject) throws ExceptionInInitializerError, IOException {
         config = new APEConfig(configObject);
@@ -123,6 +124,8 @@ public class APE {
     }
 
     /**
+     * Gets domain setup.
+     *
      * @return The object that contains all crucial information about the domain (e.g. list of tools, data types, constraint factory, etc.)
      */
     public APEDomainSetup getDomainSetup() {
@@ -135,6 +138,7 @@ public class APE {
      *
      * @param dimensionRootID ID of the data taxonomy subtree that corresponds to the list of elements that should be returned.
      * @return List where each element correspond to a map that can be transformed into JSON objects.
+     * @throws NullPointerException the null pointer exception
      */
     public List<Map<String, String>> getTaxonomyElements(String dimensionRootID) throws NullPointerException {
         SortedSet<? extends TaxonomyPredicate> elements = null;
@@ -161,10 +165,10 @@ public class APE {
     /**
      * Setup a new run instance of the APE solver and run the synthesis algorithm.
      *
-     * @param configObject Object that contains run configurations.
+     * @param configObject   Object that contains run configurations.
      * @param apeDomainSetup Domain information, including all the existing tools and types.
      * @return The list of all the solutions.
-     * @throws IOException Error in case of not providing a proper configuration file.
+     * @throws IOException   Error in case of not providing a proper configuration file.
      * @throws JSONException Error in configuration object.
      */
     public SATsolutionsList runSynthesis(JSONObject configObject, APEDomainSetup apeDomainSetup)
@@ -182,10 +186,10 @@ public class APE {
     /**
      * Setup a new run instance of the APE solver and run the synthesis algorithm.
      *
-     * @param configPath Path to the JSON that contains run configurations.
+     * @param configPath     Path to the JSON that contains run configurations.
      * @param apeDomainSetup Domain information, including all the existing tools and types.
      * @return The list of all the solutions.
-     * @throws IOException Error in case of not providing a proper configuration file.
+     * @throws IOException   Error in case of not providing a proper configuration file.
      * @throws JSONException Error in configuration object.
      */
     public SATsolutionsList runSynthesis(String configPath, APEDomainSetup apeDomainSetup)
@@ -311,7 +315,7 @@ public class APE {
      * i.e. transformation of data is in focus.
      *
      * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @param orientation Orientation in which the graph will be presented.
+     * @param orientation  Orientation in which the graph will be presented.
      * @return true if the generating was successfully performed, false otherwise.
      * @throws IOException Exception if graph cannot be written to the file system.
      */
@@ -352,7 +356,7 @@ public class APE {
      * i.e. order of the operations is in focus.
      *
      * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @param orientation Orientation in which the graph will be presented.
+     * @param orientation  Orientation in which the graph will be presented.
      * @return true if the generating was successfully performed, false otherwise.
      * @throws IOException Exception if graphs cannot be written to the file system.
      */

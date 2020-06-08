@@ -7,8 +7,14 @@ package nl.uu.cs.ape.sat.models.enums;
  */
 public enum LogicOperation {
 
+    /**
+     * Or logic operation.
+     */
     OR,
 
+    /**
+     * And logic operation.
+     */
     AND;
 
     /**
@@ -23,6 +29,8 @@ public enum LogicOperation {
     }
 
     /**
+     * To string sign string.
+     *
      * @return A simple sign corresponding to the logical operation.
      */
     public String toStringSign() {

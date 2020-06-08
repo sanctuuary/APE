@@ -17,6 +17,11 @@ public class ConstraintParameter {
      */
     private List<TaxonomyPredicate> parameterTypes;
 
+    /**
+     * Instantiates a new Constraint parameter.
+     *
+     * @param parameterTypes the parameter types
+     */
     public ConstraintParameter(List<TaxonomyPredicate> parameterTypes) {
         if (parameterTypes != null) {
             this.parameterTypes = parameterTypes;
@@ -25,11 +30,16 @@ public class ConstraintParameter {
         }
     }
 
+    /**
+     * Instantiates a new Constraint parameter.
+     */
     public ConstraintParameter() {
         this.parameterTypes = new ArrayList<TaxonomyPredicate>();
     }
 
     /**
+     * Add parameter.
+     *
      * @param newParam Add a new taxonomy predicates to describe the constraint parameter.
      */
     public void addParameter(TaxonomyPredicate newParam) {
@@ -37,6 +47,8 @@ public class ConstraintParameter {
     }
 
     /**
+     * Gets parameter types.
+     *
      * @return All the taxonomy predicates that describe the constraint parameter.
      */
     public List<TaxonomyPredicate> getParameterTypes() {

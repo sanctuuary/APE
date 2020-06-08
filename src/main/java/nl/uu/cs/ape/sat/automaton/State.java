@@ -22,9 +22,9 @@ public class State implements PredicateLabel {
      * Creates a state that corresponds to a state of the overall solution workflow.
      *
      * @param workflowStateType Parameter determining the state type.
-     * @param blockNumber Corresponds to the block number within the type automaton (not applicable for the module automaton).
-     * @param stateNumber Corresponds to the state number within block.
-     * @param input_branching Max number of branching.
+     * @param blockNumber       Corresponds to the block number within the type automaton (not applicable for the module automaton).
+     * @param stateNumber       Corresponds to the state number within block.
+     * @param input_branching   Max number of branching.
      */
     public State(WorkflowElement workflowStateType, Integer blockNumber, int stateNumber, int input_branching) {
 

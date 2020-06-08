@@ -20,6 +20,11 @@ public class SolutionGraph {
 
     private Graph graph;
 
+    /**
+     * Instantiates a new Solution graph.
+     *
+     * @param graph the graph
+     */
     SolutionGraph(Graph graph) {
         this.graph = graph;
     }

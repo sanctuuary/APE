@@ -26,7 +26,7 @@ public class Atom {
      * Creates an atom that can represent usage of the tool, creation or usage of a type,
      * or a reference between an input type and the state in which it was generated..
      *
-     * @param predicate Predicate used.
+     * @param predicate   Predicate used.
      * @param usedInState State in the automaton it was used/created in.
      * @param elementType Element that describes what type of a predicate is described.
      */
@@ -48,6 +48,8 @@ public class Atom {
     }
 
     /**
+     * Gets predicate.
+     *
      * @return Field {@link #predicate}.
      */
     public PredicateLabel getPredicate() {
@@ -95,6 +97,8 @@ public class Atom {
     }
 
     /**
+     * Gets used in state argument.
+     *
      * @return Field {@link #argumentState}.
      */
     public State getUsedInStateArgument() {

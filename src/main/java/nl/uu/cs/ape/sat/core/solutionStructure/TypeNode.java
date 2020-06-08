@@ -49,8 +49,7 @@ public class TypeNode extends SolutionWorkflowNode {
      * Creating Workflow Node that corresponds to a type instance in memory.
      *
      * @param automatonState State in the {@link TypeAutomaton} that corresponds to the workflow node.
-     * @throws ExceptionInInitializerError Exception when the Type Workflow Node is instantiated using a State in
-     *                                     TypeAutomaton that does not correspond to a {@code WorkflowElement#MEMORY_TYPE}.
+     * @throws ExceptionInInitializerError Exception when the Type Workflow Node is instantiated using a State in                                     TypeAutomaton that does not correspond to a {@code WorkflowElement#MEMORY_TYPE}.
      */
     public TypeNode(State automatonState) throws ExceptionInInitializerError {
         super(automatonState);
@@ -102,6 +101,8 @@ public class TypeNode extends SolutionWorkflowNode {
     }
 
     /**
+     * Sets created by module.
+     *
      * @param createdByModule Set the tool/workflow step that creates this data instance.
      */
     public void setCreatedByModule(ModuleNode createdByModule) {
@@ -177,6 +178,11 @@ public class TypeNode extends SolutionWorkflowNode {
         return printString.toString();
     }
 
+    /**
+     * Gets dot definition.
+     *
+     * @return the dot definition
+     */
     public String getDotDefinition() {
         return getNodeID() + " [label=\"" + getNodeLabel() + "\", color=blue];\n";
     }
@@ -225,6 +231,8 @@ public class TypeNode extends SolutionWorkflowNode {
     }
 
     /**
+     * Gets short node id.
+     *
      * @return A short non descriptive node ID, that can be used as a variable name.
      */
     public String getShortNodeID() {

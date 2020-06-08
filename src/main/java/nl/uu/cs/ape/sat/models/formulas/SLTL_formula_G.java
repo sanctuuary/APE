@@ -9,12 +9,26 @@ import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 import java.util.List;
 
+/**
+ * The type Sltl formula g.
+ */
 public class SLTL_formula_G extends SLTL_formula {
 
+    /**
+     * Instantiates a new Sltl formula g.
+     *
+     * @param predicate the predicate
+     */
     public SLTL_formula_G(TaxonomyPredicate predicate) {
         super(predicate);
     }
 
+    /**
+     * Instantiates a new Sltl formula g.
+     *
+     * @param sign      the sign
+     * @param predicate the predicate
+     */
     public SLTL_formula_G(boolean sign, TaxonomyPredicate predicate) {
         super(sign, predicate);
     }

@@ -520,9 +520,9 @@ public final class SATModuleUtils {
      * Generating the mutual exclusion constraints for each pair of tools from modules
      * (excluding abstract modules from the taxonomy) in each state of moduleAutomaton.
      *
-     * @param allModules All the modules.
+     * @param allModules      All the modules.
      * @param moduleAutomaton Module automaton.
-     * @param mappings Mapping function.
+     * @param mappings        Mapping function.
      * @return The String representation of constraints.
      */
     public static String moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
@@ -544,9 +544,9 @@ public final class SATModuleUtils {
     /**
      * Generating the mandatory usage constraints of root module @rootModule in each state of @moduleAutomaton.
      *
-     * @param allModules All the modules.
+     * @param allModules      All the modules.
      * @param moduleAutomaton Module automaton.
-     * @param mappings Mapping function.
+     * @param mappings        Mapping function.
      * @return String representation of constraints.
      */
     public static String moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton,
@@ -575,10 +575,10 @@ public final class SATModuleUtils {
      * being used, with respect to the Module Taxonomy. The rule starts from
      * the @rootModule and it's valid in each state of @moduleAutomaton.
      *
-     * @param allModules All the modules.
-     * @param currModule TODO
+     * @param allModules      All the modules.
+     * @param currModule      TODO
      * @param moduleAutomaton Module automaton.
-     * @param mappings Mapping function.
+     * @param mappings        Mapping function.
      * @return String representation of constraints enforcing taxonomy classifications.
      */
     public static String moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule, ModuleAutomaton moduleAutomaton,
@@ -636,10 +636,10 @@ public final class SATModuleUtils {
     }
 
     /**
+     * Gets predicate pairs.
+     *
      * @param predicateList List of predicates.
-     * @return A a list of pairs of tools from modules. Note that the abstract modules
-     * are not returned, only the unique pairs of modules that are representing
-     * actual tools.
+     * @return A a list of pairs of tools from modules. Note that the abstract modules are not returned, only the unique pairs of modules that are representing actual tools.
      */
     public static List<Pair<PredicateLabel>> getPredicatePairs(List<? extends PredicateLabel> predicateList) {
         List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();

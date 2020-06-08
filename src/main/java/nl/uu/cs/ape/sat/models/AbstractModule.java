@@ -22,9 +22,9 @@ public class AbstractModule extends TaxonomyPredicate {
      * Creates an abstract module from {@code moduleName} and {@code moduleID}.
      *
      * @param moduleName Name of the module.
-     * @param moduleID Unique module identifier.
-     * @param rootNode ID of the Taxonomy Root node corresponding to the Module.
-     * @param nodeType {@link NodeType} object describing the type w.r.t. the Module Taxonomy.
+     * @param moduleID   Unique module identifier.
+     * @param rootNode   ID of the Taxonomy Root node corresponding to the Module.
+     * @param nodeType   {@link NodeType} object describing the type w.r.t. the Module Taxonomy.
      */
     public AbstractModule(String moduleName, String moduleID, String rootNode, NodeType nodeType) {
         super(rootNode, nodeType);
@@ -37,7 +37,7 @@ public class AbstractModule extends TaxonomyPredicate {
      * for combining Module and AbstractModule objects.
      *
      * @param abstractModule Abstract module that is being copied
-     * @param nodeType {@link NodeType} object describing the type w.r.t. the Module Taxonomy.
+     * @param nodeType       {@link NodeType} object describing the type w.r.t. the Module Taxonomy.
      */
     public AbstractModule(TaxonomyPredicate abstractModule, NodeType nodeType) {
         super(abstractModule, (nodeType != null) ? nodeType : abstractModule.getNodeType());
@@ -58,7 +58,7 @@ public class AbstractModule extends TaxonomyPredicate {
     /**
      * Returns null. Abstract classes do not have input types.
      *
-     * @return null
+     * @return null module input
      */
     public List<DataInstance> getModuleInput() {
         return null;
@@ -67,7 +67,7 @@ public class AbstractModule extends TaxonomyPredicate {
     /**
      * Returns null. Abstract classes do not have output types.
      *
-     * @return null
+     * @return null module output
      */
     public List<DataInstance> getModuleOutput() {
         return null;

@@ -32,6 +32,9 @@ public class AtomMappings {
     /** Number of all auxiliary variables. */
     private int auxMax = 100000;
 
+    /**
+     * Instantiates a new Atom mappings.
+     */
     public AtomMappings() {
         mappings = new HashMap<Atom, Integer>();
         reverseMapping = new HashMap<Integer, Atom>();
@@ -45,7 +48,7 @@ public class AtomMappings {
      * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. If the Atom did not occur before,
      * it is added to the mapping set and the mapping value is returned, otherwise the existing mapping value is returned.
      *
-     * @param predicate Predicate of the mapped atom.
+     * @param predicate   Predicate of the mapped atom.
      * @param usedInState Argument of the mapped atom (usually name of the type/module state).
      * @param elementType TODO
      * @return Mapping number of the atom (number is always &gt; 0).
@@ -91,6 +94,8 @@ public class AtomMappings {
     }
 
     /**
+     * Gets size.
+     *
      * @return The size of the mapping set.
      */
     public int getSize() {
@@ -106,6 +111,9 @@ public class AtomMappings {
         return auxiliary++;
     }
 
+    /**
+     * Reset aux variables.
+     */
     public void resetAuxVariables() {
         auxiliary = 1;
     }

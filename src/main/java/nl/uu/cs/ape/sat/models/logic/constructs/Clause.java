@@ -11,6 +11,9 @@ public class Clause extends ArrayList<Literal> {
 
     private static final long serialVersionUID = -7456831885895888413L;
 
+    /**
+     * Instantiates a new Clause.
+     */
     public Clause() {
         super();
     }
