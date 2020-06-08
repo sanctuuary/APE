@@ -22,7 +22,7 @@ public class AllModules extends AllPredicates {
     }
 
     /**
-     * Return the set of currently defined modules (both {@link AbstractModule} and {@link Module}).
+     * @return The set of currently defined modules (both {@link AbstractModule} and {@link Module}).
      */
     public Collection<TaxonomyPredicate> getModules() {
         return getPredicates().values();
@@ -78,12 +78,12 @@ public class AllModules extends AllPredicates {
     }
 
     /**
-     * Returns the module to which the specified key is mapped to, or {@code null}
+     * Returns the module to which the specified key is mapped to, or null
      * if the moduleID has no mappings.
      *
      * @param moduleID The key whose associated value is to be returned
      * @return         {@link AbstractModule} or {@link Module} to which the specified key
-     *                 is mapped to, or {@code null} if the moduleID has no mappings
+     *                 is mapped to, or null if the moduleID has no mappings
      */
     public AbstractModule get(String moduleID) {
         return (AbstractModule) getPredicates().get(moduleID);
@@ -115,22 +115,22 @@ public class AllModules extends AllPredicates {
     }
 
     /**
-     * Returns {@code true} if this set contains the specified element. More formally,
-     * returns {@code true} if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
+     * Returns true if this set contains the specified element. More formally,
+     * returns true if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
      *
      * @param module Module that is searched for.
-     * @return {@code true} if this set contains the specified element.
+     * @return true if this set contains the specified element.
      */
     public boolean existsModule(AbstractModule module) {
         return getPredicates().containsKey(module.getPredicateID());
     }
 
     /**
-     * Returns {@code true} if this set contains the specified element. More formally,
-     * returns {@code true} if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
+     * Returns true if this set contains the specified element. More formally,
+     * returns true if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
      *
      * @param moduleID ID of the module that is searched for.
-     * @return {@code true} if this set contains the specified element.
+     * @return true if this set contains the specified element.
      */
     public boolean existsModule(String moduleID) {
         return getPredicates().containsKey(moduleID);

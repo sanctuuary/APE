@@ -92,11 +92,11 @@ public class AllTypes extends AllPredicates {
     }
 
     /*
-     * Returns the type to which the specified key is mapped to, or {@code null} if
+     * Returns the type to which the specified key is mapped to, or null if
      * the typeID has no mappings.
      *
      * @param typeID - the key whose associated value is to be returned
-     * @return The {@link Type} to which the specified key is mapped to, or {@code null}
+     * @return The {@link Type} to which the specified key is mapped to, or null
      *         if the typeID has no mappings
 
     public Type get(String typeID) {
@@ -104,12 +104,12 @@ public class AllTypes extends AllPredicates {
     }*/
 
     /**
-     * Returns the type to which the specified key is mapped to under the given dimension, or {@code null} if
+     * Returns the type to which the specified key is mapped to under the given dimension, or null if
      * the typeID has no mappings or does not belong to the given dimension.
      *
      * @param typeID The key whose associated value is to be returned.
      * @param dimensionID The ID of the dimension to which the type belongs to.
-     * @return {@link Type} to which the specified key is mapped to, or {@code null} if the typeID has no mappings or does not belong to the given dimension.
+     * @return {@link Type} to which the specified key is mapped to, or null if the typeID has no mappings or does not belong to the given dimension.
      */
     public Type get(String typeID, String dimensionID) {
         Type type = (Type) getPredicates().get(typeID);
@@ -131,22 +131,22 @@ public class AllTypes extends AllPredicates {
     }
 
     /**
-     * Returns {@code true} if this set contains the specified type element. More formally,
-     * returns {@code true} if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
+     * Returns true if this set contains the specified type element. More formally,
+     * returns true if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
      *
      * @param type Type that is searched for.
-     * @return {@code true} if the type exists in the set.
+     * @return true if the type exists in the set.
      */
     public boolean existsType(Type type) {
         return getPredicates().containsKey(type.getPredicateID());
     }
 
     /**
-     * Returns {@code true} if this set contains the specified type element. More formally,
-     * returns {@code true} if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
+     * Returns true if this set contains the specified type element. More formally,
+     * returns true if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
      *
      * @param typeID ID of the type that is searched for.
-     * @return {@code true} if the type exists in the set.
+     * @return true if the type exists in the set.
      */
     public boolean existsType(String typeID) {
         return getPredicates().containsKey(typeID);

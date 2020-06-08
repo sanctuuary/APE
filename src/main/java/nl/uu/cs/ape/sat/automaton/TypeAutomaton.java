@@ -91,27 +91,25 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
-     * Returns the {@code null} state.
+     * Returns the null state.
      *
-     * @return State representing a {@code null} state.
+     * @return State representing a null state.
      */
     public State getNullState() {
         return nullState;
     }
 
     /**
-     * Add to the automaton the Type Block that contains types used by tools.
-     *
-     * @return {@code true} (as specified by {@link Collection#add}
+     * @param block Add to the automaton the Type Block that contains types used by tools.
+     * @return true (as specified by {@link Collection#add}
      */
     public boolean addUsedTypesBlock(Block block) {
         return usedTypesAutomaton.add(block);
     }
 
     /**
-     * Add to the automaton the Type Block that contains types added to the memory.
-     *
-     * @return {@code true} (as specified by {@link Collection#add}
+     * @param block Add to the automaton the Type Block that contains types added to the memory.
+     * @return true (as specified by {@link Collection#add}
      */
     public boolean addMemoryTypesBlock(Block block) {
         return memoryTypesAutomaton.add(block);
@@ -222,7 +220,7 @@ public class TypeAutomaton implements Automaton {
     /**
      * Return all the type states that are used after a certain block, i.e. all the slots of tool inputs that are used after current types were added to the memory.
      *
-     * @param minBlockNoM emory block after which we are looking into tool inputs (this block is not included).
+     * @param minBlockNo Memory block after which we are looking into tool inputs (this block is not included).
      * @return List of Used States.
      */
     public List<State> getUsedStatesAfterBlockNo(int minBlockNo) {

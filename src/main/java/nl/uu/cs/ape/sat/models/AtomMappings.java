@@ -47,7 +47,8 @@ public class AtomMappings {
      *
      * @param predicate Predicate of the mapped atom.
      * @param usedInState Argument of the mapped atom (usually name of the type/module state).
-     * @return Mapping number of the atom (number is always > 0).
+     * @param elementType TODO
+     * @return Mapping number of the atom (number is always &gt; 0).
      */
     public Integer add(PredicateLabel predicate, State usedInState, WorkflowElement elementType) {
         Atom atom = new Atom(predicate, usedInState, elementType);
@@ -68,7 +69,7 @@ public class AtomMappings {
 
     /**
      * Return the mapping value (Integer) for the <b>atom</b>.
-     * If the <b>atom</b> was not mapped it returns {@code null}.
+     * If the <b>atom</b> was not mapped it returns null.
      *
      * @param atom String representation of the atom.
      * @return Mapping of the atom.
@@ -80,7 +81,7 @@ public class AtomMappings {
 
     /**
      * Return the mapping value (Integer) for the<b>atom</b>.
-     * If the <b>atom</b> was not mapped it returns {@code null}.
+     * If the <b>atom</b> was not mapped it returns null.
      *
      * @param mapping Integer mapping of the atom.
      * @return The original atom.
@@ -90,7 +91,7 @@ public class AtomMappings {
     }
 
     /**
-     * Returns the size of the mapping set.
+     * @return The size of the mapping set.
      */
     public int getSize() {
         return size;

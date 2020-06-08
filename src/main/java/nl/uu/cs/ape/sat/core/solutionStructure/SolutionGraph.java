@@ -56,6 +56,7 @@ public class SolutionGraph {
      * Change title of the graph.
      *
      * @param title The new title of the graph.
+     * @return A graph with the changed title.
      */
     public SolutionGraph changeTitle(String title) {
         this.graph = graph(title).with(this.graph);

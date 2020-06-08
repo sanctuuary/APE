@@ -373,7 +373,7 @@ public class SolutionWorkflow {
     /**
      * Get a graph that represent the solution in .dot format (see http://www.graphviz.org/).
      *
-     * @return {@link String} that represents the solution workflow in .dot graph format.
+     * @return String that represents the solution workflow in .dot graph format.
      */
     public String getSolutionDotFormat() {
         StringBuilder solution = new StringBuilder();
@@ -508,14 +508,14 @@ public class SolutionWorkflow {
     }
 
     /**
-     * Sets the index of the solution in all the solutions.
+     * @param i Sets the index of the solution in all the solutions.
      */
     public void setIndex(int i) {
         this.index = i;
     }
 
     /**
-     * Returns the index of the solution in all the solutions.
+     * @return The index of the solution in all the solutions.
      */
     public int getIndex() {
         return this.index;
@@ -524,7 +524,7 @@ public class SolutionWorkflow {
     /**
      * Return the executable shell script, that corresponds to the given workflow.
      *
-     * @return {@link String} that represents the shell script for executing the given workflow.
+     * @return String that represents the shell script for executing the given workflow.
      */
     public String getScriptExecution() {
         StringBuffer script = new StringBuffer("#!/bin/bash\n");

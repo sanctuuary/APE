@@ -135,14 +135,14 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Get root of the Ontology tree that this node belongs to. Used to distinguish
      * between mutually exclusive data taxonomy subtrees (type and format).
      *
-     * @return {@link String} ID of the root class.
+     * @return String ID of the root class.
      */
     public String getRootNodeID() {
         return rootNodeID;
     }
 
     /**
-     * Set root of the Ontology tree that this node belongs to.
+     * @param rootType Set root of the Ontology tree that this node belongs to.
      */
     public void setRootNode(String rootType) {
         this.rootNodeID = rootType;
@@ -169,14 +169,14 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Returns whether the node is relevant for the scenario (if it can be used in
      * practice).
      *
-     * @return {@code true} if the node can occur in our solution (as a type or module), {@code false} otherwise.
+     * @return true if the node can occur in our solution (as a type or module), false otherwise.
      */
     public boolean getIsRelevant() {
         return isRelevant;
     }
 
     /**
-     * Transform the main 2 characteristics of the term into a map.
+     * @return Transform the main 2 characteristics of the term into a map.
      */
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<String, String>();
@@ -191,7 +191,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * TODO Should it be topdown??
      *
      * @param allPredicates Map of all the predicates of the given type.
-     * @return {@code true} if the predicates were successfully set to be relevant.
+     * @return true if the predicates were successfully set to be relevant.
      */
     public boolean setAsRelevantTaxonomyTerm(AllPredicates allPredicates) {
         if (this.isRelevant) {
@@ -216,7 +216,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * and all the corresponding subClasses.
      *
      * @param allPredicates Map of all the predicates of the given type.
-     * @return {@code true} if the predicates were successfully set to be relevant.
+     * @return true if the predicates were successfully set to be relevant.
      */
     private boolean setAsRelevantTaxonomyTermTopDown(AllPredicates allPredicates) {
         if (this.isRelevant) {
@@ -238,7 +238,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * and all the corresponding superClasses.
      *
      * @param allPredicates Map of all the predicates of the given type.
-     * @return {@code true} if the predicates were successfully set to be relevant.
+     * @return true if the predicates were successfully set to be relevant.
      */
     private boolean setAsRelevantTaxonomyTermBottomUp(AllPredicates allPredicates) {
         if (this.isRelevant) {
@@ -258,14 +258,14 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Function is used to return the predicate identifier defined as String.
      *
-     * @return {@link String} representation of the predicate, used to uniquely identify the predicate.
+     * @return String representation of the predicate, used to uniquely identify the predicate.
      */
     public abstract String getPredicateID();
 
     /**
      * Function is used to return the label that describes the predicate.
      *
-     * @return {@link String} representation of the predicate label, used for presentation
+     * @return String representation of the predicate label, used for presentation
      * in case when the predicate id is too complex/long.
      */
     public abstract String getPredicateLabel();
@@ -274,7 +274,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * The function is used to determine the type of the predicate
      * [<b>type</b>,<b>module</b> or <b>abstract module</b>].
      *
-     * @return {@link String} [<b>type</b>,<b>module</b> or <b>abstract module</b>]
+     * @return String [<b>type</b>,<b>module</b> or <b>abstract module</b>]
      */
     public abstract String getType();
 
@@ -291,7 +291,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Print the ID of the current predicate.
      *
-     * @return PredicateLabel ID as a {@link String}
+     * @return PredicateLabel ID as a String
      */
     public String toShortString() {
         return getPredicateLabel();
@@ -300,7 +300,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Print the tree shaped representation of the corresponding taxonomy.
      *
-     * @param str {@link String} that is helping the recursive function to distinguish between the tree levels.
+     * @param str String that is helping the recursive function to distinguish between the tree levels.
      * @param allPredicates Set of all the predicates.
      */
     public void printTree(String str, AllPredicates allPredicates) {
@@ -314,7 +314,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Adds a sub-predicate to the current one, if they are not defined already.
      *
      * @param predicate Predicate that will be added as a subclass.
-     * @return {@code true} if sub-predicate was added, {@code false} otherwise.
+     * @return true if sub-predicate was added, false otherwise.
      */
     public boolean addSubPredicate(TaxonomyPredicate predicate) {
         if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
@@ -351,7 +351,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Adds a super-predicate to the current one, if it was not added present already.
      *
      * @param predicate Predicate that will be added as a superclass.
-     * @return {@code true} if super-predicate was added, {@code false} otherwise.
+     * @return true if super-predicate was added, false otherwise.
      */
     public boolean addSuperPredicate(TaxonomyPredicate predicate) {
         if (predicate == null) {
@@ -376,40 +376,40 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
-     * Returns {@code true} if the type is a simple/leaf type, otherwise returns {@code false} - the
+     * Returns true if the type is a simple/leaf type, otherwise returns false - the
      * type is an abstract (non-leaf) type.
      *
-     * @return {@code true} (simple/primitive/leaf type) or {@code false} (abstract/non-leaf type).
+     * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type).
      */
     public boolean isSimplePredicate() {
         return (this.nodeType == NodeType.LEAF);
     }
 
     /**
-     * Returns {@code true} if the type is an instance, otherwise returns {@code false} - the type
+     * Returns true if the type is an instance, otherwise returns false - the type
      * is an abstract (non-leaf) type or a regular leaf type.
      *
-     * @return {@code true} (instance) or {@code false} (leaf type or abstract/non-leaf type).
+     * @return true (instance) or false (leaf type or abstract/non-leaf type).
      */
     public boolean isInstancePredicate() {
         return this.nodeType == NodeType.INSTANCE;
     }
 
     /**
-     * Returns {@code true} if the type is an empty type, otherwise returns {@code false} - the type
+     * Returns true if the type is an empty type, otherwise returns false - the type
      * is an actual (abstract or non-abstract) type.
      *
-     * @return {@code true} (empty type) or {@code false} (implemented type).
+     * @return true (empty type) or false (implemented type).
      */
     public boolean isEmptyPredicate() {
         return this.nodeType == NodeType.EMPTY;
     }
 
     /**
-     * Returns {@code true} if the type the root type, otherwise returns {@code false} - the type is
+     * Returns true if the type the root type, otherwise returns false - the type is
      * not the root node of the taxonomy.
      *
-     * @return {@code true} (root node) or {@code false} (non-root node).
+     * @return true (root node) or false (non-root node).
      */
     public boolean isRootPredicate() {
         return this.nodeType == NodeType.ROOT;
@@ -432,7 +432,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
-     * Sets the type of the data node, based on the taxonomy.
+     * @param nodeType \Sets the type of the data node, based on the taxonomy.
      */
     public void setNodePredicate(NodeType nodeType) {
         this.nodeType = nodeType;

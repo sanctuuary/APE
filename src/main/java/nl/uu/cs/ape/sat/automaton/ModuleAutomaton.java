@@ -21,7 +21,7 @@ public class ModuleAutomaton implements Automaton {
     /**
      * Generate the Module State automatons based on the defined length.
      *
-     * @param automata_bound Length of the automaton.
+     * @param automata_bound  Length of the automaton.
      * @param input_branching Input branching factor (max number of inputs for modules).
      */
     public ModuleAutomaton(int automata_bound, int input_branching) {
@@ -34,23 +34,18 @@ public class ModuleAutomaton implements Automaton {
         }
     }
 
-//	public ModuleAutomaton(List<State> moduleStates) {
-//		super();
-//		this.moduleStates = moduleStates;
-//	}
-
     /**
      * TODO: REMOVE-duplicate
      * Return all Module States from the Module automaton.
      *
-     * @return {@link List} <{@link State}>.
+     * @return Module automaton as a list.
      */
     public List<State> getModuleStates() {
         return moduleStates;
     }
 
     /**
-     * Add @state to the Module automaton.
+     * Add {@link State} to the Module automaton.
      *
      * @param state Module state to be added.
      */
@@ -61,7 +56,7 @@ public class ModuleAutomaton implements Automaton {
     /**
      * Return the size of the Module automaton.
      *
-     * @return Current size of the {@link List} <{@link State}>.
+     * @return Current amount of module states.
      */
     public int size() {
         return moduleStates.size();
@@ -85,6 +80,9 @@ public class ModuleAutomaton implements Automaton {
         return moduleStates;
     }
 
+    /**
+     * Print.
+     */
     public void print() {
         System.out.println("-------------------------------------------------------------");
         System.out.println("\tModule automaton:");

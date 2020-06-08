@@ -37,6 +37,7 @@ public class Module extends AbstractModule {
      * @param rootNode ID of the Taxonomy Root associated with the Module.
      * @param moduleInput List of the INPUT types/formats.
      * @param moduleOutput List of the OUTPUT types/formats.
+     * @param moduleExecution TODO
      */
     public Module(String moduleName, String moduleID, String rootNode, List<DataInstance> moduleInput,
                   List<DataInstance> moduleOutput, String moduleExecution) {
@@ -52,6 +53,7 @@ public class Module extends AbstractModule {
      * @param moduleName Name of the module.
      * @param moduleID Unique module identifier.
      * @param rootNode ID of the Taxonomy Root node corresponding to the Module.
+     * @param moduleExecution TODO
      */
     public Module(String moduleName, String moduleID, String rootNode, String moduleExecution) {
         super(moduleName, moduleID, rootNode, NodeType.LEAF);
@@ -75,7 +77,7 @@ public class Module extends AbstractModule {
 
     /**
      * Returns the list (possibly empty) of required input types for the module.
-     * Returns {@code null} in the case of abstract classes, as they do not have input types.
+     * Returns null in the case of abstract classes, as they do not have input types.
      *
      * @return List of input types (tool modules) or null (non-tool/abstract modules).
      */
@@ -123,9 +125,9 @@ public class Module extends AbstractModule {
 
     /**
      * Return the object that implements the execution of the Module.
-     * {@code null} in case of it not having an implementation.
+     * null in case of it not having an implementation.
      *
-     * @return {@code ModuleExecution} object or {@code null} if the module does not have an implementation.
+     * @return {@code ModuleExecution} object or null if the module does not have an implementation.
      */
     public String getExecutionCode() {
         return this.executionCommand;

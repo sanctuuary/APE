@@ -30,7 +30,7 @@ public class ConstraintParameter {
     }
 
     /**
-     * Add a new taxonomy predicates to describe the constraint parameter.
+     * @param newParam Add a new taxonomy predicates to describe the constraint parameter.
      */
     public void addParameter(TaxonomyPredicate newParam) {
         this.parameterTypes.add(newParam);

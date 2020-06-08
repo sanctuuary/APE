@@ -67,6 +67,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
      * @param domainSetup Domain information, including all the existing tools and types.
      * @param allSolutions Set of {@link SolutionWorkflow}.
      * @param config Setup configuration for the synthesis.
+     * @param size TODO
      */
     public SAT_SynthesisEngine(APEDomainSetup domainSetup, SATsolutionsList allSolutions,
                                APEConfig config, int size) {
@@ -85,7 +86,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     /**
      * Generate the SAT encoding of the workflow synthesis and return it as a string.
      *
-     * @return {@code true} if the encoding was performed successfully, {@code false} otherwise.
+     * @return true if the encoding was performed successfully, false otherwise.
      * @throws IOException Error if taxonomies have not been setup properly.
      */
     public boolean synthesisEncoding() throws IOException {
@@ -202,7 +203,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     /**
      * Using the SAT input generated from SAT encoding and running MiniSAT solver to find the solutions.
      *
-     * @return {@code true} if the synthesis execution results in new candidate solutions, otherwise {@code false}.
+     * @return true if the synthesis execution results in new candidate solutions, otherwise false.
      */
     public boolean synthesisExecution() {
 

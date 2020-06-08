@@ -97,11 +97,11 @@ public class ModuleNode extends SolutionWorkflowNode {
     }
 
     /**
-     * Set an input type in a specific input slot.
+     * @param memoryTypeNode Input type to be set.
+     * @param inputIndex A specific input slot.
      */
     public void setInputType(int inputIndex, TypeNode memoryTypeNode) {
         APEUtils.safeSet(this.inputTypes, inputIndex, memoryTypeNode);
-
     }
 
     public void addOutputType(TypeNode outputTypeNode) {
@@ -125,21 +125,21 @@ public class ModuleNode extends SolutionWorkflowNode {
     }
 
     /**
-     * Method returns the next operation that should be per in the workflow structure.
+     * @return The next operation that should be per in the workflow structure.
      */
     public ModuleNode getNextModuleNode() {
         return nextModuleNode;
     }
 
     /**
-     * Method returns {@code true} if the current operation is not the last one in the workflow, {@code false} otherwise.
+     * @return True if the current operation is not the last one in the workflow, false otherwise.
      */
     public boolean hasNextModule() {
         return nextModuleNode != null;
     }
 
     /**
-     * Method returns {@code true} if the current operation is not the first one in the workflow, {@code false} otherwise.
+     * @return True if the current operation is not the first one in the workflow, false otherwise.
      */
     public boolean hasPrevModule() {
         return prevModuleNode != null;

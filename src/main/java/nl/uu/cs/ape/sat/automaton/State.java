@@ -21,10 +21,10 @@ public class State implements PredicateLabel {
     /**
      * Creates a state that corresponds to a state of the overall solution workflow.
      *
+     * @param workflowStateType Parameter determining the state type.
      * @param blockNumber Corresponds to the block number within the type automaton (not applicable for the module automaton).
      * @param stateNumber Corresponds to the state number within block.
      * @param input_branching Max number of branching.
-     * @param workflowStateType Parameter determining the state type.
      */
     public State(WorkflowElement workflowStateType, Integer blockNumber, int stateNumber, int input_branching) {
 
@@ -90,7 +90,7 @@ public class State implements PredicateLabel {
     /**
      * Returns the text representing the state (e.g. M04 or T02.31).
      *
-     * @return {@link String} representation of the state.
+     * @return String representation of the state.
      */
     public String getPredicateID() {
         return stateName;
@@ -99,7 +99,7 @@ public class State implements PredicateLabel {
     /**
      * Returns the text representing the state (e.g. M04 or T02.31).
      *
-     * @return {@link String} representation of the state.
+     * @return String representation of the state.
      */
     public String getPredicateLabel() {
         return stateName;
@@ -116,9 +116,9 @@ public class State implements PredicateLabel {
 
     /**
      * Returns the absolute order number of the state within the whole workflow. Unlike {@link #getStateNumber}, this function returns number that can be used to compare ordering of any 2 states in the system,
-     * disregarding the block or their type (data type, tool, etc.). {@code NULL} state has AbsoluteStateNumber -1.
+     * disregarding the block or their type (data type, tool, etc.). null state has AbsoluteStateNumber -1.
      *
-     * @return Non-negative number that corresponds to the absolute order number of the state or -1 for {@code NULL} state.
+     * @return Non-negative number that corresponds to the absolute order number of the state or -1 for null state.
      */
     public int getAbsoluteStateNumber() {
         return absoluteStateNumber;

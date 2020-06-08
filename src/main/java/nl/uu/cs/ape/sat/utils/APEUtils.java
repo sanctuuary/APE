@@ -109,6 +109,10 @@ public final class APEUtils {
     }
 
     /**
+     * @param domainSetup Domain information, including all the existing tools and types.
+     * @param mappings Mapping function.
+     * @param moduleAutomaton Module automaton.
+     * @param typeAutomaton Type automaton.
      * @return The CNF representation of the SLTL constraints in our project.
      */
     public static String encodeAPEConstraints(APEDomainSetup domainSetup, AtomMappings mappings,
@@ -145,7 +149,11 @@ public final class APEUtils {
      *
      * @param constraintID ID of the constraint.
      * @param parameters Parameters for the constraint template.
-     * @return {@link String} representation of the SAT encoding for the specified constraint.
+     * @param domainSetup Domain information, including all the existing tools and types.
+     * @param mappings Mapping function.
+     * @param moduleAutomaton Module automaton.
+     * @param typeAutomaton Type automaton.
+     * @return String representation of the SAT encoding for the specified constraint.
      */
     public static String constraintSATEncoding(String constraintID, List<TaxonomyPredicate> parameters,
                                                APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
@@ -157,13 +165,14 @@ public final class APEUtils {
     }
 
     /**
-     * Used to write the {@code text} to a file {@code file}. If @append is {@code true}, the {@code text} is
+     * Used to write the {@code text} to a file {@code file}. If @append is true, the {@code text} is
      * appended to the {@code file}, otherwise the {@code file} is rewritten.
      *
      * @param text Text that will be written in the file.
      * @param file The system-dependent file name.
-     * @param append If {@code true}, then bytes will be written to the end of the file rather than the beginning.
+     * @param append If true, then bytes will be written to the end of the file rather than the beginning.
      * @throws IOException Exception if file not found.
+     * @return True if write to file was successful, false otherwise.
      */
     public static boolean write2file(String text, File file, boolean append) throws IOException {
         FileWriter fw = new FileWriter(file, append);
@@ -210,7 +219,7 @@ public final class APEUtils {
      *
      * @param label Label of the current term.
      * @param ontologyPrefixURI OWL prefix information.
-     * @return {@link String} representing full OWL class URI.
+     * @return String representing full OWL class URI.
      */
     public static String createClassURI(String label, String ontologyPrefixURI) {
         if (label.startsWith("http")) {
@@ -307,6 +316,7 @@ public final class APEUtils {
      * @param jsonObject {@link JSONObject} that is being explored.
      * @param key Key label that corresponds to the elements.
      * @param clazz Class to which the elements should belong to.
+     * @param <T> Class to which the elements should belong to.
      * @return List of elements that corresponds to the key. If the key does not exists returns empty list.
      */
     public static <T> List<T> getListFromJson(JSONObject jsonObject, String key, Class<T> clazz) {
@@ -338,6 +348,7 @@ public final class APEUtils {
      *
      * @param jsonArray JSON array object.
      * @param _class Class type that the elements of the array are.
+     * @param <T> Class to which the elements should belong to.
      * @return List of objects of type {@link T}.
      */
     public static <T> List<T> getListFromJsonList(JSONArray jsonArray, Class<T> _class) {
@@ -354,7 +365,7 @@ public final class APEUtils {
      * an existing file with required reading permissions.
      *
      * @param path Path to the file.
-     * @return {@code true} if the file exists and can be read, {@code false} otherwise.
+     * @return true if the file exists and can be read, false otherwise.
      */
     public static boolean isValidReadFile(String path) {
         if (path == null || path == "") {
@@ -375,9 +386,7 @@ public final class APEUtils {
     }
 
     /**
-     * In case that the debug mode is on, print the constraint
-     * templates and tool and data taxonomy trees.
-     *
+     * @param debug In case that the debug mode is on, print the constraint templates and tool and data taxonomy trees.
      * @param domainSetup Domain information, including all the existing tools and types.
      */
     public static void debugPrintout(boolean debug, APEDomainSetup domainSetup) {
@@ -442,6 +451,9 @@ public final class APEUtils {
 
     /**
      * Print header to illustrate the part of the synthesis that is being performed.
+     *
+     * @param argument TODO
+     * @param title TODO
      */
     public static void printHeader(Integer argument, String... title) {
         String arg = (argument == null) ? "" : (" " + argument);
@@ -458,6 +470,7 @@ public final class APEUtils {
      * Provide a safe interface for iteration trough a list/set.
      *
      * @param currList List/set that is being evaluated.
+     * @param <E> Any type.
      * @return An empty list in case of {@code currList == null}, or {@code currList} otherwise.
      */
     public static <E> Collection<E> safe(Collection<E> currList) {
@@ -470,6 +483,7 @@ public final class APEUtils {
      *
      * @param currList List of elements.
      * @param index Index of the element that is to be returned.
+     * @param <E> Any type.
      * @return Element of the list, or null if the index is out of bounds.
      */
     public static <E> E safeGet(List<E> currList, int index) {
@@ -489,7 +503,8 @@ public final class APEUtils {
      * @param list List that is manipulated.
      * @param index Absolute position of the new element.
      * @param element New element to be added to the list.
-     * @throws IndexOutOfBoundsException Exception if the index is out of range (index < 0).
+     * @param <E> Any type.
+     * @throws IndexOutOfBoundsException Exception if the index is out of range (index &lt; 0).
      */
     public static <E> void safeSet(List<E> list, int index, E element) {
         if (index < 0) {
@@ -554,7 +569,12 @@ public final class APEUtils {
     }
 
     /**
-     * Get file content as a string.
+     * Read the file to a String.
+     *
+     * @param path Path to the file.
+     * @param encoding The charset encoding.
+     * @throws IOException Error while reading the file.
+     * @return File content as a String.
      */
     public static String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
@@ -567,7 +587,6 @@ public final class APEUtils {
         } else {
             timers.put(timerID, (long) -1);
         }
-
     }
 
     public static void timerRestartAndPrint(String timerID, String printString) {

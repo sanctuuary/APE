@@ -30,7 +30,7 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
 
     /**
      * Two SolutionWorkflowNodes are equal if they represent the same state in the workflow.
-     * @return {@code true} if the state that the describe is the same.
+     * @return true if the state that the describe is the same.
      */
     @Override
     public boolean equals(Object obj) {
@@ -60,12 +60,12 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
     }
 
     /**
-     * Get the unique label that describes the node.
+     * @return The unique label that describes the node.
      */
     public abstract String getNodeID();
 
     /**
-     * Get a label that describes the node.
+     * @return A label that describes the node.
      */
     public abstract String getNodeLabel();
 

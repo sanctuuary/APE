@@ -114,7 +114,7 @@ public class Atom {
      * Returns the string representation of the WorkflowElement, used for the textual solution representation. In case of the atom depicting
      * a usage of a type in the workflow, the structure of the representation contains an additional attribute, state in which the type was initially added to the memory.
      *
-     * @return {@link String} representing the workflow element in a textual form.
+     * @return String representing the workflow element in a textual form.
      */
     public String toString() {
         if (this.elementType == WorkflowElement.MEM_TYPE_REFERENCE) {

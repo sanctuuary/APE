@@ -56,7 +56,7 @@ public class APEDomainSetup {
     }
 
     /**
-     * Add a constraint to the list of constraints, that should be encoded during the execution of the synthesis.
+     * @param constr Add a constraint to the list of constraints, that should be encoded during the execution of the synthesis.
      */
     public void addConstraintData(ConstraintTemplateData constr) {
         this.unformattedConstr.add(constr);
@@ -107,10 +107,10 @@ public class APEDomainSetup {
     }
 
     /**
-     * Return the {@link ConstraintTemplate} that corresponds to the given ID, or {@code null} if the constraint with the given ID does not exist.
+     * Return the {@link ConstraintTemplate} that corresponds to the given ID, or null if the constraint with the given ID does not exist.
      *
      * @param constraintID ID of the {@code ConstraintTemplate}.
-     * @return The {@code ConstraintTemplate} that corresponds to the given ID, or {@code null} if the ID is not mapped to any constraint.
+     * @return The {@code ConstraintTemplate} that corresponds to the given ID, or null if the ID is not mapped to any constraint.
      */
     public ConstraintTemplate getConstraintTamplate(String constraintID) {
         return constraintFactory.getConstraintTemplate(constraintID);

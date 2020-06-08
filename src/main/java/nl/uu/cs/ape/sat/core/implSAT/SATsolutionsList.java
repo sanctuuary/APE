@@ -72,9 +72,9 @@ public class SATsolutionsList {
     }
 
     /**
-     * Returns {@code true} if the list of all the solutions contains no elements.
+     * Returns true if the list of all the solutions contains no elements.
      *
-     * @return {@code true} if the list contains no elements.
+     * @return true if the list contains no elements.
      */
     public boolean isEmpty() {
         return this.solutions.isEmpty();
@@ -95,7 +95,7 @@ public class SATsolutionsList {
      * and it's nonempty.)
      *
      * @param currSolutions Solutions that should be added to the list of all solutions.
-     * @return {@code true} if this list changed as a result of the call.
+     * @return true if this list changed as a result of the call.
      */
     public boolean addSolutions(List<SolutionWorkflow> currSolutions) {
         for (SolutionWorkflow solution : currSolutions) {

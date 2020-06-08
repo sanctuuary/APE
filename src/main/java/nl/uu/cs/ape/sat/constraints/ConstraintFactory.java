@@ -33,10 +33,10 @@ public class ConstraintFactory {
     }
 
     /**
-     * Return the {@code ConstraintTemplate} that corresponds to the given ID, or {@code null} if the constraint with the given ID does not exist.
+     * Return the {@code ConstraintTemplate} that corresponds to the given ID, or null if the constraint with the given ID does not exist.
      *
      * @param constraintID ID of the {@code ConstraintTemplate}.
-     * @return The {@link ConstraintTemplate} that corresponds to the given ID, or {@code null} if the ID is not mapped to any constraint.
+     * @return The {@link ConstraintTemplate} that corresponds to the given ID, or null if the ID is not mapped to any constraint.
      */
     public ConstraintTemplate getConstraintTemplate(String constraintID) {
         return constraintTemplates.get(constraintID);
@@ -46,7 +46,7 @@ public class ConstraintFactory {
      * Add constraint template to the set of constraints.
      *
      * @param constraintTemplate Constraint template that is added to the set.
-     * @return {@code true} if the constraint template was successfully added to the set or {@code false} in case that the constraint ID already exists in the set.
+     * @return true if the constraint template was successfully added to the set or false in case that the constraint ID already exists in the set.
      */
     public boolean addConstraintTemplate(ConstraintTemplate constraintTemplate) {
         if (constraintTemplates.put(constraintTemplate.getConstraintID(), constraintTemplate) != null) {
@@ -59,7 +59,7 @@ public class ConstraintFactory {
     /**
      * Print the template for encoding each constraint, containing the template ID, description and required number of parameters.
      *
-     * @return {@link String} representing the description.
+     * @return String representing the description.
      */
     public String printConstraintsCodes() {
         StringBuilder templates = new StringBuilder("{\n" + "  \"constraints\": [\n");
@@ -73,7 +73,9 @@ public class ConstraintFactory {
     /**
      * Adding each constraint format in the set of all cons. formats.
      *
-     * @return {@link String} description of all the formats (ID, description and number of parameters for each).
+     * @param allModules TODO
+     * @param allTypes TODO
+     * @return String description of all the formats (ID, description and number of parameters for each).
      */
     public boolean initializeConstraints(AllModules allModules, AllTypes allTypes) {
 

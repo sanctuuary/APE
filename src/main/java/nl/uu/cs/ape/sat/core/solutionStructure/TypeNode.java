@@ -35,13 +35,13 @@ public class TypeNode extends SolutionWorkflowNode {
 
     /**
      * Module/step in the workflow that generates the data instance as input.
-     * If {@code null} data instance corresponds to the initial workflow input.
+     * If null data instance corresponds to the initial workflow input.
      */
     private ModuleNode createdByModule;
 
     /**
      * Modules/steps in the workflow that use this data instance as input.
-     * {@code NULL} represents workflow output.
+     * null represents workflow output.
      */
     private List<ModuleNode> usedByModules;
 
@@ -102,7 +102,7 @@ public class TypeNode extends SolutionWorkflowNode {
     }
 
     /**
-     * Set the tool/workflow step that creates this data instance.
+     * @param createdByModule Set the tool/workflow step that creates this data instance.
      */
     public void setCreatedByModule(ModuleNode createdByModule) {
         this.createdByModule = createdByModule;
@@ -130,26 +130,26 @@ public class TypeNode extends SolutionWorkflowNode {
     /**
      * Get tool step in the workflow that creates this data instance as output.
      *
-     * @return The {@link ModuleNode} that uses this data type. If {@code null} data instance corresponds to the initial workflow input.
+     * @return The {@link ModuleNode} that uses this data type. If null data instance corresponds to the initial workflow input.
      */
     public ModuleNode getCreatedByModule() {
         return createdByModule;
     }
 
     /**
-     * Get all module nodes that use the data instance in input. If {@code NULL} is
+     * Get all module nodes that use the data instance in input. If null is
      * in the list, the type is used as workflow output.
      *
-     * @return List of modules that used the type instance (a {@code NULL} value represent the workflow output).
+     * @return List of modules that used the type instance (a null value represent the workflow output).
      */
     public List<ModuleNode> getUsedByModules() {
         return usedByModules;
     }
 
     /**
-     * Returns {@code true} if the node does not contain any type instances.
+     * Returns true if the node does not contain any type instances.
      *
-     * @return {@code true} if the type node is empty.
+     * @return true if the type node is empty.
      */
     public boolean isEmpty() {
         return usedTypes.isEmpty();
@@ -225,7 +225,7 @@ public class TypeNode extends SolutionWorkflowNode {
     }
 
     /**
-     * Get a short non descriptive node ID, that can be used as a variable name.
+     * @return A short non descriptive node ID, that can be used as a variable name.
      */
     public String getShortNodeID() {
         return "node" + Math.abs(getNodeID().hashCode());

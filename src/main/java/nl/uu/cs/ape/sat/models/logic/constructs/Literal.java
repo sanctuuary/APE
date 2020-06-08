@@ -23,10 +23,10 @@ public class Literal implements Comparable<Literal> {
     /** Integer value used to encode the atom into cnf form. */
     private Integer mappedAtom;
 
-    /** {@code true} if the atom is negated. */
+    /** true if the atom is negated. */
     private Boolean negated;
 
-    /** The {@link Atom} class represents elements of the workflow, that can be {@code true} or not (depending of the truth value of the literal). */
+    /** The {@link Atom} class represents elements of the workflow, that can be true or not (depending of the truth value of the literal). */
     private Atom atom;
 
     /**
@@ -91,19 +91,19 @@ public class Literal implements Comparable<Literal> {
     }
 
     /**
-     * Return {@code true} if the current workflow element is of the given {@link WorkflowElement} type.
+     * Return true if the current workflow element is of the given {@link WorkflowElement} type.
      *
      * @param workflowElemType Element type that is current literal is compared to.
-     * @return {@code true} if the current workflow element corresponds to the given {@link WorkflowElement}, {@code false} otherwise.
+     * @return true if the current workflow element corresponds to the given {@link WorkflowElement}, false otherwise.
      */
     public boolean isWorkflowElementType(WorkflowElement workflowElemType) {
         return atom.getWorkflowElementType() == workflowElemType;
     }
 
     /**
-     * Returns {@code true} in case the literal is NEGATED, {@code false} otherwise.
+     * Returns true in case the literal is NEGATED, false otherwise.
      *
-     * @return {@code true} if Literal is negated.
+     * @return true if Literal is negated.
      */
     public boolean isNegated() {
         return negated;
@@ -112,7 +112,7 @@ public class Literal implements Comparable<Literal> {
     /**
      * Returns the state in the automaton.
      *
-     * @return {@link String} representation of the module/type automaton state.
+     * @return String representation of the module/type automaton state.
      */
     public State getUsedInStateArgument() {
         return atom.getUsedInStateArgument();

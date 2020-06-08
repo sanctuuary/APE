@@ -12,7 +12,7 @@ public enum LogicOperation {
     AND;
 
     /**
-     * Get a string corresponding to the logical operation.
+     * @return A string corresponding to the logical operation.
      */
     public String toString() {
         if (this == LogicOperation.OR) {
@@ -23,7 +23,7 @@ public enum LogicOperation {
     }
 
     /**
-     * Get a simple sign corresponding to the logical operation.
+     * @return A simple sign corresponding to the logical operation.
      */
     public String toStringSign() {
         if (this == LogicOperation.OR) {

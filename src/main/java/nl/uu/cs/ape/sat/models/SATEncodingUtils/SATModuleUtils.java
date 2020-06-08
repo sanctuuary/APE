@@ -37,7 +37,7 @@ public final class SATModuleUtils {
      * pipeline or general memory approach.
      *
      * @param synthesisInstance A specific synthesis run that contains all the information specific for it.
-     * @return {@link String} representation of CNF constraints regarding the required INPUT and OUTPUT types of the modules.
+     * @return String representation of CNF constraints regarding the required INPUT and OUTPUT types of the modules.
      */
     public static String encodeModuleAnnotations(SAT_SynthesisEngine synthesisInstance) {
         StringBuilder constraints = new StringBuilder();
@@ -53,7 +53,7 @@ public final class SATModuleUtils {
      * represent the same data.
      *
      * @param synthesisInstance A specific synthesis run that contains all the information specific for it.
-     * @return {@link String} representation of CNF constraints regarding the required memory structure implementation.
+     * @return String representation of CNF constraints regarding the required memory structure implementation.
      */
     public static String encodeMemoryStructure(SAT_SynthesisEngine synthesisInstance) {
         StringBuilder constraints = new StringBuilder();
@@ -78,7 +78,7 @@ public final class SATModuleUtils {
      * Returns the CNF representation of the input type constraints for all tools
      * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.
      *
-     * @return {@link String} representation of constraints.
+     * @return String representation of constraints.
      */
     private static String inputCons(SAT_SynthesisEngine synthesisInstance) {
 
@@ -136,7 +136,7 @@ public final class SATModuleUtils {
      * ensure that the {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented
      * correctly.
      *
-     * @return {@link String} representing the constraints required to ensure that
+     * @return String representing the constraints required to ensure that
      *         the {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
      */
     private static String generalReferenceCons(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton, AtomMappings mappings) {
@@ -149,7 +149,7 @@ public final class SATModuleUtils {
                 for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
                     for (State currUsedTypeState : currUsedBlock.getStates()) {
                         if (!currType.isEmptyPredicate()) {
-                            /* ..the referenced memory state cannot be {@code null}.. */
+                            /* ..the referenced memory state cannot be null.. */
                             constraints = constraints.append("-")
                                     .append(mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
                                     .append(" ");
@@ -179,7 +179,7 @@ public final class SATModuleUtils {
 
                                 }
                             }
-                            /* If the type is empty the referenced state has to be {@code null}. */
+                            /* If the type is empty the referenced state has to be null. */
                         } else {
                             constraints = constraints.append("-")
                                     .append(mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
@@ -203,7 +203,7 @@ public final class SATModuleUtils {
      * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
      * the Message Passing Approach.
      *
-     * @return {@link String} representation of constraints.
+     * @return String representation of constraints.
      */
     private static String inputMsgPassingCons(AllModules allModules, TypeAutomaton typeAutomaton, AtomMappings mappings) {
 
@@ -257,7 +257,7 @@ public final class SATModuleUtils {
      * referenced by a tool's input type, it has to be of right type. <br>
      * Function is implementing the Message Passing Approach.
      *
-     * @return {@link String} representation of constraints.
+     * @return String representation of constraints.
      */
     private static String enforcingUsageOfGeneratedTypesMsgPassingCons(SAT_SynthesisEngine synthesisInstance) {
 
@@ -325,7 +325,7 @@ public final class SATModuleUtils {
      * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
      * the Shared Memory Approach.
      *
-     * @return {@link String} representation of constraints.
+     * @return String representation of constraints.
      */
     private static String inputSharedMemCons(TypeAutomaton typeAutomaton, AtomMappings mappings) {
 
@@ -378,7 +378,7 @@ public final class SATModuleUtils {
      * referenced by a tool's input type, it has to be of right type. <br>
      * Function is implementing the Shared Memory Approach.
      *
-     * @return {@link String} representation of constraints.
+     * @return String representation of constraints.
      */
     private static String enforcingUsageOfGeneratedTypesSharedMemCons(SAT_SynthesisEngine synthesisInstance) {
 
@@ -469,7 +469,7 @@ public final class SATModuleUtils {
      * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.<br>
      * Generate constraints that preserve tool outputs.
      *
-     * @return {@link String} representation of constraints.
+     * @return String representation of constraints.
      */
     private static String outputCons(SAT_SynthesisEngine synthesisInstance) {
 
@@ -520,7 +520,10 @@ public final class SATModuleUtils {
      * Generating the mutual exclusion constraints for each pair of tools from modules
      * (excluding abstract modules from the taxonomy) in each state of moduleAutomaton.
      *
-     * @return The {@link String} representation of constraints.
+     * @param allModules All the modules.
+     * @param moduleAutomaton Module automaton.
+     * @param mappings Mapping function.
+     * @return The String representation of constraints.
      */
     public static String moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
 
@@ -539,10 +542,12 @@ public final class SATModuleUtils {
     }
 
     /**
-     * Generating the mandatory usage constraints of root module @rootModule in each
-     * state of @moduleAutomaton.
+     * Generating the mandatory usage constraints of root module @rootModule in each state of @moduleAutomaton.
      *
-     * @return {@link String} representation of constraints.
+     * @param allModules All the modules.
+     * @param moduleAutomaton Module automaton.
+     * @param mappings Mapping function.
+     * @return String representation of constraints.
      */
     public static String moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton,
                                               AtomMappings mappings) {
@@ -570,7 +575,11 @@ public final class SATModuleUtils {
      * being used, with respect to the Module Taxonomy. The rule starts from
      * the @rootModule and it's valid in each state of @moduleAutomaton.
      *
-     * @return {@link String} representation of constraints enforcing taxonomy classifications.
+     * @param allModules All the modules.
+     * @param currModule TODO
+     * @param moduleAutomaton Module automaton.
+     * @param mappings Mapping function.
+     * @return String representation of constraints enforcing taxonomy classifications.
      */
     public static String moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule, ModuleAutomaton moduleAutomaton,
                                                         AtomMappings mappings) {
@@ -585,6 +594,11 @@ public final class SATModuleUtils {
 
     /**
      * Providing the recursive method used in {@link #moduleEnforceTaxonomyStructure}.
+     *
+     * @param allModules All the modules.
+     * @param currModule TODO
+     * @param moduleState TODO
+     * @param mappings Mapping function.
      */
     private static String moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule,
                                                                  AtomMappings mappings, State moduleState) {
@@ -622,11 +636,10 @@ public final class SATModuleUtils {
     }
 
     /**
-     * Returns a list of pairs of tools from modules. Note that the abstract modules
+     * @param predicateList List of predicates.
+     * @return A a list of pairs of tools from modules. Note that the abstract modules
      * are not returned, only the unique pairs of modules that are representing
      * actual tools.
-     *
-     * @return List of pairs of modules.
      */
     public static List<Pair<PredicateLabel>> getPredicatePairs(List<? extends PredicateLabel> predicateList) {
         List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();

@@ -32,7 +32,10 @@ public class SATTypeUtils {
      * (excluding abstract modules from the taxonomy) in each state
      * of @moduleAutomaton.
      *
-     * @return {@link String} representation of constraints.
+     * @param allTypes      TODO
+     * @param typeAutomaton TODO
+     * @param mappings      TODO
+     * @return String representation of constraints.
      */
     public static String typeMutualExclusion(AllTypes allTypes, TypeAutomaton typeAutomaton, AtomMappings mappings) {
 
@@ -68,7 +71,10 @@ public class SATTypeUtils {
      * state of @moduleAutomaton. It enforces that each type instance is either
      * defined on all the dimensions or is empty.
      *
-     * @return {@link String} representation of constraints.
+     * @param domainSetup   TODO
+     * @param typeAutomaton TODO
+     * @param mappings      TODO
+     * @return String representation of constraints.
      */
     public static String typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton, AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
@@ -102,10 +108,10 @@ public class SATTypeUtils {
      * and it's valid in each state of @typeAutomaton. @emptyType denotes the type
      * that is being used if the state has no type.
      *
-     * @param allTypes The type taxonomy
-     * @param typeAutomaton Type automaton
-     * @param mappings Mapping function
-     * @return The {@link String} representation of constraints enforcing taxonomy classifications.
+     * @param allTypes      TODO
+     * @param typeAutomaton TODO
+     * @param mappings      TODO
+     * @return The String representation of constraints enforcing taxonomy classifications.
      */
     public static String typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton, AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
@@ -168,8 +174,11 @@ public class SATTypeUtils {
     /**
      * Encoding the initial workflow input.
      *
+     * @param allTypes       TODO
      * @param program_inputs Input types for the program.
-     * @return The {@link String} representation of the initial input encoding.
+     * @param typeAutomaton  TODO
+     * @param mappings       TODO
+     * @return The String representation of the initial input encoding.
      */
     public static String encodeInputData(AllTypes allTypes, List<DataInstance> program_inputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {
         StringBuilder encoding = new StringBuilder();
@@ -203,7 +212,11 @@ public class SATTypeUtils {
      * Encoding the workflow output. The provided output files have to occur
      * as the final list of "used" data types. In the predefined order.
      *
-     * @return {@link String} representation of the workflow output encoding.
+     * @param allTypes        TODO
+     * @param program_outputs Output types for the program.
+     * @param typeAutomaton   TODO
+     * @param mappings        TODO
+     * @return String representation of the workflow output encoding.
      */
     public static String encodeOutputData(AllTypes allTypes, List<DataInstance> program_outputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {
         StringBuilder encoding = new StringBuilder();

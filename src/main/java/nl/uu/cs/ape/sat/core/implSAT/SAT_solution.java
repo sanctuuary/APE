@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * The {@code SAT_solution} class describes the solution produced by the SAT
  * solver. It stores the original solution and the mapped one. In case of the
- * parameter <b>unsat</b> being {@code true}, there are no solutions.
+ * parameter <b>unsat</b> being true, there are no solutions.
  * <p>
  * It also implements general solution interface {@link SolutionInterpreter}.
  *
@@ -42,7 +42,7 @@ public class SAT_solution extends SolutionInterpreter {
     private final List<Literal> references2MemTypes;
     private final Set<PredicateLabel> usedTypeStates;
 
-    /** {@code true} if the there is no solution to the problem. Problem is UNASATISFIABLE. */
+    /** true if the there is no solution to the problem. Problem is UNASATISFIABLE. */
     private final boolean unsat;
 
     /**
@@ -99,7 +99,7 @@ public class SAT_solution extends SolutionInterpreter {
     }
 
     /**
-     * Creating an empty solution, for UNSAT problem. The list <b>literals</b> is {@code null}.
+     * Creating an empty solution, for UNSAT problem. The list <b>literals</b> is null.
      */
     public SAT_solution() {
         unsat = true;
@@ -115,7 +115,7 @@ public class SAT_solution extends SolutionInterpreter {
     /**
      * Returns the solution in human readable format.
      *
-     * @return {@link String} representing the solution (only positive literals).
+     * @return String representing the solution (only positive literals).
      */
     public String getSolution() {
         StringBuilder solution = new StringBuilder();
@@ -132,7 +132,7 @@ public class SAT_solution extends SolutionInterpreter {
     /**
      * Returns the complete solution in human readable format, including the negative predicates.
      *
-     * @return {@link String} representing the solution positive and negative literals).
+     * @return String representing the solution positive and negative literals).
      */
     public String getCompleteSolution() {
         StringBuilder solution = new StringBuilder();
@@ -151,7 +151,7 @@ public class SAT_solution extends SolutionInterpreter {
      * filtering out the information that are not required to generate the workflow.
      * The solution literals are sorted according the state they are used in.
      *
-     * @return {@link String} representing the tools used in the solution.
+     * @return String representing the tools used in the solution.
      */
     public String getRelevantToolsInSolution() {
         StringBuilder solution = new StringBuilder();
@@ -170,7 +170,7 @@ public class SAT_solution extends SolutionInterpreter {
      * filtering out the information that are not required to generate the workflow.
      * The solution literals are sorted according the state they are used in.
      *
-     * @return {@link String} representing the tools and data used in the solutions.
+     * @return String representing the tools and data used in the solutions.
      */
     public String getRelevantSolution() {
         StringBuilder solution = new StringBuilder();
@@ -206,7 +206,7 @@ public class SAT_solution extends SolutionInterpreter {
     /**
      * Returns the solution in mapped format. The original solution created by the SAT solver.
      *
-     * @return {@link String} representing the mapped solution created by SAT solver.
+     * @return String representing the mapped solution created by SAT solver.
      */
     public String getOriginalSATSolution() {
         StringBuilder solution = new StringBuilder();
@@ -243,10 +243,10 @@ public class SAT_solution extends SolutionInterpreter {
     }
 
     /**
-     * Returns the satisfiability of the problem. Returns {@code true} if the problem is
-     * satisfiable, {@code false} otherwise.
+     * Returns the satisfiability of the problem. Returns true if the problem is
+     * satisfiable, false otherwise.
      *
-     * @return {@code true} if the problem is satisfiable, {@code false} otherwise.
+     * @return true if the problem is satisfiable, false otherwise.
      */
     public boolean isSat() {
         return !unsat;

@@ -55,7 +55,7 @@ public abstract class AllPredicates {
     public abstract TaxonomyPredicate addPredicate(TaxonomyPredicate newPredicate) throws Exception;
 
     /**
-     * Returns the runtime class of the predicates that belong to the Object.
+     * @return The runtime class of the predicates that belong to the Object.
      */
     public abstract Class<?> getPredicateClass();
 
@@ -64,7 +64,7 @@ public abstract class AllPredicates {
      * Remove the parts of the taxonomy that are not in use for the given set of
      * available tools and types in the domain.
      *
-     * @return {@code true} if the trimming finished successfully, {@code false} otherwise.
+     * @return true if the trimming finished successfully, false otherwise.
      */
     public boolean trimTaxonomy() {
         for (TaxonomyPredicate root : getRootPredicates()) {
@@ -88,7 +88,7 @@ public abstract class AllPredicates {
      * set of available tools and types in the domain.
      *
      * @param subTaxRoot SubTaxonomy that is to be trimmed.
-     * @return {@code true} if the trimming finished successfully, {@code false} otherwise.
+     * @return true if the trimming finished successfully, false otherwise.
      */
     public boolean trimSubTaxonomy(TaxonomyPredicate subTaxRoot) {
         if (subTaxRoot == null) {
@@ -112,7 +112,7 @@ public abstract class AllPredicates {
     }
 
     /**
-     * Return the predicates from the domain.
+     * @return The predicates from the domain.
      */
     protected Map<String, TaxonomyPredicate> getPredicates() {
         return this.predicates;

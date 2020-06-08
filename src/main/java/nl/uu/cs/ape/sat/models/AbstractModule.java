@@ -58,7 +58,7 @@ public class AbstractModule extends TaxonomyPredicate {
     /**
      * Returns null. Abstract classes do not have input types.
      *
-     * @return {@code null}
+     * @return null
      */
     public List<DataInstance> getModuleInput() {
         return null;
@@ -67,7 +67,7 @@ public class AbstractModule extends TaxonomyPredicate {
     /**
      * Returns null. Abstract classes do not have output types.
      *
-     * @return {@code null}
+     * @return null
      */
     public List<DataInstance> getModuleOutput() {
         return null;

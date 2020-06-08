@@ -51,7 +51,7 @@ public class OWLReader {
      * Method used to read separately <b>ModulesTaxonomy</b> and
      * <b>TypesTaxonomy</b> part of the ontology.
      *
-     * @return {@code true} is the ontology was read correctly, {@code false} otherwise.
+     * @return true is the ontology was read correctly, false otherwise.
      * @throws ExceptionInInitializerError Exception if Type dimensions have common classes.
      */
     public boolean readOntology() throws ExceptionInInitializerError {
@@ -112,7 +112,7 @@ public class OWLReader {
     /**
      * Calculate whether the type dimensions are disjoint or have overlaps.
      *
-     * @return {code true} if the dimensions are disjoint, {@code false} otherwise.
+     * @return {code true} if the dimensions are disjoint, false otherwise.
      */
     private boolean dimensionsDisjoint(List<OWLClass> typeClasses) {
         if (typeClasses.size() < 2) {
@@ -239,7 +239,7 @@ public class OWLReader {
      * Returning the label of the provided OWL class.
      *
      * @param currClass Provided OWL class.
-     * @return {@link String} representation of the class name.
+     * @return String representation of the class name.
      */
     private String getLabel(OWLClass currClass) {
         if (currClass == null || currClass.isOWLNothing()) {
@@ -264,7 +264,7 @@ public class OWLReader {
      * Returning the IRI of the provided OWL class.
      *
      * @param currClass Provided OWL class.
-     * @return {@link String} representation of the class name.
+     * @return String representation of the class name.
      */
     private String getIRI(OWLClass currClass) {
         if (currClass == null) {

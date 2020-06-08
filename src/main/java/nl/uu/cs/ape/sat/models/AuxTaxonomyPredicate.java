@@ -29,6 +29,9 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
 
     /**
      * Create an auxiliary predicate.
+     *
+     * @param predicate the predicate
+     * @param logicOp   the logic op
      */
     public AuxTaxonomyPredicate(TaxonomyPredicate predicate, LogicOperation logicOp) {
         super(predicate.getRootNodeID(), predicate.getNodeType());
@@ -37,11 +40,18 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
         this.containingPredicates = new TreeSet<TaxonomyPredicate>();
     }
 
+    /**
+     * Gets taxonomy predicates.
+     *
+     * @return the taxonomy predicates
+     */
     public TaxonomyPredicate getTaxonomyPredicates() {
         return taxonomyPredicate;
     }
 
     /**
+     * Gets logic op.
+     *
      * @return the field {@link #logicOp}.
      */
     public LogicOperation getLogicOp() {

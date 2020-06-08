@@ -73,7 +73,7 @@ public class APE {
      * Method used to setup the domain using the configuration file and the
      * corresponding annotation and constraints files.
      *
-     * @return {@code true} if the setup was successfully performed, {@code false} otherwise.
+     * @return true if the setup was successfully performed, false otherwise.
      * @throws ExceptionInInitializerError Exception while reading the provided ontology.
      */
     private boolean setupDomain() throws ExceptionInInitializerError {
@@ -123,8 +123,7 @@ public class APE {
     }
 
     /**
-     * Get the object that contains all crucial information about the domain
-     * (e.g. list of tools, data types, constraint factory, etc.)
+     * @return The object that contains all crucial information about the domain (e.g. list of tools, data types, constraint factory, etc.)
      */
     public APEDomainSetup getDomainSetup() {
         return apeDomainSetup;
@@ -165,6 +164,7 @@ public class APE {
      * @param configObject Object that contains run configurations.
      * @param apeDomainSetup Domain information, including all the existing tools and types.
      * @return The list of all the solutions.
+     * @throws IOException Error in case of not providing a proper configuration file.
      * @throws JSONException Error in configuration object.
      */
     public SATsolutionsList runSynthesis(JSONObject configObject, APEDomainSetup apeDomainSetup)
@@ -183,7 +183,9 @@ public class APE {
      * Setup a new run instance of the APE solver and run the synthesis algorithm.
      *
      * @param configPath Path to the JSON that contains run configurations.
+     * @param apeDomainSetup Domain information, including all the existing tools and types.
      * @return The list of all the solutions.
+     * @throws IOException Error in case of not providing a proper configuration file.
      * @throws JSONException Error in configuration object.
      */
     public SATsolutionsList runSynthesis(String configPath, APEDomainSetup apeDomainSetup)
@@ -251,7 +253,7 @@ public class APE {
      * Write textual "human readable" version on workflow solutions to a file.
      *
      * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @return {@code true} if the writing was successfully performed, {@code false} otherwise.
+     * @return true if the writing was successfully performed, false otherwise.
      * @throws IOException Exception if file not found.
      */
     public boolean writeSolutionToFile(SATsolutionsList allSolutions) throws IOException {
@@ -270,8 +272,7 @@ public class APE {
      * Generating scripts that represent executable versions of the workflow solutions and executing them.
      *
      * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @return {@code true} if the execution was successfully performed, {@code false} otherwise.
-     * @throws IOException Exception if graph cannot be written to the file system.
+     * @return true if the execution was successfully performed, false otherwise.
      */
     public boolean writeExecutableWorkflows(SATsolutionsList allSolutions) {
         String executionsFolder = config.getExecutionScriptsFolder();
@@ -311,7 +312,7 @@ public class APE {
      *
      * @param allSolutions Set of {@link SolutionWorkflow}.
      * @param orientation Orientation in which the graph will be presented.
-     * @return {@code true} if the generating was successfully performed, {@code false} otherwise.
+     * @return true if the generating was successfully performed, false otherwise.
      * @throws IOException Exception if graph cannot be written to the file system.
      */
     public boolean writeDataFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
@@ -352,7 +353,7 @@ public class APE {
      *
      * @param allSolutions Set of {@link SolutionWorkflow}.
      * @param orientation Orientation in which the graph will be presented.
-     * @return {@code true} if the generating was successfully performed, {@code false} otherwise.
+     * @return true if the generating was successfully performed, false otherwise.
      * @throws IOException Exception if graphs cannot be written to the file system.
      */
     public boolean writeControlFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {

@@ -76,7 +76,7 @@ public class APEConfig {
     private String constraintsPath;
 
     /**
-     * {@code true} if the shared memory structure should be used, {@code false} in
+     * true if the shared memory structure should be used, false in
      * case of a restrictive message passing structure.
      */
     private Boolean sharedMemory;
@@ -156,7 +156,7 @@ public class APEConfig {
      */
     private ConfigEnum useAllGeneratedData;
     /**
-     * {@code true} if debug mode is turned on.
+     * true if debug mode is turned on.
      */
     private Boolean debugMode;
 
@@ -173,8 +173,9 @@ public class APEConfig {
     /**
      * Initialize the configuration of the project.
      *
-     * @throws IOException   error in reading the configuration file
-     * @throws JSONException error in parsing the configuration file
+     * @param congifPath Path to the APE configuration file.
+     * @throws IOException   Error in reading the configuration file.
+     * @throws JSONException Error in parsing the configuration file.
      */
     public APEConfig(String congifPath) throws IOException, JSONException {
         if (congifPath == null) {
@@ -200,7 +201,8 @@ public class APEConfig {
     /**
      * Initialize the configuration of the project.
      *
-     * @throws JSONException error in parsing the configuration object
+     * @param configObject The APE configuration JSONObject{@link JSONObject}.
+     * @throws JSONException Error in parsing the configuration file.
      */
     public APEConfig(JSONObject configObject) throws JSONException {
         if (configObject == null) {
@@ -222,6 +224,12 @@ public class APEConfig {
 
     /**
      * Setup the configuration for the current run of the synthesis.
+     *
+     * @param congifPath     Path to the APE configuration file.
+     * @param apeDomainSetup the ape domain setup
+     * @return True if the configuration setup was successful, false otherwise.
+     * @throws IOException   Error in reading the configuration file.
+     * @throws JSONException Error in parsing the configuration file.
      */
     public boolean setupRunConfiguration(String congifPath, APEDomainSetup apeDomainSetup) throws IOException, JSONException {
         if (congifPath == null) {
@@ -242,6 +250,11 @@ public class APEConfig {
 
     /**
      * Setup the configuration for the current run of the synthesis.
+     *
+     * @param configObject   The APE configuration JSONObject{@link JSONObject}.
+     * @param apeDomainSetup the ape domain setup
+     * @return the run configuration
+     * @throws JSONException Error in parsing the configuration file.
      */
     public boolean setupRunConfiguration(JSONObject configObject, APEDomainSetup apeDomainSetup) throws JSONException {
         if (configObject == null) {
@@ -260,8 +273,8 @@ public class APEConfig {
     /**
      * Setting up the core configuration of the library.
      *
-     * @return {@code true} if the method successfully set-up the configuration,
-     * {@code false} otherwise.
+     * @return true if the method successfully set-up the configuration,
+     * false otherwise.
      */
     private boolean coreConfigSetup() {
 
@@ -360,8 +373,8 @@ public class APEConfig {
     /**
      * Setting up the core configuration of the library.
      *
-     * @return {@code true} if the method successfully set-up the configuration,
-     * {@code false} otherwise.
+     * @return true if the method successfully set-up the configuration,
+     * false otherwise.
      */
     private boolean runConfigSetup(APEDomainSetup apeDomainSetup) {
 
@@ -535,6 +548,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets ontology path.
+     *
      * @return the {@link #ontologyPath}
      */
     public String getOntologyPath() {
@@ -542,6 +557,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets ontology prefix uri.
+     *
      * @return the {@link #ontologyPrefixURI}
      */
     public String getOntologyPrefixURI() {
@@ -549,6 +566,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets tool taxonomy root.
+     *
      * @return the {@link #toolTaxonomyRoot}
      */
     public String getToolTaxonomyRoot() {
@@ -563,6 +582,8 @@ public class APEConfig {
 //	}
 
     /**
+     * Gets data dimension roots.
+     *
      * @return the {@link #dataDimensionRoots}
      */
     public List<String> getDataDimensionRoots() {
@@ -570,6 +591,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets tool annotations path.
+     *
      * @return the {@link #toolAnnotationsPath}
      */
     public String getToolAnnotationsPath() {
@@ -577,6 +600,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets constraints path.
+     *
      * @return the {@link #constraintsPath}
      */
     public String getConstraintsPath() {
@@ -584,17 +609,18 @@ public class APEConfig {
     }
 
     /**
-     * Returns {@code true} if the shared memory structure should be used, i.e. if the generated data is available in memory to all the tools used subsequently,
-     * or {@code false} in case of a restrictive message passing structure, i.e. if the generated data is available only to the tool next in sequence..
+     * Returns true if the shared memory structure should be used, i.e. if the generated data is available in memory to all the tools used subsequently,
+     * or false in case of a restrictive message passing structure, i.e. if the generated data is available only to the tool next in sequence..
      *
-     * @return {@code true} if the shared memory structure should be used, {@code false} in
-     * case of a restrictive message passing structure.
+     * @return true if the shared memory structure should be used, false in case of a restrictive message passing structure.
      */
     public Boolean getSharedMemory() {
         return sharedMemory;
     }
 
     /**
+     * Gets solution path.
+     *
      * @return the {@link #solutionPath}
      */
     public String getSolutionPath() {
@@ -602,6 +628,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets solution min length.
+     *
      * @return the {@link #solutionMinLength}
      */
     public Integer getSolutionMinLength() {
@@ -609,6 +637,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets solution max length.
+     *
      * @return the {@link #solutionMaxLength}
      */
     public Integer getSolutionMaxLength() {
@@ -616,6 +646,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets max no solutions.
+     *
      * @return the {@link #maxNoSolutions}
      */
     public Integer getMaxNoSolutions() {
@@ -623,6 +655,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets execution scripts folder.
+     *
      * @return the {@link #executionScriptsFolder}
      */
     public String getExecutionScriptsFolder() {
@@ -630,6 +664,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets no executions.
+     *
      * @return the {@link #noExecutions}
      */
     public Integer getNoExecutions() {
@@ -637,6 +673,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets solution graphs folder.
+     *
      * @return the {@link #solutionGraphsFolder}
      */
     public String getSolutionGraphsFolder() {
@@ -644,6 +682,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets no graphs.
+     *
      * @return the {@link #noGraphs}
      */
     public Integer getNoGraphs() {
@@ -651,6 +691,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets max no tool outputs.
+     *
      * @return the {@link #maxNoTool_outputs}
      */
     public Integer getMaxNoToolOutputs() {
@@ -658,6 +700,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets max no tool inputs.
+     *
      * @return the {@link #maxNoToolInputs}
      */
     public Integer getMaxNoToolInputs() {
@@ -665,6 +709,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets program inputs.
+     *
      * @return the {@link #programInputs}
      */
     public List<DataInstance> getProgramInputs() {
@@ -672,6 +718,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets program outputs.
+     *
      * @return the {@link #programOutputs}
      */
     public List<DataInstance> getProgram_outputs() {
@@ -679,6 +727,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets use workflow input.
+     *
      * @return the {@link #useWorkflowInput}
      */
     public ConfigEnum getUseWorkflowInput() {
@@ -686,6 +736,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets all generated data.
+     *
      * @return the {@link #useAllGeneratedData}
      */
     public ConfigEnum getUseAllGeneratedData() {
@@ -693,6 +745,8 @@ public class APEConfig {
     }
 
     /**
+     * Gets debug mode.
+     *
      * @return the {@link #debugMode}
      */
     public Boolean getDebugMode() {
@@ -700,19 +754,28 @@ public class APEConfig {
     }
 
     /**
-     * @return the {@link #configNode}
+     * Gets core config json obj.
+     *
+     * @return the {@link #coreConfiguration}
      */
     public JSONObject getCoreConfigJsonObj() {
         return coreConfiguration;
     }
 
     /**
+     * Gets run config json obj.
+     *
      * @return the {@link #runConfiguration}
      */
     public JSONObject getRunConfigJsonObj() {
         return runConfiguration;
     }
 
+    /**
+     * Gets cwl format root.
+     *
+     * @return the cwl format root
+     */
     public String getCWLFormatRoot() {
         return "format_1915";
     }
@@ -722,7 +785,7 @@ public class APEConfig {
      * can be used to rename the tags.
      *
      * @param tag that is used
-     * @return
+     * @return json tags
      */
     public static String getJsonTags(String tag) {
         switch (tag) {
@@ -749,9 +812,9 @@ public class APEConfig {
      * Method checks whether the provided path is a valid file path with required
      * writing permissions. Method is tailored for verifying config file fields.
      *
-     * @param tag  - corresponding tag from the config file
-     * @param path - path to the file
-     * @return {@code true} if the file exists or can be created, {@code false}
+     * @param tag  Corresponding tag from the config file.
+     * @param path Path to the file.
+     * @return True if the file exists or can be created, false
      * otherwise.
      */
     private static boolean isValidConfigWriteFile(String tag, String path) {
@@ -782,9 +845,9 @@ public class APEConfig {
      * Method checks whether the provided path is a valid file path with required
      * writing permissions. Method is tailored for verifying config file fields.
      *
-     * @param tag  - corresponding tag from the config file
-     * @param path - path to the file
-     * @return {@code true} if the file exists or can be created, {@code false}
+     * @param tag  Corresponding tag from the config file.
+     * @param path Path to the file.
+     * @return True if the file exists or can be created, false
      * otherwise.
      */
     private static boolean isValidConfigWriteFolder(String tag, String path) {
@@ -809,10 +872,9 @@ public class APEConfig {
      * required reading permissions. Method is tailored for verifying config file
      * fields.
      *
-     * @param tag  - corresponding tag from the config file
-     * @param path - path to the file
-     * @return {@code true} if the file exists and can be read, {@code false}
-     * otherwise.
+     * @param tag  Corresponding tag from the config file.
+     * @param path Path to the file.
+     * @return True if the file exists and can be read, false otherwise.
      */
     private static boolean isValidConfigReadFile(String tag, String path) {
         if (path == null || path == "") {
@@ -838,10 +900,9 @@ public class APEConfig {
      * return the number if it does. Method is tailored for verifying config file
      * fields.
      *
-     * @param tag          - corresponding tag from the config file
-     * @param stringNumber - provided string
-     * @return Integer number represented with the string, {@code null} in case of a
-     * bad String format.
+     * @param tag          Corresponding tag from the config file.
+     * @param stringNumber Provided string.
+     * @return Integer number represented with the string, null in case of a bad String format.
      */
     private static Integer isValidConfigInt(String tag, String stringNumber) {
         if (stringNumber == null || stringNumber == "") {
@@ -861,10 +922,9 @@ public class APEConfig {
      * return the boolean if it does. Method is tailored for verifying config file
      * fields.
      *
-     * @param tag        - corresponding tag from the config file
-     * @param stringBool - provided string
-     * @return Boolean value represented with the string, {@code null} in case of a
-     * bad boolean format.
+     * @param tag  Corresponding tag from the config file.
+     * @param stringBool Provided string.
+     * @return Boolean value represented with the string, null in case of a bad boolean format.
      */
     private static Boolean isValidConfigBoolean(String tag, String stringBool) {
         if (stringBool == null || stringBool == "") {
@@ -887,10 +947,9 @@ public class APEConfig {
      * ({@link ConfigEnum}), and return the {@link ConfigEnum} if it does. Method is
      * tailored for verifying config file fields.
      *
-     * @param tag        - corresponding tag from the config file
-     * @param stringEnum - provided string
-     * @return Boolean value represented with the string, {@code null} in case of a
-     * bad boolean format.
+     * @param tag        Corresponding tag from the config file.
+     * @param stringEnum Provided string.
+     * @return Boolean value represented with the string, null in case of a bad boolean format.
      */
     private static ConfigEnum isValidConfigEnum(String tag, String stringEnum) {
         if (stringEnum == null || stringEnum == "") {

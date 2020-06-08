@@ -84,7 +84,7 @@ public abstract class ConstraintTemplate {
      * @param moduleAutomaton Module automaton.
      * @param typeAutomaton Type automaton.
      * @param mappings Set of the mappings for the literals.
-     * @return The {@link String} CNF representation of the constraint. {@code NULL} in case of incorrect number of constraint parameters.
+     * @return The String CNF representation of the constraint. null in case of incorrect number of constraint parameters.
      */
     public abstract String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
                                          TypeAutomaton typeAutomaton, AtomMappings mappings);
@@ -92,7 +92,7 @@ public abstract class ConstraintTemplate {
     /**
      * Print the template for encoding the constraint, containing the template ID, description and required number of parameters.
      *
-     * @return {@link String} representing the description.
+     * @return String representing the description.
      */
     public String printConstraintCode() {
 

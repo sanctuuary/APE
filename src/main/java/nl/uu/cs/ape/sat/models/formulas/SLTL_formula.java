@@ -23,7 +23,7 @@ public abstract class SLTL_formula {
 
     private TaxonomyPredicate predicate;
 
-    /** Sign of the predicate, {@code false} if the predicate is negated, {@code true} otherwise. */
+    /** Sign of the predicate, false if the predicate is negated, true otherwise. */
     private boolean sign;
 
     public SLTL_formula(TaxonomyPredicate predicate) {
@@ -33,11 +33,11 @@ public abstract class SLTL_formula {
 
     /**
      * Modal operators are performed over <b>formulas</b>. In case of value of
-     * <b>sign</b> being {@code true}, <b>formula</b> is positive, otherwise the
+     * <b>sign</b> being true, <b>formula</b> is positive, otherwise the
      * formula is negative (<b>predicate</b> is negated).
      *
      * @param predicate A {@link TaxonomyPredicate}.
-     * @param sign Sign of the predicate, {@code false} if the predicate is negated, {@code true} otherwise.
+     * @param sign Sign of the predicate, false if the predicate is negated, true otherwise.
      */
     public SLTL_formula(boolean sign, TaxonomyPredicate predicate) {
         this.predicate = predicate;
@@ -48,14 +48,14 @@ public abstract class SLTL_formula {
      * Setting whether the predicate is negated or not.
      * If sign is <b>false</b> the predicate will be negated.
      *
-     * @param sign Sign of the predicate, {@code false} if the predicate is negated, {@code true} otherwise.
+     * @param sign Sign of the predicate, false if the predicate is negated, true otherwise.
      */
     public void setSign(boolean sign) {
         this.sign = sign;
     }
 
     /**
-     * @return <b>false</b> if the predicate is negated, <b>{@code true}</b> otherwise.
+     * @return <b>false</b> if the predicate is negated, <b>true</b> otherwise.
      */
     public boolean getSign() {
         return sign;
@@ -74,7 +74,7 @@ public abstract class SLTL_formula {
     /**
      * Returns the type of the SLTL formula [<b>F</b>, <b>G</b> or <b>X</b>].
      *
-     * @return {@link String} [<b>F</b>, <b>G</b> or <b>X</b>], depending on the type of SLTL formula.
+     * @return String [<b>F</b>, <b>G</b> or <b>X</b>], depending on the type of SLTL formula.
      */
     public abstract String getType();
 
@@ -83,7 +83,10 @@ public abstract class SLTL_formula {
      * defined @moduleAutomaton and @typeAutomaton.
      *
      * @param moduleAutomaton Automaton of all the module states.
-     * @return The {@link String} CNF representation of the SLTL formula.
+     * @param mappings Set of the mappings for the literals.
+     * @param typeStateBlocks Automaton of all the type states.
+     * @param workflowElement TODO
+     * @return The String CNF representation of the SLTL formula.
      */
     public abstract String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement workflowElement, AtomMappings mappings);
 
@@ -95,7 +98,7 @@ public abstract class SLTL_formula {
      * @param then_predicate Predicate that is enforced by <b>if_predicate</b>.
      * @param moduleAutomaton Module automaton.
      * @param mappings Set of the mappings for the literals.
-     * @return The {@link String} CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTL formula.
      */
     public static String ite_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate, ModuleAutomaton moduleAutomaton,
                                     AtomMappings mappings) {
@@ -120,10 +123,11 @@ public abstract class SLTL_formula {
      *
      * @param if_predicate Predicate that enforce the usage of <b>then_predicate</b>.
      * @param then_predicate Predicate that is enforced by <b>if_predicate</b>.
+     * @param typeElement TODO
      * @param moduleAutomaton Module automaton.
      * @param typeBlocks Type blocks (corresponding to the memory or used type states).
      * @param mappings Set of the mappings for the literals.
-     * @return The {@link String} CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTL formula.
      */
     public static String ite_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate, WorkflowElement typeElement, ModuleAutomaton moduleAutomaton,
                                   List<Block> typeBlocks, AtomMappings mappings) {
@@ -159,7 +163,7 @@ public abstract class SLTL_formula {
      * @param then_not_predicate Module that is forbidden by <b>if_predicate</b>.
      * @param moduleAutomaton Module automaton.
      * @param mappings Set of the mappings for the literals.
-     * @return The {@link String} CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTL formula.
      */
     public static String itn_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate,
                                     ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
@@ -185,10 +189,11 @@ public abstract class SLTL_formula {
      *
      * @param if_predicate Predicate that forbids the usage of <b>then_not_predicate</b>.
      * @param then_not_predicate Predicate that is forbidden by <b>if_predicate</b>.
+     * @param typeElement TODO
      * @param moduleAutomaton Module automaton.
      * @param typeBlocks Type blocks (corresponding to the memory or used type states).
      * @param mappings Set of the mappings for the literals.
-     * @return The {@link String} CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTL formula.
      */
     public static String itn_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate, WorkflowElement typeElement, ModuleAutomaton moduleAutomaton,
                                   List<Block> typeBlocks, AtomMappings mappings) {
@@ -226,7 +231,7 @@ public abstract class SLTL_formula {
      * @param second_module_in_sequence Predicate that enforces the usage of <b>first_predicate</b>.
      * @param moduleAutomaton Module automaton.
      * @param mappings Set of the mappings for the literals.
-     * @return The {@link String} CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTL formula.
      */
     public static String depend_module(TaxonomyPredicate second_module_in_sequence, TaxonomyPredicate first_module_in_sequence,
                                        ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
@@ -250,10 +255,10 @@ public abstract class SLTL_formula {
      * <b>second_module_in_sequence</b> as a next predicate in the sequence.
      *
      * @param first_module_in_sequence Predicate that enforce the usage of <b>second_predicate</b>.
-     * @param second_module_in_sequence Predicate that is enforced by first_predicate</b>.
+     * @param second_module_in_sequence Predicate that is enforced by <b>first_predicate</b>.
      * @param moduleAutomaton Module automaton.
      * @param mappings Set of the mappings for the literals.
-     * @return The {@link String} CNF representation of the constraint.
+     * @return The String CNF representation of the constraint.
      */
     public static String next_module(TaxonomyPredicate first_module_in_sequence, TaxonomyPredicate second_module_in_sequence,
                                      ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
@@ -282,7 +287,7 @@ public abstract class SLTL_formula {
      * @param second_module_in_sequence Predicate that is enforced by <b>first_predicate</b>.
      * @param moduleAutomaton Module automaton.
      * @param mappings Set of the mappings for the literals.
-     * @return The {@link String} CNF representation of the constraint.
+     * @return The String CNF representation of the constraint.
      */
     public static String prev_module(TaxonomyPredicate second_module_in_sequence, TaxonomyPredicate first_module_in_sequence,
                                      ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
@@ -307,7 +312,9 @@ public abstract class SLTL_formula {
      * Use <b>last_module</b> as last module in the solution.
      *
      * @param last_module The module.
-     * @return The {@link String} CNF representation of the SLTL formula.
+     * @param mappings Set of the mappings for the literals.
+     * @param moduleAutomaton Automaton of all the module states.
+     * @return The String CNF representation of the SLTL formula.
      */
     public static String useAsLastModule(TaxonomyPredicate last_module, ModuleAutomaton moduleAutomaton,
                                          AtomMappings mappings) {
@@ -326,7 +333,9 @@ public abstract class SLTL_formula {
      *
      * @param module The module.
      * @param n The absolute position in the solution.
-     * @return The {@link String} CNF representation of the SLTL formula.
+     * @param moduleAutomaton Automaton of all the module states.
+     * @param mappings Set of the mappings for the literals.
+     * @return The String CNF representation of the SLTL formula.
      */
     public static String useAsNthModule(TaxonomyPredicate module, int n, ModuleAutomaton moduleAutomaton,
                                         AtomMappings mappings) {
@@ -345,7 +354,9 @@ public abstract class SLTL_formula {
      *
      * @param module Module to be used.
      * @param n Number of repetitions.
-     * @return The {@link String} CNF representation of the SLTL formula.
+     * @param moduleAutomaton Automaton of all the module states.
+     * @param mappings Set of the mappings for the literals.
+     * @return The String CNF representation of the SLTL formula.
      */
     public static String useModuleNtimes(TaxonomyPredicate module, int n, ModuleAutomaton moduleAutomaton,
                                          AtomMappings mappings) {

@@ -10,14 +10,14 @@ public interface PredicateLabel extends Comparable<PredicateLabel> {
     /**
      * Get string that corresponds to the predicate ID.
      *
-     * @return {@link String} identifying the predicate.
+     * @return String identifying the predicate.
      */
     public String getPredicateID();
 
     /**
      * Get string that corresponds to the predicate label.
      *
-     * @return {@link String} representation of the predicate.
+     * @return String representation of the predicate.
      */
     public String getPredicateLabel();
 
