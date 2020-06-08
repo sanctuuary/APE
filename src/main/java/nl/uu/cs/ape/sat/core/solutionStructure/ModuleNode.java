@@ -30,22 +30,34 @@ import static guru.nidi.graphviz.model.Factory.node;
  */
 public class ModuleNode extends SolutionWorkflowNode {
 
-    /** Tool that is used in the workflow step. */
+    /**
+     * Tool that is used in the workflow step.
+     */
     private Module usedModule;
 
-    /** Abstract Modules that describe the workflow step. */
+    /**
+     * Abstract Modules that describe the workflow step.
+     */
     private Set<AbstractModule> abstractModules;
 
-    /** Next module step in the workflow. */
+    /**
+     * Next module step in the workflow.
+     */
     private ModuleNode nextModuleNode;
 
-    /** Previous module step in the workflow. */
+    /**
+     * Previous module step in the workflow.
+     */
     private ModuleNode prevModuleNode;
 
-    /** List of the data instances that are used as input for the tool. */
+    /**
+     * List of the data instances that are used as input for the tool.
+     */
     private List<TypeNode> inputTypes;
 
-    /** List of the data instances that are generated as output of the tool. */
+    /**
+     * List of the data instances that are generated as output of the tool.
+     */
     private List<TypeNode> outputTypes;
 
     /**

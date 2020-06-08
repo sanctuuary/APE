@@ -23,26 +23,40 @@ import java.util.*;
  */
 public class SAT_solution extends SolutionInterpreter {
 
-    /** List of all the literals provided by the solution. */
+    /**
+     * List of all the literals provided by the solution.
+     */
     private final List<Literal> literals;
 
-    /** List of all the positive literals provided by the solution. */
+    /**
+     * List of all the positive literals provided by the solution.
+     */
     private final List<Literal> positiveLiterals;
 
-    /** List of only relevant (positive) literals that represent implemented modules/tools. */
+    /**
+     * List of only relevant (positive) literals that represent implemented modules/tools.
+     */
     private final List<Literal> relevantModules;
 
-    /** List of only relevant (positive) literals that represent simple types. */
+    /**
+     * List of only relevant (positive) literals that represent simple types.
+     */
     private final List<Literal> relevantTypes;
 
-    /** List of all the relevant types and modules combined. */
+    /**
+     * List of all the relevant types and modules combined.
+     */
     private final List<Literal> relevantElements;
 
-    /** List of all the references for the types in the memory, when used as tool inputs. */
+    /**
+     * List of all the references for the types in the memory, when used as tool inputs.
+     */
     private final List<Literal> references2MemTypes;
     private final Set<PredicateLabel> usedTypeStates;
 
-    /** true if the there is no solution to the problem. Problem is UNASATISFIABLE. */
+    /**
+     * true if the there is no solution to the problem. Problem is UNASATISFIABLE.
+     */
     private final boolean unsat;
 
     /**

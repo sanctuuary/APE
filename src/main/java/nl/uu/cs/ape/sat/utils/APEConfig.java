@@ -922,7 +922,7 @@ public class APEConfig {
      * return the boolean if it does. Method is tailored for verifying config file
      * fields.
      *
-     * @param tag  Corresponding tag from the config file.
+     * @param tag        Corresponding tag from the config file.
      * @param stringBool Provided string.
      * @return Boolean value represented with the string, null in case of a bad boolean format.
      */

@@ -137,8 +137,8 @@ public class OWLReader {
      * Recursively exploring the hierarchy of the ontology and defining objects
      * ({@link AbstractModule}) on each step of the way.
      *
-     * @param reasoner Reasoner used to provide subclasses.
-     * @param currClass The class (node) currently explored.
+     * @param reasoner   Reasoner used to provide subclasses.
+     * @param currClass  The class (node) currently explored.
      * @param superClass The superclass of the currClass.
      */
     private void exploreModuleOntologyRec(OWLReasoner reasoner, OWLClass currClass,
@@ -182,8 +182,8 @@ public class OWLReader {
      * Recursively exploring the hierarchy of the ontology and defining objects
      * ({@link Type}) on each step of the way.
      *
-     * @param reasoner Reasoner used to provide subclasses.
-     * @param currClass The class (node) currently explored.
+     * @param reasoner   Reasoner used to provide subclasses.
+     * @param currClass  The class (node) currently explored.
      * @param superClass The superclass of the currClass.
      */
     private void exploreTypeOntologyRec(OWLReasoner reasoner, OWLClass currClass,

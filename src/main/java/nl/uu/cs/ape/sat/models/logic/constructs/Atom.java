@@ -13,13 +13,19 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  */
 public class Atom {
 
-    /** PredicateLabel that is referred (tool or type). */
+    /**
+     * PredicateLabel that is referred (tool or type).
+     */
     private final PredicateLabel predicate;
 
-    /** State in which the type/operation was used. */
+    /**
+     * State in which the type/operation was used.
+     */
     private final State argumentState;
 
-    /** Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.) */
+    /**
+     * Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.)
+     */
     private WorkflowElement elementType;
 
     /**

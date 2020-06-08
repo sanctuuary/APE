@@ -18,10 +18,14 @@ public class SATsolutionsList {
 
     private List<SolutionWorkflow> solutions;
 
-    /** Max number of solutions that should be found. */
+    /**
+     * Max number of solutions that should be found.
+     */
     private int maxSolutions;
 
-    /** Mapping of predicates into integers (for SAT encoding). */
+    /**
+     * Mapping of predicates into integers (for SAT encoding).
+     */
     private AtomMappings mappings;
 
     private int solutionIndex = 0;

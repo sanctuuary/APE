@@ -31,7 +31,9 @@ import static guru.nidi.graphviz.model.Factory.*;
  */
 public class SolutionWorkflow {
 
-    /** List of module nodes ordered according to their position in the workflow. */
+    /**
+     * List of module nodes ordered according to their position in the workflow.
+     */
     private List<ModuleNode> moduleNodes;
 
     /**
@@ -67,16 +69,24 @@ public class SolutionWorkflow {
      */
     private Map<State, ModuleNode> usedType2ToolMap;
 
-    /** Non-structured solution obtained directly from the SAT output. */
+    /**
+     * Non-structured solution obtained directly from the SAT output.
+     */
     private SAT_solution nativeSolution;
 
-    /** Graph representation of the data-flow workflow solution. */
+    /**
+     * Graph representation of the data-flow workflow solution.
+     */
     private SolutionGraph dataflowGraph;
 
-    /** Graph representation of the control-flow workflow solution. */
+    /**
+     * Graph representation of the control-flow workflow solution.
+     */
     private SolutionGraph controlflowGraph;
 
-    /** Index of the solution. */
+    /**
+     * Index of the solution.
+     */
     private int index;
 
     /**

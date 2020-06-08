@@ -19,12 +19,16 @@ import java.util.TreeSet;
  */
 public class AuxTaxonomyPredicate extends TaxonomyPredicate {
 
-    /** Corresponding TaxonomyPredicate. */
+    /**
+     * Corresponding TaxonomyPredicate.
+     */
     private final TaxonomyPredicate taxonomyPredicate;
 
     private SortedSet<TaxonomyPredicate> containingPredicates;
 
-    /** Field defines the connective between the subclasses of the predicate. */
+    /**
+     * Field defines the connective between the subclasses of the predicate.
+     */
     private final LogicOperation logicOp;
 
     /**

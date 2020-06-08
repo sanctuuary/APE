@@ -23,13 +23,19 @@ public class AtomMappings {
     private Map<Integer, Atom> reverseMapping;
     private Map<String, Atom> mapped;
 
-    /** Number of mapped predicates. */
+    /**
+     * Number of mapped predicates.
+     */
     private int size;
 
-    /** Number  of auxiliary introduced variables. */
+    /**
+     * Number  of auxiliary introduced variables.
+     */
     private int auxiliary;
 
-    /** Number of all auxiliary variables. */
+    /**
+     * Number of all auxiliary variables.
+     */
     private int auxMax = 100000;
 
     /**

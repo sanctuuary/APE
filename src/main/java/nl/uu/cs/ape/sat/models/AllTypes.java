@@ -16,7 +16,9 @@ import java.util.*;
  */
 public class AllTypes extends AllPredicates {
 
-    /** {@link Type} object representing the "empty type". */
+    /**
+     * {@link Type} object representing the "empty type".
+     */
     private Type emptyType;
 
     /**

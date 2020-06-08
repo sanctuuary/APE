@@ -15,7 +15,9 @@ import java.util.List;
  */
 public class DataInstance {
 
-    /** List of data types that describe different data dimensions and correspond to a single data instance. */
+    /**
+     * List of data types that describe different data dimensions and correspond to a single data instance.
+     */
     private List<TaxonomyPredicate> types;
 
     /**

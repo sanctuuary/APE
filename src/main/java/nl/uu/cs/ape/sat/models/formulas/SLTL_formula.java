@@ -23,7 +23,9 @@ public abstract class SLTL_formula {
 
     private TaxonomyPredicate predicate;
 
-    /** Sign of the predicate, false if the predicate is negated, true otherwise. */
+    /**
+     * Sign of the predicate, false if the predicate is negated, true otherwise.
+     */
     private boolean sign;
 
     /**

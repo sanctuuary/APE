@@ -89,8 +89,8 @@ public class AllModules extends AllPredicates {
      * if the moduleID has no mappings.
      *
      * @param moduleID The key whose associated value is to be returned
-     * @return         {@link AbstractModule} or {@link Module} to which the specified key
-     *                 is mapped to, or null if the moduleID has no mappings
+     * @return {@link AbstractModule} or {@link Module} to which the specified key
+     * is mapped to, or null if the moduleID has no mappings
      */
     public AbstractModule get(String moduleID) {
         return (AbstractModule) getPredicates().get(moduleID);

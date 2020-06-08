@@ -140,10 +140,10 @@ public class State implements PredicateLabel {
      * {@link WorkflowElement#USED_TYPE} corresponds to the Used Type State,<br>
      * {@link WorkflowElement#MODULE} corresponds to the Module/Tool State.
      *
-     * @param blockNumber Corresponds to the block number within the type automaton (not applicable for the module automaton).
-     * @param stateNumber Corresponds to the state number within block.
+     * @param blockNumber     Corresponds to the block number within the type automaton (not applicable for the module automaton).
+     * @param stateNumber     Corresponds to the state number within block.
      * @param input_branching Max number of branching.
-     * @param typeOfTheState Parameter determining the state type.
+     * @param typeOfTheState  Parameter determining the state type.
      * @return The calculated absolute order number of the state.
      */
     private static int calculateAbsStateNumber(Integer blockNumber, int stateNumber, int input_branching, WorkflowElement typeOfTheState) {

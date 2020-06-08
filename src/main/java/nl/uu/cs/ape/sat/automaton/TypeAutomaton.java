@@ -17,13 +17,19 @@ import java.util.List;
  */
 public class TypeAutomaton implements Automaton {
 
-    /** Blocks of data types that are being added to the memory (usually outputs from the tools, apart from the initial workflow input). */
+    /**
+     * Blocks of data types that are being added to the memory (usually outputs from the tools, apart from the initial workflow input).
+     */
     private List<Block> memoryTypesAutomaton;
 
-    /** Blocks of data types that are being used by tools from the memory (inputs to the tools). */
+    /**
+     * Blocks of data types that are being used by tools from the memory (inputs to the tools).
+     */
     private List<Block> usedTypesAutomaton;
 
-    /** State is used in order to represent no state. */
+    /**
+     * State is used in order to represent no state.
+     */
     private State nullState;
 
     /**

@@ -137,7 +137,7 @@ public final class SATModuleUtils {
      * correctly.
      *
      * @return String representing the constraints required to ensure that
-     *         the {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
+     * the {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
      */
     private static String generalReferenceCons(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton, AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
@@ -595,10 +595,10 @@ public final class SATModuleUtils {
     /**
      * Providing the recursive method used in {@link #moduleEnforceTaxonomyStructure}.
      *
-     * @param allModules All the modules.
-     * @param currModule TODO
+     * @param allModules  All the modules.
+     * @param currModule  TODO
      * @param moduleState TODO
-     * @param mappings Mapping function.
+     * @param mappings    Mapping function.
      */
     private static String moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule,
                                                                  AtomMappings mappings, State moduleState) {

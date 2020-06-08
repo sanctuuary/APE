@@ -41,7 +41,9 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      */
     private Set<TaxonomyPredicate> subPredicates;
 
-    /** Set of all the predicates that contain the current predicate (null if the predicate is a root). */
+    /**
+     * Set of all the predicates that contain the current predicate (null if the predicate is a root).
+     */
     private Set<TaxonomyPredicate> superPredicates;
 
     /**

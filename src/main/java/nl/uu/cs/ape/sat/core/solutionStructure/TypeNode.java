@@ -27,10 +27,14 @@ import static guru.nidi.graphviz.model.Factory.node;
  */
 public class TypeNode extends SolutionWorkflowNode {
 
-    /** Types that define the data instance. The set cannot contain {@code EmptyType}. */
+    /**
+     * Types that define the data instance. The set cannot contain {@code EmptyType}.
+     */
     private SortedSet<Type> usedTypes;
 
-    /** Abstract Types that describe the data instance. */
+    /**
+     * Abstract Types that describe the data instance.
+     */
     private SortedSet<Type> abstractTypes;
 
     /**

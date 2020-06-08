@@ -23,19 +23,29 @@ import java.util.SortedSet;
  */
 public class APEDomainSetup {
 
-    /** All modules/operations used in the domain. */
+    /**
+     * All modules/operations used in the domain.
+     */
     private AllModules allModules;
 
-    /** All data types defined in the domain. */
+    /**
+     * All data types defined in the domain.
+     */
     private AllTypes allTypes;
 
-    /** Prefix used to define OWL class IDs */
+    /**
+     * Prefix used to define OWL class IDs
+     */
     private String ontologyPrexifURI;
 
-    /** Object used to create temporal constraints. */
+    /**
+     * Object used to create temporal constraints.
+     */
     private ConstraintFactory constraintFactory;
 
-    /** List of data gathered from the constraint file. */
+    /**
+     * List of data gathered from the constraint file.
+     */
     private List<ConstraintTemplateData> unformattedConstr;
     private List<AuxTaxonomyPredicate> helperPredicates;
 

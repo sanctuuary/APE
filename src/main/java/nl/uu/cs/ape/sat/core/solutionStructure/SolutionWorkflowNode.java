@@ -9,7 +9,9 @@ import nl.uu.cs.ape.sat.automaton.State;
  */
 public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflowNode> {
 
-    /** State in the automaton that the Node refers to. */
+    /**
+     * State in the automaton that the Node refers to.
+     */
     private State automatonState;
 
     /**
@@ -40,6 +42,7 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
 
     /**
      * Two SolutionWorkflowNodes are equal if they represent the same state in the workflow.
+     *
      * @return true if the state that the describe is the same.
      */
     @Override

@@ -37,28 +37,44 @@ import java.util.List;
  */
 public class SAT_SynthesisEngine implements SynthesisEngine {
 
-    /** Object that contains all the domain information. */
+    /**
+     * Object that contains all the domain information.
+     */
     private final APEDomainSetup domainSetup;
 
-    /** APE library configuration object. */
+    /**
+     * APE library configuration object.
+     */
     private final APEConfig config;
 
-    /** Mapping of all the predicates to integers. */
+    /**
+     * Mapping of all the predicates to integers.
+     */
     private final AtomMappings mappings;
 
-    /** Set of all the solutions found by the library. */
+    /**
+     * Set of all the solutions found by the library.
+     */
     private final SATsolutionsList allSolutions;
 
-    /** CNF encoding of the problem. */
+    /**
+     * CNF encoding of the problem.
+     */
     private StringBuilder cnfEncoding;
 
-    /** String used as an input for the SAT solver. */
+    /**
+     * String used as an input for the SAT solver.
+     */
     private InputStream temp_sat_input;
 
-    /** Representation of the tool part of the automaton used to encode the structure of the solution. */
+    /**
+     * Representation of the tool part of the automaton used to encode the structure of the solution.
+     */
     private ModuleAutomaton moduleAutomaton;
 
-    /** Representation of the type part of the automaton used to encode the structure of the solution. */
+    /**
+     * Representation of the type part of the automaton used to encode the structure of the solution.
+     */
     private TypeAutomaton typeAutomaton;
 
     /**

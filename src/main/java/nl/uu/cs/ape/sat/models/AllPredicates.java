@@ -14,7 +14,9 @@ public abstract class AllPredicates {
 
     private Map<String, TaxonomyPredicate> predicates;
 
-    /** Root of the taxonomy. */
+    /**
+     * Root of the taxonomy.
+     */
     private List<String> taxonomyRoots;
 
     /**

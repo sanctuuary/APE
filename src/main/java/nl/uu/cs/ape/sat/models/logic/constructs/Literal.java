@@ -20,13 +20,19 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
  */
 public class Literal implements Comparable<Literal> {
 
-    /** Integer value used to encode the atom into cnf form. */
+    /**
+     * Integer value used to encode the atom into cnf form.
+     */
     private Integer mappedAtom;
 
-    /** true if the atom is negated. */
+    /**
+     * true if the atom is negated.
+     */
     private Boolean negated;
 
-    /** The {@link Atom} class represents elements of the workflow, that can be true or not (depending of the truth value of the literal). */
+    /**
+     * The {@link Atom} class represents elements of the workflow, that can be true or not (depending of the truth value of the literal).
+     */
     private Atom atom;
 
     /**
@@ -173,8 +179,8 @@ public class Literal implements Comparable<Literal> {
      *
      * @param otherLiteral The Literal to be compared
      * @return The value 0 if the argument Literal's state is equal to this Literal's state;
-     *         a value less than 0 if this Literal's state comes before the @otherLiteral's state;
-     *         and a value greater than 0 if this Literal's state comes after the @otherLiteral's state.
+     * a value less than 0 if this Literal's state comes before the @otherLiteral's state;
+     * and a value greater than 0 if this Literal's state comes after the @otherLiteral's state.
      */
     public int compareTo(Literal otherLiteral) {
 
