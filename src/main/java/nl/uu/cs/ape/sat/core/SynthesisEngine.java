@@ -4,15 +4,24 @@ import java.io.IOException;
 
 /**
  * The {@code SynthesisEngine} interface is used as a template in order to implement different synthesis approaches over the given input.
- *  
- * @author Vedran Kasalica
  *
+ * @author Vedran Kasalica
  */
 public interface SynthesisEngine {
-	
-	public boolean synthesisEncoding() throws IOException;
-	
-	public boolean synthesisExecution();
-	
+
+    /**
+     * Synthesis encoding boolean.
+     *
+     * @return the boolean
+     * @throws IOException the io exception
+     */
+    public boolean synthesisEncoding() throws IOException;
+
+    /**
+     * Synthesis execution boolean.
+     *
+     * @return the boolean
+     */
+    public boolean synthesisExecution();
 
 }
