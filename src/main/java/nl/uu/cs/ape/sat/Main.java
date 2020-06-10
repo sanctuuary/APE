@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat;
 
 import guru.nidi.graphviz.attribute.RankDir;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
+import nl.uu.cs.ape.sat.utils.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONException;
 
@@ -33,23 +34,25 @@ public class Main {
 
         APE apeFramework = null;
         try {
+
+            // set up the APE framework
             apeFramework = new APE(path);
-        } catch (JSONException e) {
-            System.err.println(e.getMessage());
-            return;
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return;
-        } catch (ExceptionInInitializerError e) {
+
+        } catch (APEConfigException | JSONException | IOException e) {
+            System.err.println("Error in setting up the APE framework:");
             System.err.println(e.getMessage());
             return;
         }
 
         SATsolutionsList solutions;
         try {
+
+            // run the synthesis and retrieve the solutions
             solutions = apeFramework.runSynthesis(path, apeFramework.getDomainSetup());
-        } catch (IOException e) {
-            System.err.println("Error in synthesis execution. Writing to the file system failed.");
+
+        } catch (APEConfigException | JSONException | IOException e) {
+            System.err.println("Error in synthesis execution:");
+            System.err.println(e.getMessage());
             return;
         }
 

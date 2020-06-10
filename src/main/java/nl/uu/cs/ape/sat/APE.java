@@ -9,10 +9,7 @@ import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APEConfig;
-import nl.uu.cs.ape.sat.utils.APEDomainSetup;
-import nl.uu.cs.ape.sat.utils.APEUtils;
-import nl.uu.cs.ape.sat.utils.OWLReader;
+import nl.uu.cs.ape.sat.utils.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,17 +35,17 @@ public class APE {
      * Create instance of the APE solver.
      *
      * @param configPath Path to the APE configuration file. If the string is null the default './ape.config' value is assumed.
-     * @throws IOException                 Exception while reading the configuration file.
-     * @throws JSONException               Exception while reading the configuration file.
-     * @throws ExceptionInInitializerError the exception in initializer error
+     * @throws IOException        Exception while reading the configuration file.
+     * @throws JSONException      Exception while reading the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
      */
-    public APE(String configPath) throws IOException, JSONException, ExceptionInInitializerError {
+    public APE(String configPath) throws IOException, JSONException, APEConfigException {
         config = new APEConfig(configPath);
-        if (config == null || config.getCoreConfigJsonObj() == null) {
-            throw new ExceptionInInitializerError("Configuration failed. Error in configuration file.");
+        if (config.getCoreConfigJsonObj() == null) {
+            throw new APEConfigException("Configuration failed. Error in configuration file.");
         }
         if (!setupDomain()) {
-            throw new IOException("Error in settin up the domain.");
+            throw new APEConfigException("Error in setting up the domain.");
         }
     }
 
@@ -56,17 +53,14 @@ public class APE {
      * Create instance of the APE solver.
      *
      * @param configObject The APE configuration JSONObject{@link JSONObject}.
-     * @throws ExceptionInInitializerError Exception while reading the configuration file.
-     * @throws IOException                 Exception while reading the configuration file.
+     * @throws IOException        Exception while reading the configuration file.
+     * @throws JSONException      Exception while reading the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
      */
-    public APE(JSONObject configObject) throws ExceptionInInitializerError, IOException {
+    public APE(JSONObject configObject) throws IOException, JSONException, APEConfigException {
         config = new APEConfig(configObject);
-        if (config == null) {
-            System.err.println("Configuration failed. Error in configuration object.");
-            throw new ExceptionInInitializerError();
-        }
         if (!setupDomain()) {
-            throw new IOException("Error in setting up the domain.");
+            throw new APEConfigException("Error in setting up the domain.");
         }
     }
 
@@ -171,11 +165,10 @@ public class APE {
      * @throws IOException   Error in case of not providing a proper configuration file.
      * @throws JSONException Error in configuration object.
      */
-    public SATsolutionsList runSynthesis(JSONObject configObject, APEDomainSetup apeDomainSetup)
-            throws IOException, JSONException {
+    public SATsolutionsList runSynthesis(JSONObject configObject, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
         apeDomainSetup.clearConstraints();
         config.setupRunConfiguration(configObject, apeDomainSetup);
-        if (config == null || config.getRunConfigJsonObj() == null) {
+        if (config.getRunConfigJsonObj() == null) {
             throw new JSONException("Run configuration failed. Error in configuration object.");
         }
         SATsolutionsList solutions = executeSynthesis();
@@ -192,12 +185,12 @@ public class APE {
      * @throws IOException   Error in case of not providing a proper configuration file.
      * @throws JSONException Error in configuration object.
      */
-    public SATsolutionsList runSynthesis(String configPath, APEDomainSetup apeDomainSetup)
-            throws IOException, JSONException {
+    public SATsolutionsList runSynthesis(String configPath, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
         config.setupRunConfiguration(configPath, apeDomainSetup);
-        if (config == null || config.getRunConfigJsonObj() == null) {
+        if (config.getRunConfigJsonObj() == null) {
             throw new JSONException("Run configuration failed. Error in configuration file.");
         }
+
         SATsolutionsList solutions = executeSynthesis();
 
         return solutions;
