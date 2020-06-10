@@ -792,4 +792,13 @@ public final class APEUtils {
 
         return abstractLabel.toString();
     }
+
+    /**
+     * Print a warning to the console for the user to see.
+     *
+     * @param warning The warning message.
+     */
+    public static void printWarning(String warning){
+        System.out.println("[WARNING] " + warning);
+    }
 }
