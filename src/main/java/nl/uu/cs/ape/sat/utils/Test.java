@@ -62,12 +62,13 @@ public class Test {
 
         APE apeFramework = null;
         try {
+
+            // set up the APE framework
             apeFramework = new APE(file.getAbsolutePath());
-        } catch (JSONException e) {
-            System.err.println("Error in parsing the configuration file.");
-            return null;
-        } catch (IOException e) {
-            System.err.println("Error in reading the configuration file.");
+
+        } catch (APEConfigException | JSONException | IOException e) {
+            System.err.println("Error in setting up the APE framework:");
+            System.err.println(e.getMessage());
             return null;
         }
 

@@ -5,18 +5,22 @@ import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * The {@code APEConfig} (singleton) class is used to define the configuration
+ * The {@link APEConfig} (singleton) class is used to define the configuration
  * variables required for the proper execution of the library.
  *
  * @author Vedran Kasalica
@@ -24,29 +28,66 @@ import java.util.List;
 public class APEConfig {
 
     /**
-     * Tags used in the ape.config file
+     * Tags used in the JSON file.
      */
-    private final String ONTOLOGY_TAG = "ontology_path";
-    private final String ONTOLOGY_PREFIX = "ontologyPrexifIRI";
-    private final String TOOL_ONTOLOGY_TAG = "toolsTaxonomyRoot";
-    //	private final String DATA_ONTOLOGY_TAG = "dataTaxonomyRoot";
-    private final String DIMENSIONSONTOLOGY_TAG = "dataSubTaxonomyRoot";
-    private final String TOOL_ANNOTATIONS_TAG = "tool_annotations_path";
-    private final String CONSTRAINTS_TAG = "constraints_path";
-    private final String SHARED_MEMORY_TAG = "shared_memory";
-    private final String SOLUTION_PATH_TAG = "solutions_path";
-    private final String SOLUTION_MIN_LENGTH_TAG = "solution_min_length";
-    private final String SOLUTION_MAX_LENGTH_TAG = "solution_max_length";
-    private final String MAX_NOSOLUTIONS_TAG = "max_solutions";
-    private final String EXECUTIONSCRIPTS_FOLDER_TAG = "execution_scripts_folder";
-    private final String NOEXECUTIONS_TAG = "number_of_execution_scripts";
-    private final String SOLUTION_GRAPS_FOLDER_TAG = "solution_graphs_folder";
-    private final String NO_GRAPHS_TAG = "number_of_generated_graphs";
-    private final String PROGRAM_INPUTS_TAG = "inputs";
-    private final String PROGRAM_OUTPUTS_TAG = "outputs";
-    private final String USEWORKFLOW_INPUT = "use_workflow_input";
-    private final String USE_ALL_GENERATED_DATA = "use_all_generated_data";
-    private final String DEBUG_MODE_TAG = "debug_mode";
+    private static final String ONTOLOGY_TAG = "ontology_path";
+    private static final String ONTOLOGY_PREFIX = "ontologyPrexifIRI";
+    private static final String TOOL_ONTOLOGY_TAG = "toolsTaxonomyRoot";
+    private static final String DIMENSIONSONTOLOGY_TAG = "dataSubTaxonomyRoot";
+    private static final String TOOL_ANNOTATIONS_TAG = "tool_annotations_path";
+    private static final String CONSTRAINTS_TAG = "constraints_path";
+    private static final String SHARED_MEMORY_TAG = "shared_memory";
+    private static final String SOLUTION_PATH_TAG = "solutions_path";
+    private static final String SOLUTION_MIN_LENGTH_TAG = "solution_min_length";
+    private static final String SOLUTION_MAX_LENGTH_TAG = "solution_max_length";
+    private static final String MAX_NOSOLUTIONS_TAG = "max_solutions";
+    private static final String EXECUTIONSCRIPTS_FOLDER_TAG = "execution_scripts_folder";
+    private static final String NOEXECUTIONS_TAG = "number_of_execution_scripts";
+    private static final String SOLUTION_GRAPHS_FOLDER_TAG = "solution_graphs_folder";
+    private static final String NO_GRAPHS_TAG = "number_of_generated_graphs";
+    private static final String PROGRAM_INPUTS_TAG = "inputs";
+    private static final String PROGRAM_OUTPUTS_TAG = "outputs";
+    private static final String USEWORKFLOW_INPUT = "use_workflow_input";
+    private static final String USE_ALL_GENERATED_DATA = "use_all_generated_data";
+    private static final String DEBUG_MODE_TAG = "debug_mode";
+
+    /**
+     * Tags separated in the categories: obligatory, optional, core and run.
+     * The obligatory tags are used in the constructor to check the presence of tags.
+     * Optional tags or All tags are mostly used by test cases.
+     */
+    private static final String[] obligatoryCoreTags = new String[]{
+            ONTOLOGY_TAG,
+            ONTOLOGY_PREFIX,
+            TOOL_ONTOLOGY_TAG,
+            DIMENSIONSONTOLOGY_TAG,
+            TOOL_ANNOTATIONS_TAG,
+            SOLUTION_PATH_TAG,
+            EXECUTIONSCRIPTS_FOLDER_TAG,
+            SOLUTION_GRAPHS_FOLDER_TAG
+    };
+    private static final String[] optionalCoreTags = new String[]{};
+    private static final String[] obligatoryRunTags = new String[]{
+            SOLUTION_MIN_LENGTH_TAG,
+            SOLUTION_MAX_LENGTH_TAG,
+            MAX_NOSOLUTIONS_TAG,
+            PROGRAM_INPUTS_TAG,
+            PROGRAM_OUTPUTS_TAG
+    };
+    private static final String[] optionalRunTags = new String[]{
+            CONSTRAINTS_TAG,
+            SHARED_MEMORY_TAG,
+            NOEXECUTIONS_TAG,
+            NO_GRAPHS_TAG,
+            USEWORKFLOW_INPUT,
+            USE_ALL_GENERATED_DATA,
+            DEBUG_MODE_TAG
+    };
+
+    /**
+     * READ and WRITE enums used to verify paths.
+     */
+    private enum Permission {READ, WRITE}
 
     /**
      * Path to the taxonomy file
@@ -63,41 +104,34 @@ public class APEConfig {
     /**
      * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each respresents a data dimension (e.g. data type, data format, etc.).
      */
-    private List<String> dataDimensionRoots;
-
+    private List<String> dataDimensionRoots = new ArrayList<>();
     /**
      * Path to the XML file with all tool annotations.
      */
     private String toolAnnotationsPath;
-
     /**
      * Path to the file with all workflow constraints.
      */
     private String constraintsPath;
-
     /**
      * true if the shared memory structure should be used, false in
      * case of a restrictive message passing structure.
      */
     private Boolean sharedMemory;
-
     /**
      * Path to the file that will contain all the solutions to the problem in human
      * readable representation.
      */
     private String solutionPath;
-
     /**
      * Min and Max possible length of the solutions (length of the automaton). For
      * no upper limit, max length should be set to 0.
      */
     private Integer solutionMinLength, solutionMaxLength;
-
     /**
      * Max number of solution that the solver will return.
      */
     private Integer maxNoSolutions;
-
     /**
      * Path to the folder that will contain all the scripts generated based on the
      * candidate workflows.
@@ -108,7 +142,6 @@ public class APEConfig {
      * workflows. Default is 0.
      */
     private Integer noExecutions;
-
     /**
      * Path to the folder that will contain all the figures/graphs generated based
      * on the candidate workflows.
@@ -119,26 +152,24 @@ public class APEConfig {
      * workflows. Default is 0.
      */
     private Integer noGraphs;
-
     /**
      * Output branching factor (max number of outputs per tool).
+     * TODO: automatically read the max tool outputs from the tool annotation file.
      */
-    private Integer maxNoTool_outputs = 3;
-
+    private Integer maxNoTool_outputs = 5;
     /**
      * Input branching factor (max number of inputs per tool).
+     * TODO: automatically read the max tool inputs from the tool annotation file.
      */
-    private Integer maxNoToolInputs = 3;
-
+    private Integer maxNoToolInputs = 5;
     /**
      * Input types of the workflow.
      */
-    private List<DataInstance> programInputs;
+    private List<DataInstance> programInputs = new ArrayList<>();
     /**
      * Output types of the workflow.
      */
-    private List<DataInstance> programOutputs;
-
+    private List<DataInstance> programOutputs = new ArrayList<>();
     /**
      * Determines the required usage for the data instances that are given as
      * workflow input:<br>
@@ -156,15 +187,13 @@ public class APEConfig {
      */
     private ConfigEnum useAllGeneratedData;
     /**
-     * true if debug mode is turned on.
+     * Mode is true if debug mode is turned on.
      */
     private Boolean debugMode;
-
     /**
      * Configurations used to read "ape.configuration" file.
      */
     private JSONObject coreConfiguration;
-
     /**
      * Configurations used to describe the synthesis run.
      */
@@ -173,79 +202,64 @@ public class APEConfig {
     /**
      * Initialize the configuration of the project.
      *
-     * @param congifPath Path to the APE configuration file.
-     * @throws IOException   Error in reading the configuration file.
-     * @throws JSONException Error in parsing the configuration file.
+     * @param configPath Path to the APE configuration file.
+     * @throws IOException        Error in reading the configuration file.
+     * @throws JSONException      Error in parsing the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
      */
-    public APEConfig(String congifPath) throws IOException, JSONException {
-        if (congifPath == null) {
-            throw new IOException("The configuration file path is not provided correctly.");
-        }
+    public APEConfig(String configPath) throws IOException, JSONException, APEConfigException {
+        if (configPath == null)
+            throw new NullPointerException("The provided core configuration file path is null.");
 
-        dataDimensionRoots = new ArrayList<String>();
-        programInputs = new ArrayList<DataInstance>();
-        programOutputs = new ArrayList<DataInstance>();
-
-        File file = new File(congifPath);
-
+        File file = new File(configPath);
         String content = FileUtils.readFileToString(file, "utf-8");
 
         // Convert JSON string to JSONObject
         coreConfiguration = new JSONObject(content);
 
-        if (!coreConfigSetup()) {
-            throw new JSONException("Core configuration failed.");
-        }
+        coreConfigSetup();
     }
 
     /**
      * Initialize the configuration of the project.
      *
      * @param configObject The APE configuration JSONObject{@link JSONObject}.
-     * @throws JSONException Error in parsing the configuration file.
+     * @throws IOException        Error in reading the configuration file.
+     * @throws JSONException      Error in parsing the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
      */
-    public APEConfig(JSONObject configObject) throws JSONException {
-        if (configObject == null) {
-            throw new JSONException("Core configuration error. The provided JSON object is null.");
-        }
+    public APEConfig(JSONObject configObject) throws IOException, JSONException, APEConfigException {
+        if (configObject == null)
+            throw new NullPointerException("The provided JSONObject is null.");
 
-        dataDimensionRoots = new ArrayList<String>();
-        programInputs = new ArrayList<DataInstance>();
-        programOutputs = new ArrayList<DataInstance>();
-
-        // Convert JSON string to JSONObject
+        // Set JSONObject as core configuration
         coreConfiguration = configObject;
 
-        if (!coreConfigSetup()) {
-            throw new JSONException("Core configuration failed.");
-        }
-
+        coreConfigSetup();
     }
 
     /**
      * Setup the configuration for the current run of the synthesis.
      *
-     * @param congifPath     Path to the APE configuration file.
+     * @param configPath     Path to the APE configuration file.
      * @param apeDomainSetup the ape domain setup
      * @return True if the configuration setup was successful, false otherwise.
-     * @throws IOException   Error in reading the configuration file.
-     * @throws JSONException Error in parsing the configuration file.
+     * @throws IOException        Error in reading the configuration file.
+     * @throws JSONException      Error in parsing the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
      */
-    public boolean setupRunConfiguration(String congifPath, APEDomainSetup apeDomainSetup) throws IOException, JSONException {
-        if (congifPath == null) {
-            throw new IOException("The configuration file path is not provided correctly.");
-        }
+    public boolean setupRunConfiguration(String configPath, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
+        if (configPath == null)
+            throw new NullPointerException("The provided run configuration file path is null.");
 
-        File file = new File(congifPath);
+        File file = new File(configPath);
+
         String content = FileUtils.readFileToString(file, "utf-8");
 
         // Convert JSON string to JSONObject
         runConfiguration = new JSONObject(content);
 
-        if (!runConfigSetup(apeDomainSetup)) {
-            throw new JSONException("Run configuration failed.");
-        }
-        return true;
+        return runConfigSetup(apeDomainSetup);
     }
 
     /**
@@ -254,118 +268,72 @@ public class APEConfig {
      * @param configObject   The APE configuration JSONObject{@link JSONObject}.
      * @param apeDomainSetup the ape domain setup
      * @return the run configuration
-     * @throws JSONException Error in parsing the configuration file.
+     * @throws IOException        Error in reading the configuration file.
+     * @throws JSONException      Error in parsing the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
      */
-    public boolean setupRunConfiguration(JSONObject configObject, APEDomainSetup apeDomainSetup) throws JSONException {
-        if (configObject == null) {
-            throw new JSONException("Run configuration error. The provided JSON object is null.");
-        }
+    public boolean setupRunConfiguration(JSONObject configObject, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
+        if (configObject == null)
+            throw new NullPointerException("The provided JSONObject is null.");
 
-        // Convert JSON string to JSONObject
+        // Set JSONObject as run configuration
         runConfiguration = configObject;
 
-        if (!runConfigSetup(apeDomainSetup)) {
-            throw new JSONException("Run configuration failed.");
-        }
-        return true;
+        return runConfigSetup(apeDomainSetup);
     }
 
     /**
      * Setting up the core configuration of the library.
      *
-     * @return true if the method successfully set-up the configuration,
-     * false otherwise.
+     * @return true if the method successfully set-up the configuration, false otherwise.
+     * @throws IOException        Error in reading the configuration file.
+     * @throws JSONException      Error in parsing the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
      */
-    private boolean coreConfigSetup() {
+    private boolean coreConfigSetup() throws IOException, JSONException, APEConfigException {
 
-        try {
-            ontologyPath = coreConfiguration.getString(ONTOLOGY_TAG);
-            if (!isValidConfigReadFile(ONTOLOGY_TAG, ontologyPath)) {
-                return false;
-            }
-        } catch (JSONException JSONException) {
-            System.err.println("Tag '" + ONTOLOGY_TAG + "' in the configuration file is not provided correctly.");
-            return false;
-        }
-        try {
-            ontologyPrefixURI = coreConfiguration.getString(ONTOLOGY_PREFIX);
-        } catch (JSONException JSONException) {
-            ontologyPrefixURI = "";
-        }
-        try {
-            toolTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(TOOL_ONTOLOGY_TAG), getOntologyPrefixURI());
-            if (toolTaxonomyRoot == null || toolTaxonomyRoot == "") {
-                System.err.println("Incorrect format of " + TOOL_ONTOLOGY_TAG + " tag in the config file.");
-                return false;
-            }
-        } catch (JSONException JSONException) {
-            System.err.println("Tag '" + TOOL_ONTOLOGY_TAG + "' in the configuration file is not provided correctly.");
-            return false;
+        /* JSONObject must have been parsed correctly. */
+        if (coreConfiguration == null) {
+            throw new APEConfigException("Cannot set up the core configuration, because the JSONObject is initialized to NULL. The configuration file might not have been parsed correctly.");
         }
 
-//		try {
-//			this.dataTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(DATA_ONTOLOGY_TAG), getOntologyPrefixURI());
-//			if (dataTaxonomyRoot == null || this.dataTaxonomyRoot == "") {
-//				System.err.println("Incorrect format of " + DATA_ONTOLOGY_TAG + " tag in the config file.");
-//				return false;
-//			}
-//		} catch (JSONException JSONException) {
-//			System.err.println("Tag '" + DATA_ONTOLOGY_TAG + "' in the configuration file is not provided correctly.");
-//			return false;
-//		}
-
-        try {
-            List<String> tmpDataDimensionsRoots = APEUtils.getListFromJson(coreConfiguration, DIMENSIONSONTOLOGY_TAG, String.class);
-            for (String subTaxonomy : tmpDataDimensionsRoots) {
-                dataDimensionRoots.add(APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()));
+        /* Make sure all required core tags are present. This way, teh parser does not have to check presence of the tag */
+        for (String requiredTag : getObligatoryCoreTags()) {
+            if (!coreConfiguration.has(requiredTag)) {
+                throw APEConfigException.missingTag(requiredTag);
             }
-        } catch (JSONException JSONException) {
-            System.err.println("Tag '" + DIMENSIONSONTOLOGY_TAG + "' in the configuration file is not provided correctly.");
-            return false;
         }
 
-        try {
-            this.toolAnnotationsPath = coreConfiguration.getString(TOOL_ANNOTATIONS_TAG);
-            if (!isValidConfigReadFile(TOOL_ANNOTATIONS_TAG, this.toolAnnotationsPath)) {
-                return false;
-            }
-        } catch (JSONException JSONException) {
-            System.err
-                    .println("Tag '" + TOOL_ANNOTATIONS_TAG + "' in the configuration file is not provided correctly.");
-            return false;
+        /* Path to the OWL file. */
+        this.ontologyPath = readPath(ONTOLOGY_TAG, coreConfiguration, Permission.READ);
+
+        /* URI of the ontology classes. */
+        this.ontologyPrefixURI = coreConfiguration.getString(ONTOLOGY_PREFIX);
+
+        /* The root class of the tool taxonomy. */
+        /* TODO: should throw an exception if the root is not present in the OWL file. */
+        this.toolTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(TOOL_ONTOLOGY_TAG), getOntologyPrefixURI());
+        if (this.toolTaxonomyRoot.equals("")) {
+            throw APEConfigException.invalidValue(TOOL_ONTOLOGY_TAG, coreConfiguration.getString(TOOL_ONTOLOGY_TAG), "incorrect format.");
         }
 
-        try {
-            this.solutionPath = coreConfiguration.getString(SOLUTION_PATH_TAG);
-            if (!isValidConfigWriteFile(SOLUTION_PATH_TAG, this.solutionPath)) {
-                return false;
-            }
-        } catch (JSONException JSONException) {
-            System.err.println("Tag '" + SOLUTION_PATH_TAG + "' in the configuration file is not provided correctly.");
-            return false;
+        /* Dimension classes of teh data taxonomy. */
+        /* TODO: should throw an exception if a dimension is not present in the OWL file. */
+        for (String subTaxonomy : APEUtils.getListFromJson(coreConfiguration, DIMENSIONSONTOLOGY_TAG, String.class)) {
+            this.dataDimensionRoots.add(APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()));
         }
 
-        try {
-            this.executionScriptsFolder = coreConfiguration.getString(EXECUTIONSCRIPTS_FOLDER_TAG);
-            if (!isValidConfigWriteFolder(EXECUTIONSCRIPTS_FOLDER_TAG, this.executionScriptsFolder)) {
-                return false;
-            }
-        } catch (JSONException JSONException) {
-            System.err.println("Tag '" + EXECUTIONSCRIPTS_FOLDER_TAG
-                    + "' in the configuration file is not provided. Solution workflows will not be executable.");
-            this.executionScriptsFolder = null;
-        }
+        /* Path to the tool annotations JSON file. */
+        this.toolAnnotationsPath = readPath(TOOL_ANNOTATIONS_TAG, coreConfiguration, Permission.READ);
 
-        try {
-            this.solutionGraphsFolder = coreConfiguration.getString(SOLUTION_GRAPS_FOLDER_TAG);
-            if (!isValidConfigWriteFolder(SOLUTION_GRAPS_FOLDER_TAG, this.solutionGraphsFolder)) {
-                return false;
-            }
-        } catch (JSONException JSONException) {
-            System.err.println("Tag '" + SOLUTION_GRAPS_FOLDER_TAG
-                    + "' in the configuration file is not provided. Solution graphs will not be generated.");
-            this.solutionGraphsFolder = null;
-        }
+        /* Path to the solution directory. */
+        this.solutionPath = readPath(SOLUTION_PATH_TAG, coreConfiguration, Permission.READ, Permission.WRITE) + "\\sat_solutions.txt";
+
+        /* Path to the output script directory. */
+        this.executionScriptsFolder = readPath(EXECUTIONSCRIPTS_FOLDER_TAG, coreConfiguration, Permission.WRITE);
+
+        /* Path to the output graph directory. */
+        this.solutionGraphsFolder = readPath(SOLUTION_GRAPHS_FOLDER_TAG, coreConfiguration, Permission.WRITE);
 
         return true;
     }
@@ -373,168 +341,248 @@ public class APEConfig {
     /**
      * Setting up the core configuration of the library.
      *
-     * @return true if the method successfully set-up the configuration,
-     * false otherwise.
+     * @return true if the method successfully set-up the configuration, false otherwise.
+     * @throws IOException        Error in reading the configuration file.
+     * @throws JSONException      Error in parsing the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
      */
-    private boolean runConfigSetup(APEDomainSetup apeDomainSetup) {
+    private boolean runConfigSetup(APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
 
-        try {
-            this.constraintsPath = runConfiguration.getString(CONSTRAINTS_TAG);
-            if (!isValidConfigReadFile(CONSTRAINTS_TAG, this.constraintsPath)) {
-                return false;
+        /* JSONObject must have been parsed correctly. */
+        if (runConfiguration == null) {
+            throw new APEConfigException("Cannot set up the run configuration, because the JSONObject is initialized to NULL. The configuration file might not have been parsed correctly.");
+        }
+
+        /* Make sure all required core tags are present. This way, the rest of the method does not have to check the presence of the tag. */
+        for (String tag : getObligatoryRunTags()) {
+            if (!runConfiguration.has(tag)) {
+                throw APEConfigException.missingTag(tag);
             }
-        } catch (JSONException JSONException) {
-            System.out.println("Tag '" + CONSTRAINTS_TAG
-                    + "' in the configuration file is not provided correctly. No constraints will be applied.");
-            this.constraintsPath = null;
+        }
+
+        /* Path to the JSON constraints file. */
+        if (runConfiguration.has(CONSTRAINTS_TAG)) {
+            this.constraintsPath = readPath(CONSTRAINTS_TAG, runConfiguration, Permission.READ);
+        } else {
+            APEUtils.printWarning("Tag '" + CONSTRAINTS_TAG + "' in the configuration file is not provided. No constraints will be applied.");
+        }
+
+        /* Read shared memory tag. */
+        this.sharedMemory = readBooleanOrDefault(SHARED_MEMORY_TAG, runConfiguration, true);
+
+        /* Minimal length of the solution must be greater or equal to 1. */
+        this.solutionMinLength = runConfiguration.getInt(SOLUTION_MIN_LENGTH_TAG);
+        if (solutionMinLength < 1) {
+            throw APEConfigException.invalidValue(SOLUTION_MIN_LENGTH_TAG, solutionMinLength, "use a numeric value greater or equal to 1.");
+        }
+
+        /* Maximum length of the solution must be greater or equal to 1. */
+        this.solutionMaxLength = runConfiguration.getInt(SOLUTION_MAX_LENGTH_TAG);
+        if (this.solutionMaxLength < 1) {
+            throw APEConfigException.invalidValue(SOLUTION_MAX_LENGTH_TAG, solutionMaxLength, "use a numeric value greater or equal to 1.");
+        }
+
+        /* Check MIN and MAX solution length. */
+        if (solutionMaxLength < solutionMinLength) {
+            throw APEConfigException.invalidValue(SOLUTION_MAX_LENGTH_TAG, solutionMaxLength, String.format("MAX solution length cannot be smaller than MIN solution length (%s).", solutionMinLength));
+        }
+
+        /* Maximum number of generated solutions. */
+        this.maxNoSolutions = runConfiguration.getInt(MAX_NOSOLUTIONS_TAG);
+        if (this.maxNoSolutions < 0) {
+            throw APEConfigException.invalidValue(MAX_NOSOLUTIONS_TAG, maxNoSolutions, "use a numeric value greater or equal to 0.");
+        }
+
+        /* Number of execution scripts generated from the solutions. */
+        this.noExecutions = readIntegerOrDefault(NOEXECUTIONS_TAG, runConfiguration, 0);
+        if (this.noExecutions < 0) {
+            throw APEConfigException.invalidValue(NOEXECUTIONS_TAG, this.noExecutions, "use a numeric value greater or equal to 0.");
+        }
+
+        /* Number of graphs generated from the solutions. */
+        this.noGraphs = readIntegerOrDefault(NO_GRAPHS_TAG, runConfiguration, 0);
+        if (this.noGraphs < 0) {
+            throw APEConfigException.invalidValue(NO_GRAPHS_TAG, this.noGraphs, "use a numeric value greater or equal to 0.");
+        }
+
+        /* Parse the input and output DataInstances of the program*/
+        this.programInputs = getDataInstances(PROGRAM_INPUTS_TAG, runConfiguration, apeDomainSetup);
+        this.programOutputs = getDataInstances(PROGRAM_OUTPUTS_TAG, runConfiguration, apeDomainSetup);
+
+        /* Read the config enums. */
+        this.useWorkflowInput = readConfigEnumOrDefault(USEWORKFLOW_INPUT, runConfiguration, ConfigEnum.ALL);
+        this.useAllGeneratedData = readConfigEnumOrDefault(USE_ALL_GENERATED_DATA, runConfiguration, ConfigEnum.ONE);
+
+        /* DEBUG_MODE_TAG */
+        this.debugMode = readBooleanOrDefault(DEBUG_MODE_TAG, runConfiguration, false);
+
+        return true;
+    }
+
+    /**
+     * Method checks whether the provided value represent a Boolean, and returns the Boolean if it does.
+     * Method returns the param {@code default_value} if the specified tag is not present.
+     *
+     * @param tag           Corresponding tag from the config file.
+     * @param config        Provided JSON configuration with values.
+     * @param default_value This value will be returned if the specified tag is not present in the JSONObject.
+     * @return Value represented in the JSON object, or the default value if the tag is not present.
+     * @throws JSONException Error in parsing the value for specified tag.
+     */
+    private static Boolean readBooleanOrDefault(String tag, JSONObject config, boolean default_value) throws JSONException {
+
+        if (!config.has(tag)) {
+            APEUtils.printWarning(String.format("Tag '%s' in the configuration file is not provided. Default value is: %s.", tag, default_value));
+            return default_value;
+        }
+
+        return config.getBoolean(tag);
+    }
+
+    /**
+     * Method checks whether the provided value represent a Integer, and Integer the boolean if it does.
+     * Method returns the param {@code default_value} if the specified tag is not present.
+     *
+     * @param tag           Corresponding tag from the config file.
+     * @param config        Provided JSON configuration with values.
+     * @param default_value This value will be returned if the specified tag is not present in the JSONObject.
+     * @return Value represented in the JSON object, or the default value if the tag is not present.
+     * @throws JSONException Error in parsing the value for specified tag.
+     */
+    private static Integer readIntegerOrDefault(String tag, JSONObject config, int default_value) throws JSONException {
+
+        if (!config.has(tag)) {
+            APEUtils.printWarning(String.format("Tag '%s' in the configuration file is not provided. Default value is: %s.", tag, default_value));
+            return default_value;
+        }
+
+        return config.getInt(tag);
+    }
+
+    /**
+     * Method checks whether the provided value represent a {@link ConfigEnum}, and returns the {@link ConfigEnum} if it does.
+     * Method returns the param {@code default_value} if the specified tag is not present.
+     *
+     * @param tag           Corresponding tag from the config file.
+     * @param config        Provided JSON configuration with values.
+     * @param default_value This value will be returned if the specified tag is not present in the JSONObject.
+     * @return Value represented in the JSON object, or the default value if the tag is not present.
+     * @throws JSONException      Error in parsing the value for specified tag.
+     * @throws APEConfigException Error in setting up the the configuration.
+     */
+    private static ConfigEnum readConfigEnumOrDefault(String tag, JSONObject config, ConfigEnum default_value) throws JSONException, APEConfigException {
+
+        if (!config.has(tag)) {
+            APEUtils.printWarning(String.format("Tag '%s' in the configuration file is not provided. Default value is: %s.", tag, default_value));
+            return default_value;
+        }
+
+        String stringEnum = config.getString(tag);
+
+        if (stringEnum == null) {
+            throw APEConfigException.invalidValue(tag, "null", "value is null.");
+        }
+        if (stringEnum.equals("")) {
+            throw APEConfigException.invalidValue(tag, stringEnum, "value is empty.");
         }
 
         try {
-            this.sharedMemory = runConfiguration.getBoolean(SHARED_MEMORY_TAG);
-        } catch (JSONException JSONException) {
-            System.out.println("Tag '" + SHARED_MEMORY_TAG
-                    + "' in the configuration file is not provided correctly. Default value is: true.");
-            this.sharedMemory = true;
+            return ConfigEnum.valueOf(stringEnum.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw APEConfigException.invalidValue(tag, stringEnum, String.format("could not parse value. Use one of the following values: %s", Arrays.toString(ConfigEnum.values())));
+        }
+    }
+
+    /**
+     * Method checks whether the provided value represent a correct path, and returns the path if it does.
+     *
+     * @param tag    Corresponding tag from the config file.
+     * @param config Provided JSON configuration with values.
+     * @return Path represented in the JSON object, or the default value if the tag is not present.
+     * @throws IOException        Error if path is cannot be found.
+     * @throws JSONException      Error in parsing the value for specified tag.
+     * @throws APEConfigException Error in setting up the the configuration.
+     */
+    private static String readPath(String tag, JSONObject config, Permission... requestedPermissions) throws IOException, JSONException, APEConfigException {
+
+        // read path
+        String stringPath = config.getString(tag);
+
+        // check on empty values
+        if (stringPath == null) {
+            throw APEConfigException.invalidValue(tag, "null", "value is null.");
+        }
+        if (stringPath.equals("")) {
+            throw APEConfigException.invalidValue(tag, stringPath, "value is empty.");
         }
 
-        try {
-            this.solutionMinLength = runConfiguration.getInt(SOLUTION_MIN_LENGTH_TAG);
-            if (this.solutionMinLength < 1) {
-                return false;
+        // path should exist
+        Path path = Paths.get(stringPath);
+        if (Files.notExists(path)) {
+            throw APEConfigException.pathNotFound(tag, stringPath);
+        }
+
+        // check permissions
+        for (Permission permission : Arrays.stream(requestedPermissions).distinct().collect(Collectors.toList())) {
+
+            if (permission == Permission.READ && !Files.isReadable(path)) {
+                throw APEConfigException.missingPermission(tag, stringPath, permission);
             }
-        } catch (JSONException JSONException) {
-            System.err.println(
-                    "Tag '" + SOLUTION_MIN_LENGTH_TAG + "' in the configuration file is not provided correctly.");
-            return false;
-        }
 
-        try {
-            this.solutionMaxLength = runConfiguration.getInt(SOLUTION_MAX_LENGTH_TAG);
-            if (this.solutionMaxLength < 1) {
-                return false;
+            if (permission == Permission.WRITE && !Files.isWritable(path)) {
+                throw APEConfigException.missingPermission(tag, stringPath, permission);
             }
-        } catch (JSONException JSONException) {
-            System.err.println(
-                    "Tag '" + SOLUTION_MAX_LENGTH_TAG + "' in the configuration file is not provided correctly.");
-            return false;
+
         }
 
-        if (solutionMaxLength != 0 && solutionMaxLength < solutionMinLength) {
-            System.err.println("MAX solution length cannot be smaller than MIN solution length.");
-            return false;
-        }
+        return stringPath;
+    }
+
+    /**
+     * Used to read the input and output data instances for the program. This method calls {@link #getDataInstance}.
+     */
+    private ArrayList<DataInstance> getDataInstances(String tag, JSONObject config, APEDomainSetup domain) throws JSONException {
+
+        ArrayList<DataInstance> instances = new ArrayList<>();
 
         try {
-            this.maxNoSolutions = runConfiguration.getInt(MAX_NOSOLUTIONS_TAG);
-            if (this.maxNoSolutions < 0) {
-                return false;
-            }
-        } catch (JSONException JSONException) {
-            System.err
-                    .println("Tag '" + MAX_NOSOLUTIONS_TAG + "' in the configuration file is not provided correctly.");
-            return false;
-        }
-
-        try {
-            this.noExecutions = runConfiguration.getInt(NOEXECUTIONS_TAG);
-            if (this.noExecutions < 0) {
-                return false;
-            }
-        } catch (JSONException JSONException) {
-            System.err.println("Tag '" + NOEXECUTIONS_TAG
-                    + "' in the configuration file is not provided correctly. Default value is: 0.");
-            this.noExecutions = 0;
-        }
-
-        try {
-            this.noGraphs = runConfiguration.getInt(NO_GRAPHS_TAG);
-            if (this.noExecutions < 0) {
-                return false;
-            }
-        } catch (JSONException JSONException) {
-            System.err.println("Tag '" + NO_GRAPHS_TAG
-                    + "' in the configuration file is not provided correctly. Default value is: 0.");
-            this.noGraphs = 0;
-        }
-        programInputs.clear();
-        try {
-            for (JSONObject jsonModuleInput : APEUtils.getListFromJson(runConfiguration, PROGRAM_INPUTS_TAG, JSONObject.class)) {
-                DataInstance input;
-                if ((input = getDataInstance(jsonModuleInput, apeDomainSetup.getAllTypes())) != null) {
-                    programInputs.add(input);
-                }
-            }
-        } catch (JSONException JSONException) {
-            System.out.println("Tag '" + PROGRAM_INPUTS_TAG
-                    + "' is not provided in the configuration file. Program will have no inputs.");
-            programInputs.clear();
-        }
-
-        programOutputs.clear();
-        try {
-            for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(runConfiguration, PROGRAM_OUTPUTS_TAG, JSONObject.class)) {
+            for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(config, tag, JSONObject.class)) {
                 DataInstance output;
-                if ((output = getDataInstance(jsonModuleOutput, apeDomainSetup.getAllTypes())) != null) {
-                    programOutputs.add(output);
+                if ((output = getDataInstance(jsonModuleOutput, domain.getAllTypes())) != null) {
+                    instances.add(output);
                 }
             }
-        } catch (JSONException JSONException) {
-            System.out.println("Tag '" + PROGRAM_OUTPUTS_TAG
-                    + "' is not provided in the configuration file. Program will have no outputs.");
-            programOutputs.clear();
+        } catch (ClassCastException e) {
+            instances.clear();
+            throw APEConfigException.cannotParse(tag, config.get(tag).toString(), JSONObject[].class, "please provide the correct format.");
         }
 
-        try {
-            String tempUseWInput = runConfiguration.getString(USEWORKFLOW_INPUT);
-            this.useWorkflowInput = isValidConfigEnum(USEWORKFLOW_INPUT, tempUseWInput);
-            if (this.useWorkflowInput == null) {
-                this.useWorkflowInput = ConfigEnum.ALL;
-                System.out.println("Tag " + USEWORKFLOW_INPUT
-                        + "' in the configuration file is not provided. Default value is: ALL.");
-            }
-        } catch (JSONException JSONException) {
-            System.err.println("Tag '" + USEWORKFLOW_INPUT + "' in the configuration file is not provided correctly.");
-            return false;
-        }
-
-        try {
-            String tempUseGenData = runConfiguration.getString(USE_ALL_GENERATED_DATA);
-            this.useAllGeneratedData = isValidConfigEnum(USE_ALL_GENERATED_DATA, tempUseGenData);
-            if (this.useWorkflowInput == null) {
-                this.useWorkflowInput = ConfigEnum.ONE;
-                System.out.println("Tag " + USE_ALL_GENERATED_DATA
-                        + "' in the configuration file is not provided. Default value is: ONE.");
-            }
-
-        } catch (JSONException JSONException) {
-            System.err.println(
-                    "Tag '" + USE_ALL_GENERATED_DATA + "' in the configuration file is not provided correctly.");
-            return false;
-        }
-
-        try {
-            this.debugMode = runConfiguration.getBoolean(DEBUG_MODE_TAG);
-        } catch (JSONException JSONException) {
-            System.out.println("Tag '" + DEBUG_MODE_TAG
-                    + "' in the configuration file is not provided correctly. Default value is: false.");
-            this.debugMode = false;
-        }
-
-        return true;
+        return instances;
     }
 
+    /**
+     * Used to read an input or output data instance for the program.
+     */
     private DataInstance getDataInstance(JSONObject jsonModuleInput, AllTypes allTypes) {
+
         DataInstance dataInstances = new DataInstance();
+
         for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
+
             String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel, getOntologyPrefixURI());
+
             for (String currTypeLabel : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
+
                 String currTypeURI = APEUtils.createClassURI(currTypeLabel, getOntologyPrefixURI());
+
                 Type currType = allTypes.get(currTypeURI, typeSuperClassURI);
+
                 if (currType == null) {
                     System.err.println("Error in the configuration file. The data type '" + currTypeURI
                             + "' was not defined or does not belong to the dimension '" + typeSuperClassLabel + "'.");
                     return null;
                 }
+
                 dataInstances.addType(currType);
             }
         }
@@ -544,7 +592,69 @@ public class APEConfig {
         }
 
         return null;
+    }
 
+    /**
+     * Get all obligatory JSON tags to set up the framework.
+     *
+     * @return All obligatory JSON tags to set up the framework.
+     */
+    public static String[] getObligatoryCoreTags() {
+        return obligatoryCoreTags;
+    }
+
+    /**
+     * Get all optional JSON tags to set up the framework.
+     *
+     * @return All optional JSON tags to set up the framework.
+     */
+    public static String[] getOptionalCoreTags() {
+        return optionalCoreTags;
+    }
+
+    /**
+     * Get all obligatory JSON tags to execute the synthesis.
+     *
+     * @return All obligatory JSON tags to execute the synthesis.
+     */
+    public static String[] getObligatoryRunTags() {
+        return obligatoryRunTags;
+    }
+
+    /**
+     * Get all optional JSON tags to execute the synthesis.
+     *
+     * @return All optional JSON tags to execute the synthesis.
+     */
+    public static String[] getOptionalRunTags() {
+        return optionalRunTags;
+    }
+
+    /**
+     * Get all JSON tags that can be used to set up the framework.
+     *
+     * @return All JSON tags that can be used to set up the framework.
+     */
+    public static String[] getCoreTags() {
+        return ArrayUtils.addAll(getObligatoryCoreTags(), getOptionalCoreTags());
+    }
+
+    /**
+     * Get all JSON tags that can be used to execute the synthesis.
+     *
+     * @return All JSON tags that can be used to execute the synthesis.
+     */
+    public static String[] getRunTags() {
+        return ArrayUtils.addAll(getObligatoryRunTags(), getOptionalRunTags());
+    }
+
+    /**
+     * Get all JSON tags that can be used to set up the framework and execute the synthesis.
+     *
+     * @return All JSON tags that can be used to set up the framework and execute the synthesis.
+     */
+    public static String[] getAllTags() {
+        return ArrayUtils.addAll(getCoreTags(), getRunTags());
     }
 
     /**
@@ -573,13 +683,6 @@ public class APEConfig {
     public String getToolTaxonomyRoot() {
         return toolTaxonomyRoot;
     }
-
-//	/**
-//	 * @return the {@link #dataTaxonomyRoot}
-//	 */
-//	public String getDataTaxonomyRoot() {
-//		return dataTaxonomyRoot;
-//	}
 
     /**
      * Gets data dimension roots.
@@ -807,167 +910,4 @@ public class APEConfig {
                 return null;
         }
     }
-
-    /**
-     * Method checks whether the provided path is a valid file path with required
-     * writing permissions. Method is tailored for verifying config file fields.
-     *
-     * @param tag  Corresponding tag from the config file.
-     * @param path Path to the file.
-     * @return True if the file exists or can be created, false
-     * otherwise.
-     */
-    private static boolean isValidConfigWriteFile(String tag, String path) {
-        if (path == null || path == "") {
-            System.err.println("Tag '" + tag + "' in the configuration file is not provided correctly.");
-            return false;
-        }
-        File f = new File(path);
-        if (f.isDirectory()) {
-            System.err.println("Tag '" + tag + "':\nProvided path: \"" + path + "\" is a directory.");
-            return false;
-        } else {
-            if (!f.getParentFile().isDirectory()) {
-                System.err.println("Tag '" + tag + "':\nProvided path: \"" + path + "\" is not a valid path.");
-                return false;
-            } else {
-                if (!f.canWrite() && !f.getParentFile().canWrite()) {
-                    System.err.println(
-                            "Tag '" + tag + "':\nProvided path: \"" + path + "\" is missing the writing permission.");
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Method checks whether the provided path is a valid file path with required
-     * writing permissions. Method is tailored for verifying config file fields.
-     *
-     * @param tag  Corresponding tag from the config file.
-     * @param path Path to the file.
-     * @return True if the file exists or can be created, false
-     * otherwise.
-     */
-    private static boolean isValidConfigWriteFolder(String tag, String path) {
-        if (path == null || path == "") {
-            System.err.println("Tag '" + tag + "' in the configuration file is not provided correctly.");
-            return false;
-        }
-        File f = new File(path);
-        if (!f.isDirectory()) {
-            System.err.println("Tag '" + tag + "':\nProvided path: \"" + path + "\" is not a directory.");
-            return false;
-        } else if (!f.canWrite()) {
-            System.err
-                    .println("Tag '" + tag + "':\nProvided path: \"" + path + "\" is missing the writing permission.");
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Method checks whether the provided path corresponds to an existing file with
-     * required reading permissions. Method is tailored for verifying config file
-     * fields.
-     *
-     * @param tag  Corresponding tag from the config file.
-     * @param path Path to the file.
-     * @return True if the file exists and can be read, false otherwise.
-     */
-    private static boolean isValidConfigReadFile(String tag, String path) {
-        if (path == null || path == "") {
-            System.err.println("Tag '" + tag + "' in the configuration file is not provided correctly.");
-            return false;
-        }
-        File f = new File(path);
-        if (!f.isFile()) {
-            System.err.println("Tag '" + tag + "':\nProvided path: \"" + path + "\" is not a file.");
-            return false;
-        } else {
-            if (!f.canRead()) {
-                System.err.println(
-                        "Tag '" + tag + "':\nProvided file: \"" + path + "\" is missing the reading permission.");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Method checks whether the provided string represent an integer number, and
-     * return the number if it does. Method is tailored for verifying config file
-     * fields.
-     *
-     * @param tag          Corresponding tag from the config file.
-     * @param stringNumber Provided string.
-     * @return Integer number represented with the string, null in case of a bad String format.
-     */
-    private static Integer isValidConfigInt(String tag, String stringNumber) {
-        if (stringNumber == null || stringNumber == "") {
-            System.err.println("Tag '" + tag + "' in the configuration file is not provided correctly.");
-            return null;
-        } else if (!StringUtils.isNumeric(stringNumber)) {
-            System.err.println(
-                    "Tag '" + tag + "':\nProvided number: \"" + stringNumber + "\" is not in a correct format.");
-            return null;
-        }
-
-        return Integer.parseInt(stringNumber);
-    }
-
-    /**
-     * Method checks whether the provided string represent a boolean value, and
-     * return the boolean if it does. Method is tailored for verifying config file
-     * fields.
-     *
-     * @param tag        Corresponding tag from the config file.
-     * @param stringBool Provided string.
-     * @return Boolean value represented with the string, null in case of a bad boolean format.
-     */
-    private static Boolean isValidConfigBoolean(String tag, String stringBool) {
-        if (stringBool == null || stringBool == "") {
-            System.err.println("Tag '" + tag + "' in the configuration file is not provided correctly.");
-            return null;
-        } else {
-            Boolean boolVal = BooleanUtils.toBooleanObject(stringBool);
-            if (boolVal == null) {
-                System.err.println("Tag '" + tag + "':\nProvided boolean value: \"" + stringBool
-                        + "\" is not in a correct format.");
-                return null;
-            } else {
-                return boolVal;
-            }
-        }
-    }
-
-    /**
-     * Method checks whether the provided string represent an enumeration value
-     * ({@link ConfigEnum}), and return the {@link ConfigEnum} if it does. Method is
-     * tailored for verifying config file fields.
-     *
-     * @param tag        Corresponding tag from the config file.
-     * @param stringEnum Provided string.
-     * @return Boolean value represented with the string, null in case of a bad boolean format.
-     */
-    private static ConfigEnum isValidConfigEnum(String tag, String stringEnum) {
-        if (stringEnum == null || stringEnum == "") {
-            System.err.println("Tag '" + tag + "' in the configuration file is not provided correctly.");
-            return null;
-        } else {
-            if (stringEnum.toUpperCase().equals("ALL")) {
-                return ConfigEnum.ALL;
-            } else if (stringEnum.toUpperCase().equals("ONE")) {
-                return ConfigEnum.ONE;
-            } else if (stringEnum.toUpperCase().equals("NONE")) {
-                return ConfigEnum.NONE;
-            } else {
-                System.err.println("Tag '" + tag + "':\nProvided boolean value: \"" + stringEnum
-                        + "\" is not in a correct format.");
-            }
-        }
-        return null;
-    }
-
 }

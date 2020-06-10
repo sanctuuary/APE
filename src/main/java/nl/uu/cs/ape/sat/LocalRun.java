@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat;
 
 import guru.nidi.graphviz.attribute.RankDir;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
+import nl.uu.cs.ape.sat.utils.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONException;
 
@@ -35,34 +36,36 @@ public class LocalRun {
 
         APE apeFramework = null;
         try {
+
+            // set up the APE framework
             apeFramework = new APE(file.getAbsolutePath());
-        } catch (JSONException e) {
+
+        } catch (APEConfigException | JSONException | IOException e) {
+            System.err.println("Error in setting up the APE framework:");
             System.err.println(e.getMessage());
             return;
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return;
-        } catch (ExceptionInInitializerError e) {
-            System.err.println(e.getMessage());
         }
 
         SATsolutionsList solutions;
         try {
+
+            // run the synthesis and retrieve the solutions
             solutions = apeFramework.runSynthesis(file.getAbsolutePath(), apeFramework.getDomainSetup());
-        } catch (IOException e) {
-            System.err.println("Error in synthesis execution. Writing to the file system failed.");
+
+        } catch (APEConfigException | JSONException | IOException e) {
+            System.err.println("Error in synthesis execution:");
+            System.err.println(e.getMessage());
             return;
         }
 
         /*
          * Writing solutions to the specified file in human readable format
          */
-        if (solutions == null) {
-
-        } else if (solutions.isEmpty()) {
+        if (solutions != null && solutions.isEmpty()) {
             System.out.println("UNSAT");
         } else {
             try {
+                assert solutions != null;
                 apeFramework.writeSolutionToFile(solutions);
                 apeFramework.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
 //				apeFramework.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
