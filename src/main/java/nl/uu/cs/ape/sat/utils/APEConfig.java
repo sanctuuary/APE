@@ -235,7 +235,12 @@ public class APEConfig {
         // Set JSONObject as core configuration
         coreConfiguration = configObject;
 
-        coreConfigSetup();
+        //try{
+            coreConfigSetup();
+        //}
+        //catch (ClassCastException e){
+        //    throw new APEConfigException(e.getMessage());
+        //}
     }
 
     /**
@@ -314,13 +319,18 @@ public class APEConfig {
         /* TODO: should throw an exception if the root is not present in the OWL file. */
         this.toolTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(TOOL_ONTOLOGY_TAG), getOntologyPrefixURI());
         if (this.toolTaxonomyRoot.equals("")) {
-            throw APEConfigException.invalidValue(TOOL_ONTOLOGY_TAG, coreConfiguration.getString(TOOL_ONTOLOGY_TAG), "incorrect format.");
+            throw APEConfigException.invalidValue(TOOL_ONTOLOGY_TAG, coreConfiguration, "incorrect format.");
         }
 
         /* Dimension classes of teh data taxonomy. */
         /* TODO: should throw an exception if a dimension is not present in the OWL file. */
-        for (String subTaxonomy : APEUtils.getListFromJson(coreConfiguration, DIMENSIONSONTOLOGY_TAG, String.class)) {
-            this.dataDimensionRoots.add(APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()));
+        try{
+            for (String subTaxonomy : APEUtils.getListFromJson(coreConfiguration, DIMENSIONSONTOLOGY_TAG, String.class)) {
+                this.dataDimensionRoots.add(APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()));
+            }
+        }
+        catch (ClassCastException e){
+            throw APEConfigException.invalidValue(DIMENSIONSONTOLOGY_TAG, coreConfiguration, "expected a list in correct format.");
         }
 
         /* Path to the tool annotations JSON file. */

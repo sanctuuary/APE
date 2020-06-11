@@ -1,6 +1,7 @@
 package nl.uu.cs.ape.sat.utils;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -56,6 +57,18 @@ public class APEConfigException extends Exception {
      */
     public static APEConfigException invalidValue(String tag, Object value, String info) {
         return new APEConfigException(String.format("'%s' is not a valid value for tag '%s', %s", value, tag, info));
+    }
+
+    /**
+     * Invalid value ape config exception.
+     *
+     * @param tag   Corresponding JSON tag in the configuration file.
+     * @param config The configuration provided by the user.
+     * @param info  Application specific information that may help the user solve the problem.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static APEConfigException invalidValue(String tag, JSONObject config, String info) {
+        return new APEConfigException(String.format("'%s' is not a valid value for tag '%s', %s", config.get(tag), tag, info));
     }
 
     /**
