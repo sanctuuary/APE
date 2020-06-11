@@ -235,12 +235,7 @@ public class APEConfig {
         // Set JSONObject as core configuration
         coreConfiguration = configObject;
 
-        //try{
-            coreConfigSetup();
-        //}
-        //catch (ClassCastException e){
-        //    throw new APEConfigException(e.getMessage());
-        //}
+        coreConfigSetup();
     }
 
     /**
