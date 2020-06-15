@@ -107,6 +107,39 @@ public class APEConfigException extends Exception {
     }
 
     /**
+     * Path is found, but it is not a file.
+     *
+     * @param tag  Corresponding JSON tag in the configuration file.
+     * @param path The relative- or absolute path to a JSON- or OWL file.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static IOException notAFile(String tag, String path) {
+        return new IOException(String.format("Provided path '%s' for tag '%s' is not a file.", path, tag));
+    }
+
+    /**
+     * File is found, but it is not in the correct format.
+     *
+     * @param tag  Corresponding JSON tag in the configuration file.
+     * @param path The relative- or absolute path to a JSON- or OWL file.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static IOException incorrectFileFormat(String tag, String path, String extension) {
+        return new IOException(String.format("Provided path '%s' for tag '%s' is not in the expected '%s' format.", path, tag, extension));
+    }
+
+    /**
+     * Path is found, but it is not a directory.
+     *
+     * @param tag  Corresponding JSON tag in the configuration file.
+     * @param path The relative- or absolute path to a JSON- or OWL file.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static IOException notADirectory(String tag, String path) {
+        return new IOException(String.format("Provided path '%s' for tag '%s' is not a directory.", path, tag));
+    }
+
+    /**
      * Missing permission ape config exception.
      *
      * @param tag               Corresponding JSON tag in the configuration file.

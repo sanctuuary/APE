@@ -3,13 +3,14 @@ package nl.uu.cs.ape.sat.utils;
 import nl.uu.cs.ape.TestUtil;
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
+import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import util.TagInfo;
+import util.TagTypeEvaluation;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,6 +47,57 @@ class APEConfigTest {
             .toString();
 
     /**
+     * The tags can be divided in these categories displayed in the array.
+     * TagInfo takes the following data:
+     * - Type
+     * - Correct value example
+     * - Incorrect value examples
+     * - Tag names of this type.
+     */
+    private static final TagInfo[] tagTypes = new TagInfo[]{
+            new TagInfo(
+                    "Boolean",
+                    true,
+                    new Object[]{"wrong", 1},
+                    new String[]{"shared_memory", "debug_mode"}),
+            new TagInfo(
+                    "Enum",
+                    ConfigEnum.ONE.toString(),
+                    new Object[]{false, "wrong", 1},
+                    new String[]{"use_workflow_input", "use_all_generated_data"}),
+            new TagInfo(
+                    "Integer",
+                    1,
+                    new Object[]{false, "wrong"},
+                    new String[]{"solution_min_length", "solution_max_length", "max_solutions", "number_of_execution_scripts", "number_of_generated_graphs"}),
+            new TagInfo(
+                    "OntologyPrefix",
+                    "http://www.co-ode.org/ontologies/ont.owl#",
+                    new Object[]{false, "wrong"},
+                    new String[]{"ontologyPrexifIRI"}),
+            new TagInfo(
+                    "OntologyPath",
+                    TestUtil.getAbsoluteResourcePath("correctTemplate/ontology.owl"),
+                    new Object[]{false, "wrong"},
+                    new String[]{"ontology_path"}),
+            new TagInfo(
+                    "JSONPath",
+                    TestUtil.getAbsoluteResourcePath("correctTemplate/tool_annotations.json"),
+                    new Object[]{false, "wrong"},
+                    new String[]{"tool_annotations_path", "constraints_path"}),
+            new TagInfo(
+                    "DirectoryPath",
+                    TestUtil.getAbsoluteResourcePath("correctTemplate/"),
+                    new Object[]{false, "wrong"},
+                    new String[]{"solutions_path", "execution_scripts_folder", "solution_graphs_folder"}),
+            new TagInfo(
+                    "TaxonomyEntity",
+                    "ToolsTaxonomy",
+                    new Object[]{false, "wrong"},
+                    new String[]{"toolsTaxonomyRoot", "dataSubTaxonomyRoot"}),
+    };
+
+    /**
      * Get a copy of the configuration template.
      *
      * @return A copy of the configuration template.
@@ -76,17 +128,27 @@ class APEConfigTest {
     @Test
     public void testMissingTags() {
 
+        /* Missing one of the obligatory core tags should result in an exception while creating the framework. */
         for (String tag : APEConfig.getObligatoryCoreTags()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag);
             assertThrows(APEConfigException.class, () -> new APEConfig(obj));
         }
 
+        /* Missing one of the obligatory run tags should  result in an exception while executing the run phase. */
         for (String tag : APEConfig.getObligatoryRunTags()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag);
             assertDoesNotThrow(() -> new APEConfig(obj));
             assertThrows(APEConfigException.class, () -> setupRun(obj));
+        }
+
+        /* Missing one of the optional tags should not throw an exception, but should display a warning. */
+        for (String tag : ArrayUtils.addAll(APEConfig.getOptionalCoreTags(), APEConfig.getOptionalRunTags())) {
+            JSONObject obj = getCorrectTemplate();
+            obj.remove(tag);
+            assertDoesNotThrow(() -> new APEConfig(obj));
+            assertDoesNotThrow(() -> setupRun(obj));
         }
     }
 
@@ -98,15 +160,12 @@ class APEConfigTest {
     public void testIncorrectPaths() {
 
         final String[] pathTags = new String[]{"ontology_path", "tool_annotations_path", "execution_scripts_folder", "solution_graphs_folder", "solutions_path"};
-        final String[] wrongPaths = new String[]{null, "", "./does/not/exist.txt", "does/not/exist.txt", "./does/not/exist/", "does/not/exist/", TestUtil.getAbsoluteResourcePath("") + "\\doesnotexist.txt"};
+        final String[] wrongPaths = new String[]{null, "", "./does/not/exist.json", "does/not/exist.json", "./does/not/exist/", "does/not/exist/", TestUtil.getAbsoluteResourcePath("") + "\\doesnotexist.json"};
 
         for (String tag : pathTags) {
             for (String path : wrongPaths) {
                 try {
-                    JSONObject obj = getCorrectTemplate().put(tag, path);
-                    APEConfig config = new APEConfig(obj);
-                    APE ape = new APE(obj);
-                    config.setupRunConfiguration(obj, ape.getDomainSetup());
+                    setupRun(getCorrectTemplate().put(tag, path));
                     fail(String.format("Expected exception for APEConfig with a wrong path '%s' for tag '%s' was not thrown.", path, tag));
                 } catch (APEConfigException | JSONException | IOException e) {
                     assertTrue(e.getMessage().contains(tag));
@@ -116,44 +175,47 @@ class APEConfigTest {
         }
     }
 
-    /**
-     * Test if the {@link APEConfigException#invalidValue} exception is thrown
-     * on an incorrect value for tags that expect an Integer number.
-     */
     @Test
-    public void testNumericTags() {
-        ArrayList<String> numericTags = new ArrayList<>(Arrays.asList("solution_min_length", "solution_max_length", "max_solutions", "number_of_execution_scripts", "number_of_generated_graphs"));
-        ArrayList<String> nonNumericTags = new ArrayList<>(Arrays.asList(APEConfig.getAllTags()));
-        nonNumericTags.removeAll(numericTags);
+    public void tagTypeTest() {
 
-        for (String tag : numericTags) {
-            String nonNumericValue = "test";
-            try {
-                JSONObject obj = getCorrectTemplate().put(tag, nonNumericValue);
-                APEConfig config = new APEConfig(obj);
-                APE ape = new APE(obj);
-                config.setupRunConfiguration(obj, ape.getDomainSetup());
-                fail(String.format("Expected exception for APEConfig with a non-numeric value '%s' for numeric tag '%s' was not thrown.", nonNumericValue, tag));
-            } catch (APEConfigException | JSONException | IOException e) {
-                assertTrue(e.getMessage().contains(tag));
-                TestUtil.success(String.format("Expected exception was thrown for APEConfig with a non-numeric value for numeric tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+        TagTypeEvaluation evaluation;
+
+        for (TagInfo tagInfo : tagTypes) {
+
+            // true positive
+            evaluation = new TagTypeEvaluation(tagInfo.getTagType(), false);
+            for (String tag : tagInfo.getTags()) {
+                try {
+                    setupRun(getCorrectTemplate().put(tag, tagInfo.getCorrectExample())); // set invalid value for non-boolean tag and run the configuration
+                    evaluation.forTag(tag).result(true);
+                } catch (Exception e) {
+                    evaluation.forTag(tag).result(false, e);
+                }
             }
-        }
 
-        for (String tag : nonNumericTags) {
-            int numericValue = 1;
-            try {
-                JSONObject obj = getCorrectTemplate().put(tag, numericValue);
-                APEConfig config = new APEConfig(obj);
-                APE ape = new APE(obj);
-                config.setupRunConfiguration(obj, ape.getDomainSetup());
-                fail(String.format("Expected exception for APEConfig with a numeric value '%s' for non-numeric tag '%s' was not thrown.", numericValue, tag));
-            } catch (APEConfigException | JSONException | IOException e) {
-                assertTrue(e.getMessage().contains(tag));
-                TestUtil.success(String.format("Expected exception was thrown for APEConfig with a non-numeric value for non-numeric tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+            for (String tag : tagInfo.getTags()) {
+                for (Object wrongExample : tagInfo.getWrongExample()) {
+                    try {
+                        setupRun(getCorrectTemplate().put(tag, wrongExample)); // set invalid value for boolean tag and run the configuration
+                        evaluation.forTag(tag).result(false);
+                    } catch (Exception e) {
+                        evaluation.forTag(tag).result(true, e);
+                    }
+                }
+            }
+
+            evaluation = new TagTypeEvaluation(tagInfo.getTagType(), true);
+            for (String tag : otherTagsThan(tagInfo.getTags())) {
+                try {
+                    setupRun(getCorrectTemplate().put(tag, tagInfo.getCorrectExample())); // set invalid value for non-boolean tag and run the configuration
+                    evaluation.forTag(tag).result(false);
+                } catch (Exception e) {
+                    evaluation.forTag(tag).result(true, e);
+                }
             }
         }
     }
+
 
     /**
      * Creates a configuration from JSON and executes {@link APEConfig#setupRunConfiguration}
@@ -166,5 +228,9 @@ class APEConfigTest {
         APE ape = new APE(obj);
         APEConfig config = new APEConfig(obj);
         config.setupRunConfiguration(obj, ape.getDomainSetup());
+    }
+
+    private String[] otherTagsThan(String[] tags) {
+        return ArrayUtils.removeElements(APEConfig.getAllTags(), tags);
     }
 }

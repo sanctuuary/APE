@@ -11,6 +11,8 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * The {@code TestUtil} class is used to read contents of resource files more easily, as functional tests will make use of json files in the test resource folders.
  *
@@ -50,8 +52,20 @@ public class TestUtil {
     }
 
     public static void success(String message){
-        // write success message
         System.out.println("\u001B[32mSUCCESS:\u001B[0m " + message);
-        //System.out.println(message);
+    }
+
+    private static boolean debugMode = true;
+
+    public static void testResult(boolean success, String message){
+
+        if(!success){
+            fail(message);
+            return;
+        }
+
+        if(success && debugMode){
+            success(message);
+        }
     }
 }

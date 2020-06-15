@@ -5,6 +5,7 @@ import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +18,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -305,7 +308,7 @@ public class APEConfig {
         }
 
         /* Path to the OWL file. */
-        this.ontologyPath = readPath(ONTOLOGY_TAG, coreConfiguration, Permission.READ);
+        this.ontologyPath = readFilePath(ONTOLOGY_TAG, coreConfiguration, "owl", Permission.READ);
 
         /* URI of the ontology classes. */
         this.ontologyPrefixURI = coreConfiguration.getString(ONTOLOGY_PREFIX);
@@ -329,16 +332,16 @@ public class APEConfig {
         }
 
         /* Path to the tool annotations JSON file. */
-        this.toolAnnotationsPath = readPath(TOOL_ANNOTATIONS_TAG, coreConfiguration, Permission.READ);
+        this.toolAnnotationsPath = readFilePath(TOOL_ANNOTATIONS_TAG, coreConfiguration, "json", Permission.READ);
 
         /* Path to the solution directory. */
-        this.solutionPath = readPath(SOLUTION_PATH_TAG, coreConfiguration, Permission.READ, Permission.WRITE) + "\\sat_solutions.txt";
+        this.solutionPath = readDirectoryPath(SOLUTION_PATH_TAG, coreConfiguration, Permission.READ, Permission.WRITE) + "\\sat_solutions.txt";
 
         /* Path to the output script directory. */
-        this.executionScriptsFolder = readPath(EXECUTIONSCRIPTS_FOLDER_TAG, coreConfiguration, Permission.WRITE);
+        this.executionScriptsFolder = readDirectoryPath(EXECUTIONSCRIPTS_FOLDER_TAG, coreConfiguration, Permission.WRITE);
 
         /* Path to the output graph directory. */
-        this.solutionGraphsFolder = readPath(SOLUTION_GRAPHS_FOLDER_TAG, coreConfiguration, Permission.WRITE);
+        this.solutionGraphsFolder = readDirectoryPath(SOLUTION_GRAPHS_FOLDER_TAG, coreConfiguration, Permission.WRITE);
 
         return true;
     }
@@ -367,7 +370,7 @@ public class APEConfig {
 
         /* Path to the JSON constraints file. */
         if (runConfiguration.has(CONSTRAINTS_TAG)) {
-            this.constraintsPath = readPath(CONSTRAINTS_TAG, runConfiguration, Permission.READ);
+            this.constraintsPath = readFilePath(CONSTRAINTS_TAG, runConfiguration, "json", Permission.READ);
         } else {
             APEUtils.printWarning("Tag '" + CONSTRAINTS_TAG + "' in the configuration file is not provided. No constraints will be applied.");
         }
@@ -508,7 +511,7 @@ public class APEConfig {
      * @throws JSONException      Error in parsing the value for specified tag.
      * @throws APEConfigException Error in setting up the the configuration.
      */
-    private static String readPath(String tag, JSONObject config, Permission... requestedPermissions) throws IOException, JSONException, APEConfigException {
+    private static String readFilePath(String tag, JSONObject config, String extension, Permission... requestedPermissions) throws IOException, JSONException, APEConfigException {
 
         // read path
         String stringPath = config.getString(tag);
@@ -525,6 +528,63 @@ public class APEConfig {
         Path path = Paths.get(stringPath);
         if (Files.notExists(path)) {
             throw APEConfigException.pathNotFound(tag, stringPath);
+        }
+
+        if (!Files.isRegularFile(path)) {
+            throw APEConfigException.notAFile(tag, stringPath);
+        }
+
+        if(!FilenameUtils.getExtension(path.toAbsolutePath().toString()).toUpperCase().equals(extension.toUpperCase())){
+            throw APEConfigException.incorrectFileFormat(tag, stringPath, extension);
+        }
+
+        // check permissions
+        for (Permission permission : Arrays.stream(requestedPermissions).distinct().collect(Collectors.toList())) {
+
+            if (permission == Permission.READ && !Files.isReadable(path)) {
+                throw APEConfigException.missingPermission(tag, stringPath, permission);
+            }
+
+            if (permission == Permission.WRITE && !Files.isWritable(path)) {
+                throw APEConfigException.missingPermission(tag, stringPath, permission);
+            }
+
+        }
+
+        return stringPath;
+    }
+
+    /**
+     * Method checks whether the provided value represent a correct path, and returns the path if it does.
+     *
+     * @param tag    Corresponding tag from the config file.
+     * @param config Provided JSON configuration with values.
+     * @return Path represented in the JSON object, or the default value if the tag is not present.
+     * @throws IOException        Error if path is cannot be found.
+     * @throws JSONException      Error in parsing the value for specified tag.
+     * @throws APEConfigException Error in setting up the the configuration.
+     */
+    private static String readDirectoryPath(String tag, JSONObject config, Permission... requestedPermissions) throws IOException, JSONException, APEConfigException {
+
+        // read path
+        String stringPath = config.getString(tag);
+
+        // check on empty values
+        if (stringPath == null) {
+            throw APEConfigException.invalidValue(tag, "null", "value is null.");
+        }
+        if (stringPath.equals("")) {
+            throw APEConfigException.invalidValue(tag, stringPath, "value is empty.");
+        }
+
+        // path should exist
+        Path path = Paths.get(stringPath);
+        if (Files.notExists(path) || !Files.isDirectory(path)) {
+            throw APEConfigException.pathNotFound(tag, stringPath);
+        }
+
+        if (!Files.isDirectory(path)) {
+            throw APEConfigException.notADirectory(tag, stringPath);
         }
 
         // check permissions
