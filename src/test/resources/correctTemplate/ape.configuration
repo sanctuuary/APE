@@ -1,0 +1,27 @@
+{
+  "ontologyPrexifIRI": "http://www.co-ode.org/ontologies/ont.owl#",
+  "toolsTaxonomyRoot": "ToolsTaxonomy",
+  "dataTaxonomyRoot": "DataTaxonomy",
+  "dataSubTaxonomyRoot": [ "TypesTaxonomy" ],
+  "shared_memory": "true",
+  "solution_min_length": "1",
+  "solution_max_length": "8",
+  "max_solutions": "100",
+  "number_of_execution_scripts": "3",
+  "number_of_generated_graphs": "10",
+  "inputs": [
+    {
+      "TypesTaxonomy": [
+      "XYZ_table_file"
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "TypesTaxonomy": ["PostScript"]
+    }
+  ],
+  "debug_mode": "true",
+  "use_workflow_input": "all",
+  "use_all_generated_data": "one"
+}

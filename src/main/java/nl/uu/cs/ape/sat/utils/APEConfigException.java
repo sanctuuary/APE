@@ -1,6 +1,7 @@
 package nl.uu.cs.ape.sat.utils;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -59,6 +60,18 @@ public class APEConfigException extends Exception {
     }
 
     /**
+     * Invalid value ape config exception.
+     *
+     * @param tag   Corresponding JSON tag in the configuration file.
+     * @param config The configuration provided by the user.
+     * @param info  Application specific information that may help the user solve the problem.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static APEConfigException invalidValue(String tag, JSONObject config, String info) {
+        return new APEConfigException(String.format("'%s' is not a valid value for tag '%s', %s", config.get(tag), tag, info));
+    }
+
+    /**
      * Missing tag ape config exception.
      *
      * @param tag Corresponding JSON tag in the configuration file.
@@ -91,6 +104,39 @@ public class APEConfigException extends Exception {
      */
     public static IOException pathNotFound(String tag, String path) {
         return new IOException(String.format("Provided path '%s' for tag '%s' does not exist.", path, tag));
+    }
+
+    /**
+     * Path is found, but it is not a file.
+     *
+     * @param tag  Corresponding JSON tag in the configuration file.
+     * @param path The relative- or absolute path to a JSON- or OWL file.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static IOException notAFile(String tag, String path) {
+        return new IOException(String.format("Provided path '%s' for tag '%s' is not a file.", path, tag));
+    }
+
+    /**
+     * File is found, but it is not in the correct format.
+     *
+     * @param tag  Corresponding JSON tag in the configuration file.
+     * @param path The relative- or absolute path to a JSON- or OWL file.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static IOException incorrectFileFormat(String tag, String path, String extension) {
+        return new IOException(String.format("Provided path '%s' for tag '%s' is not in the expected '%s' format.", path, tag, extension));
+    }
+
+    /**
+     * Path is found, but it is not a directory.
+     *
+     * @param tag  Corresponding JSON tag in the configuration file.
+     * @param path The relative- or absolute path to a JSON- or OWL file.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static IOException notADirectory(String tag, String path) {
+        return new IOException(String.format("Provided path '%s' for tag '%s' is not a directory.", path, tag));
     }
 
     /**
