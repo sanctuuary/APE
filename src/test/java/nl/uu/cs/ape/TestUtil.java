@@ -51,8 +51,8 @@ public class TestUtil {
         return new JSONObject(getTextResource(resource));
     }
 
-    public static void success(String message){
-        System.out.println("\u001B[32mSUCCESS:\u001B[0m " + message);
+    public static void success(String message, Object ... params){
+        System.out.println("\u001B[32mSUCCESS:\u001B[0m " + String.format(message, params));
     }
 
     private static boolean debugMode = true;
