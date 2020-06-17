@@ -588,18 +588,26 @@ public class APEConfig {
 
         // path should exist and should be a file path
         Path path = Paths.get(stringPath);
-
-        // if file already exists 'createNewFile' will do nothing. If the file does not exist, print a warning to the console.
-        if(new File(path.toString()).createNewFile()){
-            APEUtils.printWarning("File " + stringPath + "does not exist. The file will be created.");
-        }
-
-        if (Files.isDirectory(path)) {
+        // check if the proposed path represents a file and not a directory (it does not matter whether it exists or not)
+        if(FilenameUtils.getExtension(path.toString()).equals("")){
             throw APEConfigException.notAFile(tag, stringPath);
         }
 
-        if (path.getParent() == null || !Files.isDirectory(path.getParent())) {
-            throw APEConfigException.notADirectory(tag, stringPath);
+        // create parent directory if required
+        File directory = new File(path.getParent().toString());
+        if (!directory.exists()){
+            APEUtils.printWarning("Directory '" + path.getParent().toString() + "' does not exist. The directory will be created.");
+            if(directory.mkdirs()){
+                APEUtils.printWarning("Successfully created directory '" + path.getParent().toString() + "'");
+            }
+        }
+
+        // create file if required
+        if (Files.notExists(path)){
+            APEUtils.printWarning("File '" + stringPath + "' does not exist. The file will be created.");
+            if(new File(path.toString()).createNewFile()){
+                APEUtils.printWarning("Successfully created file '" + stringPath + "'");
+            }
         }
 
         // check permissions
