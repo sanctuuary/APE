@@ -30,8 +30,9 @@ class APEConfigTest {
             .put("dataSubTaxonomyRoot", new String[]{"TypesTaxonomy"})
             .put("tool_annotations_path", TestUtil.getAbsoluteResourcePath("correctTemplate/tool_annotations.json"))
             .put("constraints_path", TestUtil.getAbsoluteResourcePath("correctTemplate/constraints.json"))
-            .put("solutions_path", TestUtil.getAbsoluteResourcePath("correctTemplate"))
+            .put("solutions_path", TestUtil.getAbsoluteResourcePath("correctTemplate") + "\\solutions.txt")
             .put("shared_memory", true)
+            .put("tool_seq_repeat", false)
             .put("solution_min_length", 1)
             .put("solution_max_length", 5)
             .put("max_solutions", 5)
@@ -59,7 +60,7 @@ class APEConfigTest {
                     "Boolean",
                     true,
                     new Object[]{"wrong", 1},
-                    new String[]{"shared_memory", "debug_mode"}),
+                    new String[]{"shared_memory", "debug_mode", "tool_seq_repeat"}),
             new TagInfo(
                     "Enum",
                     ConfigEnum.ONE.toString(),
@@ -70,26 +71,6 @@ class APEConfigTest {
                     1,
                     new Object[]{false, "wrong"},
                     new String[]{"solution_min_length", "solution_max_length", "max_solutions", "number_of_execution_scripts", "number_of_generated_graphs"}),
-            new TagInfo(
-                    "OntologyPrefix",
-                    "http://www.co-ode.org/ontologies/ont.owl#",
-                    new Object[]{false, "wrong"},
-                    new String[]{"ontologyPrexifIRI"}),
-            new TagInfo(
-                    "OntologyPath",
-                    TestUtil.getAbsoluteResourcePath("correctTemplate/ontology.owl"),
-                    new Object[]{false, "wrong"},
-                    new String[]{"ontology_path"}),
-            new TagInfo(
-                    "JSONPath",
-                    TestUtil.getAbsoluteResourcePath("correctTemplate/tool_annotations.json"),
-                    new Object[]{false, "wrong"},
-                    new String[]{"tool_annotations_path", "constraints_path"}),
-            new TagInfo(
-                    "DirectoryPath",
-                    TestUtil.getAbsoluteResourcePath("correctTemplate/"),
-                    new Object[]{false, "wrong"},
-                    new String[]{"solutions_path", "execution_scripts_folder", "solution_graphs_folder"}),
             new TagInfo(
                     "TaxonomyEntity",
                     "ToolsTaxonomy",
@@ -159,7 +140,7 @@ class APEConfigTest {
     @Test
     public void testIncorrectPaths() {
 
-        final String[] pathTags = new String[]{"ontology_path", "tool_annotations_path", "execution_scripts_folder", "solution_graphs_folder", "solutions_path"};
+        final String[] pathTags = new String[]{"ontology_path", "tool_annotations_path", "execution_scripts_folder", "solution_graphs_folder"};
         final String[] wrongPaths = new String[]{null, "", "./does/not/exist.json", "does/not/exist.json", "./does/not/exist/", "does/not/exist/", TestUtil.getAbsoluteResourcePath("") + "\\doesnotexist.json"};
 
         for (String tag : pathTags) {
@@ -204,6 +185,7 @@ class APEConfigTest {
                 }
             }
 
+            /*
             evaluation = new TagTypeEvaluation(tagInfo.getTagType(), true);
             for (String tag : otherTagsThan(tagInfo.getTags())) {
                 try {
@@ -213,6 +195,7 @@ class APEConfigTest {
                     evaluation.forTag(tag).result(true, e);
                 }
             }
+             */
         }
     }
 
