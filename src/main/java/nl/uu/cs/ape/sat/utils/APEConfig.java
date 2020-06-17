@@ -316,7 +316,7 @@ public class APEConfig {
         }
 
         /* Path to the OWL file. */
-        this.ontologyPath = readFilePath(ONTOLOGY_TAG, coreConfiguration, "owl", Permission.READ);
+        this.ontologyPath = readFilePath(ONTOLOGY_TAG, coreConfiguration, Permission.READ);
 
         /* URI of the ontology classes. */
         this.ontologyPrefixURI = coreConfiguration.getString(ONTOLOGY_PREFIX);
@@ -340,7 +340,7 @@ public class APEConfig {
         }
 
         /* Path to the tool annotations JSON file. */
-        this.toolAnnotationsPath = readFilePath(TOOL_ANNOTATIONS_TAG, coreConfiguration, "json", Permission.READ);
+        this.toolAnnotationsPath = readFilePath(TOOL_ANNOTATIONS_TAG, coreConfiguration, Permission.READ);
 
         /* check if it is a dir - wrong, get parent check the 
         
@@ -380,7 +380,7 @@ public class APEConfig {
 
         /* Path to the JSON constraints file. */
         if (runConfiguration.has(CONSTRAINTS_TAG)) {
-            this.constraintsPath = readFilePath(CONSTRAINTS_TAG, runConfiguration, "json", Permission.READ);
+            this.constraintsPath = readFilePath(CONSTRAINTS_TAG, runConfiguration, Permission.READ);
         } else {
             APEUtils.printWarning("Tag '" + CONSTRAINTS_TAG + "' in the configuration file is not provided. No constraints will be applied.");
         }
@@ -524,7 +524,7 @@ public class APEConfig {
      * @throws JSONException      Error in parsing the value for specified tag.
      * @throws APEConfigException Error in setting up the the configuration.
      */
-    private static String readFilePath(String tag, JSONObject config, String extension, Permission... requestedPermissions) throws IOException, JSONException, APEConfigException {
+    private static String readFilePath(String tag, JSONObject config, Permission... requestedPermissions) throws IOException, JSONException, APEConfigException {
 
         // read path
         String stringPath = config.getString(tag);
@@ -545,10 +545,6 @@ public class APEConfig {
 
         if (!Files.isRegularFile(path)) {
             throw APEConfigException.notAFile(tag, stringPath);
-        }
-
-        if(!FilenameUtils.getExtension(path.toAbsolutePath().toString()).toUpperCase().equals(extension.toUpperCase())){
-            throw APEConfigException.incorrectFileFormat(tag, stringPath, extension);
         }
 
         // check permissions
@@ -592,12 +588,26 @@ public class APEConfig {
 
         // path should exist and should be a file path
         Path path = Paths.get(stringPath);
-        if (Files.isDirectory(path)) {
+        // check if the proposed path represents a file and not a directory (it does not matter whether it exists or not)
+        if(FilenameUtils.getExtension(path.toString()).equals("")){
             throw APEConfigException.notAFile(tag, stringPath);
         }
 
-        if (path.getParent() == null || !Files.isDirectory(path.getParent())) {
-            throw APEConfigException.notADirectory(tag, stringPath);
+        // create parent directory if required
+        File directory = new File(path.getParent().toString());
+        if (!directory.exists()){
+            APEUtils.printWarning("Directory '" + path.getParent().toString() + "' does not exist. The directory will be created.");
+            if(directory.mkdirs()){
+                APEUtils.printWarning("Successfully created directory '" + path.getParent().toString() + "'");
+            }
+        }
+
+        // create file if required
+        if (Files.notExists(path)){
+            APEUtils.printWarning("File '" + stringPath + "' does not exist. The file will be created.");
+            if(new File(path.toString()).createNewFile()){
+                APEUtils.printWarning("Successfully created file '" + stringPath + "'");
+            }
         }
 
         // check permissions
