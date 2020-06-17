@@ -271,7 +271,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
                  * Adding the negation of the positive part of the solution as a constraint
                  * (default negation does not work)
                  */
-                IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray());
+                IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray(config.getToolSeqRepeat()));
                 solver.addClause(negSol);
             }
         } catch (ParseFormatException e) {

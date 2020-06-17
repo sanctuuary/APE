@@ -53,6 +53,7 @@ public class APEConfig {
     private static final String USEWORKFLOW_INPUT = "use_workflow_input";
     private static final String USE_ALL_GENERATED_DATA = "use_all_generated_data";
     private static final String DEBUG_MODE_TAG = "debug_mode";
+    private static final String TOOL_SEQ_REPEAT = "tool_seq_repeat";
 
     /**
      * Tags separated in the categories: obligatory, optional, core and run.
@@ -84,7 +85,8 @@ public class APEConfig {
             NO_GRAPHS_TAG,
             USEWORKFLOW_INPUT,
             USE_ALL_GENERATED_DATA,
-            DEBUG_MODE_TAG
+            DEBUG_MODE_TAG,
+            TOOL_SEQ_REPEAT
     };
 
     /**
@@ -121,6 +123,12 @@ public class APEConfig {
      * case of a restrictive message passing structure.
      */
     private Boolean sharedMemory;
+    /**
+     * false if the provided solutions should be distinguished 
+     * based on the tool sequences alone, i.e. tool sequences cannot repeat, 
+     * ignoring the types in the solutions.
+     */
+    private Boolean toolSeqRepeat;
     /**
      * Path to the file that will contain all the solutions to the problem in human
      * readable representation.
@@ -334,8 +342,10 @@ public class APEConfig {
         /* Path to the tool annotations JSON file. */
         this.toolAnnotationsPath = readFilePath(TOOL_ANNOTATIONS_TAG, coreConfiguration, "json", Permission.READ);
 
+        /* check if it is a dir - wrong, get parent check the 
+        
         /* Path to the solution directory. */
-        this.solutionPath = readDirectoryPath(SOLUTION_PATH_TAG, coreConfiguration, Permission.READ, Permission.WRITE) + "\\sat_solutions.txt";
+        this.solutionPath = readFilesDirectoryPath(SOLUTION_PATH_TAG, coreConfiguration, Permission.WRITE);
 
         /* Path to the output script directory. */
         this.executionScriptsFolder = readDirectoryPath(EXECUTIONSCRIPTS_FOLDER_TAG, coreConfiguration, Permission.WRITE);
@@ -378,6 +388,9 @@ public class APEConfig {
         /* Read shared memory tag. */
         this.sharedMemory = readBooleanOrDefault(SHARED_MEMORY_TAG, runConfiguration, true);
 
+        /* Read solutions filtering tag. */
+        this.toolSeqRepeat = readBooleanOrDefault(TOOL_SEQ_REPEAT, runConfiguration, true);
+        
         /* Minimal length of the solution must be greater or equal to 1. */
         this.solutionMinLength = runConfiguration.getInt(SOLUTION_MIN_LENGTH_TAG);
         if (solutionMinLength < 1) {
@@ -554,6 +567,55 @@ public class APEConfig {
         return stringPath;
     }
 
+    /**
+     * Method checks whether the provided value represent a correct path, and returns the path if it does.
+     *
+     * @param tag    Corresponding tag from the config file.
+     * @param config Provided JSON configuration with values.
+     * @return Path represented in the JSON object, or the default value if the tag is not present.
+     * @throws IOException        Error if path is cannot be found.
+     * @throws JSONException      Error in parsing the value for specified tag.
+     * @throws APEConfigException Error in setting up the the configuration.
+     */
+    private static String readFilesDirectoryPath(String tag, JSONObject config, Permission... requestedPermissions) throws IOException, JSONException, APEConfigException {
+
+        // read path
+        String stringPath = config.getString(tag);
+
+        // check on empty values
+        if (stringPath == null) {
+            throw APEConfigException.invalidValue(tag, "null", "value is null.");
+        }
+        if (stringPath.equals("")) {
+            throw APEConfigException.invalidValue(tag, stringPath, "value is empty.");
+        }
+
+        // path should exist and should be a file path
+        Path path = Paths.get(stringPath);
+        if (Files.isDirectory(path)) {
+            throw APEConfigException.notAFile(tag, stringPath);
+        }
+
+        if (path.getParent() == null || !Files.isDirectory(path.getParent())) {
+            throw APEConfigException.notADirectory(tag, stringPath);
+        }
+
+        // check permissions
+        for (Permission permission : Arrays.stream(requestedPermissions).distinct().collect(Collectors.toList())) {
+
+            if (permission == Permission.READ && !Files.isReadable(path)) {
+                throw APEConfigException.missingPermission(tag, stringPath, permission);
+            }
+
+            if (permission == Permission.WRITE && !Files.isWritable(path)) {
+                throw APEConfigException.missingPermission(tag, stringPath, permission);
+            }
+
+        }
+
+        return stringPath;
+    }
+    
     /**
      * Method checks whether the provided value represent a correct path, and returns the path if it does.
      *
@@ -778,13 +840,22 @@ public class APEConfig {
 
     /**
      * Returns true if the shared memory structure should be used, i.e. if the generated data is available in memory to all the tools used subsequently,
-     * or false in case of a restrictive message passing structure, i.e. if the generated data is available only to the tool next in sequence..
+     * or false in case of a restrictive message passing structure, i.e. if the generated data is available only to the tool next in sequence.
      *
      * @return true if the shared memory structure should be used, false in case of a restrictive message passing structure.
      */
     public Boolean getSharedMemory() {
         return sharedMemory;
     }
+    
+    /**
+     * Returns false if the provided solutions should be distinguished based on the tool sequences alone, i.e. tool sequences cannot repeat, ignoring the types in the solutions.
+     *
+     * @return true if tool sequences cannot repeat, ignoring the types in the solutions, or false in case that the tool sequences can repeat as long as the corresponding types differ.
+     */
+	public Boolean getToolSeqRepeat() {
+		return toolSeqRepeat;
+	}
 
     /**
      * Gets solution path.

@@ -232,26 +232,32 @@ public class SAT_solution extends SolutionInterpreter {
         return solution.toString();
     }
 
-    /**
-     * Returns the negated solution in mapped format. Negating the original solution
-     * created by the SAT solver. Usually used to add to the solver to find new
-     * solutions.
-     *
-     * @return int[] representing the negated solution.
-     */
-    public int[] getNegatedMappedSolutionArray() {
-        List<Integer> negSol = new ArrayList<Integer>();
-        if (!unsat) {
-            for (Literal literal : relevantElements) {
-                if (literal.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
-                    negSol.add(literal.toNegatedMappedInt());
-                }
-            }
-        }
-        int[] negSolList = new int[negSol.size()];
-        for (int i = 0; i < negSol.size(); i++) {
-            negSolList[i] = negSol.get(i);
-        }
+	/**
+	 * Returns the negated solution in mapped format. Negating the original solution
+	 * created by the SAT solver. Usually used to add to the solver to find new
+	 * solutions.
+	 * 
+	 * @return int[] representing the negated solution
+	 */
+	public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
+		List<Integer> negSol = new ArrayList<Integer>();
+		if (!unsat) {
+			if(!toolSeqRepeat) {
+				for (Literal literal : relevantModules) {
+					negSol.add(literal.toNegatedMappedInt());
+				}
+			} else {
+			for (Literal literal : relevantElements) {
+				if (literal.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
+					negSol.add(literal.toNegatedMappedInt());
+				}
+			}
+			}
+		}
+		int[] negSolList = new int[negSol.size()];
+		for (int i = 0; i < negSol.size(); i++) {
+			negSolList[i] = negSol.get(i);
+		}
 
         return negSolList;
     }

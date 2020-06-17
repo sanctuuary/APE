@@ -138,7 +138,7 @@ public class APEConfigException extends Exception {
     public static IOException notADirectory(String tag, String path) {
         return new IOException(String.format("Provided path '%s' for tag '%s' is not a directory.", path, tag));
     }
-
+    
     /**
      * Missing permission ape config exception.
      *
