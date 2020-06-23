@@ -160,6 +160,18 @@ public class APE {
      * Setup a new run instance of the APE solver and run the synthesis algorithm.
      *
      * @param configObject   Object that contains run configurations.
+     * @return The list of all the solutions.
+     * @throws IOException   Error in case of not providing a proper configuration file.
+     * @throws JSONException Error in configuration object.
+     */
+    public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, JSONException, APEConfigException {
+        return runSynthesis(configObject, this.getDomainSetup());
+    }
+
+    /**
+     * Setup a new run instance of the APE solver and run the synthesis algorithm.
+     *
+     * @param configObject   Object that contains run configurations.
      * @param apeDomainSetup Domain information, including all the existing tools and types.
      * @return The list of all the solutions.
      * @throws IOException   Error in case of not providing a proper configuration file.
@@ -174,6 +186,18 @@ public class APE {
         SATsolutionsList solutions = executeSynthesis();
 
         return solutions;
+    }
+
+    /**
+     * Setup a new run instance of the APE solver and run the synthesis algorithm.
+     *
+     * @param configPath     Path to the JSON that contains run configurations.
+     * @return The list of all the solutions.
+     * @throws IOException   Error in case of not providing a proper configuration file.
+     * @throws JSONException Error in configuration object.
+     */
+    public SATsolutionsList runSynthesis(String configPath) throws IOException, JSONException, APEConfigException {
+        return runSynthesis(configPath, this.getDomainSetup());
     }
 
     /**
