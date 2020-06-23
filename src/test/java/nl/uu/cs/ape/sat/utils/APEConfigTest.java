@@ -142,10 +142,33 @@ class APEConfigTest {
      * is thrown on an incorrect value for tags that expect a path.
      */
     @Test
-    public void testIncorrectPaths() {
+    public void testIncorrectFilePaths() {
 
-        final String[] pathTags = new String[]{"ontology_path", "tool_annotations_path", "execution_scripts_folder", "solution_graphs_folder"};
+        final String[] pathTags = new String[]{"ontology_path", "tool_annotations_path"};
         final String[] wrongPaths = new String[]{null, "", "./does/not/exist.json", "does/not/exist.json", "./does/not/exist/", "does/not/exist/", TestUtil.getAbsoluteResourcePath("") + "\\doesnotexist.json"};
+
+        for (String tag : pathTags) {
+            for (String path : wrongPaths) {
+                try {
+                    setupRun(getCorrectTemplate().put(tag, path));
+                    fail(String.format("Expected exception for APEConfig with a wrong path '%s' for tag '%s' was not thrown.", path, tag));
+                } catch (APEConfigException | JSONException | IOException e) {
+                    assertTrue(e.getMessage().contains(tag));
+                    TestUtil.success(String.format("Expected exception was thrown for APEConfig with a wrong path for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+                }
+            }
+        }
+    }
+
+    /**
+     * Test if the {@link APEConfigException#pathNotFound} exception
+     * is thrown on an incorrect value for tags that expect a path.
+     */
+    @Test
+    public void testIncorrectDirectoryPaths() {
+
+        final String[] pathTags = new String[]{ "execution_scripts_folder", "solution_graphs_folder"};
+        final String[] wrongPaths = new String[]{null, "file.json", TestUtil.getAbsoluteResourcePath("") + "\\file.json"};
 
         for (String tag : pathTags) {
             for (String path : wrongPaths) {
