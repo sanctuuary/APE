@@ -35,6 +35,13 @@ public class TestUtil {
     }
 
     /**
+     * @return the absolute path of a the resource root that can be used by the library.
+     */
+    public static String getAbsoluteResourceRoot() {
+        return getAbsoluteResourcePath("");
+    }
+
+    /**
      * @param resource: relative path of a resource in the test resource folder
      * @return contents of a resource in String format
      */
