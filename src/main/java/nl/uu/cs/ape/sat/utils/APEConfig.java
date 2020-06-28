@@ -649,10 +649,22 @@ public class APEConfig {
             throw APEConfigException.invalidValue(tag, stringPath, "value is empty.");
         }
 
+        if(!FilenameUtils.getExtension(stringPath).equals("")){
+            throw APEConfigException.notADirectory(tag, stringPath);
+        }
+
         // path should exist
         Path path = Paths.get(stringPath);
-        if (Files.notExists(path) || !Files.isDirectory(path)) {
-            throw APEConfigException.pathNotFound(tag, stringPath);
+        if (Files.notExists(path)) {
+            // create parent directory if required
+            File directory = new File(path.toAbsolutePath().toString());
+            APEUtils.printWarning("Directory '" + stringPath + "' does not exist. The directory will be created.");
+            if(directory.mkdirs()){
+                APEUtils.printWarning("Successfully created directory '" + stringPath + "'");
+            }
+            else{
+                throw new APEConfigException("Could not create directory '" + stringPath + "'");
+            }
         }
 
         if (!Files.isDirectory(path)) {

@@ -35,6 +35,13 @@ public class TestUtil {
     }
 
     /**
+     * @return the absolute path of a the resource root that can be used by the library.
+     */
+    public static String getAbsoluteResourceRoot() {
+        return getAbsoluteResourcePath("");
+    }
+
+    /**
      * @param resource: relative path of a resource in the test resource folder
      * @return contents of a resource in String format
      */
@@ -51,8 +58,8 @@ public class TestUtil {
         return new JSONObject(getTextResource(resource));
     }
 
-    public static void success(String message){
-        System.out.println("\u001B[32mSUCCESS:\u001B[0m " + message);
+    public static void success(String message, Object ... params){
+        System.out.println("\u001B[32mSUCCESS:\u001B[0m " + String.format(message, params));
     }
 
     private static boolean debugMode = true;

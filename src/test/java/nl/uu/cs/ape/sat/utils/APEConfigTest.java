@@ -11,6 +11,10 @@ import util.TagInfo;
 import util.TagTypeEvaluation;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -138,9 +142,9 @@ class APEConfigTest {
      * is thrown on an incorrect value for tags that expect a path.
      */
     @Test
-    public void testIncorrectPaths() {
+    public void testIncorrectFilePaths() {
 
-        final String[] pathTags = new String[]{"ontology_path", "tool_annotations_path", "execution_scripts_folder", "solution_graphs_folder"};
+        final String[] pathTags = new String[]{"ontology_path", "tool_annotations_path"};
         final String[] wrongPaths = new String[]{null, "", "./does/not/exist.json", "does/not/exist.json", "./does/not/exist/", "does/not/exist/", TestUtil.getAbsoluteResourcePath("") + "\\doesnotexist.json"};
 
         for (String tag : pathTags) {
@@ -154,6 +158,71 @@ class APEConfigTest {
                 }
             }
         }
+    }
+
+    /**
+     * Test if the {@link APEConfigException#pathNotFound} exception
+     * is thrown on an incorrect value for tags that expect a path.
+     */
+    @Test
+    public void testIncorrectDirectoryPaths() {
+
+        final String[] pathTags = new String[]{ "execution_scripts_folder", "solution_graphs_folder"};
+        final String[] wrongPaths = new String[]{null, "file.json", TestUtil.getAbsoluteResourcePath("") + "\\file.json"};
+
+        for (String tag : pathTags) {
+            for (String path : wrongPaths) {
+                try {
+                    setupRun(getCorrectTemplate().put(tag, path));
+                    fail(String.format("Expected exception for APEConfig with a wrong path '%s' for tag '%s' was not thrown.", path, tag));
+                } catch (APEConfigException | JSONException | IOException e) {
+                    assertTrue(e.getMessage().contains(tag));
+                    TestUtil.success(String.format("Expected exception was thrown for APEConfig with a wrong path for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testSolutionsPath(){
+        final String tag = "solutions_path";
+
+        // an existing file should be allowed
+        try {
+            final Path existingFile = Paths.get(Objects.requireNonNull(TestUtil.getAbsoluteResourcePath("testFiles/existingFile.txt")));
+            assertTrue(Files.exists(existingFile));
+            setupRun(getCorrectTemplate().put(tag, existingFile.toString()));
+        } catch (APEConfigException | JSONException | IOException e) {
+            assertTrue(e.getMessage().contains(tag));
+            fail(String.format("Unexpected exception was thrown for APEConfig with a correct file path for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+        }
+
+        // a non existing file should also be allowed, APE will create the directories and file if possible
+        try {
+            final Path nonExistingFile = Paths.get(TestUtil.getAbsoluteResourcePath("testFiles") + "\\newFile.json");
+            assertTrue(Files.notExists(nonExistingFile)); // file should not exists
+            setupRun(getCorrectTemplate().put(tag, nonExistingFile.toString())); // setup APE
+            assertTrue(Files.exists(nonExistingFile)); // file should now exist
+
+            //clean up
+            Files.delete(nonExistingFile); // delete file
+            assertTrue(Files.notExists(nonExistingFile)); // file should not exists
+
+        } catch (APEConfigException | JSONException | IOException e) {
+            assertTrue(e.getMessage().contains(tag));
+            fail(String.format("Unexpected exception was thrown for APEConfig with a correct value for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+        }
+
+        for(String incorrect : new String[]{"", "./a/directory", "a/directory", TestUtil.getAbsoluteResourcePath("") + "\\newDirectory" }){
+            try {
+                setupRun(getCorrectTemplate().put(tag, incorrect));
+                fail(String.format("Expected exception for APEConfig with an incorrect value '%s' for tag '%s' was not thrown.", incorrect, tag));
+            } catch (APEConfigException | JSONException | IOException e) {
+                assertTrue(e.getMessage().contains(tag));
+                TestUtil.success(String.format("Expected exception was thrown for APEConfig with an incorrect value for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+            }
+        }
+
     }
 
     @Test
@@ -184,18 +253,6 @@ class APEConfigTest {
                     }
                 }
             }
-
-            /*
-            evaluation = new TagTypeEvaluation(tagInfo.getTagType(), true);
-            for (String tag : otherTagsThan(tagInfo.getTags())) {
-                try {
-                    setupRun(getCorrectTemplate().put(tag, tagInfo.getCorrectExample())); // set invalid value for non-boolean tag and run the configuration
-                    evaluation.forTag(tag).result(false);
-                } catch (Exception e) {
-                    evaluation.forTag(tag).result(true, e);
-                }
-            }
-             */
         }
     }
 
