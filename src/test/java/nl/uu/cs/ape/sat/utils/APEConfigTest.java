@@ -95,7 +95,7 @@ class APEConfigTest {
     public void verifyCorrectTemplate() {
         assertDoesNotThrow(() -> {
             JSONObject template = getCorrectTemplate();
-            APEConfig config = new APEConfig(template);
+            APECoreConfig config = new APECoreConfig(template);
             APE ape = new APE(template);
             boolean success = config.setupRunConfiguration(template, ape.getDomainSetup());
             assertTrue(success);
@@ -110,25 +110,25 @@ class APEConfigTest {
     public void testMissingTags() {
 
         /* Missing one of the obligatory core tags should result in an exception while creating the framework. */
-        for (String tag : APEConfig.getObligatoryCoreTags()) {
+        for (String tag : APECoreConfig.getObligatoryCoreTags()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag);
-            assertThrows(APEConfigException.class, () -> new APEConfig(obj));
+            assertThrows(APEConfigException.class, () -> new APECoreConfig(obj));
         }
 
         /* Missing one of the obligatory run tags should  result in an exception while executing the run phase. */
-        for (String tag : APEConfig.getObligatoryRunTags()) {
+        for (String tag : APECoreConfig.getObligatoryRunTags()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag);
-            assertDoesNotThrow(() -> new APEConfig(obj));
+            assertDoesNotThrow(() -> new APECoreConfig(obj));
             assertThrows(APEConfigException.class, () -> setupRun(obj));
         }
 
         /* Missing one of the optional tags should not throw an exception, but should display a warning. */
-        for (String tag : ArrayUtils.addAll(APEConfig.getOptionalCoreTags(), APEConfig.getOptionalRunTags())) {
+        for (String tag : ArrayUtils.addAll(APECoreConfig.getOptionalCoreTags(), APECoreConfig.getOptionalRunTags())) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag);
-            assertDoesNotThrow(() -> new APEConfig(obj));
+            assertDoesNotThrow(() -> new APECoreConfig(obj));
             assertDoesNotThrow(() -> setupRun(obj));
         }
     }
@@ -147,10 +147,10 @@ class APEConfigTest {
             for (String path : wrongPaths) {
                 try {
                     setupRun(getCorrectTemplate().put(tag, path));
-                    fail(String.format("Expected exception for APEConfig with a wrong path '%s' for tag '%s' was not thrown.", path, tag));
+                    fail(String.format("Expected exception for APECoreConfig with a wrong path '%s' for tag '%s' was not thrown.", path, tag));
                 } catch (APEConfigException | JSONException | IOException e) {
                     assertTrue(e.getMessage().contains(tag));
-                    TestUtil.success(String.format("Expected exception was thrown for APEConfig with a wrong path for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+                    TestUtil.success(String.format("Expected exception was thrown for APECoreConfig with a wrong path for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
                 }
             }
         }
@@ -201,7 +201,7 @@ class APEConfigTest {
 
 
     /**
-     * Creates a configuration from JSON and executes {@link APEConfig#setupRunConfiguration}
+     * Creates a configuration from JSON and executes {@link APECoreConfig#setupRunConfiguration}
      *
      * @param obj The configuration to set up.
      * @throws IOException        Error if a path provided in the configuration file is incorrect.
@@ -209,11 +209,11 @@ class APEConfigTest {
      */
     private void setupRun(JSONObject obj) throws IOException, APEConfigException {
         APE ape = new APE(obj);
-        APEConfig config = new APEConfig(obj);
+        APECoreConfig config = new APECoreConfig(obj);
         config.setupRunConfiguration(obj, ape.getDomainSetup());
     }
 
     private String[] otherTagsThan(String[] tags) {
-        return ArrayUtils.removeElements(APEConfig.getAllTags(), tags);
+        return ArrayUtils.removeElements(APECoreConfig.getAllTags(), tags);
     }
 }

@@ -2,7 +2,7 @@ package nl.uu.cs.ape.sat.models;
 
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APECoreConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ public class AllModules extends AllPredicates {
      *
      * @param config the config
      */
-    public AllModules(APEConfig config) {
+    public AllModules(APECoreConfig config) {
         super(Arrays.asList(config.getToolTaxonomyRoot()));
     }
 

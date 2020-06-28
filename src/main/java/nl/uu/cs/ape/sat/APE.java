@@ -25,8 +25,8 @@ import java.util.*;
  */
 public class APE {
 
-    /** Configuration object defined from the configuration file. */
-    private final APEConfig config;
+    /** Core configuration object defined from the configuration file. */
+    private final APECoreConfig config;
 
     /** Object containing general APE encoding. */
     private APEDomainSetup apeDomainSetup;
@@ -40,7 +40,7 @@ public class APE {
      * @throws APEConfigException Error in setting up the the configuration.
      */
     public APE(String configPath) throws IOException, JSONException, APEConfigException {
-        config = new APEConfig(configPath);
+        config = new APECoreConfig(configPath);
         if (config.getCoreConfigJsonObj() == null) {
             throw new APEConfigException("Configuration failed. Error in configuration file.");
         }
@@ -58,7 +58,7 @@ public class APE {
      * @throws APEConfigException Error in setting up the the configuration.
      */
     public APE(JSONObject configObject) throws IOException, JSONException, APEConfigException {
-        config = new APEConfig(configObject);
+        config = new APECoreConfig(configObject);
         if (!setupDomain()) {
             throw new APEConfigException("Error in setting up the domain.");
         }
@@ -72,7 +72,7 @@ public class APE {
      * @throws ExceptionInInitializerError Exception while reading the provided ontology.
      */
     private boolean setupDomain() throws ExceptionInInitializerError {
-        // Variable that describes a successful run of the program.
+        // Variable that describes a successful execution of the method.
         boolean succRun = true;
         /*
          * Encode the taxonomies as objects - generate the list of all types / modules
@@ -113,7 +113,7 @@ public class APE {
      *
      * @return Field {@link #config}.
      */
-    public APEConfig getConfig() {
+    public APECoreConfig getConfig() {
         return config;
     }
 

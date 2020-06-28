@@ -25,7 +25,7 @@ public class TagTypeEvaluation extends Evaluation {
         if(e == null)
             sb.append("NOT ");
 
-        sb.append("thrown for APEConfig with a ");
+        sb.append("thrown for APECoreConfig with a ");
 
         if(!reverse && e != null)
             sb.append("non-");

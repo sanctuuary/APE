@@ -54,7 +54,7 @@ public class APEDomainSetup {
      *
      * @param config the config
      */
-    public APEDomainSetup(APEConfig config) {
+    public APEDomainSetup(APECoreConfig config) {
         unformattedConstr = new ArrayList<ConstraintTemplateData>();
         allModules = new AllModules(config);
         allTypes = new AllTypes(config);

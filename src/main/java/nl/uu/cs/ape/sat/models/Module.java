@@ -3,7 +3,7 @@ package nl.uu.cs.ape.sat.models;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONException;
@@ -161,12 +161,12 @@ public class Module extends AbstractModule {
             throws JSONException {
         String ontologyPrefixURI = domainSetup.getOntologyPrefixURI();
         AllModules allModules = domainSetup.getAllModules();
-        String moduleURI = APEUtils.createClassURI(jsonModule.getString(APEConfig.getJsonTags("id")), ontologyPrefixURI);
+        String moduleURI = APEUtils.createClassURI(jsonModule.getString(APECoreConfig.getJsonTags("id")), ontologyPrefixURI);
         if (allModules.get(moduleURI) != null) {
             moduleURI = moduleURI + "[tool]";
         }
-        String moduleLabel = jsonModule.getString(APEConfig.getJsonTags("label"));
-        Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("taxonomyOperations"), String.class));
+        String moduleLabel = jsonModule.getString(APECoreConfig.getJsonTags("label"));
+        Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("taxonomyOperations"), String.class));
         taxonomyModules = APEUtils.createURIsFromLabels(taxonomyModules, ontologyPrefixURI);
         /* Check if the referenced module taxonomy classes exist. */
         List<String> toRemove = new ArrayList<String>();
@@ -174,7 +174,7 @@ public class Module extends AbstractModule {
             String taxonomyModuleURI = APEUtils.createClassURI(taxonomyModule, ontologyPrefixURI);
             if (allModules.get(taxonomyModuleURI) == null) {
                 System.err.println("Tool '" + moduleURI + "' annotation issue. "
-                        + "Referenced '" + APEConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy.");
+                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy.");
                 toRemove.add(taxonomyModuleURI);
             }
         }
@@ -183,21 +183,21 @@ public class Module extends AbstractModule {
         /* If the taxonomy terms were not properly specified the tool taxonomy root is used as superclass of the tool. */
         if (taxonomyModules.isEmpty()) {
             System.err.println("Tool '" + moduleURI + "' annotation issue. "
-                    + "None of the referenced '" + APEConfig.getJsonTags("taxonomyOperations") + "' can be found in the Tool Taxonomy.");
+                    + "None of the referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "' can be found in the Tool Taxonomy.");
             taxonomyModules.add(allModules.getRootsIDs().get(0));
         }
 
         String executionCode = null;
         try {
-            executionCode = jsonModule.getJSONObject(APEConfig.getJsonTags("implementation"))
-                    .getString(APEConfig.getJsonTags("code"));
+            executionCode = jsonModule.getJSONObject(APECoreConfig.getJsonTags("implementation"))
+                    .getString(APECoreConfig.getJsonTags("code"));
         } catch (JSONException e) {
             /* Skip the execution code */
         }
 
-        List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("inputs"),
+        List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("inputs"),
                 JSONObject.class);
-        List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APEConfig.getJsonTags("outputs"),
+        List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("outputs"),
                 JSONObject.class);
 
         List<DataInstance> inputs = new ArrayList<DataInstance>();

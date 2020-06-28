@@ -3,7 +3,7 @@ package nl.uu.cs.ape.sat.models;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.*;
@@ -32,7 +32,7 @@ public class AllTypes extends AllPredicates {
      *
      * @param config the config
      */
-    public AllTypes(APEConfig config) {
+    public AllTypes(APECoreConfig config) {
         super(config.getDataDimensionRoots());
         dataTaxonomyDimensions = config.getDataDimensionRoots();
         emptyType = new Type("empty", "empty", "empty", NodeType.EMPTY);

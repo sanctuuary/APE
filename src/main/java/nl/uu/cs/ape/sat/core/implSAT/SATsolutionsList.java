@@ -2,7 +2,7 @@ package nl.uu.cs.ape.sat.core.implSAT;
 
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AtomMappings;
-import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APECoreConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class SATsolutionsList {
      *
      * @param config - setup configuration for the synthesis.
      */
-    public SATsolutionsList(APEConfig config) {
+    public SATsolutionsList(APECoreConfig config) {
         this.solutions = new ArrayList<SolutionWorkflow>();
 
         /* Provides mapping from each atom to a number, and vice versa */

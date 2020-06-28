@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.sat.core.solutionStructure;
 
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class CWLCreator {
      * @param solution  the solution
      * @param apeConfig the ape config
      */
-    public CWLCreator(SolutionWorkflow solution, APEConfig apeConfig) {
+    public CWLCreator(SolutionWorkflow solution, APECoreConfig apeConfig) {
         cwlRepresentation = new StringBuilder(
                 "class: WorkflowNo_" + solution.getIndex() + "\ncwlVersion: " + cwlVersion + "").append("\n");
         generateCWLRepresentation(solution, apeConfig);
@@ -41,7 +41,7 @@ public class CWLCreator {
         return cwlRepresentation.toString();
     }
 
-    private void generateCWLRepresentation(SolutionWorkflow solution, APEConfig apeConfig) {
+    private void generateCWLRepresentation(SolutionWorkflow solution, APECoreConfig apeConfig) {
         cwlRepresentation = cwlRepresentation.append("inputs:").append("\n");
         for (TypeNode typeNode : solution.getWorkflowInputTypeStates()) {
             getNewCWLDataInstance(typeNode, apeConfig, 1);
@@ -61,7 +61,7 @@ public class CWLCreator {
     /**
      * TODO
      */
-    private void defineCWLStep(ModuleNode moduleNode, APEConfig apeConfig, int i) {
+    private void defineCWLStep(ModuleNode moduleNode, APECoreConfig apeConfig, int i) {
         cwlRepresentation = cwlRepresentation.append(tabs(i) + moduleNode.getNodeID() + ":");
         /// TODO split the function into smaller functions
         cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "in:").append("\n");
@@ -94,7 +94,7 @@ public class CWLCreator {
     /**
      * TODO
      */
-    private void getOperationRun(ModuleNode moduleNode, APEConfig apeConfig, int i) {
+    private void getOperationRun(ModuleNode moduleNode, APECoreConfig apeConfig, int i) {
         cwlRepresentation = cwlRepresentation.append(tabs(i) + "class: Operation").append("\n");
         cwlRepresentation = cwlRepresentation.append(tabs(i) + "inputs:").append("\n");
         int index = 1;
@@ -119,7 +119,7 @@ public class CWLCreator {
     /**
      * Create a label and id for a new data instance.
      */
-    private void getNewCWLDataInstance(TypeNode typeNode, APEConfig apeConfig, int i) {
+    private void getNewCWLDataInstance(TypeNode typeNode, APECoreConfig apeConfig, int i) {
         cwlRepresentation = cwlRepresentation.append(tabs(i) + typeNode.getNodeID() + ":").append("\n");
         cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "type: File").append("\n");
         String formatRoot = apeConfig.getCWLFormatRoot();
@@ -134,7 +134,7 @@ public class CWLCreator {
     /**
      * Create a label and id for a data input that uses an existing data instance.
      */
-    private void getExistingCWLDataInstance(TypeNode typeNode, APEConfig apeConfig, int i, String prefix) {
+    private void getExistingCWLDataInstance(TypeNode typeNode, APECoreConfig apeConfig, int i, String prefix) {
         cwlRepresentation = cwlRepresentation.append(tabs(i) + prefix + "_" + typeNode.getNodeID() + ":").append("\n");
         cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "type: File").append("\n");
         String formatRoot = apeConfig.getCWLFormatRoot();

@@ -9,7 +9,7 @@ import nl.uu.cs.ape.sat.models.SATEncodingUtils.SATModuleUtils;
 import nl.uu.cs.ape.sat.models.SATEncodingUtils.SATTypeUtils;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APEConfig;
+import nl.uu.cs.ape.sat.utils.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.apache.commons.io.IOUtils;
@@ -45,7 +45,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     /**
      * APE library configuration object.
      */
-    private final APEConfig config;
+    private final APECoreConfig config;
 
     /**
      * Mapping of all the predicates to integers.
@@ -86,7 +86,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
      * @param size         TODO
      */
     public SAT_SynthesisEngine(APEDomainSetup domainSetup, SATsolutionsList allSolutions,
-                               APEConfig config, int size) {
+                               APECoreConfig config, int size) {
         this.domainSetup = domainSetup;
         this.allSolutions = allSolutions;
         this.config = config;
@@ -301,7 +301,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
      *
      * @return the config
      */
-    public APEConfig getConfig() {
+    public APECoreConfig getConfig() {
         return config;
     }
 
