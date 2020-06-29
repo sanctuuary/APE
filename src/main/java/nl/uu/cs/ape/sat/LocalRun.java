@@ -3,8 +3,10 @@ package nl.uu.cs.ape.sat;
 import guru.nidi.graphviz.attribute.RankDir;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.utils.APEConfigException;
+import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,8 +17,8 @@ public class LocalRun {
     public static void main(String[] args) {
 
         String path = "/home/vedran/git/APE_UseCases/";
-        String subPath = "MassSpectometry/No1/";
-        String fileName = "ape.configuration";
+        String subPath = "GeoGMT/UnitTest/";
+        String fileName = "ape.configuration[0]";
         if (!APEUtils.isValidReadFile(path + subPath + fileName)) {
             System.err.println("Bad path.");
             return;
@@ -40,17 +42,17 @@ public class LocalRun {
             // set up the APE framework
             apeFramework = new APE(file.getAbsolutePath());
 
-        } catch (APEConfigException | JSONException | IOException e) {
+        } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
             System.err.println("Error in setting up the APE framework:");
             System.err.println(e.getMessage());
             return;
-        }
+		}
 
         SATsolutionsList solutions;
         try {
 
             // run the synthesis and retrieve the solutions
-            solutions = apeFramework.runSynthesis(file.getAbsolutePath(), apeFramework.getDomainSetup());
+            solutions = apeFramework.runSynthesis(file.getAbsolutePath());
 
         } catch (APEConfigException | JSONException | IOException e) {
             System.err.println("Error in synthesis execution:");
@@ -66,10 +68,10 @@ public class LocalRun {
         } else {
             try {
                 assert solutions != null;
-                apeFramework.writeSolutionToFile(solutions);
-                apeFramework.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
-//				apeFramework.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
-                apeFramework.writeExecutableWorkflows(solutions);
+                APE.writeSolutionToFile(solutions);
+                APE.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
+//				APE.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
+                APE.writeExecutableWorkflows(solutions);
 
 //				CWLCreator cwl = new CWLCreator(solutions.get(0), apeFramework.getConfig());
 //				APEUtils.write2file(cwl.getCWL(), new File(path + subPath + "tmp"), false);

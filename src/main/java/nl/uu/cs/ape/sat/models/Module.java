@@ -150,12 +150,13 @@ public class Module extends AbstractModule {
     }
 
     /**
-     * Creates and returns a module from a tool annotation instance from a Json file.
+     * Creates and returns a module from a tool annotation instance from a JSON file.
      *
      * @param jsonModule  JSON representation of a module
      * @param domainSetup Domain information, including all the existing tools and types
      * @return New {@link Module} object.
-     * @throws JSONException the json exception
+     * @throws JSONException Error if the JSON file was not properly formatted.
+     * @throws OWLException Error if a given label is an empty String.
      */
     public static Module moduleFromJson(JSONObject jsonModule, APEDomainSetup domainSetup)
             throws JSONException {
@@ -197,8 +198,10 @@ public class Module extends AbstractModule {
 
         List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("inputs"),
                 JSONObject.class);
+        domainSetup.updateMaxNoToolInputs(jsonModuleInput.size());
         List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("outputs"),
                 JSONObject.class);
+        domainSetup.updateMaxNoToolOutputs(jsonModuleOutput.size());
 
         List<DataInstance> inputs = new ArrayList<DataInstance>();
         List<DataInstance> outputs = new ArrayList<DataInstance>();
@@ -247,8 +250,9 @@ public class Module extends AbstractModule {
      *
      * @param domainSetup      Domain information, including all the existing tools and types.
      * @param jsonDataInstance JSON encoding of the data instance.
+     * @throws IllegalArgumentException    Error if a given label is an empty String.
      */
-    private static DataInstance createInstance(APEDomainSetup domainSetup, JSONObject jsonDataInstance) {
+    private static DataInstance createInstance(APEDomainSetup domainSetup, JSONObject jsonDataInstance) throws IllegalArgumentException {
         DataInstance dataInstance = new DataInstance();
         for (String typeSuperClassLabel : jsonDataInstance.keySet()) {
             String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel, domainSetup.getOntologyPrefixURI());

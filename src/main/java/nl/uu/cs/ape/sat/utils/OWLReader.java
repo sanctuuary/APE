@@ -25,251 +25,249 @@ import java.util.stream.Collectors;
  */
 public class OWLReader {
 
-    private final String ontologyPath;
-    private final AllModules allModules;
-    private final AllTypes allTypes;
-    private Map<String, Set<String>> typeDimensions = new HashMap<String, Set<String>>();
-    private OWLOntology ontology;
-    private OWLDataFactory factory;
-    private Logger logger = Logger.getLogger("MyLog");
+	private final File ontologyFile;
+	private final AllModules allModules;
+	private final AllTypes allTypes;
+	private Map<String, Set<String>> typeDimensions = new HashMap<String, Set<String>>();
+	private OWLOntology ontology;
+	private OWLDataFactory factory;
+	private Logger logger = Logger.getLogger("MyLog");
 
-    /**
-     * Setting up the reader that will populate the provided module and type sets
-     * with objects from the ontology.
-     *
-     * @param domain       Domain information, including all the existing tools and types.
-     * @param ontologyPath Path to the OWL file.
-     */
-    public OWLReader(APEDomainSetup domain, String ontologyPath) {
-        this.ontologyPath = ontologyPath;
-        this.allModules = domain.getAllModules();
-        this.allTypes = domain.getAllTypes();
-        this.factory = OWLManager.getOWLDataFactory();
-    }
+	/**
+	 * Setting up the reader that will populate the provided module and type sets
+	 * with objects from the ontology.
+	 *
+	 * @param domain Domain information, including all the existing tools and types.
+	 * @param file   Path to the OWL file.
+	 */
+	public OWLReader(APEDomainSetup domain, File ontologyFile) {
+		this.ontologyFile = ontologyFile;
+		this.allModules = domain.getAllModules();
+		this.allTypes = domain.getAllTypes();
+		this.factory = OWLManager.getOWLDataFactory();
+	}
 
-    /**
-     * Method used to read separately <b>ModulesTaxonomy</b> and
-     * <b>TypesTaxonomy</b> part of the ontology.
-     *
-     * @return true is the ontology was read correctly, false otherwise.
-     * @throws ExceptionInInitializerError Exception if Type dimensions have common classes.
-     */
-    public boolean readOntology() throws ExceptionInInitializerError {
+	/**
+	 * Method used to read separately <b>ModulesTaxonomy</b> and
+	 * <b>TypesTaxonomy</b> part of the ontology.
+	 *
+	 * @return true is the ontology was read correctly, false otherwise.
+	 * @throws APEDimensionsException Exception if Type dimensions have common
+	 *                                     classes.
+	 * @throws OWLOntologyCreationException Error in reading the OWL file.
+	 */
+	public boolean readOntology() throws APEDimensionsException, OWLOntologyCreationException {
 
-        final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        try {
-            File tempOntology = new File(ontologyPath);
-            if (tempOntology.exists()) {
-                ontology = manager.loadOntologyFromOntologyDocument(tempOntology);
-            } else {
-                logger.warning("Provided ontology does not exist.");
-                return false;
-            }
-        } catch (OWLOntologyCreationException e) {
-            logger.warning("Ontology is not properly provided.");
-            return false;
-        }
-        OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
-        OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
+		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		if (ontologyFile.exists()) {
+			ontology = manager.loadOntologyFromOntologyDocument(ontologyFile);
+		} else {
+			logger.warning("Provided ontology does not exist.");
+			return false;
+		}
+		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
 
-        /* Get a root of the operations taxonomy. */
-        String moduleRootIRI = allModules.getRootsIDs().get(0);
-        OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
-        if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
-            /* Handle scenario when the tool taxonomy root was not defined properly. */
-            logger.warning("Provided ontology does not contain the " + moduleRootIRI
-                    + " class, intended as a root for operation taxonomy.");
-            return false;
-        }
+		/* Get a root of the operations taxonomy. */
+		String moduleRootIRI = allModules.getRootsIDs().get(0);
+		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
+		if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
+			/* Handle scenario when the tool taxonomy root was not defined properly. */
+			logger.warning("Provided ontology does not contain the " + moduleRootIRI
+					+ " class, intended as a root for operation taxonomy.");
+			return false;
+		}
 
-        /* Get roots for each of the data dimensions. */
-        List<OWLClass> dimensionRootClasses = new ArrayList<OWLClass>();
-        for (String dimensionID : allTypes.getRootsIDs()) {
-            OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionID));
-            if (!ontology.containsClassInSignature(IRI.create(dimensionID))) {
-                /* Handle scenario when the type taxonomy root was not defined properly. */
-                logger.warning("Provided ontology does not contain the " + dimensionID
-                        + " class, intended as a root for a data dimension.");
-                return false;
-            } else {
-                dimensionRootClasses.add(dimensionClass);
-            }
-        }
+		/* Get roots for each of the data dimensions. */
+		List<OWLClass> dimensionRootClasses = new ArrayList<OWLClass>();
+		for (String dimensionID : allTypes.getRootsIDs()) {
+			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionID));
+			if (!ontology.containsClassInSignature(IRI.create(dimensionID))) {
+				/* Handle scenario when the type taxonomy root was not defined properly. */
+				logger.warning("Provided ontology does not contain the " + dimensionID
+						+ " class, intended as a root for a data dimension.");
+				return false;
+			} else {
+				dimensionRootClasses.add(dimensionClass);
+			}
+		}
 
-        exploreModuleOntologyRec(reasoner, moduleRootClass, null, null);
+		exploreModuleOntologyRec(reasoner, moduleRootClass, null, null);
 
-        dimensionRootClasses.forEach(typeClass -> typeDimensions.put(getIRI(typeClass), new HashSet<String>()));
-        dimensionRootClasses.forEach(
-                typeClass -> exploreTypeOntologyRec(reasoner, typeClass, null, null));
+		dimensionRootClasses.forEach(typeClass -> typeDimensions.put(getIRI(typeClass), new HashSet<String>()));
+		dimensionRootClasses.forEach(typeClass -> exploreTypeOntologyRec(reasoner, typeClass, null, null));
 
-        if (!dimensionsDisjoint(dimensionRootClasses)) {
-            throw new ExceptionInInitializerError("The type dimensions cannot have common classes");
-        }
+		String ovesrlap;
+		if ((ovesrlap = dimensionsDisjoint(dimensionRootClasses)) != null) {
+			throw APEDimensionsException.dimensionsOverlap("The dimensions '" + ovesrlap + "' have common classes.");
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    /**
-     * Calculate whether the type dimensions are disjoint or have overlaps.
-     *
-     * @return {code true} if the dimensions are disjoint, false otherwise.
-     */
-    private boolean dimensionsDisjoint(List<OWLClass> typeClasses) {
-        if (typeClasses.size() < 2) {
-            return true;
-        }
-        for (OWLClass class1 : typeClasses) {
-            for (OWLClass class2 : typeClasses) {
-                String classID1 = getIRI(class1);
-                String classID2 = getIRI(class2);
-                if (!classID1.equals(classID2)) {
-                    if (!Collections.disjoint(typeDimensions.get(classID1), typeDimensions.get(classID2))) {
-                        return false;
-                    }
-                }
-            }
-        }
+	/**
+	 * Calculate whether the type dimensions are disjoint or have overlaps.
+	 *
+	 * @return {code true} if the dimensions are disjoint, false otherwise.
+	 */
+	private String dimensionsDisjoint(List<OWLClass> typeClasses) {
+		if (typeClasses.size() < 2) {
+			return null;
+		}
+		for (OWLClass class1 : typeClasses) {
+			for (OWLClass class2 : typeClasses) {
+				String classID1 = getIRI(class1);
+				String classID2 = getIRI(class2);
+				if (!classID1.equals(classID2)) {
+					if (!Collections.disjoint(typeDimensions.get(classID1), typeDimensions.get(classID2))) {
+						return classID1 + " & " + classID2;
+					}
+				}
+			}
+		}
 
-        return true;
-    }
+		return null;
+	}
 
-    /**
-     * Recursively exploring the hierarchy of the ontology and defining objects
-     * ({@link AbstractModule}) on each step of the way.
-     *
-     * @param reasoner   Reasoner used to provide subclasses.
-     * @param currClass  The class (node) currently explored.
-     * @param superClass The superclass of the currClass.
-     */
-    private void exploreModuleOntologyRec(OWLReasoner reasoner, OWLClass currClass,
-                                          OWLClass superClass, OWLClass rootClass) {
+	/**
+	 * Recursively exploring the hierarchy of the ontology and defining objects
+	 * ({@link AbstractModule}) on each step of the way.
+	 *
+	 * @param reasoner   Reasoner used to provide subclasses.
+	 * @param currClass  The class (node) currently explored.
+	 * @param superClass The superclass of the currClass.
+	 */
+	private void exploreModuleOntologyRec(OWLReasoner reasoner, OWLClass currClass, OWLClass superClass,
+			OWLClass rootClass) {
 //		if(allModules.existsModule(getLabel(currClass))) {
 //			return;
 //		}
-        AbstractModule superModule = allModules.get(getIRI(superClass));
-        final OWLClass currRootClass;
-        /*
-         * Defining the Node Type based on the node.
-         */
-        NodeType currNodeType = NodeType.ABSTRACT;
-        if (getIRI(currClass).equals(allModules.getRootsIDs().get(0))) {
-            currNodeType = NodeType.ROOT;
-            currRootClass = currClass;
-        } else {
-            currRootClass = rootClass;
-        }
-        /* Generate the AbstractModule that corresponds to the taxonomy class. */
-        AbstractModule currModule = null;
-        try {
-            currModule = allModules.addPredicate(
-                    new AbstractModule(getLabel(currClass), getIRI(currClass), getIRI(currRootClass), currNodeType));
-        } catch (ExceptionInInitializerError e) {
-            e.printStackTrace();
-        }
-        /* Add the current module as a sub-module of the super module. */
-        if (superModule != null && currModule != null) {
-            superModule.addSubPredicate(currModule);
-        }
-        /* Add the super-type for the current type */
-        if (currNodeType != NodeType.ROOT) {
-            currModule.addSuperPredicate(superModule);
-        }
-        reasoner.getSubClasses(currClass, true).entities().filter(child -> reasoner.isSatisfiable(child))
-                .forEach(child -> exploreModuleOntologyRec(reasoner, child, currClass, currRootClass));
-    }
+		AbstractModule superModule = allModules.get(getIRI(superClass));
+		final OWLClass currRootClass;
+		/*
+		 * Defining the Node Type based on the node.
+		 */
+		NodeType currNodeType = NodeType.ABSTRACT;
+		if (getIRI(currClass).equals(allModules.getRootsIDs().get(0))) {
+			currNodeType = NodeType.ROOT;
+			currRootClass = currClass;
+		} else {
+			currRootClass = rootClass;
+		}
+		/* Generate the AbstractModule that corresponds to the taxonomy class. */
+		AbstractModule currModule = null;
+		try {
+			currModule = allModules.addPredicate(
+					new AbstractModule(getLabel(currClass), getIRI(currClass), getIRI(currRootClass), currNodeType));
+		} catch (ExceptionInInitializerError e) {
+			e.printStackTrace();
+		}
+		/* Add the current module as a sub-module of the super module. */
+		if (superModule != null && currModule != null) {
+			superModule.addSubPredicate(currModule);
+		}
+		/* Add the super-type for the current type */
+		if (currNodeType != NodeType.ROOT) {
+			currModule.addSuperPredicate(superModule);
+		}
+		reasoner.getSubClasses(currClass, true).entities().filter(child -> reasoner.isSatisfiable(child))
+				.forEach(child -> exploreModuleOntologyRec(reasoner, child, currClass, currRootClass));
+	}
 
-    /**
-     * Recursively exploring the hierarchy of the ontology and defining objects
-     * ({@link Type}) on each step of the way.
-     *
-     * @param reasoner   Reasoner used to provide subclasses.
-     * @param currClass  The class (node) currently explored.
-     * @param superClass The superclass of the currClass.
-     */
-    private void exploreTypeOntologyRec(OWLReasoner reasoner, OWLClass currClass,
-                                        OWLClass superClass, OWLClass rootClass) {
+	/**
+	 * Recursively exploring the hierarchy of the ontology and defining objects
+	 * ({@link Type}) on each step of the way.
+	 *
+	 * @param reasoner   Reasoner used to provide subclasses.
+	 * @param currClass  The class (node) currently explored.
+	 * @param superClass The superclass of the currClass.
+	 */
+	private void exploreTypeOntologyRec(OWLReasoner reasoner, OWLClass currClass, OWLClass superClass,
+			OWLClass rootClass) {
 //		if(allTypes.existsType(getLabel(currClass))) {
 //			return;
 //		}
 
-        final OWLClass currRoot;
-        Type superType, currType = null;
-        superType = allTypes.get(getIRI(superClass), getIRI(rootClass));
-        /*
-         * Check whether the current node is a root or subRoot node.
-         */
-        NodeType currNodeType = NodeType.ABSTRACT;
-        if (allTypes.getDataTaxonomyDimensionIDs().contains(getIRI(currClass))) {
-            currNodeType = NodeType.ROOT;
-            currRoot = currClass;
-        } else {
-            currRoot = rootClass;
-        }
+		final OWLClass currRoot;
+		Type superType, currType = null;
+		superType = allTypes.get(getIRI(superClass), getIRI(rootClass));
+		/*
+		 * Check whether the current node is a root or subRoot node.
+		 */
+		NodeType currNodeType = NodeType.ABSTRACT;
+		if (allTypes.getDataTaxonomyDimensionIDs().contains(getIRI(currClass))) {
+			currNodeType = NodeType.ROOT;
+			currRoot = currClass;
+		} else {
+			currRoot = rootClass;
+		}
 
-        /* Generate the Type that corresponds to the taxonomy class. */
-        try {
-            currType = allTypes.addPredicate(new Type(getLabel(currClass), getIRI(currClass), getIRI(currRoot), currNodeType));
-            typeDimensions.get(getIRI(currRoot)).add(getIRI(currClass));
-        } catch (ExceptionInInitializerError e) {
-            e.printStackTrace();
-        }
+		/* Generate the Type that corresponds to the taxonomy class. */
+		try {
+			currType = allTypes
+					.addPredicate(new Type(getLabel(currClass), getIRI(currClass), getIRI(currRoot), currNodeType));
+			typeDimensions.get(getIRI(currRoot)).add(getIRI(currClass));
+		} catch (ExceptionInInitializerError e) {
+			e.printStackTrace();
+		}
 
-        /* Add the current type as a sub-type of the super type. */
-        if (superType != null && currType != null) {
-            superType.addSubPredicate(currType);
-        }
-        /* Add the super-type for the current type */
-        if (currNodeType != NodeType.ROOT) {
-            currType.addSuperPredicate(superType);
-        }
+		/* Add the current type as a sub-type of the super type. */
+		if (superType != null && currType != null) {
+			superType.addSubPredicate(currType);
+		}
+		/* Add the super-type for the current type */
+		if (currNodeType != NodeType.ROOT) {
+			currType.addSuperPredicate(superType);
+		}
 
-        List<OWLClass> subClasses = reasoner.getSubClasses(currClass, true).entities()
-                .filter(child -> reasoner.isSatisfiable(child))
-                .collect(Collectors.toList());
+		List<OWLClass> subClasses = reasoner.getSubClasses(currClass, true).entities()
+				.filter(child -> reasoner.isSatisfiable(child)).collect(Collectors.toList());
 
-        subClasses.forEach(child -> exploreTypeOntologyRec(reasoner, child, currClass, currRoot));
+		subClasses.forEach(child -> exploreTypeOntologyRec(reasoner, child, currClass, currRoot));
 
-        if (subClasses.isEmpty()) {
-            currType.setToSimplePredicate();
-            ;
-        }
-    }
+		if (subClasses.isEmpty()) {
+			currType.setToSimplePredicate();
+			;
+		}
+	}
 
-    /**
-     * Returning the label of the provided OWL class.
-     *
-     * @param currClass Provided OWL class.
-     * @return String representation of the class name.
-     */
-    private String getLabel(OWLClass currClass) {
-        if (currClass == null || currClass.isOWLNothing()) {
-            return "N/A";
-        }
-        String label, classID = currClass.toStringID();
-        Optional<OWLAnnotation> classLabel = EntitySearcher.getAnnotations(currClass, ontology, factory.getRDFSLabel()).findFirst();
-        if (classLabel.isPresent()) {
-            OWLAnnotationValue val = classLabel.get().getValue();
-            if (val instanceof OWLLiteral) return ((OWLLiteral) val).getLiteral();
-        } else if (classID.contains("#")) {
-            label = classID.substring(classID.indexOf('#') + 1);
+	/**
+	 * Returning the label of the provided OWL class.
+	 *
+	 * @param currClass Provided OWL class.
+	 * @return String representation of the class name.
+	 */
+	private String getLabel(OWLClass currClass) {
+		if (currClass == null || currClass.isOWLNothing()) {
+			return "N/A";
+		}
+		String label, classID = currClass.toStringID();
+		Optional<OWLAnnotation> classLabel = EntitySearcher.getAnnotations(currClass, ontology, factory.getRDFSLabel())
+				.findFirst();
+		if (classLabel.isPresent()) {
+			OWLAnnotationValue val = classLabel.get().getValue();
+			if (val instanceof OWLLiteral)
+				return ((OWLLiteral) val).getLiteral();
+		} else if (classID.contains("#")) {
+			label = classID.substring(classID.indexOf('#') + 1);
 //			label = label.replace(" ", "_");
-            return label;
-        }
-        logger.fine("Class '" + classID + "' has no label.");
-        return classID;
+			return label;
+		}
+		logger.fine("Class '" + classID + "' has no label.");
+		return classID;
 
-    }
+	}
 
-    /**
-     * Returning the IRI of the provided OWL class.
-     *
-     * @param currClass Provided OWL class.
-     * @return String representation of the class name.
-     */
-    private String getIRI(OWLClass currClass) {
-        if (currClass == null) {
-            return null;
-        }
-        return currClass.toStringID();
-    }
+	/**
+	 * Returning the IRI of the provided OWL class.
+	 *
+	 * @param currClass Provided OWL class.
+	 * @return String representation of the class name.
+	 */
+	private String getIRI(OWLClass currClass) {
+		if (currClass == null) {
+			return null;
+		}
+		return currClass.toStringID();
+	}
 }

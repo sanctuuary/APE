@@ -4,12 +4,16 @@ import java.io.*;
 
 import nl.uu.cs.ape.functional.github.GitHubRepo;
 import nl.uu.cs.ape.sat.utils.APEConfigException;
+import nl.uu.cs.ape.sat.utils.APEDimensionsException;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import static nl.uu.cs.ape.TestUtil.getAbsoluteResourcePath;
 import static nl.uu.cs.ape.TestUtil.success;
@@ -36,7 +40,7 @@ class UseCaseTest {
 	}
 
 	@Test
-	void useCases() throws IOException, APEConfigException {
+	void useCases() throws IOException, OWLOntologyCreationException {
 
 		if(!repo.canConnect()){
 			System.out.println("Could not perform use case tests because there is no active internet connection.");

@@ -5,6 +5,7 @@ import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.utils.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.IOException;
 
@@ -38,7 +39,7 @@ public class Main {
             // set up the APE framework
             apeFramework = new APE(path);
 
-        } catch (APEConfigException | JSONException | IOException e) {
+        } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
             System.err.println("Error in setting up the APE framework:");
             System.err.println(e.getMessage());
             return;
@@ -48,7 +49,7 @@ public class Main {
         try {
 
             // run the synthesis and retrieve the solutions
-            solutions = apeFramework.runSynthesis(path, apeFramework.getDomainSetup());
+            solutions = apeFramework.runSynthesis(path);
 
         } catch (APEConfigException | JSONException | IOException e) {
             System.err.println("Error in synthesis execution:");
@@ -63,10 +64,10 @@ public class Main {
             System.out.println("UNSAT");
         } else {
             try {
-                apeFramework.writeSolutionToFile(solutions);
-                apeFramework.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
-//				apeFramework.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
-                apeFramework.writeExecutableWorkflows(solutions);
+                APE.writeSolutionToFile(solutions);
+                APE.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
+//				APE.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
+                APE.writeExecutableWorkflows(solutions);
             } catch (IOException e) {
                 System.err.println("Error in writing the solutions. to the file system.");
                 e.printStackTrace();

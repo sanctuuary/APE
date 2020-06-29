@@ -23,51 +23,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * The {@link APERunConfig} (singleton) class is used to define the configuration
- * variables required for the proper execution of the library.
+ * The {@link APERunConfig} class is used to define the run configuration
+ * variables, required for the proper execution of the synthesis process.
  *
  * @author Vedran Kasalica
  */
 public class APERunConfig {
 
-	
-	public class Builder {
-		/**
-	     * Path to the taxonomy file
-	     */
-	    private String ontologyPath;
-	    /**
-	     * Prefix used to define OWL class IDs
-	     */
-	    private String ontologyPrefixURI;
-	    /**
-	     * Node in the ontology that corresponds to the root of the module taxonomy.
-	     */
-	    private String toolTaxonomyRoot;
-	    /**
-	     * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each respresents a data dimension (e.g. data type, data format, etc.).
-	     */
-	    private List<String> dataDimensionRoots = new ArrayList<>();
-	    /**
-	     * Path to the XML file with all tool annotations.
-	     */
-	    private String toolAnnotationsPath;
-	    /**
-	     * Configurations used to read "ape.configuration" file.
-	     */
-	    private JSONObject coreConfiguration;
-	    
-	    
-	}
-
     /**
      * Tags used in the JSON file.
      */
-    private static final String ONTOLOGY_TAG = "ontology_path";
-    private static final String ONTOLOGY_PREFIX = "ontologyPrexifIRI";
-    private static final String TOOL_ONTOLOGY_TAG = "toolsTaxonomyRoot";
-    private static final String DIMENSIONSONTOLOGY_TAG = "dataSubTaxonomyRoot";
-    private static final String TOOL_ANNOTATIONS_TAG = "tool_annotations_path";
     private static final String CONSTRAINTS_TAG = "constraints_path";
     private static final String SHARED_MEMORY_TAG = "shared_memory";
     private static final String SOLUTION_PATH_TAG = "solutions_path";
@@ -90,22 +55,15 @@ public class APERunConfig {
      * The obligatory tags are used in the constructor to check the presence of tags.
      * Optional tags or All tags are mostly used by test cases.
      */
-    private static final String[] obligatoryCoreTags = new String[]{
-            ONTOLOGY_TAG,
-            ONTOLOGY_PREFIX,
-            TOOL_ONTOLOGY_TAG,
-            DIMENSIONSONTOLOGY_TAG,
-            TOOL_ANNOTATIONS_TAG
-    };
-    private static final String[] optionalCoreTags = new String[]{};
     private static final String[] obligatoryRunTags = new String[]{
             SOLUTION_MIN_LENGTH_TAG,
             SOLUTION_MAX_LENGTH_TAG,
-            MAX_NOSOLUTIONS_TAG,
-            PROGRAM_INPUTS_TAG,
-            PROGRAM_OUTPUTS_TAG
+            MAX_NOSOLUTIONS_TAG
+           
     };
     private static final String[] optionalRunTags = new String[]{
+    		PROGRAM_INPUTS_TAG,
+            PROGRAM_OUTPUTS_TAG,
             CONSTRAINTS_TAG,
             SHARED_MEMORY_TAG,
             NOEXECUTIONS_TAG,
@@ -119,52 +77,31 @@ public class APERunConfig {
             SOLUTION_GRAPHS_FOLDER_TAG
     };
 
-	
     /**
      * READ and WRITE enums used to verify paths.
      */
     private enum Permission {READ, WRITE}
 
     /**
-     * Path to the taxonomy file
-     */
-    private String ontologyPath;
-    /**
-     * Prefix used to define OWL class IDs
-     */
-    private String ontologyPrefixURI;
-    /**
-     * Node in the ontology that corresponds to the root of the module taxonomy.
-     */
-    private String toolTaxonomyRoot;
-    /**
-     * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each respresents a data dimension (e.g. data type, data format, etc.).
-     */
-    private List<String> dataDimensionRoots = new ArrayList<>();
-    /**
-     * Path to the XML file with all tool annotations.
-     */
-    private String toolAnnotationsPath;
-    /**
      * Path to the file with all workflow constraints.
      */
-    private String constraintsPath;
+    private String constraintsPath = null;
     /**
      * true if the shared memory structure should be used, false in
      * case of a restrictive message passing structure.
      */
-    private Boolean sharedMemory;
+    private Boolean sharedMemory = true;
     /**
      * false iff the provided solutions should be distinguished 
      * based on the tool sequences alone, i.e. tool sequences cannot repeat, 
      * ignoring the types in the solutions.
      */
-    private Boolean toolSeqRepeat;
+    private Boolean toolSeqRepeat = true;
     /**
      * Path to the file that will contain all the solutions to the problem in human
      * readable representation.
      */
-    private String solutionPath;
+    private String solutionPath = null;
     /**
      * Min and Max possible length of the solutions (length of the automaton). For
      * no upper limit, max length should be set to 0.
@@ -178,32 +115,22 @@ public class APERunConfig {
      * Path to the folder that will contain all the scripts generated based on the
      * candidate workflows.
      */
-    private String executionScriptsFolder;
+    private String executionScriptsFolder = null;
     /**
      * Number of the workflow scripts that should be generated from candidate
      * workflows. Default is 0.
      */
-    private Integer noExecutions;
+    private Integer noExecutions = 0;
     /**
      * Path to the folder that will contain all the figures/graphs generated based
      * on the candidate workflows.
      */
-    private String solutionGraphsFolder;
+    private String solutionGraphsFolder = null;
     /**
      * Number of the solution graphs that should be generated from candidate
      * workflows. Default is 0.
      */
-    private Integer noGraphs;
-    /**
-     * Output branching factor (max number of outputs per tool).
-     * TODO: automatically read the max tool outputs from the tool annotation file.
-     */
-    private Integer maxNoTool_outputs = 5;
-    /**
-     * Input branching factor (max number of inputs per tool).
-     * TODO: automatically read the max tool inputs from the tool annotation file.
-     */
-    private Integer maxNoToolInputs = 5;
+    private Integer noGraphs = 0;
     /**
      * Input types of the workflow.
      */
@@ -219,7 +146,7 @@ public class APERunConfig {
      * {@link ConfigEnum#ONE} if one of the workflow inputs should be used or <br>
      * {@link ConfigEnum#NONE} if none of the workflow inputs has to be used
      */
-    private ConfigEnum useWorkflowInput;
+    private ConfigEnum useWorkflowInput = ConfigEnum.ALL;
     /**
      * Determines the required usage for the generated data instances:<br>
      * {@link ConfigEnum#ALL} if all the generated data has to be used,<br>
@@ -227,82 +154,27 @@ public class APERunConfig {
      * output, per tool, has to be used or <br>
      * {@link ConfigEnum#NONE} if none of the data instances is obligatory to use.
      */
-    private ConfigEnum useAllGeneratedData;
+    private ConfigEnum useAllGeneratedData  = ConfigEnum.ONE;
     /**
      * Mode is true if debug mode is turned on.
      */
-    private Boolean debugMode;
+    private Boolean debugMode = false;
     /**
-     * Configurations used to read "ape.configuration" file.
+     * Object containing domain information needed for the execution.
      */
-    private JSONObject coreConfiguration;
-    /**
-     * Configurations used to describe the synthesis run.
-     */
-    private JSONObject runConfiguration;
+    private final APEDomainSetup apeDomainSetup;
+    
+    
+    
+    
+    public APERunConfig(APEDomainSetup apeDomainSetup, Integer solutionMinLength, Integer solutionMaxLength, Integer maxNoSolutions) {
+    	this.apeDomainSetup = apeDomainSetup;
+    	this.solutionMinLength = solutionMinLength;
+		this.solutionMaxLength = solutionMaxLength;
+		this.maxNoSolutions = maxNoSolutions;
+		
+	}
 
-    /**
-     * Initialize the configuration of the project.
-     *
-     * @param configPath Path to the APE configuration file.
-     * @throws IOException        Error in reading the configuration file.
-     * @throws JSONException      Error in parsing the configuration file.
-     * @throws APEConfigException Error in setting up the the configuration.
-     */
-    public APERunConfig(String configPath) throws IOException, JSONException, APEConfigException {
-        if (configPath == null)
-            throw new NullPointerException("The provided core configuration file path is null.");
-
-        File file = new File(configPath);
-        String content = FileUtils.readFileToString(file, "utf-8");
-
-        // Convert JSON string to JSONObject
-        coreConfiguration = new JSONObject(content);
-
-        coreConfigSetup();
-    }
-
-    /**
-     * Initialize the configuration of the project.
-     *
-     * @param configObject The APE configuration JSONObject{@link JSONObject}.
-     * @throws IOException        Error in reading the configuration file.
-     * @throws JSONException      Error in parsing the configuration file.
-     * @throws APEConfigException Error in setting up the the configuration.
-     */
-    public APERunConfig(JSONObject configObject) throws IOException, JSONException, APEConfigException {
-        if (configObject == null)
-            throw new NullPointerException("The provided JSONObject is null.");
-
-        // Set JSONObject as core configuration
-        coreConfiguration = configObject;
-
-        coreConfigSetup();
-    }
-
-    /**
-     * Setup the configuration for the current run of the synthesis.
-     *
-     * @param configPath     Path to the APE configuration file.
-     * @param apeDomainSetup the ape domain setup
-     * @return True if the configuration setup was successful, false otherwise.
-     * @throws IOException        Error in reading the configuration file.
-     * @throws JSONException      Error in parsing the configuration file.
-     * @throws APEConfigException Error in setting up the the configuration.
-     */
-    public boolean setupRunConfiguration(String configPath, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
-        if (configPath == null)
-            throw new NullPointerException("The provided run configuration file path is null.");
-
-        File file = new File(configPath);
-
-        String content = FileUtils.readFileToString(file, "utf-8");
-
-        // Convert JSON string to JSONObject
-        runConfiguration = new JSONObject(content);
-
-        return runConfigSetup(apeDomainSetup);
-    }
 
     /**
      * Setup the configuration for the current run of the synthesis.
@@ -314,88 +186,8 @@ public class APERunConfig {
      * @throws JSONException      Error in parsing the configuration file.
      * @throws APEConfigException Error in setting up the the configuration.
      */
-    public boolean setupRunConfiguration(JSONObject configObject, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
-        if (configObject == null)
-            throw new NullPointerException("The provided JSONObject is null.");
-
-        // Set JSONObject as run configuration
-        runConfiguration = configObject;
-
-        return runConfigSetup(apeDomainSetup);
-    }
-
-    /**
-     * Setting up the core configuration of the library.
-     *
-     * @return true if the method successfully set-up the configuration, false otherwise.
-     * @throws IOException        Error in reading the configuration file.
-     * @throws JSONException      Error in parsing the configuration file.
-     * @throws APEConfigException Error in setting up the the configuration.
-     */
-    private boolean coreConfigSetup() throws IOException, JSONException, APEConfigException {
-
-        /* JSONObject must have been parsed correctly. */
-        if (coreConfiguration == null) {
-            throw new APEConfigException("Cannot set up the core configuration, because the JSONObject is initialized to NULL. The configuration file might not have been parsed correctly.");
-        }
-
-        /* Make sure all required core tags are present. This way, teh parser does not have to check presence of the tag */
-        for (String requiredTag : getObligatoryCoreTags()) {
-            if (!coreConfiguration.has(requiredTag)) {
-                throw APEConfigException.missingTag(requiredTag);
-            }
-        }
-
-        /* Path to the OWL file. */
-        this.ontologyPath = readFilePath(ONTOLOGY_TAG, coreConfiguration, Permission.READ);
-
-        /* URI of the ontology classes. */
-        this.ontologyPrefixURI = coreConfiguration.getString(ONTOLOGY_PREFIX);
-
-        /* The root class of the tool taxonomy. */
-        /* TODO: should throw an exception if the root is not present in the OWL file. */
-        this.toolTaxonomyRoot = APEUtils.createClassURI(coreConfiguration.getString(TOOL_ONTOLOGY_TAG), getOntologyPrefixURI());
-        if (this.toolTaxonomyRoot.equals("")) {
-            throw APEConfigException.invalidValue(TOOL_ONTOLOGY_TAG, coreConfiguration, "incorrect format.");
-        }
-
-        /* Dimension classes of the data taxonomy.00000000 */
-        /* TODO: should throw an exception if a dimension is not present in the OWL file. */
-        try{
-            for (String subTaxonomy : APEUtils.getListFromJson(coreConfiguration, DIMENSIONSONTOLOGY_TAG, String.class)) {
-                this.dataDimensionRoots.add(APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()));
-            }
-        }
-        catch (ClassCastException e){
-            throw APEConfigException.invalidValue(DIMENSIONSONTOLOGY_TAG, coreConfiguration, "expected a list in correct format.");
-        }
-
-        /* Path to the tool annotations JSON file. */
-        this.toolAnnotationsPath = readFilePath(TOOL_ANNOTATIONS_TAG, coreConfiguration, Permission.READ);
-
-        /* check if it is a dir - wrong, get parent check the 
-        
-        /* Path to the solution directory. */
-        this.solutionPath = readFilesDirectoryPath(SOLUTION_PATH_TAG, coreConfiguration, Permission.WRITE);
-
-        /* Path to the output script directory. */
-        this.executionScriptsFolder = readDirectoryPath(EXECUTIONSCRIPTS_FOLDER_TAG, coreConfiguration, Permission.WRITE);
-
-        /* Path to the output graph directory. */
-        this.solutionGraphsFolder = readDirectoryPath(SOLUTION_GRAPHS_FOLDER_TAG, coreConfiguration, Permission.WRITE);
-
-        return true;
-    }
-
-    /**
-     * Setting up the core configuration of the library.
-     *
-     * @return true if the method successfully set-up the configuration, false otherwise.
-     * @throws IOException        Error in reading the configuration file.
-     * @throws JSONException      Error in parsing the configuration file.
-     * @throws APEConfigException Error in setting up the the configuration.
-     */
-    private boolean runConfigSetup(APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
+    public APERunConfig(JSONObject runConfiguration, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
+        this.apeDomainSetup = apeDomainSetup;
 
         /* JSONObject must have been parsed correctly. */
         if (runConfiguration == null) {
@@ -408,6 +200,15 @@ public class APERunConfig {
                 throw APEConfigException.missingTag(tag);
             }
         }
+        
+        /* Path to the solution directory. */
+        this.solutionPath = readFilesDirectoryPath(SOLUTION_PATH_TAG, runConfiguration, Permission.WRITE);
+
+        /* Path to the output script directory. */
+        this.executionScriptsFolder = readDirectoryPath(EXECUTIONSCRIPTS_FOLDER_TAG, runConfiguration, Permission.WRITE);
+
+        /* Path to the output graph directory. */
+        this.solutionGraphsFolder = readDirectoryPath(SOLUTION_GRAPHS_FOLDER_TAG, runConfiguration, Permission.WRITE);
 
         /* Path to the JSON constraints file. */
         if (runConfiguration.has(CONSTRAINTS_TAG)) {
@@ -458,8 +259,8 @@ public class APERunConfig {
         }
 
         /* Parse the input and output DataInstances of the program*/
-        this.programInputs = getDataInstances(PROGRAM_INPUTS_TAG, runConfiguration, apeDomainSetup);
-        this.programOutputs = getDataInstances(PROGRAM_OUTPUTS_TAG, runConfiguration, apeDomainSetup);
+        this.programInputs = getDataInstances(PROGRAM_INPUTS_TAG, runConfiguration);
+        this.programOutputs = getDataInstances(PROGRAM_OUTPUTS_TAG, runConfiguration);
 
         /* Read the config enums. */
         this.useWorkflowInput = readConfigEnumOrDefault(USEWORKFLOW_INPUT, runConfiguration, ConfigEnum.ALL);
@@ -467,8 +268,6 @@ public class APERunConfig {
 
         /* DEBUG_MODE_TAG */
         this.debugMode = readBooleanOrDefault(DEBUG_MODE_TAG, runConfiguration, false);
-
-        return true;
     }
 
     /**
@@ -721,14 +520,14 @@ public class APERunConfig {
     /**
      * Used to read the input and output data instances for the program. This method calls {@link #getDataInstance}.
      */
-    private ArrayList<DataInstance> getDataInstances(String tag, JSONObject config, APEDomainSetup domain) throws JSONException {
+    private ArrayList<DataInstance> getDataInstances(String tag, JSONObject config) throws JSONException {
 
         ArrayList<DataInstance> instances = new ArrayList<>();
 
         try {
             for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(config, tag, JSONObject.class)) {
                 DataInstance output;
-                if ((output = getDataInstance(jsonModuleOutput, domain.getAllTypes())) != null) {
+                if ((output = getDataInstance(jsonModuleOutput, this.apeDomainSetup.getAllTypes())) != null) {
                     instances.add(output);
                 }
             }
@@ -749,11 +548,11 @@ public class APERunConfig {
 
         for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
 
-            String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel, getOntologyPrefixURI());
+            String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel, this.apeDomainSetup.getOntologyPrefixURI());
 
             for (String currTypeLabel : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
 
-                String currTypeURI = APEUtils.createClassURI(currTypeLabel, getOntologyPrefixURI());
+                String currTypeURI = APEUtils.createClassURI(currTypeLabel, this.apeDomainSetup.getOntologyPrefixURI());
 
                 Type currType = allTypes.get(currTypeURI, typeSuperClassURI);
 
@@ -775,24 +574,6 @@ public class APERunConfig {
     }
 
     /**
-     * Get all obligatory JSON tags to set up the framework.
-     *
-     * @return All obligatory JSON tags to set up the framework.
-     */
-    public static String[] getObligatoryCoreTags() {
-        return obligatoryCoreTags;
-    }
-
-    /**
-     * Get all optional JSON tags to set up the framework.
-     *
-     * @return All optional JSON tags to set up the framework.
-     */
-    public static String[] getOptionalCoreTags() {
-        return optionalCoreTags;
-    }
-
-    /**
      * Get all obligatory JSON tags to execute the synthesis.
      *
      * @return All obligatory JSON tags to execute the synthesis.
@@ -810,14 +591,6 @@ public class APERunConfig {
         return optionalRunTags;
     }
 
-    /**
-     * Get all JSON tags that can be used to set up the framework.
-     *
-     * @return All JSON tags that can be used to set up the framework.
-     */
-    public static String[] getCoreTags() {
-        return ArrayUtils.addAll(getObligatoryCoreTags(), getOptionalCoreTags());
-    }
 
     /**
      * Get all JSON tags that can be used to execute the synthesis.
@@ -826,60 +599,6 @@ public class APERunConfig {
      */
     public static String[] getRunTags() {
         return ArrayUtils.addAll(getObligatoryRunTags(), getOptionalRunTags());
-    }
-
-    /**
-     * Get all JSON tags that can be used to set up the framework and execute the synthesis.
-     *
-     * @return All JSON tags that can be used to set up the framework and execute the synthesis.
-     */
-    public static String[] getAllTags() {
-        return ArrayUtils.addAll(getCoreTags(), getRunTags());
-    }
-
-    /**
-     * Gets ontology path.
-     *
-     * @return the {@link #ontologyPath}
-     */
-    public String getOntologyPath() {
-        return ontologyPath;
-    }
-
-    /**
-     * Gets ontology prefix uri.
-     *
-     * @return the {@link #ontologyPrefixURI}
-     */
-    public String getOntologyPrefixURI() {
-        return (ontologyPrefixURI != null) ? ontologyPrefixURI : "";
-    }
-
-    /**
-     * Gets tool taxonomy root.
-     *
-     * @return the {@link #toolTaxonomyRoot}
-     */
-    public String getToolTaxonomyRoot() {
-        return toolTaxonomyRoot;
-    }
-
-    /**
-     * Gets data dimension roots.
-     *
-     * @return the {@link #dataDimensionRoots}
-     */
-    public List<String> getDataDimensionRoots() {
-        return dataDimensionRoots;
-    }
-
-    /**
-     * Gets tool annotations path.
-     *
-     * @return the {@link #toolAnnotationsPath}
-     */
-    public String getToolAnnotationsPath() {
-        return toolAnnotationsPath;
     }
 
     /**
@@ -983,24 +702,6 @@ public class APERunConfig {
     }
 
     /**
-     * Gets max no tool outputs.
-     *
-     * @return the {@link #maxNoTool_outputs}
-     */
-    public Integer getMaxNoToolOutputs() {
-        return maxNoTool_outputs;
-    }
-
-    /**
-     * Gets max no tool inputs.
-     *
-     * @return the {@link #maxNoToolInputs}
-     */
-    public Integer getMaxNoToolInputs() {
-        return maxNoToolInputs;
-    }
-
-    /**
      * Gets program inputs.
      *
      * @return the {@link #programInputs}
@@ -1014,7 +715,7 @@ public class APERunConfig {
      *
      * @return the {@link #programOutputs}
      */
-    public List<DataInstance> getProgram_outputs() {
+    public List<DataInstance> getProgramOutputs() {
         return programOutputs;
     }
 
@@ -1043,24 +744,6 @@ public class APERunConfig {
      */
     public Boolean getDebugMode() {
         return debugMode;
-    }
-
-    /**
-     * Gets core config json obj.
-     *
-     * @return the {@link #coreConfiguration}
-     */
-    public JSONObject getCoreConfigJsonObj() {
-        return coreConfiguration;
-    }
-
-    /**
-     * Gets run config json obj.
-     *
-     * @return the {@link #runConfiguration}
-     */
-    public JSONObject getRunConfigJsonObj() {
-        return runConfiguration;
     }
 
     /**

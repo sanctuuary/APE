@@ -37,30 +37,30 @@ public class TypeAutomaton implements Automaton {
      * Labeling of the automaton is provided in
      * <a href="https://github.com/sanctuuary/APE/blob/master/res/WorkflowAutomaton_Implementation.png">/APE/res/WorkflowAutomaton_Implementation.png</a>
      *
-     * @param automata_bound   Length of the automaton
-     * @param input_branching  Input branching factor (max number of inputs for modules)
-     * @param output_branching Output branching factor (max number of outputs for modules)
+     * @param automataBound   Length of the automaton
+     * @param inputBranching  Input branching factor (max number of inputs for modules)
+     * @param outputBranching Output branching factor (max number of outputs for modules)
      */
-    public TypeAutomaton(int automata_bound, int input_branching, int output_branching) {
+    public TypeAutomaton(int automataBound, int inputBranching, int outputBranching) {
         memoryTypesAutomaton = new ArrayList<Block>();
         usedTypesAutomaton = new ArrayList<Block>();
-        nullState = new State(null, null, -1, input_branching);
+        nullState = new State(null, null, -1, inputBranching, outputBranching);
 
-        automata_bound = automata_bound < 1 ? 1 : automata_bound;
+        automataBound = automataBound < 1 ? 1 : automataBound;
 
-        for (int i = 0; i <= automata_bound; i++) {
+        for (int i = 0; i <= automataBound; i++) {
 
             Block tmpMemoryTypeBlock = new Block(i);
 
-            for (int j = 0; j < input_branching; j++) {
-                State tmpMemoryState = new State(WorkflowElement.MEMORY_TYPE, i, j, input_branching);
+            for (int j = 0; j < outputBranching; j++) {
+                State tmpMemoryState = new State(WorkflowElement.MEMORY_TYPE, i, j,inputBranching, outputBranching);
                 tmpMemoryTypeBlock.addState(tmpMemoryState);
             }
             memoryTypesAutomaton.add(tmpMemoryTypeBlock);
 
             Block tmpUsedTypesBlock = new Block(i);
-            for (int j = 0; j < input_branching; j++) {
-                State tmpUsedState = new State(WorkflowElement.USED_TYPE, i, j, input_branching);
+            for (int j = 0; j < inputBranching; j++) {
+                State tmpUsedState = new State(WorkflowElement.USED_TYPE, i, j, inputBranching, outputBranching);
                 tmpUsedTypesBlock.addState(tmpUsedState);
             }
             usedTypesAutomaton.add(tmpUsedTypesBlock);

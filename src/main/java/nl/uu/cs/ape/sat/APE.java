@@ -12,6 +12,7 @@ import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.*;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class APE {
 
     /** Core configuration object defined from the configuration file. */
     private final APECoreConfig config;
-
+    
     /** Object containing general APE encoding. */
     private APEDomainSetup apeDomainSetup;
 
@@ -35,17 +36,16 @@ public class APE {
      * Create instance of the APE solver.
      *
      * @param configPath Path to the APE configuration file. If the string is null the default './ape.config' value is assumed.
-     * @throws IOException        Exception while reading the configuration file.
-     * @throws JSONException      Exception while reading the configuration file.
-     * @throws APEConfigException Error in setting up the the configuration.
+     * @throws IOException        Exception reading the configuration file.
+     * @throws OWLOntologyCreationException	Exception reading the OWL file.
      */
-    public APE(String configPath) throws IOException, JSONException, APEConfigException {
+    public APE(String configPath) throws IOException, OWLOntologyCreationException {
         config = new APECoreConfig(configPath);
-        if (config.getCoreConfigJsonObj() == null) {
+        if (config == null) {
             throw new APEConfigException("Configuration failed. Error in configuration file.");
         }
         if (!setupDomain()) {
-            throw new APEConfigException("Error in setting up the domain.");
+            throw new APEConfigException("Error setting up the domain.");
         }
     }
 
@@ -53,11 +53,10 @@ public class APE {
      * Create instance of the APE solver.
      *
      * @param configObject The APE configuration JSONObject{@link JSONObject}.
-     * @throws IOException        Exception while reading the configuration file.
-     * @throws JSONException      Exception while reading the configuration file.
-     * @throws APEConfigException Error in setting up the the configuration.
+     * @throws IOException        Exception while reading the configuration file or the tool annotations file.
+     * @throws OWLOntologyCreationException  Error in reading the OWL file.
      */
-    public APE(JSONObject configObject) throws IOException, JSONException, APEConfigException {
+    public APE(JSONObject configObject) throws IOException, OWLOntologyCreationException {
         config = new APECoreConfig(configObject);
         if (!setupDomain()) {
             throw new APEConfigException("Error in setting up the domain.");
@@ -69,9 +68,11 @@ public class APE {
      * corresponding annotation and constraints files.
      *
      * @return true if the setup was successfully performed, false otherwise.
-     * @throws ExceptionInInitializerError Exception while reading the provided ontology.
+     * @throws APEDimensionsException Exception while reading the provided ontology.
+     * @throws IOException Error in handling a JSON file containing tool annotations.
+     * @throws OWLOntologyCreationException Error in reading the OWL file.
      */
-    private boolean setupDomain() throws ExceptionInInitializerError {
+    private boolean setupDomain() throws APEDimensionsException, IOException, OWLOntologyCreationException {
         // Variable that describes a successful execution of the method.
         boolean succRun = true;
         /*
@@ -80,7 +81,7 @@ public class APE {
          */
         apeDomainSetup = new APEDomainSetup(config);
 
-        OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntologyPath());
+        OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntologyFile());
         boolean ontologyRead = owlReader.readOntology();
 
         if (!ontologyRead) {
@@ -89,7 +90,7 @@ public class APE {
         }
 
         // Update allModules and allTypes sets based on the module.json file
-        succRun &= APEUtils.readModuleJson(config.getToolAnnotationsPath(), apeDomainSetup);
+        succRun &= APEUtils.readModuleJson(config.getToolAnnotationsFile(), apeDomainSetup);
 
         succRun &= apeDomainSetup.trimTaxonomy();
 
@@ -162,78 +163,57 @@ public class APE {
      * @param configObject   Object that contains run configurations.
      * @return The list of all the solutions.
      * @throws IOException   Error in case of not providing a proper configuration file.
-     * @throws JSONException Error in configuration object.
      */
-    public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, JSONException, APEConfigException {
+    public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException {
         return runSynthesis(configObject, this.getDomainSetup());
     }
 
     /**
      * Setup a new run instance of the APE solver and run the synthesis algorithm.
      *
-     * @param configObject   Object that contains run configurations.
+     * @param runConfigPath     Path to the JSON that contains run configurations.
+     * @return The list of all the solutions.
+     * @throws IOException   Error in case of not providing a proper configuration file.
+     */
+    public SATsolutionsList runSynthesis(String runConfigPath) throws IOException {
+    	String configContent = APEUtils.getFileContent(runConfigPath);
+    	JSONObject configObject = new JSONObject(configContent);
+        return runSynthesis(configObject, this.getDomainSetup());
+    }
+    
+    /**
+     * Setup a new run instance of the APE solver and run the synthesis algorithm.
+     *
+     * @param runConfigJson   Object that contains run configurations.
      * @param apeDomainSetup Domain information, including all the existing tools and types.
      * @return The list of all the solutions.
      * @throws IOException   Error in case of not providing a proper configuration file.
      * @throws JSONException Error in configuration object.
      */
-    public SATsolutionsList runSynthesis(JSONObject configObject, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
+    private SATsolutionsList runSynthesis(JSONObject runConfigJson, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
         apeDomainSetup.clearConstraints();
-        config.setupRunConfiguration(configObject, apeDomainSetup);
-        if (config.getRunConfigJsonObj() == null) {
-            throw new JSONException("Run configuration failed. Error in configuration object.");
-        }
-        SATsolutionsList solutions = executeSynthesis();
+        APERunConfig runConfig = new APERunConfig(runConfigJson, apeDomainSetup);
+        SATsolutionsList solutions = executeSynthesis(runConfig);
 
         return solutions;
     }
 
-    /**
-     * Setup a new run instance of the APE solver and run the synthesis algorithm.
-     *
-     * @param configPath     Path to the JSON that contains run configurations.
-     * @return The list of all the solutions.
-     * @throws IOException   Error in case of not providing a proper configuration file.
-     * @throws JSONException Error in configuration object.
-     */
-    public SATsolutionsList runSynthesis(String configPath) throws IOException, JSONException, APEConfigException {
-        return runSynthesis(configPath, this.getDomainSetup());
-    }
-
-    /**
-     * Setup a new run instance of the APE solver and run the synthesis algorithm.
-     *
-     * @param configPath     Path to the JSON that contains run configurations.
-     * @param apeDomainSetup Domain information, including all the existing tools and types.
-     * @return The list of all the solutions.
-     * @throws IOException   Error in case of not providing a proper configuration file.
-     * @throws JSONException Error in configuration object.
-     */
-    public SATsolutionsList runSynthesis(String configPath, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
-        config.setupRunConfiguration(configPath, apeDomainSetup);
-        if (config.getRunConfigJsonObj() == null) {
-            throw new JSONException("Run configuration failed. Error in configuration file.");
-        }
-
-        SATsolutionsList solutions = executeSynthesis();
-
-        return solutions;
-    }
 
     /**
      * Run the synthesis for the given workflow specification.
+     * @param runConfig 
      *
      * @return The list of all the solutions.
      * @throws IOException Error in case of not providing a proper configuration file.
      */
-    private SATsolutionsList executeSynthesis() throws IOException {
+    private SATsolutionsList executeSynthesis(APERunConfig runConfig) throws IOException {
         /* List of all the solutions */
-        SATsolutionsList allSolutions = new SATsolutionsList(config);
-
-        APEUtils.readConstraints(config.getConstraintsPath(), apeDomainSetup);
+        SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
+        
+        APEUtils.readConstraints(runConfig.getConstraintsPath(), apeDomainSetup);
 
         /* Print the setup information when necessary. */
-        APEUtils.debugPrintout(config.getDebugMode(), apeDomainSetup);
+        APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);
 
         /*
          * Loop over different lengths of the workflow until either, max workflow length
@@ -241,11 +221,11 @@ public class APE {
          */
         String globalTimerID = "globalTimer";
         APEUtils.timerStart(globalTimerID, true);
-        int solutionLength = config.getSolutionMinLength();
+        int solutionLength = runConfig.getSolutionMinLength();
         while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
-                && solutionLength <= config.getSolutionMaxLength()) {
+                && solutionLength <= runConfig.getSolutionMaxLength()) {
 
-            SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, config,
+            SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, runConfig,
                     solutionLength);
 
             APEUtils.printHeader(implSATsynthesis.getSolutionSize(), "Workflow discovery - length");
@@ -259,7 +239,7 @@ public class APE {
             implSATsynthesis.synthesisExecution();
 
             if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
-                    || solutionLength == config.getSolutionMaxLength()) {
+                    || solutionLength == runConfig.getSolutionMaxLength()) {
                 APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
             }
 
@@ -277,14 +257,14 @@ public class APE {
      * @return true if the writing was successfully performed, false otherwise.
      * @throws IOException Exception if file not found.
      */
-    public boolean writeSolutionToFile(SATsolutionsList allSolutions) throws IOException {
+    public static boolean writeSolutionToFile(SATsolutionsList allSolutions) throws IOException {
         StringBuilder solutions2write = new StringBuilder();
 
         for (int i = 0; i < allSolutions.size(); i++) {
             solutions2write = solutions2write.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution())
                     .append("\n");
         }
-        APEUtils.write2file(solutions2write.toString(), new File(config.getSolutionPath()), false);
+        APEUtils.write2file(solutions2write.toString(), new File(allSolutions.getRunConfiguration().getSolutionPath()), false);
 
         return true;
     }
@@ -295,9 +275,9 @@ public class APE {
      * @param allSolutions Set of {@link SolutionWorkflow}.
      * @return true if the execution was successfully performed, false otherwise.
      */
-    public boolean writeExecutableWorkflows(SATsolutionsList allSolutions) {
-        String executionsFolder = config.getExecutionScriptsFolder();
-        Integer noExecutions = config.getNoExecutions();
+    public static boolean writeExecutableWorkflows(SATsolutionsList allSolutions) {
+        String executionsFolder = allSolutions.getRunConfiguration().getExecutionScriptsFolder();
+        Integer noExecutions = allSolutions.getRunConfiguration().getNoExecutions();
         if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
             return false;
         }
@@ -336,9 +316,9 @@ public class APE {
      * @return true if the generating was successfully performed, false otherwise.
      * @throws IOException Exception if graph cannot be written to the file system.
      */
-    public boolean writeDataFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
-        String graphsFolder = config.getSolutionGraphsFolder();
-        Integer noGraphs = config.getNoGraphs();
+    public static boolean writeDataFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
+        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder();
+        Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
         if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
             return false;
         }
@@ -377,9 +357,9 @@ public class APE {
      * @return true if the generating was successfully performed, false otherwise.
      * @throws IOException Exception if graphs cannot be written to the file system.
      */
-    public boolean writeControlFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
-        String graphsFolder = config.getSolutionGraphsFolder();
-        Integer noGraphs = config.getNoGraphs();
+    public static boolean writeControlFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
+        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder();
+        Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
         if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
             return false;
         }

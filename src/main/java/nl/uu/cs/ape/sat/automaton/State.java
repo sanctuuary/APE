@@ -24,13 +24,14 @@ public class State implements PredicateLabel {
      * @param workflowStateType Parameter determining the state type.
      * @param blockNumber       Corresponds to the block number within the type automaton (not applicable for the module automaton).
      * @param stateNumber       Corresponds to the state number within block.
-     * @param input_branching   Max number of branching.
+     * @param inputBranching   Max number of inputs per module.
+     * @param outputBranching   Max number of outputs per module.
      */
-    public State(WorkflowElement workflowStateType, Integer blockNumber, int stateNumber, int input_branching) {
+    public State(WorkflowElement workflowStateType, Integer blockNumber, int stateNumber, int inputBranching, int outputBranching) {
 
         this.stateName = WorkflowElement.getStringShortcut(workflowStateType, blockNumber, stateNumber);
         this.stateNumber = stateNumber;
-        this.absoluteStateNumber = calculateAbsStateNumber(blockNumber, stateNumber, input_branching, workflowStateType);
+        this.absoluteStateNumber = calculateAbsStateNumber(blockNumber, stateNumber, inputBranching, outputBranching, workflowStateType);
         this.workflowStateType = workflowStateType;
     }
 
@@ -142,19 +143,20 @@ public class State implements PredicateLabel {
      *
      * @param blockNumber     Corresponds to the block number within the type automaton (not applicable for the module automaton).
      * @param stateNumber     Corresponds to the state number within block.
-     * @param input_branching Max number of branching.
+     * @param inputBranching   Max number of inputs per module.
+     * @param outputBranching   Max number of outputs per module.
      * @param typeOfTheState  Parameter determining the state type.
      * @return The calculated absolute order number of the state.
      */
-    private static int calculateAbsStateNumber(Integer blockNumber, int stateNumber, int input_branching, WorkflowElement typeOfTheState) {
+    private static int calculateAbsStateNumber(Integer blockNumber, int stateNumber, int inputBranching, int outputBranching, WorkflowElement typeOfTheState) {
         int absOrderNumber = -1;
 
         if (typeOfTheState == WorkflowElement.MEMORY_TYPE) {        /* Case: Memory Type State */
-            absOrderNumber = (blockNumber * input_branching * 2) + blockNumber + stateNumber;
+            absOrderNumber = (blockNumber * (inputBranching + outputBranching)) + blockNumber + stateNumber;
         } else if (typeOfTheState == WorkflowElement.USED_TYPE) {    /* Case: Used Type State */
-            absOrderNumber = (blockNumber * input_branching * 2) + blockNumber + input_branching + stateNumber;
+            absOrderNumber = (blockNumber * (inputBranching + outputBranching)) + blockNumber + outputBranching + stateNumber;
         } else if (typeOfTheState == WorkflowElement.MODULE) {        /* Case: Module/Tool State */
-            absOrderNumber = (stateNumber * input_branching * 2) + stateNumber - 1;
+            absOrderNumber = (stateNumber * (inputBranching + outputBranching) * 2) + stateNumber - 1;
         }
 
         return absOrderNumber;

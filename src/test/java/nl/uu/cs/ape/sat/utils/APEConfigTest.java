@@ -7,6 +7,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+
 import util.TagInfo;
 import util.TagTypeEvaluation;
 
@@ -93,7 +95,7 @@ class APEConfigTest {
 
     /**
      * Verify that the template is still correct.
-     * Setting up thh framework should not induce any exceptions.
+     * Setting up the framework should not induce any exceptions.
      */
     @Test
     public void verifyCorrectTemplate() {
@@ -101,7 +103,8 @@ class APEConfigTest {
             JSONObject template = getCorrectTemplate();
             APECoreConfig config = new APECoreConfig(template);
             APE ape = new APE(template);
-            boolean success = config.setupRunConfiguration(template, ape.getDomainSetup());
+            APERunConfig runCOnfig = new APERunConfig(template, ape.getDomainSetup());
+            boolean success = true;
             assertTrue(success);
         });
     }
@@ -121,7 +124,7 @@ class APEConfigTest {
         }
 
         /* Missing one of the obligatory run tags should  result in an exception while executing the run phase. */
-        for (String tag : APECoreConfig.getObligatoryRunTags()) {
+        for (String tag : APERunConfig.getObligatoryRunTags()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag);
             assertDoesNotThrow(() -> new APECoreConfig(obj));
@@ -129,7 +132,7 @@ class APEConfigTest {
         }
 
         /* Missing one of the optional tags should not throw an exception, but should display a warning. */
-        for (String tag : ArrayUtils.addAll(APECoreConfig.getOptionalCoreTags(), APECoreConfig.getOptionalRunTags())) {
+        for (String tag : ArrayUtils.addAll(APECoreConfig.getOptionalCoreTags(), APERunConfig.getOptionalRunTags())) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag);
             assertDoesNotThrow(() -> new APECoreConfig(obj));
@@ -140,9 +143,10 @@ class APEConfigTest {
     /**
      * Test if the {@link APEConfigException#pathNotFound} exception
      * is thrown on an incorrect value for tags that expect a path.
+     * @throws OWLOntologyCreationException Error reading the OWL (ontology) file.
      */
     @Test
-    public void testIncorrectFilePaths() {
+    public void testIncorrectFilePaths() throws OWLOntologyCreationException {
 
         final String[] pathTags = new String[]{"ontology_path", "tool_annotations_path"};
         final String[] wrongPaths = new String[]{null, "", "./does/not/exist.json", "does/not/exist.json", "./does/not/exist/", "does/not/exist/", TestUtil.getAbsoluteResourcePath("") + "\\doesnotexist.json"};
@@ -163,9 +167,10 @@ class APEConfigTest {
     /**
      * Test if the {@link APEConfigException#pathNotFound} exception
      * is thrown on an incorrect value for tags that expect a path.
+     * @throws OWLOntologyCreationException Error reading the OWL (ontology) file.
      */
     @Test
-    public void testIncorrectDirectoryPaths() {
+    public void testIncorrectDirectoryPaths() throws OWLOntologyCreationException {
 
         final String[] pathTags = new String[]{ "execution_scripts_folder", "solution_graphs_folder"};
         final String[] wrongPaths = new String[]{null, "file.json", TestUtil.getAbsoluteResourcePath("") + "\\file.json"};
@@ -184,7 +189,7 @@ class APEConfigTest {
     }
 
     @Test
-    public void testSolutionsPath(){
+    public void testSolutionsPath() throws OWLOntologyCreationException{
         final String tag = "solutions_path";
 
         // an existing file should be allowed
@@ -261,16 +266,16 @@ class APEConfigTest {
      * Creates a configuration from JSON and executes {@link APECoreConfig#setupRunConfiguration}
      *
      * @param obj The configuration to set up.
-     * @throws IOException        Error if a path provided in the configuration file is incorrect.
-     * @throws APEConfigException Error if a tag provided in the configuration file is incorrect.
+     * @throws IOException        			Error if a path provided in the configuration file is incorrect.
+     * @throws OWLOntologyCreationException Error reading the OWL (ontology) file.
      */
-    private void setupRun(JSONObject obj) throws IOException, APEConfigException {
+    private void setupRun(JSONObject obj) throws IOException, OWLOntologyCreationException {
         APE ape = new APE(obj);
         APECoreConfig config = new APECoreConfig(obj);
-        config.setupRunConfiguration(obj, ape.getDomainSetup());
+        APERunConfig runCOnfig = new APERunConfig(obj, ape.getDomainSetup());
     }
 
-    private String[] otherTagsThan(String[] tags) {
-        return ArrayUtils.removeElements(APECoreConfig.getAllTags(), tags);
-    }
+//    private String[] otherTagsThan(String[] tags) {
+//        return ArrayUtils.removeElements(APECoreConfig.getAllTags(), tags);
+//    }
 }

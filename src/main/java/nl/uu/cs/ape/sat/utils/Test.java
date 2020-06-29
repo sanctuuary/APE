@@ -6,6 +6,7 @@ import nl.uu.cs.ape.sat.models.AtomMappings;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,7 +41,7 @@ public class Test {
         }
     }
 
-    private static APE runSynthesisSetup() {
+    private static APE runSynthesisSetup() throws ExceptionInInitializerError, OWLOntologyCreationException {
         String path = "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/UseCase1/";
         String fileName = "ape.configuration";
         if (!APEUtils.isValidReadFile(path + fileName)) {

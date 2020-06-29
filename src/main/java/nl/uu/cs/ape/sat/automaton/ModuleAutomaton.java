@@ -21,15 +21,16 @@ public class ModuleAutomaton implements Automaton {
     /**
      * Generate the Module State automatons based on the defined length.
      *
-     * @param automata_bound  Length of the automaton.
-     * @param input_branching Input branching factor (max number of inputs for modules).
+     * @param automataBound  Length of the automaton.
+     * @param inputBranching Input branching factor (max number of inputs for modules).
+     * @param outputBranching Output branching factor (max number of inputs for modules).
      */
-    public ModuleAutomaton(int automata_bound, int input_branching) {
+    public ModuleAutomaton(int automataBound, int inputBranching, int outputBranching) {
         moduleStates = new ArrayList<State>();
-        automata_bound = Math.max(automata_bound, 1);
+        automataBound = Math.max(automataBound, 1);
 
-        for (int i = 1; i <= automata_bound; i++) {
-            State tmpState = new State(WorkflowElement.MODULE, null, i, input_branching);
+        for (int i = 1; i <= automataBound; i++) {
+            State tmpState = new State(WorkflowElement.MODULE, null, i, inputBranching, outputBranching);
             moduleStates.add(tmpState);
         }
     }

@@ -11,6 +11,7 @@ import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
+import nl.uu.cs.ape.sat.utils.APERunConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.apache.commons.io.IOUtils;
 import org.sat4j.core.VecInt;
@@ -45,7 +46,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     /**
      * APE library configuration object.
      */
-    private final APECoreConfig config;
+    private final APERunConfig runConfig;
 
     /**
      * Mapping of all the predicates to integers.
@@ -82,21 +83,23 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
      *
      * @param domainSetup  Domain information, including all the existing tools and types.
      * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @param config       Setup configuration for the synthesis.
+     * @param runConfig       Setup configuration for the synthesis.
      * @param size         TODO
      */
     public SAT_SynthesisEngine(APEDomainSetup domainSetup, SATsolutionsList allSolutions,
-                               APECoreConfig config, int size) {
+                               APERunConfig runConfig, int size) {
         this.domainSetup = domainSetup;
         this.allSolutions = allSolutions;
-        this.config = config;
+        this.runConfig = runConfig;
         allSolutions.newEncoding();
         this.mappings = allSolutions.getMappings();
         this.temp_sat_input = null;
         this.cnfEncoding = new StringBuilder();
 
-        moduleAutomaton = new ModuleAutomaton(size, config.getMaxNoToolOutputs());
-        typeAutomaton = new TypeAutomaton(size, config.getMaxNoToolInputs(), config.getMaxNoToolOutputs());
+        int maxNoToolInputs = Math.max(domainSetup.getMaxNoToolInputs(), runConfig.getProgramOutputs().size());
+        int maxNoToolOutputs = Math.max(domainSetup.getMaxNoToolOutputs(), runConfig.getProgramInputs().size());
+        moduleAutomaton = new ModuleAutomaton(size, maxNoToolInputs, maxNoToolOutputs);
+        typeAutomaton = new TypeAutomaton(size, maxNoToolInputs, maxNoToolOutputs);
     }
 
     /**
@@ -116,7 +119,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
         }
         /* Generate the automaton */
         String currLengthTimer = "length" + this.getSolutionSize();
-        APEUtils.timerStart(currLengthTimer, config.getDebugMode());
+        APEUtils.timerStart(currLengthTimer, runConfig.getDebugMode());
 
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
@@ -167,7 +170,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
          * reuse the mappings for states, instead of introducing new ones, using the I/O
          * types of NodeType.UNKNOWN.
          */
-        String inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), config.getProgramInputs(), typeAutomaton, mappings);
+        String inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton, mappings);
         if (inputDataEncoding == null) {
             return false;
         }
@@ -175,7 +178,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
         /*
          * Encode the workflow output
          */
-        String outputDataEncoding = SATTypeUtils.encodeOutputData(domainSetup.getAllTypes(), config.getProgram_outputs(), typeAutomaton, mappings);
+        String outputDataEncoding = SATTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton, mappings);
         if (outputDataEncoding == null) {
             return false;
         }
@@ -271,7 +274,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
                  * Adding the negation of the positive part of the solution as a constraint
                  * (default negation does not work)
                  */
-                IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray(config.getToolSeqRepeat()));
+                IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray(runConfig.getToolSeqRepeat()));
                 solver.addClause(negSol);
             }
         } catch (ParseFormatException e) {
@@ -297,12 +300,12 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 
 
     /**
-     * Gets config.
+     * Gets run configuration.
      *
-     * @return the config
+     * @return the runConfig
      */
-    public APECoreConfig getConfig() {
-        return config;
+    public APERunConfig getConfig() {
+        return runConfig;
     }
 
     /**

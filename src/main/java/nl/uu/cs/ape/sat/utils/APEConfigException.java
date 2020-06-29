@@ -17,7 +17,7 @@ import java.io.IOException;
  *   <li>IOException: Errors in in reading from the file system.</li>
  * </ul>
  */
-public class APEConfigException extends Exception {
+public class APEConfigException extends RuntimeException {
 
     /**
      * Instantiates a new Ape config exception.
@@ -26,25 +26,6 @@ public class APEConfigException extends Exception {
      */
     public APEConfigException(String message) {
         super(message);
-    }
-
-    /**
-     * Instantiates a new Ape config exception.
-     *
-     * @param message The message that will be passed to the {@link Exception} super class.
-     * @param cause   The cause of this exception.
-     */
-    public APEConfigException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Instantiates a new Ape config exception.
-     *
-     * @param cause The cause of this exception.
-     */
-    public APEConfigException(Throwable cause) {
-        super(cause.getMessage(), cause);
     }
 
     /**
@@ -116,6 +97,16 @@ public class APEConfigException extends Exception {
     public static IOException notAFile(String tag, String path) {
         return new IOException(String.format("Provided path '%s' for tag '%s' is not a file.", path, tag));
     }
+    
+    /**
+     * Path is found, but it is not a file.
+     *
+     * @param path The relative- or absolute path to a JSON- or OWL file.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static IOException notAFile(String path) {
+        return new IOException(String.format("Provided path '%s' is not a file.", path));
+    }
 
     /**
      * File is found, but it is not in the correct format.
@@ -149,5 +140,16 @@ public class APEConfigException extends Exception {
      */
     public static IOException missingPermission(String tag, String path, Object missingPermission) {
         return new IOException(String.format("You are missing [%s] permission for path '%s' for tag '%s'", missingPermission, path, tag));
+    }
+    
+    /**
+     * Missing permission ape config exception.
+     *
+     * @param path              The relative- or absolute path to a JSON- or OWL file.
+     * @param missingPermission The missing READ or WRITE permission for the file described by the path.
+     * @return Configuration exception with information that may help the user solve the problem.
+     */
+    public static IOException missingPermission(String path, Object missingPermission) {
+        return new IOException(String.format("You are missing [%s] permission for path '%s' for ", missingPermission, path));
     }
 }

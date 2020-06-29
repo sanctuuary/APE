@@ -3,6 +3,7 @@ package nl.uu.cs.ape.sat.core.implSAT;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.utils.APECoreConfig;
+import nl.uu.cs.ape.sat.utils.APERunConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,29 +22,35 @@ public class SATsolutionsList {
     /**
      * Max number of solutions that should be found.
      */
-    private int maxSolutions;
+    private final int maxSolutions;
 
     /**
      * Mapping of predicates into integers (for SAT encoding).
      */
-    private AtomMappings mappings;
+    private final AtomMappings mappings;
 
+    /**
+     * Current colution index.
+     */
     private int solutionIndex = 0;
-
+    /**
+     * APE run configuration.
+     */
+    private final APERunConfig runConfig;
     /**
      * Create an object that will contain all the solutions of the synthesis.
      *
-     * @param config - setup configuration for the synthesis.
+     * @param runConfig - setup configuration for the synthesis run.
      */
-    public SATsolutionsList(APECoreConfig config) {
+    public SATsolutionsList(APERunConfig runConfig) {
         this.solutions = new ArrayList<SolutionWorkflow>();
-
+        this.runConfig = runConfig;
         /* Provides mapping from each atom to a number, and vice versa */
-        mappings = new AtomMappings();
+        this. mappings = new AtomMappings();
 
         /* Variables defining the current and maximum lengths and solutions count.*/
-        maxSolutions = config.getMaxNoSolutions();
-        if (maxSolutions > 1000) {
+        this.maxSolutions = runConfig.getMaxNoSolutions();
+        if (this.maxSolutions > 1000) {
             System.out.println("Looking for " + maxSolutions + " solutions might take some time.");
         }
     }
@@ -83,6 +90,14 @@ public class SATsolutionsList {
     public boolean isEmpty() {
         return this.solutions.isEmpty();
     }
+    
+    /**
+     * Get the ape run configuration available at the start.
+     * @return the object that contains the run configuration information.
+     */
+    public APERunConfig getRunConfiguration() {
+    	return runConfig;
+    }
 
     /**
      * The procedure resets the encodings specific for a synthesis run (such as auxiliary variables).
@@ -90,7 +105,7 @@ public class SATsolutionsList {
     protected void newEncoding() {
         mappings.resetAuxVariables();
     }
-
+    
     /**
      * Appends all of the elements in the specified collection to the end of this list, in the order
      * that they are returned by the specified collection's iterator (optional operation). The behavior

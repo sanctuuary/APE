@@ -48,6 +48,16 @@ public class APEDomainSetup {
      */
     private List<ConstraintTemplateData> unformattedConstr;
     private List<AuxTaxonomyPredicate> helperPredicates;
+    
+    /**
+     * Maximum number of inputs that a tool can have.
+     */
+    private int maxNoToolInputs = 0;
+    
+    /**
+     * Maximum number of outputs that a tool can have.
+     */
+    private int maxNoToolOutputs = 0;
 
     /**
      * Instantiates a new Ape domain setup.
@@ -274,11 +284,63 @@ public class APEDomainSetup {
     }
 
     /**
-     * Gets ontology prefix uri.
+     * Gets ontology prefix URI.
      *
-     * @return the ontology prefix uri
+     * @return the ontology prefix URI
      */
     public String getOntologyPrefixURI() {
         return ontologyPrexifURI;
     }
+
+	/** 
+	 * Get the maximum number of inputs that a tool can have.
+	 * @return the field {@link maxNoToolInputs}. */
+	public int getMaxNoToolInputs() {
+		return maxNoToolInputs;
+	}
+
+	/**
+	 * Set the maximum number of inputs that a tool can have.
+	 * @param maxNoToolInputs the maxNoToolInputs to set
+	 */
+	public void setMaxNoTooInputs(int maxNoTooInputs) {
+		this.maxNoToolInputs = maxNoTooInputs;
+	}
+	
+	/**
+	 * Update the maximum number of inputs that a tool can have, i.e. increase the number if the current max number is smaller than the new number of inputs.
+	 * @param maxNoToolInputs the number of inputs that a tool has
+	 */
+	public void updateMaxNoToolInputs(int currNoInputs) {
+		if(this.maxNoToolInputs < currNoInputs) {
+			this.maxNoToolInputs = currNoInputs;
+		}
+	}
+
+	/** 
+	 * get the maximum number of outputs that a tool can have.
+	 * @return the field {@link maxNoToolOutputs}. */
+	public int getMaxNoToolOutputs() {
+		return maxNoToolOutputs;
+	}
+
+	/**
+	 * Set the maximum number of outputs that a tool can have.
+	 * @param maxNoToolOutputs the maxNoToolOutputs to set
+	 */
+	public void setMaxNoToolOutputs(int maxNoTooOutputs) {
+		this.maxNoToolOutputs = maxNoTooOutputs;
+	}
+
+	/**
+	 * Update the maximum number of outputs that a tool can have, i.e. increase the number if the current max number is smaller than the new number of outputs.
+	 * @param maxNoToolOutputs the number of outputs that the current tool has
+	 */
+	public void updateMaxNoToolOutputs(int currNoOutputs) {
+		if(this.maxNoToolInputs < currNoOutputs) {
+			this.maxNoToolInputs = currNoOutputs;
+		}
+	}
+    
+    
 }
