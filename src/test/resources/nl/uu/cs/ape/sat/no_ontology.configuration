@@ -2,7 +2,7 @@
   "ontologyPrexifIRI": "http://www.co-ode.org/ontologies/ont.owl#",
   "toolsTaxonomyRoot": "ToolsTaxonomy",
   "dataTaxonomyRoot": "DataTaxonomy",
-  "dataSubTaxonomyRoot": [ "TypesTaxonomy" ],
+  "dataDimensionsTaxonomyRoots": [ "TypesTaxonomy" ],
   "shared_memory": "true",
   "solution_min_length": "1",
   "solution_max_length": "8",

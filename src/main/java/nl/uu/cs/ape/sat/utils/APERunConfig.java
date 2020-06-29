@@ -56,13 +56,24 @@ public class APERunConfig {
 	 * obligatory tags are used in the constructor to check the presence of tags.
 	 * Optional tags or All tags are mostly used by test cases.
 	 */
-	private static final String[] obligatoryRunTags = new String[] { SOLUTION_MIN_LENGTH_TAG, SOLUTION_MAX_LENGTH_TAG,
+	private static final String[] obligatoryRunTags = new String[] { 
+			SOLUTION_MIN_LENGTH_TAG, 
+			SOLUTION_MAX_LENGTH_TAG,
 			MAX_NOSOLUTIONS_TAG
 
 	};
-	private static final String[] optionalRunTags = new String[] { PROGRAM_INPUTS_TAG, PROGRAM_OUTPUTS_TAG,
-			CONSTRAINTS_TAG, SHARED_MEMORY_TAG, NOEXECUTIONS_TAG, NO_GRAPHS_TAG, USEWORKFLOW_INPUT,
-			USE_ALL_GENERATED_DATA, DEBUG_MODE_TAG, TOOL_SEQ_REPEAT, SOLUTION_PATH_TAG, EXECUTIONSCRIPTS_FOLDER_TAG,
+	private static final String[] optionalRunTags = new String[] { 
+			PROGRAM_INPUTS_TAG, 
+			PROGRAM_OUTPUTS_TAG,
+			CONSTRAINTS_TAG, 
+			SHARED_MEMORY_TAG, 
+			NOEXECUTIONS_TAG, 
+			NO_GRAPHS_TAG, 
+			USEWORKFLOW_INPUT,
+			USE_ALL_GENERATED_DATA, 
+			DEBUG_MODE_TAG, TOOL_SEQ_REPEAT, 
+			SOLUTION_PATH_TAG, 
+			EXECUTIONSCRIPTS_FOLDER_TAG,
 			SOLUTION_GRAPHS_FOLDER_TAG };
 
 	/**
@@ -259,14 +270,29 @@ public class APERunConfig {
 		}
 
 		/* Path to the solution directory. */
-		this.solutionPath = readFilesDirectoryPath(SOLUTION_PATH_TAG, runConfiguration, Permission.WRITE);
-
+		if (runConfiguration.has(SOLUTION_PATH_TAG)) {
+			this.solutionPath = readFilesDirectoryPath(SOLUTION_PATH_TAG, runConfiguration, Permission.WRITE);
+		} else {
+			APEUtils.printWarning("Tag '" + SOLUTION_PATH_TAG
+					+ "' in the configuration file is not provided. No textual version of the solutions will not be provided.");
+		}
+		
 		/* Path to the output script directory. */
-		this.executionScriptsFolder = readDirectoryPath(EXECUTIONSCRIPTS_FOLDER_TAG, runConfiguration,
+		if (runConfiguration.has(EXECUTIONSCRIPTS_FOLDER_TAG)) {
+			this.executionScriptsFolder = readDirectoryPath(EXECUTIONSCRIPTS_FOLDER_TAG, runConfiguration,
 				Permission.WRITE);
+		} else {
+			APEUtils.printWarning("Tag '" + EXECUTIONSCRIPTS_FOLDER_TAG
+					+ "' in the configuration file is not provided. No executable solutions will not be provided.");
+		}
 
 		/* Path to the output graph directory. */
-		this.solutionGraphsFolder = readDirectoryPath(SOLUTION_GRAPHS_FOLDER_TAG, runConfiguration, Permission.WRITE);
+		if (runConfiguration.has(SOLUTION_GRAPHS_FOLDER_TAG)) {
+			this.solutionGraphsFolder = readDirectoryPath(SOLUTION_GRAPHS_FOLDER_TAG, runConfiguration, Permission.WRITE);
+		} else {
+			APEUtils.printWarning("Tag '" + SOLUTION_GRAPHS_FOLDER_TAG
+					+ "' in the configuration file is not provided. No solutions figures will not be provided.");
+		}
 
 		/* Path to the JSON constraints file. */
 		if (runConfiguration.has(CONSTRAINTS_TAG)) {

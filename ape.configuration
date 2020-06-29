@@ -2,7 +2,7 @@
   "ontology_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/demo_use_case/GMT_Demo_UseCase.owl",
   "toolsTaxonomyRoot": "ToolsTaxonomy",
   "dataTaxonomyRoot": "DataTaxonomy",
-  "dataSubTaxonomyRoot": "TypesTaxonomy",
+  "dataDimensionsTaxonomyRoots": "TypesTaxonomy",
   "tool_annotations_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/demo_use_case/tool_annotations.json",
   "constraints_path": "/home/vedran/ownCloud/PhD/All Use Cases/Evaluation/demo_use_case/constraints.json",
   "shared_memory": "true",

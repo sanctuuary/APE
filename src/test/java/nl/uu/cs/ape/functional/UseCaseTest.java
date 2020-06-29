@@ -102,7 +102,7 @@ class UseCaseTest {
 	private static UseCaseInfo[] readUseCases(String JSONPath) {
 		// TODO: read use cases from a JSON file?
 		return new UseCaseInfo[]{
-				new UseCaseInfo("SimpleDemo", "master", "SimpleDemo/ape.configuration",
+				new UseCaseInfo("SimpleDemo", "UnitTest", "SimpleDemo/ape.configuration",
 						new UseCaseMutation[]{
 								new UseCaseMutation(new JSONObject(),
 										6, new int[]{ 100 }),
