@@ -2,17 +2,16 @@ package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,8 +19,6 @@ import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
-import javax.annotation.Generated;
-import java.util.Collections;
 
 /**
  * The {@link APERunConfig} class is used to define the run configuration
@@ -921,7 +918,6 @@ public class APERunConfig {
 		public IApeDomainSetupStage withMaxNoSolutions(int maxNoSolutions);
 	}
 
-	@Generated("SparkTools")
 	public interface IApeDomainSetupStage {
 		public IBuildStage withApeDomainSetup(APEDomainSetup apeDomainSetup);
 	}
