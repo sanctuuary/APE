@@ -3,55 +3,78 @@
   "base_configuration": "GeoGMT/UnitTest/ape.configuration%5B0%5D",
   "mutations": [
     {
-      "evaluation": 0,
-      "solution_length_start": 5,
-      "expected_no_solutions": [32, 1000],
-      "config": {}
+      "description": "[NEW] replace constraints",
+      "solution_length_start": 4,
+      "expected_no_solutions": [15, 1000],
+      "replace_constraints": [
+        {
+          "constraintid": "use_t",
+          "parameters": [[ "Color_palette_table"]]
+        }
+      ]
     },
     {
-      "evaluation": 1,
+      "description": "[NEW] add constraints",
+      "solution_length_start": 9,
+      "expected_no_solutions": [640, 1000],
+      "add_constraints": [
+        {
+          "constraintid": "use_t",
+          "parameters": [[ "Color_palette_table"]]
+        }
+      ]
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 5,
+      "expected_no_solutions": [32, 1000]
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 3,
+      "expected_no_solutions": [3, 128, 1000],
+      "config": { "outputs": [] },
+      "replace_constraints": []
+    },
+    {
+      "description": "TODO",
       "solution_length_start": 1,
       "expected_no_solutions": [],
       "config": { "shared_memory": "false" }
     },
     {
-      "evaluation": -2,
+      "description": "TODO",
       "solution_length_start": 2,
-      "expected_no_solutions": [3, 125, 1000],
-      "config": { "constraints_path": "" }
+      "expected_no_solutions": [3, 128, 1000],
+      "replace_constraints": []
     },
     {
-      "evaluation": 2,
+      "description": "TODO",
       "solution_length_start": 5,
       "expected_no_solutions": [32, 1000],
       "config": { "tool_seq_repeat": "false" }
     },
     {
-      "evaluation": -4,
-      "solution_length_start": 6,
-      "expected_no_solutions": [32, 1000],
-      "config": { "constraints_path": "", "outputs": [] }
+      "description": "TODO",
+      "solution_length_start": 2,
+      "expected_no_solutions": [1, 16, 300, 1000],
+      "config": { "inputs": [], "outputs": [] },
+      "replace_constraints": []
     },
     {
-      "evaluation": -5,
-      "solution_length_start": 7,
-      "expected_no_solutions": [32, 1000],
-      "config": { "constraints_path": "", "inputs": [], "outputs": [] }
-    },
-    {
-      "evaluation": 3,
+      "description": "TODO",
       "solution_length_start": 6,
       "expected_no_solutions": [480, 1000],
       "config": { "inputs": [ { "TypesTaxonomy": ["XYZ_table_file"] }, { "TypesTaxonomy": ["XYZ_table_file"] } ] }
     },
     {
-      "evaluation": 4,
+      "description": "TODO",
       "solution_length_start": 5,
       "expected_no_solutions": [992, 1000],
       "config": { "outputs": [{ "TypesTaxonomy": ["PostScript"] }, { "TypesTaxonomy": ["PostScript"] }] }
     },
     {
-      "evaluation": 5,
+      "description": "TODO",
       "solution_length_start": 6,
       "expected_no_solutions": [1000],
       "config": {
@@ -60,7 +83,7 @@
       }
     },
     {
-      "evaluation": -3,
+      "description": "TODO",
       "solution_length_start": 6,
       "expected_no_solutions": [32, 1000],
       "config": { "inputs": [] }

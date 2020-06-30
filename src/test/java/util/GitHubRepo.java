@@ -3,19 +3,19 @@ package util;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static util.Evaluation.fail;
 import static util.Evaluation.success;
 import static util.TestResources.getAbsoluteRoot;
@@ -84,6 +84,21 @@ public class GitHubRepo {
 
     public JSONObject getJSONObject(String filePath) {
         return getJSONObject(filePath, this.commit);
+    }
+
+    private static int file_count = 0;
+
+    public String createJSONFile(JSONObject jsonObject, String name) {
+        File f = new File(Paths.get(this.getRoot(), this.repository, new SimpleDateFormat("yyyyMMdd_HHmmss_").format(new Date()) + name + "_" + (file_count++) + ".json").toAbsolutePath().toString());
+        try (FileWriter fw = new FileWriter(f)) {
+            f.createNewFile();
+            fw.write(jsonObject.toString(2));
+            fw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Cannot create file '%s'", name);
+        }
+        return f.getAbsolutePath();
     }
 
     private static class GitFile {
