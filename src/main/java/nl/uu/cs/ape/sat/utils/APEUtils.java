@@ -853,9 +853,10 @@ public final class APEUtils {
 	/**
 	 * Print a warning to the console for the user to see.
 	 *
-	 * @param warning The warning message.
+	 * @param message The warning message.
+	 * @param params additional parameters (uses String.format)
 	 */
-	public static void printWarning(String warning) {
-		System.out.println("[WARNING] " + warning);
+	public static void printWarning(String message, Object... params) {
+		System.out.println("\u001B[35mWARNING: " + String.format(message, params) + "\u001B[0m");
 	}
 }

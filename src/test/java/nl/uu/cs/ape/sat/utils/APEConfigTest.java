@@ -1,6 +1,5 @@
 package nl.uu.cs.ape.sat.utils;
 
-import nl.uu.cs.ape.TestUtil;
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import org.apache.commons.lang3.ArrayUtils;
@@ -8,9 +7,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-
-import util.TagInfo;
-import util.TagTypeEvaluation;
+import util.Evaluation;
+import util.TestResources;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +17,8 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static util.Evaluation.fail;
+import static util.Evaluation.success;
 
 /**
  * Tests whether human mistakes in the configuration are detected and
@@ -30,21 +30,21 @@ class APEConfigTest {
      * A correct template construct that is converted to a String at initialisation.
      */
     private static final String jsonTemplate = new JSONObject()
-            .put("ontology_path", TestUtil.getAbsoluteResourcePath("correctTemplate/ontology.owl"))
+            .put("ontology_path", TestResources.getAbsoluteResourcePath("template/ontology.owl"))
             .put("ontologyPrexifIRI", "http://www.co-ode.org/ontologies/ont.owl#")
             .put("toolsTaxonomyRoot", "ToolsTaxonomy")
             .put("dataDimensionsTaxonomyRoots", new String[]{"TypesTaxonomy"})
-            .put("tool_annotations_path", TestUtil.getAbsoluteResourcePath("correctTemplate/tool_annotations.json"))
-            .put("constraints_path", TestUtil.getAbsoluteResourcePath("correctTemplate/constraints.json"))
-            .put("solutions_path", TestUtil.getAbsoluteResourcePath("correctTemplate") + "\\solutions.txt")
+            .put("tool_annotations_path", TestResources.getAbsoluteResourcePath("template/tool_annotations.json"))
+            .put("constraints_path", TestResources.getAbsoluteResourcePath("template/constraints.json"))
+            .put("solutions_path", TestResources.getAbsoluteResourcePath("template") + "\\solutions.txt")
             .put("shared_memory", true)
             .put("tool_seq_repeat", false)
             .put("solution_min_length", 1)
             .put("solution_max_length", 5)
             .put("max_solutions", 5)
-            .put("execution_scripts_folder", TestUtil.getAbsoluteResourcePath("correctTemplate/Implementations"))
+            .put("execution_scripts_folder", TestResources.getAbsoluteResourcePath("template/Implementations"))
             .put("number_of_execution_scripts", 1)
-            .put("solution_graphs_folder", TestUtil.getAbsoluteResourcePath("correctTemplate/Figures"))
+            .put("solution_graphs_folder", TestResources.getAbsoluteResourcePath("template/Figures"))
             .put("number_of_generated_graphs", 1)
             .put("inputs", new JSONObject[]{new JSONObject().put("TypesTaxonomy", new String[]{"XYZ_table_file"})})
             .put("outputs", new JSONObject[]{new JSONObject().put("TypesTaxonomy", new String[]{"PostScript"})})
@@ -143,22 +143,23 @@ class APEConfigTest {
     /**
      * Test if the {@link APEConfigException#pathNotFound} exception
      * is thrown on an incorrect value for tags that expect a path.
+     *
      * @throws OWLOntologyCreationException Error reading the OWL (ontology) file.
      */
     @Test
     public void testIncorrectFilePaths() {
 
         final String[] pathTags = new String[]{"ontology_path", "tool_annotations_path"};
-        final String[] wrongPaths = new String[]{null, "", "./does/not/exist.json", "does/not/exist.json", "./does/not/exist/", "does/not/exist/", TestUtil.getAbsoluteResourcePath("") + "\\doesnotexist.json"};
+        final String[] wrongPaths = new String[]{null, "", "./does/not/exist.json", "does/not/exist.json", "./does/not/exist/", "does/not/exist/", TestResources.getAbsoluteResourcePath("") + "\\doesnotexist.json"};
 
         for (String tag : pathTags) {
             for (String path : wrongPaths) {
                 try {
                     setupRun(getCorrectTemplate().put(tag, path));
-                    fail(String.format("Expected exception for APECoreConfig with a wrong path '%s' for tag '%s' was not thrown.", path, tag));
+                    fail("Expected exception for APECoreConfig with a wrong path '%s' for tag '%s' was not thrown.", path, tag);
                 } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
                     assertTrue(e.getMessage().contains(tag));
-                    TestUtil.success(String.format("Expected exception was thrown for APECoreConfig with a wrong path for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+                    success("Expected exception was thrown for APECoreConfig with a wrong path for tag '%s'\nAPE message was: %s", tag, e.getMessage());
                 }
             }
         }
@@ -167,44 +168,45 @@ class APEConfigTest {
     /**
      * Test if the {@link APEConfigException#pathNotFound} exception
      * is thrown on an incorrect value for tags that expect a path.
+     *
      * @throws OWLOntologyCreationException Error reading the OWL (ontology) file.
      */
     @Test
-    public void testIncorrectDirectoryPaths()  {
+    public void testIncorrectDirectoryPaths() {
 
-        final String[] pathTags = new String[]{ "execution_scripts_folder", "solution_graphs_folder"};
-        final String[] wrongPaths = new String[]{"file.json", TestUtil.getAbsoluteResourcePath("") + "\\file.json"};
+        final String[] pathTags = new String[]{"execution_scripts_folder", "solution_graphs_folder"};
+        final String[] wrongPaths = new String[]{"file.json", TestResources.getAbsoluteResourcePath("") + "\\file.json"};
 
         for (String tag : pathTags) {
             for (String path : wrongPaths) {
                 try {
                     setupRun(getCorrectTemplate().put(tag, path));
-                    fail(String.format("Expected exception for APEConfig with a wrong path '%s' for tag '%s' was not thrown.", path, tag));
+                    fail("Expected exception for APEConfig with a wrong path '%s' for tag '%s' was not thrown.", path, tag);
                 } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
                     assertTrue(e.getMessage().contains(tag));
-                    TestUtil.success(String.format("Expected exception was thrown for APEConfig with a wrong path for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+                    success("Expected exception was thrown for APEConfig with a wrong path for tag '%s'\nAPE message was: %s", tag, e.getMessage());
                 }
             }
         }
     }
 
     @Test
-    public void testSolutionsPath(){
+    public void testSolutionsPath() {
         final String tag = "solutions_path";
 
         // an existing file should be allowed
         try {
-            final Path existingFile = Paths.get(Objects.requireNonNull(TestUtil.getAbsoluteResourcePath("testFiles/existingFile.txt")));
+            final Path existingFile = Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath("template/sat_solutions.txt")));
             assertTrue(Files.exists(existingFile));
             setupRun(getCorrectTemplate().put(tag, existingFile.toString()));
         } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
             assertTrue(e.getMessage().contains(tag));
-            fail(String.format("Unexpected exception was thrown for APEConfig with a correct file path for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+            fail("Unexpected exception was thrown for APEConfig with a correct file path for tag '%s'\nAPE message was: %s", tag, e.getMessage());
         }
 
         // a non existing file should also be allowed, APE will create the directories and file if possible
         try {
-            final Path nonExistingFile = Paths.get(TestUtil.getAbsoluteResourcePath("testFiles") + "\\newFile.json");
+            final Path nonExistingFile = Paths.get(TestResources.getAbsoluteRoot() + "\\thisFileDoesNotExist.txt");
             assertTrue(Files.notExists(nonExistingFile)); // file should not exists
             setupRun(getCorrectTemplate().put(tag, nonExistingFile.toString())); // setup APE
             assertTrue(Files.exists(nonExistingFile)); // file should now exist
@@ -215,16 +217,16 @@ class APEConfigTest {
 
         } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
             assertTrue(e.getMessage().contains(tag));
-            fail(String.format("Unexpected exception was thrown for APEConfig with a correct value for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+            fail("Unexpected exception was thrown for APEConfig with a correct value for tag '%s'\nAPE message was: %s", tag, e.getMessage());
         }
 
-        for(String incorrect : new String[]{"", "./a/directory", "a/directory", TestUtil.getAbsoluteResourcePath("") + "\\newDirectory" }){
+        for (String incorrect : new String[]{"", "./a/directory", "a/directory", TestResources.getAbsoluteResourcePath("") + "\\newDirectory"}) {
             try {
                 setupRun(getCorrectTemplate().put(tag, incorrect));
-                fail(String.format("Expected exception for APEConfig with an incorrect value '%s' for tag '%s' was not thrown.", incorrect, tag));
+                fail("Expected exception for APEConfig with an incorrect value '%s' for tag '%s' was not thrown.", incorrect, tag);
             } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
                 assertTrue(e.getMessage().contains(tag));
-                TestUtil.success(String.format("Expected exception was thrown for APEConfig with an incorrect value for tag '%s'\nAPE message was: %s", tag, e.getMessage()));
+                success("Expected exception was thrown for APEConfig with an incorrect value for tag '%s'\nAPE message was: %s", tag, e.getMessage());
             }
         }
 
@@ -233,23 +235,23 @@ class APEConfigTest {
     @Test
     public void tagTypeTest() {
 
-        TagTypeEvaluation evaluation;
+        Evaluation.TagTypeEvaluation evaluation;
 
         for (TagInfo tagInfo : tagTypes) {
 
             // true positive
-            evaluation = new TagTypeEvaluation(tagInfo.getTagType(), false);
-            for (String tag : tagInfo.getTags()) {
+            evaluation = new Evaluation.TagTypeEvaluation(tagInfo.tagType, false);
+            for (String tag : tagInfo.tags) {
                 try {
-                    setupRun(getCorrectTemplate().put(tag, tagInfo.getCorrectExample())); // set invalid value for non-boolean tag and run the configuration
+                    setupRun(getCorrectTemplate().put(tag, tagInfo.correctExample)); // set invalid value for non-boolean tag and run the configuration
                     evaluation.forTag(tag).result(true);
                 } catch (Exception e) {
                     evaluation.forTag(tag).result(false, e);
                 }
             }
 
-            for (String tag : tagInfo.getTags()) {
-                for (Object wrongExample : tagInfo.getWrongExample()) {
+            for (String tag : tagInfo.tags) {
+                for (Object wrongExample : tagInfo.wrongExamples) {
                     try {
                         setupRun(getCorrectTemplate().put(tag, wrongExample)); // set invalid value for boolean tag and run the configuration
                         evaluation.forTag(tag).result(false);
@@ -261,12 +263,11 @@ class APEConfigTest {
         }
     }
 
-
     /**
-     * Creates a configuration from JSON and executes {@link APECoreConfig#setupRunConfiguration}
+     * Creates a configuration from JSON and executes {@link APECoreConfig}
      *
      * @param obj The configuration to set up.
-     * @throws IOException        			Error if a path provided in the configuration file is incorrect.
+     * @throws IOException                  Error if a path provided in the configuration file is incorrect.
      * @throws OWLOntologyCreationException Error reading the OWL (ontology) file.
      */
     private void setupRun(JSONObject obj) throws IOException, OWLOntologyCreationException {
@@ -275,7 +276,18 @@ class APEConfigTest {
         APERunConfig runConfig = new APERunConfig(obj, ape.getDomainSetup());
     }
 
-//    private String[] otherTagsThan(String[] tags) {
-//        return ArrayUtils.removeElements(APECoreConfig.getAllTags(), tags);
-//    }
+    static class TagInfo {
+
+        public final String[] tags;
+        public final String tagType;
+        public final Object correctExample;
+        public final Object[] wrongExamples;
+
+        public TagInfo(String tagType, Object correctExample, Object[] wrongExamples, String[] tags) {
+            this.tagType = tagType;
+            this.tags = tags;
+            this.correctExample = correctExample;
+            this.wrongExamples = wrongExamples;
+        }
+    }
 }

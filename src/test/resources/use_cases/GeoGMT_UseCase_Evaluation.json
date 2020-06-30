@@ -1,0 +1,69 @@
+{
+  "name": "GeoGMT",
+  "base_configuration": "GeoGMT/UnitTest/ape.configuration%5B0%5D",
+  "mutations": [
+    {
+      "evaluation": 0,
+      "solution_length_start": 5,
+      "expected_no_solutions": [32, 1000],
+      "config": {}
+    },
+    {
+      "evaluation": 1,
+      "solution_length_start": 1,
+      "expected_no_solutions": [],
+      "config": { "shared_memory": "false" }
+    },
+    {
+      "evaluation": 2,
+      "solution_length_start": 5,
+      "expected_no_solutions": [32, 1000],
+      "config": { "tool_seq_repeat": "false" }
+    },
+    {
+      "evaluation": -4,
+      "solution_length_start": 6,
+      "expected_no_solutions": [32, 1000],
+      "config": { "constraints_path": "", "outputs": [] }
+    },
+    {
+      "evaluation": -5,
+      "solution_length_start": 7,
+      "expected_no_solutions": [32, 1000],
+      "config": { "constraints_path": "", "inputs": [], "outputs": [] }
+    },
+    {
+      "evaluation": 3,
+      "solution_length_start": 6,
+      "expected_no_solutions": [480, 1000],
+      "config": { "inputs": [ { "TypesTaxonomy": ["XYZ_table_file"] }, { "TypesTaxonomy": ["XYZ_table_file"] } ] }
+    },
+    {
+      "evaluation": 4,
+      "solution_length_start": 5,
+      "expected_no_solutions": [992, 1000],
+      "config": { "outputs": [{ "TypesTaxonomy": ["PostScript"] }, { "TypesTaxonomy": ["PostScript"] }] }
+    },
+    {
+      "evaluation": 5,
+      "solution_length_start": 6,
+      "expected_no_solutions": [1000],
+      "config": {
+        "inputs": [{ "TypesTaxonomy": ["XYZ_table_file"] }, { "TypesTaxonomy": ["XYZ_table_file"] }],
+        "outputs": [{ "TypesTaxonomy": ["PostScript"] }, { "TypesTaxonomy": ["PostScript"] }]
+      }
+    },
+    {
+      "evaluation": -2,
+      "solution_length_start": 2,
+      "expected_no_solutions": [3, 104, 1000],
+      "config": { "constraints_path": "" }
+    },
+    {
+      "evaluation": -3,
+      "solution_length_start": 6,
+      "expected_no_solutions": [32, 1000],
+      "config": { "inputs": [] }
+    }
+  ]
+}
