@@ -156,22 +156,6 @@ public class APEDomainSetup {
         return constraintFactory.getConstraintTemplate(constraintID);
     }
 
-//	TaxonomyPredicate generateAbstractType(List<TaxonomyPredicate> relatedTypes, AllTypes allTypes, LogicOperation logicOp) {
-//		if(relatedTypes.isEmpty()) {
-//			return null;
-//		}
-//		if(relatedTypes.size() == 1) {
-//			return relatedTypes.get(0);
-//		}
-//		StringBuilder abstractLabel = new StringBuilder(logicOp.toString());
-//		for(TaxonomyPredicate label : relatedTypes) {
-//			abstractLabel = abstractLabel.append(label.getPredicateID());
-//		}
-//		
-//		TaxonomyPredicate newAbsType = allTypes.addPredicate(new Type(abstractLabel, abstractLabel, relatedTypes.get(0).getRootNode(), NodeType.ABSTRACT));
-//		return newAbsType;
-//	}
-
     /**
      * Method used to generate a new predicate that should provide an interface for handling multiple predicates.
      * New predicated is used to simplify interaction with a set of related tools/types.
@@ -299,13 +283,6 @@ public class APEDomainSetup {
 		return maxNoToolInputs;
 	}
 
-	/**
-	 * Set the maximum number of inputs that a tool can have.
-	 * @param maxNoToolInputs the maxNoToolInputs to set
-	 */
-	public void setMaxNoTooInputs(int maxNoTooInputs) {
-		this.maxNoToolInputs = maxNoTooInputs;
-	}
 	
 	/**
 	 * Update the maximum number of inputs that a tool can have, i.e. increase the number if the current max number is smaller than the new number of inputs.
@@ -325,20 +302,12 @@ public class APEDomainSetup {
 	}
 
 	/**
-	 * Set the maximum number of outputs that a tool can have.
-	 * @param maxNoToolOutputs the maxNoToolOutputs to set
-	 */
-	public void setMaxNoToolOutputs(int maxNoTooOutputs) {
-		this.maxNoToolOutputs = maxNoTooOutputs;
-	}
-
-	/**
 	 * Update the maximum number of outputs that a tool can have, i.e. increase the number if the current max number is smaller than the new number of outputs.
 	 * @param maxNoToolOutputs the number of outputs that the current tool has
 	 */
 	public void updateMaxNoToolOutputs(int currNoOutputs) {
-		if(this.maxNoToolInputs < currNoOutputs) {
-			this.maxNoToolInputs = currNoOutputs;
+		if(this.maxNoToolOutputs < currNoOutputs) {
+			this.maxNoToolOutputs = currNoOutputs;
 		}
 	}
     
