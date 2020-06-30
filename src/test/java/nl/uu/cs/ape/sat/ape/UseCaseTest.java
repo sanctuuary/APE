@@ -58,6 +58,13 @@ class UseCaseTest {
 
             JSONObject config = useCase.getMutatedConfiguration(mutation);
 
+            /*
+             * If these are the generated solution lengths: S=[3,3,3,3,3, 4,4,4,4,4,4,4,4,4,4 ...] (from runSynthesis)
+             * with starting value v=3 and number of solutions N=[5, 1000] (from use_cases/GeoGMT_UseCase_Evaluation.json)
+             * then the following tests must succeed:
+             * For each N[i] in N: (S[N[i] - 1] == v + i) AND (S[N[i]] == v + i + 1)
+             */
+
             final int max_no_solutions = config.getInt("max_solutions");
             int current_solution_length = mutation.solution_length_start;
             for (int no_solutions : mutation.expected_no_solutions) {
@@ -67,9 +74,10 @@ class UseCaseTest {
 
                 SATsolutionsList solutions = new APE(config).runSynthesis(config);
                 assertEquals(current_solution_length, solutions.get(no_solutions - 1).getSolutionlength(),
-                        String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions-1, current_solution_length, solutions.get(no_solutions-1).getSolutionlength()));
+                        String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions - 1, current_solution_length, solutions.get(no_solutions - 1).getSolutionlength()));
                 success("Workflow solution at index %s has expected length of %s", no_solutions - 1, current_solution_length);
 
+                // if there are still solutions left (so not above 1000), test the upper bound
                 if (no_solutions < max_no_solutions && solutions.getNumberOfSolutions() > no_solutions) {
                     assertEquals(current_solution_length + 1, solutions.get(no_solutions).getSolutionlength(),
                             String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions, current_solution_length + 1, solutions.get(no_solutions).getSolutionlength()));

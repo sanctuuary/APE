@@ -15,6 +15,12 @@
       "config": { "shared_memory": "false" }
     },
     {
+      "evaluation": -2,
+      "solution_length_start": 2,
+      "expected_no_solutions": [3, 125, 1000],
+      "config": { "constraints_path": "" }
+    },
+    {
       "evaluation": 2,
       "solution_length_start": 5,
       "expected_no_solutions": [32, 1000],
@@ -52,12 +58,6 @@
         "inputs": [{ "TypesTaxonomy": ["XYZ_table_file"] }, { "TypesTaxonomy": ["XYZ_table_file"] }],
         "outputs": [{ "TypesTaxonomy": ["PostScript"] }, { "TypesTaxonomy": ["PostScript"] }]
       }
-    },
-    {
-      "evaluation": -2,
-      "solution_length_start": 2,
-      "expected_no_solutions": [3, 104, 1000],
-      "config": { "constraints_path": "" }
     },
     {
       "evaluation": -3,
