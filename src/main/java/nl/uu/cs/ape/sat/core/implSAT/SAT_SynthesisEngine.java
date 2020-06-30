@@ -83,8 +83,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
      *
      * @param domainSetup  Domain information, including all the existing tools and types.
      * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @param runConfig       Setup configuration for the synthesis.
-     * @param size         TODO
+     * @param runConfig    Setup configuration for the synthesis.
+     * @param size         Workflow length
      */
     public SAT_SynthesisEngine(APEDomainSetup domainSetup, SATsolutionsList allSolutions,
                                APERunConfig runConfig, int size) {
@@ -191,7 +191,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 
         /*
          * Counting the number of variables and clauses that will be given to the SAT solver
-         * TODO Improve this approach, no need to read the whole String again to cound lines.
+         * TODO Improve this approach, no need to read the whole String again to count lines.
          */
         int variables = mappings.getSize();
         int clauses = APEUtils.countNewLines(cnfEncoding.toString());
