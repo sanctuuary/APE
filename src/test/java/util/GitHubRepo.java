@@ -90,13 +90,19 @@ public class GitHubRepo {
 
     public String createJSONFile(JSONObject jsonObject, String name) {
         File f = new File(Paths.get(this.getRoot(), this.repository, new SimpleDateFormat("yyyyMMdd_HHmmss_").format(new Date()) + name + "_" + (file_count++) + ".json").toAbsolutePath().toString());
-        try (FileWriter fw = new FileWriter(f)) {
+        try {
             f.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Cannot create file '%s'", f.getAbsolutePath());
+        }
+
+        try (FileWriter fw = new FileWriter(f)) {
             fw.write(jsonObject.toString(2));
             fw.flush();
         } catch (IOException e) {
             e.printStackTrace();
-            fail("Cannot create file '%s'", name);
+            fail("Cannot write to file '%s'", f.getAbsolutePath());
         }
         return f.getAbsolutePath();
     }
@@ -175,7 +181,7 @@ public class GitHubRepo {
                 dis.close(); // close the data input stream
                 targetFile = new File(getFilePath());
                 fos = new FileOutputStream(targetFile);
-                fos.write(fileData);  // write out the file we want to save.
+                fos.write(fileData); // write out the file we want to save.
                 fos.close(); // close the output stream writer
 
                 success("Downloading file '%s' from '%s'", url.getPath(), this.repository);
