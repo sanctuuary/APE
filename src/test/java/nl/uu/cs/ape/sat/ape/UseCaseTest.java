@@ -66,11 +66,13 @@ class UseCaseTest {
                 //System.out.println(String.format("min_length=%s, no_solutions=%s, max_solutions=%s", config.getInt("solution_min_length"), no_solutions, config.getInt("max_solutions")));
 
                 SATsolutionsList solutions = new APE(config).runSynthesis(config);
-                assertEquals(current_solution_length, solutions.get(no_solutions - 1).getSolutionlength());
+                assertEquals(current_solution_length, solutions.get(no_solutions - 1).getSolutionlength(),
+                        String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions-1, current_solution_length, solutions.get(no_solutions-1).getSolutionlength()));
                 success("Workflow solution at index %s has expected length of %s", no_solutions - 1, current_solution_length);
 
                 if (no_solutions < max_no_solutions && solutions.getNumberOfSolutions() > no_solutions) {
-                    assertEquals(current_solution_length + 1, solutions.get(no_solutions).getSolutionlength());
+                    assertEquals(current_solution_length + 1, solutions.get(no_solutions).getSolutionlength(),
+                            String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions, current_solution_length + 1, solutions.get(no_solutions).getSolutionlength()));
                     success("Workflow solution at index %s has expected length of %s", no_solutions, current_solution_length + 1);
                 }
 
@@ -79,7 +81,8 @@ class UseCaseTest {
 
             // no solutions can be found
             if (mutation.expected_no_solutions.length == 0) {
-                assertEquals(0, new APE(config).runSynthesis(config).size());
+                final int no_solutions = new APE(config).runSynthesis(config).getNumberOfSolutions();
+                assertEquals(0, no_solutions, String.format("APE found '%s' solutions, while for this use case APE should have found 0.", no_solutions));
                 success("APE did not find any solutions as expected.");
             }
         }
