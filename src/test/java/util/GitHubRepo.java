@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static util.Evaluation.fail;
 import static util.Evaluation.success;
 import static util.TestResources.getAbsoluteRoot;
@@ -25,7 +24,7 @@ public class GitHubRepo {
     private String absoluteLocalRoot;
     private String repository;
     private String commit;
-    private HashMap<Integer, GitFile> files;
+    private HashMap<Integer, TempFile> files;
 
     public GitHubRepo(String repository, String commitOrBranch) {
         this.absoluteLocalRoot = Paths.get(getAbsoluteRoot(), "temp").toString();
@@ -62,9 +61,10 @@ public class GitHubRepo {
     }
 
     public String getFile(String filePath, String commit) {
-        int key = GitFile.hash(commit, filePath);
+        GitFile gf = new GitFile(absoluteLocalRoot, repository, commit, filePath);
+        int key = gf.hash(commit, filePath);
         if (!files.containsKey(key)) {
-            files.put(key, new GitFile(absoluteLocalRoot, repository, commit, filePath));
+            files.put(key, gf);
         }
         return files.get(key).getFilePath();
     }
@@ -88,67 +88,43 @@ public class GitHubRepo {
 
     private static int file_count = 0;
 
-    public String createJSONFile(JSONObject jsonObject, String name) {
-        File f = new File(Paths.get(this.getRoot(), this.repository, new SimpleDateFormat("yyyyMMdd_HHmmss_").format(new Date()) + name + "_" + (file_count++) + ".json").toAbsolutePath().toString());
-        try {
-            f.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail("Cannot create file '%s'", f.getAbsolutePath());
+    public String createJSONFile(JSONObject put, String name) {
+        TempFile temp = new TempFile(absoluteLocalRoot, new SimpleDateFormat("yyyyMMdd_HHmmss_").format(new Date()) + name + "_" + (file_count++) + ".json");
+        temp.write(put.toString(3));
+        int key = temp.hash();
+        if (!files.containsKey(key)) {
+            files.put(key, temp);
         }
-
-        try (FileWriter fw = new FileWriter(f)) {
-            fw.write(jsonObject.toString(2));
-            fw.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail("Cannot write to file '%s'", f.getAbsolutePath());
-        }
-        return f.getAbsolutePath();
+        return files.get(key).getFilePath();
     }
 
-    private static class GitFile {
+    private static class TempFile {
 
-        private final String root;
-        private final String repository;
-        private final String commit;
-        private final String relative_file_path;
+        private String folder = "";
+        private String file = "";
 
-        public GitFile(String root, String repository, String commit, String relative_file_path) {
-            this.root = root;
-            this.repository = resolvePath(repository);
-            this.commit = commit;
-            this.relative_file_path = resolvePath(relative_file_path);
-
-            if (!exists()) {
-                createFile();
-                fetchFile();
-            }
+        public TempFile(String folder, String file){
+            this.folder = folder;
+            this.file = file;
         }
 
-        private static String resolvePath(String path) {
+        public TempFile(){ }
+
+        public String getFilePath(){
+            return Paths.get(folder, file).toString();
+        }
+
+        protected static String resolvePath(String path) {
             return path.replace("./", "").replace("/", "\\");
         }
 
-        private static void createDirectory(Path directory) {
+        protected static void createDirectory(Path directory) {
             if (!Files.exists(directory) && !new File(directory.toString()).mkdirs()) {
                 fail("Could not create directory " + directory.toString());
             }
         }
 
-        public static int hash(String commit, String file) {
-            return Objects.hash(commit, resolvePath(file));
-        }
-
-        public String getFilePath() {
-            return Paths.get(root, repository, commit, relative_file_path).toString();
-        }
-
-        private boolean exists() {
-            return Files.exists(Paths.get(getFilePath()));
-        }
-
-        private void createFile() {
+        protected void createFile() {
 
             Path file = Paths.get(getFilePath());
 
@@ -161,6 +137,54 @@ public class GitHubRepo {
                     fail("Could not create file " + file.toString());
                 }
             }
+        }
+
+        protected boolean exists() {
+            return Files.exists(Paths.get(getFilePath()));
+        }
+
+        public void write(String content) {
+            try (FileWriter fw = new FileWriter(new File(getFilePath()))) {
+                fw.write(content);
+                fw.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+                fail("Cannot write to file '%s'", getFilePath());
+            }
+        }
+
+        public int hash() {
+            return Objects.hash(getFilePath());
+        }
+    }
+
+    private static class GitFile extends TempFile {
+
+        private final String root;
+        private final String repository;
+        private final String commit;
+        private final String relative_file_path;
+
+        public GitFile(String root, String repository, String commit, String relative_file_path) {
+            super();
+            this.root = root;
+            this.repository = resolvePath(repository);
+            this.commit = commit;
+            this.relative_file_path = resolvePath(relative_file_path);
+
+            if (!exists()) {
+                createFile();
+                fetchFile();
+            }
+        }
+
+        public int hash(String commit, String file) {
+            return Objects.hash(commit, resolvePath(file));
+        }
+
+        @Override
+        public String getFilePath() {
+            return Paths.get(root, repository, commit, relative_file_path).toString();
         }
 
         private void fetchFile() {
