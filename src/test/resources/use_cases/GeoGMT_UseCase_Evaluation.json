@@ -25,7 +25,7 @@
       ]
     },
     {
-      "description": "TODO",
+      "description": "The base configuration without any changes.",
       "solution_length_start": 5,
       "expected_no_solutions": [32, 1000]
     },

@@ -5,14 +5,14 @@ import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import util.GitHubRepo;
 
-import java.io.IOException;
 import java.util.Arrays;
 
+import static nl.uu.cs.ape.sat.utils.APEUtils.printWarning;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static util.Evaluation.success;
 import static util.TestResources.getJSONResource;
@@ -29,6 +29,15 @@ class UseCaseTest {
     @BeforeAll
     public static void before() {
         repo = new GitHubRepo("sanctuuary/APE_UseCases", "UnitTest");
+
+        final boolean canConnect = repo.canConnect();
+        final String message = "There needs to be an active internet connection to run the use case tests.\nSKIP: " + UseCaseTest.class.getName();
+
+        if (!canConnect)
+            printWarning(message);
+
+        // ignore use case tests if there is no active internet connection
+        Assumptions.assumeTrue(canConnect, message);
     }
 
     @AfterAll
@@ -37,22 +46,36 @@ class UseCaseTest {
     }
 
     @Test
-    void testUseCaseGeoGMT() throws IOException, OWLOntologyCreationException {
+    void GeoGMT() throws Exception {
+        testUseCase("GeoGMT", "use_cases/GeoGMT_UseCase_Evaluation.json");
+    }
 
-        if (!repo.canConnect()) {
-            System.out.println("Could not perform use case tests because there is no active internet connection.");
-            return;
-        }
+    @Test
+    void SimpleDemo() throws Exception {
+        testUseCase("SimpleDemo", "use_cases/SimpleDemo_UseCase_Evaluation.json");
+    }
+
+    @Test
+    void ImageMagick() throws Exception {
+        testUseCase("ImageMagick", "use_cases/ImageMagick_UseCase_Evaluation.json");
+    }
+
+    @Test
+    void MassSpectometry() throws Exception {
+        testUseCase("MassSpectometry", "use_cases/MassSpectometry_UseCase_Evaluation.json");
+    }
+
+    void testUseCase(String name, String evaluationPath) throws Exception {
 
         System.out.println("-------------------------------------------------------------");
-        System.out.println("       RUN USE CASE TESTS");
-        System.out.println("-------------------------------------------------------------\n");
+        System.out.println("       TEST " + name);
+        System.out.println("-------------------------------------------------------------");
 
-        UseCase useCase = new UseCase("use_cases/GeoGMT_UseCase_Evaluation.json", repo);
+        UseCase useCase = new UseCase(evaluationPath, repo);
 
         for (UseCase.Mutation mutation : useCase.mutations) {
 
-            mutation.printTitle(useCase.name);
+            mutation.print(useCase.name);
 
             final JSONObject config = mutation.execute(useCase.base_configuration);
 
@@ -68,8 +91,6 @@ class UseCaseTest {
             final int max_no_solutions = config.getInt("max_solutions");
             int current_solution_length = mutation.solution_length_start;
             for (int no_solutions : mutation.expected_no_solutions) {
-
-                //System.out.println(String.format("min_length=%s, no_solutions=%s, max_solutions=%s", config.getInt("solution_min_length"), no_solutions, config.getInt("max_solutions")));
 
                 assertEquals(current_solution_length, solutions.get(no_solutions - 1).getSolutionlength(),
                         String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions - 1, current_solution_length, solutions.get(no_solutions - 1).getSolutionlength()));
@@ -97,23 +118,13 @@ class UseCaseTest {
 
     }
 
-    @Test
-    void testUseCaseSimpleDemo() {
-
-    }
-
-    @Test
-    void testUseCaseImageMagick() {
-
-    }
-
     private static class UseCase {
 
         public final String name;
         public final JSONObject base_configuration;
         public final Mutation[] mutations;
 
-        public UseCase(String useCasePath, GitHubRepo repo) throws IOException {
+        public UseCase(String useCasePath, GitHubRepo repo) {
 
             JSONObject useCase = getJSONResource(useCasePath);
 
@@ -151,6 +162,8 @@ class UseCaseTest {
             private final static String REPLACE_CONST = "replace_constraints";
             private final static String CONSTRAINTS = "constraints";
             private final static String CONSTRAINTS_PATH = "constraints_path";
+            private final static String DESCRIPTION = "description";
+
             public final int solution_length_start;
             public final int[] expected_no_solutions;
             public JSONObject config_mutations;
@@ -163,7 +176,7 @@ class UseCaseTest {
 
                 this.config_mutations = mutation.has(CONFIG) ? mutation.getJSONObject(CONFIG) : null;
                 this.solution_length_start = mutation.getInt(START_LENGTH);
-                this.description = mutation.getString("description");
+                this.description = mutation.has(DESCRIPTION) ? mutation.getString(DESCRIPTION) : null;
 
                 JSONArray jsonArray = mutation.getJSONArray(NO_SOLUTIONS);
                 this.expected_no_solutions = new int[jsonArray.length()];
@@ -202,30 +215,28 @@ class UseCaseTest {
                 return config;
             }
 
-            @Override
-            public String toString() {
+            public void print(String name) {
+                System.out.println("-------------------------------------------------------------");
+                System.out.println("    MUTATION FOR: " + name);
 
-                String s = "Mutation{";
-                if (config_mutations != null)
-                    s += "\n   config_mutations = " + config_mutations.toString();
-                if (constraints_path != null)
-                    s += "\n   constraints_path = '" + constraints_path + '\'';
+                if (description != null) {
+                    System.out.println("    DESCRIPTION: " + description);
+                }
 
-                s += "\n   solution_length_start = " + solution_length_start;
-                s += "\n   expected_no_solutions = " + Arrays.toString(expected_no_solutions);
-                s += "\n}";
-                return s;
-            }
-
-            public void printTitle(String name) {
-                System.out.println("\n-------------------------------------------------------------");
-                System.out.println("    USE CASE " + name + ": " + description);
-                if (config_mutations != null)
+                if (config_mutations != null) {
                     System.out.println("    CONFIG MUTATION: " + config_mutations.toString());
-                if (add_constraints != null)
+                }
+
+                if (add_constraints != null) {
                     System.out.println("    ADD CONSTRAINTS: " + add_constraints.toString());
-                if (replace_constraints != null)
+                }
+
+                if (replace_constraints != null) {
                     System.out.println("    REPLACE CONSTRAINTS: " + replace_constraints.getJSONArray(CONSTRAINTS).toString());
+                }
+
+                System.out.println("    MINIMAL SOLUTION LENGTH: " + solution_length_start);
+                System.out.println("    EXPECTED AMOUNT OF SOLUTIONS STARTING AT MINIMAL SOLUTIONS: " + Arrays.toString(expected_no_solutions));
                 System.out.println("-------------------------------------------------------------\n");
             }
         }
