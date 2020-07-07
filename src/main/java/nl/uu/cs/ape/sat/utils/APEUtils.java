@@ -36,8 +36,6 @@ public final class APEUtils {
 	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
 	private final static Map<String, Long> timers = new HashMap<String, Long>();
 
-	private static boolean illegalAccessWarningsDisabled = disableIllegalAccessWarnings();
-
 	/**
 	 * Private constructor is used to to prevent instantiation.
 	 */
@@ -352,19 +350,6 @@ public final class APEUtils {
 
 		return jsonArray;
 
-	}
-
-	/**
-	 * Java uses System.err to print illegal reflective access warnings.
-	 * By closing the stream and redirecting it to System.out, the warnings won't show up.
-	 */
-	public static boolean disableIllegalAccessWarnings(){
-		if (illegalAccessWarningsDisabled)
-			return true;
-
-		System.err.close();
-		System.setErr(System.out);
-		return true;
 	}
 
 	/**
