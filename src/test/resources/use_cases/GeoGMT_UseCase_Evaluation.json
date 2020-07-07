@@ -1,0 +1,92 @@
+{
+  "name": "GeoGMT",
+  "base_configuration": "GeoGMT/UnitTest/ape.configuration%5B0%5D",
+  "mutations": [
+    {
+      "description": "[NEW] replace constraints",
+      "solution_length_start": 4,
+      "expected_no_solutions": [15, 1000],
+      "replace_constraints": [
+        {
+          "constraintid": "use_t",
+          "parameters": [[ "Color_palette_table"]]
+        }
+      ]
+    },
+    {
+      "description": "[NEW] add constraints",
+      "solution_length_start": 9,
+      "expected_no_solutions": [640, 1000],
+      "add_constraints": [
+        {
+          "constraintid": "use_t",
+          "parameters": [[ "Color_palette_table"]]
+        }
+      ]
+    },
+    {
+      "description": "The base configuration without any changes.",
+      "solution_length_start": 5,
+      "expected_no_solutions": [32, 1000]
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 3,
+      "expected_no_solutions": [3, 128, 1000],
+      "config": { "outputs": [] },
+      "replace_constraints": []
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 1,
+      "expected_no_solutions": [],
+      "config": { "shared_memory": "false" }
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 2,
+      "expected_no_solutions": [3, 128, 1000],
+      "replace_constraints": []
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 5,
+      "expected_no_solutions": [32, 1000],
+      "config": { "tool_seq_repeat": "false" }
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 2,
+      "expected_no_solutions": [1, 16, 300, 1000],
+      "config": { "inputs": [], "outputs": [] },
+      "replace_constraints": []
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 6,
+      "expected_no_solutions": [480, 1000],
+      "config": { "inputs": [ { "TypesTaxonomy": ["XYZ_table_file"] }, { "TypesTaxonomy": ["XYZ_table_file"] } ] }
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 5,
+      "expected_no_solutions": [992, 1000],
+      "config": { "outputs": [{ "TypesTaxonomy": ["PostScript"] }, { "TypesTaxonomy": ["PostScript"] }] }
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 6,
+      "expected_no_solutions": [1000],
+      "config": {
+        "inputs": [{ "TypesTaxonomy": ["XYZ_table_file"] }, { "TypesTaxonomy": ["XYZ_table_file"] }],
+        "outputs": [{ "TypesTaxonomy": ["PostScript"] }, { "TypesTaxonomy": ["PostScript"] }]
+      }
+    },
+    {
+      "description": "TODO",
+      "solution_length_start": 6,
+      "expected_no_solutions": [32, 1000],
+      "config": { "inputs": [] }
+    }
+  ]
+}

@@ -239,9 +239,8 @@ public class APERunConfig {
 	/**
 	 * Setup the configuration for the current run of the synthesis.
 	 *
-	 * @param configObject   The APE configuration JSONObject{@link JSONObject}.
-	 * @param apeDomainSetup the ape domain setup
-	 * @return the run configuration
+	 * @param runConfiguration The APE configuration {@link JSONObject}.
+	 * @param apeDomainSetup   The ape domain setup
 	 * @throws IOException        Error in reading the configuration file.
 	 * @throws JSONException      Error in parsing the configuration file.
 	 * @throws APEConfigException Error in setting up the the configuration.
@@ -292,7 +291,7 @@ public class APERunConfig {
 		}
 
 		/* Path to the JSON constraints file. */
-		if (runConfiguration.has(CONSTRAINTS_TAG)) {
+		if (runConfiguration.has(CONSTRAINTS_TAG) && !runConfiguration.getString(CONSTRAINTS_TAG).equals("")) {
 			this.constraintsPath = readFilePath(CONSTRAINTS_TAG, runConfiguration, Permission.READ);
 		} else {
 			APEUtils.printWarning("Tag '" + CONSTRAINTS_TAG
@@ -540,7 +539,7 @@ public class APERunConfig {
 			APEUtils.printWarning(
 					"Directory '" + path.getParent().toString() + "' does not exist. The directory will be created.");
 			if (directory.mkdirs()) {
-				APEUtils.printWarning("Successfully created directory '" + path.getParent().toString() + "'");
+				System.out.println("Successfully created directory '" + path.getParent().toString() + "'");
 			}
 		}
 
@@ -548,7 +547,7 @@ public class APERunConfig {
 		if (Files.notExists(path)) {
 			APEUtils.printWarning("File '" + stringPath + "' does not exist. The file will be created.");
 			if (new File(path.toString()).createNewFile()) {
-				APEUtils.printWarning("Successfully created file '" + stringPath + "'");
+				System.out.println("Successfully created file '" + stringPath + "'");
 			}
 		}
 
@@ -605,7 +604,7 @@ public class APERunConfig {
 			File directory = new File(path.toAbsolutePath().toString());
 			APEUtils.printWarning("Directory '" + stringPath + "' does not exist. The directory will be created.");
 			if (directory.mkdirs()) {
-				APEUtils.printWarning("Successfully created directory '" + stringPath + "'");
+				System.out.println("Successfully created directory '" + stringPath + "'");
 			} else {
 				throw new APEConfigException("Could not create directory '" + stringPath + "'");
 			}

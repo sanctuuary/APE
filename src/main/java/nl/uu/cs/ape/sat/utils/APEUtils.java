@@ -230,7 +230,7 @@ public final class APEUtils {
 	/**
 	 * Return the content of the file provided under the given path.
 	 * 
-	 * @param configPath
+	 * @param configPath Path to the text file.
 	 * @return String representing the content of the file.
 	 * @throws IOException Error if the the given file path is not correct or the
 	 *                     file is corrupted.
@@ -325,7 +325,7 @@ public final class APEUtils {
 	 * @param key      Key label that corresponds to the elements.
 	 * @return List of elements that corresponds to the key. If the key does not
 	 *         exists returns empty list.
-	 * @throws IOException
+	 * @throws IOException Error if the the given file path is not correct or the file is corrupted.
 	 */
 	public static List<JSONObject> getListFromJson(String jsonPath, String key) throws IOException {
 		return getListFromJson(new File(jsonPath), key);
@@ -337,7 +337,7 @@ public final class APEUtils {
 	 * the elements are put in a {@link List}, otherwise if the key corresponds to a
 	 * {@link JSONObject} list will contain only that object.
 	 *
-	 * @param jsonPath Path to the Json file.
+	 * @param jsonFile File instance containing a json file.
 	 * @param key      Key label that corresponds to the elements.
 	 * @return List of elements that corresponds to the key. If the key does not
 	 *         exists returns empty list.
@@ -853,9 +853,10 @@ public final class APEUtils {
 	/**
 	 * Print a warning to the console for the user to see.
 	 *
-	 * @param warning The warning message.
+	 * @param message The warning message.
+	 * @param params additional parameters (uses String.format)
 	 */
-	public static void printWarning(String warning) {
-		System.out.println("[WARNING] " + warning);
+	public static void printWarning(String message, Object... params) {
+		System.out.println("\u001B[35mWARNING: " + String.format(message, params) + "\u001B[0m");
 	}
 }

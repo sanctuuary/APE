@@ -156,7 +156,6 @@ public class Module extends AbstractModule {
      * @param domainSetup Domain information, including all the existing tools and types
      * @return New {@link Module} object.
      * @throws JSONException Error if the JSON file was not properly formatted.
-     * @throws OWLException Error if a given label is an empty String.
      */
     public static Module moduleFromJson(JSONObject jsonModule, APEDomainSetup domainSetup)
             throws JSONException {

@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.core.solutionStructure;
 
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.engine.GraphvizJdkEngine;
 import guru.nidi.graphviz.engine.Renderer;
 import guru.nidi.graphviz.model.Graph;
 
@@ -27,6 +28,7 @@ public class SolutionGraph {
      */
     SolutionGraph(Graph graph) {
         this.graph = graph;
+        Graphviz.useEngine(new GraphvizJdkEngine());
     }
 
     /**

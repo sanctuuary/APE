@@ -1,0 +1,11 @@
+{
+  "name": "SimpleDemo",
+  "base_configuration": "SimpleDemo/ape.configuration",
+  "mutations": [
+    {
+      "description": "The base configuration without any changes.",
+      "solution_length_start": 5,
+      "expected_no_solutions": [24, 576, 1000]
+    }
+  ]
+}
