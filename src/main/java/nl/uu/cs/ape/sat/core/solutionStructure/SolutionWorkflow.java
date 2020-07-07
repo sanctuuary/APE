@@ -318,6 +318,7 @@ public class SolutionWorkflow {
      * Returns the negated solution in mapped format. Negating the original solution
      * created by the SAT solver. Usually used to add to the solver to find new solutions.
      *
+     * @param toolSeqRepeat TODO
      * @return int[] representing the negated solution
      */
     public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {

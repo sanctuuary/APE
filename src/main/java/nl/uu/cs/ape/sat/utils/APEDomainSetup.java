@@ -278,7 +278,8 @@ public class APEDomainSetup {
 
 	/** 
 	 * Get the maximum number of inputs that a tool can have.
-	 * @return the field {@link maxNoToolInputs}. */
+     *
+	 * @return the field {@link #maxNoToolInputs}. */
 	public int getMaxNoToolInputs() {
 		return maxNoToolInputs;
 	}
@@ -286,7 +287,8 @@ public class APEDomainSetup {
 	
 	/**
 	 * Update the maximum number of inputs that a tool can have, i.e. increase the number if the current max number is smaller than the new number of inputs.
-	 * @param maxNoToolInputs the number of inputs that a tool has
+     *
+	 * @param currNoInputs the number of inputs that a tool has
 	 */
 	public void updateMaxNoToolInputs(int currNoInputs) {
 		if(this.maxNoToolInputs < currNoInputs) {
@@ -295,15 +297,17 @@ public class APEDomainSetup {
 	}
 
 	/** 
-	 * get the maximum number of outputs that a tool can have.
-	 * @return the field {@link maxNoToolOutputs}. */
+	 * Get the maximum number of outputs that a tool can have.
+     *
+	 * @return the field {@link #maxNoToolOutputs}. */
 	public int getMaxNoToolOutputs() {
 		return maxNoToolOutputs;
 	}
 
 	/**
 	 * Update the maximum number of outputs that a tool can have, i.e. increase the number if the current max number is smaller than the new number of outputs.
-	 * @param maxNoToolOutputs the number of outputs that the current tool has
+     *
+	 * @param currNoOutputs the number of outputs that the current tool has
 	 */
 	public void updateMaxNoToolOutputs(int currNoOutputs) {
 		if(this.maxNoToolOutputs < currNoOutputs) {

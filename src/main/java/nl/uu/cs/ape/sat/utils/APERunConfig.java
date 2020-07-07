@@ -239,9 +239,8 @@ public class APERunConfig {
 	/**
 	 * Setup the configuration for the current run of the synthesis.
 	 *
-	 * @param configObject   The APE configuration JSONObject{@link JSONObject}.
-	 * @param apeDomainSetup the ape domain setup
-	 * @return the run configuration
+	 * @param runConfiguration The APE configuration {@link JSONObject}.
+	 * @param apeDomainSetup   The ape domain setup
 	 * @throws IOException        Error in reading the configuration file.
 	 * @throws JSONException      Error in parsing the configuration file.
 	 * @throws APEConfigException Error in setting up the the configuration.

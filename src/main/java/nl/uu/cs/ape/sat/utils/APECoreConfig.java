@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.semanticweb.owlapi.model.OWLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,16 +74,16 @@ public class APECoreConfig {
      */
     private File toolAnnotations;
 
-    
     /**
      * Initialize the configuration of the project.
      *
-     * @param configPath Path to the APE configuration file.
-     * @throws IOException        Error in reading the configuration file.
-     * @throws JSONException      Error in parsing the configuration file.
-     * @throws APEConfigException Error in setting up the the configuration.
+     * @param ontology A file containing the APE configuration.
+     * @param ontologyPrefixURI TODO
+     * @param toolTaxonomyRoot TODO
+     * @param dataDimensionRoots TODO
+     * @param toolAnnotations TODO
      */
-    public APECoreConfig(File ontology, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations) throws IOException, JSONException {
+    public APECoreConfig(File ontology, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations) {
     	/* Path to the OWL file. */
         this.ontology = ontology;
 
@@ -143,7 +144,7 @@ public class APECoreConfig {
      * @throws IOException        Error in reading the configuration file.
      * @throws JSONException      Error in parsing the configuration file.
      * @throws APEConfigException Error in setting up the the configuration.
-     * @throws OWLException Error in setting up the the configuration.
+     * @throws OWLException       Error in setting up the ontology for the configuration.
      */
     private boolean coreConfigSetup(JSONObject coreConfiguration) throws IOException, JSONException, APEConfigException {
 
@@ -273,7 +274,7 @@ public class APECoreConfig {
     /**
      * Gets ontology path.
      *
-     * @return the {@link #ontologyPath}
+     * @return the {@link #ontology}
      */
     public File getOntologyFile() {
         return ontology;
@@ -309,7 +310,7 @@ public class APECoreConfig {
     /**
      * Gets tool annotations path.
      *
-     * @return the {@link #toolAnnotationsPath}
+     * @return the {@link #toolAnnotations}
      */
     public File getToolAnnotationsFile() {
         return toolAnnotations;
