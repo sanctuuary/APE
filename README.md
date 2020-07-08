@@ -14,7 +14,7 @@ For [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) we created a video that 
 </div>
 
 ## Requirements
-To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html) (or higher) installed on your system. To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source) the APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well.
+To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html) (or higher) installed on your system. To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well.
 
 ## Releases
 | Date       | Version | Download                                                                             |
@@ -78,6 +78,17 @@ Our use cases are motivated by practical problems in various domains (e.g. bioin
 
 For one of the bioinformatics use cases our intern Karl Allgaeuer developed a prototype of a web-based interface to APE. It is available at http://ape.science.uu.nl/ (beta).
 A Docker version of this demonstrator is available at https://github.com/sanctuuary/Burke_Docker
+
+## The APE team
+* Vedran Kasalica (v.kasalica@uu.nl), lead developer
+* Maurin Voshol, student developer
+* Anna-Lena Lamprecht, project initiator and principal investigator
+
+## Contact
+For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica@uu.nl).
+
+## Contributions
+We welcome contributions (bug reports, bug fixes, feature requests, extensions, use cases, ...) to APE. Please get in touch with Vedran Kasalica (v.kasalica@uu.nl) to coordinate your contribution. We expect all contributors to follow our [Code of Conduct](https://github.com/sanctuuary/APE/blob/master/CODE_OF_CONDUCT.md).
 
 ## Credits
 APE has been inspired by the [Loose Programming framework PROPHETS](http://ls5-www.cs.tu-dortmund.de/projects/prophets/index.php). It uses similar mechanisms for semantic domain modeling, workflow specification and synthesis, but strives to provide the automated exploration and composition functionality independent from a concrete workflow system.
