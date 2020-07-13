@@ -2,13 +2,13 @@
 
 # APE (Automated Pipeline Explorer)
 
-APE is a command line tool and Java API for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. 
+APE is a command line tool and Java API [[1]](#1) for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. 
 
 APE relies on a semantic domain model that includes tool and type taxonomies as controlled vocabularies for the description of computational tools, and functional tool annotations (inputs, outputs, operations performed) using terms from these taxonomies. Based on this domain model and a specification of the available workflow inputs, the intended workflow outputs and possibly additional constraints, APE then computes possible workflows. 
 
-Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. 
+Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. For detailed description we refer to [[2]](#2).
 
-For [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) we created a video that explains APE in 5 minutes:
+For [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) we created a video that explains APE [[1]](#1) in 5 minutes:
 <div align="left">
   <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="./res/youtubeThumbnail.png" alt="APE - Youtube video" width=30%></a>
 </div>
@@ -26,7 +26,7 @@ From the project root, simply launch
 ```shell
 $ mvn -DskipTests=true install
 ```
-to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-<version>-jar-with-dependencies.jar`
+to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-<version>-executable.jar`
 
 ## Using APE
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
@@ -35,7 +35,7 @@ Automated workflow composition with APE can be performed through its command lin
 When running APE-&lt;version>.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly. This configuration file (see [APE cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/ape.configuration) and [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)) provides references to all therefor required information:
 1. *Domain model* - classification of the types and operations in the domain in form of an **ontology** (see [ontology example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/GMT_Demo_UseCase.owl) in OWL) and a **tool annotation file** (see [tool annotations example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/tool_annotations.json) in JSON).
 2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraints.json))
-3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc.
+3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc. (see [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)).
 
 To run the APE CLI use:
 
@@ -74,9 +74,9 @@ SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 ```
 
 ## Use cases and demos
-Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS). Different examples are available at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
+Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS [[3]](#3)). Different examples are available at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
-For one of the bioinformatics use cases our intern Karl Allgaeuer developed a prototype of a web-based interface to APE. It is available at http://ape.science.uu.nl/ (beta).
+For one of the bioinformatics use cases our intern Karl Allgaeuer developed a prototype of a web-based interface to APE. It is available at http://ape.science.uu.nl/ (alpha).
 A Docker version of this demonstrator is available at https://github.com/sanctuuary/Burke_Docker
 
 ## The APE team
@@ -105,3 +105,25 @@ APE is licensed under the [Apache 2.0](https://github.com/sanctuuary/APE/blob/ma
 3. [**apache-common-lang**](https://mvnrepository.com/artifact/org.apache.commons/commons-lang3) - Apache 2.0
 4. [**graphviz-java**](https://mvnrepository.com/artifact/guru.nidi/graphviz-java) - Apache 2.0
 5. [**org.json**](https://mvnrepository.com/artifact/org.json/json) - [JSON license](https://www.json.org/license.html)
+
+## References
+<a id="1">[1]</a> 
+Kasalica V., Lamprecht AL. (2020) 
+APE: A Command-Line Tool and API for Automated Workflow Composition. 
+ICCS 2020. ICCS 2020. Lecture Notes in Computer Science, vol 12143. Springer,
+https://doi.org/10.1007/978-3-030-50436-6_34
+
+
+<a id="2">[2]</a> 
+Kasalica, V., & Lamprecht, A.-L. (2020). 
+Workflow Discovery with Semantic Constraints:
+The SAT-Based Implementation of APE. Electronic Communications of the EASST, 78(0).
+https://doi.org/10.14279/tuj.eceasst.78.1092
+
+
+<a id="3">[3]</a> 
+Kasalica, V., & Lamprecht, A.-L. (2019). 
+Workflow discovery through semantic constraints: A geovisualization case study. 
+In Computational science and its applications – ICCSA 2019
+(pp. 473–488), Springer International Publishing,
+https://doi.org/10.1007/978-3-030-24302-9_53
