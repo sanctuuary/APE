@@ -72,21 +72,27 @@ APE ape = new APE("path/to/setup-configuration.json");
 
 // run the synthesis
 SATsolutionsList solutions = ape.runSynthesis("path/to/run-configuration.json");
+// write the solutions for the file system
+APE.writeSolutionToFile(solutions);
+APE.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
+APE.writeExecutableWorkflows(solutions);
 ```
 
-However, the API allows to edit this file programmatically, and thus for instance add constraints or change execution parameters dynamically:
+However, the API allows to generate and edit the configuration file programmatically:
 
 ```java
 // set up the framework
-JSONObject setupConfig = ...
-APE ape = new APE(setupConfig);
+APECoreConfig coreConfig = new APECoreConfig(...);
+APE ape = new APE(coreConfig);
 
 // run the synthesis
-JSONObject runConfig = ...
+APERunConfig runConfig = APERunConfig.builder().withSolutionMinLength(1).withSolutionMaxLength(10)
+                                                .withMaxNoSolutions(100).withApeDomainSetup(ape.getDomainSetup())
+                                                .build();
 SATsolutionsList solutions1 = ape.runSynthesis(runConfig);
 
 // run the synthesis again with altered parameters
-runConfig.put("use_workflow_input", "ONE");
+runConfig.setUseWorkflowInput(ConfigEnum.ONE);
 SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 ```
 
