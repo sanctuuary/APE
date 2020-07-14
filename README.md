@@ -20,7 +20,7 @@ For [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) we created a video that 
 ## Requirements
 To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html) (or higher) installed on your system. To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well.
 
-## How to add APE to your project
+## How to add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
 ```xml
 <!-- https://mvnrepository.com/artifact/io.github.sanctuuary/APE -->
@@ -30,6 +30,7 @@ To add a dependency on APE using Maven, use the following:
     <version>1.0.0</version>
 </dependency>
 ```
+For more information (regarding Gradle, Ivy, etc.) check the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
 
 ## Releases
 | Date       | Version | Download                                                                             |
