@@ -2,13 +2,14 @@ package nl.uu.cs.ape.sat.ape;
 
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
+import util.GitHubRepo;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import util.GitHubRepo;
 
 import java.util.Arrays;
 
@@ -28,7 +29,7 @@ class UseCaseTest {
 
     @BeforeAll
     public static void before() {
-        repo = new GitHubRepo("sanctuuary/APE_UseCases", "UnitTest");
+        repo = new GitHubRepo("sanctuuary/APE_UseCases", "master");
 
         final boolean canConnect = repo.canConnect();
         final String message = "There needs to be an active internet connection to run the use case tests.\nSKIP: " + UseCaseTest.class.getName();

@@ -1,6 +1,6 @@
 {
   "name": "GeoGMT",
-  "base_configuration": "GeoGMT/UnitTest/ape.configuration%5B0%5D",
+  "base_configuration": "GeoGMT/E0/ape.configuration",
   "mutations": [
     {
       "description": "[NEW] replace constraints",
