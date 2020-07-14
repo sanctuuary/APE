@@ -20,6 +20,11 @@ For [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) we created a video that 
 ## Requirements
 To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html) (or higher) installed on your system. To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well.
 
+### Releases
+| Date       | Version | Download                                                                             |
+|------------|---------|--------------------------------------------------------------------------------------|
+| 15-07-2020 | 1.0.1   | [jar]() [executable]() [javadoc]() [sources]()|
+
 ## How to add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
 ```xml
@@ -32,12 +37,8 @@ To add a dependency on APE using Maven, use the following:
 ```
 For more information (regarding Gradle, Ivy, etc.) check the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
 
-## Releases
-| Date       | Version | Download                                                                             |
-|------------|---------|--------------------------------------------------------------------------------------|
-| 01-06-2020 | 1.0.0   | [APE-1.0.0.jar](https://github.com/sanctuuary/APE_UseCases/raw/master/APE-1.0.0.jar) |
 
-## How to build APE from source (using Maven)
+### How to build APE from source (using Maven)
 From the project root, simply launch
 ```shell
 $ mvn -DskipTests=true install
@@ -48,9 +49,9 @@ to build the APE modules from the source tree and the built files will be genera
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
 ### Command line interface (CLI)
-When running APE-&lt;version>.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly. This configuration file (see [APE cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/ape.configuration) and [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)) provides references to all therefor required information:
-1. *Domain model* - classification of the types and operations in the domain in form of an **ontology** (see [ontology example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/GMT_Demo_UseCase.owl) in OWL) and a **tool annotation file** (see [tool annotations example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/tool_annotations.json) in JSON).
-2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/SimpleDemo/constraints.json))
+When running APE-&lt;version>.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly. This configuration file (see [APE cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/ape.configuration) and [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)) provides references to all therefor required information:
+1. *Domain model* - classification of the types and operations in the domain in form of an **ontology** (see [ontology example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/imagemagick_taxonomy.owl) in OWL) and a **tool annotation file** (see [tool annotations example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/tool_annotations.json) in JSON).
+2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraints.json))
 3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc. (see [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)).
 
 To run the APE CLI use:
@@ -59,7 +60,7 @@ To run the APE CLI use:
 java -jar APE-<version>.jar configuration.json
 ```
 
-For more details check the [simple demo](https://github.com/sanctuuary/APE_UseCases/tree/master/SimpleDemo).
+For more details check the [demo use case](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick).
 
 ### Application programming interface (API)
 
@@ -71,21 +72,27 @@ APE ape = new APE("path/to/setup-configuration.json");
 
 // run the synthesis
 SATsolutionsList solutions = ape.runSynthesis("path/to/run-configuration.json");
+// write the solutions for the file system
+APE.writeSolutionToFile(solutions);
+APE.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
+APE.writeExecutableWorkflows(solutions);
 ```
 
-However, the API allows to edit this file programmatically, and thus for instance add constraints or change execution parameters dynamically:
+However, the API allows to generate and edit the configuration file programmatically:
 
 ```java
 // set up the framework
-JSONObject setupConfig = ...
-APE ape = new APE(setupConfig);
+APECoreConfig coreConfig = new APECoreConfig(...);
+APE ape = new APE(coreConfig);
 
 // run the synthesis
-JSONObject runConfig = ...
+APERunConfig runConfig = APERunConfig.builder().withSolutionMinLength(1).withSolutionMaxLength(10)
+                                                .withMaxNoSolutions(100).withApeDomainSetup(ape.getDomainSetup())
+                                                .build();
 SATsolutionsList solutions1 = ape.runSynthesis(runConfig);
 
 // run the synthesis again with altered parameters
-runConfig.put("use_workflow_input", "ONE");
+runConfig.setUseWorkflowInput(ConfigEnum.ONE);
 SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 ```
 
