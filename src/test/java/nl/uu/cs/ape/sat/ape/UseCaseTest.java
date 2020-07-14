@@ -51,11 +51,6 @@ class UseCaseTest {
     }
 
     @Test
-    void SimpleDemo() throws Exception {
-        testUseCase("SimpleDemo", "use_cases/SimpleDemo_UseCase_Evaluation.json");
-    }
-
-    @Test
     void ImageMagick() throws Exception {
         testUseCase("ImageMagick", "use_cases/ImageMagick_UseCase_Evaluation.json");
     }
