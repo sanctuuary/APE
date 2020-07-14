@@ -28,7 +28,6 @@ public class SolutionGraph {
      */
     SolutionGraph(Graph graph) {
         this.graph = graph;
-        Graphviz.useEngine(new GraphvizJdkEngine());
     }
 
     /**
