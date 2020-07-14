@@ -9,12 +9,15 @@ tags:
 authors:
   - name: Vedran Kasalica
     orcid: 0000-0002-0097-1056
+    affiliation: 1
   - name: Maurin Voshol
+    affiliation: 1
   - name: Anna-Lena Lamprecht
     orcid: 0000-0003-1953-5606
+    affiliation: 1
 affiliations:
  - name: Department of Information and Computing Sciences, Utrecht University, 3584 CC Utrecht, Netherlands
-
+   index: 1
 date: 7 July 2020
 bibliography: paper.bib
 
