@@ -2,6 +2,9 @@
 
 # APE (Automated Pipeline Explorer)
 
+[![Latest release](https://img.shields.io/github/release/sanctuuary/APE.svg)](https://github.com/sanctuuary/APE/releases/latest)
+[![Build Status](https://travis-ci.org/sanctuuary/APE.svg?branch=master)](https://travis-ci.org/sanctuuary/APE)
+
 APE is a command line tool and Java API [[1]](#1) for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. 
 
 APE relies on a semantic domain model that includes tool and type taxonomies as controlled vocabularies for the description of computational tools, and functional tool annotations (inputs, outputs, operations performed) using terms from these taxonomies. Based on this domain model and a specification of the available workflow inputs, the intended workflow outputs and possibly additional constraints, APE then computes possible workflows. 
