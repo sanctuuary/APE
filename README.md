@@ -4,6 +4,7 @@
 
 [![Latest release](https://img.shields.io/github/release/sanctuuary/APE.svg)](https://github.com/sanctuuary/APE/releases/latest)
 [![Build Status](https://travis-ci.org/sanctuuary/APE.svg?branch=master)](https://travis-ci.org/sanctuuary/APE)
+[![GitHub license](https://img.shields.io/github/license/sanctuuary/APE)](https://github.com/sanctuuary/APE/blob/master/LICENSE)
 
 APE is a command line tool and Java API [[1]](#1) for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. 
 
