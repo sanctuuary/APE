@@ -3,13 +3,20 @@
  */
 package nl.uu.cs.ape.sat;
 
-import guru.nidi.graphviz.attribute.RankDir;
+import guru.nidi.graphviz.attribute.Rank.RankDir;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.*;
+import nl.uu.cs.ape.sat.utils.APEConfigException;
+import nl.uu.cs.ape.sat.utils.APECoreConfig;
+import nl.uu.cs.ape.sat.utils.APEDimensionsException;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
+import nl.uu.cs.ape.sat.utils.APERunConfig;
+import nl.uu.cs.ape.sat.utils.APEUtils;
+import nl.uu.cs.ape.sat.utils.OWLReader;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -35,7 +42,7 @@ public class APE {
     /**
      * Create instance of the APE solver.
      *
-     * @param configPath Path to the APE configuration file. If the string is null the default './ape.config' value is assumed.
+     * @param configPath Path to the APE JSON configuration file. If the string is null the default './ape.config' value is assumed.
      * @throws IOException        Exception reading the configuration file.
      * @throws OWLOntologyCreationException	Exception reading the OWL file.
      */
@@ -52,12 +59,26 @@ public class APE {
     /**
      * Create instance of the APE solver.
      *
-     * @param configObject The APE configuration JSONObject{@link JSONObject}.
+     * @param configObject The APE configuration {@link JSONObject}.
      * @throws IOException        Exception while reading the configuration file or the tool annotations file.
      * @throws OWLOntologyCreationException  Error in reading the OWL file.
      */
     public APE(JSONObject configObject) throws IOException, OWLOntologyCreationException {
         config = new APECoreConfig(configObject);
+        if (!setupDomain()) {
+            throw new APEConfigException("Error in setting up the domain.");
+        }
+    }
+    
+    /**
+     * Create instance of the APE solver.
+     *
+     * @param config The APE configuration {@link APECoreConfig}.
+     * @throws IOException        Exception while reading the configuration file or the tool annotations file.
+     * @throws OWLOntologyCreationException  Error in reading the OWL file.
+     */
+    public APE(APECoreConfig config) throws IOException, OWLOntologyCreationException {
+        this.config = config;
         if (!setupDomain()) {
             throw new APEConfigException("Error in setting up the domain.");
         }
@@ -73,6 +94,7 @@ public class APE {
      * @throws OWLOntologyCreationException Error in reading the OWL file.
      */
     private boolean setupDomain() throws APEDimensionsException, IOException, OWLOntologyCreationException {
+
         // Variable that describes a successful execution of the method.
         boolean succRun = true;
         /*
