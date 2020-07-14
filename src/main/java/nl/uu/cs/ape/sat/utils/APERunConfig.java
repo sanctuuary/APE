@@ -858,6 +858,118 @@ public class APERunConfig {
 	public boolean getDebugMode() {
 		return debugMode;
 	}
+	
+	/**
+	 * @param constraintsPath the constraintsPath to set
+	 */
+	public void setConstraintsPath(String constraintsPath) {
+		this.constraintsPath = constraintsPath;
+	}
+
+	/**
+	 * @param sharedMemory the sharedMemory to set
+	 */
+	public void setSharedMemory(boolean sharedMemory) {
+		this.sharedMemory = sharedMemory;
+	}
+
+	/**
+	 * @param toolSeqRepeat the toolSeqRepeat to set
+	 */
+	public void setToolSeqRepeat(boolean toolSeqRepeat) {
+		this.toolSeqRepeat = toolSeqRepeat;
+	}
+
+	/**
+	 * @param solutionPath the solutionPath to set
+	 */
+	public void setSolutionPath(String solutionPath) {
+		this.solutionPath = solutionPath;
+	}
+
+	/**
+	 * @param solutionMinLength the solutionMinLength to set
+	 */
+	public void setSolutionMinLength(int solutionMinLength) {
+		this.solutionMinLength = solutionMinLength;
+	}
+
+	/**
+	 * @param solutionMaxLength the solutionMaxLength to set
+	 */
+	public void setSolutionMaxLength(int solutionMaxLength) {
+		this.solutionMaxLength = solutionMaxLength;
+	}
+
+	/**
+	 * @param maxNoSolutions the maxNoSolutions to set
+	 */
+	public void setMaxNoSolutions(int maxNoSolutions) {
+		this.maxNoSolutions = maxNoSolutions;
+	}
+
+	/**
+	 * @param executionScriptsFolder the executionScriptsFolder to set
+	 */
+	public void setExecutionScriptsFolder(String executionScriptsFolder) {
+		this.executionScriptsFolder = executionScriptsFolder;
+	}
+
+	/**
+	 * @param noExecutions the noExecutions to set
+	 */
+	public void setNoExecutions(int noExecutions) {
+		this.noExecutions = noExecutions;
+	}
+
+	/**
+	 * @param solutionGraphsFolder the solutionGraphsFolder to set
+	 */
+	public void setSolutionGraphsFolder(String solutionGraphsFolder) {
+		this.solutionGraphsFolder = solutionGraphsFolder;
+	}
+
+	/**
+	 * @param noGraphs the noGraphs to set
+	 */
+	public void setNoGraphs(int noGraphs) {
+		this.noGraphs = noGraphs;
+	}
+
+	/**
+	 * @param programInputs the programInputs to set
+	 */
+	public void setProgramInputs(List<DataInstance> programInputs) {
+		this.programInputs = programInputs;
+	}
+
+	/**
+	 * @param programOutputs the programOutputs to set
+	 */
+	public void setProgramOutputs(List<DataInstance> programOutputs) {
+		this.programOutputs = programOutputs;
+	}
+
+	/**
+	 * @param useWorkflowInput the useWorkflowInput to set
+	 */
+	public void setUseWorkflowInput(ConfigEnum useWorkflowInput) {
+		this.useWorkflowInput = useWorkflowInput;
+	}
+
+	/**
+	 * @param useAllGeneratedData the useAllGeneratedData to set
+	 */
+	public void setUseAllGeneratedData(ConfigEnum useAllGeneratedData) {
+		this.useAllGeneratedData = useAllGeneratedData;
+	}
+
+	/**
+	 * @param debugMode the debugMode to set
+	 */
+	public void setDebugMode(boolean debugMode) {
+		this.debugMode = debugMode;
+	}
 
 	/**
 	 * Gets cwl format root. TODO: Set real values.
