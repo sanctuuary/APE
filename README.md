@@ -1,4 +1,4 @@
-<img src="./res/ape_logo_sqare.png" alt="logo" width=20% align="left" />
+<img src="https://raw.githubusercontent.com/wiki/sanctuuary/APE/logo.png" alt="logo" width=20% align="left" />
 
 # APE (Automated Pipeline Explorer)
 
@@ -14,7 +14,7 @@ Internally, APE uses a component-based program synthesis approach. It translates
 
 For [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) we created a video that explains APE [[1]](#1) in 5 minutes:
 <div align="left">
-  <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="./res/youtubeThumbnail.png" alt="APE - Youtube video" width=30%></a>
+  <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="https://raw.githubusercontent.com/wiki/sanctuuary/APE/youtube_thumbnail.png" alt="APE - Youtube video" width=30%></a>
 </div>
 
 ## Requirements
