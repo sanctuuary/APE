@@ -444,9 +444,12 @@ public class SolutionWorkflow {
      * @return The {@link Graph} object that represents the solution workflow.
      */
     private SolutionGraph generateFieldDataflowGraph(String title, RankDir orientation) {
-        Graph workflowGraph = graph(title).directed().graphAttr().with(Rank.dir(orientation));
-        
-        
+        Graph workflowGraph = graph(title).directed();
+
+        if(orientation != RankDir.TOP_TO_BOTTOM){
+            workflowGraph = workflowGraph.graphAttr().with(Rank.dir(orientation));
+        }
+
         String input = "Workflow INPUT" + "     ";
         String output = "Workflow OUTPUT" + "     ";
         boolean inputDefined = false, outputDefined = false;
@@ -476,7 +479,7 @@ public class SolutionWorkflow {
                 if (!toolOutput.isEmpty()) {
                     workflowGraph = toolOutput.addTypeToGraph(workflowGraph);
                     workflowGraph = workflowGraph.with(node(currTool.getNodeID()).link(to(node(toolOutput.getNodeID()))
-                            .with(Label.of("out " + (outputNo++) + "  "), Color.BLACK, LinkAttr.weight(index++))));
+                            .with(Label.of("out " + (outputNo++) + "  "), LinkAttr.weight(index++))));
                 }
             }
         }

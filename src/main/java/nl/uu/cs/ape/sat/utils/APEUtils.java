@@ -856,18 +856,4 @@ public final class APEUtils {
 	public static void printWarning(String message, Object... params) {
 		System.out.println("\u001B[35mWARNING: " + String.format(message, params) + "\u001B[0m");
 	}
-
-	private final static PrintStream original = System.err;
-	private final static PrintStream empty = new PrintStream(new OutputStream() {
-		@Override
-		public void write(int b) { }
-	});
-
-	public static void disableErr(){
-		System.setErr(empty);
-	}
-
-	public static void enableErr(){
-		System.setErr(original);
-	}
 }

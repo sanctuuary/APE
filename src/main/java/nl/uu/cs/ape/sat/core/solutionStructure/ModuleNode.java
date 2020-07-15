@@ -261,7 +261,7 @@ public class ModuleNode extends SolutionWorkflowNode {
      */
     public Graph addModuleToGraph(Graph workflowGraph) {
         return workflowGraph = workflowGraph
-                .with(node(getNodeID()).with(Label.of(getNodeLabel() + "              "), Shape.polygon(4), Color.BLUE, Style.BOLD));
+                .with(node(getNodeID()).with(Label.of(getNodeLabel() + "              "), Shape.RECTANGLE, Color.BLUE, Style.BOLD));
     }
 
     /**
