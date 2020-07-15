@@ -1,6 +1,6 @@
 package nl.uu.cs.ape.sat;
 
-import guru.nidi.graphviz.attribute.RankDir;
+import guru.nidi.graphviz.attribute.Rank.RankDir;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.utils.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APEUtils;

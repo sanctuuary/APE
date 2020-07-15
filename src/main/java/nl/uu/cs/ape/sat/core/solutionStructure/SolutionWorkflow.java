@@ -1,6 +1,12 @@
 package nl.uu.cs.ape.sat.core.solutionStructure;
 
-import guru.nidi.graphviz.attribute.*;
+import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.attribute.Label;
+import guru.nidi.graphviz.attribute.LinkAttr;
+import guru.nidi.graphviz.attribute.Rank;
+import guru.nidi.graphviz.attribute.Rank.RankDir;
+import guru.nidi.graphviz.attribute.Shape;
+import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
@@ -20,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import static guru.nidi.graphviz.model.Factory.*;
 
@@ -437,8 +444,9 @@ public class SolutionWorkflow {
      * @return The {@link Graph} object that represents the solution workflow.
      */
     private SolutionGraph generateFieldDataflowGraph(String title, RankDir orientation) {
-        Graph workflowGraph = graph(title).directed().graphAttr().with(orientation);
-
+        Graph workflowGraph = graph(title).directed().graphAttr().with(Rank.dir(orientation));
+        
+        
         String input = "Workflow INPUT" + "     ";
         String output = "Workflow OUTPUT" + "     ";
         boolean inputDefined = false, outputDefined = false;
@@ -494,7 +502,7 @@ public class SolutionWorkflow {
      * @return The {@link Graph} object that represents the solution workflow.
      */
     private SolutionGraph generateFieldControlflowGraph(String title, RankDir orientation) {
-        Graph workflowGraph = graph(title).directed().graphAttr().with(orientation);
+        Graph workflowGraph = graph(title).directed().graphAttr().with(Rank.dir(orientation));
 
         String input = "START" + "     ";
         String output = "END" + "     ";

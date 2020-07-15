@@ -31,7 +31,7 @@ public class OWLReader {
 	private Map<String, Set<String>> typeDimensions = new HashMap<String, Set<String>>();
 	private OWLOntology ontology;
 	private OWLDataFactory factory;
-	private Logger logger = Logger.getLogger("MyLog");
+	private Logger logger = Logger.getLogger("OWLReader.class");
 
 	/**
 	 * Setting up the reader that will populate the provided module and type sets

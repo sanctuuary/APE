@@ -1,9 +1,8 @@
 package nl.uu.cs.ape.sat;
 
-import guru.nidi.graphviz.attribute.RankDir;
+import guru.nidi.graphviz.attribute.Rank.RankDir;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.utils.APEConfigException;
-import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -17,8 +16,8 @@ public class LocalRun {
     public static void main(String[] args) {
 
         String path = "/home/vedran/git/APE_UseCases/";
-        String subPath = "GeoGMT/UnitTest/";
-        String fileName = "ape.configuration[0]";
+        String subPath = "GeoGMT/E0/";
+        String fileName = "ape.configuration";
         if (!APEUtils.isValidReadFile(path + subPath + fileName)) {
             System.err.println("Bad path.");
             return;
