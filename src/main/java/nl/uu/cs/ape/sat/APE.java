@@ -351,6 +351,7 @@ public class APE {
         Arrays.stream(new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
                 .forEach(File::delete);
         System.out.print("Loading");
+        //APEUtils.disableErr();
         /* Creating the requested graphs in parallel. */
         allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
             try {
@@ -359,11 +360,12 @@ public class APE {
                 solution.getDataflowGraph(title, orientation).getWrite2File(new File(path));
                 System.out.print(".");
             } catch (IOException e) {
+                //APEUtils.enableErr();
                 System.err.println("Error occurred while writing a graph to the file system.");
                 e.printStackTrace();
             }
         });
-
+        //APEUtils.enableErr();
         APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
 
         return true;

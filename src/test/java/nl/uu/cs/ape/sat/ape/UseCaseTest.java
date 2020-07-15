@@ -1,5 +1,6 @@
 package nl.uu.cs.ape.sat.ape;
 
+import guru.nidi.graphviz.attribute.Rank;
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import util.GitHubRepo;
@@ -83,6 +84,8 @@ class UseCaseTest {
              */
 
             final SATsolutionsList solutions = new APE(config).runSynthesis(config);
+
+            APE.writeDataFlowGraphs(solutions, Rank.RankDir.TOP_TO_BOTTOM);
 
             final int max_no_solutions = config.getInt("max_solutions");
             int current_solution_length = mutation.solution_length_start;

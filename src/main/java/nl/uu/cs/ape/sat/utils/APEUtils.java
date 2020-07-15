@@ -14,10 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -858,5 +855,19 @@ public final class APEUtils {
 	 */
 	public static void printWarning(String message, Object... params) {
 		System.out.println("\u001B[35mWARNING: " + String.format(message, params) + "\u001B[0m");
+	}
+
+	private final static PrintStream original = System.err;
+	private final static PrintStream empty = new PrintStream(new OutputStream() {
+		@Override
+		public void write(int b) { }
+	});
+
+	public static void disableErr(){
+		System.setErr(empty);
+	}
+
+	public static void enableErr(){
+		System.setErr(original);
 	}
 }
