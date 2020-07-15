@@ -26,13 +26,6 @@ To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you n
 |------------|---------|--------------------------------------------------------------------------------------|
 | 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
 
-### How to build APE from source (using Maven)
-From the project root, simply launch
-```shell
-$ mvn -DskipTests=true install
-```
-to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-<version>-executable.jar`
-
 # Using APE
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
@@ -84,7 +77,7 @@ runConfig.setUseWorkflowInput(ConfigEnum.ONE);
 SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 ```
 
-## How to add APE to your Maven project
+## Add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
 ```xml
 <!-- https://mvnrepository.com/artifact/io.github.sanctuuary/APE -->
@@ -96,8 +89,15 @@ To add a dependency on APE using Maven, use the following:
 ```
 For more information (regarding Gradle, Ivy, etc.) check the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
 
+## Build APE from source (using Maven)
+From the project root, simply launch
+```shell
+$ mvn -DskipTests=true install
+```
+to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-<version>-executable.jar`
 
-# Use cases and demos
+
+# Use Cases and Demos
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS [[3]](#3)). Different examples are available at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
 For one of the bioinformatics use cases our intern Karl Allgaeuer developed a prototype of a web-based interface to APE. It is available at http://ape.science.uu.nl/ (alpha).
