@@ -32,7 +32,7 @@ To add a dependency on APE using Maven, use the following:
 <dependency>
     <groupId>io.github.sanctuuary</groupId>
     <artifactId>APE</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 For more information (regarding Gradle, Ivy, etc.) check the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
