@@ -23,7 +23,7 @@ To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you n
 ### Releases
 | Date       | Version | Download                                                                             |
 |------------|---------|--------------------------------------------------------------------------------------|
-| 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.0/APE-1.0.0.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.0/APE-1.0.0-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.0/APE-1.0.0-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.0/APE-1.0.0-sources.jar)|
+| 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
 
 ## How to add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
