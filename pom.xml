@@ -6,7 +6,7 @@
 	<artifactId>APE</artifactId>
 	<version>1.0.1</version>
 	<packaging>jar</packaging>
-	<name>nl.uu.cs:APE</name>
+	<name>io.github.sanctuuary:APE</name>
 	<description>APE is a command line tool and an API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools.</description>
 	<url>https://github.com/sanctuuary/APE</url>
 	<licenses>
