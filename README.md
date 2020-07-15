@@ -19,7 +19,8 @@ For [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) we created a video that 
 </div>
 
 ## Requirements
-To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system. To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well.
+To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
+
 
 ### Releases
 | Date       | Version | Download                                                                             |
