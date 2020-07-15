@@ -26,6 +26,19 @@ To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you n
 |------------|---------|--------------------------------------------------------------------------------------|
 | 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
 
+## Add APE to your Maven project
+To add a dependency on APE using Maven, use the following:
+```xml
+<!-- https://mvnrepository.com/artifact/io.github.sanctuuary/APE -->
+<dependency>
+    <groupId>io.github.sanctuuary</groupId>
+    <artifactId>APE</artifactId>
+    <version>1.0.1</version>
+</dependency>
+```
+For more information (regarding Gradle, Ivy, etc.) check the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
+
+
 # Using APE
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
@@ -76,18 +89,6 @@ SATsolutionsList solutions1 = ape.runSynthesis(runConfig);
 runConfig.setUseWorkflowInput(ConfigEnum.ONE);
 SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 ```
-
-## Add APE to your Maven project
-To add a dependency on APE using Maven, use the following:
-```xml
-<!-- https://mvnrepository.com/artifact/io.github.sanctuuary/APE -->
-<dependency>
-    <groupId>io.github.sanctuuary</groupId>
-    <artifactId>APE</artifactId>
-    <version>1.0.1</version>
-</dependency>
-```
-For more information (regarding Gradle, Ivy, etc.) check the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
 
 ## Build APE from source (using Maven)
 From the project root, simply launch
