@@ -1,4 +1,4 @@
-<img src="./res/ape_logo_sqare.png" alt="logo" width=20% align="left" />
+<img src="https://raw.githubusercontent.com/wiki/sanctuuary/APE/logo.png" alt="logo" width=20% align="left" />
 
 # APE (Automated Pipeline Explorer)
 
@@ -15,7 +15,7 @@ Internally, APE uses a component-based program synthesis approach. It translates
 
 For [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) we created a video that explains APE [[1]](#1) in 5 minutes:
 <div align="left">
-  <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="./res/youtubeThumbnail.png" alt="APE - Youtube video" width=30%></a>
+  <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="https://raw.githubusercontent.com/wiki/sanctuuary/APE/youtube_thumbnail.png" alt="APE - Youtube video" width=30%></a>
 </div>
 
 ## Requirements
@@ -24,7 +24,7 @@ To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you n
 ### Releases
 | Date       | Version | Download                                                                             |
 |------------|---------|--------------------------------------------------------------------------------------|
-| 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.0/APE-1.0.0.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.0/APE-1.0.0-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.0/APE-1.0.0-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.0/APE-1.0.0-sources.jar)|
+| 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
 
 ### How to build APE from source (using Maven)
 From the project root, simply launch
