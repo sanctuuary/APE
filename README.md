@@ -37,14 +37,14 @@ To add a dependency on APE using Maven, use the following:
     <version>1.0.1</version>
 </dependency>
 ```
-For more information (regarding Gradle, Ivy, etc.) check the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
+For information regarding Gradle, Ivy, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
 
 
 # Using APE
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
 ## How to run APE from the command line
-[APE-1.0.1-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar) is available in (maven repository)[https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0].
+[APE-1.0.1-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar) is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
 
 When running APE-&lt;version>-executable.jar from the command line, it requires a JSON configuration file (for example *configuration.json*) given as a parameter and executes the automated workflow composition process accordingly. 
 ```shell
