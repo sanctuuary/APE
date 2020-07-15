@@ -48,7 +48,7 @@ This configuration file (see [APE cofiguration example](https://github.com/sanct
 2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraints.json))
 3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc. (see [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)).
 
-[Use cases](https://github.com/sanctuuary/APE_UseCases/) provide more details regarding the composition setup and the composition execution using the existing use cases (such as [composition of ImageMagic operations](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick).
+[Use cases](https://github.com/sanctuuary/APE_UseCases/) provide more details regarding the composition setup and the composition execution using the existing use cases (such as [composition of ImageMagic operations](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick)).
 
 ## How to use APE API
 
@@ -97,7 +97,7 @@ To add a dependency on APE using Maven, use the following:
 For more information (regarding Gradle, Ivy, etc.) check the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/1.0.0).
 
 
-## Use cases and demos
+# Use cases and demos
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS [[3]](#3)). Different examples are available at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
 For one of the bioinformatics use cases our intern Karl Allgaeuer developed a prototype of a web-based interface to APE. It is available at http://ape.science.uu.nl/ (alpha).
