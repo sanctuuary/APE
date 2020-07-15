@@ -84,6 +84,9 @@ class UseCaseTest {
 
             final SATsolutionsList solutions = new APE(config).runSynthesis(config);
 
+            // Generate workflow images
+            // APE.writeDataFlowGraphs(solutions, Rank.RankDir.TOP_TO_BOTTOM);
+
             final int max_no_solutions = config.getInt("max_solutions");
             int current_solution_length = mutation.solution_length_start;
             for (int no_solutions : mutation.expected_no_solutions) {

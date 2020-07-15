@@ -2,9 +2,9 @@ package nl.uu.cs.ape.sat.core.solutionStructure;
 
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.engine.GraphvizJdkEngine;
 import guru.nidi.graphviz.engine.Renderer;
 import guru.nidi.graphviz.model.Graph;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -45,7 +45,11 @@ public class SolutionGraph {
      * @return The {@link BufferedImage} object that correspond to the workflow.
      */
     public BufferedImage getPNGImage() {
-        return Graphviz.fromGraph(graph).render(Format.PNG).toImage();
+        final Renderer renderer = getPNGRenderer();
+        APEUtils.disableErr();
+        final BufferedImage image = renderer.toImage();
+        APEUtils.enableErr();
+        return image;
     }
 
     /**
@@ -55,7 +59,10 @@ public class SolutionGraph {
      * @throws IOException Exception in case of error in file handling.
      */
     public void getWrite2File(File file) throws IOException {
-        Graphviz.fromGraph(graph).render(Format.PNG).toFile(file);
+        final Renderer renderer = getPNGRenderer();
+        APEUtils.disableErr();
+        renderer.toFile(file);
+        APEUtils.enableErr();
     }
 
     /**
