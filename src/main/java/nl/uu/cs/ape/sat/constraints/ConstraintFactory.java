@@ -81,8 +81,8 @@ public class ConstraintFactory {
     /**
      * Adding each constraint format in the set of all cons. formats.
      *
-     * @param allModules TODO
-     * @param allTypes   TODO
+     * @param allModules All modules in the domain
+     * @param allTypes   All types in the domain
      * @return String description of all the formats (ID, description and number of parameters for each).
      */
     public boolean initializeConstraints(AllModules allModules, AllTypes allTypes) {
@@ -257,9 +257,9 @@ public class ConstraintFactory {
     /**
      * TODO: Needs to be implemented. Input should be compared with the constraint templates, wrt the types of parameters and dimensions of each.
      *
-     * @param constraintID TODO
-     * @param parameters   TODO
-     * @return TODO boolean
+     * @param constraintID ID of the constraint.
+     * @param parameters    {@link List} of {@link TaxonomyPredicate}.
+     * @return {@code true} if the format is correct, {@code false} otherwise.
      */
     public boolean isGoodConstraintFormat(String constraintID, List<TaxonomyPredicate> parameters) {
         return true;

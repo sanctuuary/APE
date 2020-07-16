@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * The {@code CWLCreator} class is used to TODO.
+ * The {@code CWLCreator} class is used to generate a CWL workflow structure from a given workflow solution.
  *
  * @author Vedran Kasalica
  */
@@ -33,14 +33,18 @@ public class CWLCreator {
     }
 
     /**
-     * Gets cwl.
+     * Gets CWL representation.
      *
      * @return the cwl
      */
     public String getCWL() {
         return cwlRepresentation.toString();
     }
-
+    /**
+     * TODO
+     * @param solution
+     * @param apeConfig
+     */
     private void generateCWLRepresentation(SolutionWorkflow solution, APECoreConfig apeConfig) {
         cwlRepresentation = cwlRepresentation.append("inputs:").append("\n");
         for (TypeNode typeNode : solution.getWorkflowInputTypeStates()) {
@@ -60,6 +64,9 @@ public class CWLCreator {
 
     /**
      * TODO
+     * @param moduleNode
+     * @param apeConfig
+     * @param i
      */
     private void defineCWLStep(ModuleNode moduleNode, APECoreConfig apeConfig, int i) {
         cwlRepresentation = cwlRepresentation.append(tabs(i) + moduleNode.getNodeID() + ":");
@@ -75,7 +82,6 @@ public class CWLCreator {
             cwlRepresentation = cwlRepresentation.append(typeNode.getNodeID()).append("\n");
         }
 
-        ///
         cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "out: ");
         String outputTypes = "[";
         for (TypeNode typeNode : moduleNode.getOutputTypes()) {
@@ -93,6 +99,9 @@ public class CWLCreator {
 
     /**
      * TODO
+     * @param moduleNode
+     * @param apeConfig
+     * @param i
      */
     private void getOperationRun(ModuleNode moduleNode, APECoreConfig apeConfig, int i) {
         cwlRepresentation = cwlRepresentation.append(tabs(i) + "class: Operation").append("\n");
@@ -118,6 +127,9 @@ public class CWLCreator {
 
     /**
      * Create a label and id for a new data instance.
+     * @param typeNode
+     * @param apeConfig
+     * @param i
      */
     private void getNewCWLDataInstance(TypeNode typeNode, APECoreConfig apeConfig, int i) {
         cwlRepresentation = cwlRepresentation.append(tabs(i) + typeNode.getNodeID() + ":").append("\n");
@@ -133,6 +145,10 @@ public class CWLCreator {
 
     /**
      * Create a label and id for a data input that uses an existing data instance.
+     * @param typeNode 
+     * @param apeConfig
+     * @param i
+     * @param prefix
      */
     private void getExistingCWLDataInstance(TypeNode typeNode, APECoreConfig apeConfig, int i, String prefix) {
         cwlRepresentation = cwlRepresentation.append(tabs(i) + prefix + "_" + typeNode.getNodeID() + ":").append("\n");
@@ -147,7 +163,9 @@ public class CWLCreator {
     }
 
     /**
-     * TODO
+     * Create YML array from the collection of {@link TaxonomyPredicate}s.
+     * @param formats collection of {@link TaxonomyPredicate}s
+     * @return List of {@link TaxonomyPredicate}s' IDs in YML array format.
      */
     private String toYmlArray(Collection<TaxonomyPredicate> formats) {
         String str = "[";
@@ -158,7 +176,9 @@ public class CWLCreator {
     }
 
     /**
-     * TODO
+     * Return string that contains the given number of tabs.
+     * @param size number of tabs
+     * @return String that consists of defined number of tabs.
      */
     private String tabs(int size) {
         String tabs = "";

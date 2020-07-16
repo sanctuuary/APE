@@ -113,7 +113,7 @@ public class SolutionWorkflow {
         this.usedType2ToolMap = new HashMap<State, ModuleNode>();
 
         ModuleNode prev = null;
-        for (State currState : toolAutomaton.getModuleStates()) {
+        for (State currState : toolAutomaton.getAllStates()) {
             ModuleNode currNode = new ModuleNode(currState);
             currNode.setPrevModuleNode(prev);
             if (prev != null) {
@@ -255,7 +255,7 @@ public class SolutionWorkflow {
     /**
      * Get non-structured solution obtained directly from the SAT output.
      *
-     * @return A {@link SAT_solution} object, that contains information about the native SAT encoding, and how it translates into human .. ? TODO.
+     * @return A {@link SAT_solution} object, that contains information about the native SAT encoding, and how it translates into human readable text.
      */
     public SAT_solution getNativeSATsolution() {
         return this.nativeSolution;
@@ -325,7 +325,7 @@ public class SolutionWorkflow {
      * Returns the negated solution in mapped format. Negating the original solution
      * created by the SAT solver. Usually used to add to the solver to find new solutions.
      *
-     * @param toolSeqRepeat TODO
+     * @param toolSeqRepeat variable defining if the provided solutions should be distinguished based on the tool sequences alone
      * @return int[] representing the negated solution
      */
     public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {

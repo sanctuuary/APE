@@ -40,6 +40,8 @@ public class SLTL_formula_G extends SLTL_formula {
      *
      * @param moduleAutomaton Automaton of all the module states.
      * @param typeStateBlocks Automaton of all the type states.
+     * @param workflowElement type of the workflow element ({@link WorkflowElement#MODULE}, {@link WorkflowElement#MEM_TYPE_REFERENCE} etc.)
+     * @param mappings        Set of the mappings for the literals.
      * @return The CNF representation of the SLTL formula.
      */
     @Override
@@ -62,7 +64,7 @@ public class SLTL_formula_G extends SLTL_formula {
                 }
             }
         } else {
-            for (State moduleState : moduleAutomaton.getModuleStates()) {
+            for (State moduleState : moduleAutomaton.getAllStates()) {
                 constraints += negSign + mappings.add(super.getSubFormula(), moduleState, workflowElement)
                         + " 0\n";
             }

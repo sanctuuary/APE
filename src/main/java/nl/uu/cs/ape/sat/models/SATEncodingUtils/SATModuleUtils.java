@@ -90,7 +90,7 @@ public final class SATModuleUtils {
             if ((potentialModule instanceof Module)) {
                 Module module = (Module) potentialModule;
                 /* ..iterate through all the states.. */
-                for (State moduleState : synthesisInstance.getModuleAutomaton().getModuleStates()) {
+                for (State moduleState : synthesisInstance.getModuleAutomaton().getAllStates()) {
                     int moduleNo = moduleState.getStateNumber();
                     /* ..and for each state and input state of that module state.. */
                     List<State> currInputStates = synthesisInstance.getTypeAutomaton().getUsedTypesBlock(moduleNo - 1).getStates();
@@ -252,7 +252,7 @@ public final class SATModuleUtils {
     }
 
     /**
-     * TODO: TEST THE METHOD!!
+     * TODO: TEST THE METHOD
      * Function returns the encoding that ensures that each time a memory type is
      * referenced by a tool's input type, it has to be of right type. <br>
      * Function is implementing the Message Passing Approach.
@@ -482,7 +482,7 @@ public final class SATModuleUtils {
             if ((potentialModule instanceof Module)) {
                 Module module = (Module) potentialModule;
                 // iterate through all the states
-                for (State moduleState : synthesisInstance.getModuleAutomaton().getModuleStates()) {
+                for (State moduleState : synthesisInstance.getModuleAutomaton().getAllStates()) {
                     int moduleNo = moduleState.getStateNumber();
                     // and for each state and output state of that module state
                     List<State> currOutputStates = synthesisInstance.getTypeAutomaton().getMemoryTypesBlock(moduleNo).getStates();
@@ -530,7 +530,7 @@ public final class SATModuleUtils {
         StringBuilder constraints = new StringBuilder();
 
         for (Pair<PredicateLabel> pair : allModules.getSimplePairs()) {
-            for (State moduleState : moduleAutomaton.getModuleStates()) {
+            for (State moduleState : moduleAutomaton.getAllStates()) {
                 constraints = constraints.append("-")
                         .append(mappings.add(pair.getFirst(), moduleState, WorkflowElement.MODULE)).append(" ");
                 constraints = constraints.append("-")
@@ -557,7 +557,7 @@ public final class SATModuleUtils {
         }
         StringBuilder constraints = new StringBuilder();
 
-        for (State moduleState : moduleAutomaton.getModuleStates()) {
+        for (State moduleState : moduleAutomaton.getAllStates()) {
             for (TaxonomyPredicate tool : allModules.getModules()) {
                 if (tool instanceof Module) {
                     constraints = constraints.append(mappings.add(tool, moduleState, WorkflowElement.MODULE))
@@ -576,7 +576,7 @@ public final class SATModuleUtils {
      * the @rootModule and it's valid in each state of @moduleAutomaton.
      *
      * @param allModules      All the modules.
-     * @param currModule      TODO
+     * @param currModule      Module that should be used.
      * @param moduleAutomaton Module automaton.
      * @param mappings        Mapping function.
      * @return String representation of constraints enforcing taxonomy classifications.
@@ -585,7 +585,7 @@ public final class SATModuleUtils {
                                                         AtomMappings mappings) {
 
         StringBuilder constraints = new StringBuilder();
-        for (State moduleState : moduleAutomaton.getModuleStates()) {
+        for (State moduleState : moduleAutomaton.getAllStates()) {
             constraints = constraints.append(
                     moduleEnforceTaxonomyStructureForState(allModules, currModule, mappings, moduleState));
         }
@@ -596,18 +596,18 @@ public final class SATModuleUtils {
      * Providing the recursive method used in {@link #moduleEnforceTaxonomyStructure}.
      *
      * @param allModules  All the modules.
-     * @param currModule  TODO
-     * @param moduleState TODO
+     * @param currModule  Module that should be used.
+     * @param moduleState State in which the module should be used.
      * @param mappings    Mapping function.
      */
     private static String moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule,
                                                                  AtomMappings mappings, State moduleState) {
-        String superModule_state = mappings.add(currModule, moduleState, WorkflowElement.MODULE).toString();
+        String superModuleState = mappings.add(currModule, moduleState, WorkflowElement.MODULE).toString();
 
         StringBuilder constraints = new StringBuilder();
-        StringBuilder currConstraint = new StringBuilder("-").append(superModule_state).append(" ");
+        StringBuilder currConstraint = new StringBuilder("-").append(superModuleState).append(" ");
 
-        List<String> subModules_States = new ArrayList<String>();
+        List<String> subModulesStates = new ArrayList<String>();
         if (!(currModule.getSubPredicates() == null || currModule.getSubPredicates().isEmpty())) {
             /*
              * Ensuring the TOP-DOWN taxonomy tree dependency
@@ -618,16 +618,16 @@ public final class SATModuleUtils {
                 }
                 String subModule_State = mappings.add(subModule, moduleState, WorkflowElement.MODULE).toString();
                 currConstraint = currConstraint.append(subModule_State).append(" ");
-                subModules_States.add(subModule_State);
+                subModulesStates.add(subModule_State);
                 constraints = constraints.append(moduleEnforceTaxonomyStructureForState(allModules, subModule, mappings, moduleState));
             }
             currConstraint = currConstraint.append("0\n");
             /*
              * Ensuring the BOTTOM-UP taxonomy tree dependency
              */
-            for (String subModule_State : subModules_States) {
+            for (String subModule_State : subModulesStates) {
                 currConstraint = currConstraint.append("-").append(subModule_State).append(" ")
-                        .append(superModule_state).append(" 0\n");
+                        .append(superModuleState).append(" 0\n");
             }
             return currConstraint.append(constraints).toString();
         } else {

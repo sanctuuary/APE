@@ -56,7 +56,7 @@ public class AtomMappings {
      *
      * @param predicate   Predicate of the mapped atom.
      * @param usedInState Argument of the mapped atom (usually name of the type/module state).
-     * @param elementType TODO
+     * @param elementType Element that defines what type of a predicate is described (such as {@link WorkflowElement#MODULE}.
      * @return Mapping number of the atom (number is always &gt; 0).
      */
     public Integer add(PredicateLabel predicate, State usedInState, WorkflowElement elementType) {

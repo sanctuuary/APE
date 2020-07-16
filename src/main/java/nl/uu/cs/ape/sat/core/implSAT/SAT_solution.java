@@ -237,7 +237,7 @@ public class SAT_solution extends SolutionInterpreter {
 	 * created by the SAT solver. Usually used to add to the solver to find new
 	 * solutions.
 	 *
-     * @param toolSeqRepeat TODO
+     * @param toolSeqRepeat variable defining if the provided solutions should be distinguished based on the tool sequences alone
 	 * @return int[] representing the negated solution
 	 */
 	public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
