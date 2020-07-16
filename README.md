@@ -7,27 +7,31 @@
 [![Build Status](https://travis-ci.org/sanctuuary/APE.svg?branch=master)](https://travis-ci.org/sanctuuary/APE)
 [![GitHub license](https://img.shields.io/github/license/sanctuuary/APE)](https://github.com/sanctuuary/APE/blob/master/LICENSE)
 
-APE is a command line tool and Java API [[1]](#1) for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. 
+APE is a command line tool and Java API for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. 
 
 APE relies on a semantic domain model that includes tool and type taxonomies as controlled vocabularies for the description of computational tools, and functional tool annotations (inputs, outputs, operations performed) using terms from these taxonomies. Based on this domain model and a specification of the available workflow inputs, the intended workflow outputs and possibly additional constraints, APE then computes possible workflows. 
 
-Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. For detailed description we refer to [[2]](#2).
+Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. For detailed description we refer to [[1]](#1).
 
-For [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) we created a video that explains APE [[1]](#1) in 5 minutes:
+For our paper at [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) [[2]](#2) we created a video that explains APE in 5 minutes:
 <div align="left">
   <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="https://raw.githubusercontent.com/wiki/sanctuuary/APE/youtube_thumbnail.png" alt="APE - Youtube video" width=30%></a>
 </div>
 
 ## Requirements
-To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
+To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
 
+To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
+
+#### Note
+Building APE from source is not required to run it, as the latest stable version is available at [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
 ### Releases
 | Date       | Version | Download                                                                             |
 |------------|---------|--------------------------------------------------------------------------------------|
 | 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
 
-## Add APE to your Maven project
+### Add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
 ```xml
 <!-- https://mvnrepository.com/artifact/io.github.sanctuuary/APE -->
@@ -39,25 +43,49 @@ To add a dependency on APE using Maven, use the following:
 ```
 For information regarding Gradle, Ivy, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
+### Build APE from source (using Maven)
+From the project root, simply launch
+```shell
+$ mvn -DskipTests=true install
+```
+to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-<version>-executable.jar`
 
-# Using APE
+## Using APE
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
-## How to run APE from the command line
+### How to run APE from the command line
 [APE-1.0.1-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar) is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
-When running APE-&lt;version>-executable.jar from the command line, it requires a JSON configuration file (for example *configuration.json*) given as a parameter and executes the automated workflow composition process accordingly. 
+When running APE-&lt;version>-executable.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly:
 ```shell
-java -jar APE-<version>-executable.jar configuration.json
+java -jar APE-<version>-executable.jar [path-to-ape-configuration]
 ```
-This configuration file (see [APE cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/ape.configuration) and [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)) provides references to all therefor required information:
+
+The configuration file (see [APE cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/config.json) and [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)) provides references to all therefor required information:
 1. *Domain model* - classification of the types and operations in the domain in form of an **ontology** (see [ontology example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/imagemagick_taxonomy.owl) in OWL) and a **tool annotation file** (see [tool annotations example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/tool_annotations.json) in JSON).
 2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraints.json))
 3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc. (see [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)).
 
-[Use cases](https://github.com/sanctuuary/APE_UseCases/) provide more details regarding the composition setup and the composition execution using the existing use cases (such as [composition of ImageMagic operations](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick)).
+#### My first APE run
 
-## How to use APE API
+```shell
+git clone git@github.com:sanctuuary/APE_UseCases.git
+```
+or
+```shell
+git clone https://github.com/sanctuuary/APE_UseCases.git
+```
+Download the latest version of [`APE-<version>-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
+```shell
+cd ~/git/APE_UseCases
+java -jar APE-1.0.1-executable.jar ImageMagick/Example1/config.json
+```
+See [ImageMagick: Example 1](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick/Example1) for more information about the results and on how to execute the composed workflow.
+
+#### More examples
+[Use cases](https://github.com/sanctuuary/APE_UseCases/) contains all the details and **examples** regarding the composition setup and the composition execution using the existing use cases (such as [composition of ImageMagick operations](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick)).
+
+### How to use the APE API
 
 Like the CLI, the APE API relies on a configuration file that references the domain ontology, tool annotations, workflow specification and execution parameters:
 
@@ -91,16 +119,9 @@ runConfig.setUseWorkflowInput(ConfigEnum.ONE);
 SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 ```
 
-## Build APE from source (using Maven)
-From the project root, simply launch
-```shell
-$ mvn -DskipTests=true install
-```
-to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-<version>-executable.jar`
 
-
-# Use Cases and Demos
-Our use cases are motivated by practical problems in various domains (e.g. bioinformatisc, GIS [[3]](#3)). Different examples are available at [GitHub Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
+## Use Cases and Demos
+Our use cases are motivated by practical problems in various domains (e.g. bioinformatics, GIS [[3]](#3)). Different examples are available at the [APE Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
 For one of the bioinformatics use cases our intern Karl Allgaeuer developed a prototype of a web-based interface to APE. It is available at http://ape.science.uu.nl/ (alpha).
 A Docker version of this demonstrator is available at https://github.com/sanctuuary/Burke_Docker
@@ -108,7 +129,7 @@ A Docker version of this demonstrator is available at https://github.com/sanctuu
 ## The APE team
 * Vedran Kasalica (v.kasalica@uu.nl), lead developer
 * Maurin Voshol, student developer
-* Anna-Lena Lamprecht, project initiator and principal investigator
+* Anna-Lena Lamprecht (a.l.lamprecht@uu.nl), project initiator and principal investigator
 
 ## Contact
 For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica@uu.nl).
@@ -134,18 +155,16 @@ APE is licensed under the [Apache 2.0](https://github.com/sanctuuary/APE/blob/ma
 
 ## References
 <a id="1">[1]</a> 
-Kasalica V., Lamprecht AL. (2020) 
-APE: A Command-Line Tool and API for Automated Workflow Composition. 
-ICCS 2020. ICCS 2020. Lecture Notes in Computer Science, vol 12143. Springer,
-https://doi.org/10.1007/978-3-030-50436-6_34
-
-
-<a id="2">[2]</a> 
 Kasalica, V., & Lamprecht, A.-L. (2020). 
 Workflow Discovery with Semantic Constraints:
 The SAT-Based Implementation of APE. Electronic Communications of the EASST, 78(0).
 https://doi.org/10.14279/tuj.eceasst.78.1092
 
+<a id="2">[2]</a> 
+Kasalica V., Lamprecht AL. (2020) 
+APE: A Command-Line Tool and API for Automated Workflow Composition. 
+ICCS 2020. ICCS 2020. Lecture Notes in Computer Science, vol 12143. Springer,
+https://doi.org/10.1007/978-3-030-50436-6_34
 
 <a id="3">[3]</a> 
 Kasalica, V., & Lamprecht, A.-L. (2019). 
