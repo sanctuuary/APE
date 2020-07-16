@@ -80,7 +80,7 @@ Download the latest version of [`APE-<version>-executable.jar`](https://repo.mav
 cd ~/git/APE_UseCases
 java -jar APE-1.0.1-executable.jar ImageMagick/Example1/config.json
 ```
-See [ImageMagic: Example 1](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick/Example1) for more information about the results and on how to run the composed workflow.
+See [ImageMagic: Example 1](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick/Example1) for more information about the results and on how to execute the composed workflow.
 
 #### More examples
 [Use cases](https://github.com/sanctuuary/APE_UseCases/) contains all the details and **examples** regarding the composition setup and the composition execution using the existing use cases (such as [composition of ImageMagic operations](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick)).
