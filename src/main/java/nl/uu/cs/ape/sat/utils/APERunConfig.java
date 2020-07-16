@@ -534,6 +534,10 @@ public class APERunConfig {
 		}
 
 		// create parent directory if required
+		if(path.getParent() == null) {
+			throw new IOException("Path '" + stringPath + "' is not well formatted.");
+		}
+		
 		File directory = new File(path.getParent().toString());
 		if (!directory.exists()) {
 			APEUtils.printWarning(
