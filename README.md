@@ -119,6 +119,7 @@ runConfig.setUseWorkflowInput(ConfigEnum.ONE);
 SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 ```
 
+For more information see [APE javadoc.io](https://javadoc.io/doc/io.github.sanctuuary/APE/latest/index.html) page.
 
 ## Use Cases and Demos
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatics, GIS [[3]](#3)). Different examples are available at the [APE Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
