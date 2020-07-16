@@ -60,7 +60,23 @@ The configuration file (see [APE cofiguration example](https://github.com/sanctu
 2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraints.json))
 3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc. (see [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)).
 
-### Example
+### My first APE run
+
+```shell
+git clone git@github.com:sanctuuary/APE_UseCases.git
+```
+or
+```shell
+git clone https://github.com/sanctuuary/APE_UseCases.git
+```
+Download [APE-1.0.1-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar) and add it to the root of the APE_UseCases directory (`~/git/APE_UseCases`)
+```shell
+cd ~/git/APE_UseCases
+java -jar APE-1.0.1-executable.jar ImageMagic/Example1/config.json
+```
+See [ImageMagic Example 1](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick/Example1) for more details.
+
+### More examples
 [Use cases](https://github.com/sanctuuary/APE_UseCases/) contains all the details and **examples** regarding the composition setup and the composition execution using the existing use cases (such as [composition of ImageMagic operations](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick)).
 
 ## How to use APE API
