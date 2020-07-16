@@ -3,7 +3,7 @@ package nl.uu.cs.ape.sat.models.enums;
 /**
  * Defines the values describing the states in the workflow.
  * <p>
- * Values: [{@code TOOL}, {@code MEMORY_TYPE}, {@code USED_TYPE}, {@code MEM_TYPE_REFERENCE}]
+ * Values: [{@code MODULE}, {@code MEMORY_TYPE}, {@code USED_TYPE}, {@code MEM_TYPE_REFERENCE}]
  */
 public enum WorkflowElement {
 

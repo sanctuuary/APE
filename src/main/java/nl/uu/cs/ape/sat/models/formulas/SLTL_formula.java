@@ -93,7 +93,7 @@ public abstract class SLTL_formula {
      *
      * @param moduleAutomaton Automaton of all the module states.
      * @param typeStateBlocks Automaton of all the type states.
-     * @param workflowElement TODO
+     * @param workflowElement type of the workflow element ({@link WorkflowElement#MODULE}, {@link WorkflowElement#MEM_TYPE_REFERENCE} etc.)
      * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the SLTL formula.
      */
@@ -112,10 +112,10 @@ public abstract class SLTL_formula {
     public static String ite_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate, ModuleAutomaton moduleAutomaton,
                                     AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
-        int automatonSize = moduleAutomaton.getModuleStates().size();
+        int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
             constraints = constraints.append("-"
-                    + mappings.add(if_predicate, moduleAutomaton.getModuleStates().get(i), WorkflowElement.MODULE)
+                    + mappings.add(if_predicate, moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)
                     + " ");
             for (int j = i + 1; j < automatonSize; j++) {
                 constraints = constraints.append(mappings.add(then_predicate, moduleAutomaton.get(j), WorkflowElement.MODULE)).append(" ");
@@ -177,9 +177,9 @@ public abstract class SLTL_formula {
     public static String itn_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate,
                                     ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
-        int automatonSize = moduleAutomaton.getModuleStates().size();
+        int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize - 1; i++) {
-            State currModuleState = moduleAutomaton.getModuleStates().get(i);
+            State currModuleState = moduleAutomaton.getAllStates().get(i);
             for (int j = i + 1; j < automatonSize; j++) {
                 constraints = constraints.append("-").append(mappings.add(if_predicate, currModuleState, WorkflowElement.MODULE)).append(" ");
                 constraints = constraints.append("-"
@@ -245,10 +245,10 @@ public abstract class SLTL_formula {
     public static String depend_module(TaxonomyPredicate second_module_in_sequence, TaxonomyPredicate first_module_in_sequence,
                                        ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
-        int automatonSize = moduleAutomaton.getModuleStates().size();
+        int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
             constraints = constraints.append("-").append(mappings.add(second_module_in_sequence,
-                    moduleAutomaton.getModuleStates().get(i), WorkflowElement.MODULE)).append(" ");
+                    moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)).append(" ");
             for (int j = 0; j < i; j++) {
                 constraints = constraints.append(mappings.add(first_module_in_sequence,
                         moduleAutomaton.get(j), WorkflowElement.MODULE)).append(" ");
@@ -272,10 +272,10 @@ public abstract class SLTL_formula {
     public static String next_module(TaxonomyPredicate first_module_in_sequence, TaxonomyPredicate second_module_in_sequence,
                                      ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
-        int automatonSize = moduleAutomaton.getModuleStates().size();
+        int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
             constraints = constraints.append("-").append(mappings.add(first_module_in_sequence,
-                    moduleAutomaton.getModuleStates().get(i), WorkflowElement.MODULE)).append(" ");
+                    moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)).append(" ");
 
             /* Clause that forbids using first_predicate as the last in the sequence */
             if (i < automatonSize - 1) {
@@ -301,10 +301,10 @@ public abstract class SLTL_formula {
     public static String prev_module(TaxonomyPredicate second_module_in_sequence, TaxonomyPredicate first_module_in_sequence,
                                      ModuleAutomaton moduleAutomaton, AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
-        int automatonSize = moduleAutomaton.getModuleStates().size();
+        int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
             constraints = constraints.append("-").append(mappings.add(second_module_in_sequence,
-                    moduleAutomaton.getModuleStates().get(i), WorkflowElement.MODULE)).append(" ");
+                    moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)).append(" ");
 
             /* Clause that forbids using second_module_in_sequence as the first tool in the sequence */
             if (i > 0) {
@@ -329,7 +329,7 @@ public abstract class SLTL_formula {
                                          AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
 
-        List<State> moduleAutomatonStates = moduleAutomaton.getModuleStates();
+        List<State> moduleAutomatonStates = moduleAutomaton.getAllStates();
         State lastModuleState = moduleAutomatonStates.get(moduleAutomatonStates.size() - 1);
         constraints = constraints.append(mappings.add(last_module, lastModuleState, WorkflowElement.MODULE)).append(" 0\n");
 
@@ -350,7 +350,7 @@ public abstract class SLTL_formula {
                                         AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
 
-        List<State> moduleAutomatonStates = moduleAutomaton.getModuleStates();
+        List<State> moduleAutomatonStates = moduleAutomaton.getAllStates();
         State nthModuleState = moduleAutomatonStates.get(n - 1);
         constraints = constraints.append(mappings.add(module, nthModuleState, WorkflowElement.MODULE)).append(" 0\n");
 

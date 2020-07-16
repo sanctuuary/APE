@@ -9,8 +9,8 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 import java.util.*;
 
 /**
- * The {@code AllTypes} class represent the set of all data dimensions (e.g. types,formats, etc.)
- * that can be used in our program.
+ * The {@code AllTypes} class represent the set of all the data dimensions that can be used in our program. The data 
+ * can be grouped in multiple data dimensions (e.g. types,formats, etc.) and each {@link Type} will belong to one of those dimensions.
  *
  * @author Vedran Kasalica
  */
@@ -211,7 +211,6 @@ public class AllTypes extends AllPredicates {
 
                 /*
                  * Add empty type to each mutual exclusive class
-                 * TODO: is it necessary to add empty type in each dimension?
                  */
                 for (List<TaxonomyPredicate> currSubTree : subTreesMap.values()) {
                     currSubTree.add(type);

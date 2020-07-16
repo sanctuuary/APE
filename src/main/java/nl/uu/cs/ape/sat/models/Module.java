@@ -43,7 +43,7 @@ public class Module extends AbstractModule {
      * @param rootNode        ID of the Taxonomy Root associated with the Module.
      * @param moduleInput     List of the INPUT types/formats.
      * @param moduleOutput    List of the OUTPUT types/formats.
-     * @param moduleExecution TODO
+     * @param moduleExecution Command that is used to execute the tool from the command line.
      */
     public Module(String moduleName, String moduleID, String rootNode, List<DataInstance> moduleInput,
                   List<DataInstance> moduleOutput, String moduleExecution) {
@@ -59,7 +59,7 @@ public class Module extends AbstractModule {
      * @param moduleName      Name of the module.
      * @param moduleID        Unique module identifier.
      * @param rootNode        ID of the Taxonomy Root node corresponding to the Module.
-     * @param moduleExecution TODO
+     * @param moduleExecution Command that is used to execute the tool from the command line.
      */
     public Module(String moduleName, String moduleID, String rootNode, String moduleExecution) {
         super(moduleName, moduleID, rootNode, NodeType.LEAF);

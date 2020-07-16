@@ -36,16 +36,6 @@ public class ModuleAutomaton implements Automaton {
     }
 
     /**
-     * TODO: REMOVE-duplicate
-     * Return all Module States from the Module automaton.
-     *
-     * @return Module automaton as a list.
-     */
-    public List<State> getModuleStates() {
-        return moduleStates;
-    }
-
-    /**
      * Add {@link State} to the Module automaton.
      *
      * @param state Module state to be added.

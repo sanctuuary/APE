@@ -34,7 +34,7 @@ public class Atom {
      *
      * @param predicate   Predicate used.
      * @param usedInState State in the automaton it was used/created in.
-     * @param elementType Element that describes what type of a predicate is described.
+     * @param elementType Element that defines what type of a predicate is described (such as {@link WorkflowElement#MODULE}.
      */
     public Atom(PredicateLabel predicate, State usedInState, WorkflowElement elementType) {
         this.predicate = predicate;

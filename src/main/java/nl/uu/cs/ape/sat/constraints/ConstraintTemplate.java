@@ -162,6 +162,4 @@ public abstract class ConstraintTemplate {
 
     }
 
-    // TODO: define implementation of each constraint and a general template
-    // constraint that will be modified
 }

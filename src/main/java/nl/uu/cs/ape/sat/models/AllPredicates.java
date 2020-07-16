@@ -6,7 +6,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 import java.util.*;
 
 /**
- * The {@code AllPredicates} class is used to TODO
+ * The {@code AllPredicates} class is used to group all predicates of the same type (such as module, data) into one collection.
  *
  * @author Vedran Kasalica
  */
