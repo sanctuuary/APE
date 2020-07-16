@@ -50,16 +50,18 @@ Automated workflow composition with APE can be performed through its command lin
 ## How to run APE from the command line
 [APE-1.0.1-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar) is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
-When running APE-&lt;version>-executable.jar from the command line, it requires a JSON configuration file (for example *configuration.json*) given as a parameter and executes the automated workflow composition process accordingly. 
+When running APE-&lt;version>-executable.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly:
 ```shell
-java -jar APE-<version>-executable.jar configuration.json
+java -jar APE-<version>-executable.jar [path-to-ape-configuration]
 ```
-This configuration file (see [APE cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/config.json) and [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)) provides references to all therefor required information:
+
+The configuration file (see [APE cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/config.json) and [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)) provides references to all therefor required information:
 1. *Domain model* - classification of the types and operations in the domain in form of an **ontology** (see [ontology example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/imagemagick_taxonomy.owl) in OWL) and a **tool annotation file** (see [tool annotations example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/tool_annotations.json) in JSON).
 2. *Workflow specification* - including a list of **workflow inputs/outputs** and template-based (see [constraint templates](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraint_templates.json)) **workflow constraints** (see [workflow constraints example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/constraints.json))
 3. *Parameters* for the synthesis execution, such as the number of desired solutions, output directory, system configurations, etc. (see [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)).
 
-[Use cases](https://github.com/sanctuuary/APE_UseCases/) provide more details regarding the composition setup and the composition execution using the existing use cases (such as [composition of ImageMagic operations](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick)).
+### Example
+[Use cases](https://github.com/sanctuuary/APE_UseCases/) contains all the details and **examples** regarding the composition setup and the composition execution using the existing use cases (such as [composition of ImageMagic operations](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick)).
 
 ## How to use APE API
 
