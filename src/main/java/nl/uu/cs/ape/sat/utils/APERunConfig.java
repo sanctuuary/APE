@@ -3,7 +3,6 @@ package nl.uu.cs.ape.sat.utils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +10,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import nl.uu.cs.ape.sat.configuration.APEConfigField;
+import nl.uu.cs.ape.sat.configuration.APEConfigTag;
+import nl.uu.cs.ape.sat.configuration.APEConfigTagFactory;
+import nl.uu.cs.ape.sat.io.APEFiles;
+import nl.uu.cs.ape.sat.models.Pair;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,13 +52,35 @@ public class APERunConfig {
 	private static final String DEBUG_MODE_TAG = "debug_mode";
 	private static final String TOOL_SEQ_REPEAT = "tool_seq_repeat";
 
+	private static final APEConfigTag<Integer> SOLUTION_MIN_LENGTH_TAG_2 = new APEConfigTag<>("solution_min_length", Integer.class)
+			.withDefaultValue(1)
+			.addValidationFunction(i -> i >= 1, "Length must be greater of equal to 1.");
+	private static final APEConfigTag<Integer> SOLUTION_MAX_LENGTH_TAG_2 = new APEConfigTag<>("solution_max_length", Integer.class)
+			.withDefaultValue(8)
+			.addValidationFunction(i -> i >= 1, "Length must be greater of equal to 1.");
+
+	;
+
+	private APEConfigField<Integer> solutionMinLength_2 = new APEConfigField.Number(SOLUTION_MIN_LENGTH_TAG_2);
+	private APEConfigField<Integer> solutionMaxLength_2 =  new APEConfigField.Number(SOLUTION_MAX_LENGTH_TAG_2)
+			.addValidationFunction(i -> i >= solutionMinLength_2.getValue(), "");
+
+	private static final APEConfigTag<Integer> SOLUTION_STUFF = new APEConfigTagFactory.Number("solutionstuff")
+			.withDefaultValue(1)
+			.addValidationFunction(i -> i >= 1, "Length must be greater of equal to 1.");
+
+	private APEConfigField<Integer> solutionstuff = new APEConfigField.Number(SOLUTION_STUFF);
+
+	private static final APEConfigTag<String> A_PATH = new APEConfigTagFactory.Path("a_path")
+			.addValidationFunction(path -> APEFiles.exists(path))
+
 	/**
 	 * Tags separated in the categories: obligatory, optional, core and run. The
 	 * obligatory tags are used in the constructor to check the presence of tags.
 	 * Optional tags or All tags are mostly used by test cases.
 	 */
 	private static final String[] obligatoryRunTags = new String[] { 
-			SOLUTION_MIN_LENGTH_TAG, 
+			SOLUTION_MIN_LENGTH_TAG, 0
 			SOLUTION_MAX_LENGTH_TAG,
 			MAX_NOSOLUTIONS_TAG
 
@@ -72,13 +98,6 @@ public class APERunConfig {
 			SOLUTION_PATH_TAG, 
 			EXECUTIONSCRIPTS_FOLDER_TAG,
 			SOLUTION_GRAPHS_FOLDER_TAG };
-
-	/**
-	 * READ and WRITE enums used to verify paths.
-	 */
-	private enum Permission {
-		READ, WRITE
-	}
 
 	/**
 	 * Path to the file with all workflow constraints.
@@ -104,7 +123,7 @@ public class APERunConfig {
 	 * Min and Max possible length of the solutions (length of the automaton). For
 	 * no upper limit, max length should be set to 0.
 	 */
-	private int solutionMinLength, solutionMaxLength;
+	private Pair<Integer> solutionLength;
 	/**
 	 * Max number of solution that the solver will return.
 	 */
@@ -168,6 +187,7 @@ public class APERunConfig {
 	 * @param builder Builder object
 	 */
 	private APERunConfig(Builder builder) {
+
 		/* Minimal length of the solution must be greater or equal to 1. */
 		this.solutionMinLength = builder.solutionMinLength;
 		if (this.solutionMinLength < 1) {
@@ -474,7 +494,7 @@ public class APERunConfig {
 		}
 
 		// path should exist
-		Path path = Paths.get(stringPath);
+		java.nio.file.Path path = Paths.get(stringPath);
 		if (Files.notExists(path)) {
 			throw APEConfigException.pathNotFound(tag, stringPath);
 		}
@@ -526,7 +546,7 @@ public class APERunConfig {
 		}
 
 		// path should exist and should be a file path
-		Path path = Paths.get(stringPath);
+		java.nio.file.Path path = Paths.get(stringPath);
 		// check if the proposed path represents a file and not a directory (it does not
 		// matter whether it exists or not)
 		if (FilenameUtils.getExtension(path.toString()).equals("")) {
@@ -571,68 +591,7 @@ public class APERunConfig {
 		return stringPath;
 	}
 
-	/**
-	 * Method checks whether the provided value represent a correct path, and
-	 * returns the path if it does.
-	 *
-	 * @param tag    Corresponding tag from the config file.
-	 * @param config Provided JSON configuration with values.
-	 * @return Path represented in the JSON object, or the default value if the tag
-	 *         is not present.
-	 * @throws IOException        Error if path is cannot be found.
-	 * @throws JSONException      Error in parsing the value for specified tag.
-	 * @throws APEConfigException Error in setting up the the configuration.
-	 */
-	private static String readDirectoryPath(String tag, JSONObject config, Permission... requestedPermissions)
-			throws IOException, JSONException, APEConfigException {
 
-		// read path
-		String stringPath = config.getString(tag);
-
-		// check on empty values
-		if (stringPath == null) {
-			throw APEConfigException.invalidValue(tag, "null", "value is null.");
-		}
-		if (stringPath.equals("")) {
-			throw APEConfigException.invalidValue(tag, stringPath, "value is empty.");
-		}
-
-		if (!FilenameUtils.getExtension(stringPath).equals("")) {
-			throw APEConfigException.notADirectory(tag, stringPath);
-		}
-
-		// path should exist
-		Path path = Paths.get(stringPath);
-		if (Files.notExists(path)) {
-			// create parent directory if required
-			File directory = new File(path.toAbsolutePath().toString());
-			APEUtils.printWarning("Directory '" + stringPath + "' does not exist. The directory will be created.");
-			if (directory.mkdirs()) {
-				System.out.println("Successfully created directory '" + stringPath + "'");
-			} else {
-				throw new APEConfigException("Could not create directory '" + stringPath + "'");
-			}
-		}
-
-		if (!Files.isDirectory(path)) {
-			throw APEConfigException.notADirectory(tag, stringPath);
-		}
-
-		// check permissions
-		for (Permission permission : Arrays.stream(requestedPermissions).distinct().collect(Collectors.toList())) {
-
-			if (permission == Permission.READ && !Files.isReadable(path)) {
-				throw APEConfigException.missingPermission(tag, stringPath, permission);
-			}
-
-			if (permission == Permission.WRITE && !Files.isWritable(path)) {
-				throw APEConfigException.missingPermission(tag, stringPath, permission);
-			}
-
-		}
-
-		return stringPath;
-	}
 
 	/**
 	 * Used to read the input and output data instances for the program. This method
@@ -758,19 +717,19 @@ public class APERunConfig {
 	/**
 	 * Gets solution min length.
 	 *
-	 * @return the {@link #solutionMinLength}
+	 * @return the {@link #solutionLength}
 	 */
 	public int getSolutionMinLength() {
-		return solutionMinLength;
+		return solutionLength.getFirst();
 	}
 
 	/**
 	 * Gets solution max length.
 	 *
-	 * @return the {@link #solutionMaxLength}
+	 * @return the {@link #solutionLength}
 	 */
 	public int getSolutionMaxLength() {
-		return solutionMaxLength;
+		return solutionLength.getSecond();
 	}
 
 	/**

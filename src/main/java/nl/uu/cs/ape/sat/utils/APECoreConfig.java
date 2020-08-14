@@ -1,6 +1,10 @@
 package nl.uu.cs.ape.sat.utils;
 
-
+import nl.uu.cs.ape.sat.configuration.APEConfigField;
+import nl.uu.cs.ape.sat.configuration.APEConfigTag;
+import nl.uu.cs.ape.sat.configuration.APEConfigTagFactory;
+import nl.uu.cs.ape.sat.configuration.ValidationRule;
+import nl.uu.cs.ape.sat.io.APEFiles;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
@@ -17,6 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nl.uu.cs.ape.sat.io.APEFiles.readFileFromPath;
+
 /**
  * The {@link APECoreConfig} class is used to define the core configuration
  * variables required for the proper execution of the library.
@@ -28,11 +34,39 @@ public class APECoreConfig {
     /**
      * Tags used in the JSON file.
      */
-    private final static String ONTOLOGY_TAG = "ontology_path";
-    private final static String ONTOLOGY_PREFIX = "ontologyPrexifIRI";
-    private final static String TOOL_ONTOLOGY_TAG = "toolsTaxonomyRoot";
-    private final static String DIMENSIONSONTOLOGY_TAG = "dataDimensionsTaxonomyRoots";
-    private final static String TOOL_ANNOTATIONS_TAG = "tool_annotations_path";
+    public final static APEConfigTag<File> ONTOLOGY_TAG = new APEConfigTagFactory.ExistingFile("ontology_path")
+            .withTagDescription("This tag should be a path to an .owl file.");
+
+    public final static APEConfigTag<File> TOOL_ANNOTATIONS_TAG = new APEConfigTagFactory.ExistingFile("tool_annotations_path")
+            .withTagDescription("This tag should be a path to an .json file.");
+
+    public final static APEConfigTag<String> ONTOLOGY_PREFIX = new APEConfigTagFactory.StringTag("ontologyPrexifIRI")
+            .addValidationFunction(APEFiles::isURI, "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).");
+
+    public final static APEConfigTag<String> TOOL_ONTOLOGY_TAG = new APEConfigTagFactory.StringTag("toolsTaxonomyRoot");
+
+    public final static APEConfigTag<List<String>> DIMENSIONSONTOLOGY_TAG = new APEConfigTagFactory.DataDimensions("dataDimensionsTaxonomyRoots");
+
+    /**
+     * The taxonomy (ontology) file
+     */
+    private APEConfigField<File> ontology = ONTOLOGY_TAG.createField();
+    /**
+     * The JSON file with all tool annotations.
+     */
+    private APEConfigField<File> toolAnnotations = TOOL_ANNOTATIONS_TAG.createField();
+    /**
+     * Prefix used to define OWL class IDs
+     */
+    private APEConfigField<String> ontologyPrefixURI = ONTOLOGY_PREFIX.createField();
+    /**
+     * Node in the ontology that corresponds to the root of the module taxonomy.
+     */
+    private APEConfigField<String> toolTaxonomyRoot = TOOL_ONTOLOGY_TAG.createField();
+    /**
+     * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
+     */
+    private APEConfigField<List<String>> dataDimensionRoots = DIMENSIONSONTOLOGY_TAG.createField();
 
     /**
      * Tags separated in the categories: obligatory, optional, core and run.
@@ -47,32 +81,6 @@ public class APECoreConfig {
             TOOL_ANNOTATIONS_TAG
     };
     private final static String[] optionalCoreTags = new String[]{};
-
-    /**
-     * READ and WRITE enums used to verify paths.
-     */
-    private enum Permission {READ, WRITE}
-
-    /**
-     * The taxonomy (ontology) file
-     */
-    private File ontology;
-    /**
-     * Prefix used to define OWL class IDs
-     */
-    private String ontologyPrefixURI;
-    /**
-     * Node in the ontology that corresponds to the root of the module taxonomy.
-     */
-    private String toolTaxonomyRoot;
-    /**
-     * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
-     */
-    private List<String> dataDimensionRoots = new ArrayList<>();
-    /**
-     * The JSON file with all tool annotations.
-     */
-    private File toolAnnotations;
 
     /**
      * Initialize the configuration of the project.
@@ -101,7 +109,6 @@ public class APECoreConfig {
         /* Path to the tool annotations JSON file. */
         this.toolAnnotations = toolAnnotations;
     }
-    
     
     /**
      * Initialize the configuration of the project.
@@ -161,7 +168,7 @@ public class APECoreConfig {
         }
 
         /* Path to the OWL file. */
-        this.ontology = readFileFromPath(ONTOLOGY_TAG, coreConfiguration, Permission.READ);
+        this.ontology = readFileFromPath(ONTOLOGY_TAG, coreConfiguration.getString(ONTOLOGY_TAG), APEFiles.Permission.READ);
 
         /* URI of the ontology classes. */
         this.ontologyPrefixURI = coreConfiguration.getString(ONTOLOGY_PREFIX);
@@ -187,60 +194,9 @@ public class APECoreConfig {
 		}
 
         /* Path to the tool annotations JSON file. */
-        this.toolAnnotations = readFileFromPath(TOOL_ANNOTATIONS_TAG, coreConfiguration, Permission.READ);
+        this.toolAnnotations = readFileFromPath(TOOL_ANNOTATIONS_TAG, coreConfiguration.getString(TOOL_ANNOTATIONS_TAG), APEFiles.Permission.READ);
 
         return true;
-    }
-    
-    /**
-     * Method checks whether the provided value represent a correct path to a file, and returns the corresponding file if it does.
-     *
-     * @param tag    Corresponding tag from the config file.
-     * @param config Provided JSON configuration with values.
-     * @return File represented by the path in the JSON object, or the default value if the tag is not present.
-     * @throws IOException        Error if path is cannot be found.
-     * @throws JSONException      Error in parsing the value for specified tag.
-     * @throws APEConfigException Error in setting up the the configuration.
-     */
-    private static File readFileFromPath(String tag, JSONObject config, Permission... requestedPermissions) throws IOException, JSONException, APEConfigException {
-
-        // read path
-        String filePath = config.getString(tag);
-
-        // check on empty values
-        if (filePath == null) {
-            throw APEConfigException.invalidValue(tag, "null", "value is null.");
-        }
-        if (filePath.equals("")) {
-            throw APEConfigException.invalidValue(tag, filePath, "value is empty.");
-        }
-
-        // path should exist
-        Path path = Paths.get(filePath);
-        if (Files.notExists(path)) {
-            throw APEConfigException.pathNotFound(tag, filePath);
-        }
-
-        if (!Files.isRegularFile(path)) {
-            throw APEConfigException.notAFile(tag, filePath);
-        }
-
-        // check permissions
-        for (Permission permission : Arrays.stream(requestedPermissions).distinct().collect(Collectors.toList())) {
-
-            if (permission == Permission.READ && !Files.isReadable(path)) {
-                throw APEConfigException.missingPermission(tag, filePath, permission);
-            }
-
-            if (permission == Permission.WRITE && !Files.isWritable(path)) {
-                throw APEConfigException.missingPermission(tag, filePath, permission);
-            }
-
-        }
-        
-        File file = new File(filePath);
-
-        return file;
     }
 
 

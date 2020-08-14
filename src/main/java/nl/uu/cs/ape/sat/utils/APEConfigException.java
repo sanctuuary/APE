@@ -1,5 +1,7 @@
 package nl.uu.cs.ape.sat.utils;
 
+import nl.uu.cs.ape.sat.configuration.ValidationResult;
+import nl.uu.cs.ape.sat.configuration.ValidationResults;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -140,5 +142,21 @@ public class APEConfigException extends RuntimeException {
      */
     public static IOException missingPermission(String path, Object missingPermission) {
         return new IOException(String.format("You are missing [%s] permission for path '%s' for ", missingPermission, path));
+    }
+
+    public static JSONException fieldNotSpecified(String tag, String type) {
+        return new JSONException(String.format("No '%s' value provided for tag '%s'.", type, tag));
+    }
+
+    public static JSONException ruleViolation(ValidationResult result){
+        return new JSONException(String.format("Tag '%s' is incorrect. %s", result.getTag(), result.getRuleDescription()));
+    }
+
+    public static JSONException ruleViolations(ValidationResults validationResults) {
+        StringBuilder sb = new StringBuilder();
+        validationResults.getFails().stream().forEach(fail -> {
+            sb.append(String.format("Tag '%s' is incorrect: %s\n", fail.getTag(), fail.getRuleDescription()));
+        });
+        return new JSONException(sb.toString());
     }
 }
