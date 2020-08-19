@@ -4,7 +4,6 @@ import nl.uu.cs.ape.sat.io.APEFiles;
 import nl.uu.cs.ape.sat.utils.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -45,7 +44,7 @@ public class APEConfigTagFactory {
         @Override
         protected E constructFromJSON(JSONObject json) {
             final String s = json.getString(getName()).toUpperCase();
-            return E.valueOf(getType(), s);
+            return E.valueOf(getTagType(), s);
         }
     }
 

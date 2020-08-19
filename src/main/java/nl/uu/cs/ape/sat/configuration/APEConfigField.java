@@ -6,26 +6,26 @@ import org.json.JSONObject;
 public class APEConfigField<T> {
 
     private T value = null;
-    private final APEConfigTag<T> tag;
 
-    public APEConfigField(APEConfigTag<T> tag){
-        this.tag = tag;
+    private final APEConfigTag<T> info;
+
+    public APEConfigField(APEConfigTag<T> info){
+        this.info = info;
     }
 
     public void setValue(JSONObject obj) {
 
-        final String tagName = tag.getName();
         final T t;
 
         // missing tag
-        if(obj.has(tagName)){
-            t = tag.constructFromJSON(obj);
+        if(obj.has(info.getName())){
+            t = info.constructFromJSON(obj);
         }
-        else if(tag.isOptional()){
-            t = tag.getDefault();
+        else if(info.isOptional()){
+            t = info.getDefault();
         }
         else{
-            throw APEConfigException.missingTag(tagName);
+            throw APEConfigException.missingTag(info.getName());
         }
 
         setValue(t);
@@ -33,14 +33,13 @@ public class APEConfigField<T> {
 
     public void setValue(T value) {
 
-        ValidationResults results = tag.validate(value);
+        ValidationResults results = info.validate(value);
 
         if(results.fail()){
             throw APEConfigException.ruleViolations(results);
         }
 
         this.value = value;
-
     }
 
     public T getValue(){
@@ -49,10 +48,11 @@ public class APEConfigField<T> {
             return this.value;
         }
 
-        if(this.tag.getDefault() != null){
-            return this.tag.getDefault();
+        if(info.getDefault() != null){
+            return info.getDefault();
         }
 
-        throw APEConfigException.fieldNotSpecified(this.tag.getName(), this.tag.getType().getSimpleName());
+        throw APEConfigException.fieldNotSpecified(info.getName(), info.getTagType().getSimpleName());
     }
+
 }
