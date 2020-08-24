@@ -33,13 +33,11 @@ public class APERunConfig {
 	 */
 	private static final String CONSTRAINTS_TAG = "constraints_path";
 	private static final String SHARED_MEMORY_TAG = "shared_memory";
-	private static final String SOLUTION_PATH_TAG = "solutions_path";
+	private static final String SOLUTION_DIR_PATH_TAG = "solutions_dir_path";
 	private static final String SOLUTION_MIN_LENGTH_TAG = "solution_min_length";
 	private static final String SOLUTION_MAX_LENGTH_TAG = "solution_max_length";
 	private static final String MAX_NOSOLUTIONS_TAG = "max_solutions";
-	private static final String EXECUTIONSCRIPTS_FOLDER_TAG = "execution_scripts_folder";
 	private static final String NOEXECUTIONS_TAG = "number_of_execution_scripts";
-	private static final String SOLUTION_GRAPHS_FOLDER_TAG = "solution_graphs_folder";
 	private static final String NO_GRAPHS_TAG = "number_of_generated_graphs";
 	private static final String PROGRAM_INPUTS_TAG = "inputs";
 	private static final String PROGRAM_OUTPUTS_TAG = "outputs";
@@ -69,9 +67,7 @@ public class APERunConfig {
 			USEWORKFLOW_INPUT,
 			USE_ALL_GENERATED_DATA, 
 			DEBUG_MODE_TAG, TOOL_SEQ_REPEAT, 
-			SOLUTION_PATH_TAG, 
-			EXECUTIONSCRIPTS_FOLDER_TAG,
-			SOLUTION_GRAPHS_FOLDER_TAG };
+			SOLUTION_DIR_PATH_TAG };
 
 	/**
 	 * READ and WRITE enums used to verify paths.
@@ -96,10 +92,9 @@ public class APERunConfig {
 	 */
 	private boolean toolSeqRepeat = true;
 	/**
-	 * Path to the file that will contain all the solutions to the problem in human
-	 * readable representation.
+	 * Path to the directory that will contain all the solutions to the problem.
 	 */
-	private String solutionPath = null;
+	private String solutionDirPath = null;
 	/**
 	 * Min and Max possible length of the solutions (length of the automaton). For
 	 * no upper limit, max length should be set to 0.
@@ -110,20 +105,10 @@ public class APERunConfig {
 	 */
 	private int maxNoSolutions;
 	/**
-	 * Path to the folder that will contain all the scripts generated based on the
-	 * candidate workflows.
-	 */
-	private String executionScriptsFolder = null;
-	/**
 	 * Number of the workflow scripts that should be generated from candidate
 	 * workflows. Default is 0.
 	 */
 	private int noExecutions = 0;
-	/**
-	 * Path to the folder that will contain all the figures/graphs generated based
-	 * on the candidate workflows.
-	 */
-	private String solutionGraphsFolder = null;
 	/**
 	 * Number of the solution graphs that should be generated from candidate
 	 * workflows. Default is 0.
@@ -204,24 +189,20 @@ public class APERunConfig {
 		}
 		this.sharedMemory = builder.sharedMemory;
 		this.toolSeqRepeat = builder.toolSeqRepeat;
-		this.solutionPath = builder.solutionPath;
-
-		this.executionScriptsFolder = builder.executionScriptsFolder;
-		if (!new File(this.executionScriptsFolder).isDirectory()) {
+		
+		this.solutionDirPath = builder.solutionDirPath;
+		if (!new File(this.solutionDirPath).isDirectory()) {
 			throw new APEConfigException(
-					"Configuration error. The given path is not a directory:" + this.executionScriptsFolder);
+					"Configuration error. The given path is not a directory:" + this.solutionDirPath);
+		}
+		if(!(this.solutionDirPath.endsWith("/") || this.solutionDirPath.endsWith("\\"))) {
+			this.solutionDirPath += File.separator;
 		}
 
 		this.noExecutions = builder.noExecutions;
 		if (this.noExecutions < 0) {
 			throw APEConfigException.invalidValue(NOEXECUTIONS_TAG, this.noExecutions,
 					"use a numeric value greater or equal to 0.");
-		}
-
-		this.solutionGraphsFolder = builder.solutionGraphsFolder;
-		if (!new File(this.solutionGraphsFolder).isDirectory()) {
-			throw new APEConfigException(
-					"Configuration error. The given path is not a directory:" + this.solutionGraphsFolder);
 		}
 
 		this.noGraphs = builder.noGraphs;
@@ -265,30 +246,19 @@ public class APERunConfig {
 			}
 		}
 
-		/* Path to the solution directory. */
-		if (runConfiguration.has(SOLUTION_PATH_TAG)) {
-			this.solutionPath = readFilesDirectoryPath(SOLUTION_PATH_TAG, runConfiguration, Permission.WRITE);
-		} else {
-			APEUtils.printWarning("Tag '" + SOLUTION_PATH_TAG
-					+ "' in the configuration file is not provided. No textual version of the solutions will not be provided.");
-		}
 		
-		/* Path to the output script directory. */
-		if (runConfiguration.has(EXECUTIONSCRIPTS_FOLDER_TAG)) {
-			this.executionScriptsFolder = readDirectoryPath(EXECUTIONSCRIPTS_FOLDER_TAG, runConfiguration,
+		/* Path to the solution directory. */
+		if (runConfiguration.has(SOLUTION_DIR_PATH_TAG)) {
+			this.solutionDirPath = readDirectoryPath(SOLUTION_DIR_PATH_TAG, runConfiguration,
 				Permission.WRITE);
 		} else {
-			APEUtils.printWarning("Tag '" + EXECUTIONSCRIPTS_FOLDER_TAG
-					+ "' in the configuration file is not provided. No executable solutions will not be provided.");
+			APEUtils.printWarning("Tag '" + SOLUTION_DIR_PATH_TAG
+					+ "' in the configuration file is not provided. No solutions will not be generated to the file system.");
 		}
-
-		/* Path to the output graph directory. */
-		if (runConfiguration.has(SOLUTION_GRAPHS_FOLDER_TAG)) {
-			this.solutionGraphsFolder = readDirectoryPath(SOLUTION_GRAPHS_FOLDER_TAG, runConfiguration, Permission.WRITE);
-		} else {
-			APEUtils.printWarning("Tag '" + SOLUTION_GRAPHS_FOLDER_TAG
-					+ "' in the configuration file is not provided. No solutions figures will not be provided.");
+		if(!(this.solutionDirPath.endsWith("/") || this.solutionDirPath.endsWith("\\"))) {
+			this.solutionDirPath += File.separator;
 		}
+		
 
 		/* Path to the JSON constraints file. */
 		if (runConfiguration.has(CONSTRAINTS_TAG) && !runConfiguration.getString(CONSTRAINTS_TAG).equals("")) {
@@ -577,6 +547,7 @@ public class APERunConfig {
 	 *
 	 * @param tag    Corresponding tag from the config file.
 	 * @param config Provided JSON configuration with values.
+	 * @param requestedPermissions R/W/E permissions required over the directory
 	 * @return Path represented in the JSON object, or the default value if the tag
 	 *         is not present.
 	 * @throws IOException        Error if path is cannot be found.
@@ -747,16 +718,33 @@ public class APERunConfig {
 	}
 
 	/**
-	 * Gets solution path.
+	 * Get the path of the solution directory.
 	 *
-	 * @return the {@link #solutionPath}
+	 * @return The path to the directory where all the solutions should be stored.
 	 */
-	public String getSolutionPath() {
-		return solutionPath;
+	public String getSolutionDirPath() {
+		return solutionDirPath;
 	}
 
 	/**
-	 * Gets solution min length.
+	 * Get the path to the directory where the executable scripts corresponding to the given solutions should be stored.
+	 * @return
+	 */
+	public String getSolutionDirPath2Executables() {
+		
+		return solutionDirPath + "Executables" + File.separator;
+	}
+	
+	/**
+	 * Get the path to the directory where the graphs representation of the solutions should be stored.
+	 * @return
+	 */
+	public String getSolutionDirPath2Figures() {
+		return solutionDirPath + "Figures" + File.separator;
+	}
+	
+	/**
+	 * Get minimum length of the required solutions.
 	 *
 	 * @return the {@link #solutionMinLength}
 	 */
@@ -765,7 +753,7 @@ public class APERunConfig {
 	}
 
 	/**
-	 * Gets solution max length.
+	 * Get maximum length of the required solutions.
 	 *
 	 * @return the {@link #solutionMaxLength}
 	 */
@@ -774,7 +762,7 @@ public class APERunConfig {
 	}
 
 	/**
-	 * Gets max no solutions.
+	 * Get maximum number of the required solutions.
 	 *
 	 * @return the {@link #maxNoSolutions}
 	 */
@@ -783,16 +771,7 @@ public class APERunConfig {
 	}
 
 	/**
-	 * Gets execution scripts folder.
-	 *
-	 * @return the {@link #executionScriptsFolder}
-	 */
-	public String getExecutionScriptsFolder() {
-		return executionScriptsFolder;
-	}
-
-	/**
-	 * Gets no executions.
+	 * Get no or required execution scripts.
 	 *
 	 * @return the {@link #noExecutions}
 	 */
@@ -801,16 +780,7 @@ public class APERunConfig {
 	}
 
 	/**
-	 * Gets solution graphs folder.
-	 *
-	 * @return the {@link #solutionGraphsFolder}
-	 */
-	public String getSolutionGraphsFolder() {
-		return solutionGraphsFolder;
-	}
-
-	/**
-	 * Gets no graphs.
+	 * Get no or required solution graphs.
 	 *
 	 * @return the {@link #noGraphs}
 	 */
@@ -887,8 +857,8 @@ public class APERunConfig {
 	/**
 	 * @param solutionPath the solutionPath to set
 	 */
-	public void setSolutionPath(String solutionPath) {
-		this.solutionPath = solutionPath;
+	public void setSolutionDirPath(String solutionDirPath) {
+		this.solutionDirPath = solutionDirPath;
 	}
 
 	/**
@@ -913,24 +883,10 @@ public class APERunConfig {
 	}
 
 	/**
-	 * @param executionScriptsFolder the executionScriptsFolder to set
-	 */
-	public void setExecutionScriptsFolder(String executionScriptsFolder) {
-		this.executionScriptsFolder = executionScriptsFolder;
-	}
-
-	/**
 	 * @param noExecutions the noExecutions to set
 	 */
 	public void setNoExecutions(int noExecutions) {
 		this.noExecutions = noExecutions;
-	}
-
-	/**
-	 * @param solutionGraphsFolder the solutionGraphsFolder to set
-	 */
-	public void setSolutionGraphsFolder(String solutionGraphsFolder) {
-		this.solutionGraphsFolder = solutionGraphsFolder;
 	}
 
 	/**
@@ -1044,13 +1000,9 @@ public class APERunConfig {
 
 		public IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
 
-		public IBuildStage withSolutionPath(String solutionPath);
-
-		public IBuildStage withExecutionScriptsFolder(String executionScriptsFolder);
+		public IBuildStage withSolutionDirPath(String solutionPath);
 
 		public IBuildStage withNoExecutions(int noExecutions);
-
-		public IBuildStage withSolutionGraphsFolder(String solutionGraphsFolder);
 
 		public IBuildStage withNoGraphs(int noGraphs);
 
@@ -1079,10 +1031,8 @@ public class APERunConfig {
 		private String constraintsPath;
 		private boolean sharedMemory;
 		private boolean toolSeqRepeat;
-		private String solutionPath;
-		private String executionScriptsFolder;
+		private String solutionDirPath;
 		private int noExecutions;
-		private String solutionGraphsFolder;
 		private int noGraphs;
 		private List<DataInstance> programInputs = Collections.emptyList();
 		private List<DataInstance> programOutputs = Collections.emptyList();
@@ -1136,26 +1086,15 @@ public class APERunConfig {
 		}
 
 		@Override
-		public IBuildStage withSolutionPath(String solutionPath) {
-			this.solutionPath = solutionPath;
+		public IBuildStage withSolutionDirPath(String solutionDirPath) {
+			this.solutionDirPath = solutionDirPath;
 			return this;
 		}
 
-		@Override
-		public IBuildStage withExecutionScriptsFolder(String executionScriptsFolder) {
-			this.executionScriptsFolder = executionScriptsFolder;
-			return this;
-		}
 
 		@Override
 		public IBuildStage withNoExecutions(int noExecutions) {
 			this.noExecutions = noExecutions;
-			return this;
-		}
-
-		@Override
-		public IBuildStage withSolutionGraphsFolder(String solutionGraphsFolder) {
-			this.solutionGraphsFolder = solutionGraphsFolder;
 			return this;
 		}
 
