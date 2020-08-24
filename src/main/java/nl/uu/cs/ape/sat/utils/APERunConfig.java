@@ -51,23 +51,13 @@ public class APERunConfig {
 	 * obligatory tags are used in the constructor to check the presence of tags.
 	 * Optional tags or All tags are mostly used by test cases.
 	 */
-	private static final String[] obligatoryRunTags = new String[] { 
-			SOLUTION_MIN_LENGTH_TAG, 
-			SOLUTION_MAX_LENGTH_TAG,
+	private static final String[] obligatoryRunTags = new String[] { SOLUTION_MIN_LENGTH_TAG, SOLUTION_MAX_LENGTH_TAG,
 			MAX_NOSOLUTIONS_TAG
 
 	};
-	private static final String[] optionalRunTags = new String[] { 
-			PROGRAM_INPUTS_TAG, 
-			PROGRAM_OUTPUTS_TAG,
-			CONSTRAINTS_TAG, 
-			SHARED_MEMORY_TAG, 
-			NOEXECUTIONS_TAG, 
-			NO_GRAPHS_TAG, 
-			USEWORKFLOW_INPUT,
-			USE_ALL_GENERATED_DATA, 
-			DEBUG_MODE_TAG, TOOL_SEQ_REPEAT, 
-			SOLUTION_DIR_PATH_TAG };
+	private static final String[] optionalRunTags = new String[] { PROGRAM_INPUTS_TAG, PROGRAM_OUTPUTS_TAG,
+			CONSTRAINTS_TAG, SHARED_MEMORY_TAG, NOEXECUTIONS_TAG, NO_GRAPHS_TAG, USEWORKFLOW_INPUT,
+			USE_ALL_GENERATED_DATA, DEBUG_MODE_TAG, TOOL_SEQ_REPEAT, SOLUTION_DIR_PATH_TAG };
 
 	/**
 	 * READ and WRITE enums used to verify paths.
@@ -189,13 +179,13 @@ public class APERunConfig {
 		}
 		this.sharedMemory = builder.sharedMemory;
 		this.toolSeqRepeat = builder.toolSeqRepeat;
-		
+
 		this.solutionDirPath = builder.solutionDirPath;
 		if (!new File(this.solutionDirPath).isDirectory()) {
 			throw new APEConfigException(
 					"Configuration error. The given path is not a directory:" + this.solutionDirPath);
 		}
-		if(!(this.solutionDirPath.endsWith("/") || this.solutionDirPath.endsWith("\\"))) {
+		if (!(this.solutionDirPath.endsWith("/") || this.solutionDirPath.endsWith("\\"))) {
 			this.solutionDirPath += File.separator;
 		}
 
@@ -246,19 +236,16 @@ public class APERunConfig {
 			}
 		}
 
-		
 		/* Path to the solution directory. */
 		if (runConfiguration.has(SOLUTION_DIR_PATH_TAG)) {
-			this.solutionDirPath = readDirectoryPath(SOLUTION_DIR_PATH_TAG, runConfiguration,
-				Permission.WRITE);
+			this.solutionDirPath = readDirectoryPath(SOLUTION_DIR_PATH_TAG, runConfiguration, Permission.WRITE);
+			if (!(this.solutionDirPath.endsWith("/") || this.solutionDirPath.endsWith("\\"))) {
+				this.solutionDirPath += File.separator;
+			}
 		} else {
 			APEUtils.printWarning("Tag '" + SOLUTION_DIR_PATH_TAG
 					+ "' in the configuration file is not provided. No solutions will not be generated to the file system.");
 		}
-		if(!(this.solutionDirPath.endsWith("/") || this.solutionDirPath.endsWith("\\"))) {
-			this.solutionDirPath += File.separator;
-		}
-		
 
 		/* Path to the JSON constraints file. */
 		if (runConfiguration.has(CONSTRAINTS_TAG) && !runConfiguration.getString(CONSTRAINTS_TAG).equals("")) {
@@ -504,10 +491,10 @@ public class APERunConfig {
 		}
 
 		// create parent directory if required
-		if(path.getParent() == null) {
+		if (path.getParent() == null) {
 			throw new IOException("Path '" + stringPath + "' is not well formatted.");
 		}
-		
+
 		File directory = new File(path.getParent().toString());
 		if (!directory.exists()) {
 			APEUtils.printWarning(
@@ -545,8 +532,8 @@ public class APERunConfig {
 	 * Method checks whether the provided value represent a correct path, and
 	 * returns the path if it does.
 	 *
-	 * @param tag    Corresponding tag from the config file.
-	 * @param config Provided JSON configuration with values.
+	 * @param tag                  Corresponding tag from the config file.
+	 * @param config               Provided JSON configuration with values.
 	 * @param requestedPermissions R/W/E permissions required over the directory
 	 * @return Path represented in the JSON object, or the default value if the tag
 	 *         is not present.
@@ -727,22 +714,26 @@ public class APERunConfig {
 	}
 
 	/**
-	 * Get the path to the directory where the executable scripts corresponding to the given solutions should be stored.
+	 * Get the path to the directory where the executable scripts corresponding to
+	 * the given solutions should be stored.
+	 * 
 	 * @return
 	 */
 	public String getSolutionDirPath2Executables() {
-		
+
 		return solutionDirPath + "Executables" + File.separator;
 	}
-	
+
 	/**
-	 * Get the path to the directory where the graphs representation of the solutions should be stored.
+	 * Get the path to the directory where the graphs representation of the
+	 * solutions should be stored.
+	 * 
 	 * @return
 	 */
 	public String getSolutionDirPath2Figures() {
-		return solutionDirPath + "Figures" + File.separator;
+		return solutionDirPath + "Workflows" + File.separator;
 	}
-	
+
 	/**
 	 * Get minimum length of the required solutions.
 	 *
@@ -832,7 +823,7 @@ public class APERunConfig {
 	public boolean getDebugMode() {
 		return debugMode;
 	}
-	
+
 	/**
 	 * @param constraintsPath the constraintsPath to set
 	 */
@@ -1090,7 +1081,6 @@ public class APERunConfig {
 			this.solutionDirPath = solutionDirPath;
 			return this;
 		}
-
 
 		@Override
 		public IBuildStage withNoExecutions(int noExecutions) {
