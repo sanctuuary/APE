@@ -1,16 +1,16 @@
 package nl.uu.cs.ape.sat.utils;
 
 import nl.uu.cs.ape.sat.configuration.APEConfig;
-import nl.uu.cs.ape.sat.configuration.APEConfigField;
 import nl.uu.cs.ape.sat.configuration.APEConfigTag;
 import nl.uu.cs.ape.sat.configuration.APEConfigTagFactory;
-import nl.uu.cs.ape.sat.io.APEFiles;
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,31 +25,27 @@ public class APECoreConfig extends APEConfig {
     /**
      * The taxonomy (ontology) file
      */
-    public final static APEConfigTag<File> ONTOLOGY_TAG = new APEConfigTagFactory.ExistingFile("ontology_path")
-            .withTagDescription("This tag should be a path to an .owl file.");
-
-    /**
-     * The JSON file with all tool annotations.
-     */
-    public final static APEConfigTag<File> TOOL_ANNOTATIONS_TAG = new APEConfigTagFactory.ExistingFile("tool_annotations_path")
-            .withTagDescription("This tag should be a path to an .json file.");
+    public final APEConfigTag<Path> ONTOLOGY = new APEConfigTagFactory.TAGS.ONTOLOGY();
 
     /**
      * Prefix used to define OWL class IDs
      */
-    public final static APEConfigTag<String> ONTOLOGY_PREFIX = new APEConfigTagFactory.StringTag("ontologyPrexifIRI")
-            .withDefaultValue("")
-            .addValidationFunction(APEFiles::isURI, "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).");
+    public final APEConfigTag<String> ONTOLOGY_PREFIX = new APEConfigTagFactory.TAGS.ONTOLOGY_PREFIX();
 
     /**
      * Node in the ontology that corresponds to the root of the module taxonomy.
      */
-    public final static APEConfigTag<String> TOOL_ONTOLOGY_TAG = new APEConfigTagFactory.StringTag("toolsTaxonomyRoot");
+    public final APEConfigTag<String> TOOL_ONTOLOGY_ROOT = new APEConfigTagFactory.TAGS.TOOL_ONTOLOGY_ROOT();
 
     /**
      * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
      */
-    public final static APEConfigTag<List<String>> DIMENSIONSONTOLOGY_TAG = new APEConfigTagFactory.DataDimensions("dataDimensionsTaxonomyRoots");
+    public final APEConfigTag<List<String>> DIMENSIONS_ONTOLOGY = new APEConfigTagFactory.TAGS.DIMENSIONS_ONTOLOGY(ONTOLOGY_PREFIX::getValue);
+
+    /**
+     * The JSON file with all tool annotations.
+     */
+    public final APEConfigTag<Path> TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.TOOL_ANNOTATIONS();
 
     /**
      * Initialize the configuration of the project.
@@ -63,22 +59,22 @@ public class APECoreConfig extends APEConfig {
     public APECoreConfig(File ontology, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations) {
 
         /* Path to the OWL file. */
-        getField(ONTOLOGY_TAG).setValue(ontology);
+        this.ONTOLOGY.setValue(ontology.toPath());
 
         /* URI of the ontology classes. */
-        getField(ONTOLOGY_PREFIX).setValue(ontologyPrefixURI);
+        this.ONTOLOGY_PREFIX.setValue(ontologyPrefixURI);
 
         /* The root class of the tool taxonomy. */
-        getField(TOOL_ONTOLOGY_TAG).setValue(APEUtils.createClassURI(toolTaxonomyRoot, getOntologyPrefixURI()));
+        this.TOOL_ONTOLOGY_ROOT.setValue(APEUtils.createClassURI(toolTaxonomyRoot, getOntologyPrefixURI()));
 
         /* Dimension classes of the data taxonomy. */
-        getField(DIMENSIONSONTOLOGY_TAG).setValue(
+        this.DIMENSIONS_ONTOLOGY.setValue(
                 dataDimensionRoots.stream()
                         .map(subTaxonomy -> APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()))
                         .collect(Collectors.toList()));
 
         /* Path to the tool annotations JSON file. */
-        getField(TOOL_ANNOTATIONS_TAG).setValue(toolAnnotations);
+        this.TOOL_ANNOTATIONS.setValue(toolAnnotations.toPath());
     }
 
     /**
@@ -90,13 +86,12 @@ public class APECoreConfig extends APEConfig {
      * @throws APEConfigException Error in setting up the the configuration.
      */
     public APECoreConfig(String configPath) throws IOException, JSONException, APEConfigException {
+
         if (configPath == null) {
             throw new NullPointerException("The provided core configuration file path is null.");
         }
-        File file = new File(configPath);
-        String content = FileUtils.readFileToString(file, "utf-8");
 
-        coreConfigSetup(new JSONObject(content));
+        coreConfigSetup(new JSONObject(FileUtils.readFileToString(new File(configPath), "utf-8")));
     }
 
     /**
@@ -107,10 +102,19 @@ public class APECoreConfig extends APEConfig {
      * @throws APEConfigException Error in setting up the the configuration.
      */
     public APECoreConfig(JSONObject configObject) throws JSONException, APEConfigException {
-        if (configObject == null)
+
+        if (configObject == null) {
             throw new NullPointerException("The provided JSONObject is null.");
+        }
 
         coreConfigSetup(configObject);
+    }
+
+    /**
+     * Initialize the class without setting any parameters.
+     * This private constructor is used to create an empty class to retrieve the tags in a static way.
+     */
+    private APECoreConfig() {
     }
 
     /**
@@ -141,72 +145,106 @@ public class APECoreConfig extends APEConfig {
         }
     }
 
+    public static JSONArray JSONTagInfo() {
+        return new APECoreConfig().getAllTagInfoJSON();
+    }
+    public static APEConfigTag<?>[] allTags() {
+        return new APECoreConfig().getAllTags();
+    }
+    public static APEConfigTag<?>[] obligatoryTags() {
+        return new APECoreConfig().getObligatoryTags();
+    }
+    public static APEConfigTag<?>[] optionalTags() {
+        return new APECoreConfig().getOptionalTags();
+    }
+
+    /**
+     * Should be in correct order of dependencies.
+     *
+     * @return all the Tags specified in this class.
+     */
+    @Override
+    public APEConfigTag<?>[] getAllTags() {
+        return new APEConfigTag[]{
+                ONTOLOGY,
+                ONTOLOGY_PREFIX,
+                TOOL_ONTOLOGY_ROOT,
+                DIMENSIONS_ONTOLOGY,
+                TOOL_ANNOTATIONS
+        };
+    }
+
     /**
      * Setting up the core configuration of the library.
-     *
-     * @return true if the method successfully set-up the configuration, false otherwise.
+     * <p>
      * //@throws IOException        Error in reading the configuration file.
+     *
      * @throws JSONException      Error in parsing the configuration file.
      * @throws APEConfigException Error in setting up the the configuration.
      *                            //@throws OWLException       Error in setting up the ontology for the configuration.
      */
-    private boolean coreConfigSetup(JSONObject coreConfiguration) throws JSONException, APEConfigException {
+    private void coreConfigSetup(JSONObject coreConfiguration) throws JSONException, APEConfigException {
 
         /* JSONObject must have been parsed correctly. */
         if (coreConfiguration == null) {
             throw new APEConfigException("Cannot set up the core configuration, because the JSONObject is initialized to NULL. The configuration file might not have been parsed correctly.");
         }
 
-        for (APEConfigField<?> field : getFields()) {
-            field.setValue(coreConfiguration);
+        // set the value for each tag
+        for (APEConfigTag<?> tag : getAllTags()) {
+            tag.setValue(coreConfiguration);
         }
-
-        return true;
     }
 
     /**
      * Gets ontology path.
      *
-     * @return the value of tag {@link #TOOL_ANNOTATIONS_TAG}
+     * @return the value of tag {@link #ONTOLOGY}
      */
     public File getOntologyFile() {
-        return getField(ONTOLOGY_TAG).getValue();
+        return ONTOLOGY.getValue().toFile();
     }
 
     /**
      * Gets ontology prefix uri.
      *
-     * @return the value of tag {@link #TOOL_ANNOTATIONS_TAG}
+     * @return the value of tag {@link #ONTOLOGY_PREFIX}
      */
     public String getOntologyPrefixURI() {
-        return getField(ONTOLOGY_PREFIX).getValue();
+        return ONTOLOGY_PREFIX.getValue();
     }
 
     /**
      * Gets tool taxonomy root.
      *
-     * @return the value of tag {@link #TOOL_ANNOTATIONS_TAG}
+     * @return the value of tag {@link #TOOL_ONTOLOGY_ROOT}
      */
     public String getToolTaxonomyRoot() {
-        return getField(TOOL_ONTOLOGY_TAG).getValue();
+        return TOOL_ONTOLOGY_ROOT.getValue();
     }
 
     /**
      * Gets data dimension roots.
      *
-     * @return the value of tag {@link #TOOL_ANNOTATIONS_TAG}
+     * @return the value of tag {@link #DIMENSIONS_ONTOLOGY}
      */
     public List<String> getDataDimensionRoots() {
-        return getField(DIMENSIONSONTOLOGY_TAG).getValue();
+        return DIMENSIONS_ONTOLOGY.getValue();
     }
+
+    /*
+     * Tags separated in the categories: obligatory, optional, core and run.
+     * The obligatory tags are used in the constructor to check the presence of tags.
+     * Optional tags or All tags are mostly used by test cases.
+     */
 
     /**
      * Gets tool annotations path.
      *
-     * @return the value of tag {@link #TOOL_ANNOTATIONS_TAG}
+     * @return the value of tag {@link #TOOL_ANNOTATIONS}
      */
     public File getToolAnnotationsFile() {
-        return getField(TOOL_ANNOTATIONS_TAG).getValue();
+        return TOOL_ANNOTATIONS.getValue().toFile();
     }
 
     /**

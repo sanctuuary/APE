@@ -232,7 +232,7 @@ public class APE {
         /* List of all the solutions */
         SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
         
-        APEUtils.readConstraints(runConfig.getConstraintsPath(), apeDomainSetup);
+        APEUtils.readConstraints(runConfig.getConstraintsPath().toString(), apeDomainSetup);
 
         /* Print the setup information when necessary. */
         APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);
@@ -243,9 +243,9 @@ public class APE {
          */
         String globalTimerID = "globalTimer";
         APEUtils.timerStart(globalTimerID, true);
-        int solutionLength = runConfig.getSolutionMinLength();
+        int solutionLength = runConfig.getSolutionLength().getMin();
         while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
-                && solutionLength <= runConfig.getSolutionMaxLength()) {
+                && solutionLength <= runConfig.getSolutionLength().getMax()) {
 
             SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, runConfig,
                     solutionLength);
@@ -261,7 +261,7 @@ public class APE {
             implSATsynthesis.synthesisExecution();
 
             if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
-                    || solutionLength == runConfig.getSolutionMaxLength()) {
+                    || solutionLength == runConfig.getSolutionLength().getMax()) {
                 APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
             }
 
@@ -286,7 +286,7 @@ public class APE {
             solutions2write = solutions2write.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution())
                     .append("\n");
         }
-        APEUtils.write2file(solutions2write.toString(), new File(allSolutions.getRunConfiguration().getSolutionPath()), false);
+        APEUtils.write2file(solutions2write.toString(), new File(allSolutions.getRunConfiguration().getSolutionPath().toString()), false);
 
         return true;
     }
@@ -298,7 +298,7 @@ public class APE {
      * @return true if the execution was successfully performed, false otherwise.
      */
     public static boolean writeExecutableWorkflows(SATsolutionsList allSolutions) {
-        String executionsFolder = allSolutions.getRunConfiguration().getExecutionScriptsFolder();
+        String executionsFolder = allSolutions.getRunConfiguration().getExecutionScriptsFolder().toString();
         Integer noExecutions = allSolutions.getRunConfiguration().getNoExecutions();
         if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
             return false;
@@ -339,7 +339,7 @@ public class APE {
      * @throws IOException Exception if graph cannot be written to the file system.
      */
     public static boolean writeDataFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
-        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder();
+        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder().toString();
         Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
         if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
             return false;
@@ -380,7 +380,7 @@ public class APE {
      * @throws IOException Exception if graphs cannot be written to the file system.
      */
     public static boolean writeControlFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
-        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder();
+        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder().toString();
         Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
         if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
             return false;

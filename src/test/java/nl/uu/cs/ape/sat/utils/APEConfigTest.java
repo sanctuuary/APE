@@ -1,6 +1,8 @@
 package nl.uu.cs.ape.sat.utils;
 
 import nl.uu.cs.ape.sat.APE;
+import nl.uu.cs.ape.sat.configuration.APEConfigTag;
+import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
@@ -39,8 +41,7 @@ class APEConfigTest {
             .put("solutions_path", TestResources.getAbsoluteResourcePath("template") + "\\solutions.txt")
             .put("shared_memory", true)
             .put("tool_seq_repeat", false)
-            .put("solution_min_length", 1)
-            .put("solution_max_length", 5)
+            .put("solution_length", new JSONObject().put(Range.MIN_TAG, 1).put(Range.MAX_TAG, 5))
             .put("max_solutions", 5)
             .put("execution_scripts_folder", TestResources.getAbsoluteResourcePath("template/Implementations"))
             .put("number_of_execution_scripts", 1)
@@ -117,24 +118,24 @@ class APEConfigTest {
     public void testMissingTags() {
 
         /* Missing one of the obligatory core tags should result in an exception while creating the framework. */
-        for (String tag : APECoreConfig.getObligatoryCoreTags()) {
+        for (APEConfigTag<?> tag : APECoreConfig.obligatoryTags()) {
             JSONObject obj = getCorrectTemplate();
-            obj.remove(tag);
+            obj.remove(tag.getTagName());
             assertThrows(APEConfigException.class, () -> new APECoreConfig(obj));
         }
 
         /* Missing one of the obligatory run tags should  result in an exception while executing the run phase. */
-        for (String tag : APERunConfig.getObligatoryRunTags()) {
+        for (APEConfigTag<?> tag : APERunConfig.obligatoryTags()) {
             JSONObject obj = getCorrectTemplate();
-            obj.remove(tag);
+            obj.remove(tag.getTagName());
             assertDoesNotThrow(() -> new APECoreConfig(obj));
             assertThrows(APEConfigException.class, () -> setupRun(obj));
         }
 
         /* Missing one of the optional tags should not throw an exception, but should display a warning. */
-        for (String tag : ArrayUtils.addAll(APECoreConfig.getOptionalCoreTags(), APERunConfig.getOptionalRunTags())) {
+        for (APEConfigTag<?> tag : ArrayUtils.addAll(APECoreConfig.optionalTags(), APERunConfig.optionalTags())) {
             JSONObject obj = getCorrectTemplate();
-            obj.remove(tag);
+            obj.remove(tag.getTagName());
             assertDoesNotThrow(() -> new APECoreConfig(obj));
             assertDoesNotThrow(() -> setupRun(obj));
         }

@@ -2,26 +2,17 @@ package nl.uu.cs.ape.sat.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
-import nl.uu.cs.ape.sat.configuration.APEConfigField;
-import nl.uu.cs.ape.sat.configuration.APEConfigTag;
-import nl.uu.cs.ape.sat.configuration.APEConfigTagFactory;
-import nl.uu.cs.ape.sat.io.APEFiles;
-import nl.uu.cs.ape.sat.models.Pair;
-import org.apache.commons.io.FilenameUtils;
+import nl.uu.cs.ape.sat.configuration.*;
+import nl.uu.cs.ape.sat.models.Range;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.DataInstance;
-import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 
 /**
@@ -30,132 +21,96 @@ import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
  *
  * @author Vedran Kasalica
  */
-public class APERunConfig {
+public class APERunConfig extends APEConfig {
 
 	/**
-	 * Tags used in the JSON file.
+	 * Should be in correct order of dependencies.
+	 *
+	 * @return all the Tags specified in this class.
 	 */
-	private static final String CONSTRAINTS_TAG = "constraints_path";
-	private static final String SHARED_MEMORY_TAG = "shared_memory";
-	private static final String SOLUTION_PATH_TAG = "solutions_path";
-	private static final String SOLUTION_MIN_LENGTH_TAG = "solution_min_length";
-	private static final String SOLUTION_MAX_LENGTH_TAG = "solution_max_length";
-	private static final String MAX_NOSOLUTIONS_TAG = "max_solutions";
-	private static final String EXECUTIONSCRIPTS_FOLDER_TAG = "execution_scripts_folder";
-	private static final String NOEXECUTIONS_TAG = "number_of_execution_scripts";
-	private static final String SOLUTION_GRAPHS_FOLDER_TAG = "solution_graphs_folder";
-	private static final String NO_GRAPHS_TAG = "number_of_generated_graphs";
-	private static final String PROGRAM_INPUTS_TAG = "inputs";
-	private static final String PROGRAM_OUTPUTS_TAG = "outputs";
-	private static final String USEWORKFLOW_INPUT = "use_workflow_input";
-	private static final String USE_ALL_GENERATED_DATA = "use_all_generated_data";
-	private static final String DEBUG_MODE_TAG = "debug_mode";
-	private static final String TOOL_SEQ_REPEAT = "tool_seq_repeat";
-
-	private static final APEConfigTag<Integer> SOLUTION_MIN_LENGTH_TAG_2 = new APEConfigTag<>("solution_min_length", Integer.class)
-			.withDefaultValue(1)
-			.addValidationFunction(i -> i >= 1, "Length must be greater of equal to 1.");
-	private static final APEConfigTag<Integer> SOLUTION_MAX_LENGTH_TAG_2 = new APEConfigTag<>("solution_max_length", Integer.class)
-			.withDefaultValue(8)
-			.addValidationFunction(i -> i >= 1, "Length must be greater of equal to 1.");
-
-	;
-
-	private APEConfigField<Integer> solutionMinLength_2 = new APEConfigField.Number(SOLUTION_MIN_LENGTH_TAG_2);
-	private APEConfigField<Integer> solutionMaxLength_2 =  new APEConfigField.Number(SOLUTION_MAX_LENGTH_TAG_2)
-			.addValidationFunction(i -> i >= solutionMinLength_2.getValue(), "");
-
-	private static final APEConfigTag<Integer> SOLUTION_STUFF = new APEConfigTagFactory.Number("solutionstuff")
-			.withDefaultValue(1)
-			.addValidationFunction(i -> i >= 1, "Length must be greater of equal to 1.");
-
-	private APEConfigField<Integer> solutionstuff = new APEConfigField.Number(SOLUTION_STUFF);
-
-	private static final APEConfigTag<String> A_PATH = new APEConfigTagFactory.Path("a_path")
-			.addValidationFunction(path -> APEFiles.exists(path))
-
-	/**
-	 * Tags separated in the categories: obligatory, optional, core and run. The
-	 * obligatory tags are used in the constructor to check the presence of tags.
-	 * Optional tags or All tags are mostly used by test cases.
-	 */
-	private static final String[] obligatoryRunTags = new String[] { 
-			SOLUTION_MIN_LENGTH_TAG, 0
-			SOLUTION_MAX_LENGTH_TAG,
-			MAX_NOSOLUTIONS_TAG
-
-	};
-	private static final String[] optionalRunTags = new String[] { 
-			PROGRAM_INPUTS_TAG, 
-			PROGRAM_OUTPUTS_TAG,
-			CONSTRAINTS_TAG, 
-			SHARED_MEMORY_TAG, 
-			NOEXECUTIONS_TAG, 
-			NO_GRAPHS_TAG, 
-			USEWORKFLOW_INPUT,
-			USE_ALL_GENERATED_DATA, 
-			DEBUG_MODE_TAG, TOOL_SEQ_REPEAT, 
-			SOLUTION_PATH_TAG, 
-			EXECUTIONSCRIPTS_FOLDER_TAG,
-			SOLUTION_GRAPHS_FOLDER_TAG };
+	@Override
+	public APEConfigTag<?>[] getAllTags() {
+		return new APEConfigTag<?>[]{
+				CONSTRAINTS,
+				SHARED_MEMORY,
+				SOLUTION_PATH,
+				SOLUTION_LENGTH_RANGE,
+				MAX_NO_SOLUTIONS,
+				EXECUTION_SCRIPTS_FOLDER,
+				SOLUTION_GRAPHS_FOLDER,
+				NO_EXECUTIONS,
+				NO_GRAPHS,
+				USE_WORKFLOW_INPUT,
+				USE_ALL_GENERATED_DATA,
+				DEBUG_MODE,
+				TOOL_SEQ_REPEAT,
+				PROGRAM_INPUTS,
+				PROGRAM_OUTPUTS
+		};
+	}
 
 	/**
 	 * Path to the file with all workflow constraints.
 	 */
-	private String constraintsPath = null;
+	public final APEConfigTag<Path> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
+
 	/**
 	 * true if the shared memory structure should be used, false in case of a
 	 * restrictive message passing structure.
 	 */
-	private boolean sharedMemory = true;
-	/**
-	 * false iff the provided solutions should be distinguished based on the tool
-	 * sequences alone, i.e. tool sequences cannot repeat, ignoring the types in the
-	 * solutions.
-	 */
-	private boolean toolSeqRepeat = true;
+	public final APEConfigTag<Boolean> SHARED_MEMORY = new APEConfigTagFactory.TAGS.SHARED_MEMORY();
+
 	/**
 	 * Path to the file that will contain all the solutions to the problem in human
 	 * readable representation.
 	 */
-	private String solutionPath = null;
+	public final APEConfigTag<Path> SOLUTION_PATH = new APEConfigTagFactory.TAGS.SOLUTION_PATH();
+
 	/**
 	 * Min and Max possible length of the solutions (length of the automaton). For
 	 * no upper limit, max length should be set to 0.
 	 */
-	private Pair<Integer> solutionLength;
+	public final APEConfigTag<Range> SOLUTION_LENGTH_RANGE = new APEConfigTagFactory.TAGS.SOLUTION_LENGTH_RANGE();
+
 	/**
 	 * Max number of solution that the solver will return.
 	 */
-	private int maxNoSolutions;
+	public final APEConfigTag<Integer> MAX_NO_SOLUTIONS = new APEConfigTagFactory.TAGS.MAX_NO_SOLUTIONS();
+
 	/**
 	 * Path to the folder that will contain all the scripts generated based on the
 	 * candidate workflows.
 	 */
-	private String executionScriptsFolder = null;
-	/**
-	 * Number of the workflow scripts that should be generated from candidate
-	 * workflows. Default is 0.
-	 */
-	private int noExecutions = 0;
+	public final APEConfigTag<Path> EXECUTION_SCRIPTS_FOLDER = new APEConfigTagFactory.TAGS.EXECUTION_SCRIPTS_FOLDER();
+
 	/**
 	 * Path to the folder that will contain all the figures/graphs generated based
 	 * on the candidate workflows.
 	 */
-	private String solutionGraphsFolder = null;
+	public final APEConfigTag<Path> SOLUTION_GRAPHS_FOLDER = new APEConfigTagFactory.TAGS.SOLUTION_GRAPHS_FOLDER();
+
+	/**
+	 * Number of the workflow scripts that should be generated from candidate
+	 * workflows. Default is 0.
+	 */
+	public final APEConfigTag<Integer> NO_EXECUTIONS = new APEConfigTagFactory.TAGS.NO_EXECUTIONS();
+
 	/**
 	 * Number of the solution graphs that should be generated from candidate
 	 * workflows. Default is 0.
 	 */
-	private int noGraphs = 0;
+	public final APEConfigTag<Integer> NO_GRAPHS = new APEConfigTagFactory.TAGS.NO_GRAPHS();
+
 	/**
 	 * Input types of the workflow.
 	 */
-	private List<DataInstance> programInputs = new ArrayList<>();
+	public final APEConfigTag<List<DataInstance>> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
+
 	/**
 	 * Output types of the workflow.
 	 */
-	private List<DataInstance> programOutputs = new ArrayList<>();
+	public final APEConfigTag<List<DataInstance>> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
+
 	/**
 	 * Determines the required usage for the data instances that are given as
 	 * workflow input:<br>
@@ -163,7 +118,8 @@ public class APERunConfig {
 	 * {@link ConfigEnum#ONE} if one of the workflow inputs should be used or <br>
 	 * {@link ConfigEnum#NONE} if none of the workflow inputs has to be used
 	 */
-	private ConfigEnum useWorkflowInput = ConfigEnum.ALL;
+	public final APEConfigTag<ConfigEnum> USE_WORKFLOW_INPUT = new APEConfigTagFactory.TAGS.USE_WORKFLOW_INPUT();
+
 	/**
 	 * Determines the required usage for the generated data instances:<br>
 	 * {@link ConfigEnum#ALL} if all the generated data has to be used,<br>
@@ -171,11 +127,20 @@ public class APERunConfig {
 	 * output, per tool, has to be used or <br>
 	 * {@link ConfigEnum#NONE} if none of the data instances is obligatory to use.
 	 */
-	private ConfigEnum useAllGeneratedData = ConfigEnum.ONE;
+	public final APEConfigTag<ConfigEnum> USE_ALL_GENERATED_DATA = new APEConfigTagFactory.TAGS.USE_ALL_GENERATED_DATA();
+
 	/**
 	 * Mode is true if debug mode is turned on.
 	 */
-	private boolean debugMode = false;
+	public final APEConfigTag<Boolean> DEBUG_MODE = new APEConfigTagFactory.TAGS.DEBUG_MODE();
+
+	/**
+	 * false iff the provided solutions should be distinguished based on the tool
+	 * sequences alone, i.e. tool sequences cannot repeat, ignoring the types in the
+	 * solutions.
+	 */
+	private final APEConfigTag<Boolean> TOOL_SEQ_REPEAT = new APEConfigTagFactory.TAGS.TOOL_SEQ_REPEAT();
+
 	/**
 	 * Object containing domain information needed for the execution.
 	 */
@@ -188,72 +153,27 @@ public class APERunConfig {
 	 */
 	private APERunConfig(Builder builder) {
 
-		/* Minimal length of the solution must be greater or equal to 1. */
-		this.solutionMinLength = builder.solutionMinLength;
-		if (this.solutionMinLength < 1) {
-			throw APEConfigException.invalidValue(SOLUTION_MIN_LENGTH_TAG, solutionMinLength,
-					"use a numeric value greater or equal to 1.");
-		}
-		/* Maximum length of the solution must be greater or equal to 1. */
-		this.solutionMaxLength = builder.solutionMaxLength;
-		if (this.solutionMaxLength < 1) {
-			throw APEConfigException.invalidValue(SOLUTION_MAX_LENGTH_TAG, solutionMaxLength,
-					"use a numeric value greater or equal to 1.");
-		}
-
-		/* Check MIN and MAX solution length. */
-		if (this.solutionMaxLength < this.solutionMinLength) {
-			throw APEConfigException.invalidValue(SOLUTION_MAX_LENGTH_TAG, solutionMaxLength, String
-					.format("MAX solution length cannot be smaller than MIN solution length (%s).", solutionMinLength));
-		}
-
-		this.maxNoSolutions = builder.maxNoSolutions;
-		if (this.maxNoSolutions < 0) {
-			throw APEConfigException.invalidValue(MAX_NOSOLUTIONS_TAG, maxNoSolutions,
-					"use a numeric value greater or equal to 0.");
-		}
-
-		this.apeDomainSetup = builder.apeDomainSetup;
-		if (this.apeDomainSetup == null) {
+		if (getApeDomainSetup() == null) {
 			throw new APEConfigException("Domain setup provided cannot have null value.");
 		}
 
-		this.constraintsPath = builder.constraintsPath;
-		if (!new File(this.constraintsPath).isFile()) {
-			throw new APEConfigException("Configuration error. The given path is not a file:" + this.constraintsPath);
-		}
-		this.sharedMemory = builder.sharedMemory;
-		this.toolSeqRepeat = builder.toolSeqRepeat;
-		this.solutionPath = builder.solutionPath;
+		this.apeDomainSetup = builder.apeDomainSetup;
 
-		this.executionScriptsFolder = builder.executionScriptsFolder;
-		if (!new File(this.executionScriptsFolder).isDirectory()) {
-			throw new APEConfigException(
-					"Configuration error. The given path is not a directory:" + this.executionScriptsFolder);
-		}
-
-		this.noExecutions = builder.noExecutions;
-		if (this.noExecutions < 0) {
-			throw APEConfigException.invalidValue(NOEXECUTIONS_TAG, this.noExecutions,
-					"use a numeric value greater or equal to 0.");
-		}
-
-		this.solutionGraphsFolder = builder.solutionGraphsFolder;
-		if (!new File(this.solutionGraphsFolder).isDirectory()) {
-			throw new APEConfigException(
-					"Configuration error. The given path is not a directory:" + this.solutionGraphsFolder);
-		}
-
-		this.noGraphs = builder.noGraphs;
-		if (this.noGraphs < 0) {
-			throw APEConfigException.invalidValue(NO_GRAPHS_TAG, this.noGraphs,
-					"use a numeric value greater or equal to 0.");
-		}
-		this.programInputs = builder.programInputs;
-		this.programOutputs = builder.programOutputs;
-		this.useWorkflowInput = builder.useWorkflowInput;
-		this.useAllGeneratedData = builder.useAllGeneratedData;
-		this.debugMode = builder.debugMode;
+		setConstraintsPath(builder.constraintsPath);
+		setSolutionLength(builder.solutionMinLength, builder.solutionMaxLength);
+		setMaxNoSolutions(builder.maxNoSolutions);
+		setSharedMemory(builder.sharedMemory);
+		setToolSeqRepeat(builder.toolSeqRepeat);
+		setSolutionPath(builder.solutionPath);
+		setExecutionScriptsFolder(builder.executionScriptsFolder);
+		setSolutionGraphsFolder(builder.solutionGraphsFolder);
+		setNoExecutions(builder.noExecutions);
+		setNoGraphs(builder.noGraphs);
+		setProgramInputs(builder.programInputs);
+		setProgramOutputs(builder.programOutputs);
+		setUseWorkflowInput(builder.useWorkflowInput);
+		setUseAllGeneratedData(builder.useAllGeneratedData);
+		setDebugMode(builder.debugMode);
 	}
 
 	/**
@@ -267,416 +187,31 @@ public class APERunConfig {
 	 */
 	public APERunConfig(JSONObject runConfiguration, APEDomainSetup apeDomainSetup)
 			throws IOException, JSONException, APEConfigException {
-		this.apeDomainSetup = apeDomainSetup;
 
 		/* JSONObject must have been parsed correctly. */
 		if (runConfiguration == null) {
 			throw new APEConfigException(
 					"Cannot set up the run configuration, because the JSONObject is initialized to NULL. The configuration file might not have been parsed correctly.");
 		}
-
-		/*
-		 * Make sure all required core tags are present. This way, the rest of the
-		 * method does not have to check the presence of the tag.
-		 */
-		for (String tag : getObligatoryRunTags()) {
-			if (!runConfiguration.has(tag)) {
-				throw APEConfigException.missingTag(tag);
-			}
+		if (getApeDomainSetup() == null) {
+			throw new APEConfigException("Domain setup provided cannot have null value.");
 		}
 
-		/* Path to the solution directory. */
-		if (runConfiguration.has(SOLUTION_PATH_TAG)) {
-			this.solutionPath = readFilesDirectoryPath(SOLUTION_PATH_TAG, runConfiguration, Permission.WRITE);
-		} else {
-			APEUtils.printWarning("Tag '" + SOLUTION_PATH_TAG
-					+ "' in the configuration file is not provided. No textual version of the solutions will not be provided.");
+		this.apeDomainSetup = apeDomainSetup;
+
+		// set the apeDomain BEFORE setting the tags
+		for(APEConfigTag<?> tag : allTags()){
+			tag.setValue(runConfiguration);
 		}
-		
-		/* Path to the output script directory. */
-		if (runConfiguration.has(EXECUTIONSCRIPTS_FOLDER_TAG)) {
-			this.executionScriptsFolder = readDirectoryPath(EXECUTIONSCRIPTS_FOLDER_TAG, runConfiguration,
-				Permission.WRITE);
-		} else {
-			APEUtils.printWarning("Tag '" + EXECUTIONSCRIPTS_FOLDER_TAG
-					+ "' in the configuration file is not provided. No executable solutions will not be provided.");
-		}
-
-		/* Path to the output graph directory. */
-		if (runConfiguration.has(SOLUTION_GRAPHS_FOLDER_TAG)) {
-			this.solutionGraphsFolder = readDirectoryPath(SOLUTION_GRAPHS_FOLDER_TAG, runConfiguration, Permission.WRITE);
-		} else {
-			APEUtils.printWarning("Tag '" + SOLUTION_GRAPHS_FOLDER_TAG
-					+ "' in the configuration file is not provided. No solutions figures will not be provided.");
-		}
-
-		/* Path to the JSON constraints file. */
-		if (runConfiguration.has(CONSTRAINTS_TAG) && !runConfiguration.getString(CONSTRAINTS_TAG).equals("")) {
-			this.constraintsPath = readFilePath(CONSTRAINTS_TAG, runConfiguration, Permission.READ);
-		} else {
-			APEUtils.printWarning("Tag '" + CONSTRAINTS_TAG
-					+ "' in the configuration file is not provided. No constraints will be applied.");
-		}
-
-		/* Read shared memory tag. */
-		this.sharedMemory = readBooleanOrDefault(SHARED_MEMORY_TAG, runConfiguration, true);
-
-		/* Read solutions filtering tag. */
-		this.toolSeqRepeat = readBooleanOrDefault(TOOL_SEQ_REPEAT, runConfiguration, true);
-
-		/* Minimal length of the solution must be greater or equal to 1. */
-		this.solutionMinLength = runConfiguration.getInt(SOLUTION_MIN_LENGTH_TAG);
-		if (this.solutionMinLength < 1) {
-			throw APEConfigException.invalidValue(SOLUTION_MIN_LENGTH_TAG, solutionMinLength,
-					"use a numeric value greater or equal to 1.");
-		}
-
-		/* Maximum length of the solution must be greater or equal to 1. */
-		this.solutionMaxLength = runConfiguration.getInt(SOLUTION_MAX_LENGTH_TAG);
-		if (this.solutionMaxLength < 1) {
-			throw APEConfigException.invalidValue(SOLUTION_MAX_LENGTH_TAG, solutionMaxLength,
-					"use a numeric value greater or equal to 1.");
-		}
-
-		/* Check MIN and MAX solution length. */
-		if (this.solutionMaxLength < this.solutionMinLength) {
-			throw APEConfigException.invalidValue(SOLUTION_MAX_LENGTH_TAG, solutionMaxLength, String
-					.format("MAX solution length cannot be smaller than MIN solution length (%s).", solutionMinLength));
-		}
-
-		/* Maximum number of generated solutions. */
-		this.maxNoSolutions = runConfiguration.getInt(MAX_NOSOLUTIONS_TAG);
-		if (this.maxNoSolutions < 0) {
-			throw APEConfigException.invalidValue(MAX_NOSOLUTIONS_TAG, maxNoSolutions,
-					"use a numeric value greater or equal to 0.");
-		}
-
-		/* Number of execution scripts generated from the solutions. */
-		this.noExecutions = readIntegerOrDefault(NOEXECUTIONS_TAG, runConfiguration, 0);
-		if (this.noExecutions < 0) {
-			throw APEConfigException.invalidValue(NOEXECUTIONS_TAG, this.noExecutions,
-					"use a numeric value greater or equal to 0.");
-		}
-
-		/* Number of graphs generated from the solutions. */
-		this.noGraphs = readIntegerOrDefault(NO_GRAPHS_TAG, runConfiguration, 0);
-		if (this.noGraphs < 0) {
-			throw APEConfigException.invalidValue(NO_GRAPHS_TAG, this.noGraphs,
-					"use a numeric value greater or equal to 0.");
-		}
-
-		/* Parse the input and output DataInstances of the program */
-		this.programInputs = getDataInstances(PROGRAM_INPUTS_TAG, runConfiguration);
-		this.programOutputs = getDataInstances(PROGRAM_OUTPUTS_TAG, runConfiguration);
-
-		/* Read the config enums. */
-		this.useWorkflowInput = readConfigEnumOrDefault(USEWORKFLOW_INPUT, runConfiguration, ConfigEnum.ALL);
-		this.useAllGeneratedData = readConfigEnumOrDefault(USE_ALL_GENERATED_DATA, runConfiguration, ConfigEnum.ONE);
-
-		/* DEBUG_MODE_TAG */
-		this.debugMode = readBooleanOrDefault(DEBUG_MODE_TAG, runConfiguration, false);
-	}
-
-	/**
-	 * Method checks whether the provided value represent a boolean, and returns the
-	 * boolean if it does. Method returns the param {@code default_value} if the
-	 * specified tag is not present.
-	 *
-	 * @param tag           Corresponding tag from the config file.
-	 * @param config        Provided JSON configuration with values.
-	 * @param default_value This value will be returned if the specified tag is not
-	 *                      present in the JSONObject.
-	 * @return Value represented in the JSON object, or the default value if the tag
-	 *         is not present.
-	 * @throws JSONException Error in parsing the value for specified tag.
-	 */
-	private static boolean readBooleanOrDefault(String tag, JSONObject config, boolean default_value)
-			throws JSONException {
-
-		if (!config.has(tag)) {
-			APEUtils.printWarning(String.format(
-					"Tag '%s' in the configuration file is not provided. Default value is: %s.", tag, default_value));
-			return default_value;
-		}
-
-		return config.getBoolean(tag);
-	}
-
-	/**
-	 * Method checks whether the provided value represent a Integer, and Integer the
-	 * boolean if it does. Method returns the param {@code default_value} if the
-	 * specified tag is not present.
-	 *
-	 * @param tag           Corresponding tag from the config file.
-	 * @param config        Provided JSON configuration with values.
-	 * @param default_value This value will be returned if the specified tag is not
-	 *                      present in the JSONObject.
-	 * @return Value represented in the JSON object, or the default value if the tag
-	 *         is not present.
-	 * @throws JSONException Error in parsing the value for specified tag.
-	 */
-	private static int readIntegerOrDefault(String tag, JSONObject config, int default_value) throws JSONException {
-
-		if (!config.has(tag)) {
-			APEUtils.printWarning(String.format(
-					"Tag '%s' in the configuration file is not provided. Default value is: %s.", tag, default_value));
-			return default_value;
-		}
-
-		return config.getInt(tag);
-	}
-
-	/**
-	 * Method checks whether the provided value represent a {@link ConfigEnum}, and
-	 * returns the {@link ConfigEnum} if it does. Method returns the param
-	 * {@code default_value} if the specified tag is not present.
-	 *
-	 * @param tag           Corresponding tag from the config file.
-	 * @param config        Provided JSON configuration with values.
-	 * @param default_value This value will be returned if the specified tag is not
-	 *                      present in the JSONObject.
-	 * @return Value represented in the JSON object, or the default value if the tag
-	 *         is not present.
-	 * @throws JSONException      Error in parsing the value for specified tag.
-	 * @throws APEConfigException Error in setting up the the configuration.
-	 */
-	private static ConfigEnum readConfigEnumOrDefault(String tag, JSONObject config, ConfigEnum default_value)
-			throws JSONException, APEConfigException {
-
-		if (!config.has(tag)) {
-			APEUtils.printWarning(String.format(
-					"Tag '%s' in the configuration file is not provided. Default value is: %s.", tag, default_value));
-			return default_value;
-		}
-
-		String stringEnum = config.getString(tag);
-
-		if (stringEnum == null) {
-			throw APEConfigException.invalidValue(tag, "null", "value is null.");
-		}
-		if (stringEnum.equals("")) {
-			throw APEConfigException.invalidValue(tag, stringEnum, "value is empty.");
-		}
-
-		try {
-			return ConfigEnum.valueOf(stringEnum.toUpperCase());
-		} catch (IllegalArgumentException e) {
-			throw APEConfigException.invalidValue(tag, stringEnum,
-					String.format("could not parse value. Use one of the following values: %s",
-							Arrays.toString(ConfigEnum.values())));
-		}
-	}
-
-	/**
-	 * Method checks whether the provided value represent a correct path, and
-	 * returns the path if it does.
-	 *
-	 * @param tag    Corresponding tag from the config file.
-	 * @param config Provided JSON configuration with values.
-	 * @return Path represented in the JSON object, or the default value if the tag
-	 *         is not present.
-	 * @throws IOException        Error if path is cannot be found.
-	 * @throws JSONException      Error in parsing the value for specified tag.
-	 * @throws APEConfigException Error in setting up the the configuration.
-	 */
-	private static String readFilePath(String tag, JSONObject config, Permission... requestedPermissions)
-			throws IOException, JSONException, APEConfigException {
-
-		// read path
-		String stringPath = config.getString(tag);
-
-		// check on empty values
-		if (stringPath == null) {
-			throw APEConfigException.invalidValue(tag, "null", "value is null.");
-		}
-		if (stringPath.equals("")) {
-			throw APEConfigException.invalidValue(tag, stringPath, "value is empty.");
-		}
-
-		// path should exist
-		java.nio.file.Path path = Paths.get(stringPath);
-		if (Files.notExists(path)) {
-			throw APEConfigException.pathNotFound(tag, stringPath);
-		}
-
-		if (!Files.isRegularFile(path)) {
-			throw APEConfigException.notAFile(tag, stringPath);
-		}
-
-		// check permissions
-		for (Permission permission : Arrays.stream(requestedPermissions).distinct().collect(Collectors.toList())) {
-
-			if (permission == Permission.READ && !Files.isReadable(path)) {
-				throw APEConfigException.missingPermission(tag, stringPath, permission);
-			}
-
-			if (permission == Permission.WRITE && !Files.isWritable(path)) {
-				throw APEConfigException.missingPermission(tag, stringPath, permission);
-			}
-
-		}
-
-		return stringPath;
-	}
-
-	/**
-	 * Method checks whether the provided value represent a correct path, and
-	 * returns the path if it does.
-	 *
-	 * @param tag    Corresponding tag from the config file.
-	 * @param config Provided JSON configuration with values.
-	 * @return Path represented in the JSON object, or the default value if the tag
-	 *         is not present.
-	 * @throws IOException        Error if path is cannot be found.
-	 * @throws JSONException      Error in parsing the value for specified tag.
-	 * @throws APEConfigException Error in setting up the the configuration.
-	 */
-	private static String readFilesDirectoryPath(String tag, JSONObject config, Permission... requestedPermissions)
-			throws IOException, JSONException, APEConfigException {
-
-		// read path
-		String stringPath = config.getString(tag);
-
-		// check on empty values
-		if (stringPath == null) {
-			throw APEConfigException.invalidValue(tag, "null", "value is null.");
-		}
-		if (stringPath.equals("")) {
-			throw APEConfigException.invalidValue(tag, stringPath, "value is empty.");
-		}
-
-		// path should exist and should be a file path
-		java.nio.file.Path path = Paths.get(stringPath);
-		// check if the proposed path represents a file and not a directory (it does not
-		// matter whether it exists or not)
-		if (FilenameUtils.getExtension(path.toString()).equals("")) {
-			throw APEConfigException.notAFile(tag, stringPath);
-		}
-
-		// create parent directory if required
-		if(path.getParent() == null) {
-			throw new IOException("Path '" + stringPath + "' is not well formatted.");
-		}
-		
-		File directory = new File(path.getParent().toString());
-		if (!directory.exists()) {
-			APEUtils.printWarning(
-					"Directory '" + path.getParent().toString() + "' does not exist. The directory will be created.");
-			if (directory.mkdirs()) {
-				System.out.println("Successfully created directory '" + path.getParent().toString() + "'");
-			}
-		}
-
-		// create file if required
-		if (Files.notExists(path)) {
-			APEUtils.printWarning("File '" + stringPath + "' does not exist. The file will be created.");
-			if (new File(path.toString()).createNewFile()) {
-				System.out.println("Successfully created file '" + stringPath + "'");
-			}
-		}
-
-		// check permissions
-		for (Permission permission : Arrays.stream(requestedPermissions).distinct().collect(Collectors.toList())) {
-
-			if (permission == Permission.READ && !Files.isReadable(path)) {
-				throw APEConfigException.missingPermission(tag, stringPath, permission);
-			}
-
-			if (permission == Permission.WRITE && !Files.isWritable(path)) {
-				throw APEConfigException.missingPermission(tag, stringPath, permission);
-			}
-
-		}
-
-		return stringPath;
-	}
-
-
-
-	/**
-	 * Used to read the input and output data instances for the program. This method
-	 * calls {@link #getDataInstance}.
-	 */
-	private ArrayList<DataInstance> getDataInstances(String tag, JSONObject config) throws JSONException {
-
-		ArrayList<DataInstance> instances = new ArrayList<>();
-
-		try {
-			for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(config, tag, JSONObject.class)) {
-				DataInstance output;
-				if ((output = getDataInstance(jsonModuleOutput, this.apeDomainSetup.getAllTypes())) != null) {
-					instances.add(output);
-				}
-			}
-		} catch (ClassCastException e) {
-			instances.clear();
-			throw APEConfigException.cannotParse(tag, config.get(tag).toString(), JSONObject[].class,
-					"please provide the correct format.");
-		}
-
-		return instances;
-	}
-
-	/**
-	 * Used to read an input or output data instance for the program.
-	 */
-	private DataInstance getDataInstance(JSONObject jsonModuleInput, AllTypes allTypes) {
-
-		DataInstance dataInstances = new DataInstance();
-
-		for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
-
-			String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel,
-					this.apeDomainSetup.getOntologyPrefixURI());
-
-			for (String currTypeLabel : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
-
-				String currTypeURI = APEUtils.createClassURI(currTypeLabel, this.apeDomainSetup.getOntologyPrefixURI());
-
-				Type currType = allTypes.get(currTypeURI, typeSuperClassURI);
-
-				if (currType == null) {
-					System.err.println("Error in the configuration file. The data type '" + currTypeURI
-							+ "' was not defined or does not belong to the dimension '" + typeSuperClassLabel + "'.");
-					return null;
-				}
-
-				dataInstances.addType(currType);
-			}
-		}
-
-		if (!dataInstances.getTypes().isEmpty()) {
-			return dataInstances;
-		}
-
-		return null;
-	}
-
-	/**
-	 * Get all obligatory JSON tags to execute the synthesis.
-	 *
-	 * @return All obligatory JSON tags to execute the synthesis.
-	 */
-	public static String[] getObligatoryRunTags() {
-		return obligatoryRunTags;
-	}
-
-	/**
-	 * Get all optional JSON tags to execute the synthesis.
-	 *
-	 * @return All optional JSON tags to execute the synthesis.
-	 */
-	public static String[] getOptionalRunTags() {
-		return optionalRunTags;
 	}
 
 	/**
 	 * Gets constraints path.
 	 *
-	 * @return the {@link #constraintsPath}
+	 * @return the value of {@link #CONSTRAINTS}
 	 */
-	public String getConstraintsPath() {
-		return constraintsPath;
+	public Path getConstraintsPath() {
+		return CONSTRAINTS.getValue();
 	}
 
 	/**
@@ -689,7 +224,7 @@ public class APERunConfig {
 	 *         a restrictive message passing structure.
 	 */
 	public boolean getSharedMemory() {
-		return sharedMemory;
+		return SHARED_MEMORY.getValue();
 	}
 
 	/**
@@ -702,236 +237,220 @@ public class APERunConfig {
 	 *         long as the corresponding types differ.
 	 */
 	public boolean getToolSeqRepeat() {
-		return toolSeqRepeat;
+		return TOOL_SEQ_REPEAT.getValue();
 	}
 
 	/**
 	 * Gets solution path.
 	 *
-	 * @return the {@link #solutionPath}
+	 * @return the value of {@link #SOLUTION_PATH}
 	 */
-	public String getSolutionPath() {
-		return solutionPath;
+	public Path getSolutionPath() {
+		return SOLUTION_PATH.getValue();
 	}
 
 	/**
-	 * Gets solution min length.
+	 * Gets solution min and max length.
 	 *
-	 * @return the {@link #solutionLength}
+	 * @return the value of {@link #SOLUTION_LENGTH_RANGE}
 	 */
-	public int getSolutionMinLength() {
-		return solutionLength.getFirst();
-	}
-
-	/**
-	 * Gets solution max length.
-	 *
-	 * @return the {@link #solutionLength}
-	 */
-	public int getSolutionMaxLength() {
-		return solutionLength.getSecond();
+	public Range getSolutionLength() {
+		return SOLUTION_LENGTH_RANGE.getValue();
 	}
 
 	/**
 	 * Gets max no solutions.
 	 *
-	 * @return the {@link #maxNoSolutions}
+	 * @return the value of {@link #MAX_NO_SOLUTIONS}
 	 */
 	public int getMaxNoSolutions() {
-		return maxNoSolutions;
+		return MAX_NO_SOLUTIONS.getValue();
 	}
 
 	/**
 	 * Gets execution scripts folder.
 	 *
-	 * @return the {@link #executionScriptsFolder}
+	 * @return the value of {@link #EXECUTION_SCRIPTS_FOLDER}
 	 */
-	public String getExecutionScriptsFolder() {
-		return executionScriptsFolder;
+	public Path getExecutionScriptsFolder() {
+		return EXECUTION_SCRIPTS_FOLDER.getValue();
 	}
 
 	/**
 	 * Gets no executions.
 	 *
-	 * @return the {@link #noExecutions}
+	 * @return the value of {@link #NO_EXECUTIONS}
 	 */
 	public int getNoExecutions() {
-		return noExecutions;
+		return NO_EXECUTIONS.getValue();
 	}
 
 	/**
 	 * Gets solution graphs folder.
 	 *
-	 * @return the {@link #solutionGraphsFolder}
+	 * @return the value of {@link #SOLUTION_GRAPHS_FOLDER}
 	 */
-	public String getSolutionGraphsFolder() {
-		return solutionGraphsFolder;
+	public Path getSolutionGraphsFolder() {
+		return SOLUTION_GRAPHS_FOLDER.getValue();
 	}
 
 	/**
 	 * Gets no graphs.
 	 *
-	 * @return the {@link #noGraphs}
+	 * @return the value of {@link #NO_GRAPHS}
 	 */
 	public int getNoGraphs() {
-		return noGraphs;
+		return NO_GRAPHS.getValue();
 	}
 
 	/**
 	 * Gets program inputs.
 	 *
-	 * @return the {@link #programInputs}
+	 * @return the value of {@link #PROGRAM_INPUTS}
 	 */
 	public List<DataInstance> getProgramInputs() {
-		return programInputs;
+		return PROGRAM_INPUTS.getValue();
 	}
 
 	/**
 	 * Gets program outputs.
 	 *
-	 * @return the {@link #programOutputs}
+	 * @return the value of {@link #PROGRAM_OUTPUTS}
 	 */
 	public List<DataInstance> getProgramOutputs() {
-		return programOutputs;
+		return PROGRAM_OUTPUTS.getValue();
 	}
 
 	/**
 	 * Gets use workflow input.
 	 *
-	 * @return the {@link #useWorkflowInput}
+	 * @return the value of {@link #USE_WORKFLOW_INPUT}
 	 */
 	public ConfigEnum getUseWorkflowInput() {
-		return useWorkflowInput;
+		return USE_WORKFLOW_INPUT.getValue();
 	}
 
 	/**
 	 * Gets all generated data.
 	 *
-	 * @return the {@link #useAllGeneratedData}
+	 * @return the value of {@link #USE_ALL_GENERATED_DATA}
 	 */
 	public ConfigEnum getUseAllGeneratedData() {
-		return useAllGeneratedData;
+		return USE_ALL_GENERATED_DATA.getValue();
 	}
 
 	/**
 	 * Gets debug mode.
 	 *
-	 * @return the {@link #debugMode}
+	 * @return the value of {@link #DEBUG_MODE}
 	 */
 	public boolean getDebugMode() {
-		return debugMode;
+		return DEBUG_MODE.getValue();
 	}
 	
 	/**
 	 * @param constraintsPath the constraintsPath to set
 	 */
 	public void setConstraintsPath(String constraintsPath) {
-		this.constraintsPath = constraintsPath;
+		CONSTRAINTS.setValue(Paths.get(constraintsPath));
 	}
 
 	/**
 	 * @param sharedMemory the sharedMemory to set
 	 */
 	public void setSharedMemory(boolean sharedMemory) {
-		this.sharedMemory = sharedMemory;
+		SHARED_MEMORY.setValue(sharedMemory);
 	}
 
 	/**
 	 * @param toolSeqRepeat the toolSeqRepeat to set
 	 */
 	public void setToolSeqRepeat(boolean toolSeqRepeat) {
-		this.toolSeqRepeat = toolSeqRepeat;
+		TOOL_SEQ_REPEAT.setValue(toolSeqRepeat);
 	}
 
 	/**
 	 * @param solutionPath the solutionPath to set
 	 */
 	public void setSolutionPath(String solutionPath) {
-		this.solutionPath = solutionPath;
+		SOLUTION_PATH.setValue(Paths.get(solutionPath));
 	}
 
 	/**
 	 * @param solutionMinLength the solutionMinLength to set
 	 */
-	public void setSolutionMinLength(int solutionMinLength) {
-		this.solutionMinLength = solutionMinLength;
-	}
-
-	/**
-	 * @param solutionMaxLength the solutionMaxLength to set
-	 */
-	public void setSolutionMaxLength(int solutionMaxLength) {
-		this.solutionMaxLength = solutionMaxLength;
+	public void setSolutionLength(int solutionMinLength, int solutionMaxLength) {
+		this.SOLUTION_LENGTH_RANGE.setValue(Range.of(solutionMinLength, solutionMaxLength));
 	}
 
 	/**
 	 * @param maxNoSolutions the maxNoSolutions to set
 	 */
 	public void setMaxNoSolutions(int maxNoSolutions) {
-		this.maxNoSolutions = maxNoSolutions;
+		MAX_NO_SOLUTIONS.setValue(maxNoSolutions);
 	}
 
 	/**
 	 * @param executionScriptsFolder the executionScriptsFolder to set
 	 */
 	public void setExecutionScriptsFolder(String executionScriptsFolder) {
-		this.executionScriptsFolder = executionScriptsFolder;
+		EXECUTION_SCRIPTS_FOLDER.setValue(Paths.get(executionScriptsFolder));
 	}
 
 	/**
 	 * @param noExecutions the noExecutions to set
 	 */
 	public void setNoExecutions(int noExecutions) {
-		this.noExecutions = noExecutions;
+		NO_EXECUTIONS.setValue(noExecutions);
 	}
 
 	/**
 	 * @param solutionGraphsFolder the solutionGraphsFolder to set
 	 */
 	public void setSolutionGraphsFolder(String solutionGraphsFolder) {
-		this.solutionGraphsFolder = solutionGraphsFolder;
+		SOLUTION_GRAPHS_FOLDER.setValue(Paths.get(solutionGraphsFolder));
 	}
 
 	/**
 	 * @param noGraphs the noGraphs to set
 	 */
 	public void setNoGraphs(int noGraphs) {
-		this.noGraphs = noGraphs;
+		NO_GRAPHS.setValue(noGraphs);
 	}
 
 	/**
 	 * @param programInputs the programInputs to set
 	 */
 	public void setProgramInputs(List<DataInstance> programInputs) {
-		this.programInputs = programInputs;
+		PROGRAM_INPUTS.setValue(programInputs);
 	}
 
 	/**
 	 * @param programOutputs the programOutputs to set
 	 */
 	public void setProgramOutputs(List<DataInstance> programOutputs) {
-		this.programOutputs = programOutputs;
+		PROGRAM_OUTPUTS.setValue(programOutputs);
 	}
 
 	/**
 	 * @param useWorkflowInput the useWorkflowInput to set
 	 */
 	public void setUseWorkflowInput(ConfigEnum useWorkflowInput) {
-		this.useWorkflowInput = useWorkflowInput;
+		USE_WORKFLOW_INPUT.setValue(useWorkflowInput);
 	}
 
 	/**
 	 * @param useAllGeneratedData the useAllGeneratedData to set
 	 */
 	public void setUseAllGeneratedData(ConfigEnum useAllGeneratedData) {
-		this.useAllGeneratedData = useAllGeneratedData;
+		USE_ALL_GENERATED_DATA.setValue(useAllGeneratedData);
 	}
 
 	/**
 	 * @param debugMode the debugMode to set
 	 */
 	public void setDebugMode(boolean debugMode) {
-		this.debugMode = debugMode;
+		DEBUG_MODE.setValue(debugMode);
 	}
 
 	/**
@@ -941,6 +460,10 @@ public class APERunConfig {
 	 */
 	public String getCWLFormatRoot() {
 		return "format_1915";
+	}
+
+	private APEDomainSetup getApeDomainSetup() {
+		return apeDomainSetup;
 	}
 
 	/**
@@ -970,6 +493,13 @@ public class APERunConfig {
 			return null;
 		}
 	}
+	/**
+	 * Initialize the class without setting any parameters.
+	 * This private constructor is used to create an empty class to retrieve the tags in a static way.
+	 */
+	private APERunConfig(){
+		apeDomainSetup = null;
+	}
 
 	/**
 	 * Creates builder to build {@link APERunConfig}.
@@ -979,6 +509,21 @@ public class APERunConfig {
 	public static ISolutionMinLengthStage builder() {
 		return new Builder();
 	}
+
+	public static JSONArray JSONTagInfo() {
+		return new APERunConfig().getAllTagInfoJSON();
+	}
+	public static APEConfigTag<?>[] allTags() {
+		return new APERunConfig().getAllTags();
+	}
+	public static APEConfigTag<?>[] obligatoryTags() {
+		return new APERunConfig().getObligatoryTags();
+	}
+	public static APEConfigTag<?>[] optionalTags() {
+		return new APERunConfig().getOptionalTags();
+	}
+
+
 
 	public interface ISolutionMinLengthStage {
 		public ISolutionMaxLengthStage withSolutionMinLength(int solutionMinLength);

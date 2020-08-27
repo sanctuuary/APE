@@ -63,7 +63,7 @@ public class APEFiles {
      * @throws JSONException      Error in parsing the value for specified tag.
      * @throws APEConfigException Error in setting up the the configuration.
      */
-    public static File readFileFromPath(String tag, String inputPath, Permission... requestedPermissions)
+    public static Path readFileFromPath(String tag, String inputPath, Permission... requestedPermissions)
             throws IOException, JSONException, APEConfigException {
 
         final Path path = getPath(tag, inputPath);
@@ -79,7 +79,7 @@ public class APEFiles {
         // check permissions
         checkPermissions(tag, path, requestedPermissions);
 
-        return new File(path.toAbsolutePath().toString());
+        return path.toAbsolutePath();
     }
 
     /**
@@ -94,7 +94,7 @@ public class APEFiles {
      * @throws JSONException      Error in parsing the value for specified tag.
      * @throws APEConfigException Error in setting up the the configuration.
      */
-    private static String readDirectoryPath(String tag, String inputPath, Permission... requestedPermissions)
+    public static Path readDirectoryPath(String tag, String inputPath, Permission... requestedPermissions)
             throws IOException, JSONException, APEConfigException {
 
         final Path path = getPath(tag, inputPath);
@@ -112,9 +112,13 @@ public class APEFiles {
             throw APEConfigException.notADirectory(tag, absolutePath);
         }
 
-        checkPermissions(tag, path, requestedPermissions);
+        try {
+            checkPermissions(tag, path, requestedPermissions);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        return path.toAbsolutePath().toString();
+        return path.toAbsolutePath();
     }
 
     private static void createDirectory(String tag, Path path){

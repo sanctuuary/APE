@@ -1,5 +1,6 @@
 package nl.uu.cs.ape.sat.utils;
 
+import com.github.jsonldjava.utils.Obj;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AtomMappings;
@@ -15,10 +16,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * The {@link APEUtils} class is used for storing {@code Static} methods.
@@ -847,6 +852,15 @@ public final class APEUtils {
 		return abstractLabel.toString();
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T[] filter(T[] array, Predicate<T> filterPredicate){
+		return (T[]) Arrays.stream(array).filter(filterPredicate).toArray();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T1, T2> T2[] map(T1[] array, Function<T1, T2> mapFunction){
+		return (T2[]) Arrays.stream(array).map(mapFunction).toArray();
+	}
 	/**
 	 * Print a warning to the console for the user to see.
 	 *

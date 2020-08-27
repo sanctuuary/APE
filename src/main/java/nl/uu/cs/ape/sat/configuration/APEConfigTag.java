@@ -1,66 +1,67 @@
 package nl.uu.cs.ape.sat.configuration;
 
-import nl.uu.cs.ape.sat.utils.APECoreConfig;
+import nl.uu.cs.ape.sat.utils.APEConfigException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public abstract class APEConfigTag<T> {
 
-    /* Serializable */
-    private final String tagName;
-    private final Class<T> type;
-    private T _default = null;
-    private String tagDescription;
+    private T value;
 
-    /* Not serializable */
-    private final List<ValidationRule<T>> validations = new ArrayList<>();
+    public abstract String getTagName();
 
-    /**
-     * Instantiates a new Ape config field info.
-     *
-     * @param tagName the tag name
-     * @param type    the type
-     */
-    public APEConfigTag(String tagName, Class<T> type) {
-        this.tagName = tagName;
-        this.type = type;
+    public abstract String getLabel();
+
+    public abstract APEConfigTagType getTagType();
+
+    public abstract String getDescription();
+
+    public void addTypeInfo(JSONObject typeInfo){ }
+
+    protected abstract T constructFromJSON(JSONObject obj);
+
+    public abstract APEDefaultValue<T> getDefault();
+
+    public void setValue(JSONObject obj) {
+
+        final ValidationResults results = validate(obj);
+
+        if(results.fail()){
+            throw APEConfigException.ruleViolations(results);
+        }
+
+        this.value = constructFromJSON(obj);
     }
 
-    /**
-     * Set a default value for this field.
-     *
-     * @param value the value
-     * @return the ape config field info
-     */
-    public APEConfigTag<T> withDefaultValue(T value) {
-        this._default = value;
-        return this;
+    public void setValue(T value){
+
+        final ValidationResults results = validate(value);
+
+        if(results.fail()){
+            throw APEConfigException.ruleViolations(results);
+        }
+
+        this.value = value;
     }
 
-    /**
-     * Set a description for this field.
-     *
-     * @param tagDescription the description
-     * @return the ape config field info
-     */
-    public APEConfigTag<T> withTagDescription(String tagDescription) {
-        this.tagDescription = tagDescription;
-        return this;
+    public T getValue(){
+        if(this.value != null){
+            return this.value;
+        }
+
+        final APEDefaultValue<T> _default = getDefault();
+        if(_default.hasValue()){
+            return _default.get();
+        }
+
+        throw APEConfigException.fieldNotSpecified(getTagName(), getTagType().toString());
     }
 
-    public APEConfigTag<T> addValidationFunction(Predicate<T> predicate, String ruleDescription){
-        validations.add(new ValidationRule<T>(getName(), ruleDescription, predicate));
-        return this;
+    public boolean isOptional(){
+        return getDefault().hasValue();
     }
 
-    public ValidationResults validate(T t){
-        return new ValidationResults(this.validations.stream()
-                .map(rule -> rule.test(t))
-                .collect(Collectors.toList()));
+    public boolean isObligatory(){
+        return !isOptional();
     }
 
     public ValidationResults validate(JSONObject json){
@@ -68,8 +69,10 @@ public abstract class APEConfigTag<T> {
         final ValidationResults results = new ValidationResults();
 
         // JSON contains tag
-        if(!json.has(getName())){
-            results.add(getName(), String.format("Value for tag '%s' is missing.", getName()), false);
+        if(!json.has(getTagName())){
+            if(isObligatory()){
+                results.add(getTagName(), String.format("Value for tag '%s' is missing.", getTagName()), false);
+            }
             return results;
         }
 
@@ -79,90 +82,34 @@ public abstract class APEConfigTag<T> {
             results.add(validate(dummy));
         }
         catch (Exception e){
-            results.add(getName(), e.getMessage(), false);
+            results.add(getTagName(), e.getMessage(), false);
         }
 
         return results;
     }
 
-    protected abstract T constructFromJSON(JSONObject obj);
+    public ValidationResults validate(T value){
+        final ValidationResults results = new ValidationResults();
+        return validate(value, results);
+    };
 
-    public APEConfigField<T> createField(){
-        return new APEConfigField<>(this);
-    }
+    protected abstract ValidationResults validate(T value, ValidationResults results);
 
-    /**
-     * To json object.
-     *
-     * @return the json object
-     */
     public JSONObject toJSON() {
 
-        JSONObject obj = new JSONObject()
-                .put("tag_name", getName())
-                .put("type", getTagType().getSimpleName())
-                .put("optional", isOptional())
-                .put("description", getTagDescription());
+        final JSONObject json = new JSONObject()
+                .put("tag_name", getTagName())
+                .put("label", getLabel())
+                .put("description", getDescription())
+                .put("type", getTagType().toJSON())
+                .put("optional", isOptional());
 
-        if (isOptional()) {
-            obj.put("default", getDefault());
+        if (isOptional()){
+            json.put("default", getDefault().get());
         }
 
-        return obj;
+        return json;
     }
-
-    /**
-     * Get tag name.
-     *
-     * @return the string
-     */
-    public String getName() {
-        return this.tagName;
-    }
-
-    /**
-     * Get type class of the data.
-     *
-     * @return the class
-     */
-    public Class<T> getTagType() {
-        return this.type;
-    }
-
-    /**
-     * If the field has a default value, this field is optional.
-     *
-     * @return the boolean
-     */
-    public boolean isOptional() {
-        return !this.isMandatory();
-    }
-
-    /**
-     * If the field does not have a default value, this field is mandatory.
-     *
-     * @return the boolean
-     */
-    public boolean isMandatory() {
-        return this._default == null;
-    }
-
-    /**
-     * Get description for this field.
-     *
-     * @return the string
-     */
-    public String getTagDescription() {
-        return this.tagDescription;
-    }
-
-    /**
-     * Gets default value for this field.
-     *
-     * @return the default
-     */
-    public T getDefault() {
-        return this._default;
-    }
-
 }
+
+

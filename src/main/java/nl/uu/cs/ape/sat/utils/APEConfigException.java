@@ -78,6 +78,10 @@ public class APEConfigException extends RuntimeException {
         return new JSONException(String.format("Value '%s' cannot be parsed to type '%s' for tag '%s', %s", value, expectedType.getSimpleName(), tag, info));
     }
 
+    public static <T> JSONException requiredValidationTag(String tag, String requiredTag, String info) {
+        return new JSONException(String.format("Cannot parse tag '%s' without '%s', %s", tag, requiredTag, info));
+    }
+
     /**
      * Path not found ape config exception.
      *
