@@ -4,8 +4,8 @@ import org.json.JSONObject;
 
 public class Range {
 
-    public final static String MIN_TAG = "minimal";
-    public final static String MAX_TAG = "maximal";
+    public final static String MIN_TAG = "min";
+    public final static String MAX_TAG = "max";
 
     final int min;
     final int max;

@@ -318,8 +318,7 @@ public class APERunConfig extends APEConfig {
      */
     public Path getSolutionDirPath2(String relativePath) {
         // relative paths should not start with '/' or '\'
-        char c = relativePath.charAt(0);
-        if(c == '/' || c == '\\'){
+        if(relativePath.startsWith("/") || relativePath.startsWith("\\")){
             return getSolutionDirPath().resolve(relativePath.substring(1));
         }
         return getSolutionDirPath().resolve(relativePath);

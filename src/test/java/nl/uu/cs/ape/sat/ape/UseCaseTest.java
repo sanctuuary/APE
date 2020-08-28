@@ -29,7 +29,7 @@ class UseCaseTest {
 
     @BeforeAll
     public static void before() {
-        repo = new GitHubRepo("sanctuuary/APE_UseCases", "master");
+        repo = new GitHubRepo("sanctuuary/APE_UseCases", "solutionLengthUpdate");
 
         final boolean canConnect = repo.canConnect();
         final String message = "There needs to be an active internet connection to run the use case tests.\nSKIP: " + UseCaseTest.class.getName();

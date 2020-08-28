@@ -177,7 +177,7 @@ class APEConfigTest {
     @Test
     public void testIncorrectDirectoryPaths() {
 
-        final String[] pathTags = new String[]{"execution_scripts_folder", "solution_graphs_folder"};
+        final String[] pathTags = new String[]{"solutions_dir_path"};
         final String[] wrongPaths = new String[]{"file.json", TestResources.getAbsoluteResourcePath("") + "\\file.json"};
 
         for (String tag : pathTags) {
@@ -191,49 +191,6 @@ class APEConfigTest {
                 }
             }
         }
-    }
-
-    @Test
-    public void testSolutionsPath() {
-        final String tag = "solutions_path";
-
-        // an existing file should be allowed
-        try {
-            final Path existingFile = Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath("template/sat_solutions.txt")));
-            assertTrue(Files.exists(existingFile));
-            setupRun(getCorrectTemplate().put(tag, existingFile.toString()));
-        } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
-            assertTrue(e.getMessage().contains(tag));
-            fail("Unexpected exception was thrown for APEConfig with a correct file path for tag '%s'\nAPE message was: %s", tag, e.getMessage());
-        }
-
-        // a non existing file should also be allowed, APE will create the directories and file if possible
-        try {
-            final Path nonExistingFile = Paths.get(TestResources.getAbsoluteRoot() + "\\thisFileDoesNotExist.txt");
-            assertTrue(Files.notExists(nonExistingFile)); // file should not exists
-            setupRun(getCorrectTemplate().put(tag, nonExistingFile.toString())); // setup APE
-            assertTrue(Files.exists(nonExistingFile)); // file should now exist
-
-            //clean up
-            Files.delete(nonExistingFile); // delete file
-            assertTrue(Files.notExists(nonExistingFile)); // file should not exists
-
-        } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
-            assertTrue(e.getMessage().contains(tag));
-            e.printStackTrace();
-            fail("Unexpected exception was thrown for APEConfig with a correct value for tag '%s'\nAPE message was: %s", tag, e.getMessage());
-        }
-
-        for (String incorrect : new String[]{"", "./a/directory", "a/directory", TestResources.getAbsoluteResourcePath("") + "\\newDirectory"}) {
-            try {
-                setupRun(getCorrectTemplate().put(tag, incorrect));
-                fail("Expected exception for APEConfig with an incorrect value '%s' for tag '%s' was not thrown.", incorrect, tag);
-            } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
-                assertTrue(e.getMessage().contains(tag));
-                success("Expected exception was thrown for APEConfig with an incorrect value for tag '%s'\nAPE message was: %s", tag, e.getMessage());
-            }
-        }
-
     }
 
     @Test
