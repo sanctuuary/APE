@@ -278,7 +278,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(Path value, ValidationResults results) {
-                return null;
+                return results;
             }
         }
 
@@ -381,7 +381,7 @@ public class APEConfigTagFactory {
 
             @Override
             public APEDefaultValue<String> getDefault() {
-                return APEDefaultValue.withDefault("");
+                return APEDefaultValue.noDefault();
             }
 
         }
@@ -460,7 +460,11 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class TOOL_ONTOLOGY_ROOT extends TYPES.StringTag {
+        public static class TOOL_ONTOLOGY_ROOT extends APEConfigDependentTag.One<String, String> {
+
+            public TOOL_ONTOLOGY_ROOT(Provider<String> prefix_provider) {
+                super(prefix_provider);
+            }
 
             @Override
             public String getTagName() {
@@ -489,7 +493,12 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected ValidationResults validate(String value, ValidationResults results) {
+            protected String constructFromJSON(JSONObject obj, String prefix) {
+                return APEUtils.createClassURI(obj.getString(getTagName()), prefix);
+            }
+
+            @Override
+            protected ValidationResults validate(String value, String prefix, ValidationResults results) {
                 return results;
             }
         }
@@ -575,35 +584,6 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class SOLUTION_PATH extends TYPES.ExistingFile{
-
-            @Override
-            protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[] { APEFiles.Permission.READ, APEFiles.Permission.WRITE };
-            }
-
-            @Override
-            public String getTagName() {
-                return "solutions_path";
-            }
-
-            @Override
-            public String getLabel() {
-                return "Solution file";
-            }
-
-            @Override
-            public String getDescription() {
-                // TODO
-                return "";
-            }
-
-            @Override
-            public APEDefaultValue<Path> getDefault() {
-                return APEDefaultValue.withDefault(null);
-            }
-        }
-
         public static class SOLUTION_LENGTH_RANGE extends TYPES.IntRange{
 
             @Override
@@ -661,45 +641,21 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class EXECUTION_SCRIPTS_FOLDER extends TYPES.Directory{
+        public static class SOLUTION_DIR_PATH extends TYPES.Directory {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[] {APEFiles.Permission.READ, APEFiles.Permission.WRITE};
+                return new APEFiles.Permission[] { APEFiles.Permission.READ, APEFiles.Permission.WRITE };
             }
 
             @Override
             public String getTagName() {
-                return "execution_scripts_folder";
+                return "solutions_dir_path";
             }
 
             @Override
             public String getLabel() {
-                return "Execution scripts folder";
-            }
-
-            @Override
-            public String getDescription() {
-                // TODO
-                return "";
-            }
-        }
-
-        public static class SOLUTION_GRAPHS_FOLDER extends TYPES.Directory{
-
-            @Override
-            protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[] {APEFiles.Permission.READ, APEFiles.Permission.WRITE};
-            }
-
-            @Override
-            public String getTagName() {
-                return "solution_graphs_folder";
-            }
-
-            @Override
-            public String getLabel() {
-                return "Graphs folder";
+                return "Solution directory";
             }
 
             @Override

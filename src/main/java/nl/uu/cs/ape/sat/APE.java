@@ -23,6 +23,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -286,7 +287,7 @@ public class APE {
             solutions2write = solutions2write.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution())
                     .append("\n");
         }
-        APEUtils.write2file(solutions2write.toString(), new File(allSolutions.getRunConfiguration().getSolutionPath().toString()), false);
+        APEUtils.write2file(solutions2write.toString(), allSolutions.getRunConfiguration().getSolutionDirPath2("solutions.txt").toFile(), false);
 
         return true;
     }
@@ -298,7 +299,7 @@ public class APE {
      * @return true if the execution was successfully performed, false otherwise.
      */
     public static boolean writeExecutableWorkflows(SATsolutionsList allSolutions) {
-        String executionsFolder = allSolutions.getRunConfiguration().getExecutionScriptsFolder().toString();
+        Path executionsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Executables();
         Integer noExecutions = allSolutions.getRunConfiguration().getNoExecutions();
         if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
             return false;
@@ -306,16 +307,21 @@ public class APE {
         APEUtils.printHeader(null, "Executing first " + noExecutions + " solution");
         APEUtils.timerStart("executingWorkflows", true);
 
-        Arrays.stream(
-                new File(executionsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
-                .forEach(File::delete);
+        final File executeDir = executionsFolder.toFile();
+        if(executeDir.isDirectory()) {
+            Arrays.stream(
+                    executionsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
+                    .forEach(File::delete);
+        } else {
+            executeDir.mkdir();
+        }
         System.out.print("Loading");
 
         /* Creating the requested scripts in parallel. */
         allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noExecutions).forEach(solution -> {
             try {
                 String title = "workflowSolution_" + solution.getIndex() + ".sh";
-                File script = new File(executionsFolder + "/" + title);
+                File script = executionsFolder.resolve(title).toFile();
                 APEUtils.write2file(solution.getScriptExecution(), script, false);
                 System.out.print(".");
             } catch (IOException e) {
@@ -339,7 +345,7 @@ public class APE {
      * @throws IOException Exception if graph cannot be written to the file system.
      */
     public static boolean writeDataFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
-        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder().toString();
+        Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
         Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
         if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
             return false;
@@ -348,15 +354,20 @@ public class APE {
         APEUtils.timerStart("drawingGraphs", true);
         System.out.println();
         /* Removing the existing files from the file system. */
-        Arrays.stream(new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
-                .forEach(File::delete);
+        File graphDir = graphsFolder.toFile();
+        if(graphDir.isDirectory()) {
+            Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
+                    .forEach(File::delete);
+        } else {
+            graphDir.mkdir();
+        }
         System.out.print("Loading");
         /* Creating the requested graphs in parallel. */
         allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
             try {
                 String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
-                String path = graphsFolder + "/" + title;
-                solution.getDataflowGraph(title, orientation).getWrite2File(new File(path));
+                Path path = graphsFolder.resolve(title);
+                solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile());
                 System.out.print(".");
             } catch (IOException e) {
                 System.err.println("Error occurred while writing a graph to the file system.");
@@ -380,7 +391,7 @@ public class APE {
      * @throws IOException Exception if graphs cannot be written to the file system.
      */
     public static boolean writeControlFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
-        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder().toString();
+        Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
         Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
         if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
             return false;
@@ -389,15 +400,20 @@ public class APE {
         APEUtils.timerStart("drawingGraphs", true);
         System.out.println();
         /* Removing the existing files from the file system. */
-        Arrays.stream(new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
-                .forEach(File::delete);
+        File graphDir = graphsFolder.toFile();
+        if(graphDir.isDirectory()) {
+            Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
+                    .forEach(File::delete);
+        } else {
+            graphDir.mkdir();
+        }
         System.out.print("Loading");
         /* Creating the requested graphs in parallel. */
         allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
             try {
                 String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
-                String path = graphsFolder + "/" + title;
-                solution.getControlflowGraph(title, orientation).getWrite2File(new File(path));
+                Path path = graphsFolder.resolve(title);
+                solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile());
                 System.out.print(".");
             } catch (IOException e) {
                 System.err.println("Error occurred while writing a graph to the file system.");

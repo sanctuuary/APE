@@ -1,6 +1,7 @@
 package nl.uu.cs.ape.sat.utils;
 
 import nl.uu.cs.ape.sat.APE;
+import nl.uu.cs.ape.sat.configuration.APEConfig;
 import nl.uu.cs.ape.sat.configuration.APEConfigTag;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
@@ -38,14 +39,12 @@ class APEConfigTest {
             .put("dataDimensionsTaxonomyRoots", new String[]{"TypesTaxonomy"})
             .put("tool_annotations_path", TestResources.getAbsoluteResourcePath("template/tool_annotations.json"))
             .put("constraints_path", TestResources.getAbsoluteResourcePath("template/constraints.json"))
-            .put("solutions_path", TestResources.getAbsoluteResourcePath("template") + "\\solutions.txt")
+            .put("solutions_dir_path", TestResources.getAbsoluteResourcePath("template"))
             .put("shared_memory", true)
             .put("tool_seq_repeat", false)
             .put("solution_length", new JSONObject().put(Range.MIN_TAG, 1).put(Range.MAX_TAG, 5))
             .put("max_solutions", 5)
-            .put("execution_scripts_folder", TestResources.getAbsoluteResourcePath("template/Implementations"))
             .put("number_of_execution_scripts", 1)
-            .put("solution_graphs_folder", TestResources.getAbsoluteResourcePath("template/Figures"))
             .put("number_of_generated_graphs", 1)
             .put("inputs", new JSONObject[]{new JSONObject().put("TypesTaxonomy", new String[]{"XYZ_table_file"})})
             .put("outputs", new JSONObject[]{new JSONObject().put("TypesTaxonomy", new String[]{"PostScript"})})
@@ -77,7 +76,12 @@ class APEConfigTest {
                     "Integer",
                     1,
                     new Object[]{false, "wrong"},
-                    new String[]{"solution_min_length", "solution_max_length", "max_solutions", "number_of_execution_scripts", "number_of_generated_graphs"}),
+                    new String[]{"max_solutions", "number_of_execution_scripts", "number_of_generated_graphs"}),
+            new TagInfo(
+                    "Range",
+                    new JSONObject().put(Range.MIN_TAG, 2).put(Range.MAX_TAG, 5),
+                    new Object[]{false, "wrong", 2},
+                    new String[]{"solution_length"}),
             new TagInfo(
                     "TaxonomyEntity",
                     "ToolsTaxonomy",
@@ -103,10 +107,8 @@ class APEConfigTest {
         assertDoesNotThrow(() -> {
             JSONObject template = getCorrectTemplate();
             APECoreConfig config = new APECoreConfig(template);
-            APE ape = new APE(template);
-            APERunConfig runCOnfig = new APERunConfig(template, ape.getDomainSetup());
-            boolean success = true;
-            assertTrue(success);
+            APE ape = new APE(config);
+            APERunConfig runConfig = new APERunConfig(template, ape.getDomainSetup());
         });
     }
 
@@ -121,7 +123,7 @@ class APEConfigTest {
         for (APEConfigTag<?> tag : APECoreConfig.obligatoryTags()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag.getTagName());
-            assertThrows(APEConfigException.class, () -> new APECoreConfig(obj));
+            assertThrows(JSONException.class, () -> new APECoreConfig(obj));
         }
 
         /* Missing one of the obligatory run tags should  result in an exception while executing the run phase. */
@@ -129,11 +131,11 @@ class APEConfigTest {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag.getTagName());
             assertDoesNotThrow(() -> new APECoreConfig(obj));
-            assertThrows(APEConfigException.class, () -> setupRun(obj));
+            assertThrows(JSONException.class, () -> setupRun(obj));
         }
 
         /* Missing one of the optional tags should not throw an exception, but should display a warning. */
-        for (APEConfigTag<?> tag : ArrayUtils.addAll(APECoreConfig.optionalTags(), APERunConfig.optionalTags())) {
+        for (APEConfigTag<?> tag : APECoreConfig.optionalTags()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag.getTagName());
             assertDoesNotThrow(() -> new APECoreConfig(obj));
@@ -218,6 +220,7 @@ class APEConfigTest {
 
         } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
             assertTrue(e.getMessage().contains(tag));
+            e.printStackTrace();
             fail("Unexpected exception was thrown for APEConfig with a correct value for tag '%s'\nAPE message was: %s", tag, e.getMessage());
         }
 
@@ -254,6 +257,8 @@ class APEConfigTest {
             for (String tag : tagInfo.tags) {
                 for (Object wrongExample : tagInfo.wrongExamples) {
                     try {
+                        //System.out.println("tag " + tag);
+                        //System.out.println("value " + wrongExample);
                         setupRun(getCorrectTemplate().put(tag, wrongExample)); // set invalid value for boolean tag and run the configuration
                         evaluation.forTag(tag).result(false);
                     } catch (Exception e) {

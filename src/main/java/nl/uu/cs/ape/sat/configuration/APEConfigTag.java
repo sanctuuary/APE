@@ -1,6 +1,7 @@
 package nl.uu.cs.ape.sat.configuration;
 
 import nl.uu.cs.ape.sat.utils.APEConfigException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class APEConfigTag<T> {
@@ -81,7 +82,7 @@ public abstract class APEConfigTag<T> {
             final T dummy = constructFromJSON(json);
             results.add(validate(dummy));
         }
-        catch (Exception e){
+        catch (JSONException | APEConfigException e){
             results.add(getTagName(), e.getMessage(), false);
         }
 

@@ -4,27 +4,24 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public abstract class APEConfig {
 
     public abstract APEConfigTag<?>[] getAllTags();
 
-    public APEConfigTag<?>[] getObligatoryTags(){
-        return APEUtils.filter(getAllTags(), APEConfigTag::isObligatory);
+    public List<APEConfigTag<?>> getObligatoryTags(){
+        return Arrays.stream(getAllTags()).filter(APEConfigTag::isObligatory).collect(Collectors.toList());
     }
 
-    public APEConfigTag<?>[] getOptionalTags(){
-        return APEUtils.filter(getAllTags(), APEConfigTag::isOptional);
+    public List<APEConfigTag<?>> getOptionalTags(){
+        return Arrays.stream(getAllTags()).filter(APEConfigTag::isOptional).collect(Collectors.toList());
     }
 
     public JSONArray getAllTagInfoJSON(){
         return new JSONArray(APEUtils.map(getAllTags(), APEConfigTag::toJSON));
     }
 
-    public void debug(){
-        final JSONObject json = new JSONObject();
-        for(APEConfigTag<?> tag : getAllTags()){
-            json.put(tag.getTagName(), tag.getValue().toString());
-        }
-        System.out.println(json.toString(3));
-    }
 }

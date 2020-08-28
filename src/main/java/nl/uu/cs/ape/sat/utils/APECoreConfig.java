@@ -35,7 +35,7 @@ public class APECoreConfig extends APEConfig {
     /**
      * Node in the ontology that corresponds to the root of the module taxonomy.
      */
-    public final APEConfigTag<String> TOOL_ONTOLOGY_ROOT = new APEConfigTagFactory.TAGS.TOOL_ONTOLOGY_ROOT();
+    public final APEConfigTag<String> TOOL_ONTOLOGY_ROOT = new APEConfigTagFactory.TAGS.TOOL_ONTOLOGY_ROOT(ONTOLOGY_PREFIX::getValue);
 
     /**
      * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
@@ -151,10 +151,10 @@ public class APECoreConfig extends APEConfig {
     public static APEConfigTag<?>[] allTags() {
         return new APECoreConfig().getAllTags();
     }
-    public static APEConfigTag<?>[] obligatoryTags() {
+    public static List<APEConfigTag<?>> obligatoryTags() {
         return new APECoreConfig().getObligatoryTags();
     }
-    public static APEConfigTag<?>[] optionalTags() {
+    public static List<APEConfigTag<?>> optionalTags() {
         return new APECoreConfig().getOptionalTags();
     }
 
@@ -166,8 +166,8 @@ public class APECoreConfig extends APEConfig {
     @Override
     public APEConfigTag<?>[] getAllTags() {
         return new APEConfigTag[]{
-                ONTOLOGY,
                 ONTOLOGY_PREFIX,
+                ONTOLOGY,
                 TOOL_ONTOLOGY_ROOT,
                 DIMENSIONS_ONTOLOGY,
                 TOOL_ANNOTATIONS
