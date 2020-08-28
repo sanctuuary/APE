@@ -1,5 +1,6 @@
-package nl.uu.cs.ape.sat.configuration;
+package nl.uu.cs.ape.sat.configuration.tags;
 
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import org.json.JSONObject;
 
 import javax.inject.Provider;

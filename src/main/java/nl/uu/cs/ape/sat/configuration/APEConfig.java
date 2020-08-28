@@ -1,8 +1,8 @@
 package nl.uu.cs.ape.sat.configuration;
 
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;

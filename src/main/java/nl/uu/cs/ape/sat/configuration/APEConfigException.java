@@ -1,7 +1,7 @@
-package nl.uu.cs.ape.sat.utils;
+package nl.uu.cs.ape.sat.configuration;
 
-import nl.uu.cs.ape.sat.configuration.ValidationResult;
-import nl.uu.cs.ape.sat.configuration.ValidationResults;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResult;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import org.json.JSONException;
 import org.json.JSONObject;
 

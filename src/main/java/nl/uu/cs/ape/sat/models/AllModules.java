@@ -2,7 +2,7 @@ package nl.uu.cs.ape.sat.models;
 
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APECoreConfig;
+import nl.uu.cs.ape.sat.configuration.APECoreConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;

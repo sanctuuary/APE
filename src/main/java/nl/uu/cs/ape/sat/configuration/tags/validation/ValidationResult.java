@@ -1,6 +1,5 @@
-package nl.uu.cs.ape.sat.configuration;
+package nl.uu.cs.ape.sat.configuration.tags.validation;
 
-import nl.uu.cs.ape.sat.utils.APEConfigException;
 import org.json.JSONObject;
 
 public class ValidationResult {

@@ -1,6 +1,6 @@
 package nl.uu.cs.ape.sat.io;
 
-import nl.uu.cs.ape.sat.utils.APEConfigException;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;

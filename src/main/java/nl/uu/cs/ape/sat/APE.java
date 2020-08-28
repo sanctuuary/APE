@@ -9,11 +9,11 @@ import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APEConfigException;
-import nl.uu.cs.ape.sat.utils.APECoreConfig;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
+import nl.uu.cs.ape.sat.configuration.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
-import nl.uu.cs.ape.sat.utils.APERunConfig;
+import nl.uu.cs.ape.sat.configuration.APERunConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import nl.uu.cs.ape.sat.utils.OWLReader;
 

@@ -1,11 +1,12 @@
-package nl.uu.cs.ape.sat.configuration;
+package nl.uu.cs.ape.sat.configuration.tags;
 
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.io.APEFiles;
 import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
-import nl.uu.cs.ape.sat.utils.APEConfigException;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONArray;
@@ -119,8 +120,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<List<DataInstance>> getDefault() {
-                return APEDefaultValue.withDefault(new ArrayList<>());
+            public APEConfigDefaultValue<List<DataInstance>> getDefault() {
+                return APEConfigDefaultValue.withDefault(new ArrayList<>());
             }
 
             @Override
@@ -214,8 +215,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<Integer> getDefault() {
-                return APEDefaultValue.noDefault();
+            public APEConfigDefaultValue<Integer> getDefault() {
+                return APEConfigDefaultValue.noDefault();
             }
 
             @Override
@@ -233,8 +234,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<Range> getDefault() {
-                return APEDefaultValue.noDefault();
+            public APEConfigDefaultValue<Range> getDefault() {
+                return APEConfigDefaultValue.noDefault();
             }
 
             @Override
@@ -272,8 +273,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<Path> getDefault() {
-                return APEDefaultValue.withDefault(null);
+            public APEConfigDefaultValue<Path> getDefault() {
+                return APEConfigDefaultValue.withDefault(null);
             }
 
             @Override
@@ -352,8 +353,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<Path> getDefault() {
-                return APEDefaultValue.noDefault();
+            public APEConfigDefaultValue<Path> getDefault() {
+                return APEConfigDefaultValue.noDefault();
             }
 
             @Override
@@ -380,8 +381,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<String> getDefault() {
-                return APEDefaultValue.noDefault();
+            public APEConfigDefaultValue<String> getDefault() {
+                return APEConfigDefaultValue.noDefault();
             }
 
         }
@@ -409,8 +410,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<List<String>> getDefault() {
-                return APEDefaultValue.noDefault();
+            public APEConfigDefaultValue<List<String>> getDefault() {
+                return APEConfigDefaultValue.noDefault();
             }
         }
 
@@ -488,8 +489,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<String> getDefault() {
-                return APEDefaultValue.noDefault();
+            public APEConfigDefaultValue<String> getDefault() {
+                return APEConfigDefaultValue.noDefault();
             }
 
             @Override
@@ -526,8 +527,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<Path> getDefault() {
-                return APEDefaultValue.noDefault();
+            public APEConfigDefaultValue<Path> getDefault() {
+                return APEConfigDefaultValue.noDefault();
             }
         }
 
@@ -555,8 +556,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<Path> getDefault() {
-                return APEDefaultValue.withDefault(null);
+            public APEConfigDefaultValue<Path> getDefault() {
+                return APEConfigDefaultValue.withDefault(null);
             }
         }
 
@@ -579,8 +580,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<Boolean> getDefault() {
-                return APEDefaultValue.withDefault(true);
+            public APEConfigDefaultValue<Boolean> getDefault() {
+                return APEConfigDefaultValue.withDefault(true);
             }
         }
 
@@ -737,8 +738,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<ConfigEnum> getDefault() {
-                return APEDefaultValue.withDefault(ConfigEnum.ALL);
+            public APEConfigDefaultValue<ConfigEnum> getDefault() {
+                return APEConfigDefaultValue.withDefault(ConfigEnum.ALL);
             }
         }
 
@@ -766,8 +767,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<ConfigEnum> getDefault() {
-                return APEDefaultValue.withDefault(ConfigEnum.ONE);
+            public APEConfigDefaultValue<ConfigEnum> getDefault() {
+                return APEConfigDefaultValue.withDefault(ConfigEnum.ONE);
             }
         }
 
@@ -790,8 +791,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<Boolean> getDefault() {
-                return APEDefaultValue.withDefault(false);
+            public APEConfigDefaultValue<Boolean> getDefault() {
+                return APEConfigDefaultValue.withDefault(false);
             }
         }
 
@@ -814,8 +815,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEDefaultValue<Boolean> getDefault() {
-                return APEDefaultValue.withDefault(true);
+            public APEConfigDefaultValue<Boolean> getDefault() {
+                return APEConfigDefaultValue.withDefault(true);
             }
         }
     }

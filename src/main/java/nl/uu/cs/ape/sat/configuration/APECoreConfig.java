@@ -1,8 +1,8 @@
-package nl.uu.cs.ape.sat.utils;
+package nl.uu.cs.ape.sat.configuration;
 
-import nl.uu.cs.ape.sat.configuration.APEConfig;
-import nl.uu.cs.ape.sat.configuration.APEConfigTag;
-import nl.uu.cs.ape.sat.configuration.APEConfigTagFactory;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;

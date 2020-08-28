@@ -1,12 +1,12 @@
-package nl.uu.cs.ape.sat.utils;
+package nl.uu.cs.ape.sat.configuration;
 
-import nl.uu.cs.ape.sat.configuration.APEConfig;
-import nl.uu.cs.ape.sat.configuration.APEConfigDependentTag;
-import nl.uu.cs.ape.sat.configuration.APEConfigTag;
-import nl.uu.cs.ape.sat.configuration.APEConfigTagFactory;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigDependentTag;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

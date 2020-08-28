@@ -1,5 +1,6 @@
 package nl.uu.cs.ape.sat.utils;
 
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

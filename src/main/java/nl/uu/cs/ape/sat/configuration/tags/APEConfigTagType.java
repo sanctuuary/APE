@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.configuration;
+package nl.uu.cs.ape.sat.configuration.tags;
 
 import org.json.JSONObject;
 

@@ -1,11 +1,9 @@
-package nl.uu.cs.ape.sat.configuration;
+package nl.uu.cs.ape.sat.configuration.tags.validation;
 
-import nl.uu.cs.ape.sat.utils.APEConfigException;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

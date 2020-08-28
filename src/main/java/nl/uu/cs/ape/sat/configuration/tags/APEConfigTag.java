@@ -1,6 +1,7 @@
-package nl.uu.cs.ape.sat.configuration;
+package nl.uu.cs.ape.sat.configuration.tags;
 
-import nl.uu.cs.ape.sat.utils.APEConfigException;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,7 +21,7 @@ public abstract class APEConfigTag<T> {
 
     protected abstract T constructFromJSON(JSONObject obj);
 
-    public abstract APEDefaultValue<T> getDefault();
+    public abstract APEConfigDefaultValue<T> getDefault();
 
     public void setValue(JSONObject obj) {
 
@@ -49,7 +50,7 @@ public abstract class APEConfigTag<T> {
             return this.value;
         }
 
-        final APEDefaultValue<T> _default = getDefault();
+        final APEConfigDefaultValue<T> _default = getDefault();
         if(_default.hasValue()){
             return _default.get();
         }
