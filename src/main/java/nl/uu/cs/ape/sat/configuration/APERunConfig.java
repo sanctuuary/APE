@@ -3,7 +3,9 @@ package nl.uu.cs.ape.sat.configuration;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigDependentTag;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.sat.models.DataInstance;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
@@ -14,8 +16,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * The {@link APERunConfig} class is used to define the run configuration
@@ -23,7 +28,7 @@ import java.util.List;
  *
  * @author Vedran Kasalica
  */
-public class APERunConfig extends APEConfig {
+public class APERunConfig {
 
     /**
      * Path to the file with all workflow constraints.
@@ -153,7 +158,7 @@ public class APERunConfig extends APEConfig {
         this.apeDomainSetup = apeDomainSetup;
 
         // set the apeDomain BEFORE setting the tags
-        for (APEConfigTag<?> tag : getAllTags()) {
+        for (APEConfigTag<?> tag : all_tags) {
             tag.setValue(runConfiguration);
         }
     }
@@ -203,21 +208,7 @@ public class APERunConfig extends APEConfig {
         return new Builder();
     }
 
-    public static JSONArray JSONTagInfo() {
-        return new APERunConfig().getAllTagInfoJSON();
-    }
 
-    public static APEConfigTag<?>[] allTags() {
-        return new APERunConfig().getAllTags();
-    }
-
-    public static List<APEConfigTag<?>> obligatoryTags() {
-        return new APERunConfig().getObligatoryTags();
-    }
-
-    public static List<APEConfigTag<?>> optionalTags() {
-        return new APERunConfig().getOptionalTags();
-    }
 
     public APEDomainSetup getApeDomainSetup() {
         return this.apeDomainSetup;
@@ -228,23 +219,45 @@ public class APERunConfig extends APEConfig {
      *
      * @return all the Tags specified in this class.
      */
-    @Override
-    public APEConfigTag<?>[] getAllTags() {
-        return new APEConfigTag<?>[]{
-                CONSTRAINTS,
-                SHARED_MEMORY,
-                SOLUTION_DIR_PATH,
-                SOLUTION_LENGTH_RANGE,
-                MAX_NO_SOLUTIONS,
-                NO_EXECUTIONS,
-                NO_GRAPHS,
-                USE_WORKFLOW_INPUT,
-                USE_ALL_GENERATED_DATA,
-                DEBUG_MODE,
-                TOOL_SEQ_REPEAT,
-                PROGRAM_OUTPUTS,
-                PROGRAM_INPUTS
+    private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
+            this.CONSTRAINTS,
+            this.SHARED_MEMORY,
+            this.SOLUTION_DIR_PATH,
+            this.SOLUTION_LENGTH_RANGE,
+            this.MAX_NO_SOLUTIONS,
+            this.NO_EXECUTIONS,
+            this.NO_GRAPHS,
+            this.USE_WORKFLOW_INPUT,
+            this.USE_ALL_GENERATED_DATA,
+            this.DEBUG_MODE,
+            this.TOOL_SEQ_REPEAT,
+            this.PROGRAM_OUTPUTS,
+            this.PROGRAM_INPUTS
         };
+
+    /**
+     * Should be in correct order for the Web API.
+     *
+     * @return static versions of the Tags specified in this class.
+     */
+    private static final APEConfigTags tag_info = new APEConfigTags(
+            new CONSTRAINTS(),
+            new SHARED_MEMORY(),
+            new SOLUTION_DIR_PATH(),
+            new SOLUTION_LENGTH_RANGE(),
+            new MAX_NO_SOLUTIONS(),
+            new NO_EXECUTIONS(),
+            new NO_GRAPHS(),
+            new USE_WORKFLOW_INPUT(),
+            new USE_ALL_GENERATED_DATA(),
+            new DEBUG_MODE(),
+            new TOOL_SEQ_REPEAT(),
+            new PROGRAM_OUTPUTS(null),
+            new PROGRAM_INPUTS(null)
+    );
+
+    public static APEConfigTags getTags(){
+        return tag_info;
     }
 
     /**

@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.utils;
+package nl.uu.cs.ape.sat.configuration;
 
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import org.junit.jupiter.api.Test;

@@ -17,8 +17,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import static nl.uu.cs.ape.sat.configuration.tags.APEConfigTag.TagType.*;
 
 public class APEConfigTagFactory {
 
@@ -27,8 +28,8 @@ public class APEConfigTagFactory {
         public static abstract class ExistingFile extends APEConfigTag<Path> {
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.FILE_PATH);
+            public TagType getType() {
+                return FILE_PATH;
             }
 
             @Override
@@ -47,14 +48,6 @@ public class APEConfigTagFactory {
             public ValidationResults validate(Path path, ValidationResults results) {
                 results.add(getTagName(), "The file should exist.", Files.exists(path));
                 return results;
-            }
-        }
-
-        public static abstract class StringTag extends APEConfigTag<String>{
-
-            @Override
-            protected String constructFromJSON(JSONObject obj) {
-                return obj.getString(getTagName());
             }
         }
 
@@ -91,8 +84,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.DATA_DIMENSIONS);
+            public TagType getType() {
+                return DATA_DIMENSIONS;
             }
 
             @Override
@@ -109,8 +102,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.DATA_INSTANCES);
+            public TagType getType() {
+                return DATA_INSTANCES;
             }
 
             @Override
@@ -187,8 +180,8 @@ public class APEConfigTagFactory {
         public static abstract class Bool extends APEConfigTag<Boolean> {
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.BOOLEAN);
+            public TagType getType() {
+                return BOOLEAN;
             }
 
             @Override
@@ -202,11 +195,17 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static abstract class PositiveInt extends APEConfigTag<Integer>{
+        public static abstract class Int extends APEConfigTag<Integer>{
+
+            private final Range range;
+
+            public Int(Range range){
+                this.range = range;
+            }
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.INTEGER, json -> json.put("minimal", 0));
+            public TagType getType() {
+                return INTEGER;
             }
 
             @Override
@@ -220,13 +219,18 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public void addTypeInfo(JSONObject typeInfo) {
-                super.addTypeInfo(typeInfo);
-                typeInfo.put("min", 0);
+            protected JSONObject getTypeConstraints() {
+                return range.toJSON();
             }
         }
 
         public static abstract class IntRange extends APEConfigTag<Range>{
+
+            private final Range boundaries;
+
+            public IntRange(Range boundaries){
+                this.boundaries = boundaries;
+            }
 
             @Override
             protected Range constructFromJSON(JSONObject obj) {
@@ -239,6 +243,11 @@ public class APEConfigTagFactory {
             }
 
             @Override
+            public TagType getType() {
+                return INTEGER_RANGE;
+            }
+
+            @Override
             protected ValidationResults validate(Range range, ValidationResults results) {
                 results.add(getTagName(),
                         "Maximal solution length should be greater or equal to the minimal solution length.",
@@ -247,9 +256,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public void addTypeInfo(JSONObject typeInfo) {
-                super.addTypeInfo(typeInfo);
-                typeInfo.put("boundaries", Range.of(1, 20));
+            protected JSONObject getTypeConstraints() {
+                return boundaries.toJSON();
             }
         }
 
@@ -258,8 +266,8 @@ public class APEConfigTagFactory {
             protected abstract APEFiles.Permission[] getRequiredPermissions();
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.FOLDER_PATH);
+            public TagType getType() {
+                return FOLDER_PATH;
             }
 
             @Override
@@ -286,8 +294,8 @@ public class APEConfigTagFactory {
         public static abstract class Option<E extends Enum<E>> extends APEConfigTag<E> {
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.CONFIG_ENUM, json -> json.put("options", new JSONArray(getOptions())));
+            public TagType getType() {
+                return ENUM;
             }
 
             public abstract Class<E> getEnumClass();
@@ -307,17 +315,16 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public void addTypeInfo(JSONObject typeInfo) {
-                super.addTypeInfo(typeInfo);
-                typeInfo.put("options", new JSONArray(Arrays.stream(getOptions()).map(Enum::toString)));
+            protected JSONObject getTypeConstraints() {
+                return new JSONObject().put("options", new JSONArray(getOptions()));
             }
         }
 
         public static abstract class URI extends APEConfigTag<String>{
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.URI);
+            public TagType getType() {
+                return URI;
             }
 
             @Override
@@ -346,6 +353,7 @@ public class APEConfigTagFactory {
             public String getLabel() {
                 return "Ontology";
             }
+
 
             @Override
             public String getDescription() {
@@ -406,7 +414,7 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
 
             @Override
@@ -478,8 +486,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.TOOL_ROOT);
+            public TagType getType() {
+                return MODULE;
             }
 
             @Override
@@ -552,7 +560,7 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
 
             @Override
@@ -576,7 +584,7 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
 
             @Override
@@ -586,6 +594,10 @@ public class APEConfigTagFactory {
         }
 
         public static class SOLUTION_LENGTH_RANGE extends TYPES.IntRange{
+
+            public SOLUTION_LENGTH_RANGE() {
+                super(Range.of(1, 50));
+            }
 
             @Override
             public String getTagName() {
@@ -598,14 +610,9 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigTagType getTagType() {
-                return new APEConfigTagType(APEConfigTagType.Type.INTEGER_RANGE, jsonObject -> jsonObject.put("minimal", 1).put("maximal", 20));
-            }
-
-            @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
 
             @Override
@@ -618,7 +625,12 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class MAX_NO_SOLUTIONS extends TYPES.PositiveInt {
+        public static class MAX_NO_SOLUTIONS extends TYPES.Int {
+
+            public MAX_NO_SOLUTIONS() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
+
             @Override
             public String getTagName() {
                 return "max_solutions";
@@ -632,7 +644,7 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
 
             @Override
@@ -662,11 +674,15 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
         }
 
-        public static class NO_EXECUTIONS extends TYPES.PositiveInt{
+        public static class NO_EXECUTIONS extends TYPES.Int {
+
+            public NO_EXECUTIONS() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
 
             @Override
             public String getTagName() {
@@ -690,7 +706,11 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class NO_GRAPHS extends TYPES.PositiveInt{
+        public static class NO_GRAPHS extends TYPES.Int {
+
+            public NO_GRAPHS() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
 
             @Override
             public String getTagName() {
@@ -734,7 +754,7 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
 
             @Override
@@ -763,7 +783,7 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
 
             @Override
@@ -787,7 +807,7 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
 
             @Override
@@ -811,7 +831,7 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 // TODO
-                return "";
+                return "TODO";
             }
 
             @Override

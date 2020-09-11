@@ -13,11 +13,24 @@ public abstract class APEConfigTag<T> {
 
     public abstract String getLabel();
 
-    public abstract APEConfigTagType getTagType();
+    public enum TagType {
+        FILE_PATH,
+        FOLDER_PATH,
+        URI,
+        INTEGER,
+        INTEGER_RANGE,
+        BOOLEAN,
+        ENUM,
+        DATA_DIMENSIONS,
+        DATA_INSTANCES,
+        MODULE
+    }
+
+    public abstract TagType getType();
 
     public abstract String getDescription();
 
-    public void addTypeInfo(JSONObject typeInfo){ }
+    protected JSONObject getTypeConstraints() { return new JSONObject(); }
 
     protected abstract T constructFromJSON(JSONObject obj);
 
@@ -55,7 +68,7 @@ public abstract class APEConfigTag<T> {
             return _default.get();
         }
 
-        throw APEConfigException.fieldNotSpecified(getTagName(), getTagType().toString());
+        throw APEConfigException.fieldNotSpecified(getTagName(), getType().toString());
     }
 
     public boolean isOptional(){
@@ -97,20 +110,50 @@ public abstract class APEConfigTag<T> {
 
     protected abstract ValidationResults validate(T value, ValidationResults results);
 
-    public JSONObject toJSON() {
+    public Info<T> getInfo(){
+        return new Info(this);
+    }
 
-        final JSONObject json = new JSONObject()
-                .put("tag_name", getTagName())
-                .put("label", getLabel())
-                .put("description", getDescription())
-                .put("type", getTagType().toJSON())
-                .put("optional", isOptional());
+    public JSONObject toJSON(){
+        return getInfo().toJSON();
+    }
 
-        if (isOptional()){
-            json.put("default", getDefault().get());
+    public static class Info <T> {
+
+        public final String tag_name, label, description;
+        public final boolean optional;
+        public final TagType type;
+        public final T _default;
+        public final JSONObject constraints;
+
+        protected Info(APEConfigTag<T> tag) {
+            this.tag_name = tag.getTagName();
+            this.label = tag.getLabel();
+            this.description = tag.getDescription();
+            this.optional = tag.isOptional();
+            this.type = tag.getType();
+            this._default = this.optional ? tag.getDefault().get() : null;
+            this.constraints = tag.getTypeConstraints();
         }
 
-        return json;
+        public JSONObject toJSON() {
+            final JSONObject json = new JSONObject()
+                        .put("tag", tag_name)
+                        .put("label", label)
+                        .put("description", description)
+                        .put("type", type)
+                        .put("optional", optional);
+
+            if(optional){
+                json.put("default", _default == null ? "" : _default);
+            }
+
+            if(!constraints.isEmpty()){
+                json.put("constraints", constraints);
+            }
+
+            return json;
+        }
     }
 }
 

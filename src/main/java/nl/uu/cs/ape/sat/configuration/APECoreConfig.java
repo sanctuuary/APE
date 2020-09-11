@@ -1,7 +1,10 @@
 package nl.uu.cs.ape.sat.configuration;
 
+import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
@@ -11,8 +14,11 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The {@link APECoreConfig} class is used to define the core configuration
@@ -20,7 +26,7 @@ import java.util.stream.Collectors;
  *
  * @author Vedran Kasalica
  */
-public class APECoreConfig extends APEConfig {
+public class APECoreConfig {
 
     /**
      * The taxonomy (ontology) file
@@ -145,33 +151,34 @@ public class APECoreConfig extends APEConfig {
         }
     }
 
-    public static JSONArray JSONTagInfo() {
-        return new APECoreConfig().getAllTagInfoJSON();
-    }
-    public static APEConfigTag<?>[] allTags() {
-        return new APECoreConfig().getAllTags();
-    }
-    public static List<APEConfigTag<?>> obligatoryTags() {
-        return new APECoreConfig().getObligatoryTags();
-    }
-    public static List<APEConfigTag<?>> optionalTags() {
-        return new APECoreConfig().getOptionalTags();
-    }
-
     /**
      * Should be in correct order of dependencies.
      *
      * @return all the Tags specified in this class.
      */
-    @Override
-    public APEConfigTag<?>[] getAllTags() {
-        return new APEConfigTag[]{
-                ONTOLOGY_PREFIX,
-                ONTOLOGY,
-                TOOL_ONTOLOGY_ROOT,
-                DIMENSIONS_ONTOLOGY,
-                TOOL_ANNOTATIONS
-        };
+    private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
+            this.ONTOLOGY_PREFIX,
+            this.ONTOLOGY,
+            this.TOOL_ONTOLOGY_ROOT,
+            this.DIMENSIONS_ONTOLOGY,
+            this.TOOL_ANNOTATIONS
+    };
+
+    /**
+     * Should be in correct order for the Web API.
+     *
+     * @return static versions of the Tags specified in this class.
+     */
+    private static final APEConfigTags tag_info = new APEConfigTags(
+            new ONTOLOGY_PREFIX(),
+            new ONTOLOGY(),
+            new TOOL_ONTOLOGY_ROOT(null),
+            new DIMENSIONS_ONTOLOGY(null),
+            new TOOL_ANNOTATIONS()
+    );
+
+    public static APEConfigTags getTags(){
+        return tag_info;
     }
 
     /**
@@ -191,7 +198,7 @@ public class APECoreConfig extends APEConfig {
         }
 
         // set the value for each tag
-        for (APEConfigTag<?> tag : getAllTags()) {
+        for (APEConfigTag<?> tag : all_tags) {
             tag.setValue(coreConfiguration);
         }
     }

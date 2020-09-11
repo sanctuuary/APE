@@ -1,9 +1,6 @@
-package nl.uu.cs.ape.sat.utils;
+package nl.uu.cs.ape.sat.configuration;
 
 import nl.uu.cs.ape.sat.APE;
-import nl.uu.cs.ape.sat.configuration.APEConfigException;
-import nl.uu.cs.ape.sat.configuration.APECoreConfig;
-import nl.uu.cs.ape.sat.configuration.APERunConfig;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
@@ -117,24 +114,24 @@ class APEConfigTest {
     public void testMissingTags() {
 
         /* Missing one of the obligatory core tags should result in an exception while creating the framework. */
-        for (APEConfigTag<?> tag : APECoreConfig.obligatoryTags()) {
+        for (APEConfigTag.Info info : APECoreConfig.getTags().getObligatory()) {
             JSONObject obj = getCorrectTemplate();
-            obj.remove(tag.getTagName());
+            obj.remove(info.tag_name);
             assertThrows(JSONException.class, () -> new APECoreConfig(obj));
         }
 
         /* Missing one of the obligatory run tags should  result in an exception while executing the run phase. */
-        for (APEConfigTag<?> tag : APERunConfig.obligatoryTags()) {
+        for (APEConfigTag.Info tag : APERunConfig.getTags().getObligatory()) {
             JSONObject obj = getCorrectTemplate();
-            obj.remove(tag.getTagName());
+            obj.remove(tag.tag_name);
             assertDoesNotThrow(() -> new APECoreConfig(obj));
             assertThrows(JSONException.class, () -> setupRun(obj));
         }
 
         /* Missing one of the optional tags should not throw an exception, but should display a warning. */
-        for (APEConfigTag<?> tag : APECoreConfig.optionalTags()) {
+        for (APEConfigTag.Info tag_info : APECoreConfig.getTags().getOptional()) {
             JSONObject obj = getCorrectTemplate();
-            obj.remove(tag.getTagName());
+            obj.remove(tag_info.tag_name);
             assertDoesNotThrow(() -> new APECoreConfig(obj));
             assertDoesNotThrow(() -> setupRun(obj));
         }
