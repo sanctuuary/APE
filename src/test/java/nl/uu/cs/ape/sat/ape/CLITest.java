@@ -21,6 +21,18 @@ public class CLITest {
         );
     }
 
+    // add files to 'src/test/resources/' folder and add the relative paths here
+    //@Test
+    public void templateTest(){
+        run(
+                "relative/path/base_config.json",
+                "relative/path/ontology.owl",
+                "relative/path/tool_annotations.json",
+                "relative/path/constraints.json",
+                "relative/path"
+        );
+    }
+
     public void run(String base_config_path, String ontology_path, String tools_path, String constraints_path, String solution_dir_path){
 
         // get the base configuration file
