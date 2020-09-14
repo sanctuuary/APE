@@ -1,12 +1,12 @@
 package nl.uu.cs.ape.sat.configuration.tags;
 
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.io.APEFiles;
 import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
-import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONArray;
@@ -23,7 +23,7 @@ import static nl.uu.cs.ape.sat.configuration.tags.APEConfigTag.TagType.*;
 
 public class APEConfigTagFactory {
 
-    public static class TYPES{
+    public static class TYPES {
 
         public static abstract class ExistingFile extends APEConfigTag<Path> {
 
@@ -51,7 +51,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static abstract class DataDimensions extends APEConfigDependentTag.One<List<String>, String>{
+        public static abstract class DataDimensions extends APEConfigDependentTag.One<List<String>, String> {
 
             public DataDimensions(Provider<String> provider) {
                 super(provider);
@@ -60,17 +60,16 @@ public class APEConfigTagFactory {
             @Override
             protected List<String> constructFromJSON(JSONObject obj, String ontology_prefix) {
 
-                if(ontology_prefix == null){
+                if (ontology_prefix == null) {
                     throw APEConfigException.requiredValidationTag(getTagName(), new TAGS.ONTOLOGY_PREFIX().getTagName(), "");
                 }
 
                 List<String> dataDimensionRoots = new ArrayList<>();
-                try{
+                try {
                     for (String subTaxonomy : APEUtils.getListFromJson(obj, getTagName(), String.class)) {
                         dataDimensionRoots.add(APEUtils.createClassURI(subTaxonomy, ontology_prefix));
                     }
-                }
-                catch (ClassCastException e){
+                } catch (ClassCastException e) {
                     throw APEConfigException.invalidValue(getTagName(), obj, "expected a list in correct format.");
                 } catch (IllegalArgumentException e) {
                     throw APEConfigException.invalidValue(getTagName(), obj, "elements of the list cannot be empty.");
@@ -95,7 +94,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static abstract class DataInstances extends APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup>{
+        public static abstract class DataInstances extends APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> {
 
             public DataInstances(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -121,7 +120,7 @@ public class APEConfigTagFactory {
             protected List<DataInstance> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
                 final ArrayList<DataInstance> instances = new ArrayList<>();
 
-                if(apeDomainSetup == null){
+                if (apeDomainSetup == null) {
                     throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
                 }
 
@@ -195,11 +194,11 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static abstract class Int extends APEConfigTag<Integer>{
+        public static abstract class Int extends APEConfigTag<Integer> {
 
             private final Range range;
 
-            public Int(Range range){
+            public Int(Range range) {
                 this.range = range;
             }
 
@@ -224,11 +223,11 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static abstract class IntRange extends APEConfigTag<Range>{
+        public static abstract class IntRange extends APEConfigTag<Range> {
 
             private final Range boundaries;
 
-            public IntRange(Range boundaries){
+            public IntRange(Range boundaries) {
                 this.boundaries = boundaries;
             }
 
@@ -261,7 +260,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static abstract class Directory extends APEConfigTag<Path>{
+        public static abstract class Directory extends APEConfigTag<Path> {
 
             protected abstract APEFiles.Permission[] getRequiredPermissions();
 
@@ -300,7 +299,7 @@ public class APEConfigTagFactory {
 
             public abstract Class<E> getEnumClass();
 
-            public E[] getOptions(){
+            public E[] getOptions() {
                 return getEnumClass().getEnumConstants();
             }
 
@@ -320,7 +319,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static abstract class URI extends APEConfigTag<String>{
+        public static abstract class URI extends APEConfigTag<String> {
 
             @Override
             public TagType getType() {
@@ -340,7 +339,7 @@ public class APEConfigTagFactory {
         }
     }
 
-    public static class TAGS{
+    public static class TAGS {
 
         public static class ONTOLOGY extends TYPES.ExistingFile {
 
@@ -367,11 +366,11 @@ public class APEConfigTagFactory {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[] { APEFiles.Permission.READ };
+                return new APEFiles.Permission[]{APEFiles.Permission.READ};
             }
         }
 
-        public static class ONTOLOGY_PREFIX extends TYPES.URI{
+        public static class ONTOLOGY_PREFIX extends TYPES.URI {
 
             @Override
             public String getTagName() {
@@ -395,7 +394,7 @@ public class APEConfigTagFactory {
 
         }
 
-        public static class DIMENSIONS_ONTOLOGY extends TYPES.DataDimensions{
+        public static class DIMENSIONS_ONTOLOGY extends TYPES.DataDimensions {
 
             public DIMENSIONS_ONTOLOGY(Provider<String> provider) {
                 super(provider);
@@ -423,7 +422,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class PROGRAM_INPUTS extends TYPES.DataInstances{
+        public static class PROGRAM_INPUTS extends TYPES.DataInstances {
 
             public PROGRAM_INPUTS(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -446,7 +445,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class PROGRAM_OUTPUTS extends TYPES.DataInstances{
+        public static class PROGRAM_OUTPUTS extends TYPES.DataInstances {
 
             public PROGRAM_OUTPUTS(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -512,11 +511,11 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class TOOL_ANNOTATIONS extends TYPES.ExistingFile{
+        public static class TOOL_ANNOTATIONS extends TYPES.ExistingFile {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[] { APEFiles.Permission.READ };
+                return new APEFiles.Permission[]{APEFiles.Permission.READ};
             }
 
             @Override
@@ -540,11 +539,11 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class CONSTRAINTS extends TYPES.ExistingFile{
+        public static class CONSTRAINTS extends TYPES.ExistingFile {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[] { APEFiles.Permission.READ };
+                return new APEFiles.Permission[]{APEFiles.Permission.READ};
             }
 
             @Override
@@ -569,7 +568,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class SHARED_MEMORY extends TYPES.Bool{
+        public static class SHARED_MEMORY extends TYPES.Bool {
 
             @Override
             public String getTagName() {
@@ -593,7 +592,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class SOLUTION_LENGTH_RANGE extends TYPES.IntRange{
+        public static class SOLUTION_LENGTH_RANGE extends TYPES.IntRange {
 
             public SOLUTION_LENGTH_RANGE() {
                 super(Range.of(1, 50));
@@ -658,7 +657,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[] { APEFiles.Permission.READ, APEFiles.Permission.WRITE };
+                return new APEFiles.Permission[]{APEFiles.Permission.READ, APEFiles.Permission.WRITE};
             }
 
             @Override
@@ -734,7 +733,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class USE_WORKFLOW_INPUT extends TYPES.Option<ConfigEnum>{
+        public static class USE_WORKFLOW_INPUT extends TYPES.Option<ConfigEnum> {
 
             @Override
             public Class<ConfigEnum> getEnumClass() {
@@ -763,7 +762,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class USE_ALL_GENERATED_DATA extends TYPES.Option<ConfigEnum>{
+        public static class USE_ALL_GENERATED_DATA extends TYPES.Option<ConfigEnum> {
 
             @Override
             public Class<ConfigEnum> getEnumClass() {
@@ -792,7 +791,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class DEBUG_MODE extends TYPES.Bool{
+        public static class DEBUG_MODE extends TYPES.Bool {
 
             @Override
             public String getTagName() {
@@ -816,7 +815,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class TOOL_SEQ_REPEAT extends TYPES.Bool{
+        public static class TOOL_SEQ_REPEAT extends TYPES.Bool {
 
             @Override
             public String getTagName() {

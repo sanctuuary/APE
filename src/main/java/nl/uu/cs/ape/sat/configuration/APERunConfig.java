@@ -3,24 +3,20 @@ package nl.uu.cs.ape.sat.configuration;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigDependentTag;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.sat.models.DataInstance;
-import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * The {@link APERunConfig} class is used to define the run configuration
@@ -31,6 +27,25 @@ import java.util.stream.Collectors;
 public class APERunConfig {
 
     /**
+     * Static versions of the Tags specified in this class. Should be in correct order for the Web API.
+     */
+    private static final APEConfigTags tag_info = new APEConfigTags(
+            new CONSTRAINTS(),
+            new SHARED_MEMORY(),
+            new SOLUTION_DIR_PATH(),
+            new SOLUTION_LENGTH_RANGE(),
+            new MAX_NO_SOLUTIONS(),
+            new NO_EXECUTIONS(),
+            new NO_GRAPHS(),
+            new USE_WORKFLOW_INPUT(),
+            new USE_ALL_GENERATED_DATA(),
+            new DEBUG_MODE(),
+            new TOOL_SEQ_REPEAT(),
+            new PROGRAM_OUTPUTS(null),
+            new PROGRAM_INPUTS(null)
+    );
+
+    /**
      * Path to the file with all workflow constraints.
      */
     public final APEConfigTag<Path> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
@@ -39,29 +54,24 @@ public class APERunConfig {
      * restrictive message passing structure.
      */
     public final APEConfigTag<Boolean> SHARED_MEMORY = new APEConfigTagFactory.TAGS.SHARED_MEMORY();
-
     /**
      * Path to the directory that will contain all the solutions to the problem.
      */
     public final APEConfigTag<Path> SOLUTION_DIR_PATH = new APEConfigTagFactory.TAGS.SOLUTION_DIR_PATH();
-
     /**
      * Min and Max possible length of the solutions (length of the automaton). For
      * no upper limit, max length should be set to 0.
      */
     public final APEConfigTag<Range> SOLUTION_LENGTH_RANGE = new APEConfigTagFactory.TAGS.SOLUTION_LENGTH_RANGE();
-
     /**
      * Max number of solution that the solver will return.
      */
     public final APEConfigTag<Integer> MAX_NO_SOLUTIONS = new APEConfigTagFactory.TAGS.MAX_NO_SOLUTIONS();
-
     /**
      * Number of the workflow scripts that should be generated from candidate
      * workflows. Default is 0.
      */
     public final APEConfigTag<Integer> NO_EXECUTIONS = new APEConfigTagFactory.TAGS.NO_EXECUTIONS();
-
     /**
      * Number of the solution graphs that should be generated from candidate
      * workflows. Default is 0.
@@ -93,6 +103,24 @@ public class APERunConfig {
      * solutions.
      */
     public final APEConfigTag<Boolean> TOOL_SEQ_REPEAT = new APEConfigTagFactory.TAGS.TOOL_SEQ_REPEAT();
+    /**
+     * All the Tags specified in this class. Should be in correct order of dependencies.
+     */
+    private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
+            this.CONSTRAINTS,
+            this.SHARED_MEMORY,
+            this.SOLUTION_DIR_PATH,
+            this.SOLUTION_LENGTH_RANGE,
+            this.MAX_NO_SOLUTIONS,
+            this.NO_EXECUTIONS,
+            this.NO_GRAPHS,
+            this.USE_WORKFLOW_INPUT,
+            this.USE_ALL_GENERATED_DATA,
+            this.DEBUG_MODE,
+            this.TOOL_SEQ_REPEAT,
+            this.PROGRAM_OUTPUTS,
+            this.PROGRAM_INPUTS
+    };
     /**
      * Object containing domain information needed for the execution.
      */
@@ -130,8 +158,8 @@ public class APERunConfig {
         setUseWorkflowInput(builder.useWorkflowInput);
         setUseAllGeneratedData(builder.useAllGeneratedData);
         setDebugMode(builder.debugMode);
-		setProgramInputs(builder.programInputs);
-		setProgramOutputs(builder.programOutputs);
+        setProgramInputs(builder.programInputs);
+        setProgramOutputs(builder.programOutputs);
     }
 
     /**
@@ -161,14 +189,6 @@ public class APERunConfig {
         for (APEConfigTag<?> tag : all_tags) {
             tag.setValue(runConfiguration);
         }
-    }
-
-    /**
-     * Initialize the class without setting any parameters.
-     * This private constructor is used to create an empty class to retrieve the tags in a static way.
-     */
-    private APERunConfig() {
-        apeDomainSetup = null;
     }
 
     /**
@@ -208,56 +228,12 @@ public class APERunConfig {
         return new Builder();
     }
 
-
+    public static APEConfigTags getTags() {
+        return tag_info;
+    }
 
     public APEDomainSetup getApeDomainSetup() {
         return this.apeDomainSetup;
-    }
-
-    /**
-     * Should be in correct order of dependencies.
-     *
-     * @return all the Tags specified in this class.
-     */
-    private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
-            this.CONSTRAINTS,
-            this.SHARED_MEMORY,
-            this.SOLUTION_DIR_PATH,
-            this.SOLUTION_LENGTH_RANGE,
-            this.MAX_NO_SOLUTIONS,
-            this.NO_EXECUTIONS,
-            this.NO_GRAPHS,
-            this.USE_WORKFLOW_INPUT,
-            this.USE_ALL_GENERATED_DATA,
-            this.DEBUG_MODE,
-            this.TOOL_SEQ_REPEAT,
-            this.PROGRAM_OUTPUTS,
-            this.PROGRAM_INPUTS
-        };
-
-    /**
-     * Should be in correct order for the Web API.
-     *
-     * @return static versions of the Tags specified in this class.
-     */
-    private static final APEConfigTags tag_info = new APEConfigTags(
-            new CONSTRAINTS(),
-            new SHARED_MEMORY(),
-            new SOLUTION_DIR_PATH(),
-            new SOLUTION_LENGTH_RANGE(),
-            new MAX_NO_SOLUTIONS(),
-            new NO_EXECUTIONS(),
-            new NO_GRAPHS(),
-            new USE_WORKFLOW_INPUT(),
-            new USE_ALL_GENERATED_DATA(),
-            new DEBUG_MODE(),
-            new TOOL_SEQ_REPEAT(),
-            new PROGRAM_OUTPUTS(null),
-            new PROGRAM_INPUTS(null)
-    );
-
-    public static APEConfigTags getTags(){
-        return tag_info;
     }
 
     /**
@@ -327,11 +303,12 @@ public class APERunConfig {
 
     /**
      * Get the path to the directory where the graphs representation of the solutions should be stored.
+     *
      * @return
      */
     public Path getSolutionDirPath2(String relativePath) {
         // relative paths should not start with '/' or '\'
-        if(relativePath.startsWith("/") || relativePath.startsWith("\\")){
+        if (relativePath.startsWith("/") || relativePath.startsWith("\\")) {
             return getSolutionDirPath().resolve(relativePath.substring(1));
         }
         return getSolutionDirPath().resolve(relativePath);
@@ -339,6 +316,7 @@ public class APERunConfig {
 
     /**
      * Get the path to the directory where the executable scripts corresponding to the given solutions should be stored.
+     *
      * @return
      */
     public Path getSolutionDirPath2Executables() {
@@ -347,6 +325,7 @@ public class APERunConfig {
 
     /**
      * Get the path to the directory where the graphs representation of the solutions should be stored.
+     *
      * @return
      */
     public Path getSolutionDirPath2Figures() {
@@ -520,45 +499,45 @@ public class APERunConfig {
      * @return created builder
      */
     public interface ISolutionMinLengthStage {
-        public ISolutionMaxLengthStage withSolutionMinLength(int solutionMinLength);
+        ISolutionMaxLengthStage withSolutionMinLength(int solutionMinLength);
     }
 
     public interface ISolutionMaxLengthStage {
-        public IMaxNoSolutionsStage withSolutionMaxLength(int solutionMaxLength);
+        IMaxNoSolutionsStage withSolutionMaxLength(int solutionMaxLength);
     }
 
     public interface IMaxNoSolutionsStage {
-        public IApeDomainSetupStage withMaxNoSolutions(int maxNoSolutions);
+        IApeDomainSetupStage withMaxNoSolutions(int maxNoSolutions);
     }
 
     public interface IApeDomainSetupStage {
-        public IBuildStage withApeDomainSetup(APEDomainSetup apeDomainSetup);
+        IBuildStage withApeDomainSetup(APEDomainSetup apeDomainSetup);
     }
 
     public interface IBuildStage {
-        public IBuildStage withConstraintsPath(String constraintsPath);
+        IBuildStage withConstraintsPath(String constraintsPath);
 
-        public IBuildStage withSharedMemory(boolean sharedMemory);
+        IBuildStage withSharedMemory(boolean sharedMemory);
 
-        public IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
+        IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
 
-        public IBuildStage withSolutionDirPath(String solutionPath);
+        IBuildStage withSolutionDirPath(String solutionPath);
 
-        public IBuildStage withNoExecutions(int noExecutions);
+        IBuildStage withNoExecutions(int noExecutions);
 
-        public IBuildStage withNoGraphs(int noGraphs);
+        IBuildStage withNoGraphs(int noGraphs);
 
-        public IBuildStage withProgramInputs(List<DataInstance> programInputs);
+        IBuildStage withProgramInputs(List<DataInstance> programInputs);
 
-        public IBuildStage withProgramOutputs(List<DataInstance> programOutputs);
+        IBuildStage withProgramOutputs(List<DataInstance> programOutputs);
 
-        public IBuildStage withUseWorkflowInput(ConfigEnum useWorkflowInput);
+        IBuildStage withUseWorkflowInput(ConfigEnum useWorkflowInput);
 
-        public IBuildStage withUseAllGeneratedData(ConfigEnum useAllGeneratedData);
+        IBuildStage withUseAllGeneratedData(ConfigEnum useAllGeneratedData);
 
-        public IBuildStage withDebugMode(boolean debugMode);
+        IBuildStage withDebugMode(boolean debugMode);
 
-        public APERunConfig build();
+        APERunConfig build();
     }
 
     /**

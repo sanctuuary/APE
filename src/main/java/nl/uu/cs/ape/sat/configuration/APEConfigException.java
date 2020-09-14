@@ -45,9 +45,9 @@ public class APEConfigException extends RuntimeException {
     /**
      * Invalid value ape config exception.
      *
-     * @param tag   Corresponding JSON tag in the configuration file.
+     * @param tag    Corresponding JSON tag in the configuration file.
      * @param config The configuration provided by the user.
-     * @param info  Application specific information that may help the user solve the problem.
+     * @param info   Application specific information that may help the user solve the problem.
      * @return Configuration exception with information that may help the user solve the problem.
      */
     public static APEConfigException invalidValue(String tag, JSONObject config, String info) {
@@ -103,7 +103,7 @@ public class APEConfigException extends RuntimeException {
     public static IOException notAFile(String tag, String path) {
         return new IOException(String.format("Provided path '%s' for tag '%s' is not a file.", path, tag));
     }
-    
+
     /**
      * Path is found, but it is not a file.
      *
@@ -124,7 +124,7 @@ public class APEConfigException extends RuntimeException {
     public static IOException notADirectory(String tag, String path) {
         return new IOException(String.format("Provided path '%s' for tag '%s' is not a directory.", path, tag));
     }
-    
+
     /**
      * Missing permission ape config exception.
      *
@@ -136,7 +136,7 @@ public class APEConfigException extends RuntimeException {
     public static IOException missingPermission(String tag, String path, Object missingPermission) {
         return new IOException(String.format("You are missing [%s] permission for path '%s' for tag '%s'", missingPermission, path, tag));
     }
-    
+
     /**
      * Missing permission ape config exception.
      *
@@ -152,7 +152,7 @@ public class APEConfigException extends RuntimeException {
         return new JSONException(String.format("No '%s' value provided for tag '%s'.", type, tag));
     }
 
-    public static JSONException ruleViolation(ValidationResult result){
+    public static JSONException ruleViolation(ValidationResult result) {
         return new JSONException(String.format("Tag '%s' is incorrect. %s", result.getTag(), result.getRuleDescription()));
     }
 

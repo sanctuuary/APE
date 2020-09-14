@@ -892,15 +892,4 @@ public final class APEUtils {
 		System.setErr(original);
 	}
 
-	public static JSONObject clone(JSONObject original){
-		return new JSONObject(original, JSONObject.getNames(original));
-	}
-
-	public static JSONArray clone(JSONArray original){
-		final JSONArray jsonArray = new JSONArray();
-		for(int i = 0; i < original.length(); i++){
-			jsonArray.put(i, original.get(i));
-		}
-		return jsonArray;
-	}
 }

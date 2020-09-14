@@ -12,46 +12,46 @@ public class ValidationResults {
 
     private final List<ValidationResult> results = new ArrayList<>();
 
-    public ValidationResults(){
+    public ValidationResults() {
     }
 
-    public ValidationResults(Collection<ValidationResult> results){
+    public ValidationResults(Collection<ValidationResult> results) {
         this.results.addAll(results);
     }
 
-    public void add(String tag, String ruleDescription, boolean success){
+    public void add(String tag, String ruleDescription, boolean success) {
         results.add(new ValidationResult(tag, ruleDescription, success));
     }
 
-    public void add(ValidationResults results){
+    public void add(ValidationResults results) {
         this.results.addAll(results.toList());
     }
 
-    public List<ValidationResult> toList(){
+    public List<ValidationResult> toList() {
         return new ArrayList<>(this.results);
     }
 
-    public ValidationResults getFails(){
+    public ValidationResults getFails() {
         return new ValidationResults(this.results.stream()
                 .filter(ValidationResult::isFail)
                 .collect(Collectors.toList()));
     }
 
-    public boolean fail(){
+    public boolean fail() {
         return results.stream().anyMatch(ValidationResult::isFail);
     }
 
-    public boolean success(){
+    public boolean success() {
         return results.stream().allMatch(ValidationResult::isSuccess);
     }
 
-    public ValidationResults getSuccesses(){
+    public ValidationResults getSuccesses() {
         return new ValidationResults(this.results.stream()
                 .filter(ValidationResult::isSuccess)
                 .collect(Collectors.toList()));
     }
 
-    public JSONArray toJSONArray(){
+    public JSONArray toJSONArray() {
         return new JSONArray(results.stream().map(ValidationResult::toJSON));
     }
 

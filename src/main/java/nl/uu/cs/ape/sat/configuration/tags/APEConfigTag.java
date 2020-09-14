@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.sat.configuration.tags;
 
-import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,6 +12,99 @@ public abstract class APEConfigTag<T> {
     public abstract String getTagName();
 
     public abstract String getLabel();
+
+    public abstract TagType getType();
+
+    public abstract String getDescription();
+
+    protected JSONObject getTypeConstraints() {
+        return new JSONObject();
+    }
+
+    protected abstract T constructFromJSON(JSONObject obj);
+
+    public abstract APEConfigDefaultValue<T> getDefault();
+
+    public T getValue() {
+        if (this.value != null) {
+            return this.value;
+        }
+
+        final APEConfigDefaultValue<T> _default = getDefault();
+        if (_default.hasValue()) {
+            return _default.get();
+        }
+
+        throw APEConfigException.fieldNotSpecified(getTagName(), getType().toString());
+    }
+
+    public void setValue(JSONObject obj) {
+
+        final ValidationResults results = validate(obj);
+
+        if (results.fail()) {
+            throw APEConfigException.ruleViolations(results);
+        }
+
+        this.value = constructFromJSON(obj);
+    }
+
+    public void setValue(T value) {
+
+        final ValidationResults results = validate(value);
+
+        if (results.fail()) {
+            throw APEConfigException.ruleViolations(results);
+        }
+
+        this.value = value;
+    }
+
+    public boolean isOptional() {
+        return getDefault().hasValue();
+    }
+
+    public boolean isObligatory() {
+        return !isOptional();
+    }
+
+    public ValidationResults validate(JSONObject json) {
+
+        final ValidationResults results = new ValidationResults();
+
+        // JSON contains tag
+        if (!json.has(getTagName())) {
+            if (isObligatory()) {
+                results.add(getTagName(), String.format("Value for tag '%s' is missing.", getTagName()), false);
+            }
+            return results;
+        }
+
+        // Can construct object T
+        try {
+            final T dummy = constructFromJSON(json);
+            results.add(validate(dummy));
+        } catch (JSONException | APEConfigException e) {
+            results.add(getTagName(), e.getMessage(), false);
+        }
+
+        return results;
+    }
+
+    public ValidationResults validate(T value) {
+        final ValidationResults results = new ValidationResults();
+        return validate(value, results);
+    }
+
+    protected abstract ValidationResults validate(T value, ValidationResults results);
+
+    public Info<T> getInfo() {
+        return new Info(this);
+    }
+
+    public JSONObject toJSON() {
+        return getInfo().toJSON();
+    }
 
     public enum TagType {
         FILE_PATH,
@@ -26,99 +119,7 @@ public abstract class APEConfigTag<T> {
         MODULE
     }
 
-    public abstract TagType getType();
-
-    public abstract String getDescription();
-
-    protected JSONObject getTypeConstraints() { return new JSONObject(); }
-
-    protected abstract T constructFromJSON(JSONObject obj);
-
-    public abstract APEConfigDefaultValue<T> getDefault();
-
-    public void setValue(JSONObject obj) {
-
-        final ValidationResults results = validate(obj);
-
-        if(results.fail()){
-            throw APEConfigException.ruleViolations(results);
-        }
-
-        this.value = constructFromJSON(obj);
-    }
-
-    public void setValue(T value){
-
-        final ValidationResults results = validate(value);
-
-        if(results.fail()){
-            throw APEConfigException.ruleViolations(results);
-        }
-
-        this.value = value;
-    }
-
-    public T getValue(){
-        if(this.value != null){
-            return this.value;
-        }
-
-        final APEConfigDefaultValue<T> _default = getDefault();
-        if(_default.hasValue()){
-            return _default.get();
-        }
-
-        throw APEConfigException.fieldNotSpecified(getTagName(), getType().toString());
-    }
-
-    public boolean isOptional(){
-        return getDefault().hasValue();
-    }
-
-    public boolean isObligatory(){
-        return !isOptional();
-    }
-
-    public ValidationResults validate(JSONObject json){
-
-        final ValidationResults results = new ValidationResults();
-
-        // JSON contains tag
-        if(!json.has(getTagName())){
-            if(isObligatory()){
-                results.add(getTagName(), String.format("Value for tag '%s' is missing.", getTagName()), false);
-            }
-            return results;
-        }
-
-        // Can construct object T
-        try{
-            final T dummy = constructFromJSON(json);
-            results.add(validate(dummy));
-        }
-        catch (JSONException | APEConfigException e){
-            results.add(getTagName(), e.getMessage(), false);
-        }
-
-        return results;
-    }
-
-    public ValidationResults validate(T value){
-        final ValidationResults results = new ValidationResults();
-        return validate(value, results);
-    };
-
-    protected abstract ValidationResults validate(T value, ValidationResults results);
-
-    public Info<T> getInfo(){
-        return new Info(this);
-    }
-
-    public JSONObject toJSON(){
-        return getInfo().toJSON();
-    }
-
-    public static class Info <T> {
+    public static class Info<T> {
 
         public final String tag_name, label, description;
         public final boolean optional;
@@ -138,17 +139,17 @@ public abstract class APEConfigTag<T> {
 
         public JSONObject toJSON() {
             final JSONObject json = new JSONObject()
-                        .put("tag", tag_name)
-                        .put("label", label)
-                        .put("description", description)
-                        .put("type", type)
-                        .put("optional", optional);
+                    .put("tag", tag_name)
+                    .put("label", label)
+                    .put("description", description)
+                    .put("type", type)
+                    .put("optional", optional);
 
-            if(optional){
+            if (optional) {
                 json.put("default", _default == null ? "" : _default);
             }
 
-            if(!constraints.isEmpty()){
+            if (!constraints.isEmpty()) {
                 json.put("constraints", constraints);
             }
 

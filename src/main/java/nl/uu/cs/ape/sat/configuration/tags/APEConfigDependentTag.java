@@ -11,7 +11,7 @@ public class APEConfigDependentTag {
 
         private final Provider<D1> provider1;
 
-        public One(Provider<D1> provider1){
+        public One(Provider<D1> provider1) {
             this.provider1 = provider1;
         }
 

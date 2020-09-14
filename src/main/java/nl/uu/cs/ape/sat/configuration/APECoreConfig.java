@@ -1,24 +1,19 @@
 package nl.uu.cs.ape.sat.configuration;
 
-import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.apache.commons.io.FileUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * The {@link APECoreConfig} class is used to define the core configuration
@@ -29,29 +24,45 @@ import java.util.stream.Stream;
 public class APECoreConfig {
 
     /**
+     * Static versions of the Tags specified in this class. Should be in correct order for the Web API.
+     */
+    private static final APEConfigTags tag_info = new APEConfigTags(
+            new ONTOLOGY_PREFIX(),
+            new ONTOLOGY(),
+            new TOOL_ONTOLOGY_ROOT(null),
+            new DIMENSIONS_ONTOLOGY(null),
+            new TOOL_ANNOTATIONS()
+    );
+    /**
      * The taxonomy (ontology) file
      */
     public final APEConfigTag<Path> ONTOLOGY = new APEConfigTagFactory.TAGS.ONTOLOGY();
-
     /**
      * Prefix used to define OWL class IDs
      */
     public final APEConfigTag<String> ONTOLOGY_PREFIX = new APEConfigTagFactory.TAGS.ONTOLOGY_PREFIX();
-
     /**
      * Node in the ontology that corresponds to the root of the module taxonomy.
      */
     public final APEConfigTag<String> TOOL_ONTOLOGY_ROOT = new APEConfigTagFactory.TAGS.TOOL_ONTOLOGY_ROOT(ONTOLOGY_PREFIX::getValue);
-
     /**
      * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
      */
     public final APEConfigTag<List<String>> DIMENSIONS_ONTOLOGY = new APEConfigTagFactory.TAGS.DIMENSIONS_ONTOLOGY(ONTOLOGY_PREFIX::getValue);
-
     /**
      * The JSON file with all tool annotations.
      */
     public final APEConfigTag<Path> TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.TOOL_ANNOTATIONS();
+    /**
+     * All the Tags specified in this class. Should be in correct order of dependencies.
+     */
+    private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
+            this.ONTOLOGY_PREFIX,
+            this.ONTOLOGY,
+            this.TOOL_ONTOLOGY_ROOT,
+            this.DIMENSIONS_ONTOLOGY,
+            this.TOOL_ANNOTATIONS
+    };
 
     /**
      * Initialize the configuration of the project.
@@ -117,13 +128,6 @@ public class APECoreConfig {
     }
 
     /**
-     * Initialize the class without setting any parameters.
-     * This private constructor is used to create an empty class to retrieve the tags in a static way.
-     */
-    private APECoreConfig() {
-    }
-
-    /**
      * Function that returns the tags that are used in the JSON files. Function
      * can be used to rename the tags.
      *
@@ -151,33 +155,7 @@ public class APECoreConfig {
         }
     }
 
-    /**
-     * Should be in correct order of dependencies.
-     *
-     * @return all the Tags specified in this class.
-     */
-    private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
-            this.ONTOLOGY_PREFIX,
-            this.ONTOLOGY,
-            this.TOOL_ONTOLOGY_ROOT,
-            this.DIMENSIONS_ONTOLOGY,
-            this.TOOL_ANNOTATIONS
-    };
-
-    /**
-     * Should be in correct order for the Web API.
-     *
-     * @return static versions of the Tags specified in this class.
-     */
-    private static final APEConfigTags tag_info = new APEConfigTags(
-            new ONTOLOGY_PREFIX(),
-            new ONTOLOGY(),
-            new TOOL_ONTOLOGY_ROOT(null),
-            new DIMENSIONS_ONTOLOGY(null),
-            new TOOL_ANNOTATIONS()
-    );
-
-    public static APEConfigTags getTags(){
+    public static APEConfigTags getTags() {
         return tag_info;
     }
 
