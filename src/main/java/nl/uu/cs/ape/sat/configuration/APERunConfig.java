@@ -104,6 +104,14 @@ public class APERunConfig {
      */
     public final APEConfigTag<Boolean> TOOL_SEQ_REPEAT = new APEConfigTagFactory.TAGS.TOOL_SEQ_REPEAT();
     /**
+     * Input types of the workflow.
+     */
+    public final APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
+    /**
+     * Output types of the workflow.
+     */
+    public final APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
+    /**
      * All the Tags specified in this class. Should be in correct order of dependencies.
      */
     private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
@@ -125,14 +133,6 @@ public class APERunConfig {
      * Object containing domain information needed for the execution.
      */
     public APEDomainSetup apeDomainSetup;
-    /**
-     * Input types of the workflow.
-     */
-    public final APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
-    /**
-     * Output types of the workflow.
-     */
-    public final APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
 
     /**
      * Constructor used to implement the Builder Pattern.

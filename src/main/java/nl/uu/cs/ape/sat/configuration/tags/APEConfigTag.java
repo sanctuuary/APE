@@ -99,11 +99,7 @@ public abstract class APEConfigTag<T> {
     protected abstract ValidationResults validate(T value, ValidationResults results);
 
     public Info<T> getInfo() {
-        return new Info(this);
-    }
-
-    public JSONObject toJSON() {
-        return getInfo().toJSON();
+        return new Info<>(this);
     }
 
     public enum TagType {
