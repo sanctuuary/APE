@@ -1,0 +1,154 @@
+{
+    "constraints": [
+      {
+        "constraintid": "ite_m",
+        "parameters": [ [
+          "Modules_with_xyz_file_output"],[
+          "Modules_with_xyz_file_input"
+        ]]
+      },
+      {
+        "constraintid": "ite_m",
+        "parameters": [ [
+          "Modules_with_grid_file_output"],[
+          "Modules_with_grid_file_input"
+        ]]
+      },
+      {
+        "constraintid": "ite_m",
+        "parameters": [ [
+          "Modules_with_color_palette_output"],[
+          "Modules_with_color_palette_input"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Data_generation"],[
+          "Adding_data"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Data_processing"],[
+          "Adding_data"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Data_processing"],[
+          "Data_generation"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Plot_creation"],[
+          "Adding_data"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Plot_creation"],[
+          "Data_generation"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Plot_creation"],[
+          "Data_processing"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Data_presentation"],[
+          "Adding_data"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Data_presentation"],[
+          "Data_generation"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Data_presentation"],[
+          "Data_processing"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Data_presentation"],[
+          "Plot_creation"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Layer2"],[
+          "Layer1"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Layer3"],[
+          "Layer1"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "Layer3"],[
+          "Layer2"
+        ]]
+      },
+      {
+        "constraintid": "itn_m",
+        "parameters": [ [
+          "gs"],[
+          "gs"
+        ]]
+      },
+      {
+        "constraintid": "next_m",
+        "parameters": [ [
+          "initGMT"],[
+          "Plot_creation"
+        ]]
+      },
+      {
+        "constraintid": "use_t",
+        "parameters": [[ "Plots"]]
+      },
+      {
+        "constraintid": "nuse_m",
+        "parameters": [[ "3D_surfaces"]]
+      },
+      {
+        "constraintid": "use_m",
+        "parameters": [[ "Draw_water"]]
+      },
+      {
+        "constraintid": "use_m",
+        "parameters": [ ["Draw_land"]]
+      },
+      {
+        "constraintid": "use_m",
+        "parameters": [ ["Draw_political_borders"]]
+      },
+      {
+        "constraintid": "use_m",
+        "parameters": [ ["Points_and_lines"]]
+      }
+    ]
+}

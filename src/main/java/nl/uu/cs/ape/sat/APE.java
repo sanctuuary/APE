@@ -9,11 +9,11 @@ import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APEConfigException;
-import nl.uu.cs.ape.sat.utils.APECoreConfig;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
+import nl.uu.cs.ape.sat.configuration.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
-import nl.uu.cs.ape.sat.utils.APERunConfig;
+import nl.uu.cs.ape.sat.configuration.APERunConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import nl.uu.cs.ape.sat.utils.OWLReader;
 
@@ -23,6 +23,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -232,7 +233,7 @@ public class APE {
         /* List of all the solutions */
         SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
         
-        APEUtils.readConstraints(runConfig.getConstraintsPath(), apeDomainSetup);
+        APEUtils.readConstraints(runConfig.getConstraintsPath().toString(), apeDomainSetup);
 
         /* Print the setup information when necessary. */
         APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);
@@ -243,9 +244,9 @@ public class APE {
          */
         String globalTimerID = "globalTimer";
         APEUtils.timerStart(globalTimerID, true);
-        int solutionLength = runConfig.getSolutionMinLength();
+        int solutionLength = runConfig.getSolutionLength().getMin();
         while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
-                && solutionLength <= runConfig.getSolutionMaxLength()) {
+                && solutionLength <= runConfig.getSolutionLength().getMax()) {
 
             SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, runConfig,
                     solutionLength);
@@ -261,7 +262,7 @@ public class APE {
             implSATsynthesis.synthesisExecution();
 
             if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
-                    || solutionLength == runConfig.getSolutionMaxLength()) {
+                    || solutionLength == runConfig.getSolutionLength().getMax()) {
                 APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
             }
 
@@ -286,7 +287,7 @@ public class APE {
             solutions2write = solutions2write.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution())
                     .append("\n");
         }
-        APEUtils.write2file(solutions2write.toString(), new File(allSolutions.getRunConfiguration().getSolutionPath()), false);
+        APEUtils.write2file(solutions2write.toString(), allSolutions.getRunConfiguration().getSolutionDirPath2("solutions.txt").toFile(), false);
 
         return true;
     }
@@ -298,7 +299,7 @@ public class APE {
      * @return true if the execution was successfully performed, false otherwise.
      */
     public static boolean writeExecutableWorkflows(SATsolutionsList allSolutions) {
-        String executionsFolder = allSolutions.getRunConfiguration().getExecutionScriptsFolder();
+        Path executionsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Executables();
         Integer noExecutions = allSolutions.getRunConfiguration().getNoExecutions();
         if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
             return false;
@@ -306,16 +307,21 @@ public class APE {
         APEUtils.printHeader(null, "Executing first " + noExecutions + " solution");
         APEUtils.timerStart("executingWorkflows", true);
 
-        Arrays.stream(
-                new File(executionsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
-                .forEach(File::delete);
+        final File executeDir = executionsFolder.toFile();
+        if(executeDir.isDirectory()) {
+            Arrays.stream(
+                    executionsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
+                    .forEach(File::delete);
+        } else {
+            executeDir.mkdir();
+        }
         System.out.print("Loading");
 
         /* Creating the requested scripts in parallel. */
         allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noExecutions).forEach(solution -> {
             try {
                 String title = "workflowSolution_" + solution.getIndex() + ".sh";
-                File script = new File(executionsFolder + "/" + title);
+                File script = executionsFolder.resolve(title).toFile();
                 APEUtils.write2file(solution.getScriptExecution(), script, false);
                 System.out.print(".");
             } catch (IOException e) {
@@ -339,7 +345,7 @@ public class APE {
      * @throws IOException Exception if graph cannot be written to the file system.
      */
     public static boolean writeDataFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
-        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder();
+        Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
         Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
         if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
             return false;
@@ -348,15 +354,20 @@ public class APE {
         APEUtils.timerStart("drawingGraphs", true);
         System.out.println();
         /* Removing the existing files from the file system. */
-        Arrays.stream(new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
-                .forEach(File::delete);
+        File graphDir = graphsFolder.toFile();
+        if(graphDir.isDirectory()) {
+            Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
+                    .forEach(File::delete);
+        } else {
+            graphDir.mkdir();
+        }
         System.out.print("Loading");
         /* Creating the requested graphs in parallel. */
         allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
             try {
                 String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
-                String path = graphsFolder + "/" + title;
-                solution.getDataflowGraph(title, orientation).getWrite2File(new File(path));
+                Path path = graphsFolder.resolve(title);
+                solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile());
                 System.out.print(".");
             } catch (IOException e) {
                 System.err.println("Error occurred while writing a graph to the file system.");
@@ -380,7 +391,7 @@ public class APE {
      * @throws IOException Exception if graphs cannot be written to the file system.
      */
     public static boolean writeControlFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
-        String graphsFolder = allSolutions.getRunConfiguration().getSolutionGraphsFolder();
+        Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
         Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
         if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
             return false;
@@ -389,15 +400,20 @@ public class APE {
         APEUtils.timerStart("drawingGraphs", true);
         System.out.println();
         /* Removing the existing files from the file system. */
-        Arrays.stream(new File(graphsFolder).listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
-                .forEach(File::delete);
+        File graphDir = graphsFolder.toFile();
+        if(graphDir.isDirectory()) {
+            Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
+                    .forEach(File::delete);
+        } else {
+            graphDir.mkdir();
+        }
         System.out.print("Loading");
         /* Creating the requested graphs in parallel. */
         allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
             try {
                 String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
-                String path = graphsFolder + "/" + title;
-                solution.getControlflowGraph(title, orientation).getWrite2File(new File(path));
+                Path path = graphsFolder.resolve(title);
+                solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile());
                 System.out.print(".");
             } catch (IOException e) {
                 System.err.println("Error occurred while writing a graph to the file system.");

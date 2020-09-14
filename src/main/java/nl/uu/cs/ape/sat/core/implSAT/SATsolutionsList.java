@@ -2,8 +2,7 @@ package nl.uu.cs.ape.sat.core.implSAT;
 
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AtomMappings;
-import nl.uu.cs.ape.sat.utils.APECoreConfig;
-import nl.uu.cs.ape.sat.utils.APERunConfig;
+import nl.uu.cs.ape.sat.configuration.APERunConfig;
 
 import java.util.ArrayList;
 import java.util.List;

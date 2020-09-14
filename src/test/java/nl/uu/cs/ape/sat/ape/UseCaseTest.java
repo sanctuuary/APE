@@ -29,6 +29,7 @@ class UseCaseTest {
 
     @BeforeAll
     public static void before() {
+
         repo = new GitHubRepo("sanctuuary/APE_UseCases", "08b2fbd213b703c025a862e779d73a2f44bde6ef");
 
         final boolean canConnect = repo.canConnect();
@@ -133,9 +134,7 @@ class UseCaseTest {
             // read base config
             this.base_configuration = repo.getJSONObject(useCase.getString("base_configuration"));
             // create path/directory for the solutions
-            this.base_configuration.put("solutions_path", repo.getRoot() + "\\sat_solutions.txt");
-            this.base_configuration.put("execution_scripts_folder", repo.getRoot() + "\\execution_scripts");
-            this.base_configuration.put("solution_graphs_folder", repo.getRoot() + "\\solution_graphs");
+            this.base_configuration.put("solutions_dir_path", repo.getRoot());
             this.base_configuration.put("debug_mode", false);
 
             this.base_configuration.put("ontology_path", repo.getFile(this.base_configuration.getString("ontology_path")));

@@ -4,6 +4,7 @@ import nl.uu.cs.ape.sat.automaton.Automaton;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.configuration.APECoreConfig;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.models.*;

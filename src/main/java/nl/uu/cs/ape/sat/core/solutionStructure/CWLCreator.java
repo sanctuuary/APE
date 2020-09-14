@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.sat.core.solutionStructure;
 
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APECoreConfig;
+import nl.uu.cs.ape.sat.configuration.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.ArrayList;

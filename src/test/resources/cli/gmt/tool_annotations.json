@@ -1,0 +1,528 @@
+{
+    "functions": [
+      {
+        "label": "add_cpt",
+        "id": "add_cpt",
+        "taxonomyOperations": ["add_cpt"],
+        "outputs": [{
+          "TypesTaxonomy": ["Color_palette_table"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "add_XYZ_table",
+        "id": "add_XYZ_table",
+        "taxonomyOperations": ["add_XYZ_table"],
+        "outputs": [{
+          "TypesTaxonomy": ["XYZ_table_file"]
+        }],
+        "implementation": {
+          "code": "echo \"Enter path to the XYZ table file:\"\n read $@output[0]"
+        }
+      },
+      {
+        "label": "initGMT",
+        "id": "initGMT",
+        "taxonomyOperations": ["initGMT"],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          "code": "@output[0]='result.ps'\ngmt pscoast -R2.81/50.52/7.84/53.75r -JM6i -P -W0p,white -K > $@output[0]"
+        }
+      },
+      {
+        "label": "add_grd",
+        "id": "add_grd",
+        "taxonomyOperations": ["add_grd"],
+        "outputs": [{
+          "TypesTaxonomy": ["NetCDF_files"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "grdgradient",
+        "id": "grdgradient",
+        "taxonomyOperations": ["grdgradient"],
+        "inputs": [{
+          "TypesTaxonomy": ["NetCDF_files"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["intensfile"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "makecpt",
+        "id": "makecpt",
+        "taxonomyOperations": ["makecpt"],
+        "inputs": [{
+          "TypesTaxonomy": ["Color_palette_table"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["Color_palette_table"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "xyz2grd",
+        "id": "xyz2grd",
+        "taxonomyOperations": ["xyz2grd"],
+        "inputs": [{
+          "TypesTaxonomy": ["XYZ_table_file"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["NetCDF_files"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "psconvert_PDF",
+        "id": "psconvert",
+        "taxonomyOperations": ["psconvert"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PDF"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "psconvert_PNG",
+        "id": "psconvert",
+        "taxonomyOperations": ["psconvert"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PNG"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "psconvert_JPEG",
+        "id": "psconvert",
+        "taxonomyOperations": ["psconvert"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["JPEG"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "grdcontour",
+        "id": "grdcontour",
+        "taxonomyOperations": ["grdcontour"],
+        "inputs": [
+          {
+            "TypesTaxonomy": ["NetCDF_files"]
+          },
+          {
+            "TypesTaxonomy": ["PostScript"]
+          }
+        ],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "grdview_2",
+        "id": "grdview",
+        "taxonomyOperations": ["grdview"],
+        "inputs": [
+          {
+            "TypesTaxonomy": ["NetCDF_files"]
+          },
+          {
+            "TypesTaxonomy": ["Color_palette_table"]
+          },
+          {
+            "TypesTaxonomy": ["PostScript"]
+          }
+        ],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "grdview_3",
+        "id": "grdview",
+        "taxonomyOperations": ["grdview"],
+        "inputs": [
+          {
+            "TypesTaxonomy": ["NetCDF_files"]
+          },
+          {
+            "TypesTaxonomy": ["Color_palette_table"]
+          },
+          {
+            "TypesTaxonomy": ["intensfile"]
+          },
+          {
+            "TypesTaxonomy": ["PostScript"]
+          }
+        ],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "grdimage_2",
+        "id": "grdimage",
+        "taxonomyOperations": ["grdimage"],
+        "inputs": [
+          {
+            "TypesTaxonomy": ["NetCDF_files"]
+          },
+          {
+            "TypesTaxonomy": ["Color_palette_table"]
+          },
+          {
+            "TypesTaxonomy": ["PostScript"]
+          }
+        ],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "grdimage_3",
+        "id": "grdimage",
+        "taxonomyOperations": ["grdimage"],
+        "inputs": [
+          {
+            "TypesTaxonomy": ["NetCDF_files"]
+          },
+          {
+            "TypesTaxonomy": ["Color_palette_table"]
+          },
+          {
+            "TypesTaxonomy": ["intensfile"]
+          },
+          {
+            "TypesTaxonomy": ["PostScript"]
+          }
+        ],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "psxy_p",
+        "id": "psxy_p",
+        "taxonomyOperations": ["psxy_p"],
+        "inputs": [
+          {
+            "TypesTaxonomy": ["XYZ_table_file"]
+          },
+          {
+            "TypesTaxonomy": ["PostScript"]
+          }
+        ],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          "code": "gmt psxy -R -J -O -Sc0.05 -Gred -Wthinnest $@input[0] >> $@input[1]\n@output[0]=$@input[1]"
+        }
+      },
+      {
+        "label": "psxy_l",
+        "id": "psxy_l",
+        "taxonomyOperations": ["psxy_l"],
+        "inputs": [
+          {
+            "TypesTaxonomy": ["XYZ_table_file"]
+          },
+          {
+            "TypesTaxonomy": ["PostScript"]
+          }
+        ],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          "code": "gmt psxy -R -J -O -V -Wthinnest $@input[0] >> $@input[1]\n@output[0]=$@input[1]"
+        }
+      },
+      {
+        "label": "pstext",
+        "id": "pstext",
+        "taxonomyOperations": ["pstext"],
+        "inputs": [
+          {
+            "TypesTaxonomy": ["XYZ_table_file"]
+          },
+          {
+            "TypesTaxonomy": ["PostScript"]
+          }
+        ],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "psscale",
+        "id": "psscale",
+        "taxonomyOperations": ["psscale"],
+        "inputs": [
+          {
+            "TypesTaxonomy": ["Color_palette_table"]
+          },
+          {
+            "TypesTaxonomy": ["PostScript"]
+          }
+        ],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "pscoast_B",
+        "id": "pscoast_B",
+        "taxonomyOperations": ["pscoast_B"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          "code": "gmt pscoast -R -J -N1p/thinner -Df -O -K >> $@input[0]\n@output[0]=$@input[0]"
+        }
+      },
+      {
+        "label": "psbasemap_B",
+        "id": "psbasemap_B",
+        "taxonomyOperations": ["psbasemap_B"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          "code": "gmt psbasemap -R -J -N1p/thinner -Df -O -K >> $@input[0]\n@output[0]=$@input[0]" 
+        }
+      },
+      {
+        "label": "pscoast_Bt",
+        "id": "pscoast_Bt",
+        "taxonomyOperations": ["pscoast_Bt"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "psbasemap_Bt",
+        "id": "psbasemap_Bt",
+        "taxonomyOperations": ["psbasemap_Bt"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "pscoast_U",
+        "id": "pscoast_U",
+        "taxonomyOperations": ["pscoast_U"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "psbasemap_U",
+        "id": "psbasemap_U",
+        "taxonomyOperations": ["psbasemap_U"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "pscoast_Td",
+        "id": "pscoast_Td",
+        "taxonomyOperations": ["pscoast_Td"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "psbasemap_Td",
+        "id": "psbasemap_Td",
+        "taxonomyOperations": ["psbasemap_Td"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "pscoast_G",
+        "id": "pscoast_G",
+        "taxonomyOperations": ["pscoast_G"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          "code": "gmt pscoast -R -J -Gdarkseagreen2 -N1p/thinner -Df -K -O -P >> $@input[0]\n@output[0]=$@input[0]"
+        }
+      },
+      {
+        "label": "pscoast_S",
+        "id": "pscoast_S",
+        "taxonomyOperations": ["pscoast_S"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          "code": "gmt pscoast -R -J -Scornflowerblue -Df -K -P -O >> $@input[0]\n@output[0]=$@input[0]"
+        }
+      },
+      {
+        "label": "pscoast_I",
+        "id": "pscoast_I",
+        "taxonomyOperations": ["pscoast_I"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          "code": "gmt pscoast -R -J -Icornflowerblue -Df -K -P -O >> $@input[0]\n@output[0]=$@input[0]"
+        }
+      },
+      {
+        "label": "pscoast_N",
+        "id": "pscoast_N",
+        "taxonomyOperations": ["pscoast_N"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          "code": "gmt pscoast -R -J -N1p/thinner -Df -K -O >> $@input[0]\n@output[0]=$@input[0]"
+        }
+      },
+      {
+        "label": "pscoast_W",
+        "id": "pscoast_W",
+        "taxonomyOperations": ["pscoast_W"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "pscoast_F",
+        "id": "pscoast_F",
+        "taxonomyOperations": ["pscoast_F"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "outputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      },
+      {
+        "label": "gs",
+        "id": "gs",
+        "taxonomyOperations": ["gs"],
+        "inputs": [{
+          "TypesTaxonomy": ["PostScript"]
+        }],
+        "implementation": {
+          
+        }
+      }
+    ]
+}
