@@ -2,7 +2,7 @@ package nl.uu.cs.ape.sat;
 
 import guru.nidi.graphviz.attribute.Rank.RankDir;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
-import nl.uu.cs.ape.sat.utils.APEConfigException;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;

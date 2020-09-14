@@ -1,5 +1,7 @@
-package nl.uu.cs.ape.sat.utils;
+package nl.uu.cs.ape.sat.configuration;
 
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResult;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,9 +45,9 @@ public class APEConfigException extends RuntimeException {
     /**
      * Invalid value ape config exception.
      *
-     * @param tag   Corresponding JSON tag in the configuration file.
+     * @param tag    Corresponding JSON tag in the configuration file.
      * @param config The configuration provided by the user.
-     * @param info  Application specific information that may help the user solve the problem.
+     * @param info   Application specific information that may help the user solve the problem.
      * @return Configuration exception with information that may help the user solve the problem.
      */
     public static APEConfigException invalidValue(String tag, JSONObject config, String info) {
@@ -76,6 +78,10 @@ public class APEConfigException extends RuntimeException {
         return new JSONException(String.format("Value '%s' cannot be parsed to type '%s' for tag '%s', %s", value, expectedType.getSimpleName(), tag, info));
     }
 
+    public static <T> JSONException requiredValidationTag(String tag, String requiredTag, String info) {
+        return new JSONException(String.format("Cannot parse tag '%s' without '%s', %s", tag, requiredTag, info));
+    }
+
     /**
      * Path not found ape config exception.
      *
@@ -97,7 +103,7 @@ public class APEConfigException extends RuntimeException {
     public static IOException notAFile(String tag, String path) {
         return new IOException(String.format("Provided path '%s' for tag '%s' is not a file.", path, tag));
     }
-    
+
     /**
      * Path is found, but it is not a file.
      *
@@ -118,7 +124,7 @@ public class APEConfigException extends RuntimeException {
     public static IOException notADirectory(String tag, String path) {
         return new IOException(String.format("Provided path '%s' for tag '%s' is not a directory.", path, tag));
     }
-    
+
     /**
      * Missing permission ape config exception.
      *
@@ -130,7 +136,7 @@ public class APEConfigException extends RuntimeException {
     public static IOException missingPermission(String tag, String path, Object missingPermission) {
         return new IOException(String.format("You are missing [%s] permission for path '%s' for tag '%s'", missingPermission, path, tag));
     }
-    
+
     /**
      * Missing permission ape config exception.
      *
@@ -140,5 +146,21 @@ public class APEConfigException extends RuntimeException {
      */
     public static IOException missingPermission(String path, Object missingPermission) {
         return new IOException(String.format("You are missing [%s] permission for path '%s' for ", missingPermission, path));
+    }
+
+    public static JSONException fieldNotSpecified(String tag, String type) {
+        return new JSONException(String.format("No '%s' value provided for tag '%s'.", type, tag));
+    }
+
+    public static JSONException ruleViolation(ValidationResult result) {
+        return new JSONException(String.format("Tag '%s' is incorrect. %s", result.getTag(), result.getRuleDescription()));
+    }
+
+    public static JSONException ruleViolations(ValidationResults validationResults) {
+        StringBuilder sb = new StringBuilder();
+        validationResults.getFails().stream().forEach(fail -> {
+            sb.append(String.format("Tag '%s' is incorrect: %s\n", fail.getTag(), fail.getRuleDescription()));
+        });
+        return new JSONException(sb.toString());
     }
 }
