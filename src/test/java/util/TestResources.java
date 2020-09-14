@@ -3,10 +3,13 @@ package util;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
@@ -69,5 +72,27 @@ public class TestResources {
      */
     public static JSONObject getJSONResource(String resource) {
         return new JSONObject(getTextResource(resource));
+    }
+
+    public static String writeFile(String relativePath, String content) {
+        Path absolutePath = Paths.get(TestResources.getAbsoluteRoot()).resolve(relativePath).toAbsolutePath();
+        Path absoluteParentPath = absolutePath.getParent();
+        try {
+            File folder = absoluteParentPath.toFile();
+            if (!folder.exists() && folder.mkdirs()) {
+                System.out.printf("Directories created for file '%s'\n", relativePath);
+            }
+            File file = absolutePath.toFile();
+            if (!file.exists() && file.createNewFile()) {
+                System.out.printf("File '%s' was created\n", relativePath);
+            }
+            Files.write(absolutePath, content.getBytes());
+
+            System.out.printf("Wrote content to '%s'\n", absolutePath);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return absolutePath.toString();
     }
 }
