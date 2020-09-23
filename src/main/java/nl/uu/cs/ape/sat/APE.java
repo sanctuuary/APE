@@ -21,10 +21,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+
+import javax.imageio.ImageIO;
 
 /**
  * The {@code APE} class is the main class of the library and is supposed
@@ -367,7 +370,7 @@ public class APE {
             try {
                 String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
                 Path path = graphsFolder.resolve(title);
-                solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile());
+                solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile(), allSolutions.getRunConfiguration().getDebugMode());
                 System.out.print(".");
             } catch (IOException e) {
                 System.err.println("Error occurred while writing a graph to the file system.");
@@ -413,7 +416,7 @@ public class APE {
             try {
                 String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
                 Path path = graphsFolder.resolve(title);
-                solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile());
+                solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile(), allSolutions.getRunConfiguration().getDebugMode());
                 System.out.print(".");
             } catch (IOException e) {
                 System.err.println("Error occurred while writing a graph to the file system.");

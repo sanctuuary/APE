@@ -859,6 +859,7 @@ public final class APEUtils {
 
     /**
      * Disable System.err temporarily, enable again with {@link #enableErr}.
+     * @param debug 
      */
     public static void disableErr() {
         System.setErr(nullStream);
@@ -866,6 +867,7 @@ public final class APEUtils {
 
     /**
      * Reset System.err to normal.
+     * @param debug 
      */
     public static void enableErr() {
         System.setErr(original);

@@ -41,14 +41,19 @@ public class SolutionGraph {
 
     /**
      * Get the PNG file, depicting the workflow structure.
-     *
+     * @param debug true if the debugging mode is ON
+     * 
      * @return The {@link BufferedImage} object that correspond to the workflow.
      */
-    public BufferedImage getPNGImage() {
+    public BufferedImage getPNGImage(boolean debug) {
         final Renderer renderer = getPNGRenderer();
-        APEUtils.disableErr();
+        if(!debug) {
+            APEUtils.disableErr();
+            }
         final BufferedImage image = renderer.toImage();
-        APEUtils.enableErr();
+        if(!debug) {
+            APEUtils.enableErr();
+        }
         return image;
     }
 
@@ -56,13 +61,18 @@ public class SolutionGraph {
      * Write to a file the PNG version of the graph.
      *
      * @param file The file that should be written to.
+     * @param debug true if the debugging mode is ON
      * @throws IOException Exception in case of error in file handling.
      */
-    public void getWrite2File(File file) throws IOException {
+    public void getWrite2File(File file, boolean debug) throws IOException {
         final Renderer renderer = getPNGRenderer();
+        if(!debug) {
         APEUtils.disableErr();
+        }
         renderer.toFile(file);
-        APEUtils.enableErr();
+        if(!debug) {
+            APEUtils.enableErr();
+        }
     }
 
     /**
