@@ -42,7 +42,7 @@ public abstract class APEConfigTag<T> {
 
         final ValidationResults results = validate(obj);
 
-        if (results.fail()) {
+        if (results.hasFails()) {
             throw APEConfigException.ruleViolations(results);
         }
 
@@ -55,7 +55,7 @@ public abstract class APEConfigTag<T> {
 
         final ValidationResults results = validate(value);
 
-        if (results.fail()) {
+        if (results.hasFails()) {
             throw APEConfigException.ruleViolations(results);
         }
 

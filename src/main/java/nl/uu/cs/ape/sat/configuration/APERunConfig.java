@@ -172,7 +172,7 @@ public class APERunConfig {
         ValidationResults results = new ValidationResults();
         for(APEConfigTag<?> tag : dummy.all_tags){
             results.add(tag.validate(json));
-            if(results.fail()){
+            if(results.hasFails()){
                 return results;
             }
             else{
