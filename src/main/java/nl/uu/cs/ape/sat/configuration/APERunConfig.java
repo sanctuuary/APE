@@ -314,22 +314,24 @@ public class APERunConfig {
         return getSolutionDirPath().resolve(relativePath);
     }
 
+    public static final String EXECUTABLES_FOLDER_NAME = "Executables";
     /**
      * Get the path to the directory where the executable scripts corresponding to the given solutions should be stored.
      *
      * @return
      */
     public Path getSolutionDirPath2Executables() {
-        return getSolutionDirPath2("Executables");
+        return getSolutionDirPath2(EXECUTABLES_FOLDER_NAME);
     }
 
+    public static final String FIGURES_FOLDER_NAME = "Figures";
     /**
      * Get the path to the directory where the graphs representation of the solutions should be stored.
      *
      * @return
      */
     public Path getSolutionDirPath2Figures() {
-        return getSolutionDirPath2("Figures");
+        return getSolutionDirPath2(FIGURES_FOLDER_NAME);
     }
 
     /**

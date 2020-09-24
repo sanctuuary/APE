@@ -1,12 +1,15 @@
 package nl.uu.cs.ape.sat.ape;
 
 import nl.uu.cs.ape.sat.Main;
+import nl.uu.cs.ape.sat.configuration.APERunConfig;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import util.TestResources;
 
 import java.nio.file.Paths;
 import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CLITest {
 
@@ -49,5 +52,13 @@ public class CLITest {
         Main.main(new String[] {
                 config_path
         });
+
+        // check whether images are produced correctly
+        final int figures_amount_generated = Objects.requireNonNull(Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path))).resolve(APERunConfig.FIGURES_FOLDER_NAME).toFile().list()).length;
+        assertEquals(config_content.getInt("number_of_generated_graphs"), figures_amount_generated);
+
+        // check whether scripts are produced correctly
+        final int executables_amount_generated = Objects.requireNonNull(Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path))).resolve(APERunConfig.EXECUTABLES_FOLDER_NAME).toFile().list()).length;
+        assertEquals(config_content.getInt("number_of_execution_scripts"), executables_amount_generated);
     }
 }
