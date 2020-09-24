@@ -52,11 +52,15 @@ public class ValidationResults {
     }
 
     public JSONArray toJSONArray() {
-        return new JSONArray(results.stream().map(ValidationResult::toJSON));
+        return new JSONArray(results.stream().map(ValidationResult::toJSON).collect(Collectors.toList()));
     }
 
     public Stream<ValidationResult> stream() {
         return results.stream();
     }
 
+    @Override
+    public String toString() {
+        return toJSONArray().toString(2);
+    }
 }

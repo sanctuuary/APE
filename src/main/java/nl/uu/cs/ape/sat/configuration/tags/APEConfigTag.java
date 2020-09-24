@@ -46,7 +46,9 @@ public abstract class APEConfigTag<T> {
             throw APEConfigException.ruleViolations(results);
         }
 
-        this.value = constructFromJSON(obj);
+        if(obj.has(getTagName())){
+            this.value = constructFromJSON(obj);
+        }
     }
 
     public void setValue(T value) {
@@ -84,7 +86,7 @@ public abstract class APEConfigTag<T> {
         try {
             final T dummy = constructFromJSON(json);
             results.add(validate(dummy));
-        } catch (JSONException | APEConfigException e) {
+        } catch (JSONException | APEConfigException | IllegalArgumentException e) {
             results.add(getTagName(), e.getMessage(), false);
         }
 
@@ -150,6 +152,10 @@ public abstract class APEConfigTag<T> {
             }
 
             return json;
+        }
+
+        public String getTagName(){
+            return tag_name;
         }
     }
 }

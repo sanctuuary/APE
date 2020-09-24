@@ -871,4 +871,7 @@ public final class APEUtils {
         System.setErr(original);
     }
 
+    public static JSONObject clone(JSONObject original){
+        return new JSONObject(original, JSONObject.getNames(original));
+    }
 }

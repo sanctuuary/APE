@@ -1,5 +1,6 @@
 package util;
 
+import nl.uu.cs.ape.sat.Main;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
@@ -94,5 +95,14 @@ public class TestResources {
             e.printStackTrace();
         }
         return absolutePath.toString();
+    }
+
+    public static JSONObject getConfigResource(String base_config_path, String ontology_path, String tools_path, String constraints_path, String solution_dir_path){
+        return getJSONResource(base_config_path)
+                // add paths to the other files to the configuration
+                .put("ontology_path", getAbsoluteResourcePath(ontology_path))
+                .put("tool_annotations_path", getAbsoluteResourcePath(tools_path))
+                .put("constraints_path", getAbsoluteResourcePath(constraints_path))
+                .put("solutions_dir_path", getAbsoluteResourcePath(solution_dir_path));
     }
 }

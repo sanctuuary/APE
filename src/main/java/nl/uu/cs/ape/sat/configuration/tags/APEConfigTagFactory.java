@@ -78,7 +78,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected ValidationResults validate(List<String> value, String dependency1, ValidationResults results) {
+            protected ValidationResults validate(List<String> value, String ontology_prefix, ValidationResults results) {
+                // TODO
                 return results;
             }
 
@@ -87,11 +88,6 @@ public class APEConfigTagFactory {
                 return DATA_DIMENSIONS;
             }
 
-            @Override
-            protected ValidationResults validate(List<String> dimensions, ValidationResults results) {
-                // TODO: Check dimensions ?
-                return results;
-            }
         }
 
         public static abstract class DataInstances extends APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> {
