@@ -16,19 +16,19 @@ public class APEConfigTags {
         this.all_tags = all_tags;
     }
 
-    public List<APEConfigTag.Info> getObligatory() {
+    public List<APEConfigTag.Info<?>> getObligatory() {
         return getAll(APEConfigTag::isObligatory);
     }
 
-    public List<APEConfigTag.Info> getOptional() {
+    public List<APEConfigTag.Info<?>> getOptional() {
         return getAll(APEConfigTag::isOptional);
     }
 
-    public List<APEConfigTag.Info> getAll(Predicate<APEConfigTag<?>> filter) {
+    public List<APEConfigTag.Info<?>> getAll(Predicate<APEConfigTag<?>> filter) {
         return Arrays.stream(all_tags).filter(filter).map(APEConfigTag::getInfo).collect(Collectors.toList());
     }
 
-    public List<APEConfigTag.Info> getAll() {
+    public List<APEConfigTag.Info<?>> getAll() {
         return Arrays.stream(all_tags).map(APEConfigTag::getInfo).collect(Collectors.toList());
     }
 
