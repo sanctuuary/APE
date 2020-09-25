@@ -5,8 +5,8 @@
   "shared_memory": "true",
   "solution_length": { "min": 1, "max": 8 },
   "max_solutions": "100",
-  "number_of_execution_scripts": "7",
-  "number_of_generated_graphs": "7",
+  "number_of_execution_scripts": "3",
+  "number_of_generated_graphs": "3",
   "tool_seq_repeat": "true",
   "inputs": [
     {
