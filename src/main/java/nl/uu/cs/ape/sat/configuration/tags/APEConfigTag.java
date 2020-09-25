@@ -42,18 +42,20 @@ public abstract class APEConfigTag<T> {
 
         final ValidationResults results = validate(obj);
 
-        if (results.fail()) {
+        if (results.hasFails()) {
             throw APEConfigException.ruleViolations(results);
         }
 
-        this.value = constructFromJSON(obj);
+        if(obj.has(getTagName())){
+            this.value = constructFromJSON(obj);
+        }
     }
 
     public void setValue(T value) {
 
         final ValidationResults results = validate(value);
 
-        if (results.fail()) {
+        if (results.hasFails()) {
             throw APEConfigException.ruleViolations(results);
         }
 
@@ -84,7 +86,7 @@ public abstract class APEConfigTag<T> {
         try {
             final T dummy = constructFromJSON(json);
             results.add(validate(dummy));
-        } catch (JSONException | APEConfigException e) {
+        } catch (JSONException | APEConfigException | IllegalArgumentException e) {
             results.add(getTagName(), e.getMessage(), false);
         }
 
@@ -150,6 +152,10 @@ public abstract class APEConfigTag<T> {
             }
 
             return json;
+        }
+
+        public String getTagName(){
+            return tag_name;
         }
     }
 }

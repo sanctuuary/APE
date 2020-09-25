@@ -5,6 +5,7 @@ import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
@@ -160,6 +161,25 @@ public class APERunConfig {
         setDebugMode(builder.debugMode);
         setProgramInputs(builder.programInputs);
         setProgramOutputs(builder.programOutputs);
+    }
+
+    private APERunConfig(APEDomainSetup setup){
+        this.apeDomainSetup = setup;
+    }
+
+    public static ValidationResults validate(JSONObject json, APEDomainSetup setup){
+        APERunConfig dummy = new APERunConfig(setup);
+        ValidationResults results = new ValidationResults();
+        for(APEConfigTag<?> tag : dummy.all_tags){
+            results.add(tag.validate(json));
+            if(results.hasFails()){
+                return results;
+            }
+            else{
+                tag.setValue(json); // for dependencies
+            }
+        }
+        return results;
     }
 
     /**

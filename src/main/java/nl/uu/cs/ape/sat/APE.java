@@ -4,6 +4,8 @@
 package nl.uu.cs.ape.sat;
 
 import guru.nidi.graphviz.attribute.Rank.RankDir;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResult;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
@@ -274,6 +276,25 @@ public class APE {
         }
 
         return allSolutions;
+    }
+
+    /**
+     * Validates all the tags in a configuration object.
+     *
+     * @param config configuration file
+     * @return Results regarding the validations
+     */
+    public static ValidationResults validate(JSONObject config){
+        ValidationResults results = APECoreConfig.validate(config);
+        if(results.hasFails()){
+            return results;
+        }
+        try {
+            APE ape = new APE(config);
+            results.add(APERunConfig.validate(config, ape.getDomainSetup()));
+        } catch (IOException | OWLOntologyCreationException ignored) { }
+
+        return results;
     }
 
     /**
