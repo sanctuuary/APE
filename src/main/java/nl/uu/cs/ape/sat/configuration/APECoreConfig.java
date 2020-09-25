@@ -4,6 +4,7 @@ import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
@@ -179,6 +180,23 @@ public class APECoreConfig {
         for (APEConfigTag<?> tag : all_tags) {
             tag.setValue(coreConfiguration);
         }
+    }
+
+    private APECoreConfig(){}
+
+    public static ValidationResults validate(JSONObject json){
+        APECoreConfig dummy = new APECoreConfig();
+        ValidationResults results = new ValidationResults();
+        for(APEConfigTag<?> tag : dummy.all_tags){
+            results.add(tag.validate(json));
+            if(results.hasFails()){
+                return results;
+            }
+            else{
+                tag.setValue(json); // for dependencies
+            }
+        }
+        return results;
     }
 
     /**
