@@ -13,16 +13,16 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
+/**
+ * The type Ape files.
+ */
 public class APEFiles {
 
     /**
      * READ and WRITE enums used to verify paths.
      */
-    public enum Permission {
-        READ, WRITE
-    }
+    public enum Permission { READ, WRITE }
 
     private static Path getPath(String tag, String path){
 
@@ -43,6 +43,14 @@ public class APEFiles {
         }
     }
 
+    /**
+     * Checks whether a path has a valid format.
+     * E.g. will return false if the path contains
+     * forbidden character.
+     *
+     * @param path the path
+     * @return a boolean indicating whether the path has a valid format
+     */
     public static boolean validPathFormat(String path){
         try {
             Paths.get(path);
@@ -56,8 +64,9 @@ public class APEFiles {
     /**
      * Method checks whether the provided value represent a correct path to a file, and returns the corresponding file if it does.
      *
-     * @param tag    Corresponding tag from the config file.
-     * @param inputPath Provided path for the file.
+     * @param tag                  Corresponding tag from the config file.
+     * @param inputPath            Provided path for the file.
+     * @param requestedPermissions the requested permissions
      * @return File represented by the path in the JSON object, or the default value if the tag is not present.
      * @throws IOException        Error if path is cannot be found.
      * @throws JSONException      Error in parsing the value for specified tag.
@@ -86,10 +95,10 @@ public class APEFiles {
      * Method checks whether the provided value represent a correct path, and
      * returns the path if it does.
      *
-     * @param tag    Corresponding tag from the config file.
-     * @param inputPath Path to the directory.
-     * @return Path represented in the JSON object, or the default value if the tag
-     *         is not present.
+     * @param tag                  Corresponding tag from the config file.
+     * @param inputPath            Path to the directory.
+     * @param requestedPermissions the requested permissions
+     * @return Path represented in the JSON object, or the default value if the tag         is not present.
      * @throws IOException        Error if path is cannot be found.
      * @throws JSONException      Error in parsing the value for specified tag.
      * @throws APEConfigException Error in setting up the the configuration.
@@ -143,68 +152,61 @@ public class APEFiles {
 
     }
 
-    private static void createFile(String tag, Path path) {
-
-        if (Files.notExists(path)) {
-
-            final String absolutePath = path.toAbsolutePath().toString();
-
-            if (!isFileFormat(path)) {
-                throw new APEConfigException("Path '" + absolutePath + "' for tag '" + tag + "' is not a file, but a directory!");
-            }
-
-            try{
-                APEUtils.printWarning(absolutePath + "' does not exist. File will be created.");
-                if(new File(absolutePath).createNewFile()){
-                    System.out.println("Successfully created file '" + absolutePath + "'");
-                }
-                else{
-                    throw new IOException("File already exists.");
-                }
-            }
-            catch (IOException e){
-                throw new APEConfigException("Could not create file '" + absolutePath + "' for tag '" + tag + "'\n" + e.getMessage());
-            }
-        }
-
-    }
-
+    /**
+     * Check permissions.
+     *
+     * @param tag                  the tag
+     * @param path                 the path
+     * @param requestedPermissions the requested permissions
+     * @throws IOException exception if the path misses requested permissions.
+     */
     public static void checkPermissions(String tag, Path path, Permission... requestedPermissions) throws IOException {
 
-        for (Permission permission : Arrays.stream(requestedPermissions).distinct().collect(Collectors.toList())) {
+        if (Arrays.stream(requestedPermissions).anyMatch(p -> p == Permission.READ) && !Files.isReadable(path)) {
+            throw APEConfigException.missingPermission(tag, path.toString(), Permission.READ);
+        }
 
-            if (permission == Permission.READ && !Files.isReadable(path)) {
-                throw APEConfigException.missingPermission(tag, path.toString(), permission);
-            }
-
-            if (permission == Permission.WRITE && !Files.isWritable(path)) {
-                throw APEConfigException.missingPermission(tag, path.toString(), permission);
-            }
+        if (Arrays.stream(requestedPermissions).anyMatch(p -> p == Permission.WRITE) && !Files.isWritable(path)) {
+            throw APEConfigException.missingPermission(tag, path.toString(), Permission.WRITE);
         }
     }
 
-    private static boolean isFolderFormat(Path path) {
+    /**
+     * Path is a folder.
+     *
+     * @param path the path
+     * @return the boolean
+     */
+    public static boolean isFolderFormat(Path path) {
         return FilenameUtils.getExtension(path.toString()).equals("");
     }
 
+    /**
+     * Path is a file.
+     *
+     * @param path the path
+     * @return the boolean
+     */
     public static boolean isFileFormat(Path path){
         return !isFolderFormat(path);
     }
 
-    public static boolean fileExists(String stringPath){
-        try{
-            final Path p = Paths.get(stringPath);
-            return Files.exists(p) && Files.isRegularFile(p);
-        }
-        catch (InvalidPathException | NullPointerException e){
-            return false;
-        }
-    }
-
+    /**
+     * Directory exists boolean.
+     *
+     * @param path the path
+     * @return the boolean
+     */
     public static boolean directoryExists(Path path){
         return Files.isDirectory(path);
     }
 
+    /**
+     * String is a valid URI.
+     *
+     * @param uri the uri
+     * @return String is a valid URI
+     */
     public static boolean isURI(String uri){
         final URL url;
         try {
