@@ -334,6 +334,8 @@ public class APERunConfig {
     /**
      * Get the path of the relative path in solution_dir_path.
      *
+     * @param relativePath the relative path
+     *
      * @return absolute path of the relative path in solution_dir_path
      */
     public Path getSolutionDirPath2(String relativePath) {
@@ -348,7 +350,7 @@ public class APERunConfig {
     /**
      * Get the path to the directory where the executable scripts corresponding to the given solutions should be stored.
      *
-     * @return
+     * @return the path to the directory where the executable scripts corresponding to the given solutions should be stored
      */
     public Path getSolutionDirPath2Executables() {
         return getSolutionDirPath2(EXECUTABLES_FOLDER_NAME);
@@ -358,7 +360,7 @@ public class APERunConfig {
     /**
      * Get the path to the directory where the graphs representation of the solutions should be stored.
      *
-     * @return
+     * @return the path to the directory where the graphs representation of the solutions should be stored
      */
     public Path getSolutionDirPath2Figures() {
         return getSolutionDirPath2(FIGURES_FOLDER_NAME);
@@ -510,6 +512,7 @@ public class APERunConfig {
 
     /**
      * @param solutionMinLength the solutionMinLength to set
+     * @param solutionMaxLength the solutionMaxLength to set
      */
     public void setSolutionLength(int solutionMinLength, int solutionMaxLength) {
         this.SOLUTION_LENGTH_RANGE.setValue(Range.of(solutionMinLength, solutionMaxLength));
@@ -527,8 +530,6 @@ public class APERunConfig {
 
     /**
      * Creates builder to build {@link APERunConfig}.
-     *
-     * @return created builder
      */
     public interface ISolutionMinLengthStage {
         ISolutionMaxLengthStage withSolutionMinLength(int solutionMinLength);

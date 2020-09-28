@@ -45,7 +45,7 @@ public class APEConfigTags {
     /**
      * Gets all tags that match the predicate in list format.
      *
-     * @param filter the filter (e.g. tag -> tag.isOptional())
+     * @param filter the filter (e.g. {@literal tag -> tag.isOptional()})
      * @return Gets all tags that match the predicate in list format
      */
     public List<APEConfigTag.Info<?>> getAll(Predicate<APEConfigTag<?>> filter) {

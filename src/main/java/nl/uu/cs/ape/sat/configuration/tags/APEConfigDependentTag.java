@@ -12,16 +12,17 @@ import javax.inject.Provider;
  * <p>
  * Instead of overriding the method constructFromJSON(JSONObject json);
  * dependent tags need you to override constructFromJSON(JSONObject json, D1 dependency1, .., DN dependencyN);
+ *     <ul>
+ *         <li>Create instance of {@literal APEConfigDependentTag.One<T, D1>} for one dependency.</li>
+ *         <li>Create instance of {@literal APEConfigDependentTag.Two<T, D1, D2>} for two dependencies..</li>
+ *         <li>Create instance of {@literal APEConfigDependentTag.Three<T, D1, D2, D3>} for three dependencies.</li>
+ *     </ul>
  * <p>
- * Create instance of {@literal APEConfigDependentTag.One<T, D1>} for one dependency.</br>
- * Create instance of {@literal APEConfigDependentTag.Two<T, D1, D2>} for two dependencies.</br>
- * Create instance of {@literal APEConfigDependentTag.Three<T, D1, D2, D3>} for three dependencies.
- * <p>
- * Example, tag2(string type) is dependent on tag1(int type):</br>
- * {@literal APEConfigTag<Integer> tag1 = ... ;}</br>
+ * Example, tag2(string type) is dependent on tag1(int type):
+ * {@literal APEConfigTag<Integer> tag1 = ... ;}
  * {@literal APEConfigTag<String> tag2 = new APEConfigDependentTag.One<String, Integer>(() -> tag1.getValue()) { ... };}
  * <p>
- * Providers (callback functions) can be instantiated like this: () -> tag1.getValue()</br>
+ * Providers (callback functions) can be instantiated like this: {@literal () -> tag1.getValue()}
  * or like this: tag1::getValue
  * <p>
  * Using providers instead of tag references makes sure tags can be dependent on other data as well (e.g. APEDomainSetup)

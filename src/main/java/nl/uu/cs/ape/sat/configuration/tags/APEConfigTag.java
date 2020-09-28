@@ -11,7 +11,7 @@ import org.json.JSONObject;
  * Call {@link APEConfigTag#getInfo()} to get an immutable version
  * of the tag.
  *
- * To implement a new Tag, the following methods should be implemented:</br>
+ * To implement a new Tag, the following methods should be implemented:
  * <ul>
  *   <li>String {@link APEConfigTag#getTagName()}</li>
  *   <li>String {@link APEConfigTag#getLabel()}</li>
@@ -151,7 +151,7 @@ public abstract class APEConfigTag<T> {
 
     /**
      * Sets the actual value of the Tag.
-     * It uses {@link APEConfigTag#validate(T value)}
+     * It uses {@link APEConfigTag#validate(Object)}
      * to check if the value is valid.
      *
      * @param value the value
@@ -246,7 +246,7 @@ public abstract class APEConfigTag<T> {
      * to add successes/failures to the results parameter that the user can use.
      * After that, return the results.
      *
-     * E.g.: results.add(getTagName(), "The maximum number of generated solutions should be greater or equal to 0.", value >= 0);
+     * E.g.: {@literal results.add(getTagName(), "The maximum number of generated solutions should be greater or equal to 0.", value >= 0);}
      *
      * @param value   the value
      * @param results the results
