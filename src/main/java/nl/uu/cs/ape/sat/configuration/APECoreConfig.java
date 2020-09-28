@@ -23,17 +23,6 @@ import java.util.stream.Collectors;
  * @author Vedran Kasalica
  */
 public class APECoreConfig {
-
-    /**
-     * Static versions of the Tags specified in this class. Should be in correct order for the Web API.
-     */
-    private static final APEConfigTags tag_info = new APEConfigTags(
-            new ONTOLOGY_PREFIX(),
-            new ONTOLOGY(),
-            new TOOL_ONTOLOGY_ROOT(null),
-            new DIMENSIONS_ONTOLOGY(null),
-            new TOOL_ANNOTATIONS()
-    );
     /**
      * The taxonomy (ontology) file
      */
@@ -54,6 +43,7 @@ public class APECoreConfig {
      * The JSON file with all tool annotations.
      */
     public final APEConfigTag<Path> TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.TOOL_ANNOTATIONS();
+
     /**
      * All the Tags specified in this class. Should be in correct order of dependencies.
      */
@@ -64,6 +54,18 @@ public class APECoreConfig {
             this.DIMENSIONS_ONTOLOGY,
             this.TOOL_ANNOTATIONS
     };
+
+    /**
+     * Static versions of the Tags specified in this class.
+     * Should be in correct order for the Web API.
+     */
+    public static final APEConfigTags TAGS = new APEConfigTags(
+            new ONTOLOGY_PREFIX(),
+            new ONTOLOGY(),
+            new TOOL_ONTOLOGY_ROOT(null),
+            new DIMENSIONS_ONTOLOGY(null),
+            new TOOL_ANNOTATIONS()
+    );
 
     /**
      * Initialize the configuration of the project.
@@ -120,11 +122,6 @@ public class APECoreConfig {
      * @throws APEConfigException Error in setting up the the configuration.
      */
     public APECoreConfig(JSONObject configObject) throws JSONException, APEConfigException {
-
-        if (configObject == null) {
-            throw new NullPointerException("The provided JSONObject is null.");
-        }
-
         coreConfigSetup(configObject);
     }
 
@@ -156,10 +153,6 @@ public class APECoreConfig {
         }
     }
 
-    public static APEConfigTags getTags() {
-        return tag_info;
-    }
-
     /**
      * Setting up the core configuration of the library.
      * <p>
@@ -182,8 +175,21 @@ public class APECoreConfig {
         }
     }
 
+    /**
+     * Private constructor used by {@link APECoreConfig#validate(JSONObject config)}
+     * to create an empty instance.
+     */
     private APECoreConfig(){}
 
+    /**
+     * Validate tje JSONObject for each CORE tag.
+     * If {@link ValidationResults#success()} ()} returns true,
+     * the configuration object can be safely used to create
+     * an APECoreConfig object.
+     *
+     * @param json the json
+     * @return the validation results
+     */
     public static ValidationResults validate(JSONObject json){
         APECoreConfig dummy = new APECoreConfig();
         ValidationResults results = new ValidationResults();
@@ -234,12 +240,6 @@ public class APECoreConfig {
     public List<String> getDataDimensionRoots() {
         return DIMENSIONS_ONTOLOGY.getValue();
     }
-
-    /*
-     * Tags separated in the categories: obligatory, optional, core and run.
-     * The obligatory tags are used in the constructor to check the presence of tags.
-     * Optional tags or All tags are mostly used by test cases.
-     */
 
     /**
      * Gets tool annotations path.

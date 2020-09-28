@@ -123,7 +123,7 @@ public abstract class APEConfigTag<T> {
             return _default.get();
         }
 
-        throw APEConfigException.fieldNotSpecified(getTagName(), getType().toString());
+        throw APEConfigException.missingTag(getTagName());
     }
 
     /**

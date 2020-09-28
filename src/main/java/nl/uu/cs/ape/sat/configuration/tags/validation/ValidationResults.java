@@ -93,11 +93,22 @@ public class ValidationResults {
 
     /**
      * Indicates whether this class contains at least one fail.
+     * This method is the counterpart of {@link ValidationResults#success()}
      *
      * @return a boolean indicating whether this class contains at least one fail
      */
     public boolean hasFails() {
         return results.stream().anyMatch(ValidationResult::isFail);
+    }
+
+    /**
+     * Indicates whether this class passed all validation criteria.
+     * This method is the counterpart of {@link ValidationResults#hasFails()}
+     *
+     * @return a boolean indicating whether this class passed all validation criteria
+     */
+    public boolean success() {
+        return !hasFails();
     }
 
     /**
