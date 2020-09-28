@@ -214,7 +214,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected JSONObject getTypeConstraints() {
+            protected JSONObject getTagConstraints() {
                 return range.toJSON();
             }
         }
@@ -251,7 +251,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected JSONObject getTypeConstraints() {
+            protected JSONObject getTagConstraints() {
                 return boundaries.toJSON();
             }
         }
@@ -310,7 +310,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected JSONObject getTypeConstraints() {
+            protected JSONObject getTagConstraints() {
                 return new JSONObject().put("options", new JSONArray(getOptions()));
             }
         }

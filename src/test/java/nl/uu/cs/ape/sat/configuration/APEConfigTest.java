@@ -114,22 +114,22 @@ class APEConfigTest {
     public void testMissingTags() {
 
         /* Missing one of the obligatory core tags should result in an exception while creating the framework. */
-        for (APEConfigTag.Info info : APECoreConfig.getTags().getObligatory()) {
+        for (APEConfigTag.Info<?> info : APECoreConfig.TAGS.getObligatory()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(info.tag_name);
-            assertThrows(JSONException.class, () -> new APECoreConfig(obj));
+            assertThrows(APEConfigException.class, () -> new APECoreConfig(obj));
         }
 
         /* Missing one of the obligatory run tags should  result in an exception while executing the run phase. */
-        for (APEConfigTag.Info tag : APERunConfig.getTags().getObligatory()) {
+        for (APEConfigTag.Info<?> tag : APERunConfig.TAGS.getObligatory()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag.tag_name);
             assertDoesNotThrow(() -> new APECoreConfig(obj));
-            assertThrows(JSONException.class, () -> setupRun(obj));
+            assertThrows(APEConfigException.class, () -> setupRun(obj));
         }
 
         /* Missing one of the optional tags should not throw an exception, but should display a warning. */
-        for (APEConfigTag.Info tag_info : APECoreConfig.getTags().getOptional()) {
+        for (APEConfigTag.Info<?> tag_info : APECoreConfig.TAGS.getOptional()) {
             JSONObject obj = getCorrectTemplate();
             obj.remove(tag_info.tag_name);
             assertDoesNotThrow(() -> new APECoreConfig(obj));
