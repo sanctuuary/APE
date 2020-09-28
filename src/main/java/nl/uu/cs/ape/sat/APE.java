@@ -277,9 +277,12 @@ public class APE {
 
     /**
      * Validates all the tags in a configuration object.
+     * If {@link ValidationResults#success()} ()} returns true,
+     * the configuration object can be safely used to setup the
+     * the APE framework and create an APERunConfiguration.
      *
      * @param config configuration file
-     * @return Results regarding the validations
+     * @return the validation results
      */
     public static ValidationResults validate(JSONObject config){
         ValidationResults results = APECoreConfig.validate(config);

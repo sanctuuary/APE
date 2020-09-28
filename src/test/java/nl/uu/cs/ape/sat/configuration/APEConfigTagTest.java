@@ -25,7 +25,7 @@ public class APEConfigTagTest {
 
         System.out.println("Test type tags..");
 
-        for (APEConfigTag.Info<?> tag : APERunConfig.getTags().getAll()) {
+        for (APEConfigTag.Info<?> tag : APERunConfig.TAGS.getAll()) {
 
             if (tag.type == APEConfigTag.TagType.INTEGER) {
                 System.out.printf("Web API shows `%s` box for tag `%s`, with min:`%s` and max:`%s`\n", tag.type, tag.label, tag.constraints.getInt("min"), tag.constraints.getInt("max"));
@@ -33,8 +33,8 @@ public class APEConfigTagTest {
         }
 
         System.out.printf("\n### Display all tag info ####\nCORE:\n%s\n\nRUN:\n%s\n",
-                APECoreConfig.getTags().toJSON().toString(3),
-                APERunConfig.getTags().toJSON().toString(3));
+                APECoreConfig.TAGS.toJSON().toString(3),
+                APERunConfig.TAGS.toJSON().toString(3));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class APEConfigTagTest {
         assertFalse(results.hasFails());
 
         /* Test missing obligatory tag  */
-        List<String> tags = APECoreConfig.getTags().getObligatory().stream().map(APEConfigTag.Info::getTagName).collect(Collectors.toList());
+        List<String> tags = APECoreConfig.TAGS.getObligatory().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 
             JSONObject altered_config = APEUtils.clone(correct_config);
@@ -66,7 +66,7 @@ public class APEConfigTagTest {
         }
 
         /* Test missing optional tag  */
-        tags = APECoreConfig.getTags().getOptional().stream().map(APEConfigTag.Info::getTagName).collect(Collectors.toList());
+        tags = APECoreConfig.TAGS.getOptional().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 
             JSONObject altered_config = APEUtils.clone(correct_config);
@@ -78,7 +78,7 @@ public class APEConfigTagTest {
         }
 
         /* Test incorrect tag  */
-        tags = APECoreConfig.getTags().getAll().stream().map(APEConfigTag.Info::getTagName).collect(Collectors.toList());
+        tags = APECoreConfig.TAGS.getAll().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 
             JSONObject altered_config = APEUtils.clone(correct_config)
@@ -109,7 +109,7 @@ public class APEConfigTagTest {
         assertFalse(results.hasFails());
 
         /* Test missing obligatory tag  */
-        List<String> tags = APERunConfig.getTags().getObligatory().stream().map(APEConfigTag.Info::getTagName).collect(Collectors.toList());
+        List<String> tags = APERunConfig.TAGS.getObligatory().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 
             JSONObject altered_config = APEUtils.clone(correct_config);
@@ -124,7 +124,7 @@ public class APEConfigTagTest {
         }
 
         /* Test missing optional tag  */
-        tags = APERunConfig.getTags().getOptional().stream().map(APEConfigTag.Info::getTagName).collect(Collectors.toList());
+        tags = APERunConfig.TAGS.getOptional().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 
             JSONObject altered_config = APEUtils.clone(correct_config);
@@ -136,7 +136,7 @@ public class APEConfigTagTest {
         }
 
         /* Test incorrect tag  */
-        tags = APERunConfig.getTags().getAll().stream().map(APEConfigTag.Info::getTagName).collect(Collectors.toList());
+        tags = APERunConfig.TAGS.getAll().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 
             JSONObject altered_config = APEUtils.clone(correct_config)
