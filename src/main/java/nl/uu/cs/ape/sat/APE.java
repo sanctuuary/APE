@@ -205,6 +205,18 @@ public class APE {
     	JSONObject configObject = new JSONObject(configContent);
         return runSynthesis(configObject, this.getDomainSetup());
     }
+
+    /**
+     * Setup a new run instance of the APE solver and run the synthesis algorithm.
+     *
+     * @param runConfig     Configuration object that contains run configurations.
+     * @return The list of all the solutions.
+     * @throws IOException   Error in case of not providing a proper configuration file.
+     */
+    public SATsolutionsList runSynthesis(APERunConfig runConfig) throws IOException {
+        runConfig.apeDomainSetup.clearConstraints();
+        return executeSynthesis(runConfig);
+    }
     
     /**
      * Setup a new run instance of the APE solver and run the synthesis algorithm.
