@@ -1,6 +1,5 @@
 package nl.uu.cs.ape.sat.configuration;
 
-import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResult;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,6 +77,15 @@ public class APEConfigException extends RuntimeException {
         return new JSONException(String.format("Value '%s' cannot be parsed to type '%s' for tag '%s', %s", value, expectedType.getSimpleName(), tag, info));
     }
 
+    /**
+     * Required validation tag json exception.
+     *
+     * @param <T>         the type parameter
+     * @param tag         the tag
+     * @param requiredTag the required tag
+     * @param info        the info
+     * @return the json exception
+     */
     public static <T> JSONException requiredValidationTag(String tag, String requiredTag, String info) {
         return new JSONException(String.format("Cannot parse tag '%s' without '%s', %s", tag, requiredTag, info));
     }
@@ -105,16 +113,6 @@ public class APEConfigException extends RuntimeException {
     }
 
     /**
-     * Path is found, but it is not a file.
-     *
-     * @param path The relative- or absolute path to a JSON- or OWL file.
-     * @return Configuration exception with information that may help the user solve the problem.
-     */
-    public static IOException notAFile(String path) {
-        return new IOException(String.format("Provided path '%s' is not a file.", path));
-    }
-
-    /**
      * Path is found, but it is not a directory.
      *
      * @param tag  Corresponding JSON tag in the configuration file.
@@ -138,29 +136,16 @@ public class APEConfigException extends RuntimeException {
     }
 
     /**
-     * Missing permission ape config exception.
+     * List all the failed validation criteria in one exception.
      *
-     * @param path              The relative- or absolute path to a JSON- or OWL file.
-     * @param missingPermission The missing READ or WRITE permission for the file described by the path.
-     * @return Configuration exception with information that may help the user solve the problem.
+     * @param validationResults the validation results
+     * @return the json exception
      */
-    public static IOException missingPermission(String path, Object missingPermission) {
-        return new IOException(String.format("You are missing [%s] permission for path '%s' for ", missingPermission, path));
-    }
-
-    public static JSONException fieldNotSpecified(String tag, String type) {
-        return new JSONException(String.format("No '%s' value provided for tag '%s'.", type, tag));
-    }
-
-    public static JSONException ruleViolation(ValidationResult result) {
-        return new JSONException(String.format("Tag '%s' is incorrect. %s", result.getTag(), result.getRuleDescription()));
-    }
-
-    public static JSONException ruleViolations(ValidationResults validationResults) {
+    public static APEConfigException ruleViolations(ValidationResults validationResults) {
         StringBuilder sb = new StringBuilder();
-        validationResults.getFails().stream().forEach(fail -> {
-            sb.append(String.format("Tag '%s' is incorrect: %s\n", fail.getTag(), fail.getRuleDescription()));
-        });
-        return new JSONException(sb.toString());
+        validationResults.getFails().forEach(fail ->
+                sb.append(String.format("Tag '%s' is incorrect: %s\n", fail.getTag(), fail.getRuleDescription()))
+        );
+        return new APEConfigException(sb.toString());
     }
 }

@@ -5,6 +5,7 @@ import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
+import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
@@ -25,26 +26,6 @@ import java.util.List;
  * @author Vedran Kasalica
  */
 public class APERunConfig {
-
-    /**
-     * Static versions of the Tags specified in this class. Should be in correct order for the Web API.
-     */
-    private static final APEConfigTags tag_info = new APEConfigTags(
-            new CONSTRAINTS(),
-            new SHARED_MEMORY(),
-            new SOLUTION_DIR_PATH(),
-            new SOLUTION_LENGTH_RANGE(),
-            new MAX_NO_SOLUTIONS(),
-            new NO_EXECUTIONS(),
-            new NO_GRAPHS(),
-            new USE_WORKFLOW_INPUT(),
-            new USE_ALL_GENERATED_DATA(),
-            new DEBUG_MODE(),
-            new TOOL_SEQ_REPEAT(),
-            new PROGRAM_OUTPUTS(null),
-            new PROGRAM_INPUTS(null)
-    );
-
     /**
      * Path to the file with all workflow constraints.
      */
@@ -129,6 +110,26 @@ public class APERunConfig {
             this.PROGRAM_OUTPUTS,
             this.PROGRAM_INPUTS
     };
+
+    /**
+     * Static versions of the Tags specified in this class. Should be in correct order for the Web API.
+     */
+    public static final APEConfigTags TAGS = new APEConfigTags(
+            new CONSTRAINTS(),
+            new SHARED_MEMORY(),
+            new SOLUTION_DIR_PATH(),
+            new SOLUTION_LENGTH_RANGE(),
+            new MAX_NO_SOLUTIONS(),
+            new NO_EXECUTIONS(),
+            new NO_GRAPHS(),
+            new USE_WORKFLOW_INPUT(),
+            new USE_ALL_GENERATED_DATA(),
+            new DEBUG_MODE(),
+            new TOOL_SEQ_REPEAT(),
+            new PROGRAM_OUTPUTS(null),
+            new PROGRAM_INPUTS(null)
+    );
+
     /**
      * Object containing domain information needed for the execution.
      */
@@ -160,6 +161,39 @@ public class APERunConfig {
         setDebugMode(builder.debugMode);
         setProgramInputs(builder.programInputs);
         setProgramOutputs(builder.programOutputs);
+    }
+
+    /**
+     * Private constructor used by {@link APERunConfig#validate(JSONObject config, APEDomainSetup setup)}
+     * to create an empty instance.
+     */
+    private APERunConfig(APEDomainSetup setup){
+        this.apeDomainSetup = setup;
+    }
+
+    /**
+     * Validate tje JSONObject for each RUN tag.
+     * If {@link ValidationResults#success()} ()} returns true,
+     * the configuration object can be safely used to create
+     * an APERunConfig object.
+     *
+     * @param json the configuration file
+     * @param setup the domain setup
+     * @return the validation results
+     */
+    public static ValidationResults validate(JSONObject json, APEDomainSetup setup){
+        APERunConfig dummy = new APERunConfig(setup);
+        ValidationResults results = new ValidationResults();
+        for(APEConfigTag<?> tag : dummy.all_tags){
+            results.add(tag.validate(json));
+            if(results.hasFails()){
+                return results;
+            }
+            else{
+                tag.setValue(json); // for dependencies
+            }
+        }
+        return results;
     }
 
     /**
@@ -226,10 +260,6 @@ public class APERunConfig {
      */
     public static ISolutionMinLengthStage builder() {
         return new Builder();
-    }
-
-    public static APEConfigTags getTags() {
-        return tag_info;
     }
 
     public APEDomainSetup getApeDomainSetup() {
@@ -302,9 +332,11 @@ public class APERunConfig {
     }
 
     /**
-     * Get the path to the directory where the graphs representation of the solutions should be stored.
+     * Get the path of the relative path in solution_dir_path.
      *
-     * @return
+     * @param relativePath the relative path
+     *
+     * @return absolute path of the relative path in solution_dir_path
      */
     public Path getSolutionDirPath2(String relativePath) {
         // relative paths should not start with '/' or '\'
@@ -314,22 +346,24 @@ public class APERunConfig {
         return getSolutionDirPath().resolve(relativePath);
     }
 
+    public static final String EXECUTABLES_FOLDER_NAME = "Executables";
     /**
      * Get the path to the directory where the executable scripts corresponding to the given solutions should be stored.
      *
-     * @return
+     * @return the path to the directory where the executable scripts corresponding to the given solutions should be stored
      */
     public Path getSolutionDirPath2Executables() {
-        return getSolutionDirPath2("Executables");
+        return getSolutionDirPath2(EXECUTABLES_FOLDER_NAME);
     }
 
+    public static final String FIGURES_FOLDER_NAME = "Figures";
     /**
      * Get the path to the directory where the graphs representation of the solutions should be stored.
      *
-     * @return
+     * @return the path to the directory where the graphs representation of the solutions should be stored
      */
     public Path getSolutionDirPath2Figures() {
-        return getSolutionDirPath2("Figures");
+        return getSolutionDirPath2(FIGURES_FOLDER_NAME);
     }
 
     /**
@@ -478,6 +512,7 @@ public class APERunConfig {
 
     /**
      * @param solutionMinLength the solutionMinLength to set
+     * @param solutionMaxLength the solutionMaxLength to set
      */
     public void setSolutionLength(int solutionMinLength, int solutionMaxLength) {
         this.SOLUTION_LENGTH_RANGE.setValue(Range.of(solutionMinLength, solutionMaxLength));
@@ -495,8 +530,6 @@ public class APERunConfig {
 
     /**
      * Creates builder to build {@link APERunConfig}.
-     *
-     * @return created builder
      */
     public interface ISolutionMinLengthStage {
         ISolutionMaxLengthStage withSolutionMinLength(int solutionMinLength);
