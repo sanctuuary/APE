@@ -47,11 +47,11 @@ public class SolutionGraph {
      */
     public BufferedImage getPNGImage(boolean debug) {
         final Renderer renderer = getPNGRenderer();
-        if(!debug) {
+        if(true) {
             APEUtils.disableErr();
             }
         final BufferedImage image = renderer.toImage();
-        if(!debug) {
+        if(true) {
             APEUtils.enableErr();
         }
         return image;
@@ -66,11 +66,11 @@ public class SolutionGraph {
      */
     public void getWrite2File(File file, boolean debug) throws IOException {
         final Renderer renderer = getPNGRenderer();
-        if(!debug) {
+        if(true) {
         APEUtils.disableErr();
         }
         renderer.toFile(file);
-        if(!debug) {
+        if(true) {
             APEUtils.enableErr();
         }
     }

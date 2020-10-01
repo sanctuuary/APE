@@ -2,8 +2,12 @@ package nl.uu.cs.ape.sat.models;
 
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 
 import java.util.List;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * The {@code AbstractModule} class represents modules/tools provided by the
@@ -77,5 +81,18 @@ public class AbstractModule extends TaxonomyPredicate {
     public String getType() {
         return "abstract module";
     }
+
+	@Override
+	public JSONObject toJSON() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DataInstance taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
+			throws JSONException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

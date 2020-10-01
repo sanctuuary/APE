@@ -7,6 +7,9 @@ import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * The {@code AuxTaxonomyPredicate} class represents an abstract class used
  * strictly to represent artificially generated abstract terms, used to abstract
@@ -161,4 +164,17 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
     public String toShortString() {
         return getPredicateID();
     }
+
+	@Override
+	public JSONObject toJSON() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DataInstance taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
+			throws JSONException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

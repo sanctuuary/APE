@@ -238,7 +238,7 @@ public class APE {
         /* List of all the solutions */
         SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
         
-        APEUtils.readConstraints(runConfig.getConstraintsPath().toString(), apeDomainSetup);
+        APEUtils.readConstraints(new File(runConfig.getConstraintsPath().toString()), apeDomainSetup);
 
         /* Print the setup information when necessary. */
         APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);

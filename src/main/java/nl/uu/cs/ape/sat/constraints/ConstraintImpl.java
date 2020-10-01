@@ -26,7 +26,7 @@ public class ConstraintImpl extends ConstraintTemplate {
      * @param description  the description
      * @param function     the function
      */
-    public ConstraintImpl(String id, List<ConstraintParameter> parametersNo, String description, Runnable function) {
+    public ConstraintImpl(String id, List<TaxonomyPredicate> parametersNo, String description, Runnable function) {
         super(id, parametersNo, description);
     }
 
