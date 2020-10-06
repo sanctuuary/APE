@@ -14,6 +14,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 
@@ -167,12 +168,13 @@ public class APEDomainSetup {
      * @param logicOp           Logical operation that describes the relation between the types.
      * @return An abstract predicate that provides abstraction over a disjunction/conjunction of the labels.
      */
-    public TaxonomyPredicate generateAuxiliaryPredicate(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
+    public AuxTaxonomyPredicate generateAuxiliaryPredicate(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
         if (relatedPredicates.isEmpty()) {
             return null;
         }
         if (relatedPredicates.size() == 1) {
-            return relatedPredicates.first();
+        	TaxonomyPredicate relevantPred = relatedPredicates.first();
+            return new AuxTaxonomyPredicate(relevantPred, Arrays.asList(relevantPred), logicOp);
         }
         String abstractLabel = APEUtils.getLabelFromList(relatedPredicates, logicOp);
 
@@ -182,11 +184,8 @@ public class APEDomainSetup {
         } else {
             newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel, abstractLabel, relatedPredicates.first().getRootNodeID(), NodeType.ABSTRACT));
         }
-        AuxTaxonomyPredicate helperPredicate = new AuxTaxonomyPredicate(newAbsType, logicOp);
+        AuxTaxonomyPredicate helperPredicate = new AuxTaxonomyPredicate(newAbsType, relatedPredicates, logicOp);
 
-        for (TaxonomyPredicate predicate : relatedPredicates) {
-            helperPredicate.addConcretePredicate(predicate);
-        }
         if (helperPredicate != null) {
             helperPredicates.add(helperPredicate);
         }

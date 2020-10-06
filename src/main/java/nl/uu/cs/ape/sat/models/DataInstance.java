@@ -4,11 +4,13 @@ import nl.uu.cs.ape.sat.constraints.ConstraintTemplateParameter;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -23,19 +25,14 @@ import org.json.JSONObject;
  *
  * @author Vedran Kasalica
  */
-public class DataInstance extends TaxonomyPredicate {
+public class DataInstances {
 
-    /**
-     * List of data types that describe different data dimensions and correspond to a single data instance.
-     */
-    private List<TaxonomyPredicate> types;
-
+    
     /**
      * Create a new data instance. The instance will be characterized by different data type dimensions.
      */
     public DataInstance(TaxonomyPredicate type) {
-    	super(type.getRootNodeID(), NodeType.LEAF);
-        this.types = new ArrayList<TaxonomyPredicate>();
+    	super(type, LogicOperation.AND);
     }
 
     /**
@@ -67,25 +64,23 @@ public class DataInstance extends TaxonomyPredicate {
 	 * @param jsonParam
 	 * @param domainSetup
 	 * @return
-	 */
-	public DataInstance taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
-			throws JSONException {
-		ConstraintTemplateParameter parameter = null;
+	 
+	public DataInstance taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup, String description)
+			throws JSONException, APEDimensionsException {
+		/* Set of predicates where each describes a type dimension */
+		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<TaxonomyPredicate>();
 		/* Iterate through each of the dimensions */
 		for (String currRootLabel : jsonParam.keySet()) {
 			String curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixURI());
-
+			if(!domainSetup.getAllTypes().existsDimension(curRootURI)) {
+				throw APEDimensionsException.notExistingDimension("Data type was defined over a non existing data dimension: '" + curRootURI + "', in JSON: '" + jsonParam + "'");
+			}
 			LogicOperation logConn = LogicOperation.OR;
 			SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
 			/* for each dimensions a disjoint array of types/tools is given */
 			for (String currTypeLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
 				String currTypeURI = APEUtils.createClassURI(currTypeLabel, domainSetup.getOntologyPrefixURI());
-
-				if (domainSetup.getAllTypes().get(currTypeURI) == null) {
-					System.err.println("Data type \"" + currTypeURI.toString()
-							+ "\" used in the tool annotations does not exist in the " + currRootLabel
-							+ " taxonomy. This might influence the validity of the solutions.");
-				}
+				
 				Type currType = domainSetup.getAllTypes().get(currTypeURI, curRootURI);
 				if (currType != null) {
 					/*
@@ -95,24 +90,51 @@ public class DataInstance extends TaxonomyPredicate {
 					currType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
 					logConnectedPredicates.add(currType);
 				} else {
-					throw new JSONException("Error in the tool annotation file. The data type '" + currTypeURI
-							+ "', used as a operation input/output, was not defined or does not belong to the dimension '"
-							+ currRootLabel + "'.");
+					throw APEDimensionsException.dimensionDoesNotContainClass(String.format("Error in a JSON input. The data type '%s' was not defined or does not belong to the data dimension '%s'.", currType, curRootURI));
 				}
 			}
 
 			/*
-			 * Create a new type, that represents a disjunction/ of the types, that can be
-			 * used to abstract over each of the tools individually.
+			 * Create a new type, that represents a disjunction of the types, that can be
+			 * used to abstract over each of the types individually and represents specificaion over one dimension.
 			 */
-			TaxonomyPredicate newAbsType = domainSetup.generateAuxiliaryPredicate(logConnectedPredicates, logConn);
-			if (newAbsType != null) {
-				newAbsType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
-//	                  dataInstance.addType(newAbsType);
+			AuxTaxonomyPredicate abstractDimensionType = domainSetup.generateAuxiliaryPredicate(logConnectedPredicates, logConn);
+			if (abstractDimensionType != null) {
+				abstractDimensionType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
+	            parameterDimensions.add(abstractDimensionType);
 			}
 
 		}
+		AuxTaxonomyPredicate taxonomyInstance = domainSetup.generateAuxiliaryPredicate(parameterDimensions, LogicOperation.AND);
+		if (taxonomyInstance != null) {
+			taxonomyInstance.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
+		}
+		
 
+		return taxonomyInstance.getTaxonomyPredicate();
+	}*/
+
+	@Override
+	public String getPredicateID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getPredicateLabel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JSONObject toJSON() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

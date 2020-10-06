@@ -232,7 +232,7 @@ public class ConstraintFactory {
      */
     public String getDescription(ConstraintTemplateData constr) {
         ConstraintTemplate currTmpl = this.constraintTemplates.get(constr.getConstraintID());
-        List<ConstraintTemplateParameter> params = constr.getParameters();
+        List<TaxonomyPredicate> params = constr.getParameters();
         String description = currTmpl.getDescription();
         for (int i = 0; i < params.size(); i++) {
             description = description.replace("${parameter_" + i + "}", params.get(i).toString());
@@ -277,7 +277,7 @@ public class ConstraintFactory {
          * @param parameterTypes the parameter types
          * @param description    the description
          */
-        public Constraint_depend_module(String id, List<ConstraintTemplateParameter> parameterTypes, String description) {
+        protected Constraint_depend_module(String id, List<ConstraintTemplateParameter> parameterTypes, String description) {
             super(id, parameterTypes, description);
         }
 
@@ -305,7 +305,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_gen_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_gen_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -335,7 +335,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_if_gen_then_not_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_if_gen_then_not_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -363,7 +363,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_if_gen_then_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_if_gen_then_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -391,7 +391,7 @@ public class ConstraintFactory {
          * @param parameterTypes the parameter types
          * @param description    the description
          */
-        public Constraint_if_then_module(String id, List<ConstraintTemplateParameter> parameterTypes, String description) {
+        protected Constraint_if_then_module(String id, List<ConstraintTemplateParameter> parameterTypes, String description) {
             super(id, parameterTypes, description);
         }
 
@@ -419,7 +419,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_if_then_not_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_if_then_not_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -447,7 +447,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_if_use_then_not_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_if_use_then_not_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -475,7 +475,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_if_use_then_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_if_use_then_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -503,7 +503,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_last_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_last_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -531,7 +531,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_next_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_next_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -559,7 +559,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_not_gen_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_not_gen_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -589,7 +589,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_not_use_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_not_use_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -619,7 +619,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_not_use_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_not_use_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -649,7 +649,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_prev_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_prev_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -677,7 +677,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_use_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_use_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 
@@ -707,7 +707,7 @@ public class ConstraintFactory {
          * @param parametersNo the parameters no
          * @param description  the description
          */
-        public Constraint_use_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+        protected Constraint_use_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
             super(id, parametersNo, description);
         }
 

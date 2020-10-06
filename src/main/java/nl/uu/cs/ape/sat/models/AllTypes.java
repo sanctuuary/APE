@@ -149,14 +149,23 @@ public class AllTypes extends AllPredicates {
     }
 
     /**
-     * Returns true if this set contains the specified type element. More formally,
-     * returns true if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
+     * Returns true if this type exists in the current domain.
      *
      * @param typeID ID of the type that is searched for.
-     * @return true if the type exists in the set.
+     * @return true if the typeID exists in the domain.
      */
     public boolean existsType(String typeID) {
         return getPredicates().containsKey(typeID);
+    }
+    
+    /**
+     * Returns true if this dimension exists in the current domain.
+     *
+     * @param dimensionID ID of the data dimension that is searched for.
+     * @return true if the dimensionID exists in the domain.
+     */
+    public boolean existsDimension(String dimensionID) {
+    	return dataTaxonomyDimensions.contains(dimensionID);
     }
 
     /**

@@ -15,7 +15,7 @@ import java.util.List;
  * subsequently using the function {@link #getConstraint}.
  *
  * @author Vedran Kasalica
- */
+
 public class ConstraintImpl extends ConstraintTemplate {
 
     /**
@@ -25,8 +25,8 @@ public class ConstraintImpl extends ConstraintTemplate {
      * @param parametersNo the parameters no
      * @param description  the description
      * @param function     the function
-     */
-    public ConstraintImpl(String id, List<TaxonomyPredicate> parametersNo, String description, Runnable function) {
+     
+    public ConstraintImpl(String id, List<ConstraintTemplateParameter> parametersNo, String description, Runnable function) {
         super(id, parametersNo, description);
     }
 
@@ -41,4 +41,5 @@ public class ConstraintImpl extends ConstraintTemplate {
         return SLTL_formula.itn_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
     }
 
-}
+}*/
+

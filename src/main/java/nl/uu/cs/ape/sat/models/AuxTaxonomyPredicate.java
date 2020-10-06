@@ -4,6 +4,7 @@ import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 
+import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -35,16 +36,18 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
     private final LogicOperation logicOp;
 
     /**
-     * Create an auxiliary predicate.
+     * Create an auxiliary predicate.<br><br>
+     * It is recommended to use the method {@link APEDomainSetup#generateAuxiliaryPredicate(SortedSet, LogicOperation)} to generate an auxiliary object.
      *
      * @param predicate the predicate
-     * @param logicOp   the logic op
+     * @param logicOp   the logic operator
      */
-    public AuxTaxonomyPredicate(TaxonomyPredicate predicate, LogicOperation logicOp) {
+    public AuxTaxonomyPredicate(TaxonomyPredicate predicate, Collection<TaxonomyPredicate> containingPredicates, LogicOperation logicOp) {
         super(predicate.getRootNodeID(), predicate.getNodeType());
         this.taxonomyPredicate = predicate;
         this.logicOp = logicOp;
         this.containingPredicates = new TreeSet<TaxonomyPredicate>();
+        this.containingPredicates.addAll(containingPredicates);
     }
 
     /**
@@ -52,28 +55,17 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
      *
      * @return the taxonomy predicates
      */
-    public TaxonomyPredicate getTaxonomyPredicates() {
+    public TaxonomyPredicate getTaxonomyPredicate() {
         return taxonomyPredicate;
     }
 
     /**
-     * Gets logic op.
+     * Gets logic operator used to group the abstracted predicates.
      *
      * @return the field {@link #logicOp}.
      */
     public LogicOperation getLogicOp() {
         return logicOp;
-    }
-
-    /**
-     * Adds a concrete predicate to be contained in the abstract one, if not add already.
-     *
-     * @param predicate Predicate that will be added to be generalized over.
-     */
-    public void addConcretePredicate(TaxonomyPredicate predicate) {
-        if (predicate != null) {
-            this.containingPredicates.add(predicate);
-        }
     }
 
     /**
@@ -172,7 +164,7 @@ public class AuxTaxonomyPredicate extends TaxonomyPredicate {
 	}
 
 	@Override
-	public DataInstance taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
+	public abstract TaxonomyPredicate taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
 			throws JSONException {
 		// TODO Auto-generated method stub
 		return null;

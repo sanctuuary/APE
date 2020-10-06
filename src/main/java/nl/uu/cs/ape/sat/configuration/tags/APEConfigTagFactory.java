@@ -141,7 +141,7 @@ public class APEConfigTagFactory {
              */
             private DataInstance getDataInstance(JSONObject jsonModuleInput, APEDomainSetup apeDomainSetup) {
 
-                DataInstance dataInstances = new DataInstance();
+                DataInstance dataInstances = null;
 
                 for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
 
@@ -159,8 +159,11 @@ public class APEConfigTagFactory {
                                     + "' was not defined or does not belong to the dimension '" + typeSuperClassLabel + "'.");
                             return null;
                         }
-
-                        dataInstances.addType(currType);
+                        if(dataInstances == null) {
+                        	dataInstances = new DataInstance(currType);
+                        } else {
+                        	dataInstances.addType(currType);
+                        }
                     }
                 }
 

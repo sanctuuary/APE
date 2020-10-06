@@ -1,8 +1,8 @@
 package nl.uu.cs.ape.sat.models.logic.constructs;
 
 import nl.uu.cs.ape.sat.models.AllPredicates;
-import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
+import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -469,7 +469,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      */
     public abstract JSONObject toJSON();
 
-	public abstract DataInstance taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
-			throws JSONException;
+	public abstract TaxonomyPredicate taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
+			throws JSONException, APEDimensionsException;
 
 }
