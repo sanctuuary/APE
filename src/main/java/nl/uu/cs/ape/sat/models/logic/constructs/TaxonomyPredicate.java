@@ -6,6 +6,8 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.*;
 
+import org.json.JSONObject;
+
 /**
  * The {@code PredicateLabel} class (interface) represents a single
  * predicate/label used to depict an operation or a data type/format.<br>
@@ -456,4 +458,11 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     public void setNodePredicate(NodeType nodeType) {
         this.nodeType = nodeType;
     }
+
+    /**
+     * Creates a JSON that represent the current taxonomy predicate.
+     * @return JSONObject that describes the taxonomy predicate.
+     */
+    public abstract JSONObject toJSON();
+
 }

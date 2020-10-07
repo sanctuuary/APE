@@ -3,7 +3,7 @@ package nl.uu.cs.ape.sat.core.implSAT;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.core.SolutionInterpreter;
 import nl.uu.cs.ape.sat.models.AllModules;
-import nl.uu.cs.ape.sat.models.AuxTaxonomyPredicate;
+import nl.uu.cs.ape.sat.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
@@ -80,7 +80,7 @@ public class SAT_solution extends SolutionInterpreter {
                 literals.add(currLiteral);
                 if (!currLiteral.isNegated()) {
                     positiveLiterals.add(currLiteral);
-                    if (currLiteral.getPredicate() instanceof AuxTaxonomyPredicate) {
+                    if (currLiteral.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
                     } else if (currLiteral.getPredicate() instanceof Module) {
                         /* add all positive literals that describe tool implementations */

@@ -94,7 +94,7 @@ public final class SATModuleUtils {
                     int moduleNo = moduleState.getStateNumber();
                     /* ..and for each state and input state of that module state.. */
                     List<State> currInputStates = synthesisInstance.getTypeAutomaton().getUsedTypesBlock(moduleNo - 1).getStates();
-                    List<DataInstance> moduleInputs = module.getModuleInput();
+                    List<Type> moduleInputs = module.getModuleInput();
                     for (State currInputState : currInputStates) {
                         int currInputStateNo = currInputState.getStateNumber();
                         /*
@@ -103,7 +103,7 @@ public final class SATModuleUtils {
                          */
                         if (currInputStateNo < moduleInputs.size()) {
                             /* Get input type and/or format that are/is required by the tool */
-                            for (TaxonomyPredicate currInputType : moduleInputs.get(currInputStateNo).getTypes()) {
+                            TaxonomyPredicate currInputType = moduleInputs.get(currInputStateNo);
                                 /* Encode: if module was used in the module state */
                                 constraints = constraints.append("-")
                                         .append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
@@ -114,7 +114,6 @@ public final class SATModuleUtils {
                                 constraints = constraints
                                         .append(mappings.add(currInputType, currInputState, WorkflowElement.USED_TYPE))
                                         .append(" 0\n");
-                            }
                         } else {
                             constraints = constraints.append("-")
                                     .append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
@@ -486,10 +485,10 @@ public final class SATModuleUtils {
                     int moduleNo = moduleState.getStateNumber();
                     // and for each state and output state of that module state
                     List<State> currOutputStates = synthesisInstance.getTypeAutomaton().getMemoryTypesBlock(moduleNo).getStates();
-                    List<DataInstance> moduleOutputs = module.getModuleOutput();
+                    List<Type> moduleOutputs = module.getModuleOutput();
                     for (int i = 0; i < currOutputStates.size(); i++) {
                         if (i < moduleOutputs.size()) {
-                            for (TaxonomyPredicate outputType : moduleOutputs.get(i).getTypes()) { // set type and format for the
+                        	TaxonomyPredicate outputType = moduleOutputs.get(i);
                                 // single output
                                 // if module was used in the module state
                                 constraints = constraints.append("-")
@@ -500,7 +499,6 @@ public final class SATModuleUtils {
                                 constraints = constraints.append(
                                         mappings.add(outputType, currOutputStates.get(i), WorkflowElement.MEMORY_TYPE))
                                         .append(" 0\n");
-                            }
                         } else {
                             constraints = constraints.append("-")
                                     .append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");

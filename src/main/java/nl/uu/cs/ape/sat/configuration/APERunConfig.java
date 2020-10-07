@@ -6,8 +6,8 @@ import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Range;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import org.json.JSONException;
@@ -87,11 +87,11 @@ public class APERunConfig {
     /**
      * Input types of the workflow.
      */
-    public final APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
+    public final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
     /**
      * Output types of the workflow.
      */
-    public final APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
+    public final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
     /**
      * All the Tags specified in this class. Should be in correct order of dependencies.
      */
@@ -435,14 +435,14 @@ public class APERunConfig {
      *
      * @return the value of {@link #PROGRAM_INPUTS}
      */
-    public List<DataInstance> getProgramInputs() {
+    public List<Type> getProgramInputs() {
         return PROGRAM_INPUTS.getValue();
     }
 
     /**
      * @param programInputs the programInputs to set
      */
-    public void setProgramInputs(List<DataInstance> programInputs) {
+    public void setProgramInputs(List<Type> programInputs) {
         PROGRAM_INPUTS.setValue(programInputs);
     }
 
@@ -451,14 +451,14 @@ public class APERunConfig {
      *
      * @return the value of {@link #PROGRAM_OUTPUTS}
      */
-    public List<DataInstance> getProgramOutputs() {
+    public List<Type> getProgramOutputs() {
         return PROGRAM_OUTPUTS.getValue();
     }
 
     /**
      * @param programOutputs the programOutputs to set
      */
-    public void setProgramOutputs(List<DataInstance> programOutputs) {
+    public void setProgramOutputs(List<Type> programOutputs) {
         PROGRAM_OUTPUTS.setValue(programOutputs);
     }
 
@@ -560,9 +560,9 @@ public class APERunConfig {
 
         IBuildStage withNoGraphs(int noGraphs);
 
-        IBuildStage withProgramInputs(List<DataInstance> programInputs);
+        IBuildStage withProgramInputs(List<Type> programInputs);
 
-        IBuildStage withProgramOutputs(List<DataInstance> programOutputs);
+        IBuildStage withProgramOutputs(List<Type> programOutputs);
 
         IBuildStage withUseWorkflowInput(ConfigEnum useWorkflowInput);
 
@@ -588,8 +588,8 @@ public class APERunConfig {
         private String solutionDirPath;
         private int noExecutions;
         private int noGraphs;
-        private List<DataInstance> programInputs = Collections.emptyList();
-        private List<DataInstance> programOutputs = Collections.emptyList();
+        private List<Type> programInputs = Collections.emptyList();
+        private List<Type> programOutputs = Collections.emptyList();
         private ConfigEnum useWorkflowInput;
         private ConfigEnum useAllGeneratedData;
         private boolean debugMode;
@@ -659,13 +659,13 @@ public class APERunConfig {
         }
 
         @Override
-        public IBuildStage withProgramInputs(List<DataInstance> programInputs) {
+        public IBuildStage withProgramInputs(List<Type> programInputs) {
             this.programInputs = programInputs;
             return this;
         }
 
         @Override
-        public IBuildStage withProgramOutputs(List<DataInstance> programOutputs) {
+        public IBuildStage withProgramOutputs(List<Type> programOutputs) {
             this.programOutputs = programOutputs;
             return this;
         }

@@ -3,7 +3,6 @@ package nl.uu.cs.ape.sat.configuration.tags;
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.io.APEFiles;
-import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
@@ -90,7 +89,7 @@ public class APEConfigTagFactory {
 
         }
 
-        public static abstract class DataInstances extends APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> {
+        public static abstract class DataInstances extends APEConfigDependentTag.One<List<Type>, APEDomainSetup> {
 
             public DataInstances(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -102,28 +101,28 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected ValidationResults validate(List<DataInstance> value, APEDomainSetup apeDomainSetup, ValidationResults results) {
+            protected ValidationResults validate(List<Type> value, APEDomainSetup apeDomainSetup, ValidationResults results) {
                 // TODO: check data instances
                 return results;
             }
 
             @Override
-            public APEConfigDefaultValue<List<DataInstance>> getDefault() {
+            public APEConfigDefaultValue<List<Type>> getDefault() {
                 return APEConfigDefaultValue.withDefault(new ArrayList<>());
             }
 
             @Override
-            protected List<DataInstance> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
-                final ArrayList<DataInstance> instances = new ArrayList<>();
+            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
+                final ArrayList<Type> instances = new ArrayList<>();
 
                 if (apeDomainSetup == null) {
                     throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
                 }
 
                 try {
-                    for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
-                        DataInstance output;
-                        if ((output = getDataInstance(jsonModuleOutput, apeDomainSetup)) != null) {
+                    for (JSONObject jsonModuleInOut : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
+                        Type output;
+                        if ((output = Type.taxonomyInstanceFromJson(jsonModuleInOut, apeDomainSetup)) != null) {
                             instances.add(output);
                         }
                     }
@@ -136,40 +135,6 @@ public class APEConfigTagFactory {
                 return instances;
             }
 
-            /**
-             * Used to read an input or output data instance for the program.
-             */
-            private DataInstance getDataInstance(JSONObject jsonModuleInput, APEDomainSetup apeDomainSetup) {
-
-                DataInstance dataInstances = new DataInstance();
-
-                for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
-
-                    String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel,
-                            apeDomainSetup.getOntologyPrefixURI());
-
-                    for (String currTypeLabel : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
-
-                        String currTypeURI = APEUtils.createClassURI(currTypeLabel, apeDomainSetup.getOntologyPrefixURI());
-
-                        Type currType = apeDomainSetup.getAllTypes().get(currTypeURI, typeSuperClassURI);
-
-                        if (currType == null) {
-                            System.err.println("Error in the configuration file. The data type '" + currTypeURI
-                                    + "' was not defined or does not belong to the dimension '" + typeSuperClassLabel + "'.");
-                            return null;
-                        }
-
-                        dataInstances.addType(currType);
-                    }
-                }
-
-                if (!dataInstances.getTypes().isEmpty()) {
-                    return dataInstances;
-                }
-
-                return null;
-            }
         }
 
         public static abstract class Bool extends APEConfigTag<Boolean> {

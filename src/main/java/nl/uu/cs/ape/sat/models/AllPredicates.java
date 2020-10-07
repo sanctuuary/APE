@@ -66,7 +66,7 @@ public abstract class AllPredicates {
      * @return the taxonomy predicate
      * @throws Exception the exception
      */
-    public abstract TaxonomyPredicate addPredicate(TaxonomyPredicate newPredicate) throws Exception;
+    public abstract TaxonomyPredicate addPredicate(TaxonomyPredicate newPredicate) throws ExceptionInInitializerError;
 
     /**
      * Gets predicate class.
@@ -167,5 +167,14 @@ public abstract class AllPredicates {
         }
 
         return elements;
+    }
+    
+    /**
+     * Check whether the string occurs as one of the roots in the taxonomy.
+     * @param curRootURI
+     * @return true if the root exists
+     */
+    public boolean existsRoot(String curRootURI) {
+    	return taxonomyRoots.contains(curRootURI);
     }
 }

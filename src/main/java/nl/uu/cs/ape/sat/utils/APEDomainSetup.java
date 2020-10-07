@@ -14,6 +14,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 
@@ -48,7 +49,7 @@ public class APEDomainSetup {
      * List of data gathered from the constraint file.
      */
     private List<ConstraintTemplateData> unformattedConstr;
-    private List<AuxTaxonomyPredicate> helperPredicates;
+    private List<AuxiliaryPredicate> helperPredicates;
     
     /**
      * Maximum number of inputs that a tool can have.
@@ -70,7 +71,7 @@ public class APEDomainSetup {
         allModules = new AllModules(config);
         allTypes = new AllTypes(config);
         constraintFactory = new ConstraintFactory();
-        helperPredicates = new ArrayList<AuxTaxonomyPredicate>();
+        helperPredicates = new ArrayList<AuxiliaryPredicate>();
         ontologyPrexifURI = config.getOntologyPrefixURI();
     }
 
@@ -158,42 +159,6 @@ public class APEDomainSetup {
     }
 
     /**
-     * Method used to generate a new predicate that should provide an interface for handling multiple predicates.
-     * New predicated is used to simplify interaction with a set of related tools/types.
-     * <p>
-     * The original predicates are available as consumed predicates(see {@link AuxTaxonomyPredicate#getGeneralizedPredicates()}) of the new {@link TaxonomyPredicate}.
-     *
-     * @param relatedPredicates Set of sorted type that are logically related to the new abstract type (label of the equivalent sets is always the same due to its ordering).
-     * @param logicOp           Logical operation that describes the relation between the types.
-     * @return An abstract predicate that provides abstraction over a disjunction/conjunction of the labels.
-     */
-    public TaxonomyPredicate generateAuxiliaryPredicate(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp) {
-        if (relatedPredicates.isEmpty()) {
-            return null;
-        }
-        if (relatedPredicates.size() == 1) {
-            return relatedPredicates.first();
-        }
-        String abstractLabel = APEUtils.getLabelFromList(relatedPredicates, logicOp);
-
-        TaxonomyPredicate newAbsType;
-        if (relatedPredicates.first() instanceof Type) {
-            newAbsType = allTypes.addPredicate(new Type(abstractLabel, abstractLabel, relatedPredicates.first().getRootNodeID(), NodeType.ABSTRACT));
-        } else {
-            newAbsType = allModules.addPredicate(new AbstractModule(abstractLabel, abstractLabel, relatedPredicates.first().getRootNodeID(), NodeType.ABSTRACT));
-        }
-        AuxTaxonomyPredicate helperPredicate = new AuxTaxonomyPredicate(newAbsType, logicOp);
-
-        for (TaxonomyPredicate predicate : relatedPredicates) {
-            helperPredicate.addConcretePredicate(predicate);
-        }
-        if (helperPredicate != null) {
-            helperPredicates.add(helperPredicate);
-        }
-        return helperPredicate;
-    }
-
-    /**
      * Encoding all the required constraints for the given program length, in order to ensure that helper predicates are used properly.
      *
      * @param mappings        Current atom mappings.
@@ -205,7 +170,7 @@ public class APEDomainSetup {
         StringBuilder constraints = new StringBuilder();
         Automaton automaton = null;
         WorkflowElement workflowElem = null;
-        for (AuxTaxonomyPredicate helperPredicate : helperPredicates) {
+        for (AuxiliaryPredicate helperPredicate : helperPredicates) {
             if (helperPredicate.getGeneralizedPredicates().first() instanceof Type) {
                 automaton = typeAutomaton;
             } else {
@@ -314,6 +279,15 @@ public class APEDomainSetup {
 		if(this.maxNoToolOutputs < currNoOutputs) {
 			this.maxNoToolOutputs = currNoOutputs;
 		}
+	}
+
+	/**
+	 * Add predicate to the list of auxiliary predicates that should be encoded.
+	 * @param helperPredicate
+	 */
+	public void addHelperPredicate(AuxiliaryPredicate helperPredicate) {
+		helperPredicates.add(helperPredicate);
+		
 	}
     
     

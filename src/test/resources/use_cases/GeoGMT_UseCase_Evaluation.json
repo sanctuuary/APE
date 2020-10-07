@@ -9,7 +9,7 @@
       "replace_constraints": [
         {
           "constraintid": "use_t",
-          "parameters": [[ "Color_palette_table"]]
+          "parameters": [ {"TypesTaxonomy" : [ "Color_palette_table"]}]
         }
       ]
     },
@@ -20,7 +20,7 @@
       "add_constraints": [
         {
           "constraintid": "use_t",
-          "parameters": [[ "Color_palette_table"]]
+          "parameters": [{"TypesTaxonomy" : [ "Color_palette_table"]}]
         }
       ]
     },

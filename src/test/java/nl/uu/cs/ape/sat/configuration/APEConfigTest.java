@@ -80,7 +80,12 @@ class APEConfigTest {
                     "TaxonomyEntity",
                     "ToolsTaxonomy",
                     new Object[]{false, "wrong"},
-                    new String[]{"toolsTaxonomyRoot", "dataDimensionsTaxonomyRoots"}),
+                    new String[]{"toolsTaxonomyRoot"}),
+            new TagInfo(
+                    "TaxonomyEntity",
+                    "TypesTaxonomy",
+                    new Object[]{false, "wrong"},
+                    new String[]{"dataDimensionsTaxonomyRoots"}),
     };
 
     /**

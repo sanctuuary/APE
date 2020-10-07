@@ -23,10 +23,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+
+import javax.imageio.ImageIO;
 
 /**
  * The {@code APE} class is the main class of the library and is supposed
@@ -92,7 +95,7 @@ public class APE {
      * corresponding annotation and constraints files.
      *
      * @return true if the setup was successfully performed, false otherwise.
-     * @throws APEDimensionsException Exception while reading the provided ontology.
+     * @throws AtomMappingsException Exception while reading the provided ontology.
      * @throws IOException Error in handling a JSON file containing tool annotations.
      * @throws OWLOntologyCreationException Error in reading the OWL file.
      */
@@ -189,7 +192,7 @@ public class APE {
      * @return The list of all the solutions.
      * @throws IOException   Error in case of not providing a proper configuration file.
      */
-    public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException {
+    public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, APEConfigException {
         return runSynthesis(configObject, this.getDomainSetup());
     }
 
@@ -200,7 +203,7 @@ public class APE {
      * @return The list of all the solutions.
      * @throws IOException   Error in case of not providing a proper configuration file.
      */
-    public SATsolutionsList runSynthesis(String runConfigPath) throws IOException {
+    public SATsolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException {
     	String configContent = APEUtils.getFileContent(runConfigPath);
     	JSONObject configObject = new JSONObject(configContent);
         return runSynthesis(configObject, this.getDomainSetup());
@@ -243,11 +246,11 @@ public class APE {
      * @return The list of all the solutions.
      * @throws IOException Error in case of not providing a proper configuration file.
      */
-    private SATsolutionsList executeSynthesis(APERunConfig runConfig) throws IOException {
+    private SATsolutionsList executeSynthesis(APERunConfig runConfig) throws IOException, JSONException {
         /* List of all the solutions */
         SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
         
-        APEUtils.readConstraints(runConfig.getConstraintsPath().toString(), apeDomainSetup);
+        APEUtils.readConstraints(new File(runConfig.getConstraintsPath().toString()), apeDomainSetup);
 
         /* Print the setup information when necessary. */
         APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);
@@ -403,7 +406,7 @@ public class APE {
             try {
                 String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
                 Path path = graphsFolder.resolve(title);
-                solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile());
+                solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile(), allSolutions.getRunConfiguration().getDebugMode());
                 System.out.print(".");
             } catch (IOException e) {
                 System.err.println("Error occurred while writing a graph to the file system.");
@@ -449,7 +452,7 @@ public class APE {
             try {
                 String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
                 Path path = graphsFolder.resolve(title);
-                solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile());
+                solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile(), allSolutions.getRunConfiguration().getDebugMode());
                 System.out.print(".");
             } catch (IOException e) {
                 System.err.println("Error occurred while writing a graph to the file system.");

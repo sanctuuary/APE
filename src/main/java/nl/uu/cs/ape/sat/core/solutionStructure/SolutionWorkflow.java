@@ -15,7 +15,7 @@ import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
 import nl.uu.cs.ape.sat.models.AbstractModule;
-import nl.uu.cs.ape.sat.models.AuxTaxonomyPredicate;
+import nl.uu.cs.ape.sat.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
@@ -173,7 +173,7 @@ public class SolutionWorkflow {
             if (mappedLiteral > synthesisInstance.getMappings().getMaxNumOfMappedAuxVar()) {
                 Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
                 if (!currLiteral.isNegated()) {
-                    if (currLiteral.getPredicate() instanceof AuxTaxonomyPredicate) {
+                    if (currLiteral.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
                     } else if (currLiteral.isWorkflowElementType(WorkflowElement.MODULE)) {
                         ModuleNode currNode = this.mappedModuleNodes.get(currLiteral.getUsedInStateArgument());
