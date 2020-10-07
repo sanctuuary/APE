@@ -79,9 +79,16 @@ public class ConstraintTemplateParameter {
 		return APEUtils.removeLastChar(print) + "}";
 	}
 
-	public Collection<?> toJSON() {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Returns a JSONObject in format that it should have been provided.
+	 * @return JSONObject
+	 */
+	public JSONObject toJSON() {
+		JSONObject json = new JSONObject();
+		for(TaxonomyPredicate predicate : parameterTypes) {
+			json.put(predicate.getRootNodeID(), predicate.getPredicateID());
+		}
+		return json;
 	}
 
 	/**

@@ -38,7 +38,7 @@ class UseCaseTest {
         if (!canConnect)
             printWarning(message);
 
-        // ignore use case tests if there is no active internet connection
+        // ignore use case tests if there is no active Internet connection
         Assumptions.assumeTrue(canConnect, message);
     }
 

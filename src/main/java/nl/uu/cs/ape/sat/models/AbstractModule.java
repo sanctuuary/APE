@@ -82,10 +82,4 @@ public class AbstractModule extends TaxonomyPredicate {
         return "abstract module";
     }
 
-	@Override
-	public JSONObject toJSON() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

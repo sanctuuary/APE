@@ -51,12 +51,6 @@ public class Type extends TaxonomyPredicate {
         return "type";
     }
 
-	@Override
-	public JSONObject toJSON() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	/**
 	 * Generate a taxonomy instance (tool or type) that is defined based on one or
 	 * more dimensions that describe it.
