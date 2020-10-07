@@ -76,11 +76,16 @@ class APEConfigTest {
                     new JSONObject().put(Range.MIN_TAG, 2).put(Range.MAX_TAG, 5),
                     new Object[]{false, "wrong", 2},
                     new String[]{"solution_length"}),
-//            new TagInfo(
-//                    "TaxonomyEntity",
-//                    "ToolsTaxonomy",
-//                    new Object[]{false, "wrong"},
-//                    new String[]{"toolsTaxonomyRoot", "dataDimensionsTaxonomyRoots"}),
+            new TagInfo(
+                    "TaxonomyEntity",
+                    "ToolsTaxonomy",
+                    new Object[]{false, "wrong"},
+                    new String[]{"toolsTaxonomyRoot"}),
+            new TagInfo(
+                    "TaxonomyEntity",
+                    "TypesTaxonomy",
+                    new Object[]{false, "wrong"},
+                    new String[]{"dataDimensionsTaxonomyRoots"}),
     };
 
     /**
