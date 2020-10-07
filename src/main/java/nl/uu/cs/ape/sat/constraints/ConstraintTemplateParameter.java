@@ -1,8 +1,7 @@
 package nl.uu.cs.ape.sat.constraints;
 
+import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
-import nl.uu.cs.ape.sat.models.enums.LogicOperation;
-import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
@@ -10,10 +9,8 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.PrimitiveIterator.OfDouble;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -73,7 +70,6 @@ public class ConstraintTemplateParameter {
 		return this.parameterTypes;
 	}
 	
-	
 
 	public String toString() {
 		String print = "{";
@@ -88,9 +84,18 @@ public class ConstraintTemplateParameter {
 		return null;
 	}
 
+	/**
+	 * Calls Type or Module creator, based on the parameter dependencies.
+	 * @param jsonParam
+	 * @param domainSetup
+	 * @return
+	 */
 	public TaxonomyPredicate taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup) {
-		// TODO Auto-generated method stub
-		return null;
+		if(parameterTypes.get(0) instanceof Type) {
+			return Type.taxonomyInstanceFromJson(jsonParam, domainSetup);
+		} else {
+			return Module.taxonomyInstanceFromJson(jsonParam, domainSetup);
+		}
 	}
 
 

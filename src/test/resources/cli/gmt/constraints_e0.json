@@ -2,153 +2,157 @@
     "constraints": [
       {
         "constraintid": "ite_m",
-        "parameters": [ [
-          "Modules_with_xyz_file_output"],[
-          "Modules_with_xyz_file_input"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Modules_with_xyz_file_output"]},
+	{"ToolsTaxonomy" : ["Modules_with_xyz_file_input"]}
+     ]
       },
       {
         "constraintid": "ite_m",
-        "parameters": [ [
-          "Modules_with_grid_file_output"],[
-          "Modules_with_grid_file_input"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Modules_with_grid_file_output"]},
+	{"ToolsTaxonomy" : ["Modules_with_grid_file_input"]}
+     ]
       },
       {
         "constraintid": "ite_m",
-        "parameters": [ [
-          "Modules_with_color_palette_output"],[
-          "Modules_with_color_palette_input"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Modules_with_color_palette_output"]},
+	{"ToolsTaxonomy" : ["Modules_with_color_palette_input"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Data_generation"],[
-          "Adding_data"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Data_generation"]},
+	{"ToolsTaxonomy" : ["Adding_data"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Data_processing"],[
-          "Adding_data"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Data_processing"]},
+	{"ToolsTaxonomy" : ["Adding_data"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Data_processing"],[
-          "Data_generation"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Data_processing"]},
+	{"ToolsTaxonomy" : ["Data_generation"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Plot_creation"],[
-          "Adding_data"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Plot_creation"]},
+	{"ToolsTaxonomy" : ["Adding_data"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Plot_creation"],[
-          "Data_generation"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Plot_creation"]},
+	{"ToolsTaxonomy" : ["Data_generation"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Plot_creation"],[
-          "Data_processing"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Plot_creation"]},
+	{"ToolsTaxonomy" : ["Data_processing"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Data_presentation"],[
-          "Adding_data"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Data_presentation"]},
+	{"ToolsTaxonomy" : ["Adding_data"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Data_presentation"],[
-          "Data_generation"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Data_presentation"]},
+	{"ToolsTaxonomy" : ["Data_generation"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Data_presentation"],[
-          "Data_processing"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Data_presentation"]},
+	{"ToolsTaxonomy" : ["Data_processing"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Data_presentation"],[
-          "Plot_creation"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Data_presentation"]},
+	{"ToolsTaxonomy" : ["Plot_creation"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Layer2"],[
-          "Layer1"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Layer2"]},
+	{"ToolsTaxonomy" : ["Layer1"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Layer3"],[
-          "Layer1"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Layer3"]},
+	{"ToolsTaxonomy" : ["Layer1"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "Layer3"],[
-          "Layer2"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Layer3"]},
+	{"ToolsTaxonomy" : ["Layer2"]}
+     ]
       },
       {
         "constraintid": "itn_m",
-        "parameters": [ [
-          "gs"],[
-          "gs"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["gs"]},
+	{"ToolsTaxonomy" : ["gs"]}
+     ]
       },
       {
         "constraintid": "next_m",
-        "parameters": [ [
-          "initGMT"],[
-          "Plot_creation"
-        ]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["initGMT"]},
+	{"ToolsTaxonomy" : ["Plot_creation"]}
+     ]
       },
       {
         "constraintid": "use_t",
-        "parameters": [[ "Plots"]]
+        "parameters": [{"TypesTaxonomy" : ["Plots"]}]
       },
       {
         "constraintid": "nuse_m",
-        "parameters": [[ "3D_surfaces"]]
+        "parameters": [{"ToolsTaxonomy" : ["3D_surfaces"]}]
       },
       {
         "constraintid": "use_m",
-        "parameters": [[ "Draw_water"]]
+        "parameters": [{"ToolsTaxonomy" : ["Draw_water"]}]
       },
       {
         "constraintid": "use_m",
-        "parameters": [ ["Draw_land"]]
+        "parameters": [{"ToolsTaxonomy" : ["Draw_land"]}]
       },
       {
         "constraintid": "use_m",
-        "parameters": [ ["Draw_political_borders"]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Draw_political_borders"]}
+     	]
       },
       {
         "constraintid": "use_m",
-        "parameters": [ ["Points_and_lines"]]
+        "parameters": [
+	{"ToolsTaxonomy" : ["Points_and_lines"]}
+     	]
       }
     ]
 }

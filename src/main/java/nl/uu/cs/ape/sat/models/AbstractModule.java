@@ -64,7 +64,7 @@ public class AbstractModule extends TaxonomyPredicate {
      *
      * @return null module input
      */
-    public List<DataInstance> getModuleInput() {
+    public List<Type> getModuleInput() {
         return null;
     }
 
@@ -73,7 +73,7 @@ public class AbstractModule extends TaxonomyPredicate {
      *
      * @return null module output
      */
-    public List<DataInstance> getModuleOutput() {
+    public List<Type> getModuleOutput() {
         return null;
     }
 
@@ -84,13 +84,6 @@ public class AbstractModule extends TaxonomyPredicate {
 
 	@Override
 	public JSONObject toJSON() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public DataInstance taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
-			throws JSONException {
 		// TODO Auto-generated method stub
 		return null;
 	}

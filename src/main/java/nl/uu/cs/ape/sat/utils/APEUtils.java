@@ -6,9 +6,7 @@ import nl.uu.cs.ape.sat.constraints.ConstraintTemplateParameter;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
-import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Module;
-import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -19,7 +17,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -59,7 +56,7 @@ public final class APEUtils {
 	 * @param domainSetup     Object that represents the domain variables.
 	 * @throws IOException Error in handling the constraints file.
 	 */
-	public static void readConstraints(File constraintsFile, APEDomainSetup domainSetup) throws IOException {
+	public static void readConstraints(File constraintsFile, APEDomainSetup domainSetup) throws IOException, JSONException {
 		if (constraintsFile == null) {
 			return;
 		}
@@ -97,32 +94,10 @@ public final class APEUtils {
 				/* for each constraint parameter */
 				for (JSONObject jsonParam : jsonConstParam) {
 					ConstraintTemplateParameter taxInstanceFromJson = currTemplateParameters.get(paramNo);
+
 					TaxonomyPredicate currParameter = taxInstanceFromJson.taxonomyInstanceFromJson(jsonParam,
 							domainSetup);
 					constraintParametes.add(currParameter);
-
-//                    SortedSet<TaxonomyPredicate> currParameter = new TreeSet<>();
-//                    for (String paramID : jsonParam.keySet()) {
-//                        String paramURI = createClassURI(paramLabel, domainSetup.getOntologyPrefixURI());
-//                        /* generate the corresponding ConstraintTemplateParameter object */
-//                        TaxonomyPredicate currParamDimension = domainSetup.getAllModules().get(paramURI);
-//                        if (currParamDimension == null) {
-//                            currParamDimension = domainSetup.getAllTypes().get(paramURI);
-//                        }
-//                        if (currParamDimension == null) {
-//                            System.err.println("Constraint parameter '" + paramURI + "' is not defined in the domain.");
-//                            throw new JSONException("JSON constrains semnatics error.");
-//                        } else {
-//                            currParameter.add(currParamDimension);
-//                        }
-//                    }
-//                    /*
-//                     * Generate an abstract term to generalize over the set of predicates that
-//                     * describe the parameter.
-//                     */
-//                    TaxonomyPredicate absCurrParam = domainSetup.generateAuxiliaryPredicate(currParameter,
-//                            LogicOperation.AND);
-//                    parameters.add(absCurrParam);
 				}
 
 				ConstraintTemplateData currConstr = domainSetup.getConstraintFactory()
@@ -132,7 +107,7 @@ public final class APEUtils {
 				} else {
 					domainSetup.addConstraintData(currConstr);
 				}
-				
+
 			} catch (JSONException e) {
 				System.err.println("Error in file: " + constraintsFile.getAbsolutePath() + ", at constraint no: "
 						+ currNode + " (" + constraintID + "). Bad format. Constraint skipped.");
@@ -350,31 +325,13 @@ public final class APEUtils {
 	 * the elements are put in a {@link List}, otherwise if the key corresponds to a
 	 * {@link JSONObject} list will contain only that object.
 	 *
-	 * @param jsonPath Path to the Json file.
-	 * @param key      Key label that corresponds to the elements.
-	 * @return List of elements that corresponds to the key. If the key does not
-	 *         exists returns empty list.
-	 * @throws IOException Error if the the given file path is not correct or the
-	 *                     file is corrupted.
-	 * 
-	 *                     public static List<JSONObject> getListFromJson(String
-	 *                     jsonPath, String key) throws IOException { return
-	 *                     getListFromJson(new File(jsonPath), key); }
-	 */
-
-	/**
-	 * The method return a list of {@link JSONObject} elements that correspond to a
-	 * given key in a Json file. If the key corresponds to a {@link JSONArray} all
-	 * the elements are put in a {@link List}, otherwise if the key corresponds to a
-	 * {@link JSONObject} list will contain only that object.
-	 *
 	 * @param jsonFile File instance containing a json file.
 	 * @param key      Key label that corresponds to the elements.
 	 * @return List of elements that corresponds to the key. If the key does not
 	 *         exists returns empty list.
 	 * @throws IOException Error in handling a JSON file.
 	 */
-	public static List<JSONObject> getListFromJson(File jsonFile, String key) throws IOException {
+	public static List<JSONObject> getListFromJson(File jsonFile, String key) throws IOException, JSONException {
 		String content = FileUtils.readFileToString(jsonFile, "utf-8");
 		JSONObject jsonObject = new JSONObject(content);
 
@@ -399,25 +356,23 @@ public final class APEUtils {
 	public static <T> List<T> getListFromJson(JSONObject jsonObject, String key, Class<T> clazz) {
 		List<T> jsonList = new ArrayList<>();
 		try {
-			Object tmp = jsonObject.get(key);
-			try {
-				if (tmp instanceof JSONArray) {
-					jsonList = getListFromJsonList((JSONArray) tmp, clazz);
-				} else {
-					T element = (T) tmp;
-					jsonList.add(element);
-				}
-			} catch (JSONException e) {
-				System.err.println("Json parsing error. Expected object '" + clazz.getSimpleName() + "' under the tag '"
-						+ key + "'. The following object does not match the provided format:\n"
-						+ jsonObject.toString());
-				return jsonList;
+		Object tmp = jsonObject.get(key);
+		try {
+			if (tmp instanceof JSONArray) {
+				jsonList = getListFromJsonList((JSONArray) tmp, clazz);
+			} else {
+				T element = (T) tmp;
+				jsonList.add(element);
 			}
+		} catch (JSONException e) {
+			System.err.println("Json parsing error. Expected object '" + clazz.getSimpleName() + "' under the tag '"
+					+ key + "'. The following object does not match the provided format:\n" + jsonObject.toString());
 			return jsonList;
+		}
+		return jsonList;
 		} catch (JSONException e) {
 			return jsonList;
 		}
-
 	}
 
 	/**

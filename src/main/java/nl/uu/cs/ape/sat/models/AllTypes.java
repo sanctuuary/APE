@@ -21,11 +21,6 @@ public class AllTypes extends AllPredicates {
      */
     private Type emptyType;
 
-    /**
-     * List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies,
-     * where each represents a data dimension (e.g. data type, data format, etc.).
-     */
-    private List<String> dataTaxonomyDimensions;
 
     /**
      * Instantiates a new All types.
@@ -34,7 +29,6 @@ public class AllTypes extends AllPredicates {
      */
     public AllTypes(APECoreConfig config) {
         super(config.getDataDimensionRoots());
-        dataTaxonomyDimensions = config.getDataDimensionRoots();
         emptyType = new Type("empty", "empty", "empty", NodeType.EMPTY);
         emptyType.setAsRelevantTaxonomyTerm(this);
         this.put(emptyType);
@@ -91,7 +85,7 @@ public class AllTypes extends AllPredicates {
                 this.put((Type) newType);
                 tmpType = (Type) newType;
             } else {
-                throw new ExceptionInInitializerError("Type error. Only Type PredicateLabel can be added to AllTypes.");
+                throw new ExceptionInInitializerError("Type error. Only 'Type' PredicateLabel can be added to the set of all types.");
             }
         }
         return tmpType;
@@ -164,8 +158,8 @@ public class AllTypes extends AllPredicates {
      * @param dimensionID ID of the data dimension that is searched for.
      * @return true if the dimensionID exists in the domain.
      */
-    public boolean existsDimension(String dimensionID) {
-    	return dataTaxonomyDimensions.contains(dimensionID);
+    public boolean existsRoot(String dimensionID) {
+    	return getRootsIDs().contains(dimensionID);
     }
 
     /**
@@ -200,7 +194,7 @@ public class AllTypes extends AllPredicates {
          */
         Map<String, List<TaxonomyPredicate>> subTreesMap = new HashMap<String, List<TaxonomyPredicate>>();
         // Add each of the dimension roots (type and format taxonomy) to the list
-        for (String subRoot : APEUtils.safe(dataTaxonomyDimensions)) {
+        for (String subRoot : APEUtils.safe(getRootsIDs())) {
             subTreesMap.put(subRoot, new ArrayList<TaxonomyPredicate>());
         }
 
@@ -245,7 +239,7 @@ public class AllTypes extends AllPredicates {
      * @return List of abstract types that represent dimensions.
      */
     public List<String> getDataTaxonomyDimensionIDs() {
-        return dataTaxonomyDimensions;
+        return getRootsIDs();
     }
 
     /**
@@ -256,7 +250,7 @@ public class AllTypes extends AllPredicates {
      */
     public List<TaxonomyPredicate> getDataTaxonomyDimensions() {
         List<TaxonomyPredicate> dimensionTypes = new ArrayList<TaxonomyPredicate>();
-        this.dataTaxonomyDimensions.stream().filter(dimensionID -> get(dimensionID) != null)
+        this.getRootsIDs().stream().filter(dimensionID -> get(dimensionID) != null)
                 .forEach(dimensionID -> dimensionTypes.add(get(dimensionID)));
         return dimensionTypes;
     }
@@ -269,7 +263,7 @@ public class AllTypes extends AllPredicates {
      */
     public SortedSet<TaxonomyPredicate> getDataTaxonomyDimensionsAsSortedSet() {
         SortedSet<TaxonomyPredicate> dimensionTypes = new TreeSet<TaxonomyPredicate>();
-        this.dataTaxonomyDimensions.stream().filter(dimensionID -> get(dimensionID) != null)
+        this.getRootsIDs().stream().filter(dimensionID -> get(dimensionID) != null)
                 .forEach(dimensionID -> dimensionTypes.add(get(dimensionID)));
         return dimensionTypes;
     }

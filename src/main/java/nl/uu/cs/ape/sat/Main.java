@@ -51,11 +51,19 @@ public class Main {
             // run the synthesis and retrieve the solutions
             solutions = apeFramework.runSynthesis(path);
 
-        } catch (APEConfigException | JSONException | IOException e) {
-            System.err.println("Error in synthesis execution:");
+        } catch (APEConfigException e) {
+            System.err.println("Error in synthesis execution. APE configuration error:");
             System.err.println(e.getMessage());
             return;
-        }
+        } catch (JSONException e) {
+        	System.err.println("Error in synthesis execution. Bad JSON formatting (APE configuration or constriants JSON). ");
+            System.err.println(e.getMessage());
+            return;
+		} catch (IOException e) {
+        	System.err.println("Error in synthesis execution.");
+            System.err.println(e.getMessage());
+            return;
+		}
 
         /*
          * Writing solutions to the specified file in human readable format

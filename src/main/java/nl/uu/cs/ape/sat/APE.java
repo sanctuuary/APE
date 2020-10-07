@@ -95,7 +95,7 @@ public class APE {
      * corresponding annotation and constraints files.
      *
      * @return true if the setup was successfully performed, false otherwise.
-     * @throws APEDimensionsException Exception while reading the provided ontology.
+     * @throws AtomMappingsException Exception while reading the provided ontology.
      * @throws IOException Error in handling a JSON file containing tool annotations.
      * @throws OWLOntologyCreationException Error in reading the OWL file.
      */
@@ -192,7 +192,7 @@ public class APE {
      * @return The list of all the solutions.
      * @throws IOException   Error in case of not providing a proper configuration file.
      */
-    public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException {
+    public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, APEConfigException {
         return runSynthesis(configObject, this.getDomainSetup());
     }
 
@@ -203,7 +203,7 @@ public class APE {
      * @return The list of all the solutions.
      * @throws IOException   Error in case of not providing a proper configuration file.
      */
-    public SATsolutionsList runSynthesis(String runConfigPath) throws IOException {
+    public SATsolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException {
     	String configContent = APEUtils.getFileContent(runConfigPath);
     	JSONObject configObject = new JSONObject(configContent);
         return runSynthesis(configObject, this.getDomainSetup());
@@ -234,7 +234,7 @@ public class APE {
      * @return The list of all the solutions.
      * @throws IOException Error in case of not providing a proper configuration file.
      */
-    private SATsolutionsList executeSynthesis(APERunConfig runConfig) throws IOException {
+    private SATsolutionsList executeSynthesis(APERunConfig runConfig) throws IOException, JSONException {
         /* List of all the solutions */
         SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
         

@@ -79,7 +79,7 @@ public class SATTypeUtils {
     public static String typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton, AtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         Type empty = domainSetup.getAllTypes().getEmptyType();
-        TaxonomyPredicate dataType = domainSetup.generateAuxiliaryPredicate(domainSetup.getAllTypes().getDataTaxonomyDimensionsAsSortedSet(), LogicOperation.AND);
+        Type dataType = AuxTypePredicate.generateAuxiliaryPredicate(domainSetup.getAllTypes().getDataTaxonomyDimensionsAsSortedSet(), LogicOperation.AND, domainSetup);
         // enforcement of types in in all the states (those that represent general
         // memory and used data instances)
         for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
@@ -180,14 +180,13 @@ public class SATTypeUtils {
      * @param mappings       TODO
      * @return The String representation of the initial input encoding.
      */
-    public static String encodeInputData(AllTypes allTypes, List<DataInstance> program_inputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {
+    public static String encodeInputData(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {
         StringBuilder encoding = new StringBuilder();
 
         List<State> workflowInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
         for (int i = 0; i < workflowInputStates.size(); i++) {
             if (i < program_inputs.size()) {
-                List<TaxonomyPredicate> currTypes = program_inputs.get(i).getTypes();
-                for (TaxonomyPredicate currType : currTypes) {
+                TaxonomyPredicate currType = program_inputs.get(i);
                     if (allTypes.get(currType.getPredicateID()) == null) {
                         System.err.println(
                                 "Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
@@ -197,7 +196,6 @@ public class SATTypeUtils {
                     encoding = encoding.append(mappings.add(currType, workflowInputStates.get(i), WorkflowElement.MEMORY_TYPE))
                             .append(" 0\n");
 //					currType.setAsRelevantTaxonomyTerm(allTypes);
-                }
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
                 encoding = encoding.append(mappings.add(allTypes.getEmptyType(), workflowInputStates.get(i), WorkflowElement.MEMORY_TYPE))
@@ -218,14 +216,13 @@ public class SATTypeUtils {
      * @param mappings        TODO
      * @return String representation of the workflow output encoding.
      */
-    public static String encodeOutputData(AllTypes allTypes, List<DataInstance> program_outputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {
+    public static String encodeOutputData(AllTypes allTypes, List<Type> program_outputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {
         StringBuilder encoding = new StringBuilder();
 
         List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
         for (int i = 0; i < workflowOutputStates.size(); i++) {
             if (i < program_outputs.size()) {
-                List<TaxonomyPredicate> currTypes = program_outputs.get(i).getTypes();
-                for (TaxonomyPredicate currType : currTypes) {
+            	TaxonomyPredicate currType = program_outputs.get(i);
                     if (allTypes.get(currType.getPredicateID()) == null) {
                         System.err.println(
                                 "Program output '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
@@ -234,7 +231,6 @@ public class SATTypeUtils {
                     encoding = encoding.append(mappings.add(currType, workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
                             .append(" 0\n");
 //					currType.setAsRelevantTaxonomyTerm(allTypes);
-                }
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
                 encoding = encoding.append(mappings.add(allTypes.getEmptyType(), workflowOutputStates.get(i), WorkflowElement.USED_TYPE))

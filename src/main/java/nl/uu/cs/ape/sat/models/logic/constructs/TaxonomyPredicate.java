@@ -2,14 +2,10 @@ package nl.uu.cs.ape.sat.models.logic.constructs;
 
 import nl.uu.cs.ape.sat.models.AllPredicates;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
-import nl.uu.cs.ape.sat.utils.APEDimensionsException;
-import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -468,8 +464,5 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @return JSONObject that describes the taxonomy predicate.
      */
     public abstract JSONObject toJSON();
-
-	public abstract TaxonomyPredicate taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
-			throws JSONException, APEDimensionsException;
 
 }

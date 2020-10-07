@@ -65,14 +65,14 @@ public class Type extends TaxonomyPredicate {
 	 * @param domainSetup
 	 * @return
 	 */
-	public AuxTaxonomyPredicate taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup, String description)
+	public static Type taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
 			throws JSONException, APEDimensionsException {
 		/* Set of predicates where each describes a type dimension */
 		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<TaxonomyPredicate>();
 		/* Iterate through each of the dimensions */
 		for (String currRootLabel : jsonParam.keySet()) {
 			String curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixURI());
-			if(!domainSetup.getAllTypes().existsDimension(curRootURI)) {
+			if(!domainSetup.getAllTypes().existsRoot(curRootURI)) {
 				throw APEDimensionsException.notExistingDimension("Data type was defined over a non existing data dimension: '" + curRootURI + "', in JSON: '" + jsonParam + "'");
 			}
 			LogicOperation logConn = LogicOperation.OR;
@@ -90,7 +90,7 @@ public class Type extends TaxonomyPredicate {
 					currType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
 					logConnectedPredicates.add(currType);
 				} else {
-					throw APEDimensionsException.dimensionDoesNotContainClass(String.format("Error in a JSON input. The data type '%s' was not defined or does not belong to the data dimension '%s'.", currType, curRootURI));
+					throw APEDimensionsException.dimensionDoesNotContainClass(String.format("Error in a JSON input. The data type '%s' was not defined or does not belong to the data dimension '%s'.", currTypeURI, curRootURI));
 				}
 			}
 
@@ -98,18 +98,15 @@ public class Type extends TaxonomyPredicate {
 			 * Create a new type, that represents a disjunction of the types, that can be
 			 * used to abstract over each of the types individually and represents specificaion over one dimension.
 			 */
-			TaxonomyPredicate abstractDimensionType = domainSetup.generateAuxiliaryPredicate(logConnectedPredicates, logConn);
+			Type abstractDimensionType = AuxTypePredicate.generateAuxiliaryPredicate(logConnectedPredicates, logConn, domainSetup);
 			if (abstractDimensionType != null) {
-				abstractDimensionType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
 	            parameterDimensions.add(abstractDimensionType);
 			}
 
 		}
-		AuxTaxonomyPredicate taxonomyInstance = domainSetup.generateAuxiliaryPredicate(parameterDimensions, LogicOperation.AND);
-		if (taxonomyInstance != null) {
-			taxonomyInstance.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
-		}
+		Type taxonomyInstance = AuxTypePredicate.generateAuxiliaryPredicate(parameterDimensions, LogicOperation.AND, domainSetup);
 
 		return taxonomyInstance;
 	}
+
 }
