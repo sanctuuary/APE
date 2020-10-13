@@ -14,10 +14,8 @@ import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -316,7 +314,7 @@ public class APEDomainSetup {
 	 *                     annotations.
 	 */
 	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException {
-		List<Module> modulesNew = new ArrayList<>();
+		List<Module> modulesNew = new ArrayList<Module>();
 		int currModule = 0;
 		for (JSONObject jsonModule : APEUtils.safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG, JSONObject.class))) {
 			currModule++;
