@@ -4,7 +4,6 @@
 package nl.uu.cs.ape.sat;
 
 import guru.nidi.graphviz.attribute.Rank.RankDir;
-import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResult;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
@@ -23,13 +22,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-
-import javax.imageio.ImageIO;
 
 /**
  * The {@code APE} class is the main class of the library and is supposed
