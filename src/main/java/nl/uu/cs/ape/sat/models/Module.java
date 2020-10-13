@@ -151,7 +151,7 @@ public class Module extends AbstractModule {
     }
 
     /**
-     * Creates and returns a module from a tool annotation instance from a JSON file.
+     * Creates a module from a tool annotation instance from a JSON file, updated the domain setup accordingly (set of all modules {@link APEDomainSetup#getAllModules()})
      *
      * @param jsonModule  JSON representation of a module
      * @param domainSetup Domain information, including all the existing tools and types

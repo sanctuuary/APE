@@ -314,15 +314,11 @@ public class APEDomainSetup {
 	 *                     annotations.
 	 */
 	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException {
-		List<Module> modulesNew = new ArrayList<Module>();
 		int currModule = 0;
 		for (JSONObject jsonModule : APEUtils.safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG, JSONObject.class))) {
 			currModule++;
 			try {
 				Module tmpModule = Module.moduleFromJson(jsonModule, this);
-				if (tmpModule != null) {
-					modulesNew.add(tmpModule);
-				}
 			} catch (JSONException e) {
 				System.err.println(e.getMessage());
 				System.err.println(
