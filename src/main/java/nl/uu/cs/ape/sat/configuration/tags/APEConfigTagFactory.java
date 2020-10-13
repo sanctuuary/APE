@@ -9,9 +9,12 @@ import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.inject.Provider;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -298,6 +301,36 @@ public class APEConfigTagFactory {
                 return results;
             }
         }
+        
+        public static abstract class JSON extends APEConfigTag<JSONObject> {
+
+            @Override
+            public TagType getType() {
+                return JSON;
+            }
+
+            @Override
+            protected JSONObject constructFromJSON(JSONObject obj) {
+            	String constrintsPath = obj.getString(getTagName());
+            	JSONObject constraints = null;
+            	try {
+            	constraints = APEUtils.readFileToJSON(new File(constrintsPath));
+            	} catch (IOException e) {
+            		throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
+				} catch (JSONException e) {
+					throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
+				}
+            	
+            
+                return constraints;
+            }
+
+            @Override
+            protected ValidationResults validate(JSONObject jsonObject, ValidationResults results) {
+                results.add(getTagName(), "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).", APEFiles.isJSON(jsonObject));
+                return results;
+            }
+        }
     }
 
     public static class TAGS {
@@ -500,12 +533,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class CONSTRAINTS extends TYPES.ExistingFile {
-
-            @Override
-            protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[]{APEFiles.Permission.READ};
-            }
+        public static class CONSTRAINTS extends TYPES.JSON {
 
             @Override
             public String getTagName() {
@@ -524,7 +552,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigDefaultValue<Path> getDefault() {
+            public APEConfigDefaultValue<JSONObject> getDefault() {
                 return APEConfigDefaultValue.withDefault(null);
             }
         }

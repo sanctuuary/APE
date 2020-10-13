@@ -4,6 +4,7 @@ import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -200,6 +201,16 @@ public class APEFiles {
     public static boolean directoryExists(Path path){
         return Files.isDirectory(path);
     }
+    
+    /**
+     * Directory exists boolean.
+     *
+     * @param jsonObject the path
+     * @return the boolean
+     */
+    public static boolean isJSON(JSONObject jsonObject) {
+        return jsonObject != null;
+    }
 
     /**
      * String is a valid URI.
@@ -216,4 +227,5 @@ public class APEFiles {
         }
         return url.getProtocol().equals("http");
     }
+
 }

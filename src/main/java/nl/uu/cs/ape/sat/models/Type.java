@@ -52,12 +52,14 @@ public class Type extends TaxonomyPredicate {
     }
 
 	/**
-	 * Generate a taxonomy instance (tool or type) that is defined based on one or
+	 * Generate a taxonomy data instance that is defined based on one or
 	 * more dimensions that describe it.
 	 * 
 	 * @param jsonParam
 	 * @param domainSetup
-	 * @return
+	 * @return A type object that represent the data instance given as the parameter.
+	 * @throws JSONException if the given JSON is not well formatted
+	 * @throws APEDimensionsException if the referenced types are not well defined
 	 */
 	public static Type taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
 			throws JSONException, APEDimensionsException {

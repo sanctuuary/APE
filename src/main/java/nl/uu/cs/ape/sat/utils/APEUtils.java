@@ -2,7 +2,9 @@ package nl.uu.cs.ape.sat.utils;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TYPES.JSON;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplateParameter;
+import nl.uu.cs.ape.sat.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
@@ -29,10 +31,6 @@ import java.util.*;
  */
 public final class APEUtils {
 
-	private final static String TOOLS_JSOM_TAG = "functions";
-	private final static String CONSTR_JSON_TAG = "constraints";
-	private final static String CONSTR_ID_TAG = "constraintid";
-	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
 	private final static Map<String, Long> timers = new HashMap<>();
 	private final static PrintStream original = System.err;
 	private final static PrintStream nullStream = new PrintStream(new OutputStream() {
@@ -46,75 +44,6 @@ public final class APEUtils {
 	 */
 	private APEUtils() {
 		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Method read the constraints from a JSON file and updates the
-	 * {@link APEDomainSetup} object accordingly.
-	 *
-	 * @param constraintsPath Path to the constraint file.
-	 * @param domainSetup     Object that represents the domain variables.
-	 * @throws IOException Error in handling the constraints file.
-	 */
-	public static void readConstraints(File constraintsFile, APEDomainSetup domainSetup) throws IOException, JSONException {
-		if (constraintsFile == null) {
-			return;
-		}
-		String constraintID = null;
-		int currNode = 0;
-
-		List<JSONObject> constraints = getListFromJson(constraintsFile, CONSTR_JSON_TAG);
-
-		/* Iterate through each constraint in the list */
-		for (JSONObject jsonConstraint : safe(constraints)) {
-			currNode++;
-			/* READ THE CONSTRAINT */
-			try {
-				constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
-				ConstraintTemplate currConstrTemplate = domainSetup.getConstraintFactory()
-						.getConstraintTemplate(constraintID);
-				if (currConstrTemplate == null) {
-					System.err.println("Error in file: " + constraintsFile.getAbsolutePath() + ", at constraint no: "
-							+ currNode + ". Constraint ID: '" + constraintID + "' does not exist. Constraint skipped.");
-					continue;
-				}
-
-				List<ConstraintTemplateParameter> currTemplateParameters = currConstrTemplate.getParameters();
-
-				List<JSONObject> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG,
-						JSONObject.class);
-				if (currTemplateParameters.size() != jsonConstParam.size()) {
-					System.err.println("Error in file: " + constraintsFile.getAbsolutePath() + ", at constraint no: "
-							+ currNode + ". Constraint ID: '" + constraintID
-							+ "'. Number of parameters does not match the required number. Constraint skipped.");
-					continue;
-				}
-				int paramNo = 0;
-				List<TaxonomyPredicate> constraintParametes = new ArrayList<TaxonomyPredicate>();
-				/* for each constraint parameter */
-				for (JSONObject jsonParam : jsonConstParam) {
-					ConstraintTemplateParameter taxInstanceFromJson = currTemplateParameters.get(paramNo);
-
-					TaxonomyPredicate currParameter = taxInstanceFromJson.taxonomyInstanceFromJson(jsonParam,
-							domainSetup);
-					constraintParametes.add(currParameter);
-				}
-
-				ConstraintTemplateData currConstr = domainSetup.getConstraintFactory()
-						.generateConstraintTemplateData(constraintID, constraintParametes);
-				if (constraintParametes.stream().anyMatch(Objects::isNull)) {
-					System.err.println("Constraint argument does not exist in the tool taxonomy.");
-				} else {
-					domainSetup.addConstraintData(currConstr);
-				}
-
-			} catch (JSONException e) {
-				System.err.println("Error in file: " + constraintsFile.getAbsolutePath() + ", at constraint no: "
-						+ currNode + " (" + constraintID + "). Bad format. Constraint skipped.");
-				continue;
-			}
-
-		}
 	}
 
 	/**
@@ -196,56 +125,16 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Updates the list of All Modules by annotating the existing ones (or adding
-	 * non-existing) using the I/O DataInstance from the @file. Returns the list of
-	 * Updated Modules.
+	 * Reads the file and provides the JSONObject that represents its content.
 	 *
-	 * @param toolAnnotationsFile JSON file containing tool annotations.
-	 * @param domainSetup         Domain information, including all the existing
-	 *                            tools and types.
-	 * @return The list of all annotated Modules in the process (possibly empty
-	 *         list).
-	 * @throws IOException Error in handling a JSON file containing tool
-	 *                     annotations.
+	 * @param file the JSON file
+	 * @return JSONObject representing the content of the file.
+	 * @throws IOException Error if the file is corrupted
+	 * @throws JSONException Error if the file is not in expected JSON format
 	 */
-	public static boolean readModuleJson(File toolAnnotationsFile, APEDomainSetup domainSetup) throws IOException {
-		List<Module> modulesNew = new ArrayList<>();
-		int currModule = 0;
-		for (JSONObject jsonModule : safe(getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG))) {
-			currModule++;
-			try {
-				Module tmpModule = Module.moduleFromJson(jsonModule, domainSetup);
-				if (tmpModule != null) {
-					modulesNew.add(tmpModule);
-				}
-			} catch (JSONException e) {
-				System.err.println(e.getMessage());
-				System.err.println(
-						"Error in file: " + toolAnnotationsFile + ", at tool no: " + currModule + ". Tool skipped.");
-			}
-		}
-		if (currModule == 0) {
-			System.err.println("No tools were annotated.");
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Return the content of the file provided under the given path.
-	 *
-	 * @param configPath Path to the text file.
-	 * @return String representing the content of the file.
-	 * @throws IOException Error if the the given file path is not correct or the
-	 *                     file is corrupted.
-	 */
-	public static String getFileContent(String configPath) throws IOException {
-		if (configPath == null) {
-			throw new NullPointerException("The provided run configuration file path is null.");
-		}
-
-		File file = new File(configPath);
-		return FileUtils.readFileToString(file, "utf-8");
+	public static JSONObject readFileToJSON(File file) throws IOException, JSONException {
+		String content = FileUtils.readFileToString(file, "utf-8");
+		return new JSONObject(content);
 	}
 
 	/*
@@ -352,7 +241,6 @@ public final class APEUtils {
 	 * @return List of elements that corresponds to the key. If the key does not
 	 *         exists returns empty list.
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> List<T> getListFromJson(JSONObject jsonObject, String key, Class<T> clazz) {
 		List<T> jsonList = new ArrayList<>();
 		try {

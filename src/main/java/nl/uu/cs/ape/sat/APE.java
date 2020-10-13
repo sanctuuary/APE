@@ -117,8 +117,8 @@ public class APE {
             return false;
         }
 
-        // Update allModules and allTypes sets based on the module.json file
-        succRun &= APEUtils.readModuleJson(config.getToolAnnotationsFile(), apeDomainSetup);
+        // Update allModules and allTypes sets based on the tool annotations
+        succRun &= apeDomainSetup.updateToolAnnotationsFromJson(APEUtils.readFileToJSON(config.getToolAnnotationsFile()));
 
         succRun &= apeDomainSetup.trimTaxonomy();
 
@@ -204,8 +204,7 @@ public class APE {
      * @throws IOException   Error in case of not providing a proper configuration file.
      */
     public SATsolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException {
-    	String configContent = APEUtils.getFileContent(runConfigPath);
-    	JSONObject configObject = new JSONObject(configContent);
+    	JSONObject configObject = APEUtils.readFileToJSON(new File(runConfigPath));
         return runSynthesis(configObject, this.getDomainSetup());
     }
 
@@ -250,7 +249,7 @@ public class APE {
         /* List of all the solutions */
         SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
         
-        APEUtils.readConstraints(new File(runConfig.getConstraintsPath().toString()), apeDomainSetup);
+        apeDomainSetup.updateConstraints(runConfig.getConstraintsJSON());
 
         /* Print the setup information when necessary. */
         APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);

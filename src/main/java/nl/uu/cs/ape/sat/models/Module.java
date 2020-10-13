@@ -245,6 +245,15 @@ public class Module extends AbstractModule {
         return currModule;
     }
 
+    /**
+	 * Generate a taxonomy tool instance that is referenced in the json.
+	 * 
+	 * @param jsonParam
+	 * @param domainSetup
+	 * @return A AbstractModule object that represent the data instance given as the parameter.
+	 * @throws JSONException if the given JSON is not well formatted
+	 * @throws APEDimensionsException if the referenced modules are not well defined
+	 */
     public static AbstractModule taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
 			throws JSONException {
 		/* Set of predicates where each describes a type dimension */
