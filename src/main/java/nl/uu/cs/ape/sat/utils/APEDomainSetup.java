@@ -16,8 +16,10 @@ import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -312,18 +314,13 @@ public class APEDomainSetup {
 	 *         list).
 	 * @throws IOException Error in handling a JSON file containing tool
 	 *                     annotations.
+	 * @throws JSONException Error if the tool annotation JSON file, bad format
 	 */
-	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException {
+	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException, JSONException {
 		int currModule = 0;
 		for (JSONObject jsonModule : APEUtils.safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG, JSONObject.class))) {
 			currModule++;
-			try {
-				Module tmpModule = Module.moduleFromJson(jsonModule, this);
-			} catch (JSONException e) {
-				System.err.println(e.getMessage());
-				System.err.println(
-						"Error in file: " + toolAnnotationsFile + ", at tool no: " + currModule + ". Tool skipped.");
-			}
+			updateToolAnnotationFromJson(jsonModule);
 		}
 		if (currModule == 0) {
 			System.err.println("No tools were annotated.");
@@ -331,6 +328,102 @@ public class APEDomainSetup {
 		}
 		return true;
 	}
+	
+	
+	/**
+     * Creates/updates a module from a tool annotation instance from a JSON file and updates the list of modules ({@link AllModules}) in the domain accordingly.
+     *
+     * @param jsonModule  JSON representation of a module
+     * @param domainSetup Domain information, including all the existing tools and types
+     * @return {@code true} if the domain was updated, false otherwise.
+     * @throws JSONException Error if the JSON file was not properly formatted.
+     */
+    public boolean updateToolAnnotationFromJson(JSONObject jsonModule)
+            throws JSONException {
+        String ontologyPrefixURI = getOntologyPrefixURI();
+        AllModules allModules = getAllModules();
+        String moduleURI = APEUtils.createClassURI(jsonModule.getString(APECoreConfig.getJsonTags("id")), ontologyPrefixURI);
+        if (allModules.get(moduleURI) != null) {
+            moduleURI = moduleURI + "[tool]";
+        }
+        String moduleLabel = jsonModule.getString(APECoreConfig.getJsonTags("label"));
+        Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("taxonomyOperations"), String.class));
+        taxonomyModules = APEUtils.createURIsFromLabels(taxonomyModules, ontologyPrefixURI);
+        /* Check if the referenced module taxonomy classes exist. */
+        List<String> toRemove = new ArrayList<String>();
+        for (String taxonomyModule : taxonomyModules) {
+            String taxonomyModuleURI = APEUtils.createClassURI(taxonomyModule, ontologyPrefixURI);
+            if (allModules.get(taxonomyModuleURI) == null) {
+                System.err.println("Tool '" + moduleURI + "' annotation issue. "
+                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy.");
+                toRemove.add(taxonomyModuleURI);
+            }
+        }
+        taxonomyModules.removeAll(toRemove);
+
+        /* If the taxonomy terms were not properly specified the tool taxonomy root is used as superclass of the tool. */
+        if (taxonomyModules.isEmpty()) {
+            System.err.println("Tool '" + moduleURI + "' annotation issue. "
+                    + "None of the referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "' can be found in the Tool Taxonomy.");
+            taxonomyModules.add(allModules.getRootsIDs().get(0));
+        }
+
+        String executionCode = null;
+        try {
+            executionCode = jsonModule.getJSONObject(APECoreConfig.getJsonTags("implementation"))
+                    .getString(APECoreConfig.getJsonTags("code"));
+        } catch (JSONException e) {
+            /* Skip the execution code */
+        }
+
+        List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("inputs"),
+                JSONObject.class);
+        updateMaxNoToolInputs(jsonModuleInput.size());
+        List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("outputs"),
+                JSONObject.class);
+        updateMaxNoToolOutputs(jsonModuleOutput.size());
+
+        List<Type> inputs = new ArrayList<Type>();
+        List<Type> outputs = new ArrayList<Type>();
+
+        /* For each input and output, allocate the corresponding abstract types. */
+        for (JSONObject jsonInput : jsonModuleInput) {
+            if (!jsonInput.isEmpty()) {
+                inputs.add(Type.taxonomyInstanceFromJson(jsonInput, this));
+            }
+        }
+        for (JSONObject jsonOutput : jsonModuleOutput) {
+            if (!jsonOutput.isEmpty()) {
+                outputs.add(Type.taxonomyInstanceFromJson(jsonOutput, this));
+            }
+        }
+
+        String moduleExecutionImpl = null;
+        if (executionCode != null && !executionCode.equals("")) {
+            moduleExecutionImpl = executionCode;
+        }
+
+        /*
+         * Add the module and make it sub module of the currSuperModule (if it was not
+         * previously defined)
+         */
+        Module currModule = (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootsIDs().get(0), moduleExecutionImpl));
+
+        /*	For each supermodule add the current module as a subset and vice versa. */
+        for (String superModuleID : taxonomyModules) {
+            AbstractModule superModule = allModules.get(superModuleID);
+            if (superModule != null) {
+                superModule.addSubPredicate(currModule);
+                currModule.addSuperPredicate(superModule);
+            }
+        }
+
+        currModule.setModuleInput(inputs);
+        currModule.setModuleOutput(outputs);
+        currModule.setAsRelevantTaxonomyTerm(allModules);
+
+        return currModule != null;
+    }
 
     /**
      * Gets ontology prefix URI.
