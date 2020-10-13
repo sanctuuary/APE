@@ -453,16 +453,10 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Sets node predicate.
      *
-     * @param nodeType \Sets the type of the data node, based on the taxonomy.
+     * @param nodeType sets the type of the data node, based on the taxonomy.
      */
     public void setNodePredicate(NodeType nodeType) {
         this.nodeType = nodeType;
     }
-
-    /**
-     * Creates a JSON that represent the current taxonomy predicate.
-     * @return JSONObject that describes the taxonomy predicate.
-     */
-    public abstract JSONObject toJSON();
 
 }

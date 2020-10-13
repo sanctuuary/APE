@@ -10,6 +10,8 @@ import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
+import nl.uu.cs.ape.sat.utils.APEUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,7 +31,7 @@ public class APERunConfig {
     /**
      * Path to the file with all workflow constraints.
      */
-    public final APEConfigTag<Path> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
+    public final APEConfigTag<JSONObject> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
     /**
      * true if the shared memory structure should be used, false in case of a
      * restrictive message passing structure.
@@ -148,7 +150,7 @@ public class APERunConfig {
 
         this.apeDomainSetup = builder.apeDomainSetup;
 
-        setConstraintsPath(builder.constraintsPath);
+        setConstraintsJSON(builder.constraintsJSON);
         setSolutionLength(builder.solutionMinLength, builder.solutionMaxLength);
         setMaxNoSolutions(builder.maxNoSolutions);
         setSharedMemory(builder.sharedMemory);
@@ -185,12 +187,12 @@ public class APERunConfig {
         APERunConfig dummy = new APERunConfig(setup);
         ValidationResults results = new ValidationResults();
         for(APEConfigTag<?> tag : dummy.all_tags){
-            results.add(tag.validate(json));
+            results.add(tag.validateConfig(json));
             if(results.hasFails()){
                 return results;
             }
             else{
-                tag.setValue(json); // for dependencies
+                tag.setValueFromConfig(json); // for dependencies
             }
         }
         return results;
@@ -221,7 +223,7 @@ public class APERunConfig {
 
         // set the apeDomain BEFORE setting the tags
         for (APEConfigTag<?> tag : all_tags) {
-            tag.setValue(runConfiguration);
+            tag.setValueFromConfig(runConfiguration);
         }
     }
 
@@ -271,15 +273,15 @@ public class APERunConfig {
      *
      * @return the value of {@link #CONSTRAINTS}
      */
-    public Path getConstraintsPath() {
+    public JSONObject getConstraintsJSON() {
         return CONSTRAINTS.getValue();
     }
 
     /**
      * @param constraintsPath the constraintsPath to set
      */
-    public void setConstraintsPath(String constraintsPath) {
-        CONSTRAINTS.setValue(Paths.get(constraintsPath));
+    public void setConstraintsJSON(JSONObject constraintsJSON) {
+        CONSTRAINTS.setValue(constraintsJSON);
     }
 
     /**
@@ -548,9 +550,9 @@ public class APERunConfig {
     }
 
     public interface IBuildStage {
-        IBuildStage withConstraintsPath(String constraintsPath);
+        IBuildStage withConstraintsJSON(JSONObject constraintsJSON);
 
-        IBuildStage withSharedMemory(boolean sharedMemory);
+		IBuildStage withSharedMemory(boolean sharedMemory);
 
         IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
 
@@ -582,7 +584,7 @@ public class APERunConfig {
         private int solutionMaxLength;
         private int maxNoSolutions;
         private APEDomainSetup apeDomainSetup;
-        private String constraintsPath;
+        private JSONObject constraintsJSON;
         private boolean sharedMemory;
         private boolean toolSeqRepeat;
         private String solutionDirPath;
@@ -622,8 +624,8 @@ public class APERunConfig {
         }
 
         @Override
-        public IBuildStage withConstraintsPath(String constraintsPath) {
-            this.constraintsPath = constraintsPath;
+        public IBuildStage withConstraintsJSON(JSONObject constraintsJSON) {
+            this.constraintsJSON = constraintsJSON;
             return this;
         }
 

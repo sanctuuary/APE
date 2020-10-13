@@ -171,7 +171,7 @@ public class APECoreConfig {
 
         // set the value for each tag
         for (APEConfigTag<?> tag : all_tags) {
-            tag.setValue(coreConfiguration);
+            tag.setValueFromConfig(coreConfiguration);
         }
     }
 
@@ -194,12 +194,12 @@ public class APECoreConfig {
         APECoreConfig dummy = new APECoreConfig();
         ValidationResults results = new ValidationResults();
         for(APEConfigTag<?> tag : dummy.all_tags){
-            results.add(tag.validate(json));
+            results.add(tag.validateConfig(json));
             if(results.hasFails()){
                 return results;
             }
             else{
-                tag.setValue(json); // for dependencies
+                tag.setValueFromConfig(json); // for dependencies
             }
         }
         return results;

@@ -6,17 +6,23 @@ import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.configuration.APECoreConfig;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
+import nl.uu.cs.ape.sat.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
+import nl.uu.cs.ape.sat.constraints.ConstraintTemplateParameter;
 import nl.uu.cs.ape.sat.models.*;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
-import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.SortedSet;
+import java.util.Objects;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * The {@code APEDomainSetup} class is used to store the domain information and initial constraints that have to be encoded.
@@ -61,6 +67,11 @@ public class APEDomainSetup {
      */
     private int maxNoToolOutputs = 0;
 
+    private final static String CONSTR_JSON_TAG = "constraints";
+	private final static String CONSTR_ID_TAG = "constraintid";
+	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
+	private final static String TOOLS_JSOM_TAG = "functions";
+    
     /**
      * Instantiates a new Ape domain setup.
      *
@@ -232,6 +243,100 @@ public class APEDomainSetup {
         }
         return constraints.toString();
     }
+    
+    /**
+	 * Method read the constraints from a JSON object and updates the
+	 * {@link APEDomainSetup} object accordingly.
+	 *
+	 * @param constraintsJSON JSON object containing the constraints
+	 * @throws ConstraintFormatException exception in case of bad constraint json formatting
+	 */
+	public void updateConstraints(JSONObject constraintsJSON) throws ConstraintFormatException {
+		if (constraintsJSON == null) {
+			return;
+		}
+		String constraintID = null;
+		int currNode = 0;
+
+		List<JSONObject> constraints = APEUtils.getListFromJson(constraintsJSON, CONSTR_JSON_TAG, JSONObject.class);
+
+		/* Iterate through each constraint in the list */
+		for (JSONObject jsonConstraint : APEUtils.safe(constraints)) {
+			currNode++;
+			/* READ THE CONSTRAINT */
+			try {
+				constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
+				ConstraintTemplate currConstrTemplate = getConstraintFactory()
+						.getConstraintTemplate(constraintID);
+				if (currConstrTemplate == null) {
+					throw ConstraintFormatException.wrongConstraintID(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+				}
+
+				List<ConstraintTemplateParameter> currTemplateParameters = currConstrTemplate.getParameters();
+
+				List<JSONObject> jsonConstParam = APEUtils.getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG,
+						JSONObject.class);
+				if (currTemplateParameters.size() != jsonConstParam.size()) {
+					throw ConstraintFormatException.wrongNumberOfParameters(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+				}
+				int paramNo = 0;
+				List<TaxonomyPredicate> constraintParametes = new ArrayList<TaxonomyPredicate>();
+				/* for each constraint parameter */
+				for (JSONObject jsonParam : jsonConstParam) {
+					ConstraintTemplateParameter taxInstanceFromJson = currTemplateParameters.get(paramNo++);
+					TaxonomyPredicate currParameter = taxInstanceFromJson.readConstraintParameterFromJson(jsonParam,
+							this);
+					constraintParametes.add(currParameter);
+				}
+
+				ConstraintTemplateData currConstr = getConstraintFactory()
+						.generateConstraintTemplateData(constraintID, constraintParametes);
+				if (constraintParametes.stream().anyMatch(Objects::isNull)) {
+					throw ConstraintFormatException.wrongParameter(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+				} else {
+					addConstraintData(currConstr);
+				}
+
+			} catch (JSONException e) {
+				throw ConstraintFormatException.badFormat(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+			}
+
+		}
+	}
+	
+	/**
+	 * Updates the list of All Modules by annotating the existing ones (or adding
+	 * non-existing) using the I/O DataInstance from the @file. Returns the list of
+	 * Updated Modules.
+	 *
+	 * @param toolAnnotationsFile JSON file containing tool annotations.
+	 * @return The list of all annotated Modules in the process (possibly empty
+	 *         list).
+	 * @throws IOException Error in handling a JSON file containing tool
+	 *                     annotations.
+	 */
+	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException {
+		List<Module> modulesNew = new ArrayList<>();
+		int currModule = 0;
+		for (JSONObject jsonModule : APEUtils.safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG, JSONObject.class))) {
+			currModule++;
+			try {
+				Module tmpModule = Module.moduleFromJson(jsonModule, this);
+				if (tmpModule != null) {
+					modulesNew.add(tmpModule);
+				}
+			} catch (JSONException e) {
+				System.err.println(e.getMessage());
+				System.err.println(
+						"Error in file: " + toolAnnotationsFile + ", at tool no: " + currModule + ". Tool skipped.");
+			}
+		}
+		if (currModule == 0) {
+			System.err.println("No tools were annotated.");
+			return false;
+		}
+		return true;
+	}
 
     /**
      * Gets ontology prefix URI.
