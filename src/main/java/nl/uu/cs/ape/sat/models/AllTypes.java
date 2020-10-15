@@ -86,7 +86,7 @@ public class AllTypes extends AllPredicates {
                 this.put((Type) newType);
                 tmpType = (Type) newType;
             } else {
-                throw new ExceptionInInitializerError("Type error. Only 'Type' PredicateLabel can be added to the set of all types.");
+                throw new ExceptionInInitializerError(String.format("Type error. Only 'Type' PredicateLabel can be added to the set of all types. '%s' is not a type", newType.getPredicateID()));
             }
         }
         return tmpType;
@@ -112,15 +112,15 @@ public class AllTypes extends AllPredicates {
      * @param typeID      The key whose associated value is to be returned.
      * @param dimensionID The ID of the dimension to which the type belongs to.
      * @return {@link Type} to which the specified key is mapped to, or null if the typeID has no mappings or does not belong to the given dimension.
-     
-    public Type get(String typeID, String dimensionID) {
-        Type type = (Type) getMappedPredicates().get(typeID);
-        if (type != null && type.getRootNodeID().equals(dimensionID)) {
-            return type;
-        } else {
-            return null;
-        }
-    }*/
+     */
+    public Type get(String predicateID, String dimentionID) throws APEDimensionsException {
+    	Type predicate = (Type) get(predicateID);
+    	if(predicate != null && predicate.getRootNodeID().equals(dimentionID)) {
+    		return predicate;
+    	} else {
+    		return null;
+    	}
+    }
 
     /**
      * Returns the type representation of the empty type.
@@ -268,20 +268,4 @@ public class AllTypes extends AllPredicates {
         return dimensionTypes;
     }
     
-    /**
-     * Returns the Predicate to which the specified key is mapped, or null if this
-     * map contains no mapping for the key.
-     *
-     * @param predicateID The key whose associated Predicate is to be returned.
-     * @param dimentionID Dimension to which the predicate belongs
-     * @return The predicate to which the specified key is mapped, or null if this map contains no mapping for the key.
-     */
-    public Type get(String predicateID, String dimentionID) throws APEDimensionsException {
-    	Type predicate = (Type) get(predicateID);
-    	if(predicate != null && predicate.getRootNodeID().equals(dimentionID)) {
-    		return predicate;
-    	} else {
-    		return null;
-    	}
-    }
 }

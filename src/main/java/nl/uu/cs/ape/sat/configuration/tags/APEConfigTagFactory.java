@@ -114,30 +114,6 @@ public class APEConfigTagFactory {
                 return APEConfigDefaultValue.withDefault(new ArrayList<>());
             }
 
-            @Override
-            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
-                final ArrayList<Type> instances = new ArrayList<>();
-
-                if (apeDomainSetup == null) {
-                    throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
-                }
-
-                try {
-                    for (JSONObject jsonModuleInOut : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
-                        Type output;
-                        if ((output = Type.taxonomyInstanceFromJson(jsonModuleInOut, apeDomainSetup)) != null) {
-                            instances.add(output);
-                        }
-                    }
-                } catch (ClassCastException e) {
-                    instances.clear();
-                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
-                            "please provide the correct format.");
-                }
-
-                return instances;
-            }
-
         }
 
         public static abstract class Bool extends APEConfigTag<Boolean> {
@@ -437,6 +413,30 @@ public class APEConfigTagFactory {
                 //TODO
                 return "";
             }
+            
+            @Override
+            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
+                final ArrayList<Type> instances = new ArrayList<>();
+
+                if (apeDomainSetup == null) {
+                    throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
+                }
+
+                try {
+                    for (JSONObject jsonModuleInOut : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
+                        Type output;
+                        if ((output = Type.taxonomyInstanceFromJson(jsonModuleInOut, apeDomainSetup, true)) != null) {
+                            instances.add(output);
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    instances.clear();
+                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
+                            "please provide the correct format.");
+                }
+
+                return instances;
+            }
         }
 
         public static class PROGRAM_OUTPUTS extends TYPES.DataInstances {
@@ -459,6 +459,30 @@ public class APEConfigTagFactory {
             public String getDescription() {
                 //TODO
                 return "";
+            }
+            
+            @Override
+            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
+                final ArrayList<Type> instances = new ArrayList<>();
+
+                if (apeDomainSetup == null) {
+                    throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
+                }
+
+                try {
+                    for (JSONObject jsonModuleInOut : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
+                        Type output;
+                        if ((output = Type.taxonomyInstanceFromJson(jsonModuleInOut, apeDomainSetup, false)) != null) {
+                            instances.add(output);
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    instances.clear();
+                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
+                            "please provide the correct format.");
+                }
+
+                return instances;
             }
         }
 

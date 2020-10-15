@@ -405,7 +405,7 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Provide a safe interface for getting an element from the list. In order to
+	 * Provide a safe interface for getting an element from a list. In order to
 	 * bypass "index out of bounds" error.
 	 *
 	 * @param          <E> Any type.
@@ -422,7 +422,7 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Functions sets an element into the list at a specific place, if the element
+	 * Functions sets an element into a list at a specific place, if the element
 	 * already exists, it overrides it. If the element is out of bound it creates
 	 * null elements to fit the given size of the array and then adds the new
 	 * element. If the index is negative number it does not change the array.

@@ -1,8 +1,10 @@
-package nl.uu.cs.ape.sat.ape;
+package nl.uu.cs.ape.test.sat.ape;
 
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
-import util.GitHubRepo;
+import nl.uu.cs.ape.sat.test.utils.GitHubRepo;
+import nl.uu.cs.ape.sat.test.utils.TestResources;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,10 +15,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static nl.uu.cs.ape.sat.utils.APEUtils.printWarning;
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static util.Evaluation.success;
-import static util.TestResources.getJSONResource;
 
 /**
  * The {@code UseCaseTest} test is an initial version for functional testing that makes use of the API.
@@ -36,7 +37,7 @@ class UseCaseTest {
         final String message = "There needs to be an active internet connection to run the use case tests.\nSKIP: " + UseCaseTest.class.getName();
 
         if (!canConnect)
-            printWarning(message);
+            APEUtils.printWarning(message);
 
         // ignore use case tests if there is no active Internet connection
         Assumptions.assumeTrue(canConnect, message);
@@ -91,7 +92,9 @@ class UseCaseTest {
             final int max_no_solutions = config.getInt("max_solutions");
             int current_solution_length = mutation.solution_length_start;
             for (int no_solutions : mutation.expected_no_solutions) {
-
+            	if(solutions.size() < max_no_solutions) {
+            		fail("The number of expected workflow solutions is be %d, but the number of generated workflows was %d.", max_no_solutions, solutions.size());
+            	}
                 assertEquals(current_solution_length, solutions.get(no_solutions - 1).getSolutionlength(),
                         String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions - 1, current_solution_length, solutions.get(no_solutions - 1).getSolutionlength()));
                 success("Workflow solution at index %s has expected length of %s", no_solutions - 1, current_solution_length);
@@ -126,7 +129,7 @@ class UseCaseTest {
 
         public UseCase(String useCasePath, GitHubRepo repo) {
 
-            JSONObject useCase = getJSONResource(useCasePath);
+            JSONObject useCase = TestResources.getJSONResource(useCasePath);
 
             // read name
             this.name = useCase.getString("name");

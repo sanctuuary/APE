@@ -1,4 +1,4 @@
-package util;
+package nl.uu.cs.ape.sat.test.utils;
 
 import org.junit.jupiter.api.Assertions;
 

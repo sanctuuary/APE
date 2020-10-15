@@ -1,8 +1,9 @@
-package util;
+package nl.uu.cs.ape.sat.test.utils;
 
-import nl.uu.cs.ape.sat.Main;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-
-import static util.Evaluation.fail;
 
 /**
  * The {@code TestUtil} class is used to read contents of resource files more easily, as functional tests will make use of json files in the test resource folders.

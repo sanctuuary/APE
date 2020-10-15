@@ -237,6 +237,8 @@ public class OWLReader {
 					currRoot, NodeType.ARTIFICIAL_LEAF);
 			if (artificialSubType != null) {
 				currType.addSubPredicate(artificialSubType);
+				currType.setPlainType(artificialSubType);
+				
 				artificialSubType.addSuperPredicate(currType);
 				artificialSubType.setToSimplePredicate();
 			} else {

@@ -1,22 +1,24 @@
-package nl.uu.cs.ape.sat.configuration;
+package nl.uu.cs.ape.sat.test.configuration;
 
 import nl.uu.cs.ape.sat.APE;
+import nl.uu.cs.ape.sat.configuration.APECoreConfig;
+import nl.uu.cs.ape.sat.configuration.APERunConfig;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
+import nl.uu.cs.ape.sat.test.utils.TestResources;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import util.TestResources;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static util.Evaluation.success;
 
 public class APEConfigTagTest {
 

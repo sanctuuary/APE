@@ -1,21 +1,27 @@
-package nl.uu.cs.ape.sat.configuration;
+package nl.uu.cs.ape.sat.test.configuration;
 
 import nl.uu.cs.ape.sat.APE;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
+import nl.uu.cs.ape.sat.configuration.APECoreConfig;
+import nl.uu.cs.ape.sat.configuration.APERunConfig;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
+import nl.uu.cs.ape.sat.test.utils.Evaluation;
+import nl.uu.cs.ape.sat.test.utils.TestResources;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import util.Evaluation;
-import util.TestResources;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static util.Evaluation.fail;
-import static util.Evaluation.success;
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests whether human mistakes in the configuration are detected and

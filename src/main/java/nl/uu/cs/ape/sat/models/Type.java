@@ -23,6 +23,7 @@ public class Type extends TaxonomyPredicate {
 
     private final String typeName;
     private final String typeID;
+    private Type plainType;
 
     /**
      * Constructor used to create a Type object.
@@ -36,6 +37,7 @@ public class Type extends TaxonomyPredicate {
         super(rootNode, nodeType);
         this.typeName = typeName;
         this.typeID = typeID;
+        this.plainType = this;
     }
 
     public String getPredicateLabel() {
@@ -50,18 +52,31 @@ public class Type extends TaxonomyPredicate {
     public String getType() {
         return "type";
     }
+    
+    public void setPlainType(Type plainType) {
+    	this.plainType = plainType;
+    }
+    
+    /** 
+     * Method returns an artificially created plain version of the abstract class in case of a strict tool annotations, or the type itself otherwise.
+     * @return The type itself or an artificially created plain version of the type when needed.
+     */
+    public Type getPlainType() {
+    	return plainType;
+    }
 
 	/**
 	 * Generate a taxonomy data instance that is defined based on one or
 	 * more dimensions that describe it.
 	 * 
-	 * @param jsonParam
-	 * @param domainSetup
+	 * @param jsonParam - JSON representation of the data instance
+	 * @param domainSetup - setup of the domain
+	 * @param isOutputData - {@code true} if the data is used to be module output, {@code false} otherwise
 	 * @return A type object that represent the data instance given as the parameter.
 	 * @throws JSONException if the given JSON is not well formatted
 	 * @throws APEDimensionsException if the referenced types are not well defined
 	 */
-	public static Type taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
+	public static Type taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup, boolean isOutputData)
 			throws JSONException, APEDimensionsException {
 		/* Set of predicates where each describes a type dimension */
 		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<TaxonomyPredicate>();
@@ -79,9 +94,13 @@ public class Type extends TaxonomyPredicate {
 				
 				Type currType = domainSetup.getAllTypes().get(currTypeURI, curRootURI);
 				if (currType != null) {
+					if(isOutputData) {
+						currType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
+						currType = currType.getPlainType();
+					}
 					/*
 					 * if the type exists, make it relevant from the taxonomy perspective and add it
-					 * to the outputs
+					 * to the list of allowed types
 					 */
 					currType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
 					logConnectedPredicates.add(currType);

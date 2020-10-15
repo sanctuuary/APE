@@ -105,7 +105,7 @@ public class ConstraintTemplateParameter {
 	 */
 	public TaxonomyPredicate readConstraintParameterFromJson(JSONObject jsonParam, APEDomainSetup domainSetup) throws JSONException, APEDimensionsException {
 		if(parameterTypes.get(0) instanceof Type) {
-			return Type.taxonomyInstanceFromJson(jsonParam, domainSetup);
+			return Type.taxonomyInstanceFromJson(jsonParam, domainSetup, false);
 		} else {
 			return Module.taxonomyInstanceFromJson(jsonParam, domainSetup);
 		}

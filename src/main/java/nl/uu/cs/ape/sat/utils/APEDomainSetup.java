@@ -400,12 +400,12 @@ public class APEDomainSetup {
         /* For each input and output, allocate the corresponding abstract types. */
         for (JSONObject jsonInput : jsonModuleInput) {
             if (!jsonInput.isEmpty()) {
-                inputs.add(Type.taxonomyInstanceFromJson(jsonInput, this));
+                inputs.add(Type.taxonomyInstanceFromJson(jsonInput, this, false));
             }
         }
         for (JSONObject jsonOutput : jsonModuleOutput) {
             if (!jsonOutput.isEmpty()) {
-                outputs.add(Type.taxonomyInstanceFromJson(jsonOutput, this));
+                outputs.add(Type.taxonomyInstanceFromJson(jsonOutput, this, true));
             }
         }
 
