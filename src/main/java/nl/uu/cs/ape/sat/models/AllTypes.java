@@ -4,6 +4,7 @@ import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.configuration.APECoreConfig;
+import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.*;
@@ -31,7 +32,7 @@ public class AllTypes extends AllPredicates {
         super(config.getDataDimensionRoots());
         emptyType = new Type("empty", "empty", "empty", NodeType.EMPTY);
         emptyType.setAsRelevantTaxonomyTerm(this);
-        this.put(emptyType);
+        getMappedPredicates().put(emptyType.getPredicateID(), emptyType);
     }
 
     /**
@@ -40,7 +41,7 @@ public class AllTypes extends AllPredicates {
      * @return The {@link Collection} of {@link Type}s.
      */
     public Collection<? extends TaxonomyPredicate> getTypes() {
-        Collection<? extends TaxonomyPredicate> types = getPredicates().values();
+        Collection<? extends TaxonomyPredicate> types = getMappedPredicates().values();
         return types;
     }
 
@@ -58,10 +59,10 @@ public class AllTypes extends AllPredicates {
      */
     private Type put(Type type) {
         Type tmpType;
-        if ((tmpType = this.get(type.getPredicateID(), type.getRootNodeID())) != null) {
+        if ((tmpType = get(type.getPredicateID(), type.getRootNodeID())) != null) {
             return tmpType;
         } else {
-            getPredicates().put(type.getPredicateID(), type);
+            getMappedPredicates().put(type.getPredicateID(), type);
             return type;
         }
     }
@@ -80,7 +81,7 @@ public class AllTypes extends AllPredicates {
      */
     public Type addPredicate(TaxonomyPredicate newType) throws ExceptionInInitializerError {
         Type tmpType;
-        if ((tmpType = this.get(newType.getPredicateID(), newType.getRootNodeID())) == null) {
+        if ((tmpType = get(newType.getPredicateID(), newType.getRootNodeID())) == null) {
             if (newType instanceof Type) {
                 this.put((Type) newType);
                 tmpType = (Type) newType;
@@ -111,16 +112,15 @@ public class AllTypes extends AllPredicates {
      * @param typeID      The key whose associated value is to be returned.
      * @param dimensionID The ID of the dimension to which the type belongs to.
      * @return {@link Type} to which the specified key is mapped to, or null if the typeID has no mappings or does not belong to the given dimension.
-     */
+     
     public Type get(String typeID, String dimensionID) {
-        Type type = (Type) getPredicates().get(typeID);
-        ;
+        Type type = (Type) getMappedPredicates().get(typeID);
         if (type != null && type.getRootNodeID().equals(dimensionID)) {
             return type;
         } else {
             return null;
         }
-    }
+    }*/
 
     /**
      * Returns the type representation of the empty type.
@@ -139,7 +139,7 @@ public class AllTypes extends AllPredicates {
      * @return true if the type exists in the set.
      */
     public boolean existsType(Type type) {
-        return getPredicates().containsKey(type.getPredicateID());
+        return getMappedPredicates().containsKey(type.getPredicateID());
     }
 
     /**
@@ -149,7 +149,7 @@ public class AllTypes extends AllPredicates {
      * @return true if the typeID exists in the domain.
      */
     public boolean existsType(String typeID) {
-        return getPredicates().containsKey(typeID);
+        return getMappedPredicates().containsKey(typeID);
     }
     
     /**
@@ -168,7 +168,7 @@ public class AllTypes extends AllPredicates {
      * @return Number of types.
      */
     public int size() {
-        return getPredicates().size();
+        return getMappedPredicates().size();
     }
 
     public Class<?> getPredicateClass() {
@@ -202,7 +202,7 @@ public class AllTypes extends AllPredicates {
          * Allocate each simple type to the corresponding subtree, according to the
          * field Type.rootNode
          */
-        for (TaxonomyPredicate type : getPredicates().values()) {
+        for (TaxonomyPredicate type : getMappedPredicates().values()) {
             if (type.isSimplePredicate()) {
                 // If the root type for the curr type exists in our list, add the type to it
                 if (subTreesMap.get(type.getRootNodeID()) != null) {
@@ -266,5 +266,22 @@ public class AllTypes extends AllPredicates {
         this.getRootsIDs().stream().filter(dimensionID -> get(dimensionID) != null)
                 .forEach(dimensionID -> dimensionTypes.add(get(dimensionID)));
         return dimensionTypes;
+    }
+    
+    /**
+     * Returns the Predicate to which the specified key is mapped, or null if this
+     * map contains no mapping for the key.
+     *
+     * @param predicateID The key whose associated Predicate is to be returned.
+     * @param dimentionID Dimension to which the predicate belongs
+     * @return The predicate to which the specified key is mapped, or null if this map contains no mapping for the key.
+     */
+    public Type get(String predicateID, String dimentionID) throws APEDimensionsException {
+    	Type predicate = (Type) get(predicateID);
+    	if(predicate != null && predicate.getRootNodeID().equals(dimentionID)) {
+    		return predicate;
+    	} else {
+    		return null;
+    	}
     }
 }

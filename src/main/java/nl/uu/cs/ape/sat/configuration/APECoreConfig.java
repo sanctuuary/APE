@@ -259,4 +259,13 @@ public class APECoreConfig {
     public String getCWLFormatRoot() {
         return "format_1915";
     }
+    
+    /**
+     * Get information whether the domain was annotated under the strict rules of the output dependency.
+     * @return {@code true} if the strict rules apply, {@code false} otherwise.
+     */
+    public boolean getUseStrictToolAnnotations() {
+        return false;
+    }
+    
 }

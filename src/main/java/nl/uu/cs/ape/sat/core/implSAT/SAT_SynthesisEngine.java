@@ -65,7 +65,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     /**
      * String used as an input for the SAT solver.
      */
-    private InputStream temp_sat_input;
+    private InputStream tmpSatInput;
 
     /**
      * Representation of the tool part of the automaton used to encode the structure of the solution.
@@ -92,7 +92,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
         this.runConfig = runConfig;
         allSolutions.newEncoding();
         this.mappings = allSolutions.getMappings();
-        this.temp_sat_input = null;
+        this.tmpSatInput = null;
         this.cnfEncoding = new StringBuilder();
 
         int maxNoToolInputs = Math.max(domainSetup.getMaxNoToolInputs(), runConfig.getProgramOutputs().size());
@@ -122,7 +122,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
-        /* Create constraints from the module.xml file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
+        /* Create constraints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
         cnfEncoding = cnfEncoding.append(SATModuleUtils.encodeModuleAnnotations(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
@@ -147,7 +147,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
         /*
          * Create the constraints enforcing:
-         * 1. Mutual exclusion of the types/formats
+         * 1. Mutual exclusion of the types/formats (according to the search model)
          * 2. Mandatory usage of the types in the transition nodes (note: "empty type" is considered a type)
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
@@ -202,8 +202,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 //		APEUtils.write2file(mknfEncoding.toString(), new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime), false);
 
 
-        temp_sat_input = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
-        temp_sat_input.close();
+        tmpSatInput = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
+        tmpSatInput.close();
 
         /* testing sat input */
 //		InputStream tmpSat = IOUtils.toInputStream(mknfEncoding.toString(), "UTF-8");
@@ -225,7 +225,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
      */
     public boolean synthesisExecution() {
 
-        List<SolutionWorkflow> currSolutions = runMiniSAT(temp_sat_input,
+        List<SolutionWorkflow> currSolutions = runMiniSAT(tmpSatInput,
                 allSolutions.getNumberOfSolutions(), allSolutions.getMaxNumberOfSolutions());
         /* Add current solutions to list of all solutions. */
         return allSolutions.addSolutions(currSolutions);

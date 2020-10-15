@@ -32,7 +32,7 @@ public class AllModules extends AllPredicates {
      * @return The set of currently defined modules (both {@link AbstractModule} and {@link Module}).
      */
     public Collection<TaxonomyPredicate> getModules() {
-        return getPredicates().values();
+        return getMappedPredicates().values();
     }
 
     /**
@@ -48,7 +48,7 @@ public class AllModules extends AllPredicates {
      * @throws ExceptionInInitializerError Error if the provided TaxonomyPredicate <b>module</b> is not an {@link AbstractModule}.
      */
     public AbstractModule addPredicate(TaxonomyPredicate module) throws ExceptionInInitializerError {
-        TaxonomyPredicate tmpModule = getPredicates().get(module.getPredicateID());
+        TaxonomyPredicate tmpModule = getMappedPredicates().get(module.getPredicateID());
         if (module instanceof Module && (tmpModule != null)) {
             if (tmpModule instanceof Module) {
                 return (Module) tmpModule;
@@ -64,7 +64,7 @@ public class AllModules extends AllPredicates {
             if (tmpModule != null) {
                 return (AbstractModule) tmpModule;
             } else if (module instanceof AbstractModule) {
-                getPredicates().put(module.getPredicateID(), module);
+                getMappedPredicates().put(module.getPredicateID(), module);
                 return (AbstractModule) module;
             } else {
                 throw new ExceptionInInitializerError("Type error. Only 'AbstractModule' PredicateLabel can be added to the set of all modules.");
@@ -80,8 +80,8 @@ public class AllModules extends AllPredicates {
      * @param oldModule Object that will be removed.
      */
     public void swapAbstractModule2Module(Module newModule, TaxonomyPredicate oldModule) {
-        getPredicates().remove(oldModule.getPredicateID());
-        getPredicates().put(newModule.getPredicateID(), newModule);
+        getMappedPredicates().remove(oldModule.getPredicateID());
+        getMappedPredicates().put(newModule.getPredicateID(), newModule);
     }
 
     /**
@@ -92,8 +92,9 @@ public class AllModules extends AllPredicates {
      * @return {@link AbstractModule} or {@link Module} to which the specified key
      * is mapped to, or null if the moduleID has no mappings
      */
+    @Override
     public AbstractModule get(String moduleID) {
-        return (AbstractModule) getPredicates().get(moduleID);
+        return (AbstractModule) super.get(moduleID);
     }
 
     /**
@@ -107,7 +108,7 @@ public class AllModules extends AllPredicates {
         List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();
 
         List<TaxonomyPredicate> iterator = new ArrayList<TaxonomyPredicate>();
-        for (TaxonomyPredicate module : getPredicates().values()) {
+        for (TaxonomyPredicate module : getMappedPredicates().values()) {
             if (module.isSimplePredicate()) {
                 iterator.add(module);
             }
@@ -129,7 +130,7 @@ public class AllModules extends AllPredicates {
      * @return true if this set contains the specified element.
      */
     public boolean existsModule(AbstractModule module) {
-        return getPredicates().containsKey(module.getPredicateID());
+        return getMappedPredicates().containsKey(module.getPredicateID());
     }
 
     /**
@@ -140,7 +141,7 @@ public class AllModules extends AllPredicates {
      * @return true if this set contains the specified element.
      */
     public boolean existsModule(String moduleID) {
-        return getPredicates().containsKey(moduleID);
+        return getMappedPredicates().containsKey(moduleID);
     }
 
     public Class<?> getPredicateClass() {

@@ -25,13 +25,21 @@ import java.util.stream.Collectors;
  */
 public class OWLReader {
 
+	/** File cinstianing the ontology */
 	private final File ontologyFile;
+	/** List of all modules in the domain */
 	private final AllModules allModules;
+	/** List of all types in the domain */
 	private final AllTypes allTypes;
+	/** Mapping from each dimension to the list of the types within it */
 	private Map<String, Set<String>> typeDimensions = new HashMap<String, Set<String>>();
+
 	private OWLOntology ontology;
 	private OWLDataFactory factory;
+	/** OWL logger */
 	private Logger logger = Logger.getLogger("OWLReader.class");
+	/** Holds information whether the domain was annotated under the strict rules of the output dependency. */
+	private boolean useStrictToolAnnotations;
 
 	/**
 	 * Setting up the reader that will populate the provided module and type sets
@@ -45,6 +53,7 @@ public class OWLReader {
 		this.allModules = domain.getAllModules();
 		this.allTypes = domain.getAllTypes();
 		this.factory = OWLManager.getOWLDataFactory();
+		this.useStrictToolAnnotations = domain.getUseStrictToolAnnotations();
 	}
 
 	/**
@@ -189,7 +198,9 @@ public class OWLReader {
 //		}
 
 		final OWLClass currRoot;
-		Type superType, currType = null;
+		Type superType = null;
+		Type currType = null;
+			
 		superType = allTypes.get(getIRI(superClass), getIRI(rootClass));
 		/*
 		 * Check whether the current node is a root or subRoot node.
@@ -202,15 +213,9 @@ public class OWLReader {
 			currRoot = rootClass;
 		}
 
-		/* Generate the Type that corresponds to the taxonomy class. */
-		try {
-			currType = allTypes
-					.addPredicate(new Type(getLabel(currClass), getIRI(currClass), getIRI(currRoot), currNodeType));
-			typeDimensions.get(getIRI(currRoot)).add(getIRI(currClass));
-		} catch (ExceptionInInitializerError e) {
-			e.printStackTrace();
-		}
+		currType = addNewTypeToAllTypes(getLabel(currClass), getIRI(currClass), currRoot, currNodeType);
 
+		
 		/* Add the current type as a sub-type of the super type. */
 		if (superType != null && currType != null) {
 			superType.addSubPredicate(currType);
@@ -227,8 +232,30 @@ public class OWLReader {
 
 		if (subClasses.isEmpty()) {
 			currType.setToSimplePredicate();
-			;
+		} else if (useStrictToolAnnotations) {
+			Type artificialSubType = addNewTypeToAllTypes(getLabel(currClass) + "_p", getIRI(currClass) + "_plain",
+					currRoot, NodeType.ARTIFICIAL_LEAF);
+			if (artificialSubType != null) {
+				currType.addSubPredicate(artificialSubType);
+				artificialSubType.addSuperPredicate(currType);
+				artificialSubType.setToSimplePredicate();
+			} else {
+				System.err.println("Artificial predicate '" + getLabel(currClass) + "' was not created correctly.");
+			}
 		}
+	}
+	
+	private Type addNewTypeToAllTypes(String classLabel, String classID, OWLClass currRoot, NodeType currNodeType) {
+		Type currType = null;
+		/* Generate the Type that corresponds to the taxonomy class. */
+		try {
+			currType = allTypes
+					.addPredicate(new Type(classLabel, classID, getIRI(currRoot), currNodeType));
+			typeDimensions.get(getIRI(currRoot)).add(classID);
+		} catch (ExceptionInInitializerError e) {
+			e.printStackTrace();
+		}
+		return currType;
 	}
 
 	/**

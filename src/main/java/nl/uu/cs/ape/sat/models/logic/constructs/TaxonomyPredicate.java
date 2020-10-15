@@ -405,13 +405,13 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
-     * Returns true if the type is an instance, otherwise returns false - the type
-     * is an abstract (non-leaf) type or a regular leaf type.
+     * Returns true if the type is an artificial predicate, otherwise returns false - it
+     * is a predicate that exists in the taxonomy.
      *
-     * @return true (instance) or false (leaf type or abstract/non-leaf type).
+     * @return true (artificial leaf) or false (taxonomy term).
      */
-    public boolean isInstancePredicate() {
-        return this.nodeType == NodeType.INSTANCE;
+    public boolean isArtificialLeaf() {
+        return this.nodeType == NodeType.ARTIFICIAL_LEAF;
     }
 
     /**

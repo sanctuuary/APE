@@ -74,6 +74,9 @@ public class APEDomainSetup {
      */
     private int maxNoToolOutputs = 0;
 
+    /** Holds information whether the domain was annotated under the strict rules of the output dependency. */
+	private boolean useStrictToolAnnotations;
+
     private final static String CONSTR_JSON_TAG = "constraints";
 	private final static String CONSTR_ID_TAG = "constraintid";
 	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
@@ -85,12 +88,13 @@ public class APEDomainSetup {
      * @param config the config
      */
     public APEDomainSetup(APECoreConfig config) {
-        unformattedConstr = new ArrayList<ConstraintTemplateData>();
-        allModules = new AllModules(config);
-        allTypes = new AllTypes(config);
-        constraintFactory = new ConstraintFactory();
-        helperPredicates = new ArrayList<AuxiliaryPredicate>();
-        ontologyPrexifURI = config.getOntologyPrefixURI();
+        this.unformattedConstr = new ArrayList<ConstraintTemplateData>();
+        this.allModules = new AllModules(config);
+        this.allTypes = new AllTypes(config);
+        this.constraintFactory = new ConstraintFactory();
+        this.helperPredicates = new ArrayList<AuxiliaryPredicate>();
+        this.ontologyPrexifURI = config.getOntologyPrefixURI();
+        this.useStrictToolAnnotations = config.getUseStrictToolAnnotations();
     }
 
     /**
@@ -327,7 +331,7 @@ public class APEDomainSetup {
 		int currModule = 0;
 		for (JSONObject jsonModule : APEUtils.safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG, JSONObject.class))) {
 			currModule++;
-			updateToolAnnotationFromJson(jsonModule);
+			updateModuleFromJson(jsonModule);
 		}
 		if (currModule == 0) {
 			System.err.println("No tools were annotated.");
@@ -345,7 +349,7 @@ public class APEDomainSetup {
      * @return {@code true} if the domain was updated, false otherwise.
      * @throws JSONException Error if the JSON file was not properly formatted.
      */
-    public boolean updateToolAnnotationFromJson(JSONObject jsonModule)
+    private boolean updateModuleFromJson(JSONObject jsonModule)
             throws JSONException {
         String ontologyPrefixURI = getOntologyPrefixURI();
         AllModules allModules = getAllModules();
@@ -489,5 +493,11 @@ public class APEDomainSetup {
 		
 	}
     
-    
+	/**
+     * Get information whether the domain was annotated under the strict rules of the output dependency.
+     * @return {@code true} if the strict rules apply, {@code false} otherwise.
+     */
+    public boolean getUseStrictToolAnnotations() {
+        return useStrictToolAnnotations;
+    }
 }
