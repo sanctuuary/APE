@@ -9,6 +9,7 @@ import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.Literal;
 import nl.uu.cs.ape.sat.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.*;
 
@@ -173,10 +174,10 @@ public class SAT_solution extends SolutionInterpreter {
             solution = new StringBuilder("UNSAT");
         } else {
             for (Literal literal : relevantModules) {
-                solution = solution.append(literal.toString()).append(" ");
+                solution = solution.append(literal.getPredicate().getPredicateLabel()).append(" -> ");
             }
         }
-        return solution.toString();
+        return APEUtils.removeNLastChar(solution.toString(), 4);
     }
 
     /**

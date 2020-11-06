@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.core.implSAT;
 
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AtomMappings;
+import nl.uu.cs.ape.sat.models.Pair;
 import nl.uu.cs.ape.sat.configuration.APERunConfig;
 
 import java.util.ArrayList;
@@ -36,6 +37,9 @@ public class SATsolutionsList {
      * APE run configuration.
      */
     private final APERunConfig runConfig;
+    
+    
+    private List<Pair<Integer>> solutionsPerLength;
     /**
      * Create an object that will contain all the solutions of the synthesis.
      *
@@ -143,7 +147,29 @@ public class SATsolutionsList {
     public int size() {
         return this.solutions.size();
     }
-
+    
+    /**
+     * Set a specific number to be the number of solutions that are found up to the specified length.
+     * @param length - the length up until which the solutions are evaluated
+     * @param noSolutions - number of solutions that can be found up until the given length
+     */
+    public void addNoSolutionsForLength(Integer length, Integer noSolutions) {
+    	if(noSolutions == 0)
+    		return;
+    	if(solutionsPerLength == null) {
+    		solutionsPerLength = new ArrayList<>();
+    	}
+    	solutionsPerLength.add(new Pair<Integer>(length, noSolutions));
+    }
+    
+    /**
+     * Returns list of pairs (X, Y), where Y describes the number of solutions up until length X.
+     * @return
+     */
+    public List<Pair<Integer>> getSolutionsPerLength() {
+    	return solutionsPerLength;
+    }
+    
     /**
      * Return the stream that represent the solutions.
      *

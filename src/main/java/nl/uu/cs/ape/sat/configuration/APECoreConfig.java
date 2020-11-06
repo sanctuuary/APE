@@ -113,6 +113,19 @@ public class APECoreConfig {
 
         coreConfigSetup(new JSONObject(FileUtils.readFileToString(new File(configPath), "utf-8")));
     }
+    
+    /**
+     * Initialize the configuration of the project.
+     *
+     * @param configPath Path to the APE configuration file.
+     * @throws IOException        Error in reading the configuration file.
+     * @throws JSONException      Error in parsing the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
+     */
+    public APECoreConfig(File config) throws IOException, JSONException, APEConfigException {
+
+        coreConfigSetup(new JSONObject(FileUtils.readFileToString(config, "utf-8")));
+    }
 
     /**
      * Initialize the configuration of the project.
@@ -206,12 +219,21 @@ public class APECoreConfig {
     }
 
     /**
-     * Gets ontology path.
+     * Gets ontology.
      *
      * @return the value of tag {@link #ONTOLOGY}
      */
     public File getOntologyFile() {
         return ONTOLOGY.getValue().toFile();
+    }
+    
+    /**
+     * Set ontology annotation.
+     *
+     * @return the value of tag {@link #TOOL_ANNOTATIONS}
+     */
+    public void setOntologyFile(File ontology) {
+    	ONTOLOGY.setValue(ontology.toPath());
     }
 
     /**
@@ -231,7 +253,7 @@ public class APECoreConfig {
     public String getToolTaxonomyRoot() {
         return TOOL_ONTOLOGY_ROOT.getValue();
     }
-
+    
     /**
      * Gets data dimension roots.
      *
@@ -249,6 +271,15 @@ public class APECoreConfig {
     public File getToolAnnotationsFile() {
         return TOOL_ANNOTATIONS.getValue().toFile();
     }
+    
+    /**
+     * Set tool annotations.
+     *
+     * @return the value of tag {@link #TOOL_ANNOTATIONS}
+     */
+    public void setToolAnnotationsFile(File toolAnnotations) {
+        TOOL_ANNOTATIONS.setValue(toolAnnotations.toPath());
+    }
 
     /**
      * Gets cwl format root.
@@ -265,7 +296,7 @@ public class APECoreConfig {
      * @return {@code true} if the strict rules apply, {@code false} otherwise.
      */
     public boolean getUseStrictToolAnnotations() {
-        return false;
+        return true;
     }
     
 }

@@ -290,7 +290,7 @@ public class APEConfigTagFactory {
             	String constrintsPath = obj.getString(getTagName());
             	JSONObject constraints = null;
             	try {
-            	constraints = APEUtils.readFileToJSON(new File(constrintsPath));
+            	constraints = APEUtils.readFileToJSONObject(new File(constrintsPath));
             	} catch (IOException e) {
             		throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
 				} catch (JSONException e) {

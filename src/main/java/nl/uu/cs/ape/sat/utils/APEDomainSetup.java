@@ -38,6 +38,10 @@ import org.json.JSONObject;
  */
 public class APEDomainSetup {
 
+	static int counterErrors = 1, x =1;
+	public Set<String> emptyTools = new HashSet<String>();
+	public Set<String> wrongToolIO = new HashSet<String>();
+	public Set<String> wrongToolTax = new HashSet<String>();
     /**
      * All modules/operations used in the domain.
      */
@@ -350,7 +354,7 @@ public class APEDomainSetup {
      * @throws JSONException Error if the JSON file was not properly formatted.
      */
     private boolean updateModuleFromJson(JSONObject jsonModule)
-            throws JSONException {
+            throws JSONException, APEDimensionsException {
         String ontologyPrefixURI = getOntologyPrefixURI();
         AllModules allModules = getAllModules();
         String moduleURI = APEUtils.createClassURI(jsonModule.getString(APECoreConfig.getJsonTags("id")), ontologyPrefixURI);
@@ -366,7 +370,8 @@ public class APEDomainSetup {
             String taxonomyModuleURI = APEUtils.createClassURI(taxonomyModule, ontologyPrefixURI);
             if (allModules.get(taxonomyModuleURI) == null) {
                 System.err.println("Tool '" + moduleURI + "' annotation issue. "
-                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy.");
+                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy." + (x++) + "\n" + wrongToolTax.size());
+                wrongToolTax.add(moduleLabel);
                 toRemove.add(taxonomyModuleURI);
             }
         }
@@ -397,6 +402,7 @@ public class APEDomainSetup {
         List<Type> inputs = new ArrayList<Type>();
         List<Type> outputs = new ArrayList<Type>();
 
+        try {
         /* For each input and output, allocate the corresponding abstract types. */
         for (JSONObject jsonInput : jsonModuleInput) {
             if (!jsonInput.isEmpty()) {
@@ -408,12 +414,20 @@ public class APEDomainSetup {
                 outputs.add(Type.taxonomyInstanceFromJson(jsonOutput, this, true));
             }
         }
+        } catch (APEDimensionsException x) {
+        	wrongToolIO.add(moduleLabel);
+//        	System.out.println("Skipped " + (counterErrors ++) + " tool annotations.");
+        	return false;
+        }
 
         String moduleExecutionImpl = null;
         if (executionCode != null && !executionCode.equals("")) {
             moduleExecutionImpl = executionCode;
         }
-
+        if(inputs.isEmpty() && outputs.isEmpty()) {
+        	emptyTools.add(moduleLabel);
+        	return false;
+        }
         /*
          * Add the module and make it sub module of the currSuperModule (if it was not
          * previously defined)

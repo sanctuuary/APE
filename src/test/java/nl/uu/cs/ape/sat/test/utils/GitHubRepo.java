@@ -206,9 +206,8 @@ public class GitHubRepo {
                 fos = new FileOutputStream(targetFile);
                 fos.write(fileData); // write out the file we want to save.
                 fos.close(); // close the output stream writer
-
                 success("Downloading file '%s' from '%s'", url.getPath(), this.repository);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 fail("Could not download file " + toString());
             }
         }

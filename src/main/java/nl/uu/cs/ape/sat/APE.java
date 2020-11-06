@@ -9,6 +9,7 @@ import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.configuration.APECoreConfig;
@@ -28,435 +29,502 @@ import java.nio.file.Path;
 import java.util.*;
 
 /**
- * The {@code APE} class is the main class of the library and is supposed
- * to be the main interface for working with the library.
+ * The {@code APE} class is the main class of the library and is supposed to be
+ * the main interface for working with the library.
  *
  * @author Vedran Kasalica
  */
 public class APE {
 
-    /** Core configuration object defined from the configuration file. */
-    private final APECoreConfig config;
-    
-    /** Object containing general APE encoding. */
-    private APEDomainSetup apeDomainSetup;
+	/** Core configuration object defined from the configuration file. */
+	private final APECoreConfig config;
 
-    /**
-     * Create instance of the APE solver.
-     *
-     * @param configPath Path to the APE JSON configuration file. If the string is null the default './ape.config' value is assumed.
-     * @throws IOException        Exception reading the configuration file.
-     * @throws OWLOntologyCreationException	Exception reading the OWL file.
-     */
-    public APE(String configPath) throws IOException, OWLOntologyCreationException {
-        config = new APECoreConfig(configPath);
-        if (config == null) {
-            throw new APEConfigException("Configuration failed. Error in configuration file.");
-        }
-        if (!setupDomain()) {
-            throw new APEConfigException("Error setting up the domain.");
-        }
-    }
+	/** Object containing general APE encoding. */
+	private APEDomainSetup apeDomainSetup;
 
-    /**
-     * Create instance of the APE solver.
-     *
-     * @param configObject The APE configuration {@link JSONObject}.
-     * @throws IOException        Exception while reading the configuration file or the tool annotations file.
-     * @throws OWLOntologyCreationException  Error in reading the OWL file.
-     */
-    public APE(JSONObject configObject) throws IOException, OWLOntologyCreationException {
-        config = new APECoreConfig(configObject);
-        if (!setupDomain()) {
-            throw new APEConfigException("Error in setting up the domain.");
-        }
-    }
-    
-    /**
-     * Create instance of the APE solver.
-     *
-     * @param config The APE configuration {@link APECoreConfig}.
-     * @throws IOException        Exception while reading the configuration file or the tool annotations file.
-     * @throws OWLOntologyCreationException  Error in reading the OWL file.
-     */
-    public APE(APECoreConfig config) throws IOException, OWLOntologyCreationException {
-        this.config = config;
-        if (!setupDomain()) {
-            throw new APEConfigException("Error in setting up the domain.");
-        }
-    }
+	/**
+	 * Create instance of the APE solver.
+	 *
+	 * @param configPath Path to the APE JSON configuration file. If the string is
+	 *                   null the default './ape.config' value is assumed.
+	 * @throws IOException                  Exception reading the configuration
+	 *                                      file.
+	 * @throws OWLOntologyCreationException Exception reading the OWL file.
+	 */
+	public APE(String configPath) throws IOException, OWLOntologyCreationException {
+		config = new APECoreConfig(configPath);
+		if (config == null) {
+			throw new APEConfigException("Configuration failed. Error in configuration file.");
+		}
+		if (!setupDomain()) {
+			throw new APEConfigException("Error setting up the domain.");
+		}
+	}
 
-    /**
-     * Method used to setup the domain using the configuration file and the
-     * corresponding annotation and constraints files.
-     *
-     * @return true if the setup was successfully performed, false otherwise.
-     * @throws AtomMappingsException Exception while reading the provided ontology.
-     * @throws IOException Error in handling a JSON file containing tool annotations.
-     * @throws OWLOntologyCreationException Error in reading the OWL file.
-     */
-    private boolean setupDomain() throws APEDimensionsException, IOException, OWLOntologyCreationException {
+	/**
+	 * Create instance of the APE solver.
+	 *
+	 * @param configObject The APE configuration {@link JSONObject}.
+	 * @throws IOException                  Exception while reading the
+	 *                                      configuration file or the tool
+	 *                                      annotations file.
+	 * @throws OWLOntologyCreationException Error in reading the OWL file.
+	 */
+	public APE(JSONObject configObject) throws IOException, OWLOntologyCreationException {
+		config = new APECoreConfig(configObject);
+		if (!setupDomain()) {
+			throw new APEConfigException("Error in setting up the domain.");
+		}
+	}
 
-        // Variable that describes a successful execution of the method.
-        boolean succRun = true;
-        /*
-         * Encode the taxonomies as objects - generate the list of all types / modules
-         * occurring in the taxonomies defining their submodules/subtypes
-         */
-        apeDomainSetup = new APEDomainSetup(config);
+	/**
+	 * Create instance of the APE solver.
+	 *
+	 * @param config The APE configuration {@link APECoreConfig}.
+	 * @throws IOException                  Exception while reading the
+	 *                                      configuration file or the tool
+	 *                                      annotations file.
+	 * @throws OWLOntologyCreationException Error in reading the OWL file.
+	 */
+	public APE(APECoreConfig config) throws IOException, OWLOntologyCreationException {
+		this.config = config;
+		if (!setupDomain()) {
+			throw new APEConfigException("Error in setting up the domain.");
+		}
+	}
 
-        OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntologyFile());
-        boolean ontologyRead = owlReader.readOntology();
+	/**
+	 * Method used to setup the domain using the configuration file and the
+	 * corresponding annotation and constraints files.
+	 *
+	 * @return true if the setup was successfully performed, false otherwise.
+	 * @throws AtomMappingsException        Exception while reading the provided
+	 *                                      ontology.
+	 * @throws IOException                  Error in handling a JSON file containing
+	 *                                      tool annotations.
+	 * @throws OWLOntologyCreationException Error in reading the OWL file.
+	 */
+	private boolean setupDomain() throws APEDimensionsException, IOException, OWLOntologyCreationException {
 
-        if (!ontologyRead) {
-            System.out.println("Error occurred while reading the provided ontology.");
-            return false;
-        }
+		// Variable that describes a successful execution of the method.
+		boolean succRun = true;
+		/*
+		 * Encode the taxonomies as objects - generate the list of all types / modules
+		 * occurring in the taxonomies defining their submodules/subtypes
+		 */
+		apeDomainSetup = new APEDomainSetup(config);
 
-        // Update allModules and allTypes sets based on the tool annotations
-        succRun &= apeDomainSetup.updateToolAnnotationsFromJson(APEUtils.readFileToJSON(config.getToolAnnotationsFile()));
+		OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntologyFile());
+		boolean ontologyRead = owlReader.readOntology();
 
-        succRun &= apeDomainSetup.trimTaxonomy();
+		if (!ontologyRead) {
+			System.out.println("Error occurred while reading the provided ontology.");
+			return false;
+		}
 
-        // Define set of all constraint formats
-        apeDomainSetup.initializeConstraints();
+		// Update allModules and allTypes sets based on the tool annotations
+		succRun &= apeDomainSetup
+				.updateToolAnnotationsFromJson(APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()));
 
-        return succRun;
-    }
+		succRun &= apeDomainSetup.trimTaxonomy();
 
-    /**
-     * Method that return all the supported constraint templates.
-     *
-     * @return List of {@link ConstraintTemplate} objects.
-     */
-    public Collection<ConstraintTemplate> getConstraintTemplates() {
-        return apeDomainSetup.getConstraintFactory().getConstraintTemplates();
-    }
+		// Define set of all constraint formats
+		apeDomainSetup.initializeConstraints();
 
-    /**
-     * The method returns the configuration file of the APE instance.
-     *
-     * @return Field {@link #config}.
-     */
-    public APECoreConfig getConfig() {
-        return config;
-    }
+		return succRun;
+	}
 
-    /**
-     * Gets domain setup.
-     *
-     * @return The object that contains all crucial information about the domain (e.g. list of tools, data types, constraint factory, etc.)
-     */
-    public APEDomainSetup getDomainSetup() {
-        return apeDomainSetup;
-    }
+	/**
+	 * Method that return all the supported constraint templates.
+	 *
+	 * @return List of {@link ConstraintTemplate} objects.
+	 */
+	public Collection<ConstraintTemplate> getConstraintTemplates() {
+		return apeDomainSetup.getConstraintFactory().getConstraintTemplates();
+	}
 
-    /**
-     * Function used to return all the elements of one data type dimension (e.g. all
-     * data types or all data formats).
-     *
-     * @param dimensionRootID ID of the data taxonomy subtree that corresponds to the list of elements that should be returned.
-     * @return List where each element correspond to a map that can be transformed into JSON objects.
-     * @throws NullPointerException the null pointer exception
-     */
-    public List<Map<String, String>> getTaxonomyElements(String dimensionRootID) throws NullPointerException {
-        SortedSet<? extends TaxonomyPredicate> elements = null;
-        TaxonomyPredicate root = apeDomainSetup.getAllTypes().get(dimensionRootID);
-        if (root != null) {
-            elements = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(root);
-        } else {
-            root = apeDomainSetup.getAllModules().get(dimensionRootID);
-            if (root != null) {
-                elements = apeDomainSetup.getAllModules().getElementsFromSubTaxonomy(root);
-            } else {
-                throw new NullPointerException();
-            }
-        }
+	/**
+	 * The method returns the configuration file of the APE instance.
+	 *
+	 * @return Field {@link #config}.
+	 */
+	public APECoreConfig getConfig() {
+		return config;
+	}
 
-        List<Map<String, String>> transformedTypes = new ArrayList<Map<String, String>>();
-        for (TaxonomyPredicate currType : elements) {
-            transformedTypes.add(currType.toMap());
-        }
+	/**
+	 * Gets domain setup.
+	 *
+	 * @return The object that contains all crucial information about the domain
+	 *         (e.g. list of tools, data types, constraint factory, etc.)
+	 */
+	public APEDomainSetup getDomainSetup() {
+		return apeDomainSetup;
+	}
 
-        return transformedTypes;
-    }
+	/**
+	 * Function used to return all the elements of one data type dimension (e.g. all
+	 * data types or all data formats).
+	 *
+	 * @param dimensionRootID ID of the data taxonomy subtree that corresponds to
+	 *                        the list of elements that should be returned.
+	 * @return List where each element correspond to a map that can be transformed
+	 *         into JSON objects.
+	 * @throws NullPointerException the null pointer exception
+	 */
+	public List<Map<String, String>> getTaxonomyElements(String dimensionRootID) throws NullPointerException {
+		SortedSet<? extends TaxonomyPredicate> elements = null;
+		TaxonomyPredicate root = apeDomainSetup.getAllTypes().get(dimensionRootID);
+		if (root != null) {
+			elements = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(root);
+		} else {
+			root = apeDomainSetup.getAllModules().get(dimensionRootID);
+			if (root != null) {
+				elements = apeDomainSetup.getAllModules().getElementsFromSubTaxonomy(root);
+			} else {
+				throw new NullPointerException();
+			}
+		}
 
-    /**
-     * Setup a new run instance of the APE solver and run the synthesis algorithm.
-     *
-     * @param configObject   Object that contains run configurations.
-     * @return The list of all the solutions.
-     * @throws IOException   Error in case of not providing a proper configuration file.
-     */
-    public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, APEConfigException {
-        return runSynthesis(configObject, this.getDomainSetup());
-    }
+		List<Map<String, String>> transformedTypes = new ArrayList<Map<String, String>>();
+		for (TaxonomyPredicate currType : elements) {
+			transformedTypes.add(currType.toMap());
+		}
 
-    /**
-     * Setup a new run instance of the APE solver and run the synthesis algorithm.
-     *
-     * @param runConfigPath     Path to the JSON that contains run configurations.
-     * @return The list of all the solutions.
-     * @throws IOException   Error in case of not providing a proper configuration file.
-     */
-    public SATsolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException {
-    	JSONObject configObject = APEUtils.readFileToJSON(new File(runConfigPath));
-        return runSynthesis(configObject, this.getDomainSetup());
-    }
+		return transformedTypes;
+	}
+	
+	/**
+	 * Setup a new run instance of the APE solver and run the synthesis algorithm.
+	 *
+	 * @param configObject Object that contains run configurations.
+	 * @return The list of all the solutions.
+	 * @throws IOException Error in case of not providing a proper configuration
+	 *                     file.
+	 */
+	public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, APEConfigException {
+		return runSynthesis(configObject, this.getDomainSetup());
+	}
 
-    /**
-     * Setup a new run instance of the APE solver and run the synthesis algorithm.
-     *
-     * @param runConfig     Configuration object that contains run configurations.
-     * @return The list of all the solutions.
-     * @throws IOException   Error in case of not providing a proper configuration file.
-     */
-    public SATsolutionsList runSynthesis(APERunConfig runConfig) throws IOException {
-        runConfig.apeDomainSetup.clearConstraints();
-        return executeSynthesis(runConfig);
-    }
-    
-    /**
-     * Setup a new run instance of the APE solver and run the synthesis algorithm.
-     *
-     * @param runConfigJson   Object that contains run configurations.
-     * @param apeDomainSetup Domain information, including all the existing tools and types.
-     * @return The list of all the solutions.
-     * @throws IOException   Error in case of not providing a proper configuration file.
-     * @throws JSONException Error in configuration object.
-     */
-    private SATsolutionsList runSynthesis(JSONObject runConfigJson, APEDomainSetup apeDomainSetup) throws IOException, JSONException, APEConfigException {
-        apeDomainSetup.clearConstraints();
-        APERunConfig runConfig = new APERunConfig(runConfigJson, apeDomainSetup);
-        SATsolutionsList solutions = executeSynthesis(runConfig);
+	/**
+	 * Setup a new run instance of the APE solver and run the synthesis algorithm.
+	 *
+	 * @param runConfigPath Path to the JSON that contains run configurations.
+	 * @return The list of all the solutions.
+	 * @throws IOException Error in case of not providing a proper configuration
+	 *                     file.
+	 */
+	public SATsolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException {
+		JSONObject configObject = APEUtils.readFileToJSONObject(new File(runConfigPath));
+		return runSynthesis(configObject, this.getDomainSetup());
+	}
 
-        return solutions;
-    }
+	/**
+	 * Setup a new run instance of the APE solver and run the synthesis algorithm.
+	 *
+	 * @param runConfig Configuration object that contains run configurations.
+	 * @return The list of all the solutions.
+	 * @throws IOException Error in case of not providing a proper configuration
+	 *                     file.
+	 */
+	public SATsolutionsList runSynthesis(APERunConfig runConfig) throws IOException {
+		runConfig.apeDomainSetup.clearConstraints();
+		return executeSynthesis(runConfig);
+	}
 
+	/**
+	 * Setup a new run instance of the APE solver and run the synthesis algorithm.
+	 *
+	 * @param runConfigJson  Object that contains run configurations.
+	 * @param apeDomainSetup Domain information, including all the existing tools
+	 *                       and types.
+	 * @return The list of all the solutions.
+	 * @throws IOException   Error in case of not providing a proper configuration
+	 *                       file.
+	 * @throws JSONException Error in configuration object.
+	 */
+	private SATsolutionsList runSynthesis(JSONObject runConfigJson, APEDomainSetup apeDomainSetup)
+			throws IOException, JSONException, APEConfigException {
+		apeDomainSetup.clearConstraints();
+		APERunConfig runConfig = new APERunConfig(runConfigJson, apeDomainSetup);
+		SATsolutionsList solutions = executeSynthesis(runConfig);
 
-    /**
-     * Run the synthesis for the given workflow specification.
-     * @param runConfig 
-     *
-     * @return The list of all the solutions.
-     * @throws IOException Error in case of not providing a proper configuration file.
-     */
-    private SATsolutionsList executeSynthesis(APERunConfig runConfig) throws IOException, JSONException {
-        /* List of all the solutions */
-        SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
-        
-        apeDomainSetup.updateConstraints(runConfig.getConstraintsJSON());
+		return solutions;
+	}
 
-        /* Print the setup information when necessary. */
-        APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);
+	/**
+	 * Run the synthesis for the given workflow specification.
+	 * 
+	 * @param runConfig
+	 *
+	 * @return The list of all the solutions.
+	 * @throws IOException Error in case of not providing a proper configuration
+	 *                     file.
+	 */
+	private SATsolutionsList executeSynthesis(APERunConfig runConfig) throws IOException, JSONException {
+//    	APEUtils.write2file(apeDomainSetup.emptyTools.toString(), new File("/home/vedran/Desktop/tools"), false);
+		APEUtils.write2file(apeDomainSetup.wrongToolIO.toString(), new File("/home/vedran/Desktop/wrongToolIO"), false);
 
-        /*
-         * Loop over different lengths of the workflow until either, max workflow length
-         * or max number of solutions has been found.
-         */
-        String globalTimerID = "globalTimer";
-        APEUtils.timerStart(globalTimerID, true);
-        int solutionLength = runConfig.getSolutionLength().getMin();
-        while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
-                && solutionLength <= runConfig.getSolutionLength().getMax()) {
+		/* List of all the solutions */
+		SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
 
-            SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, runConfig,
-                    solutionLength);
+		apeDomainSetup.updateConstraints(runConfig.getConstraintsJSON());
 
-            APEUtils.printHeader(implSATsynthesis.getSolutionSize(), "Workflow discovery - length");
+		/* Print the setup information when necessary. */
+		APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);
 
-            /* Encoding of the synthesis problem */
-            if (!implSATsynthesis.synthesisEncoding()) {
-                System.err.println("Internal error in problem encoding.");
-                return null;
-            }
-            /* Execution of the synthesis */
-            implSATsynthesis.synthesisExecution();
+		int i = 1;
+		for (Type input : runConfig.getProgramInputs()) {
+			System.out.println((i++) + ". program input is " + input.toShortString());
+		}
+		System.out.println("-------------------------------------------------------------");
+		i = 1;
+		for (Type output : runConfig.getProgramOutputs()) {
+			System.out.println((i++) + ". program output is " + output.toShortString());
+		}
+		System.out.println("-------------------------------------------------------------");
+		/*
+		 * Loop over different lengths of the workflow until either, max workflow length
+		 * or max number of solutions has been found.
+		 */
+		String globalTimerID = "globalTimer";
+		APEUtils.timerStart(globalTimerID, true);
+		int solutionLength = runConfig.getSolutionLength().getMin();
+		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
+				&& solutionLength <= runConfig.getSolutionLength().getMax()) {
 
-            if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
-                    || solutionLength == runConfig.getSolutionLength().getMax()) {
-                APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
-            }
+			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, runConfig,
+					solutionLength);
 
-            /* Increase the size of the workflow for the next depth iteration */
-            solutionLength++;
-        }
+			APEUtils.printHeader(implSATsynthesis.getSolutionSize(), "Workflow discovery - length");
 
-        return allSolutions;
-    }
+			/* Encoding of the synthesis problem */
+			if (!implSATsynthesis.synthesisEncoding()) {
+				System.err.println("Internal error in problem encoding.");
+				return null;
+			}
+			/* Execution of the synthesis - updates the object allSolutions */
+			implSATsynthesis.synthesisExecution();
+			allSolutions.addNoSolutionsForLength(solutionLength, allSolutions.getNumberOfSolutions());
+			
+			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
+					|| solutionLength == runConfig.getSolutionLength().getMax()) {
+				APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
+			}
 
-    /**
-     * Validates all the tags in a configuration object.
-     * If {@link ValidationResults#success()} ()} returns true,
-     * the configuration object can be safely used to setup the
-     * the APE framework and create an APERunConfiguration.
-     *
-     * @param config configuration file
-     * @return the validation results
-     */
-    public static ValidationResults validate(JSONObject config){
-        ValidationResults results = APECoreConfig.validate(config);
-        if(results.hasFails()){
-            return results;
-        }
-        try {
-            APE ape = new APE(config);
-            results.add(APERunConfig.validate(config, ape.getDomainSetup()));
-        } catch (IOException | OWLOntologyCreationException ignored) { }
+			/* Increase the size of the workflow for the next depth iteration */
+			solutionLength++;
+		}
 
-        return results;
-    }
+		return allSolutions;
+	}
 
-    /**
-     * Write textual "human readable" version on workflow solutions to a file.
-     *
-     * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @return true if the writing was successfully performed, false otherwise.
-     * @throws IOException Exception if file not found.
-     */
-    public static boolean writeSolutionToFile(SATsolutionsList allSolutions) throws IOException {
-        StringBuilder solutions2write = new StringBuilder();
+	/**
+	 * Validates all the tags in a configuration object. If
+	 * {@link ValidationResults#success()} ()} returns true, the configuration
+	 * object can be safely used to setup the the APE framework and create an
+	 * APERunConfiguration.
+	 *
+	 * @param config configuration file
+	 * @return the validation results
+	 */
+	public static ValidationResults validate(JSONObject config) {
+		ValidationResults results = APECoreConfig.validate(config);
+		if (results.hasFails()) {
+			return results;
+		}
+		try {
+			APE ape = new APE(config);
+			results.add(APERunConfig.validate(config, ape.getDomainSetup()));
+		} catch (IOException | OWLOntologyCreationException ignored) {
+		}
 
-        for (int i = 0; i < allSolutions.size(); i++) {
-            solutions2write = solutions2write.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution())
-                    .append("\n");
-        }
-        APEUtils.write2file(solutions2write.toString(), allSolutions.getRunConfiguration().getSolutionDirPath2("solutions.txt").toFile(), false);
+		return results;
+	}
 
-        return true;
-    }
+	/**
+	 * Write textual "human readable" version on workflow solutions to a file.
+	 *
+	 * @param allSolutions Set of {@link SolutionWorkflow}.
+	 * @return true if the writing was successfully performed, false otherwise.
+	 * @throws IOException Exception if file not found.
+	 */
+	public static boolean writeSolutionToFile(SATsolutionsList allSolutions) throws IOException {
+		StringBuilder solutions2write = new StringBuilder();
 
-    /**
-     * Generating scripts that represent executable versions of the workflow solutions and executing them.
-     *
-     * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @return true if the execution was successfully performed, false otherwise.
-     */
-    public static boolean writeExecutableWorkflows(SATsolutionsList allSolutions) {
-        Path executionsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Executables();
-        Integer noExecutions = allSolutions.getRunConfiguration().getNoExecutions();
-        if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
-            return false;
-        }
-        APEUtils.printHeader(null, "Executing first " + noExecutions + " solution");
-        APEUtils.timerStart("executingWorkflows", true);
+		for (int i = 0; i < allSolutions.size(); i++) {
+			solutions2write = solutions2write
+					.append(allSolutions.get(i).getNativeSATsolution().getRelevantToolsInSolution()).append("\n");
+		}
+		APEUtils.write2file(solutions2write.toString(),
+				allSolutions.getRunConfiguration().getSolutionDirPath2("solutions.txt").toFile(), false);
 
-        final File executeDir = executionsFolder.toFile();
-        if(executeDir.isDirectory()) {
-            Arrays.stream(
-                    executionsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
-                    .forEach(File::delete);
-        } else {
-            executeDir.mkdir();
-        }
-        System.out.print("Loading");
+		return true;
+	}
 
-        /* Creating the requested scripts in parallel. */
-        allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noExecutions).forEach(solution -> {
-            try {
-                String title = "workflowSolution_" + solution.getIndex() + ".sh";
-                File script = executionsFolder.resolve(title).toFile();
-                APEUtils.write2file(solution.getScriptExecution(), script, false);
-                System.out.print(".");
-            } catch (IOException e) {
-                System.err.println("Error occurred while writing a graph to the file system.");
-                e.printStackTrace();
-            }
-        });
+	/**
+	 * Generating scripts that represent executable versions of the workflow
+	 * solutions and executing them.
+	 *
+	 * @param allSolutions Set of {@link SolutionWorkflow}.
+	 * @return true if the execution was successfully performed, false otherwise.
+	 */
+	public static boolean writeExecutableWorkflows(SATsolutionsList allSolutions) {
+		Path executionsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Executables();
+		Integer noExecutions = allSolutions.getRunConfiguration().getNoExecutions();
+		if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
+			return false;
+		}
+		APEUtils.printHeader(null, "Executing first " + noExecutions + " solution");
+		APEUtils.timerStart("executingWorkflows", true);
 
-        APEUtils.timerPrintText("executingWorkflows", "\nWorkflows have been executed.");
-        return true;
-    }
+		final File executeDir = executionsFolder.toFile();
+		if (executeDir.isDirectory()) {
+			Arrays.stream(executionsFolder.toFile()
+					.listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
+					.forEach(File::delete);
+		} else {
+			executeDir.mkdir();
+		}
+		System.out.print("Loading");
 
-    /**
-     * Generate the graphical representations of the workflow solutions and write
-     * them to the file system. Each graph is shown in data-flow representation,
-     * i.e. transformation of data is in focus.
-     *
-     * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @param orientation  Orientation in which the graph will be presented.
-     * @return true if the generating was successfully performed, false otherwise.
-     * @throws IOException Exception if graph cannot be written to the file system.
-     */
-    public static boolean writeDataFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
-        Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
-        Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
-        if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
-            return false;
-        }
-        APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
-        APEUtils.timerStart("drawingGraphs", true);
-        System.out.println();
-        /* Removing the existing files from the file system. */
-        File graphDir = graphsFolder.toFile();
-        if(graphDir.isDirectory()) {
-            Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
-                    .forEach(File::delete);
-        } else {
-            graphDir.mkdir();
-        }
-        System.out.print("Loading");
-        /* Creating the requested graphs in parallel. */
-        allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
-            try {
-                String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
-                Path path = graphsFolder.resolve(title);
-                solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile(), allSolutions.getRunConfiguration().getDebugMode());
-                System.out.print(".");
-            } catch (IOException e) {
-                System.err.println("Error occurred while writing a graph to the file system.");
-                e.printStackTrace();
-            }
-        });
+		/* Creating the requested scripts in parallel. */
+		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noExecutions).forEach(solution -> {
+			try {
+				String title = "workflowSolution_" + solution.getIndex() + ".sh";
+				File script = executionsFolder.resolve(title).toFile();
+				APEUtils.write2file(solution.getScriptExecution(), script, false);
+				System.out.print(".");
+			} catch (IOException e) {
+				System.err.println("Error occurred while writing a graph to the file system.");
+				e.printStackTrace();
+			}
+		});
 
-        APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
+		APEUtils.timerPrintText("executingWorkflows", "\nWorkflows have been executed.");
+		return true;
+	}
 
-        return true;
-    }
+	/**
+	 * Generate the graphical representations of the workflow solutions, in top to
+	 * bottom orientation, and write them to the file system. Each graph is shown in
+	 * data-flow representation (in top to bottom orientation), i.e. transformation
+	 * of data is in focus.
+	 *
+	 * @param allSolutions Set of {@link SolutionWorkflow}.
+	 * @return true if the generating was successfully performed, false otherwise.
+	 * @throws IOException Exception if graph cannot be written to the file system.
+	 */
+	public static boolean writeDataFlowGraphs(SATsolutionsList allSolutions) throws IOException {
+		return writeDataFlowGraphs(allSolutions, RankDir.TOP_TO_BOTTOM);
+	}
 
-    /**
-     * Generate the graphical representations of the workflow solutions and write
-     * them to the file system. Each graph is shown in control-flow representation,
-     * i.e. order of the operations is in focus.
-     *
-     * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @param orientation  Orientation in which the graph will be presented.
-     * @return true if the generating was successfully performed, false otherwise.
-     * @throws IOException Exception if graphs cannot be written to the file system.
-     */
-    public static boolean writeControlFlowGraphs(SATsolutionsList allSolutions,  RankDir orientation) throws IOException {
-        Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
-        Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
-        if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
-            return false;
-        }
-        APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
-        APEUtils.timerStart("drawingGraphs", true);
-        System.out.println();
-        /* Removing the existing files from the file system. */
-        File graphDir = graphsFolder.toFile();
-        if(graphDir.isDirectory()) {
-            Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
-                    .forEach(File::delete);
-        } else {
-            graphDir.mkdir();
-        }
-        System.out.print("Loading");
-        /* Creating the requested graphs in parallel. */
-        allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
-            try {
-                String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
-                Path path = graphsFolder.resolve(title);
-                solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile(), allSolutions.getRunConfiguration().getDebugMode());
-                System.out.print(".");
-            } catch (IOException e) {
-                System.err.println("Error occurred while writing a graph to the file system.");
-                e.printStackTrace();
-            }
-        });
-        APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
+	/**
+	 * Generate the graphical representations of the workflow solutions and write
+	 * them to the file system. Each graph is shown in data-flow representation,
+	 * i.e. transformation of data is in focus.
+	 *
+	 * @param allSolutions Set of {@link SolutionWorkflow}.
+	 * @param orientation  Orientation in which the graph will be presented.
+	 * @return true if the generating was successfully performed, false otherwise.
+	 * @throws IOException Exception if graph cannot be written to the file system.
+	 */
+	public static boolean writeDataFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
+		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
+		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
+		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
+			return false;
+		}
+		APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.timerStart("drawingGraphs", true);
+		System.out.println();
+		/* Removing the existing files from the file system. */
+		File graphDir = graphsFolder.toFile();
+		if (graphDir.isDirectory()) {
+			Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
+					.forEach(File::delete);
+		} else {
+			graphDir.mkdir();
+		}
+		System.out.print("Loading");
+		/* Creating the requested graphs in parallel. */
+		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
+			try {
+				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
+				Path path = graphsFolder.resolve(title);
+				solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile(),
+						allSolutions.getRunConfiguration().getDebugMode());
+				System.out.print(".");
+			} catch (IOException e) {
+				System.err.println("Error occurred while writing a graph to the file system.");
+				e.printStackTrace();
+			}
+		});
 
-        return true;
-    }
+		APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
+
+		return true;
+	}
+
+	/**
+	 * Generate the graphical representations of the workflow solutions, in left to
+	 * right orientation and write them to the file system. Each graph is shown in
+	 * control-flow representation (in left to right orientation), i.e. order of the
+	 * operations is in focus.
+	 *
+	 * @param allSolutions Set of {@link SolutionWorkflow}.
+	 * @return true if the generating was successfully performed, false otherwise.
+	 * @throws IOException Exception if graphs cannot be written to the file system.
+	 */
+	public static boolean writeControlFlowGraphs(SATsolutionsList allSolutions) throws IOException {
+		return writeControlFlowGraphs(allSolutions, RankDir.LEFT_TO_RIGHT);
+	}
+
+	/**
+	 * Generate the graphical representations of the workflow solutions and write
+	 * them to the file system. Each graph is shown in control-flow representation,
+	 * i.e. order of the operations is in focus.
+	 *
+	 * @param allSolutions Set of {@link SolutionWorkflow}.
+	 * @param orientation  Orientation in which the graph will be presented.
+	 * @return true if the generating was successfully performed, false otherwise.
+	 * @throws IOException Exception if graphs cannot be written to the file system.
+	 */
+	public static boolean writeControlFlowGraphs(SATsolutionsList allSolutions, RankDir orientation)
+			throws IOException {
+		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
+		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
+		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
+			return false;
+		}
+		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.timerStart("drawingGraphs", true);
+		System.out.println();
+		/* Removing the existing files from the file system. */
+		File graphDir = graphsFolder.toFile();
+		if (graphDir.isDirectory()) {
+			Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
+					.forEach(File::delete);
+		} else {
+			graphDir.mkdir();
+		}
+		System.out.print("Loading");
+		/* Creating the requested graphs in parallel. */
+		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
+			try {
+				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
+				Path path = graphsFolder.resolve(title);
+				solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile(),
+						allSolutions.getRunConfiguration().getDebugMode());
+				System.out.print(".");
+			} catch (IOException e) {
+				System.err.println("Error occurred while writing a graph to the file system.");
+				e.printStackTrace();
+			}
+		});
+		APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
+
+		return true;
+	}
 
 }

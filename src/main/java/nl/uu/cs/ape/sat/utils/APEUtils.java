@@ -9,11 +9,14 @@ import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
+import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -129,12 +132,25 @@ public final class APEUtils {
 	 *
 	 * @param file the JSON file
 	 * @return JSONObject representing the content of the file.
-	 * @throws IOException Error if the file is corrupted
+	 * @throws IOException   Error if the file is corrupted
 	 * @throws JSONException Error if the file is not in expected JSON format
 	 */
-	public static JSONObject readFileToJSON(File file) throws IOException, JSONException {
+	public static JSONObject readFileToJSONObject(File file) throws IOException, JSONException {
 		String content = FileUtils.readFileToString(file, "utf-8");
 		return new JSONObject(content);
+	}
+	
+	/**
+	 * Reads the file and provides the JSONArray that represents its content.
+	 *
+	 * @param file the JSON file
+	 * @return JSONArray representing the content of the file.
+	 * @throws IOException   Error if the file is corrupted
+	 * @throws JSONException Error if the file is not in expected JSON format
+	 */
+	public static JSONArray readFileToJSONArray(File file) throws IOException, JSONException {
+		String content = FileUtils.readFileToString(file, "utf-8");
+		return new JSONArray(content);
 	}
 
 	/*
@@ -155,16 +171,16 @@ public final class APEUtils {
 //			String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ")
 //					.replace("(", "").replace(")", "") + " 0\n";
 //			boolean exists = true;
-//			int counter = 0;
+//			int counterErrors = 0;
 //			String auxVariable = "";
 //			while (exists) {
-//				auxVariable = "@RESERVED_CNF_" + counter + " ";
+//				auxVariable = "@RESERVED_CNF_" + counterErrors + " ";
 //				if (transformedCNF.contains("@RESERVED_CNF_")) {
 //					transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
 //				} else {
 //					exists = false;
 //				}
-//				counter++;
+//				counterErrors++;
 //			}
 //			return transformedCNF;
 //		} catch (ParserException e) {
@@ -244,20 +260,21 @@ public final class APEUtils {
 	public static <T> List<T> getListFromJson(JSONObject jsonObject, String key, Class<T> clazz) {
 		List<T> jsonList = new ArrayList<>();
 		try {
-		Object tmp = jsonObject.get(key);
-		try {
-			if (tmp instanceof JSONArray) {
-				jsonList = getListFromJsonList((JSONArray) tmp, clazz);
-			} else {
-				T element = (T) tmp;
-				jsonList.add(element);
+			Object tmp = jsonObject.get(key);
+			try {
+				if (tmp instanceof JSONArray) {
+					jsonList = getListFromJsonList((JSONArray) tmp, clazz);
+				} else {
+					T element = (T) tmp;
+					jsonList.add(element);
+				}
+			} catch (JSONException e) {
+				System.err.println("Json parsing error. Expected object '" + clazz.getSimpleName() + "' under the tag '"
+						+ key + "'. The following object does not match the provided format:\n"
+						+ jsonObject.toString());
+				return jsonList;
 			}
-		} catch (JSONException e) {
-			System.err.println("Json parsing error. Expected object '" + clazz.getSimpleName() + "' under the tag '"
-					+ key + "'. The following object does not match the provided format:\n" + jsonObject.toString());
 			return jsonList;
-		}
-		return jsonList;
 		} catch (JSONException e) {
 			return jsonList;
 		}
@@ -621,7 +638,7 @@ public final class APEUtils {
 					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
 						apeInputFormats.put(bioType.getString("uri"));
 					}
-					apeInput.put("format_1915$OR$", apeInputFormats);
+					apeInput.put("format_1915", apeInputFormats);
 
 					apeInputs.put(apeInput);
 				}
@@ -646,7 +663,7 @@ public final class APEUtils {
 					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
 						apeOutputFormats.put(bioType.getString("uri"));
 					}
-					apeOutput.put("format_1915$OR$", apeOutputFormats);
+					apeOutput.put("format_1915", apeOutputFormats);
 
 					apeOutputs.put(apeOutput);
 				}
@@ -699,6 +716,20 @@ public final class APEUtils {
 	public static String removeLastChar(String str) {
 		if (str != null && str.length() > 0) {
 			str = str.substring(0, str.length() - 1);
+		}
+		return str;
+	}
+
+	/**
+	 * Return the string without its last N characters.
+	 *
+	 * @param str Given string.
+	 * @param n   Number of characters to be removed.
+	 * @return A copy of the given string without its last character.
+	 */
+	public static String removeNLastChar(String str, int n) {
+		if (str != null && str.length() > 0) {
+			str = str.substring(0, str.length() - n);
 		}
 		return str;
 	}
@@ -758,5 +789,58 @@ public final class APEUtils {
 	 */
 	public static JSONObject clone(JSONObject original) {
 		return new JSONObject(original, JSONObject.getNames(original));
+	}
+
+	/**
+	 * Append text to the existing file. It adds the text at the end of the content of the file.
+	 * @param file
+	 * @param content
+	 * @throws IOException
+	 */
+	public static void appendToFile(File file, String content) throws IOException {
+		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
+		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
+		writer.write(content);
+		writer.close();
+	}
+	
+	/**
+	 * Prepend text to the existing file. It adds the text at the beginning, before the existing content of the file.
+	 * @param file
+	 * @param prefix
+	 * @throws IOException
+	 */
+	public static File concatIntoFile(String prefix, File file) throws IOException {
+	    LineIterator li = FileUtils.lineIterator(file);
+	    File tempFile = File.createTempFile("prependPrefix", ".tmp");
+	    tempFile.deleteOnExit();
+	    Writer fileWriter = new FileWriterWithEncoding(tempFile, "ASCII", true);
+		BufferedWriter writer = new BufferedWriter(fileWriter);
+	    try {
+	    	writer.write(prefix);
+	        while (li.hasNext()) {
+	        	writer.write(li.next());
+	        	writer.write("\n");
+	        }
+	    } finally {
+	    	writer.close();
+	    	li.close();
+	    }
+	    return tempFile;
+	}
+
+	public static int countLines(File cnfEncoding) {
+		int lines = 0;
+		try (BufferedReader b = new BufferedReader(new FileReader(cnfEncoding))) {
+			while (b.readLine() != null) {
+				lines++;
+				
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return lines;
 	}
 }

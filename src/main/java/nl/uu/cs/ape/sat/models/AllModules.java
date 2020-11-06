@@ -121,6 +121,14 @@ public class AllModules extends AllPredicates {
         }
         return pairs;
     }
+    
+    /**
+     * Returns the root predicate of the module taxonomy.
+     * @return AbstractModule representing the root operation.
+     */
+    public AbstractModule getRootModule() {
+    	return (AbstractModule) getRootPredicates().get(0);
+    }
 
     /**
      * Returns true if this set contains the specified element. More formally,
