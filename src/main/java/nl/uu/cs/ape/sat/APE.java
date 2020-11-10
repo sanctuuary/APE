@@ -46,7 +46,7 @@ public class APE {
 	 * Create instance of the APE solver.
 	 *
 	 * @param configPath Path to the APE JSON configuration file. If the string is
-	 *                   null the default './ape.config' value is assumed.
+	 *                   null the default './config.json' value is assumed.
 	 * @throws IOException                  Exception reading the configuration
 	 *                                      file.
 	 * @throws OWLOntologyCreationException Exception reading the OWL file.

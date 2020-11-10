@@ -204,8 +204,6 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
          */
         int variables = mappings.getSize();
         int clauses = APEUtils.countLines(cnfEncoding);
-        System.out.println("Variables: " + variables);
-        System.out.println("Clauses: " + clauses);
         
         String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");

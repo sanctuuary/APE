@@ -45,13 +45,13 @@ public class SolutionWorkflow {
 
     /**
      * List of memory type nodes provided as the initial workflow input, ordered
-     * according the initial description (ape.config file).
+     * according the initial description (config.json file).
      */
     private List<TypeNode> workflowInputTypeStates;
 
     /**
      * List of used type nodes provided as the final workflow output, ordered
-     * according the initial description (ape.config file).
+     * according the initial description (config.jsong file).
      */
     private List<TypeNode> workflowOutputTypeStates;
 

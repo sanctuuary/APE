@@ -604,6 +604,30 @@ public class APEConfigTagFactory {
                 return APEConfigDefaultValue.withDefault(true);
             }
         }
+        
+        public static class STRICT_TOOL_ANNOTATIONS extends TYPES.Bool {
+
+            @Override
+            public String getTagName() {
+                return "strict_tool_annotations";
+            }
+
+            @Override
+            public String getLabel() {
+                return "Implement strict tool annotations";
+            }
+
+            @Override
+            public String getDescription() {
+                // TODO
+                return "TODO";
+            }
+
+            @Override
+            public APEConfigDefaultValue<Boolean> getDefault() {
+                return APEConfigDefaultValue.withDefault(true);
+            }
+        }
 
         public static class SOLUTION_LENGTH_RANGE extends TYPES.IntRange {
 

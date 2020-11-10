@@ -1,6 +1,7 @@
 package nl.uu.cs.ape.test.sat.ape;
 
 import nl.uu.cs.ape.sat.APE;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.test.utils.GitHubRepo;
 import nl.uu.cs.ape.sat.test.utils.TestResources;
@@ -12,7 +13,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
@@ -49,21 +52,21 @@ class UseCaseTest {
     }
 
     @Test
-    void GeoGMT() throws Exception {
+    void GeoGMT() throws APEConfigException, OWLOntologyCreationException, IOException {
         testUseCase("GeoGMT", "use_cases/GeoGMT_UseCase_Evaluation.json");
     }
 
     @Test
-    void ImageMagick() throws Exception {
+    void ImageMagick() throws APEConfigException, OWLOntologyCreationException, IOException {
         testUseCase("ImageMagick", "use_cases/ImageMagick_UseCase_Evaluation.json");
     }
 
     @Test
-    void MassSpectometry() throws Exception {
+    void MassSpectometry() throws APEConfigException, OWLOntologyCreationException, IOException {
         testUseCase("MassSpectometry", "use_cases/MassSpectometry_UseCase_Evaluation.json");
     }
 
-    void testUseCase(String name, String evaluationPath) throws Exception {
+    void testUseCase(String name, String evaluationPath) throws APEConfigException, OWLOntologyCreationException, IOException {
 
         System.out.println("-------------------------------------------------------------");
         System.out.println("       TEST " + name);

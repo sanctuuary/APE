@@ -26,7 +26,7 @@ public class Main {
         if (args.length == 1) {
             path = args[0];
         } else {
-            path = "./ape.configuration";
+            path = "./config.json";
         }
         if (!APEUtils.isValidReadFile(path)) {
             System.err.println("Bad path.");

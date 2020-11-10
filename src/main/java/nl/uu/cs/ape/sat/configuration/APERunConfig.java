@@ -33,7 +33,7 @@ public class APERunConfig {
      */
     public final APEConfigTag<JSONObject> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
     /**
-     * true if the shared memory structure should be used, false in case of a
+     * {@code true} if the shared memory structure should be used, {@code false} in case of a
      * restrictive message passing structure.
      */
     public final APEConfigTag<Boolean> SHARED_MEMORY = new APEConfigTagFactory.TAGS.SHARED_MEMORY();

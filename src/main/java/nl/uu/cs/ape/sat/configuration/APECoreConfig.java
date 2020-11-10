@@ -43,6 +43,11 @@ public class APECoreConfig {
      * The JSON file with all tool annotations.
      */
     public final APEConfigTag<Path> TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.TOOL_ANNOTATIONS();
+    /**
+     * {@code true} if the domain expects strict tool annotations, where, {@code false} in case of a
+     * restrictive message passing structure.
+     */
+    public final APEConfigTag<Boolean> STRICT_TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.STRICT_TOOL_ANNOTATIONS();
 
     /**
      * All the Tags specified in this class. Should be in correct order of dependencies.
@@ -52,7 +57,8 @@ public class APECoreConfig {
             this.ONTOLOGY,
             this.TOOL_ONTOLOGY_ROOT,
             this.DIMENSIONS_ONTOLOGY,
-            this.TOOL_ANNOTATIONS
+            this.TOOL_ANNOTATIONS,
+            this.STRICT_TOOL_ANNOTATIONS
     };
 
     /**
@@ -64,7 +70,8 @@ public class APECoreConfig {
             new ONTOLOGY(),
             new TOOL_ONTOLOGY_ROOT(null),
             new DIMENSIONS_ONTOLOGY(null),
-            new TOOL_ANNOTATIONS()
+            new TOOL_ANNOTATIONS(),
+            new STRICT_TOOL_ANNOTATIONS()
     );
 
     /**
@@ -76,7 +83,7 @@ public class APECoreConfig {
      * @param dataDimensionRoots List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
      * @param toolAnnotations    The JSON file with all tool annotations.
      */
-    public APECoreConfig(File ontology, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations) {
+    public APECoreConfig(File ontology, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations, boolean strictToolAnnotations) {
 
         /* Path to the OWL file. */
         this.ONTOLOGY.setValue(ontology.toPath());
@@ -95,6 +102,8 @@ public class APECoreConfig {
 
         /* Path to the tool annotations JSON file. */
         this.TOOL_ANNOTATIONS.setValue(toolAnnotations.toPath());
+        /* Set the tool annotation model for the domain. */
+        this.STRICT_TOOL_ANNOTATIONS.setValue(strictToolAnnotations);
     }
 
     /**
@@ -296,7 +305,7 @@ public class APECoreConfig {
      * @return {@code true} if the strict rules apply, {@code false} otherwise.
      */
     public boolean getUseStrictToolAnnotations() {
-        return true;
+        return STRICT_TOOL_ANNOTATIONS.getValue();
     }
     
 }

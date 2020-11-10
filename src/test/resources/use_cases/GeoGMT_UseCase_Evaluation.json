@@ -1,6 +1,6 @@
 {
   "name": "GeoGMT",
-  "base_configuration": "GeoGMT/E0/ape.configuration",
+  "base_configuration": "GeoGMT/E0/config.json",
   "mutations": [
     {
       "description": "[NEW] replace constraints",
@@ -35,12 +35,6 @@
       "expected_no_solutions": [3, 128, 1000],
       "config": { "outputs": [] },
       "replace_constraints": []
-    },
-    {
-      "description": "TODO",
-      "solution_length_start": 1,
-      "expected_no_solutions": [],
-      "config": { "shared_memory": "false" }
     },
     {
       "description": "TODO",

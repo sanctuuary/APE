@@ -68,7 +68,7 @@ public class SATsolutionsList {
     }
 
     /**
-     * Get max number of solutions that should be found. This number is defined in the ape.config file.
+     * Get max number of solutions that should be found. This number is defined in the config.json file.
      *
      * @return Max number of solutions that should be found.
      */
