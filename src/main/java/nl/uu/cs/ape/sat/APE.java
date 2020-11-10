@@ -262,8 +262,8 @@ public class APE {
 	 *                     file.
 	 */
 	private SATsolutionsList executeSynthesis(APERunConfig runConfig) throws IOException, JSONException {
-//    	APEUtils.write2file(apeDomainSetup.emptyTools.toString(), new File("/home/vedran/Desktop/tools"), false);
-		APEUtils.write2file(apeDomainSetup.wrongToolIO.toString(), new File("/home/vedran/Desktop/wrongToolIO"), false);
+//    	APEUtils.write2file(apeDomainSetup.emptyTools.toString(), new File("~/Desktop/tools"), false);
+//		APEUtils.write2file(apeDomainSetup.wrongToolIO.toString(), new File("~/Desktop/wrongToolIO"), false);
 
 		/* List of all the solutions */
 		SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
