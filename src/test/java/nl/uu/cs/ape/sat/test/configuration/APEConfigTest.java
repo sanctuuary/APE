@@ -40,7 +40,6 @@ class APEConfigTest {
             .put("tool_annotations_path", TestResources.getAbsoluteResourcePath("template/tool_annotations.json"))
             .put("constraints_path", TestResources.getAbsoluteResourcePath("template/constraints.json"))
             .put("solutions_dir_path", TestResources.getAbsoluteResourcePath("template"))
-            .put("shared_memory", true)
             .put("tool_seq_repeat", false)
             .put("solution_length", new JSONObject().put(Range.MIN_TAG, 1).put(Range.MAX_TAG, 5))
             .put("max_solutions", 5)
@@ -66,7 +65,7 @@ class APEConfigTest {
                     "Boolean",
                     true,
                     new Object[]{"wrong", 1},
-                    new String[]{"shared_memory", "debug_mode", "tool_seq_repeat"}),
+                    new String[]{"debug_mode", "tool_seq_repeat"}),
             new TagInfo(
                     "Enum",
                     ConfigEnum.ONE.toString(),

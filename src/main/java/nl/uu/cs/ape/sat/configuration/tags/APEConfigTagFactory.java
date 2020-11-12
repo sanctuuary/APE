@@ -581,30 +581,6 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class SHARED_MEMORY extends TYPES.Bool {
-
-            @Override
-            public String getTagName() {
-                return "shared_memory";
-            }
-
-            @Override
-            public String getLabel() {
-                return "Use shared memory";
-            }
-
-            @Override
-            public String getDescription() {
-                // TODO
-                return "TODO";
-            }
-
-            @Override
-            public APEConfigDefaultValue<Boolean> getDefault() {
-                return APEConfigDefaultValue.withDefault(true);
-            }
-        }
-        
         public static class STRICT_TOOL_ANNOTATIONS extends TYPES.Bool {
 
             @Override

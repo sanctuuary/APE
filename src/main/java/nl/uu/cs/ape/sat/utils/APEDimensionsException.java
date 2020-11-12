@@ -35,7 +35,7 @@ public class APEDimensionsException extends RuntimeException {
      * @return Dimensions exception with information that may help the user solve the problem.
      */
     public static APEDimensionsException notExistingDimension(String message) {
-    	return new APEDimensionsException(String.format("The data dimension does not exist. %s", message));
+    	return new APEDimensionsException(String.format("The dimension does not exist. %s", message));
     }
     
     /**

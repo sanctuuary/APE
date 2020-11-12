@@ -33,11 +33,6 @@ public class APERunConfig {
      */
     public final APEConfigTag<JSONObject> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
     /**
-     * {@code true} if the shared memory structure should be used, {@code false} in case of a
-     * restrictive message passing structure.
-     */
-    public final APEConfigTag<Boolean> SHARED_MEMORY = new APEConfigTagFactory.TAGS.SHARED_MEMORY();
-    /**
      * Path to the directory that will contain all the solutions to the problem.
      */
     public final APEConfigTag<Path> SOLUTION_DIR_PATH = new APEConfigTagFactory.TAGS.SOLUTION_DIR_PATH();
@@ -99,7 +94,6 @@ public class APERunConfig {
      */
     private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
             this.CONSTRAINTS,
-            this.SHARED_MEMORY,
             this.SOLUTION_DIR_PATH,
             this.SOLUTION_LENGTH_RANGE,
             this.MAX_NO_SOLUTIONS,
@@ -118,7 +112,6 @@ public class APERunConfig {
      */
     public static final APEConfigTags TAGS = new APEConfigTags(
             new CONSTRAINTS(),
-            new SHARED_MEMORY(),
             new SOLUTION_DIR_PATH(),
             new SOLUTION_LENGTH_RANGE(),
             new MAX_NO_SOLUTIONS(),
@@ -153,7 +146,6 @@ public class APERunConfig {
         setConstraintsJSON(builder.constraintsJSON);
         setSolutionLength(builder.solutionMinLength, builder.solutionMaxLength);
         setMaxNoSolutions(builder.maxNoSolutions);
-        setSharedMemory(builder.sharedMemory);
         setToolSeqRepeat(builder.toolSeqRepeat);
         setSolutionPath(builder.solutionDirPath);
         setNoExecutions(builder.noExecutions);
@@ -282,26 +274,6 @@ public class APERunConfig {
      */
     public void setConstraintsJSON(JSONObject constraintsJSON) {
         CONSTRAINTS.setValue(constraintsJSON);
-    }
-
-    /**
-     * Returns true if the shared memory structure should be used, i.e. if the
-     * generated data is available in memory to all the tools used subsequently, or
-     * false in case of a restrictive message passing structure, i.e. if the
-     * generated data is available only to the tool next in sequence.
-     *
-     * @return true if the shared memory structure should be used, false in case of
-     * a restrictive message passing structure.
-     */
-    public boolean getSharedMemory() {
-        return SHARED_MEMORY.getValue();
-    }
-
-    /**
-     * @param sharedMemory the sharedMemory to set
-     */
-    public void setSharedMemory(boolean sharedMemory) {
-        SHARED_MEMORY.setValue(sharedMemory);
     }
 
     /**
@@ -552,8 +524,6 @@ public class APERunConfig {
     public interface IBuildStage {
         IBuildStage withConstraintsJSON(JSONObject constraintsJSON);
 
-		IBuildStage withSharedMemory(boolean sharedMemory);
-
         IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
 
         IBuildStage withSolutionDirPath(String solutionPath);
@@ -585,7 +555,6 @@ public class APERunConfig {
         private int maxNoSolutions;
         private APEDomainSetup apeDomainSetup;
         private JSONObject constraintsJSON;
-        private boolean sharedMemory;
         private boolean toolSeqRepeat;
         private String solutionDirPath;
         private int noExecutions;
@@ -626,12 +595,6 @@ public class APERunConfig {
         @Override
         public IBuildStage withConstraintsJSON(JSONObject constraintsJSON) {
             this.constraintsJSON = constraintsJSON;
-            return this;
-        }
-
-        @Override
-        public IBuildStage withSharedMemory(boolean sharedMemory) {
-            this.sharedMemory = sharedMemory;
             return this;
         }
 

@@ -25,6 +25,15 @@ public class AllModules extends AllPredicates {
     public AllModules(APECoreConfig config) {
         super(Arrays.asList(config.getToolTaxonomyRoot()));
     }
+    
+    /**
+     * Instantiates a new All modules.
+     *
+     * @param config the config
+     */
+    public AllModules(String moduleTaxonomyRoot) {
+        super(Arrays.asList(moduleTaxonomyRoot));
+    }
 
     /**
      * Gets modules.

@@ -5,10 +5,15 @@ import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
+import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
+import nl.uu.cs.ape.sat.utils.OWLReader;
+
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,6 +87,7 @@ public class APECoreConfig {
      * @param toolTaxonomyRoot   Node in the ontology that corresponds to the root of the module taxonomy.
      * @param dataDimensionRoots List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
      * @param toolAnnotations    The JSON file with all tool annotations.
+     * @param strictToolAnnotations {@code true} if the domain expects strict tool annotations
      */
     public APECoreConfig(File ontology, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations, boolean strictToolAnnotations) {
 
@@ -225,6 +231,23 @@ public class APECoreConfig {
             }
         }
         return results;
+    }
+    
+    /**
+     * Run the initial validation of the ontology file and the corresponding tool and data terms. Validation will simply check the format of the ontology and the existance of the mentioned classes.
+     * @param ontologyFile - ontology file
+     * @param ontologyPrefixURI  Prefix used to define OWL class IDs
+     * @param toolTaxonomyRoot   Node in the ontology that corresponds to the root of the module taxonomy.
+     * @param dataDimensionRoots List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
+     * @param toolAnnotations    The JSON file with all tool annotations.
+     * @return
+     * @throws APEDimensionsException Error when one of the terms does not exist in the ontology
+     * @throws OWLOntologyCreationException Error in file format.
+     * @throws FileExistsException File error.
+     */
+    public static boolean validateOntology(File ontologyFile, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots ) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
+    	return OWLReader.verifyOntology(ontologyFile, ontologyPrefixURI, toolTaxonomyRoot, dataDimensionRoots);
+    	
     }
 
     /**

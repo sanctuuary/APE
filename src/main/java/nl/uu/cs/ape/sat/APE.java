@@ -163,37 +163,49 @@ public class APE {
 	}
 
 	/**
-	 * Function used to return all the elements of one data type dimension (e.g. all
-	 * data types or all data formats).
+	 * Returns all the taxonomy elements that are subclasses of the given element.
+	 * Can be used to retrieve all data types, formats or all taxonomy operations.
 	 *
-	 * @param dimensionRootID ID of the data taxonomy subtree that corresponds to
-	 *                        the list of elements that should be returned.
-	 * @return List where each element correspond to a map that can be transformed
-	 *         into JSON objects.
-	 * @throws NullPointerException the null pointer exception
+	 * @param taxonomyElementID ID of the taxonomy element that is parent of all the
+	 *                          returned elements.
+	 * @return Sorted set of elements that belong to the given taxonomy subtree.
 	 */
-	public List<Map<String, String>> getTaxonomyElements(String dimensionRootID) throws NullPointerException {
-		SortedSet<? extends TaxonomyPredicate> elements = null;
-		TaxonomyPredicate root = apeDomainSetup.getAllTypes().get(dimensionRootID);
+	public SortedSet<TaxonomyPredicate> getTaxonomySubclasses(String taxonomyElementID) {
+		SortedSet<TaxonomyPredicate> elements = null;
+		TaxonomyPredicate root = apeDomainSetup.getAllTypes().get(taxonomyElementID);
 		if (root != null) {
 			elements = apeDomainSetup.getAllTypes().getElementsFromSubTaxonomy(root);
 		} else {
-			root = apeDomainSetup.getAllModules().get(dimensionRootID);
+			root = apeDomainSetup.getAllModules().get(taxonomyElementID);
 			if (root != null) {
 				elements = apeDomainSetup.getAllModules().getElementsFromSubTaxonomy(root);
-			} else {
-				throw new NullPointerException();
 			}
 		}
-
-		List<Map<String, String>> transformedTypes = new ArrayList<Map<String, String>>();
-		for (TaxonomyPredicate currType : elements) {
-			transformedTypes.add(currType.toMap());
+		if(root == null) {
+			return getTaxonomySubclasses(APEUtils.createClassURI(taxonomyElementID, apeDomainSetup.getOntologyPrefixURI()));
+		} else {
+			return elements;
 		}
-
-		return transformedTypes;
 	}
-	
+
+	/**
+	 * Returns the {@link TaxonomyPredicate} that corresponds to the given ID.
+	 *
+	 * @param taxonomyElementID ID of the taxonomy element
+	 * @return The corresponding {@link TaxonomyPredicate}
+	 */
+	public TaxonomyPredicate getTaxonomyElement(String taxonomyElementID) {
+		TaxonomyPredicate element = apeDomainSetup.getAllTypes().get(taxonomyElementID);
+		if (element == null) {
+			element = apeDomainSetup.getAllModules().get(taxonomyElementID);
+		}
+		if(element == null) {
+			return getTaxonomyElement(APEUtils.createClassURI(taxonomyElementID, apeDomainSetup.getOntologyPrefixURI()));
+		} else {
+			return element;
+		}
+	}
+
 	/**
 	 * Setup a new run instance of the APE solver and run the synthesis algorithm.
 	 *
@@ -306,7 +318,7 @@ public class APE {
 			/* Execution of the synthesis - updates the object allSolutions */
 			implSATsynthesis.synthesisExecution();
 			allSolutions.addNoSolutionsForLength(solutionLength, allSolutions.getNumberOfSolutions());
-			
+
 			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
 					|| solutionLength == runConfig.getSolutionLength().getMax()) {
 				APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());

@@ -9,7 +9,8 @@ import org.json.JSONObject;
  */
 public class ValidationResult {
 
-    private final String tag, ruleDescription;
+    private final String tag;
+    private final String ruleDescription;
     private final boolean success;
 
     /**

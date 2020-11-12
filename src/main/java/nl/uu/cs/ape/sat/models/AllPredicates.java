@@ -26,10 +26,10 @@ public abstract class AllPredicates {
     /**
      * Instantiates a new All mappedPredicates.
      *
-     * @param dataTaxonomyRoots the data taxonomy roots
+     * @param taxonomyRoots the taxonomy roots
      */
-    public AllPredicates(List<String> dataTaxonomyRoots) {
-        this.taxonomyRoots = dataTaxonomyRoots;
+    public AllPredicates(List<String> taxonomyRoots) {
+        this.taxonomyRoots = taxonomyRoots;
         this.mappedPredicates = new HashMap<String, TaxonomyPredicate>();
     }
 

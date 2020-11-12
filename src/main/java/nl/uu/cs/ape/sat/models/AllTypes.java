@@ -34,6 +34,18 @@ public class AllTypes extends AllPredicates {
         emptyType.setAsRelevantTaxonomyTerm(this);
         getMappedPredicates().put(emptyType.getPredicateID(), emptyType);
     }
+    
+    /**
+     * Instantiates a new All modules.
+     *
+     * @param config the config
+     */
+    public AllTypes(List<String> typeTaxonomyRoots) {
+    	super(typeTaxonomyRoots);
+        emptyType = new Type("empty", "empty", "empty", NodeType.EMPTY);
+        emptyType.setAsRelevantTaxonomyTerm(this);
+        getMappedPredicates().put(emptyType.getPredicateID(), emptyType);
+    }
 
     /**
      * Returns the set of {@link Type}s that are currently defined.

@@ -5,6 +5,8 @@ import nl.uu.cs.ape.sat.models.AllModules;
 import nl.uu.cs.ape.sat.models.AllTypes;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
+
+import org.apache.commons.io.FileExistsException;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -82,20 +84,15 @@ public class OWLReader {
 		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
 		if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
 			/* Handle scenario when the tool taxonomy root was not defined properly. */
-			logger.warning("Provided ontology does not contain the " + moduleRootIRI
-					+ " class, intended as a root for operation taxonomy.");
-			return false;
+			throw APEDimensionsException.notExistingDimension(String.format("Operation root %s does not exist in the ontology.", moduleRootIRI));
 		}
 
 		/* Get roots for each of the data dimensions. */
 		List<OWLClass> dimensionRootClasses = new ArrayList<OWLClass>();
-		for (String dimensionID : allTypes.getRootsIDs()) {
-			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionID));
-			if (!ontology.containsClassInSignature(IRI.create(dimensionID))) {
-				/* Handle scenario when the type taxonomy root was not defined properly. */
-				logger.warning("Provided ontology does not contain the " + dimensionID
-						+ " class, intended as a root for a data dimension.");
-				return false;
+		for (String dimensionIRI : allTypes.getRootsIDs()) {
+			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionIRI));
+			if (!ontology.containsClassInSignature(IRI.create(dimensionIRI))) {
+				throw APEDimensionsException.notExistingDimension(String.format("Data dimension %s does not exist in the ontology.", dimensionIRI));
 			} else {
 				dimensionRootClasses.add(dimensionClass);
 			}
@@ -109,6 +106,44 @@ public class OWLReader {
 		String ovesrlap;
 		if ((ovesrlap = dimensionsDisjoint(dimensionRootClasses)) != null) {
 			throw APEDimensionsException.dimensionsOverlap("The dimensions '" + ovesrlap + "' have common classes.");
+		}
+
+		return true;
+	}
+	
+	public static boolean verifyOntology(File ontologyFile, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots ) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
+
+		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		AllModules allModules = new AllModules(toolTaxonomyRoot);
+		AllTypes allTypes = new AllTypes(dataDimensionRoots);
+		OWLOntology ontology = null;
+		if (ontologyFile.exists()) {
+			ontology = manager.loadOntologyFromOntologyDocument(ontologyFile);
+		} else {
+			throw new FileExistsException("Ontology file does not exist.");
+		}
+		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
+		OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		
+		/* Get a root of the operations taxonomy. */
+		String moduleRootIRI = allModules.getRootsIDs().get(0);
+		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
+		if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
+			/* Handle scenario when the tool taxonomy root was not defined properly. */
+			throw APEDimensionsException.notExistingDimension(String.format("Operation root %s does not exist in the ontology.", moduleRootIRI));
+		}
+
+		/* Get roots for each of the data dimensions. */
+		List<OWLClass> dimensionRootClasses = new ArrayList<OWLClass>();
+		for (String dimensionIRI : allTypes.getRootsIDs()) {
+			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionIRI));
+			if (!ontology.containsClassInSignature(IRI.create(dimensionIRI))) {
+				/* Handle scenario when the type taxonomy root was not defined properly. */
+				throw APEDimensionsException.notExistingDimension(String.format("Data dimension %s does not exist in the ontology.", dimensionIRI));
+			} else {
+				dimensionRootClasses.add(dimensionClass);
+			}
 		}
 
 		return true;
@@ -134,7 +169,6 @@ public class OWLReader {
 				}
 			}
 		}
-
 		return null;
 	}
 
@@ -148,9 +182,6 @@ public class OWLReader {
 	 */
 	private void exploreModuleOntologyRec(OWLReasoner reasoner, OWLClass currClass, OWLClass superClass,
 			OWLClass rootClass) {
-//		if(allModules.existsModule(getLabel(currClass))) {
-//			return;
-//		}
 		AbstractModule superModule = allModules.get(getIRI(superClass));
 		final OWLClass currRootClass;
 		/*
@@ -193,9 +224,6 @@ public class OWLReader {
 	 */
 	private void exploreTypeOntologyRec(OWLReasoner reasoner, OWLClass currClass, OWLClass superClass,
 			OWLClass rootClass) {
-//		if(allTypes.existsType(getLabel(currClass))) {
-//			return;
-//		}
 
 		final OWLClass currRoot;
 		Type superType = null;
