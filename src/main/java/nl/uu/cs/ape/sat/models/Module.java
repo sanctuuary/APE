@@ -172,10 +172,14 @@ public class Module extends AbstractModule {
 			LogicOperation logConn = LogicOperation.OR;
 			SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
 			/* for each dimensions a disjoint array of types/tools is given */
-			for (String currTypeLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
-				String currTypeURI = APEUtils.createClassURI(currTypeLabel, domainSetup.getOntologyPrefixURI());
+			for (String currModuleLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
+				String currModuleURI = APEUtils.createClassURI(currModuleLabel, domainSetup.getOntologyPrefixURI());
 				
-				AbstractModule currModule = domainSetup.getAllModules().get(currTypeURI);
+				AbstractModule currModule = domainSetup.getAllModules().get(currModuleURI);
+				if (currModule == null) {
+					currModule = domainSetup.getAllModules().get(currModuleLabel);
+				}
+				
 				if (currModule != null) {
 					/*
 					 * if the type exists, make it relevant from the taxonomy perspective and add it
@@ -184,7 +188,7 @@ public class Module extends AbstractModule {
 					currModule.setAsRelevantTaxonomyTerm(domainSetup.getAllModules());
 					logConnectedPredicates.add(currModule);
 				} else {
-					throw APEDimensionsException.dimensionDoesNotContainClass(String.format("Error in a JSON input. The tool '%s' was not defined or does not belong to the tool dimension '%s'.", currTypeURI, curRootURI));
+					throw APEDimensionsException.dimensionDoesNotContainClass(String.format("Error in a JSON input. The tool '%s' was not defined or does not belong to the tool dimension '%s'.", currModuleURI, curRootURI));
 				}
 			}
 

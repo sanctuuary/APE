@@ -56,7 +56,8 @@ public class APE {
 		if (config == null) {
 			throw new APEConfigException("Configuration failed. Error in configuration file.");
 		}
-		if (!setupDomain()) {
+		boolean setupSucc = setupDomain();
+		if (!setupSucc) {
 			throw new APEConfigException("Error setting up the domain.");
 		}
 	}
@@ -72,7 +73,8 @@ public class APE {
 	 */
 	public APE(JSONObject configObject) throws IOException, OWLOntologyCreationException {
 		config = new APECoreConfig(configObject);
-		if (!setupDomain()) {
+		boolean setupSucc = setupDomain();
+		if (!setupSucc) {
 			throw new APEConfigException("Error in setting up the domain.");
 		}
 	}
@@ -88,7 +90,8 @@ public class APE {
 	 */
 	public APE(APECoreConfig config) throws IOException, OWLOntologyCreationException {
 		this.config = config;
-		if (!setupDomain()) {
+		boolean setupSucc = setupDomain();
+		if (!setupSucc) {
 			throw new APEConfigException("Error in setting up the domain.");
 		}
 	}
