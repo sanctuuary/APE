@@ -133,7 +133,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
         /*
-         * The constraints preserve the memory structure (e.g. shared memory structure), i.e. preserve the data available in memory and the
+         * The constraints preserve the memory structure, i.e. preserve the data available in memory and the
          * logic of referencing data from memory in case of tool inputs.
          */
         APEUtils.appendToFile(cnfEncoding, SATModuleUtils.encodeMemoryStructure(this));

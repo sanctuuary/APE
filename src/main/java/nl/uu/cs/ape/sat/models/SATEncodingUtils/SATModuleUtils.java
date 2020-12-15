@@ -202,7 +202,7 @@ public final class SATModuleUtils {
 
         // setting up input constraints (Shared Memory Approach)
         StringBuilder constraints = new StringBuilder();
-
+        /** For each input state...*/
         for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
             int blockNumber = currBlock.getBlockNumber();
             for (State currInputState : currBlock.getStates()) {
