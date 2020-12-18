@@ -18,6 +18,7 @@ import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.Literal;
 import nl.uu.cs.ape.sat.utils.APEUtils;
@@ -185,9 +186,9 @@ public class SolutionWorkflow {
                     } else if (currLiteral.isWorkflowElementType(WorkflowElement.MEMORY_TYPE)) {
                         TypeNode currNode = this.mappedMemoryTypeNodes.get(currLiteral.getUsedInStateArgument());
                         if (currLiteral.getPredicate() instanceof Type
-                                && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
+                                && ((Type) currLiteral.getPredicate()).isNodeType(NodeType.LEAF)) {
                             currNode.addUsedType((Type) currLiteral.getPredicate());
-                        } else if (currLiteral.getPredicate() instanceof Type) {
+                        } else if ((currLiteral.getPredicate() instanceof Type) && !((Type) currLiteral.getPredicate()).isNodeType(NodeType.EMPTY_LABEL))  {
                             currNode.addAbstractDescriptionOfUsedType((Type) currLiteral.getPredicate());
                         } else {
                             /* Memory type cannot be anything else except a Type. */

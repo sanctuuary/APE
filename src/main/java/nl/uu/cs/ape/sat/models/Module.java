@@ -163,10 +163,14 @@ public class Module extends AbstractModule {
 			throws JSONException {
 		/* Set of predicates where each describes a type dimension */
 		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<TaxonomyPredicate>();
+		AllModules allModules = domainSetup.getAllModules();
 		/* Iterate through each of the dimensions */
 		for (String currRootLabel : jsonParam.keySet()) {
-			String curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixURI());
-			if(!domainSetup.getAllModules().existsRoot(curRootURI)) {
+			String curRootURI = currRootLabel;
+			if(!allModules.existsRoot(curRootURI)) {
+				curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixURI());
+			}
+			if(!allModules.existsRoot(curRootURI)) {
 				throw APEDimensionsException.notExistingDimension("Data type was defined over a non existing data dimension: '" + curRootURI + "', in JSON: '" + jsonParam + "'");
 			}
 			LogicOperation logConn = LogicOperation.OR;
@@ -175,9 +179,9 @@ public class Module extends AbstractModule {
 			for (String currModuleLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
 				String currModuleURI = APEUtils.createClassURI(currModuleLabel, domainSetup.getOntologyPrefixURI());
 				
-				AbstractModule currModule = domainSetup.getAllModules().get(currModuleURI);
+				AbstractModule currModule = allModules.get(currModuleURI);
 				if (currModule == null) {
-					currModule = domainSetup.getAllModules().get(currModuleLabel);
+					currModule = allModules.get(currModuleLabel);
 				}
 				
 				if (currModule != null) {
@@ -185,7 +189,7 @@ public class Module extends AbstractModule {
 					 * if the type exists, make it relevant from the taxonomy perspective and add it
 					 * to the outputs
 					 */
-					currModule.setAsRelevantTaxonomyTerm(domainSetup.getAllModules());
+					currModule.setAsRelevantTaxonomyTerm(allModules);
 					logConnectedPredicates.add(currModule);
 				} else {
 					throw APEDimensionsException.dimensionDoesNotContainClass(String.format("Error in a JSON input. The tool '%s' was not defined or does not belong to the tool dimension '%s'.", currModuleURI, curRootURI));

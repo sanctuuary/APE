@@ -381,7 +381,7 @@ public class APEDomainSetup {
         if (taxonomyModules.isEmpty()) {
             System.err.println("Tool '" + moduleURI + "' annotation issue. "
                     + "None of the referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "' can be found in the Tool Taxonomy.");
-            taxonomyModules.add(allModules.getRootsIDs().get(0));
+            taxonomyModules.add(allModules.getAllRootIDs().get(0));
         }
 
         String executionCode = null;
@@ -432,7 +432,7 @@ public class APEDomainSetup {
          * Add the module and make it sub module of the currSuperModule (if it was not
          * previously defined)
          */
-        Module currModule = (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootsIDs().get(0), moduleExecutionImpl));
+        Module currModule = (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getAllRootIDs().get(0), moduleExecutionImpl));
 
         /*	For each supermodule add the current module as a subset and vice versa. */
         for (String superModuleID : taxonomyModules) {

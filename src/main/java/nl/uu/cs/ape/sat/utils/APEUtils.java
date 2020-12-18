@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.utils;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.configuration.APERunConfig;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TYPES.JSON;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplateParameter;
 import nl.uu.cs.ape.sat.constraints.ConstraintFormatException;
@@ -332,8 +333,8 @@ public final class APEUtils {
 	 * @param domainSetup Domain information, including all the existing tools and
 	 *                    types.
 	 */
-	public static void debugPrintout(boolean debug, APEDomainSetup domainSetup) {
-		if (debug) {
+	public static void debugPrintout(APERunConfig runConfig, APEDomainSetup domainSetup) {
+		if (runConfig.getDebugMode()) {
 
 			/*
 			 * Printing the constraint templates
@@ -387,6 +388,17 @@ public final class APEUtils {
 			}
 			if (domainSetup.getUnformattedConstr().isEmpty()) {
 				System.out.println("\tNo constraints.");
+			}
+			System.out.println("-------------------------------------------------------------");
+			
+			int i = 1;
+			for (Type input : runConfig.getProgramInputs()) {
+				System.out.println((i++) + ". program input is " + input.toShortString());
+			}
+			System.out.println("-------------------------------------------------------------");
+			i = 1;
+			for (Type output : runConfig.getProgramOutputs()) {
+				System.out.println((i++) + ". program output is " + output.toShortString());
 			}
 			System.out.println("-------------------------------------------------------------");
 		}

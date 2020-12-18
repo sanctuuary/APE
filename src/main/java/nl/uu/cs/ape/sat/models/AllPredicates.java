@@ -21,15 +21,15 @@ public abstract class AllPredicates {
     /**
      * Root of the taxonomy.
      */
-    private List<String> taxonomyRoots;
+    private List<String> dimensionRoots;
 
     /**
      * Instantiates a new All mappedPredicates.
      *
-     * @param taxonomyRoots the taxonomy roots
+     * @param dimensionRoots the taxonomy roots
      */
     public AllPredicates(List<String> taxonomyRoots) {
-        this.taxonomyRoots = taxonomyRoots;
+        this.dimensionRoots = taxonomyRoots;
         this.mappedPredicates = new HashMap<String, TaxonomyPredicate>();
     }
 
@@ -40,7 +40,7 @@ public abstract class AllPredicates {
      */
     public List<TaxonomyPredicate> getRootPredicates() {
         List<TaxonomyPredicate> rootpredicates = new ArrayList<>();
-        for (String rootID : taxonomyRoots) {
+        for (String rootID : dimensionRoots) {
             rootpredicates.add(get(rootID));
         }
         return rootpredicates;
@@ -48,14 +48,14 @@ public abstract class AllPredicates {
 
 
     /**
-     * Returns the ID of the root predicate of the taxonomy.
+     * Returns the ID of the root predicate of the taxonomy including the "APE label" dimension (in case of type taxonomy).
      *
      * @return The root predicate.
      */
-    public List<String> getRootsIDs() {
-        return taxonomyRoots;
+    public List<String> getAllRootIDs() {
+        return dimensionRoots;
     }
-
+    
     /**
      * Add predicate taxonomy predicate.
      *
@@ -127,7 +127,7 @@ public abstract class AllPredicates {
     /**
      * Gets mappedPredicates mapped to their IDs.
      *
-     * @return  The mapping to mappedPredicates from the domain from their IDs.
+     * @return  The mapping to mappedPredicates from their IDs.
      */
     protected Map<String, TaxonomyPredicate> getMappedPredicates() {
         return this.mappedPredicates;
@@ -172,7 +172,7 @@ public abstract class AllPredicates {
      * @return true if the root exists
      */
     public boolean existsRoot(String curRootURI) {
-    	return taxonomyRoots.contains(curRootURI);
+    	return dimensionRoots.contains(curRootURI);
     }
     
     /**

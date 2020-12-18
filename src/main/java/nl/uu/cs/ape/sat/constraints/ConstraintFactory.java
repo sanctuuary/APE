@@ -106,6 +106,7 @@ public class ConstraintFactory {
 		List<ConstraintTemplateParameter> typeParam1 = Arrays.asList(typeParameter);
 		List<ConstraintTemplateParameter> typeParam2 = Arrays.asList(typeParameter, typeParameter);
 
+		List<ConstraintTemplateParameter> moduleNlabel = Arrays.asList(moduleParameter, typeParameter);
 		
 		/*
 		 * ID: ite_m 
@@ -187,6 +188,14 @@ public class ConstraintFactory {
 		 */
 		currTemplate = new Constraint_if_use_then_not_type("use_itn_t", typeParam2,
 				"If data type ${parameter_1} was used, then data ${parameter_2} cannot be used subsequently.");
+		addConstraintTemplate(currTemplate);
+		
+		
+		/*
+		 * ID: m_in_label
+		 */
+		currTemplate = new Constraint_use_m_in_label("m_in_label", moduleNlabel,
+				"Use operation ${parameter_1} with data labeled ${parameter_2} as one of the inputs.");
 		addConstraintTemplate(currTemplate);
 
 		/*
@@ -750,6 +759,36 @@ public class ConstraintFactory {
 
 			SLTL_formula_F formula = new SLTL_formula_F(parameters.get(0));
 			return formula.getCNF(null, typeAutomaton.getUsedTypesBlocks(), WorkflowElement.USED_TYPE, mappings);
+		}
+	}
+	
+	
+	/**
+	 * Implements constraints of the form:<br>
+	 * Use operation ${parameter_1} with data labeled ${parameter_2} as one of the inputs.
+	 * {@link #getConstraint}.
+	 */
+	public class Constraint_use_m_in_label extends ConstraintTemplate {
+		/**
+		 * Instantiates a new Constraint use type.
+		 *
+		 * @param id           the id
+		 * @param parametersNo the parameters no
+		 * @param description  the description
+		 */
+		protected Constraint_use_m_in_label(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+
+			return SLTL_formula.use_m_in_label(parameters.get(0), parameters.get(1), moduleAutomaton, typeAutomaton, mappings);
 		}
 	}
 }

@@ -185,20 +185,20 @@ public class SATTypeUtils {
 
         List<State> workflowInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
         for (int i = 0; i < workflowInputStates.size(); i++) {
+        	State currState = workflowInputStates.get(i);
             if (i < program_inputs.size()) {
-                TaxonomyPredicate currType = program_inputs.get(i);
+                Type currType = program_inputs.get(i);
                     if (allTypes.get(currType.getPredicateID()) == null) {
                         System.err.println(
                                 "Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
                         return null;
                     }
 
-                    encoding = encoding.append(mappings.add(currType, workflowInputStates.get(i), WorkflowElement.MEMORY_TYPE))
+                    encoding = encoding.append(mappings.add(currType, currState, WorkflowElement.MEMORY_TYPE))
                             .append(" 0\n");
-//					currType.setAsRelevantTaxonomyTerm(allTypes);
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
-                encoding = encoding.append(mappings.add(allTypes.getEmptyType(), workflowInputStates.get(i), WorkflowElement.MEMORY_TYPE))
+                encoding = encoding.append(mappings.add(allTypes.getEmptyType(), currState, WorkflowElement.MEMORY_TYPE))
                         .append(" 0\n");
             }
 

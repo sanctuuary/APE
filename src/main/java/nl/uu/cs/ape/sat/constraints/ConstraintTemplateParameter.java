@@ -8,15 +8,13 @@ import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.PrimitiveIterator.OfDouble;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * The {@code ConstraintParameterX} class is used to represent a parameter of a
+ * The {@code ConstraintTemplateParameter} class is used to represent a parameter of a
  * constraint.
  *
  * @author Vedran Kasalica

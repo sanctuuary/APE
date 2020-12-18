@@ -423,10 +423,10 @@ public class APEConfigTagFactory {
                 }
 
                 try {
-                    for (JSONObject jsonModuleInOut : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
-                        Type output;
-                        if ((output = Type.taxonomyInstanceFromJson(jsonModuleInOut, apeDomainSetup, true)) != null) {
-                            instances.add(output);
+                    for (JSONObject jsonType : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
+                        Type input;
+                        if ((input = Type.taxonomyInstanceFromJson(jsonType, apeDomainSetup, true)) != null) {
+                            instances.add(input);
                         }
                     }
                 } catch (ClassCastException e) {
@@ -470,9 +470,9 @@ public class APEConfigTagFactory {
                 }
 
                 try {
-                    for (JSONObject jsonModuleInOut : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
+                    for (JSONObject jsonType : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
                         Type output;
-                        if ((output = Type.taxonomyInstanceFromJson(jsonModuleInOut, apeDomainSetup, false)) != null) {
+                        if ((output = Type.taxonomyInstanceFromJson(jsonType, apeDomainSetup, false)) != null) {
                             instances.add(output);
                         }
                     }

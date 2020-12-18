@@ -286,18 +286,8 @@ public class APE {
 		apeDomainSetup.updateConstraints(runConfig.getConstraintsJSON());
 
 		/* Print the setup information when necessary. */
-		APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);
+		APEUtils.debugPrintout(runConfig, apeDomainSetup);
 
-		int i = 1;
-		for (Type input : runConfig.getProgramInputs()) {
-			System.out.println((i++) + ". program input is " + input.toShortString());
-		}
-		System.out.println("-------------------------------------------------------------");
-		i = 1;
-		for (Type output : runConfig.getProgramOutputs()) {
-			System.out.println((i++) + ". program output is " + output.toShortString());
-		}
-		System.out.println("-------------------------------------------------------------");
 		/*
 		 * Loop over different lengths of the workflow until either, max workflow length
 		 * or max number of solutions has been found.

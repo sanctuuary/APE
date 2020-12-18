@@ -30,5 +30,10 @@ public enum NodeType {
     /**
      * Represents the empty predicate.
      */
-    EMPTY
+    EMPTY,
+    
+    /**
+     * Represents the empty label.
+     */
+    EMPTY_LABEL
 }

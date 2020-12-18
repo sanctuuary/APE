@@ -10,7 +10,6 @@ import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
-import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,30 +30,30 @@ public class APERunConfig {
     /**
      * Path to the file with all workflow constraints.
      */
-    public final APEConfigTag<JSONObject> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
+    private final APEConfigTag<JSONObject> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
     /**
      * Path to the directory that will contain all the solutions to the problem.
      */
-    public final APEConfigTag<Path> SOLUTION_DIR_PATH = new APEConfigTagFactory.TAGS.SOLUTION_DIR_PATH();
+   private final APEConfigTag<Path> SOLUTION_DIR_PATH = new APEConfigTagFactory.TAGS.SOLUTION_DIR_PATH();
     /**
      * Min and Max possible length of the solutions (length of the automaton). For
      * no upper limit, max length should be set to 0.
      */
-    public final APEConfigTag<Range> SOLUTION_LENGTH_RANGE = new APEConfigTagFactory.TAGS.SOLUTION_LENGTH_RANGE();
+   private final APEConfigTag<Range> SOLUTION_LENGTH_RANGE = new APEConfigTagFactory.TAGS.SOLUTION_LENGTH_RANGE();
     /**
      * Max number of solution that the solver will return.
      */
-    public final APEConfigTag<Integer> MAX_NO_SOLUTIONS = new APEConfigTagFactory.TAGS.MAX_NO_SOLUTIONS();
+   private final APEConfigTag<Integer> MAX_NO_SOLUTIONS = new APEConfigTagFactory.TAGS.MAX_NO_SOLUTIONS();
     /**
      * Number of the workflow scripts that should be generated from candidate
      * workflows. Default is 0.
      */
-    public final APEConfigTag<Integer> NO_EXECUTIONS = new APEConfigTagFactory.TAGS.NO_EXECUTIONS();
+   private final APEConfigTag<Integer> NO_EXECUTIONS = new APEConfigTagFactory.TAGS.NO_EXECUTIONS();
     /**
      * Number of the solution graphs that should be generated from candidate
      * workflows. Default is 0.
      */
-    public final APEConfigTag<Integer> NO_GRAPHS = new APEConfigTagFactory.TAGS.NO_GRAPHS();
+   private final APEConfigTag<Integer> NO_GRAPHS = new APEConfigTagFactory.TAGS.NO_GRAPHS();
     /**
      * Determines the required usage for the data instances that are given as
      * workflow input:<br>
@@ -62,7 +61,7 @@ public class APERunConfig {
      * {@link ConfigEnum#ONE} if one of the workflow inputs should be used or <br>
      * {@link ConfigEnum#NONE} if none of the workflow inputs has to be used
      */
-    public final APEConfigTag<ConfigEnum> USE_WORKFLOW_INPUT = new APEConfigTagFactory.TAGS.USE_WORKFLOW_INPUT();
+   private final APEConfigTag<ConfigEnum> USE_WORKFLOW_INPUT = new APEConfigTagFactory.TAGS.USE_WORKFLOW_INPUT();
     /**
      * Determines the required usage for the generated data instances:<br>
      * {@link ConfigEnum#ALL} if all the generated data has to be used,<br>
@@ -70,25 +69,25 @@ public class APERunConfig {
      * output, per tool, has to be used or <br>
      * {@link ConfigEnum#NONE} if none of the data instances is obligatory to use.
      */
-    public final APEConfigTag<ConfigEnum> USE_ALL_GENERATED_DATA = new APEConfigTagFactory.TAGS.USE_ALL_GENERATED_DATA();
+   private final APEConfigTag<ConfigEnum> USE_ALL_GENERATED_DATA = new APEConfigTagFactory.TAGS.USE_ALL_GENERATED_DATA();
     /**
      * Mode is true if debug mode is turned on.
      */
-    public final APEConfigTag<Boolean> DEBUG_MODE = new APEConfigTagFactory.TAGS.DEBUG_MODE();
+   private final APEConfigTag<Boolean> DEBUG_MODE = new APEConfigTagFactory.TAGS.DEBUG_MODE();
     /**
      * false iff the provided solutions should be distinguished based on the tool
      * sequences alone, i.e. tool sequences cannot repeat, ignoring the types in the
      * solutions.
      */
-    public final APEConfigTag<Boolean> TOOL_SEQ_REPEAT = new APEConfigTagFactory.TAGS.TOOL_SEQ_REPEAT();
+   private final APEConfigTag<Boolean> TOOL_SEQ_REPEAT = new APEConfigTagFactory.TAGS.TOOL_SEQ_REPEAT();
     /**
      * Input types of the workflow.
      */
-    public final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
+   private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
     /**
      * Output types of the workflow.
      */
-    public final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
+   private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
     /**
      * All the Tags specified in this class. Should be in correct order of dependencies.
      */

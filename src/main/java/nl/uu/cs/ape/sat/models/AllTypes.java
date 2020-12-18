@@ -8,6 +8,8 @@ import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The {@code AllTypes} class represent the set of all the data dimensions that can be used in our program. The data 
@@ -17,35 +19,70 @@ import java.util.*;
  */
 public class AllTypes extends AllPredicates {
 
+	 private static String empty = "empty";
+	 private static String apeLabel = "APE_label";
+	 private static String emptyLabel = "emptyLabel";
+	
     /**
      * {@link Type} object representing the "empty type".
      */
     private Type emptyType;
 
-
+    /**
+     * {@link Type} object representing the "empty label root".
+     */
+    private Type apeLabelRoot;
+    
+    /**
+     * {@link Type} object representing the "empty label type".
+     */
+    private Type emptyLabelType;
+   
     /**
      * Instantiates a new All types.
      *
      * @param config the config
      */
     public AllTypes(APECoreConfig config) {
-        super(config.getDataDimensionRoots());
-        emptyType = new Type("empty", "empty", "empty", NodeType.EMPTY);
-        emptyType.setAsRelevantTaxonomyTerm(this);
-        getMappedPredicates().put(emptyType.getPredicateID(), emptyType);
+        super(Stream.concat(config.getDataDimensionRoots().stream(), Stream.of(apeLabel))
+                             .collect(Collectors.toList()));
+        emptyType = new Type(empty, empty, empty, NodeType.EMPTY);
+        apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
+        emptyLabelType = new Type(emptyLabel, emptyLabel, apeLabel, NodeType.EMPTY_LABEL);
+        setRelevant(emptyType);
+        setRelevant(apeLabelRoot);
+        setRelevant(emptyLabelType);
+        apeLabelRoot.addSubPredicate(emptyLabelType);
+        emptyLabelType.addSuperPredicate(apeLabelRoot);
     }
     
-    /**
+	/**
      * Instantiates a new All modules.
      *
      * @param config the config
      */
     public AllTypes(List<String> typeTaxonomyRoots) {
-    	super(typeTaxonomyRoots);
-        emptyType = new Type("empty", "empty", "empty", NodeType.EMPTY);
-        emptyType.setAsRelevantTaxonomyTerm(this);
-        getMappedPredicates().put(emptyType.getPredicateID(), emptyType);
+    	super(Stream.concat(typeTaxonomyRoots.stream(), Stream.of(apeLabel))
+                .collect(Collectors.toList()));
+    	 emptyType = new Type(empty, empty, empty, NodeType.EMPTY);
+         Type apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
+         emptyLabelType = new Type(emptyLabel, emptyLabel, apeLabel, NodeType.EMPTY_LABEL);
+         setRelevant(emptyType);
+         setRelevant(apeLabelRoot);
+         setRelevant(emptyLabelType);
+         apeLabelRoot.addSubPredicate(emptyLabelType);
+         emptyLabelType.addSuperPredicate(apeLabelRoot);
     }
+    
+    /**
+     * Helper method that sets the type to be relevant in the current domain
+     * @param type - Type that should be relevant
+     */
+    private void setRelevant(Type type) {
+    	type.setAsRelevantTaxonomyTerm(this);
+        getMappedPredicates().put(type.getPredicateID(), type);
+		
+	}
 
     /**
      * Returns the set of {@link Type}s that are currently defined.
@@ -171,7 +208,7 @@ public class AllTypes extends AllPredicates {
      * @return true if the dimensionID exists in the domain.
      */
     public boolean existsRoot(String dimensionID) {
-    	return getRootsIDs().contains(dimensionID);
+    	return getAllRootIDs().contains(dimensionID);
     }
 
     /**
@@ -206,7 +243,7 @@ public class AllTypes extends AllPredicates {
          */
         Map<String, List<TaxonomyPredicate>> subTreesMap = new HashMap<String, List<TaxonomyPredicate>>();
         // Add each of the dimension roots (type and format taxonomy) to the list
-        for (String subRoot : APEUtils.safe(getRootsIDs())) {
+        for (String subRoot : APEUtils.safe(getAllRootIDs())) {
             subTreesMap.put(subRoot, new ArrayList<TaxonomyPredicate>());
         }
 
@@ -246,38 +283,68 @@ public class AllTypes extends AllPredicates {
 
     /**
      * Return the list of dimensions that represent the data. Each dimension represents
-     * a node in the data taxonomy and the root for the corresponding dimension.
+     * a node in the data taxonomy and the root for the corresponding dimension (this excludes the "APE label" dimension).
      *
      * @return List of abstract types that represent dimensions.
      */
     public List<String> getDataTaxonomyDimensionIDs() {
-        return getRootsIDs();
+    	List<String> taxonomyRoot = new ArrayList<String>();
+    	for(String dimension : getAllRootIDs()) {
+    		if(!dimension.equals(getLabelRootID())) {
+    			taxonomyRoot.add(dimension);
+    		}
+    	}
+        return taxonomyRoot;
     }
 
     /**
      * Return the list of dimensions that represent the data. Each dimension represents
-     * a node in the data taxonomy and the root for the corresponding dimension.
+     * a node in the data taxonomy and the root for the corresponding dimension (this excludes the "APE label" dimension).
      *
      * @return List of abstract types that represent dimensions.
      */
     public List<TaxonomyPredicate> getDataTaxonomyDimensions() {
         List<TaxonomyPredicate> dimensionTypes = new ArrayList<TaxonomyPredicate>();
-        this.getRootsIDs().stream().filter(dimensionID -> get(dimensionID) != null)
+        this.getDataTaxonomyDimensionIDs().stream().filter(dimensionID -> get(dimensionID) != null)
                 .forEach(dimensionID -> dimensionTypes.add(get(dimensionID)));
         return dimensionTypes;
     }
 
     /**
      * Return the SortedSet of dimensions that represent the data. Each dimension represents
-     * a node in the data taxonomy and the root for the corresponding dimension.
+     * a node in the data taxonomy and the root for the corresponding dimension (this excludes the "APE label" dimension).
      *
      * @return SortedSet of abstract types that represent dimensions.
      */
     public SortedSet<TaxonomyPredicate> getDataTaxonomyDimensionsAsSortedSet() {
         SortedSet<TaxonomyPredicate> dimensionTypes = new TreeSet<TaxonomyPredicate>();
-        this.getRootsIDs().stream().filter(dimensionID -> get(dimensionID) != null)
+        this.getDataTaxonomyDimensionIDs().stream().filter(dimensionID -> get(dimensionID) != null)
                 .forEach(dimensionID -> dimensionTypes.add(get(dimensionID)));
         return dimensionTypes;
     }
+
+	/**
+	 * Return ID of the taxonomy root containing APE type labels (variables).
+	 * @return String representing the root ID
+	 */
+    public String getLabelRootID() {
+		return apeLabel;
+	}
+    
+	/**
+	 * Return the taxonomy root containing APE type labels (variables).
+	 * @return Type representing the root 
+	 */
+    public Type getLabelRoot() {
+		return apeLabelRoot;
+	}
+    
+    /**
+	 * Return the empty APE type label. It corresponds to the type not beeing labeled.
+	 * @return Type that represents empty label
+	 */
+    public Type getEmptyAPELabel() {
+		return emptyLabelType;
+	}
     
 }

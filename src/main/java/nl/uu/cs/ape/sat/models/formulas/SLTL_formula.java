@@ -3,6 +3,7 @@ package nl.uu.cs.ape.sat.models.formulas;
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
+import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.Module;
@@ -385,9 +386,33 @@ public abstract class SLTL_formula {
      * @param typeStateBlocks the type state blocks
      * @param typeElement     the type element
      * @return the cnf
-     */
+     
     public String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement typeElement) {
         // TODO Auto-generated method stub
         return null;
-    }
+    }*/
+
+	public static String use_m_in_label(TaxonomyPredicate module, TaxonomyPredicate inputType,
+			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMappings mappings) {
+		StringBuilder constraints = new StringBuilder();
+		for (State moduleState : moduleAutomaton.getAllStates()) {
+			int moduleNo = moduleState.getStateNumber();
+            /* ..and for each state and input state of that module state.. */
+            List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
+            /* Encode: if module was used in the module state */
+            constraints = constraints.append("-")
+                    .append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
+            for (State currInputState : currInputStates) {
+                        /*
+                         * .. the corresponding data type needs to be provided in one of the input
+                         * states
+                         */
+                        constraints = constraints
+                                .append(mappings.add(inputType, currInputState, WorkflowElement.USED_TYPE))
+                                .append(" ");
+            }
+		}
+		constraints = constraints.append("0\n");
+        return constraints.toString();
+	}
 }

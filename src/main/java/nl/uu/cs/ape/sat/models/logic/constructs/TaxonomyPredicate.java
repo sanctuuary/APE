@@ -394,6 +394,17 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         return superPredicates;
     }
 
+    
+    /**
+     * Returns true if the type is a simple/leaf type, otherwise returns false - the
+     * type is an abstract (non-leaf) type.
+     *
+     * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type).
+     */
+    public boolean isNodeType(NodeType nodeType) {
+        return this.nodeType.equals(nodeType);
+    }
+    
     /**
      * Returns true if the type is a simple/leaf type, otherwise returns false - the
      * type is an abstract (non-leaf) type.
@@ -401,7 +412,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type).
      */
     public boolean isSimplePredicate() {
-        return (this.nodeType == NodeType.LEAF);
+        return (this.nodeType == NodeType.LEAF || this.nodeType == NodeType.EMPTY_LABEL);
     }
 
     /**
@@ -432,13 +443,6 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      */
     public boolean isRootPredicate() {
         return this.nodeType == NodeType.ROOT;
-    }
-
-    /**
-     * Set the type to be a simple type (LEAF type in the Taxonomy).
-     */
-    public void setToSimplePredicate() {
-        this.nodeType = NodeType.LEAF;
     }
 
     /**
