@@ -392,12 +392,24 @@ public abstract class SLTL_formula {
         return null;
     }*/
 
+    /**
+     * Creates a CNF representation of the Constraint:<br>
+     * Use <b>module<b/> with data <b>inputType<b/> as one of the inputs.
+     * 
+     * @param module			Module to be used.
+     * @param inputType			Type of one of the input types.
+     * @param moduleAutomaton	The module automaton
+     * @param typeAutomaton		The type automaton.
+     * @param mappings			Set of the mappings for the literals.
+     * @return
+     */
 	public static String use_m_in_label(TaxonomyPredicate module, TaxonomyPredicate inputType,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
+		/* For each module state in the workflow */
 		for (State moduleState : moduleAutomaton.getAllStates()) {
 			int moduleNo = moduleState.getStateNumber();
-            /* ..and for each state and input state of that module state.. */
+            /* ..and for each input state of that module state.. */
             List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
             /* Encode: if module was used in the module state */
             constraints = constraints.append("-")
@@ -411,8 +423,8 @@ public abstract class SLTL_formula {
                                 .append(mappings.add(inputType, currInputState, WorkflowElement.USED_TYPE))
                                 .append(" ");
             }
+            constraints = constraints.append("0\n");
 		}
-		constraints = constraints.append("0\n");
         return constraints.toString();
 	}
 }

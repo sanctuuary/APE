@@ -359,7 +359,7 @@ public class APE {
 
 		for (int i = 0; i < allSolutions.size(); i++) {
 			solutions2write = solutions2write
-					.append(allSolutions.get(i).getNativeSATsolution().getRelevantToolsInSolution()).append("\n");
+					.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution()).append("\n");
 		}
 		APEUtils.write2file(solutions2write.toString(),
 				allSolutions.getRunConfiguration().getSolutionDirPath2("solutions.txt").toFile(), false);
