@@ -22,6 +22,7 @@ import org.sat4j.specs.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -64,12 +65,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
      * CNF encoding of the problem.
      */
     private File cnfEncoding;
-//    private StringBuilder cnfEncoding;
 
     /**
-     * String used as an input for the SAT solver.
+     * File used as an input for the SAT solver.
      */
-    private InputStream tmpSatInput;
+    private File satInputFile;
 
     /**
      * Representation of the tool part of the automaton used to encode the structure of the solution.
@@ -97,9 +97,8 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
         this.runConfig = runConfig;
         allSolutions.newEncoding();
         this.mappings = allSolutions.getMappings();
-        this.tmpSatInput = null;
+        this.satInputFile = null;
         this.cnfEncoding = File.createTempFile("satCNF" + workflowLength, null);
-        cnfEncoding.deleteOnExit();
 
         int maxNoToolInputs = Math.max(domainSetup.getMaxNoToolInputs(), runConfig.getProgramOutputs().size());
         int maxNoToolOutputs = Math.max(domainSetup.getMaxNoToolOutputs(), runConfig.getProgramInputs().size());
@@ -209,14 +208,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
         System.out.println();
         
-        File satInputFile = APEUtils.concatIntoFile(sat_input_header, cnfEncoding);
+        satInputFile = APEUtils.concatIntoFile(sat_input_header, cnfEncoding);
+        cnfEncoding.delete();
 //		APEUtils.write2file(mknfEncoding.toString(), new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime), false);
 
         
-
-        tmpSatInput = new FileInputStream(satInputFile);
-        
-
         /* testing sat input */
 //		InputStream tmpSat = IOUtils.toInputStream(mknfEncoding.toString(), "ASCII");
 //		tmpSat.close();
@@ -233,15 +229,17 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     /**
      * Using the SAT input generated from SAT encoding and running MiniSAT solver to find the solutions.
      *
-     * @return true if the synthesis execution results in new candidate solutions, otherwise false.
+     * @return The list of new solutions.
+     * @throws IOException  Error if the sat encoding file does not exist.
      */
-    public boolean synthesisExecution() {
+    public List<SolutionWorkflow> synthesisExecution() throws IOException {
 
+    	InputStream tmpSatInput = new FileInputStream(satInputFile);
         List<SolutionWorkflow> currSolutions = runMiniSAT(tmpSatInput,
                 allSolutions.getNumberOfSolutions(), allSolutions.getMaxNumberOfSolutions());
-        
+        tmpSatInput.close();
         /* Add current solutions to list of all solutions. */
-        return allSolutions.addSolutions(currSolutions);
+        return currSolutions;
     }
 
     /**
@@ -383,5 +381,14 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     public int getSolutionSize() {
         return moduleAutomaton.size();
     }
+
+    /**
+     * Delete all temporary files created.
+     */
+	public void deleteTempFiles() {
+		cnfEncoding.delete();
+		satInputFile.delete();
+		
+	}
 
 }

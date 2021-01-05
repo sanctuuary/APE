@@ -319,7 +319,8 @@ public class APE {
 				return null;
 			}
 			/* Execution of the synthesis - updates the object allSolutions */
-			implSATsynthesis.synthesisExecution();
+			allSolutions.addSolutions(implSATsynthesis.synthesisExecution());
+			implSATsynthesis.deleteTempFiles();
 			allSolutions.addNoSolutionsForLength(solutionLength, allSolutions.getNumberOfSolutions());
 
 			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)

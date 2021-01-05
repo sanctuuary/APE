@@ -805,7 +805,8 @@ public final class APEUtils {
 	}
 	
 	/**
-	 * Prepend text to the existing file. It adds the text at the beginning, before the existing content of the file.
+	 * Prepend text to the existing file content and create a new file out of it.
+	 * It adds the text at the beginning, before the existing content of the file.
 	 * @param file
 	 * @param prefix
 	 * @throws IOException
