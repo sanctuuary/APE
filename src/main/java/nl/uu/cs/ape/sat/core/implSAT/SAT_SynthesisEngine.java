@@ -261,9 +261,14 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     private List<SolutionWorkflow> runMiniSAT(InputStream sat_input, int solutionsFound, int solutionsFoundMax) {
         List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
         ISolver solver = SolverFactory.newDefault();
-        int timeout = 3600;
-        // 1 hour timeout
-        solver.setTimeout(timeout);
+        long globalTimeoutMs = runConfig.getTimeoutMs();
+		long currTimeout = APEUtils.timerTimeLeft("globalTimer", globalTimeoutMs);
+		if (currTimeout <= 0) {
+			System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
+			return solutions;
+		}
+        // set timeout (in ms)
+        solver.setTimeoutMs(currTimeout);
         long realStartTime = 0;
         long realTimeElapsedMillis;
         Reader reader = new DimacsReader(solver);
@@ -295,7 +300,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
                 System.err.println("Unsatisfiable");
             }
         } catch (TimeoutException e) {
-            System.err.println("Timeout. Solving took longer than the default timeout: " + timeout + " seconds.");
+            System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
         } catch (IOException e) {
             System.err.println("Internal error while parsing the encoding.");
         }

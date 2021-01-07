@@ -524,7 +524,7 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Timer start.
+	 * Timer start if in debug mode.
 	 *
 	 * @param timerID   the timer id
 	 * @param debugMode the debug mode
@@ -535,6 +535,17 @@ public final class APEUtils {
 		} else {
 			timers.put(timerID, (long) -1);
 		}
+	}
+	
+	public static long timerTimeLeft(String timerID, long timeout) {
+		if(timers.get(timerID) == -1) {
+			return 0;
+		}
+		
+		long elapsedTimeMs = System.currentTimeMillis() - timers.get(timerID);
+		long timeLeftMs = timeout - elapsedTimeMs;
+		return timeLeftMs;
+				
 	}
 
 	/**

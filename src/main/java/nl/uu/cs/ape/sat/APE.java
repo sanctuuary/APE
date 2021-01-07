@@ -306,7 +306,7 @@ public class APE {
 		APEUtils.timerStart(globalTimerID, true);
 		int solutionLength = runConfig.getSolutionLength().getMin();
 		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
-				&& solutionLength <= runConfig.getSolutionLength().getMax()) {
+				&& solutionLength <= runConfig.getSolutionLength().getMax() && APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) > 0) {
 
 			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, runConfig,
 					solutionLength);
@@ -323,14 +323,18 @@ public class APE {
 			implSATsynthesis.deleteTempFiles();
 			allSolutions.addNoSolutionsForLength(solutionLength, allSolutions.getNumberOfSolutions());
 
-			if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)
-					|| solutionLength == runConfig.getSolutionLength().getMax()) {
-				APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
-			}
-
 			/* Increase the size of the workflow for the next depth iteration */
 			solutionLength++;
 		}
+		
+		if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)) {
+			System.out.println("All required solutions found.");
+		} else if (solutionLength == runConfig.getSolutionLength().getMax()) {
+			System.out.println("Maximum solution length reached.");
+		} else if(APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) <= 0) {
+			System.out.println("Timeout was reached.");
+		}
+		APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
 
 		return allSolutions;
 	}
