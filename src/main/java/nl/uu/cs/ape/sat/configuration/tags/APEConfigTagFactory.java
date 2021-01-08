@@ -754,7 +754,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getTagName() {
-                return "timeout(sec)";
+                return "timeout_sec";
             }
 
             @Override
