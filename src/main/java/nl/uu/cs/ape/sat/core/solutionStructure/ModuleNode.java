@@ -9,6 +9,7 @@ import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -280,5 +281,12 @@ public class ModuleNode extends SolutionWorkflowNode {
      */
     public String getNodeLabel() {
         return this.usedModule.getPredicateLabel();
+    }
+    
+    /**
+     *  Gets node descriptive label, containing module IDs.
+     */
+    public String getNodeFullLabel() {
+    	return this.usedModule.getPredicateID();
     }
 }

@@ -75,14 +75,21 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
     /**
      * Gets node id.
      *
-     * @return The unique label that describes the node.
+     * @return The unique ID that identifies the node and should not be used for presentation.
      */
     public abstract String getNodeID();
 
     /**
+     * Gets node full label.
+     *
+     * @return A label that describes the node using full type and tool IDs (it is usually much longer than {@link #getNodeLabel()}.
+     */
+    public abstract String getNodeFullLabel();
+    
+    /**
      * Gets node label.
      *
-     * @return A label that describes the node.
+     * @return A human readable and condensed label that describes the node.
      */
     public abstract String getNodeLabel();
 

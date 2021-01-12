@@ -6,6 +6,7 @@ import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -217,10 +218,10 @@ public class TypeNode extends SolutionWorkflowNode {
     }
 
     /**
-     * Get id of the current workflow node in .dot representation.
+     * Get the unique ID of the current workflow node in .dot representation.
      */
     public String getNodeID() {
-        StringBuilder printString = new StringBuilder();
+        StringBuilder printString = new StringBuilder("\"");
 
         int i = 0;
         for (Type type : this.usedTypes) {
@@ -229,9 +230,29 @@ public class TypeNode extends SolutionWorkflowNode {
                 printString = printString.append(",");
             }
         }
-        printString = printString.append("_").append(super.getAutomatonState().getPredicateID());
+        printString = printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
 
         return printString.toString();
+    }
+    
+    /**
+     * Gets node descriptive label, containing type IDs.
+     */
+    public String getNodeFullLabel() {
+    	 StringBuilder printString = new StringBuilder();
+         int i = 0;
+         for (Type type : this.usedTypes) {
+        	 String typeLabel = type.getPredicateID();
+        	 if(type.isArtificialLeaf()) {
+        		 // remove "_plain" suffix
+        		 typeLabel = APEUtils.removeNLastChar(typeLabel, 6);
+        	 }
+             printString = printString.append(typeLabel);
+             if (++i < this.usedTypes.size()) {
+                 printString = printString.append(", ");
+             }
+         }
+         return printString.toString();
     }
 
     /**
