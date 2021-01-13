@@ -209,7 +209,12 @@ public class TypeNode extends SolutionWorkflowNode {
         StringBuilder printString = new StringBuilder();
         int i = 0;
         for (Type type : this.usedTypes) {
-            printString = printString.append(type.getPredicateLabel());
+        	 String typeLabel = type.getPredicateLabel();
+        	 if(typeLabel.endsWith("_p")) {
+        		 // remove "_plain" suffix
+        		 typeLabel = APEUtils.removeNLastChar(typeLabel, 2);
+        	 }
+            printString = printString.append(typeLabel);
             if (++i < this.usedTypes.size()) {
                 printString = printString.append(", ");
             }
@@ -243,7 +248,7 @@ public class TypeNode extends SolutionWorkflowNode {
          int i = 0;
          for (Type type : this.usedTypes) {
         	 String typeLabel = type.getPredicateID();
-        	 if(type.isArtificialLeaf()) {
+        	 if(typeLabel.endsWith("_plain")) {
         		 // remove "_plain" suffix
         		 typeLabel = APEUtils.removeNLastChar(typeLabel, 6);
         	 }
