@@ -243,7 +243,7 @@ public class TypeNode extends SolutionWorkflowNode {
     /**
      * Gets node descriptive label, containing type IDs.
      */
-    public String getNodeFullLabel() {
+    public String getNodeLongLabel() {
     	 StringBuilder printString = new StringBuilder();
          int i = 0;
          for (Type type : this.usedTypes) {

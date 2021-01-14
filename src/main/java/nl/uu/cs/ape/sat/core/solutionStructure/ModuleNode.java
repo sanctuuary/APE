@@ -286,7 +286,7 @@ public class ModuleNode extends SolutionWorkflowNode {
     /**
      *  Gets node descriptive label, containing module IDs.
      */
-    public String getNodeFullLabel() {
+    public String getNodeLongLabel() {
     	return this.usedModule.getPredicateLongLabel();
     }
 }
