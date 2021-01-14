@@ -43,6 +43,14 @@ public class Type extends TaxonomyPredicate {
     public String getPredicateLabel() {
         return typeName;
     }
+    
+    public String getPredicateLongLabel() {
+    	if(typeID.endsWith("_plain")) {
+    		return APEUtils.removeNLastChar(typeID, 6);
+    	} else {
+    		return typeID;
+    	}
+    }
 
     public String getPredicateID() {
         return typeID;

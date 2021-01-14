@@ -247,11 +247,7 @@ public class TypeNode extends SolutionWorkflowNode {
     	 StringBuilder printString = new StringBuilder();
          int i = 0;
          for (Type type : this.usedTypes) {
-        	 String typeLabel = type.getPredicateID();
-        	 if(typeLabel.endsWith("_plain")) {
-        		 // remove "_plain" suffix
-        		 typeLabel = APEUtils.removeNLastChar(typeLabel, 6);
-        	 }
+        	 String typeLabel = type.getPredicateLongLabel();
              printString = printString.append(typeLabel);
              if (++i < this.usedTypes.size()) {
                  printString = printString.append(", ");
