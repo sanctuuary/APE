@@ -24,53 +24,57 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
  */
 public class Type extends TaxonomyPredicate {
 
-	private final String typeName;
-	private final String typeID;
-	private Type plainType;
+    private final String typeName;
+    private final String typeID;
+    private Type plainType;
 
-	/**
-	 * Constructor used to create a Type object.
-	 *
-	 * @param typeName Type name.
-	 * @param typeID   Type ID.
-	 * @param rootNode ID of the Taxonomy (Sub)Root node corresponding to the Type.
-	 * @param nodeType {@link NodeType} object describing the type w.r.t. the
-	 *                 TypeTaxonomy.
-	 */
-	public Type(String typeName, String typeID, String rootNode, NodeType nodeType) {
-		super(rootNode, nodeType);
-		this.typeName = typeName;
-		this.typeID = typeID;
-		this.plainType = this;
-	}
+    /**
+     * Constructor used to create a Type object.
+     *
+     * @param typeName Type name.
+     * @param typeID   Type ID.
+     * @param rootNode ID of the Taxonomy (Sub)Root node corresponding to the Type.
+     * @param nodeType {@link NodeType} object describing the type w.r.t. the TypeTaxonomy.
+     */
+    public Type(String typeName, String typeID, String rootNode, NodeType nodeType) {
+        super(rootNode, nodeType);
+        this.typeName = typeName;
+        this.typeID = typeID;
+        this.plainType = this;
+    }
 
-	public String getPredicateLabel() {
-		return typeName;
-	}
+    public String getPredicateLabel() {
+        return typeName;
+    }
+    
+    public String getPredicateLongLabel() {
+    	if(typeID.endsWith("_plain")) {
+    		return APEUtils.removeNLastChar(typeID, 6);
+    	} else {
+    		return typeID;
+    	}
+    }
 
-	public String getPredicateID() {
-		return typeID;
-	}
+    public String getPredicateID() {
+        return typeID;
+    }
 
-	@Override
-	public String getType() {
-		return "type";
-	}
-
-	public void setPlainType(Type plainType) {
-		this.plainType = plainType;
-	}
-
-	/**
-	 * Method returns an artificially created plain version of the abstract class in
-	 * case of a strict tool annotations, or the type itself otherwise.
-	 * 
-	 * @return The type itself or an artificially created plain version of the type
-	 *         when needed.
-	 */
-	public Type getPlainType() {
-		return plainType;
-	}
+    @Override
+    public String getType() {
+        return "type";
+    }
+    
+    public void setPlainType(Type plainType) {
+    	this.plainType = plainType;
+    }
+    
+    /** 
+     * Method returns an artificially created plain version of the abstract class in case of a strict tool annotations, or the type itself otherwise.
+     * @return The type itself or an artificially created plain version of the type when needed.
+     */
+    public Type getPlainType() {
+    	return plainType;
+    }
 
 	/**
 	 * Generate a taxonomy data instance that is defined based on one or more

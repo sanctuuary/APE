@@ -745,6 +745,39 @@ public class APEConfigTagFactory {
                 return results;
             }
         }
+        
+        public static class TIMEOUT_SEC extends TYPES.Int {
+
+            public TIMEOUT_SEC() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
+
+            @Override
+            public String getTagName() {
+                return "timeout_sec";
+            }
+
+            @Override
+            public String getLabel() {
+                return "Timeout (in sec)";
+            }
+
+            @Override
+            public String getDescription() {
+                //TODO
+                return "";
+            }
+
+            @Override
+            protected ValidationResults validate(Integer value, ValidationResults results) {
+                return results;
+            }
+            
+            @Override
+            public APEConfigDefaultValue<Integer> getDefault() {
+                return APEConfigDefaultValue.withDefault(300);
+            }
+        }
 
         public static class USE_WORKFLOW_INPUT extends TYPES.Option<ConfigEnum> {
 

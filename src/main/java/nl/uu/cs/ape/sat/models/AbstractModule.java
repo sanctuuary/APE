@@ -2,12 +2,9 @@ package nl.uu.cs.ape.sat.models;
 
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.utils.APEDomainSetup;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.List;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * The {@code AbstractModule} class represents modules/tools provided by the
@@ -57,6 +54,15 @@ public class AbstractModule extends TaxonomyPredicate {
     @Override
     public String getPredicateLabel() {
         return moduleName;
+    }
+    
+    @Override
+    public String getPredicateLongLabel() {
+    	if(moduleID.endsWith("[tool]")) {
+    		return APEUtils.removeNLastChar(moduleID, 6);
+    	} else {
+    		return moduleID;
+    	}
     }
 
     /**

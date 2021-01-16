@@ -1,5 +1,11 @@
 package nl.uu.cs.ape.sat.models.logic.constructs;
 
+/**
+ * The {@code CustomLabel} used to represent custom labels (dimension) of the data.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class CustomLabel implements PredicateLabel{
 
 	private String label;
@@ -20,6 +26,12 @@ public class CustomLabel implements PredicateLabel{
 
 	@Override
 	public String getPredicateLabel() {
+		return this.label;
+	}
+	
+
+	@Override
+	public String getPredicateLongLabel() {
 		return this.label;
 	}
 

@@ -75,6 +75,10 @@ public class APERunConfig {
      */
    private final APEConfigTag<Boolean> DEBUG_MODE = new APEConfigTagFactory.TAGS.DEBUG_MODE();
     /**
+     * Synthesis timeout in seconds.
+     */
+    public final APEConfigTag<Integer> TIMEOUT_SEC = new APEConfigTagFactory.TAGS.TIMEOUT_SEC();
+    /**
      * false iff the provided solutions should be distinguished based on the tool
      * sequences alone, i.e. tool sequences cannot repeat, ignoring the types in the
      * solutions.
@@ -101,6 +105,7 @@ public class APERunConfig {
             this.USE_WORKFLOW_INPUT,
             this.USE_ALL_GENERATED_DATA,
             this.DEBUG_MODE,
+            this.TIMEOUT_SEC,
             this.TOOL_SEQ_REPEAT,
             this.PROGRAM_OUTPUTS,
             this.PROGRAM_INPUTS
@@ -119,6 +124,7 @@ public class APERunConfig {
             new USE_WORKFLOW_INPUT(),
             new USE_ALL_GENERATED_DATA(),
             new DEBUG_MODE(),
+            new TIMEOUT_SEC(),
             new TOOL_SEQ_REPEAT(),
             new PROGRAM_OUTPUTS(null),
             new PROGRAM_INPUTS(null)
@@ -152,6 +158,7 @@ public class APERunConfig {
         setUseWorkflowInput(builder.useWorkflowInput);
         setUseAllGeneratedData(builder.useAllGeneratedData);
         setDebugMode(builder.debugMode);
+        setTimeoutSec(builder.timeoutSec);
         setProgramInputs(builder.programInputs);
         setProgramOutputs(builder.programOutputs);
     }
@@ -466,6 +473,30 @@ public class APERunConfig {
     public void setUseAllGeneratedData(ConfigEnum useAllGeneratedData) {
         USE_ALL_GENERATED_DATA.setValue(useAllGeneratedData);
     }
+    
+    /**
+     * Get timeout (in seconds) how long the execution should last.
+     * @return Timeout in seconds.
+     */
+    public int getTimeoutSec() {
+    	return TIMEOUT_SEC.getValue();
+    }
+    
+    /**
+     * Get timeout (in ms) how long the execution should last.
+     * @return Timeout in seconds.
+     */
+    public int getTimeoutMs() {
+    	return TIMEOUT_SEC.getValue() * 1000;
+    }
+    
+    /**
+     * Set the timeout in sec.
+     * @param timeoutSec
+     */
+    public void setTimeoutSec(int timeoutSec) {
+    	TIMEOUT_SEC.setValue(timeoutSec);
+    }
 
     /**
      * Gets debug mode.
@@ -523,7 +554,7 @@ public class APERunConfig {
     public interface IBuildStage {
         IBuildStage withConstraintsJSON(JSONObject constraintsJSON);
 
-        IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
+		IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
 
         IBuildStage withSolutionDirPath(String solutionPath);
 
@@ -540,6 +571,8 @@ public class APERunConfig {
         IBuildStage withUseAllGeneratedData(ConfigEnum useAllGeneratedData);
 
         IBuildStage withDebugMode(boolean debugMode);
+        
+        IBuildStage withTimeoutSec(int timeoutSec);
 
         APERunConfig build();
     }
@@ -563,6 +596,7 @@ public class APERunConfig {
         private ConfigEnum useWorkflowInput;
         private ConfigEnum useAllGeneratedData;
         private boolean debugMode;
+        private int timeoutSec;
 
         private Builder() {
         }
@@ -649,6 +683,12 @@ public class APERunConfig {
         @Override
         public IBuildStage withDebugMode(boolean debugMode) {
             this.debugMode = debugMode;
+            return this;
+        }
+        
+        @Override
+        public IBuildStage withTimeoutSec(int timeout) {
+            this.timeoutSec = timeout;
             return this;
         }
 
