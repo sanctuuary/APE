@@ -715,12 +715,11 @@ public final class APEUtils {
 
 			if (intAtom > 0) {
 				Atom atom = mappings.findOriginal(intAtom);
-				humanReadable.append(atom.getPredicate().getPredicateID()).append("(")
-						.append(atom.getUsedInStateArgument().getPredicateID()).append(") ");
+				
+				humanReadable.append(atom.toString()).append(" ");
 			} else if (intAtom < 0) {
 				Atom atom = mappings.findOriginal(-intAtom);
-				humanReadable.append("-").append(atom.getPredicate().getPredicateID()).append("(")
-						.append(atom.getUsedInStateArgument().getPredicateID()).append(") ");
+				humanReadable.append("-").append(atom.toString()).append(" ");
 			} else {
 				humanReadable.append("\n");
 			}
@@ -728,6 +727,20 @@ public final class APEUtils {
 		scanner.close();
 
 		return humanReadable.toString();
+	}
+	
+	public static void write2file(InputStream temp_sat_input, File file, Boolean append) throws IOException {
+		StringBuilder humanReadable = new StringBuilder();
+		Scanner scanner = new Scanner(temp_sat_input);
+		
+		while (scanner.hasNextLine()) {
+			String str = scanner.nextLine();
+
+			humanReadable = humanReadable.append(str).append("\n");
+		}
+		scanner.close();
+
+		APEUtils.write2file(humanReadable.toString(), file, append);
 	}
 
 	/**

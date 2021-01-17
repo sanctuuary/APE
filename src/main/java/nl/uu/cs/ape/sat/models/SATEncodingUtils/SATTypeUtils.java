@@ -174,10 +174,10 @@ public class SATTypeUtils {
     /**
      * Encoding the initial workflow input.
      *
-     * @param allTypes       TODO
+     * @param allTypes       Set of all the types in the domain
      * @param program_inputs Input types for the program.
-     * @param typeAutomaton  TODO
-     * @param mappings       TODO
+     * @param typeAutomaton  Automaton representing the type states in the model
+     * @param mappings       All the atom mappings
      * @return The String representation of the initial input encoding.
      */
     public static String encodeInputData(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {
@@ -201,7 +201,6 @@ public class SATTypeUtils {
                 encoding = encoding.append(mappings.add(allTypes.getEmptyType(), currState, WorkflowElement.MEMORY_TYPE))
                         .append(" 0\n");
             }
-
         }
         return encoding.toString();
     }
@@ -210,10 +209,10 @@ public class SATTypeUtils {
      * Encoding the workflow output. The provided output files have to occur
      * as the final list of "used" data types. In the predefined order.
      *
-     * @param allTypes        TODO
+     * @param allTypes        Set of all the types in the domain
      * @param program_outputs Output types for the program.
-     * @param typeAutomaton   TODO
-     * @param mappings        TODO
+     * @param typeAutomaton   Automaton representing the type states in the model
+     * @param mappings       All the atom mappings
      * @return String representation of the workflow output encoding.
      */
     public static String encodeOutputData(AllTypes allTypes, List<Type> program_outputs, TypeAutomaton typeAutomaton, AtomMappings mappings) {

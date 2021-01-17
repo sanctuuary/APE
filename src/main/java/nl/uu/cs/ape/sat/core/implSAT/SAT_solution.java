@@ -89,6 +89,7 @@ public class SAT_solution extends SolutionInterpreter {
                         relevantModules.add(currLiteral);
                     } else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE
                             && currLiteral.getWorkflowElementType() != WorkflowElement.MEM_TYPE_REFERENCE
+                            && currLiteral.getWorkflowElementType() != WorkflowElement.TYPE_DEPENDENCY
                             && (currLiteral.getPredicate() instanceof Type)
                             && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
                         /* add all positive literals that describe simple types */

@@ -129,8 +129,11 @@ public class Atom {
     public String toString() {
         if (this.elementType == WorkflowElement.MEM_TYPE_REFERENCE) {
             return "[" + predicate.getPredicateID() + "] <- (" + argumentState.getPredicateID() + ")";
+        } else if (this.elementType == WorkflowElement.TYPE_DEPENDENCY) {
+            return "R(" + predicate.getPredicateID() + "," + argumentState.getPredicateID() + ")";
         } else {
             return predicate.getPredicateID() + "(" + argumentState.getPredicateID() + ")";
         }
     }
+    
 }

@@ -379,18 +379,6 @@ public abstract class SLTL_formula {
         return null;
     }
 
-    /**
-     * Gets cnf.
-     *
-     * @param moduleAutomaton the module automaton
-     * @param typeStateBlocks the type state blocks
-     * @param typeElement     the type element
-     * @return the cnf
-     
-    public String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement typeElement) {
-        // TODO Auto-generated method stub
-        return null;
-    }*/
 
     /**
      * Creates a CNF representation of the Constraint:<br>
@@ -421,6 +409,40 @@ public abstract class SLTL_formula {
                          */
                         constraints = constraints
                                 .append(mappings.add(inputType, currInputState, WorkflowElement.USED_TYPE))
+                                .append(" ");
+            }
+            constraints = constraints.append("0\n");
+		}
+        return constraints.toString();
+	}
+	/**
+     * Creates a CNF representation of the Constraint:<br>
+     * Use <b>module<b/> with data <b>inputType<b/> as one of the inputs.
+     * 
+     * @param module			Module to be used.
+     * @param inputType			Type of one of the input types.
+     * @param moduleAutomaton	The module automaton
+     * @param typeAutomaton		The type automaton.
+     * @param mappings			Set of the mappings for the literals.
+     * @return
+     */
+	public static String use_m_with_dependence(TaxonomyPredicate module, int inputNo,
+			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, AtomMappings mappings) {
+		StringBuilder constraints = new StringBuilder();
+		/* For each module state in the workflow */
+		for (State moduleState : moduleAutomaton.getAllStates()) {
+			int moduleNo = moduleState.getStateNumber();
+            /* ..and for each input state of that module state.. */
+            List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
+            /* Encode: if module was used in the module state */
+            constraints = constraints.append("-")
+                    .append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
+            for (State currInputState : currInputStates) {
+                        /*
+                         * .. one of the inputs should depend on the inputNo workflow input
+                         */
+                        constraints = constraints
+                                .append(mappings.add(typeAutomaton.getWorkflowInputBlock().getState(inputNo-1), currInputState, WorkflowElement.TYPE_DEPENDENCY))
                                 .append(" ");
             }
             constraints = constraints.append("0\n");

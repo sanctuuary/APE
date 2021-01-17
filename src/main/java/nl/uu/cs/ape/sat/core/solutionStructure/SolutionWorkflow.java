@@ -213,6 +213,8 @@ public class SolutionWorkflow {
                             APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
                         }
                         memoryTypeNode.addUsedByTool(usedTypeNode);
+                    } else if (currLiteral.isWorkflowElementType(WorkflowElement.TYPE_DEPENDENCY)) {
+                    	// skip
                     }
                 }
             }
