@@ -291,6 +291,21 @@ public class SolutionWorkflow {
             return generateFieldDataflowGraph(title, orientation);
         }
     }
+    
+    /**
+     * Get the graphical representation of the data-flow diagram with the
+     * required title and in the defined orientation.
+     *
+     * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
+     * @return The solution graph in PNG format.
+     */
+    public BufferedImage getDataflowGraphPNG(RankDir orientation) {
+        if (this.dataflowGraph != null) {
+            return this.dataflowGraph.getPNGImage(false);
+        } else {
+            return generateFieldDataflowGraph("", orientation).getPNGImage(false);
+        }
+    }
 
     /**
      * Get the graphical representation of the control-flow diagram in default
@@ -326,15 +341,14 @@ public class SolutionWorkflow {
      * Get the graphical representation of the control-flow diagram with the
      * required title and in the defined orientation.
      *
-     * @param title       The title of the SolutionGraph.
      * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
      * @return The solution graph in PNG format.
      */
-    public BufferedImage getControlflowGraphPNG(String title, RankDir orientation) {
+    public BufferedImage getControlflowGraphPNG(RankDir orientation) {
         if (this.controlflowGraph != null) {
             return this.controlflowGraph.getPNGImage(false);
         } else {
-            return generateFieldControlflowGraph(title, orientation).getPNGImage(false);
+            return generateFieldControlflowGraph("", orientation).getPNGImage(false);
         }
     }
 
