@@ -73,21 +73,20 @@ public class APEConfigException extends RuntimeException {
      * @param info         Application specific information that may help the user solve the problem.
      * @return Configuration exception with information that may help the user solve the problem.
      */
-    public static <T> JSONException cannotParse(String tag, Object value, Class<T> expectedType, String info) {
-        return new JSONException(String.format("Value '%s' cannot be parsed to type '%s' for tag '%s', %s", value, expectedType.getSimpleName(), tag, info));
+    public static <T> APEConfigException cannotParse(String tag, Object value, Class<T> expectedType, String info) {
+        return new APEConfigException(String.format("Value '%s' cannot be parsed to type '%s' for tag '%s', %s", value, expectedType.getSimpleName(), tag, info));
     }
 
     /**
      * Required validation tag json exception.
      *
-     * @param <T>         the type parameter
      * @param tag         the tag
      * @param requiredTag the required tag
      * @param info        the info
      * @return the json exception
      */
-    public static <T> JSONException requiredValidationTag(String tag, String requiredTag, String info) {
-        return new JSONException(String.format("Cannot parse tag '%s' without '%s', %s", tag, requiredTag, info));
+    public static APEConfigException requiredValidationTag(String tag, String requiredTag, String info) {
+        return new APEConfigException(String.format("Cannot parse tag '%s' without '%s', %s", tag, requiredTag, info));
     }
 
     /**
@@ -97,8 +96,8 @@ public class APEConfigException extends RuntimeException {
      * @param path The relative- or absolute path to a JSON- or OWL file.
      * @return Configuration exception with information that may help the user solve the problem.
      */
-    public static IOException pathNotFound(String tag, String path) {
-        return new IOException(String.format("Provided path '%s' for tag '%s' does not exist.", path, tag));
+    public static APEConfigException pathNotFound(String tag, String path) {
+        return new APEConfigException(String.format("Provided path '%s' for tag '%s' does not exist.", path, tag));
     }
 
     /**
@@ -108,8 +107,8 @@ public class APEConfigException extends RuntimeException {
      * @param path The relative- or absolute path to a JSON- or OWL file.
      * @return Configuration exception with information that may help the user solve the problem.
      */
-    public static IOException notAFile(String tag, String path) {
-        return new IOException(String.format("Provided path '%s' for tag '%s' is not a file.", path, tag));
+    public static APEConfigException notAFile(String tag, String path) {
+        return new APEConfigException(String.format("Provided path '%s' for tag '%s' is not a file.", path, tag));
     }
 
     /**
@@ -119,8 +118,8 @@ public class APEConfigException extends RuntimeException {
      * @param path The relative- or absolute path to a JSON- or OWL file.
      * @return Configuration exception with information that may help the user solve the problem.
      */
-    public static IOException notADirectory(String tag, String path) {
-        return new IOException(String.format("Provided path '%s' for tag '%s' is not a directory.", path, tag));
+    public static APEConfigException notADirectory(String tag, String path) {
+        return new APEConfigException(String.format("Provided path '%s' for tag '%s' is not a directory.", path, tag));
     }
 
     /**
@@ -131,8 +130,8 @@ public class APEConfigException extends RuntimeException {
      * @param missingPermission The missing READ or WRITE permission for the file described by the path.
      * @return Configuration exception with information that may help the user solve the problem.
      */
-    public static IOException missingPermission(String tag, String path, Object missingPermission) {
-        return new IOException(String.format("You are missing [%s] permission for path '%s' for tag '%s'", missingPermission, path, tag));
+    public static APEConfigException missingPermission(String tag, String path, Object missingPermission) {
+        return new APEConfigException(String.format("You are missing [%s] permission for path '%s' for tag '%s'", missingPermission, path, tag));
     }
 
     /**

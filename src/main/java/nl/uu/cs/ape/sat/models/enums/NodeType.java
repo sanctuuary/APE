@@ -23,9 +23,9 @@ public enum NodeType {
     LEAF,
 
     /**
-     * Instance in the taxonomy. Usually represent an instance of a simple data type or format. It is subclass of {@link #LEAF}s.
+     * Artificially created {@link #LEAF} taxonomy element from an existing abstract class, which is disjoint with other subclasses of the abstract class.
      */
-    INSTANCE,
+    ARTIFICIAL_LEAF,
 
     /**
      * Represents the empty predicate.

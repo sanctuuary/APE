@@ -3,6 +3,7 @@ package nl.uu.cs.ape.sat.constraints;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.PrimitiveIterator.OfDouble;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -79,20 +81,31 @@ public class ConstraintTemplateParameter {
 		return APEUtils.removeLastChar(print) + "}";
 	}
 
-	public Collection<?> toJSON() {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Returns a JSONObject in format that it should have been provided.
+	 * @return JSONObject
+	 */
+	public JSONObject toJSON() {
+		JSONObject json = new JSONObject();
+		for(TaxonomyPredicate predicate : parameterTypes) {
+			json.put(predicate.getRootNodeID(), predicate.getPredicateID());
+		}
+		return json;
 	}
 
 	/**
-	 * Calls Type or Module creator, based on the parameter dependencies.
+	 * Generate a taxonomy instance (tool or type) that is defined based on one or
+	 * more dimensions that describe it. Based on the constraint, it will either generate a Type or Module object.
+	 * 
 	 * @param jsonParam
 	 * @param domainSetup
-	 * @return
+	 * @return A {@link Type} or {@link AbstractModule} object that represent the data instance given as the parameter.
+	 * @throws JSONException if the given JSON is not well formatted
+	 * @throws APEDimensionsException if the referenced types/modules are not well defined
 	 */
-	public TaxonomyPredicate taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup) {
+	public TaxonomyPredicate readConstraintParameterFromJson(JSONObject jsonParam, APEDomainSetup domainSetup) throws JSONException, APEDimensionsException {
 		if(parameterTypes.get(0) instanceof Type) {
-			return Type.taxonomyInstanceFromJson(jsonParam, domainSetup);
+			return Type.taxonomyInstanceFromJson(jsonParam, domainSetup, false);
 		} else {
 			return Module.taxonomyInstanceFromJson(jsonParam, domainSetup);
 		}

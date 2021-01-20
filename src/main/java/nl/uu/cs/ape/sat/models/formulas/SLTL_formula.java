@@ -29,7 +29,7 @@ public abstract class SLTL_formula {
     private boolean sign;
 
     /**
-     * Instantiates a new Sltl formula.
+     * Instantiates a new SLTL formula.
      *
      * @param predicate the predicate
      */

@@ -10,6 +10,8 @@ import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
+import nl.uu.cs.ape.sat.utils.APEUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,12 +31,7 @@ public class APERunConfig {
     /**
      * Path to the file with all workflow constraints.
      */
-    public final APEConfigTag<Path> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
-    /**
-     * true if the shared memory structure should be used, false in case of a
-     * restrictive message passing structure.
-     */
-    public final APEConfigTag<Boolean> SHARED_MEMORY = new APEConfigTagFactory.TAGS.SHARED_MEMORY();
+    public final APEConfigTag<JSONObject> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
     /**
      * Path to the directory that will contain all the solutions to the problem.
      */
@@ -79,6 +76,10 @@ public class APERunConfig {
      */
     public final APEConfigTag<Boolean> DEBUG_MODE = new APEConfigTagFactory.TAGS.DEBUG_MODE();
     /**
+     * Synthesis timeout in seconds.
+     */
+    public final APEConfigTag<Integer> TIMEOUT_SEC = new APEConfigTagFactory.TAGS.TIMEOUT_SEC();
+    /**
      * false iff the provided solutions should be distinguished based on the tool
      * sequences alone, i.e. tool sequences cannot repeat, ignoring the types in the
      * solutions.
@@ -97,7 +98,6 @@ public class APERunConfig {
      */
     private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
             this.CONSTRAINTS,
-            this.SHARED_MEMORY,
             this.SOLUTION_DIR_PATH,
             this.SOLUTION_LENGTH_RANGE,
             this.MAX_NO_SOLUTIONS,
@@ -106,6 +106,7 @@ public class APERunConfig {
             this.USE_WORKFLOW_INPUT,
             this.USE_ALL_GENERATED_DATA,
             this.DEBUG_MODE,
+            this.TIMEOUT_SEC,
             this.TOOL_SEQ_REPEAT,
             this.PROGRAM_OUTPUTS,
             this.PROGRAM_INPUTS
@@ -116,7 +117,6 @@ public class APERunConfig {
      */
     public static final APEConfigTags TAGS = new APEConfigTags(
             new CONSTRAINTS(),
-            new SHARED_MEMORY(),
             new SOLUTION_DIR_PATH(),
             new SOLUTION_LENGTH_RANGE(),
             new MAX_NO_SOLUTIONS(),
@@ -125,6 +125,7 @@ public class APERunConfig {
             new USE_WORKFLOW_INPUT(),
             new USE_ALL_GENERATED_DATA(),
             new DEBUG_MODE(),
+            new TIMEOUT_SEC(),
             new TOOL_SEQ_REPEAT(),
             new PROGRAM_OUTPUTS(null),
             new PROGRAM_INPUTS(null)
@@ -148,10 +149,9 @@ public class APERunConfig {
 
         this.apeDomainSetup = builder.apeDomainSetup;
 
-        setConstraintsPath(builder.constraintsPath);
+        setConstraintsJSON(builder.constraintsJSON);
         setSolutionLength(builder.solutionMinLength, builder.solutionMaxLength);
         setMaxNoSolutions(builder.maxNoSolutions);
-        setSharedMemory(builder.sharedMemory);
         setToolSeqRepeat(builder.toolSeqRepeat);
         setSolutionPath(builder.solutionDirPath);
         setNoExecutions(builder.noExecutions);
@@ -159,6 +159,7 @@ public class APERunConfig {
         setUseWorkflowInput(builder.useWorkflowInput);
         setUseAllGeneratedData(builder.useAllGeneratedData);
         setDebugMode(builder.debugMode);
+        setTimeoutSec(builder.timeoutSec);
         setProgramInputs(builder.programInputs);
         setProgramOutputs(builder.programOutputs);
     }
@@ -185,12 +186,12 @@ public class APERunConfig {
         APERunConfig dummy = new APERunConfig(setup);
         ValidationResults results = new ValidationResults();
         for(APEConfigTag<?> tag : dummy.all_tags){
-            results.add(tag.validate(json));
+            results.add(tag.validateConfig(json));
             if(results.hasFails()){
                 return results;
             }
             else{
-                tag.setValue(json); // for dependencies
+                tag.setValueFromConfig(json); // for dependencies
             }
         }
         return results;
@@ -221,7 +222,7 @@ public class APERunConfig {
 
         // set the apeDomain BEFORE setting the tags
         for (APEConfigTag<?> tag : all_tags) {
-            tag.setValue(runConfiguration);
+            tag.setValueFromConfig(runConfiguration);
         }
     }
 
@@ -271,35 +272,15 @@ public class APERunConfig {
      *
      * @return the value of {@link #CONSTRAINTS}
      */
-    public Path getConstraintsPath() {
+    public JSONObject getConstraintsJSON() {
         return CONSTRAINTS.getValue();
     }
 
     /**
      * @param constraintsPath the constraintsPath to set
      */
-    public void setConstraintsPath(String constraintsPath) {
-        CONSTRAINTS.setValue(Paths.get(constraintsPath));
-    }
-
-    /**
-     * Returns true if the shared memory structure should be used, i.e. if the
-     * generated data is available in memory to all the tools used subsequently, or
-     * false in case of a restrictive message passing structure, i.e. if the
-     * generated data is available only to the tool next in sequence.
-     *
-     * @return true if the shared memory structure should be used, false in case of
-     * a restrictive message passing structure.
-     */
-    public boolean getSharedMemory() {
-        return SHARED_MEMORY.getValue();
-    }
-
-    /**
-     * @param sharedMemory the sharedMemory to set
-     */
-    public void setSharedMemory(boolean sharedMemory) {
-        SHARED_MEMORY.setValue(sharedMemory);
+    public void setConstraintsJSON(JSONObject constraintsJSON) {
+        CONSTRAINTS.setValue(constraintsJSON);
     }
 
     /**
@@ -493,6 +474,30 @@ public class APERunConfig {
     public void setUseAllGeneratedData(ConfigEnum useAllGeneratedData) {
         USE_ALL_GENERATED_DATA.setValue(useAllGeneratedData);
     }
+    
+    /**
+     * Get timeout (in seconds) how long the execution should last.
+     * @return Timeout in seconds.
+     */
+    public int getTimeoutSec() {
+    	return TIMEOUT_SEC.getValue();
+    }
+    
+    /**
+     * Get timeout (in ms) how long the execution should last.
+     * @return Timeout in seconds.
+     */
+    public int getTimeoutMs() {
+    	return TIMEOUT_SEC.getValue() * 1000;
+    }
+    
+    /**
+     * Set the timeout in sec.
+     * @param timeoutSec
+     */
+    public void setTimeoutSec(int timeoutSec) {
+    	TIMEOUT_SEC.setValue(timeoutSec);
+    }
 
     /**
      * Gets debug mode.
@@ -548,11 +553,9 @@ public class APERunConfig {
     }
 
     public interface IBuildStage {
-        IBuildStage withConstraintsPath(String constraintsPath);
+        IBuildStage withConstraintsJSON(JSONObject constraintsJSON);
 
-        IBuildStage withSharedMemory(boolean sharedMemory);
-
-        IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
+		IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
 
         IBuildStage withSolutionDirPath(String solutionPath);
 
@@ -569,6 +572,8 @@ public class APERunConfig {
         IBuildStage withUseAllGeneratedData(ConfigEnum useAllGeneratedData);
 
         IBuildStage withDebugMode(boolean debugMode);
+        
+        IBuildStage withTimeoutSec(int timeoutSec);
 
         APERunConfig build();
     }
@@ -582,8 +587,7 @@ public class APERunConfig {
         private int solutionMaxLength;
         private int maxNoSolutions;
         private APEDomainSetup apeDomainSetup;
-        private String constraintsPath;
-        private boolean sharedMemory;
+        private JSONObject constraintsJSON;
         private boolean toolSeqRepeat;
         private String solutionDirPath;
         private int noExecutions;
@@ -593,6 +597,7 @@ public class APERunConfig {
         private ConfigEnum useWorkflowInput;
         private ConfigEnum useAllGeneratedData;
         private boolean debugMode;
+        private int timeoutSec;
 
         private Builder() {
         }
@@ -622,14 +627,8 @@ public class APERunConfig {
         }
 
         @Override
-        public IBuildStage withConstraintsPath(String constraintsPath) {
-            this.constraintsPath = constraintsPath;
-            return this;
-        }
-
-        @Override
-        public IBuildStage withSharedMemory(boolean sharedMemory) {
-            this.sharedMemory = sharedMemory;
+        public IBuildStage withConstraintsJSON(JSONObject constraintsJSON) {
+            this.constraintsJSON = constraintsJSON;
             return this;
         }
 
@@ -685,6 +684,12 @@ public class APERunConfig {
         @Override
         public IBuildStage withDebugMode(boolean debugMode) {
             this.debugMode = debugMode;
+            return this;
+        }
+        
+        @Override
+        public IBuildStage withTimeoutSec(int timeout) {
+            this.timeoutSec = timeout;
             return this;
         }
 

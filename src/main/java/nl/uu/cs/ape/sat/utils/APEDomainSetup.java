@@ -6,17 +6,30 @@ import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.configuration.APECoreConfig;
 import nl.uu.cs.ape.sat.constraints.ConstraintFactory;
+import nl.uu.cs.ape.sat.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.sat.models.*;
+import nl.uu.cs.ape.sat.constraints.ConstraintTemplateParameter;
+import nl.uu.cs.ape.sat.models.AbstractModule;
+import nl.uu.cs.ape.sat.models.AllModules;
+import nl.uu.cs.ape.sat.models.AllTypes;
+import nl.uu.cs.ape.sat.models.AtomMappings;
+import nl.uu.cs.ape.sat.models.AuxiliaryPredicate;
+import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
+import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
-import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.SortedSet;
+import java.util.Objects;
+import java.util.Set;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * The {@code APEDomainSetup} class is used to store the domain information and initial constraints that have to be encoded.
@@ -25,6 +38,10 @@ import java.util.SortedSet;
  */
 public class APEDomainSetup {
 
+	static int counterErrors = 1, x =1;
+	public Set<String> emptyTools = new HashSet<String>();
+	public Set<String> wrongToolIO = new HashSet<String>();
+	public Set<String> wrongToolTax = new HashSet<String>();
     /**
      * All modules/operations used in the domain.
      */
@@ -61,18 +78,27 @@ public class APEDomainSetup {
      */
     private int maxNoToolOutputs = 0;
 
+    /** Holds information whether the domain was annotated under the strict rules of the output dependency. */
+	private boolean useStrictToolAnnotations;
+
+    private final static String CONSTR_JSON_TAG = "constraints";
+	private final static String CONSTR_ID_TAG = "constraintid";
+	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
+	private final static String TOOLS_JSOM_TAG = "functions";
+    
     /**
      * Instantiates a new Ape domain setup.
      *
      * @param config the config
      */
     public APEDomainSetup(APECoreConfig config) {
-        unformattedConstr = new ArrayList<ConstraintTemplateData>();
-        allModules = new AllModules(config);
-        allTypes = new AllTypes(config);
-        constraintFactory = new ConstraintFactory();
-        helperPredicates = new ArrayList<AuxiliaryPredicate>();
-        ontologyPrexifURI = config.getOntologyPrefixURI();
+        this.unformattedConstr = new ArrayList<ConstraintTemplateData>();
+        this.allModules = new AllModules(config);
+        this.allTypes = new AllTypes(config);
+        this.constraintFactory = new ConstraintFactory();
+        this.helperPredicates = new ArrayList<AuxiliaryPredicate>();
+        this.ontologyPrexifURI = config.getOntologyPrefixURI();
+        this.useStrictToolAnnotations = config.getUseStrictToolAnnotations();
     }
 
     /**
@@ -232,6 +258,197 @@ public class APEDomainSetup {
         }
         return constraints.toString();
     }
+    
+    /**
+	 * Method read the constraints from a JSON object and updates the
+	 * {@link APEDomainSetup} object accordingly.
+	 *
+	 * @param constraintsJSON JSON object containing the constraints
+	 * @throws ConstraintFormatException exception in case of bad constraint json formatting
+	 */
+	public void updateConstraints(JSONObject constraintsJSON) throws ConstraintFormatException {
+		if (constraintsJSON == null) {
+			return;
+		}
+		String constraintID = null;
+		int currNode = 0;
+
+		List<JSONObject> constraints = APEUtils.getListFromJson(constraintsJSON, CONSTR_JSON_TAG, JSONObject.class);
+
+		/* Iterate through each constraint in the list */
+		for (JSONObject jsonConstraint : APEUtils.safe(constraints)) {
+			currNode++;
+			/* READ THE CONSTRAINT */
+			try {
+				constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
+				ConstraintTemplate currConstrTemplate = getConstraintFactory()
+						.getConstraintTemplate(constraintID);
+				if (currConstrTemplate == null) {
+					throw ConstraintFormatException.wrongConstraintID(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+				}
+
+				List<ConstraintTemplateParameter> currTemplateParameters = currConstrTemplate.getParameters();
+
+				List<JSONObject> jsonConstParam = APEUtils.getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG,
+						JSONObject.class);
+				if (currTemplateParameters.size() != jsonConstParam.size()) {
+					throw ConstraintFormatException.wrongNumberOfParameters(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+				}
+				int paramNo = 0;
+				List<TaxonomyPredicate> constraintParametes = new ArrayList<TaxonomyPredicate>();
+				/* for each constraint parameter */
+				for (JSONObject jsonParam : jsonConstParam) {
+					ConstraintTemplateParameter taxInstanceFromJson = currTemplateParameters.get(paramNo++);
+					TaxonomyPredicate currParameter = taxInstanceFromJson.readConstraintParameterFromJson(jsonParam,
+							this);
+					constraintParametes.add(currParameter);
+				}
+
+				ConstraintTemplateData currConstr = getConstraintFactory()
+						.generateConstraintTemplateData(constraintID, constraintParametes);
+				if (constraintParametes.stream().anyMatch(Objects::isNull)) {
+					throw ConstraintFormatException.wrongParameter(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+				} else {
+					addConstraintData(currConstr);
+				}
+
+			} catch (JSONException e) {
+				throw ConstraintFormatException.badFormat(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+			}
+
+		}
+	}
+	
+	/**
+	 * Updates the list of All Modules by annotating the existing ones (or adding
+	 * non-existing) using the I/O DataInstance from the @file. Returns the list of
+	 * Updated Modules.
+	 *
+	 * @param toolAnnotationsFile JSON file containing tool annotations.
+	 * @return The list of all annotated Modules in the process (possibly empty
+	 *         list).
+	 * @throws IOException Error in handling a JSON file containing tool
+	 *                     annotations.
+	 * @throws JSONException Error if the tool annotation JSON file, bad format
+	 */
+	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException, JSONException {
+		int currModule = 0;
+		for (JSONObject jsonModule : APEUtils.safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG, JSONObject.class))) {
+			currModule++;
+			updateModuleFromJson(jsonModule);
+		}
+		if (currModule == 0) {
+			System.err.println("No tools were annotated.");
+			return false;
+		}
+		return true;
+	}
+	
+	
+	/**
+     * Creates/updates a module from a tool annotation instance from a JSON file and updates the list of modules ({@link AllModules}) in the domain accordingly.
+     *
+     * @param jsonModule  JSON representation of a module
+     * @param domainSetup Domain information, including all the existing tools and types
+     * @return {@code true} if the domain was updated, false otherwise.
+     * @throws JSONException Error if the JSON file was not properly formatted.
+     */
+    private boolean updateModuleFromJson(JSONObject jsonModule)
+            throws JSONException, APEDimensionsException {
+        String ontologyPrefixURI = getOntologyPrefixURI();
+        AllModules allModules = getAllModules();
+        String moduleURI = APEUtils.createClassURI(jsonModule.getString(APECoreConfig.getJsonTags("id")), ontologyPrefixURI);
+        if (allModules.get(moduleURI) != null) {
+            moduleURI = moduleURI + "[tool]";
+        }
+        String moduleLabel = jsonModule.getString(APECoreConfig.getJsonTags("label"));
+        Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("taxonomyOperations"), String.class));
+        taxonomyModules = APEUtils.createURIsFromLabels(taxonomyModules, ontologyPrefixURI);
+        /* Check if the referenced module taxonomy classes exist. */
+        List<String> toRemove = new ArrayList<String>();
+        for (String taxonomyModule : taxonomyModules) {
+            String taxonomyModuleURI = APEUtils.createClassURI(taxonomyModule, ontologyPrefixURI);
+            if (allModules.get(taxonomyModuleURI) == null) {
+                System.err.println("Tool '" + moduleURI + "' annotation issue. "
+                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy." + (x++) + "\n" + wrongToolTax.size());
+                wrongToolTax.add(moduleLabel);
+                toRemove.add(taxonomyModuleURI);
+            }
+        }
+        taxonomyModules.removeAll(toRemove);
+
+        /* If the taxonomy terms were not properly specified the tool taxonomy root is used as superclass of the tool. */
+        if (taxonomyModules.isEmpty()) {
+            System.err.println("Tool '" + moduleURI + "' annotation issue. "
+                    + "None of the referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "' can be found in the Tool Taxonomy.");
+            taxonomyModules.add(allModules.getRootsIDs().get(0));
+        }
+
+        String executionCode = null;
+        try {
+            executionCode = jsonModule.getJSONObject(APECoreConfig.getJsonTags("implementation"))
+                    .getString(APECoreConfig.getJsonTags("code"));
+        } catch (JSONException e) {
+            /* Skip the execution code */
+        }
+
+        List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("inputs"),
+                JSONObject.class);
+        updateMaxNoToolInputs(jsonModuleInput.size());
+        List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("outputs"),
+                JSONObject.class);
+        updateMaxNoToolOutputs(jsonModuleOutput.size());
+
+        List<Type> inputs = new ArrayList<Type>();
+        List<Type> outputs = new ArrayList<Type>();
+
+        try {
+        /* For each input and output, allocate the corresponding abstract types. */
+        for (JSONObject jsonInput : jsonModuleInput) {
+            if (!jsonInput.isEmpty()) {
+                inputs.add(Type.taxonomyInstanceFromJson(jsonInput, this, false));
+            }
+        }
+        for (JSONObject jsonOutput : jsonModuleOutput) {
+            if (!jsonOutput.isEmpty()) {
+                outputs.add(Type.taxonomyInstanceFromJson(jsonOutput, this, true));
+            }
+        }
+        } catch (APEDimensionsException x) {
+        	wrongToolIO.add(moduleLabel);
+//        	System.out.println("Skipped " + (counterErrors ++) + " tool annotations.");
+        	return false;
+        }
+
+        String moduleExecutionImpl = null;
+        if (executionCode != null && !executionCode.equals("")) {
+            moduleExecutionImpl = executionCode;
+        }
+        if(inputs.isEmpty() && outputs.isEmpty()) {
+        	emptyTools.add(moduleLabel);
+        	return false;
+        }
+        /*
+         * Add the module and make it sub module of the currSuperModule (if it was not
+         * previously defined)
+         */
+        Module currModule = (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootsIDs().get(0), moduleExecutionImpl));
+
+        /*	For each supermodule add the current module as a subset and vice versa. */
+        for (String superModuleID : taxonomyModules) {
+            AbstractModule superModule = allModules.get(superModuleID);
+            if (superModule != null) {
+                superModule.addSubPredicate(currModule);
+                currModule.addSuperPredicate(superModule);
+            }
+        }
+
+        currModule.setModuleInput(inputs);
+        currModule.setModuleOutput(outputs);
+        currModule.setAsRelevantTaxonomyTerm(allModules);
+
+        return currModule != null;
+    }
 
     /**
      * Gets ontology prefix URI.
@@ -290,5 +507,11 @@ public class APEDomainSetup {
 		
 	}
     
-    
+	/**
+     * Get information whether the domain was annotated under the strict rules of the output dependency.
+     * @return {@code true} if the strict rules apply, {@code false} otherwise.
+     */
+    public boolean getUseStrictToolAnnotations() {
+        return useStrictToolAnnotations;
+    }
 }

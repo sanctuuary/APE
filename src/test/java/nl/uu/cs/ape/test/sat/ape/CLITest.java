@@ -1,11 +1,16 @@
-package nl.uu.cs.ape.sat.ape;
+package nl.uu.cs.ape.test.sat.ape;
 
 import nl.uu.cs.ape.sat.Main;
 import nl.uu.cs.ape.sat.configuration.APERunConfig;
+import nl.uu.cs.ape.sat.test.utils.TestResources;
+
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import util.TestResources;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 public class CLITest {
 

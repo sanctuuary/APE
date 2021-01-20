@@ -2,16 +2,21 @@ package nl.uu.cs.ape.sat.utils;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
+import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TYPES.JSON;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplateParameter;
+import nl.uu.cs.ape.sat.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.logic.constructs.Atom;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
+import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,10 +34,6 @@ import java.util.*;
  */
 public final class APEUtils {
 
-	private final static String TOOLS_JSOM_TAG = "functions";
-	private final static String CONSTR_JSON_TAG = "constraints";
-	private final static String CONSTR_ID_TAG = "constraintid";
-	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
 	private final static Map<String, Long> timers = new HashMap<>();
 	private final static PrintStream original = System.err;
 	private final static PrintStream nullStream = new PrintStream(new OutputStream() {
@@ -46,75 +47,6 @@ public final class APEUtils {
 	 */
 	private APEUtils() {
 		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Method read the constraints from a JSON file and updates the
-	 * {@link APEDomainSetup} object accordingly.
-	 *
-	 * @param constraintsPath Path to the constraint file.
-	 * @param domainSetup     Object that represents the domain variables.
-	 * @throws IOException Error in handling the constraints file.
-	 */
-	public static void readConstraints(File constraintsFile, APEDomainSetup domainSetup) throws IOException, JSONException {
-		if (constraintsFile == null) {
-			return;
-		}
-		String constraintID = null;
-		int currNode = 0;
-
-		List<JSONObject> constraints = getListFromJson(constraintsFile, CONSTR_JSON_TAG);
-
-		/* Iterate through each constraint in the list */
-		for (JSONObject jsonConstraint : safe(constraints)) {
-			currNode++;
-			/* READ THE CONSTRAINT */
-			try {
-				constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
-				ConstraintTemplate currConstrTemplate = domainSetup.getConstraintFactory()
-						.getConstraintTemplate(constraintID);
-				if (currConstrTemplate == null) {
-					System.err.println("Error in file: " + constraintsFile.getAbsolutePath() + ", at constraint no: "
-							+ currNode + ". Constraint ID: '" + constraintID + "' does not exist. Constraint skipped.");
-					continue;
-				}
-
-				List<ConstraintTemplateParameter> currTemplateParameters = currConstrTemplate.getParameters();
-
-				List<JSONObject> jsonConstParam = getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG,
-						JSONObject.class);
-				if (currTemplateParameters.size() != jsonConstParam.size()) {
-					System.err.println("Error in file: " + constraintsFile.getAbsolutePath() + ", at constraint no: "
-							+ currNode + ". Constraint ID: '" + constraintID
-							+ "'. Number of parameters does not match the required number. Constraint skipped.");
-					continue;
-				}
-				int paramNo = 0;
-				List<TaxonomyPredicate> constraintParametes = new ArrayList<TaxonomyPredicate>();
-				/* for each constraint parameter */
-				for (JSONObject jsonParam : jsonConstParam) {
-					ConstraintTemplateParameter taxInstanceFromJson = currTemplateParameters.get(paramNo);
-
-					TaxonomyPredicate currParameter = taxInstanceFromJson.taxonomyInstanceFromJson(jsonParam,
-							domainSetup);
-					constraintParametes.add(currParameter);
-				}
-
-				ConstraintTemplateData currConstr = domainSetup.getConstraintFactory()
-						.generateConstraintTemplateData(constraintID, constraintParametes);
-				if (constraintParametes.stream().anyMatch(Objects::isNull)) {
-					System.err.println("Constraint argument does not exist in the tool taxonomy.");
-				} else {
-					domainSetup.addConstraintData(currConstr);
-				}
-
-			} catch (JSONException e) {
-				System.err.println("Error in file: " + constraintsFile.getAbsolutePath() + ", at constraint no: "
-						+ currNode + " (" + constraintID + "). Bad format. Constraint skipped.");
-				continue;
-			}
-
-		}
 	}
 
 	/**
@@ -196,56 +128,29 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Updates the list of All Modules by annotating the existing ones (or adding
-	 * non-existing) using the I/O DataInstance from the @file. Returns the list of
-	 * Updated Modules.
+	 * Reads the file and provides the JSONObject that represents its content.
 	 *
-	 * @param toolAnnotationsFile JSON file containing tool annotations.
-	 * @param domainSetup         Domain information, including all the existing
-	 *                            tools and types.
-	 * @return The list of all annotated Modules in the process (possibly empty
-	 *         list).
-	 * @throws IOException Error in handling a JSON file containing tool
-	 *                     annotations.
+	 * @param file the JSON file
+	 * @return JSONObject representing the content of the file.
+	 * @throws IOException   Error if the file is corrupted
+	 * @throws JSONException Error if the file is not in expected JSON format
 	 */
-	public static boolean readModuleJson(File toolAnnotationsFile, APEDomainSetup domainSetup) throws IOException {
-		List<Module> modulesNew = new ArrayList<>();
-		int currModule = 0;
-		for (JSONObject jsonModule : safe(getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG))) {
-			currModule++;
-			try {
-				Module tmpModule = Module.moduleFromJson(jsonModule, domainSetup);
-				if (tmpModule != null) {
-					modulesNew.add(tmpModule);
-				}
-			} catch (JSONException e) {
-				System.err.println(e.getMessage());
-				System.err.println(
-						"Error in file: " + toolAnnotationsFile + ", at tool no: " + currModule + ". Tool skipped.");
-			}
-		}
-		if (currModule == 0) {
-			System.err.println("No tools were annotated.");
-			return false;
-		}
-		return true;
+	public static JSONObject readFileToJSONObject(File file) throws IOException, JSONException {
+		String content = FileUtils.readFileToString(file, "utf-8");
+		return new JSONObject(content);
 	}
-
+	
 	/**
-	 * Return the content of the file provided under the given path.
+	 * Reads the file and provides the JSONArray that represents its content.
 	 *
-	 * @param configPath Path to the text file.
-	 * @return String representing the content of the file.
-	 * @throws IOException Error if the the given file path is not correct or the
-	 *                     file is corrupted.
+	 * @param file the JSON file
+	 * @return JSONArray representing the content of the file.
+	 * @throws IOException   Error if the file is corrupted
+	 * @throws JSONException Error if the file is not in expected JSON format
 	 */
-	public static String getFileContent(String configPath) throws IOException {
-		if (configPath == null) {
-			throw new NullPointerException("The provided run configuration file path is null.");
-		}
-
-		File file = new File(configPath);
-		return FileUtils.readFileToString(file, "utf-8");
+	public static JSONArray readFileToJSONArray(File file) throws IOException, JSONException {
+		String content = FileUtils.readFileToString(file, "utf-8");
+		return new JSONArray(content);
 	}
 
 	/*
@@ -266,16 +171,16 @@ public final class APEUtils {
 //			String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ")
 //					.replace("(", "").replace(")", "") + " 0\n";
 //			boolean exists = true;
-//			int counter = 0;
+//			int counterErrors = 0;
 //			String auxVariable = "";
 //			while (exists) {
-//				auxVariable = "@RESERVED_CNF_" + counter + " ";
+//				auxVariable = "@RESERVED_CNF_" + counterErrors + " ";
 //				if (transformedCNF.contains("@RESERVED_CNF_")) {
 //					transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
 //				} else {
 //					exists = false;
 //				}
-//				counter++;
+//				counterErrors++;
 //			}
 //			return transformedCNF;
 //		} catch (ParserException e) {
@@ -352,24 +257,24 @@ public final class APEUtils {
 	 * @return List of elements that corresponds to the key. If the key does not
 	 *         exists returns empty list.
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> List<T> getListFromJson(JSONObject jsonObject, String key, Class<T> clazz) {
 		List<T> jsonList = new ArrayList<>();
 		try {
-		Object tmp = jsonObject.get(key);
-		try {
-			if (tmp instanceof JSONArray) {
-				jsonList = getListFromJsonList((JSONArray) tmp, clazz);
-			} else {
-				T element = (T) tmp;
-				jsonList.add(element);
+			Object tmp = jsonObject.get(key);
+			try {
+				if (tmp instanceof JSONArray) {
+					jsonList = getListFromJsonList((JSONArray) tmp, clazz);
+				} else {
+					T element = (T) tmp;
+					jsonList.add(element);
+				}
+			} catch (JSONException e) {
+				System.err.println("Json parsing error. Expected object '" + clazz.getSimpleName() + "' under the tag '"
+						+ key + "'. The following object does not match the provided format:\n"
+						+ jsonObject.toString());
+				return jsonList;
 			}
-		} catch (JSONException e) {
-			System.err.println("Json parsing error. Expected object '" + clazz.getSimpleName() + "' under the tag '"
-					+ key + "'. The following object does not match the provided format:\n" + jsonObject.toString());
 			return jsonList;
-		}
-		return jsonList;
 		} catch (JSONException e) {
 			return jsonList;
 		}
@@ -517,7 +422,7 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Provide a safe interface for getting an element from the list. In order to
+	 * Provide a safe interface for getting an element from a list. In order to
 	 * bypass "index out of bounds" error.
 	 *
 	 * @param          <E> Any type.
@@ -534,7 +439,7 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Functions sets an element into the list at a specific place, if the element
+	 * Functions sets an element into a list at a specific place, if the element
 	 * already exists, it overrides it. If the element is out of bound it creates
 	 * null elements to fit the given size of the array and then adds the new
 	 * element. If the index is negative number it does not change the array.
@@ -619,7 +524,7 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Timer start.
+	 * Timer start if in debug mode.
 	 *
 	 * @param timerID   the timer id
 	 * @param debugMode the debug mode
@@ -630,6 +535,17 @@ public final class APEUtils {
 		} else {
 			timers.put(timerID, (long) -1);
 		}
+	}
+	
+	public static long timerTimeLeft(String timerID, long timeout) {
+		if(timers.get(timerID) == -1) {
+			return 0;
+		}
+		
+		long elapsedTimeMs = System.currentTimeMillis() - timers.get(timerID);
+		long timeLeftMs = timeout - elapsedTimeMs;
+		return timeLeftMs;
+				
 	}
 
 	/**
@@ -733,7 +649,7 @@ public final class APEUtils {
 					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
 						apeInputFormats.put(bioType.getString("uri"));
 					}
-					apeInput.put("format_1915$OR$", apeInputFormats);
+					apeInput.put("format_1915", apeInputFormats);
 
 					apeInputs.put(apeInput);
 				}
@@ -758,7 +674,7 @@ public final class APEUtils {
 					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
 						apeOutputFormats.put(bioType.getString("uri"));
 					}
-					apeOutput.put("format_1915$OR$", apeOutputFormats);
+					apeOutput.put("format_1915", apeOutputFormats);
 
 					apeOutputs.put(apeOutput);
 				}
@@ -811,6 +727,20 @@ public final class APEUtils {
 	public static String removeLastChar(String str) {
 		if (str != null && str.length() > 0) {
 			str = str.substring(0, str.length() - 1);
+		}
+		return str;
+	}
+
+	/**
+	 * Return the string without its last N characters.
+	 *
+	 * @param str Given string.
+	 * @param n   Number of characters to be removed.
+	 * @return A copy of the given string without its last character.
+	 */
+	public static String removeNLastChar(String str, int n) {
+		if (str != null && str.length() > 0) {
+			str = str.substring(0, str.length() - n);
 		}
 		return str;
 	}
@@ -870,5 +800,59 @@ public final class APEUtils {
 	 */
 	public static JSONObject clone(JSONObject original) {
 		return new JSONObject(original, JSONObject.getNames(original));
+	}
+
+	/**
+	 * Append text to the existing file. It adds the text at the end of the content of the file.
+	 * @param file
+	 * @param content
+	 * @throws IOException
+	 */
+	public static void appendToFile(File file, String content) throws IOException {
+		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
+		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
+		writer.write(content);
+		writer.close();
+	}
+	
+	/**
+	 * Prepend text to the existing file content and create a new file out of it.
+	 * It adds the text at the beginning, before the existing content of the file.
+	 * @param file
+	 * @param prefix
+	 * @throws IOException
+	 */
+	public static File concatIntoFile(String prefix, File file) throws IOException {
+	    LineIterator li = FileUtils.lineIterator(file);
+	    File tempFile = File.createTempFile("prependPrefix", ".tmp");
+	    tempFile.deleteOnExit();
+	    Writer fileWriter = new FileWriterWithEncoding(tempFile, "ASCII", true);
+		BufferedWriter writer = new BufferedWriter(fileWriter);
+	    try {
+	    	writer.write(prefix);
+	        while (li.hasNext()) {
+	        	writer.write(li.next());
+	        	writer.write("\n");
+	        }
+	    } finally {
+	    	writer.close();
+	    	li.close();
+	    }
+	    return tempFile;
+	}
+
+	public static int countLines(File cnfEncoding) {
+		int lines = 0;
+		try (BufferedReader b = new BufferedReader(new FileReader(cnfEncoding))) {
+			while (b.readLine() != null) {
+				lines++;
+				
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return lines;
 	}
 }

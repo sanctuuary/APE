@@ -9,9 +9,12 @@ import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.inject.Provider;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -109,30 +112,6 @@ public class APEConfigTagFactory {
             @Override
             public APEConfigDefaultValue<List<Type>> getDefault() {
                 return APEConfigDefaultValue.withDefault(new ArrayList<>());
-            }
-
-            @Override
-            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
-                final ArrayList<Type> instances = new ArrayList<>();
-
-                if (apeDomainSetup == null) {
-                    throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
-                }
-
-                try {
-                    for (JSONObject jsonModuleInOut : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
-                        Type output;
-                        if ((output = Type.taxonomyInstanceFromJson(jsonModuleInOut, apeDomainSetup)) != null) {
-                            instances.add(output);
-                        }
-                    }
-                } catch (ClassCastException e) {
-                    instances.clear();
-                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
-                            "please provide the correct format.");
-                }
-
-                return instances;
             }
 
         }
@@ -298,6 +277,36 @@ public class APEConfigTagFactory {
                 return results;
             }
         }
+        
+        public static abstract class JSON extends APEConfigTag<JSONObject> {
+
+            @Override
+            public TagType getType() {
+                return JSON;
+            }
+
+            @Override
+            protected JSONObject constructFromJSON(JSONObject obj) {
+            	String constrintsPath = obj.getString(getTagName());
+            	JSONObject constraints = null;
+            	try {
+            	constraints = APEUtils.readFileToJSONObject(new File(constrintsPath));
+            	} catch (IOException e) {
+            		throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
+				} catch (JSONException e) {
+					throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
+				}
+            	
+            
+                return constraints;
+            }
+
+            @Override
+            protected ValidationResults validate(JSONObject jsonObject, ValidationResults results) {
+                results.add(getTagName(), "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).", APEFiles.isJSON(jsonObject));
+                return results;
+            }
+        }
     }
 
     public static class TAGS {
@@ -404,6 +413,30 @@ public class APEConfigTagFactory {
                 //TODO
                 return "";
             }
+            
+            @Override
+            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
+                final ArrayList<Type> instances = new ArrayList<>();
+
+                if (apeDomainSetup == null) {
+                    throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
+                }
+
+                try {
+                    for (JSONObject jsonModuleInOut : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
+                        Type output;
+                        if ((output = Type.taxonomyInstanceFromJson(jsonModuleInOut, apeDomainSetup, true)) != null) {
+                            instances.add(output);
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    instances.clear();
+                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
+                            "please provide the correct format.");
+                }
+
+                return instances;
+            }
         }
 
         public static class PROGRAM_OUTPUTS extends TYPES.DataInstances {
@@ -426,6 +459,30 @@ public class APEConfigTagFactory {
             public String getDescription() {
                 //TODO
                 return "";
+            }
+            
+            @Override
+            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
+                final ArrayList<Type> instances = new ArrayList<>();
+
+                if (apeDomainSetup == null) {
+                    throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
+                }
+
+                try {
+                    for (JSONObject jsonModuleInOut : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
+                        Type output;
+                        if ((output = Type.taxonomyInstanceFromJson(jsonModuleInOut, apeDomainSetup, false)) != null) {
+                            instances.add(output);
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    instances.clear();
+                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
+                            "please provide the correct format.");
+                }
+
+                return instances;
             }
         }
 
@@ -500,12 +557,7 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class CONSTRAINTS extends TYPES.ExistingFile {
-
-            @Override
-            protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[]{APEFiles.Permission.READ};
-            }
+        public static class CONSTRAINTS extends TYPES.JSON {
 
             @Override
             public String getTagName() {
@@ -524,21 +576,21 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigDefaultValue<Path> getDefault() {
+            public APEConfigDefaultValue<JSONObject> getDefault() {
                 return APEConfigDefaultValue.withDefault(null);
             }
         }
 
-        public static class SHARED_MEMORY extends TYPES.Bool {
+        public static class STRICT_TOOL_ANNOTATIONS extends TYPES.Bool {
 
             @Override
             public String getTagName() {
-                return "shared_memory";
+                return "strict_tool_annotations";
             }
 
             @Override
             public String getLabel() {
-                return "Use shared memory";
+                return "Implement strict tool annotations";
             }
 
             @Override
@@ -691,6 +743,39 @@ public class APEConfigTagFactory {
             @Override
             protected ValidationResults validate(Integer value, ValidationResults results) {
                 return results;
+            }
+        }
+        
+        public static class TIMEOUT_SEC extends TYPES.Int {
+
+            public TIMEOUT_SEC() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
+
+            @Override
+            public String getTagName() {
+                return "timeout_sec";
+            }
+
+            @Override
+            public String getLabel() {
+                return "Timeout (in sec)";
+            }
+
+            @Override
+            public String getDescription() {
+                //TODO
+                return "";
+            }
+
+            @Override
+            protected ValidationResults validate(Integer value, ValidationResults results) {
+                return results;
+            }
+            
+            @Override
+            public APEConfigDefaultValue<Integer> getDefault() {
+                return APEConfigDefaultValue.withDefault(300);
             }
         }
 

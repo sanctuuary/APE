@@ -2,6 +2,8 @@ package nl.uu.cs.ape.sat.core.implSAT;
 
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AtomMappings;
+import nl.uu.cs.ape.sat.models.Pair;
+import nl.uu.cs.ape.sat.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.sat.configuration.APERunConfig;
 
 import java.util.ArrayList;
@@ -36,6 +38,13 @@ public class SATsolutionsList {
      * APE run configuration.
      */
     private final APERunConfig runConfig;
+    
+    /**
+     * Synthesis result flag, i.e., the reason why the synthesis execution was interrupted.
+     */
+    private SynthesisFlag runFlag;
+    
+    private List<Pair<Integer>> solutionsPerLength;
     /**
      * Create an object that will contain all the solutions of the synthesis.
      *
@@ -64,7 +73,7 @@ public class SATsolutionsList {
     }
 
     /**
-     * Get max number of solutions that should be found. This number is defined in the ape.config file.
+     * Get max number of solutions that should be found. This number is defined in the config.json file.
      *
      * @return Max number of solutions that should be found.
      */
@@ -143,7 +152,29 @@ public class SATsolutionsList {
     public int size() {
         return this.solutions.size();
     }
-
+    
+    /**
+     * Set a specific number to be the number of solutions that are found up to the specified length.
+     * @param length - the length up until which the solutions are evaluated
+     * @param noSolutions - number of solutions that can be found up until the given length
+     */
+    public void addNoSolutionsForLength(Integer length, Integer noSolutions) {
+    	if(noSolutions == 0)
+    		return;
+    	if(solutionsPerLength == null) {
+    		solutionsPerLength = new ArrayList<>();
+    	}
+    	solutionsPerLength.add(new Pair<Integer>(length, noSolutions));
+    }
+    
+    /**
+     * Returns list of pairs (X, Y), where Y describes the number of solutions up until length X.
+     * @return
+     */
+    public List<Pair<Integer>> getSolutionsPerLength() {
+    	return solutionsPerLength;
+    }
+    
     /**
      * Return the stream that represent the solutions.
      *
@@ -161,4 +192,23 @@ public class SATsolutionsList {
     public Stream<SolutionWorkflow> getParallelStream() {
         return this.solutions.parallelStream();
     }
+
+    /**
+     *  Set the synthesis result flag, i.e., set the reason why the synthesis execution was interrupted.
+     * @param flag - the {@link SynthesisFlag} that should be set
+     */
+	public void setFlag(SynthesisFlag flag) {
+		this.runFlag = flag;
+		
+	}
+	
+	/**
+     *  Get the synthesis result flag, i.e., the reason why the synthesis execution was interrupted.
+     * @return Returns the {@link SynthesisFlag} representing the reason synthesis execution was interrupted.
+     */
+	public SynthesisFlag getFlag() {
+		return runFlag;
+		
+	}
+	
 }

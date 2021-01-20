@@ -58,15 +58,8 @@ public final class SATModuleUtils {
     public static String encodeMemoryStructure(SAT_SynthesisEngine synthesisInstance) {
         StringBuilder constraints = new StringBuilder();
 
-        if (synthesisInstance.getConfig().getSharedMemory()) {
-            /* Case when the using shared memory system. */
-            constraints = constraints.append(inputSharedMemCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
-            constraints = constraints.append(enforcingUsageOfGeneratedTypesSharedMemCons(synthesisInstance));
-        } else {
-            /* Case when the using message passing memory system. */
-            constraints = constraints.append(inputMsgPassingCons(synthesisInstance.getDomainSetup().getAllModules(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
-            constraints = constraints.append(enforcingUsageOfGeneratedTypesMsgPassingCons(synthesisInstance));
-        }
+        constraints = constraints.append(inputDependencyCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+        constraints = constraints.append(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
 
         constraints = constraints.append(generalReferenceCons(synthesisInstance.getDomainSetup(), synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
         return constraints.toString();
@@ -194,127 +187,6 @@ public final class SATModuleUtils {
         return constraints.toString();
     }
 
-    /**
-     * Generate constraints that ensure that the inputs are available in the memory.
-     * Memory in Message Passing Approach is limited to one the output of the
-     * previous tool. <br>
-     * Return the CNF representation of the input type constraints for all modules
-     * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
-     * the Message Passing Approach.
-     *
-     * @return String representation of constraints.
-     */
-    private static String inputMsgPassingCons(AllModules allModules, TypeAutomaton typeAutomaton, AtomMappings mappings) {
-
-        // setting up input constraints (Message Passing Approach)
-        StringBuilder constraints = new StringBuilder();
-
-        for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
-            int blockNumber = currBlock.getBlockNumber();
-            for (State currInputState : currBlock.getStates()) {
-                /* Used state can reference states that are directly preceding the state */
-                List<State> possibleMemStates = typeAutomaton.getMemoryTypesBlock(blockNumber).getStates();
-                possibleMemStates.add(typeAutomaton.getNullState());
-                for (State exictingMemState : possibleMemStates) {
-                    constraints = constraints
-                            .append(mappings.add(exictingMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
-                            .append(" ");
-                }
-                constraints = constraints.append(" 0\n");
-
-                /* Defining that each input can reference only one state in the shared memory */
-                for (Pair<PredicateLabel> pair : getPredicatePairs(possibleMemStates)) {
-                    constraints = constraints.append("-")
-                            .append(mappings.add(pair.getFirst(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
-                            .append(" ");
-                    constraints = constraints.append("-")
-                            .append(mappings.add(pair.getSecond(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
-                            .append(" 0\n");
-                }
-                /*
-                 * Used state cannot reference states that are not directly preceding the state
-                 */
-                for (int notCurrBlockNumber = 0; notCurrBlockNumber < typeAutomaton.getMemoryTypesBlocks()
-                        .size(); notCurrBlockNumber++) {
-                    if (notCurrBlockNumber != blockNumber) {
-                        for (State nonExictingMemState : typeAutomaton.getMemoryTypesBlock(notCurrBlockNumber)
-                                .getStates()) {
-                            constraints = constraints.append("-").append(mappings.add(nonExictingMemState,
-                                    currInputState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" 0\n");
-                        }
-                    }
-                }
-            }
-        }
-
-        return constraints.toString();
-    }
-
-    /**
-     * TODO: TEST THE METHOD
-     * Function returns the encoding that ensures that each time a memory type is
-     * referenced by a tool's input type, it has to be of right type. <br>
-     * Function is implementing the Message Passing Approach.
-     *
-     * @return String representation of constraints.
-     */
-    private static String enforcingUsageOfGeneratedTypesMsgPassingCons(SAT_SynthesisEngine synthesisInstance) {
-
-        AtomMappings mappings = synthesisInstance.getMappings();
-        Type emptyType = synthesisInstance.getEmptyType();
-
-
-        StringBuilder constraints = new StringBuilder();
-        String usageOfAllTypes = " ", usageOfAllWorkflowInputType = " ";
-        String usageOfOneType = " 0\n", usageOfWorkflowInputType = " 0\n";
-        if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ALL) {
-            usageOfAllWorkflowInputType = " 0\n";
-            usageOfWorkflowInputType = " ";
-        }
-        if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ALL) {
-
-            usageOfAllTypes = " 0\n";
-            usageOfOneType = " ";
-        }
-        /*
-         * Setting up the constraints that ensure usage of the generated types in the
-         * memory. (e.g.  all workflow inputs and at least one of each of the tool outputs
-         * needs to be used in the program, unless they are empty).
-         */
-        for (Block currBlock : synthesisInstance.getTypeAutomaton().getMemoryTypesBlocks()) {
-            int blockNumber = currBlock.getBlockNumber();
-            for (State currMemoryState : currBlock.getStates()) {
-                /* If the memory is provided as input */
-                if (blockNumber == 0) {
-                    if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.NONE) {
-                        continue;
-                    }
-                    constraints = constraints
-                            .append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE)).append(" ");
-                    for (State inputState : synthesisInstance.getTypeAutomaton().getUsedTypesBlock(blockNumber).getStates()) {
-                        constraints = constraints
-                                .append(mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
-                                .append(usageOfAllWorkflowInputType);
-                    }
-                    constraints = constraints.append(usageOfWorkflowInputType);
-                } else {
-                    if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.NONE) {
-                        break;
-                    }
-                    constraints = constraints
-                            .append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE)).append(" ");
-                    for (State inputState : synthesisInstance.getTypeAutomaton().getUsedTypesBlock(blockNumber).getStates()) {
-                        constraints = constraints
-                                .append(mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
-                                .append(usageOfAllTypes);
-                    }
-                    constraints = constraints.append(usageOfOneType);
-                }
-            }
-        }
-
-        return constraints.toString();
-    }
 
     /**
      * Generate constraints that ensure that the inputs are available in the memory.
@@ -326,11 +198,11 @@ public final class SATModuleUtils {
      *
      * @return String representation of constraints.
      */
-    private static String inputSharedMemCons(TypeAutomaton typeAutomaton, AtomMappings mappings) {
+    private static String inputDependencyCons(TypeAutomaton typeAutomaton, AtomMappings mappings) {
 
         // setting up input constraints (Shared Memory Approach)
         StringBuilder constraints = new StringBuilder();
-
+        /** For each input state...*/
         for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
             int blockNumber = currBlock.getBlockNumber();
             for (State currInputState : currBlock.getStates()) {
@@ -379,7 +251,7 @@ public final class SATModuleUtils {
      *
      * @return String representation of constraints.
      */
-    private static String enforcingUsageOfGeneratedTypesSharedMemCons(SAT_SynthesisEngine synthesisInstance) {
+    private static String enforcingUsageOfGeneratedTypesCons(SAT_SynthesisEngine synthesisInstance) {
 
         AtomMappings mappings = synthesisInstance.getMappings();
         Type emptyType = synthesisInstance.getEmptyType();
