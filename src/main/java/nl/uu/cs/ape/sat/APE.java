@@ -10,6 +10,7 @@ import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
 import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.configuration.APECoreConfig;
@@ -328,12 +329,16 @@ public class APE {
 		}
 		
 		if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)) {
-			System.out.println("All required solutions found.");
+			allSolutions.setFlag(SynthesisFlag.NONE);
 		} else if (solutionLength == runConfig.getSolutionLength().getMax()) {
-			System.out.println("Maximum solution length reached.");
+			allSolutions.setFlag(SynthesisFlag.MAX_LENGHT);
 		} else if(APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) <= 0) {
-			System.out.println("Timeout was reached.");
+			allSolutions.setFlag(SynthesisFlag.TIMEOUT);
+		} else {
+			allSolutions.setFlag(SynthesisFlag.UNKNOWN);
 		}
+		
+		System.out.println(allSolutions.getFlag().getMessage());
 		APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
 
 		return allSolutions;

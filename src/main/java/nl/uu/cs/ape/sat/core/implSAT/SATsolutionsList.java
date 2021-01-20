@@ -3,6 +3,7 @@ package nl.uu.cs.ape.sat.core.implSAT;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.Pair;
+import nl.uu.cs.ape.sat.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.sat.configuration.APERunConfig;
 
 import java.util.ArrayList;
@@ -38,6 +39,10 @@ public class SATsolutionsList {
      */
     private final APERunConfig runConfig;
     
+    /**
+     * Synthesis result flag, i.e., the reason why the synthesis execution was interrupted.
+     */
+    private SynthesisFlag runFlag;
     
     private List<Pair<Integer>> solutionsPerLength;
     /**
@@ -187,4 +192,23 @@ public class SATsolutionsList {
     public Stream<SolutionWorkflow> getParallelStream() {
         return this.solutions.parallelStream();
     }
+
+    /**
+     *  Set the synthesis result flag, i.e., set the reason why the synthesis execution was interrupted.
+     * @param flag - the {@link SynthesisFlag} that should be set
+     */
+	public void setFlag(SynthesisFlag flag) {
+		this.runFlag = flag;
+		
+	}
+	
+	/**
+     *  Get the synthesis result flag, i.e., the reason why the synthesis execution was interrupted.
+     * @return Returns the {@link SynthesisFlag} representing the reason synthesis execution was interrupted.
+     */
+	public SynthesisFlag getFlag() {
+		return runFlag;
+		
+	}
+	
 }
