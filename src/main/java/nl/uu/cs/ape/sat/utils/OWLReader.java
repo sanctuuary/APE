@@ -63,7 +63,7 @@ public class OWLReader {
 	 * <b>TypesTaxonomy</b> part of the ontology.
 	 *
 	 * @return true is the ontology was read correctly, false otherwise.
-	 * @throws AtomMappingsException Exception if Type dimensions have common
+	 * @throws APEDimensionsException Exception if Type dimensions have common
 	 *                                     classes.
 	 * @throws OWLOntologyCreationException Error in reading the OWL file.
 	 */

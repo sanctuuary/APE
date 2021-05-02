@@ -132,7 +132,7 @@ public class APECoreConfig {
     /**
      * Initialize the configuration of the project.
      *
-     * @param configPath Path to the APE configuration file.
+     * @param config 			  APE configuration file.
      * @throws IOException        Error in reading the configuration file.
      * @throws JSONException      Error in parsing the configuration file.
      * @throws APEConfigException Error in setting up the the configuration.
@@ -239,13 +239,12 @@ public class APECoreConfig {
      * @param ontologyPrefixURI  Prefix used to define OWL class IDs
      * @param toolTaxonomyRoot   Node in the ontology that corresponds to the root of the module taxonomy.
      * @param dataDimensionRoots List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
-     * @param toolAnnotations    The JSON file with all tool annotations.
      * @return
      * @throws APEDimensionsException Error when one of the terms does not exist in the ontology
      * @throws OWLOntologyCreationException Error in file format.
      * @throws FileExistsException File error.
      */
-    public static boolean validateOntology(File ontologyFile, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots ) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
+    public static boolean validateOntology(File ontologyFile, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
     	return OWLReader.verifyOntology(ontologyFile, ontologyPrefixURI, toolTaxonomyRoot, dataDimensionRoots);
     	
     }
@@ -262,7 +261,6 @@ public class APECoreConfig {
     /**
      * Set ontology annotation.
      *
-     * @return the value of tag {@link #TOOL_ANNOTATIONS}
      */
     public void setOntologyFile(File ontology) {
     	ONTOLOGY.setValue(ontology.toPath());
@@ -307,7 +305,6 @@ public class APECoreConfig {
     /**
      * Set tool annotations.
      *
-     * @return the value of tag {@link #TOOL_ANNOTATIONS}
      */
     public void setToolAnnotationsFile(File toolAnnotations) {
         TOOL_ANNOTATIONS.setValue(toolAnnotations.toPath());

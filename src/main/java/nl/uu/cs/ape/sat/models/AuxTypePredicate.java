@@ -6,6 +6,7 @@ import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
+
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -50,7 +51,7 @@ public class AuxTypePredicate extends Type implements AuxiliaryPredicate {
      * Method used to generate a new predicate that should provide an interface for handling multiple predicates.
      * New predicated is used to simplify interaction with a set of related tools/types.
      * <p>
-     * The original predicates are available as consumed predicates(see {@link AuxTaxonomyPredicate#getGeneralizedPredicates()}) of the new {@link TaxonomyPredicate}.
+     * The original predicates are available as consumed predicates (see {@link AuxTypePredicate#getGeneralizedPredicates()}) of the new {@link TaxonomyPredicate}.
      *
      * @param relatedPredicates Set of sorted type that are logically related to the new abstract type (label of the equivalent sets is always the same due to its ordering).
      * @param logicOp           Logical operation that describes the relation between the types.
