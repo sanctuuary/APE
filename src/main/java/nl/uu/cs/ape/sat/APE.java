@@ -287,7 +287,7 @@ public class APE {
 		apeDomainSetup.updateConstraints(runConfig.getConstraintsJSON());
 
 		/* Print the setup information when necessary. */
-		APEUtils.debugPrintout(runConfig.getDebugMode(), apeDomainSetup);
+		APEUtils.debugPrintout(runConfig, apeDomainSetup);
 
 		int i = 1;
 		for (Type input : runConfig.getProgramInputs()) {

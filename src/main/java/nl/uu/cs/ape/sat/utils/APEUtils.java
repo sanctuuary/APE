@@ -2,10 +2,7 @@ package nl.uu.cs.ape.sat.utils;
 
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TYPES.JSON;
-import nl.uu.cs.ape.sat.constraints.ConstraintTemplateParameter;
-import nl.uu.cs.ape.sat.constraints.ConstraintFormatException;
-import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
+import nl.uu.cs.ape.sat.configuration.APERunConfig;
 import nl.uu.cs.ape.sat.models.AtomMappings;
 import nl.uu.cs.ape.sat.models.ConstraintTemplateData;
 import nl.uu.cs.ape.sat.models.Module;
@@ -327,13 +324,12 @@ public final class APEUtils {
 	/**
 	 * Debug printout.
 	 *
-	 * @param debug       In case that the debug mode is on, print the constraint
-	 *                    templates and tool and data taxonomy trees.
+	 * @param runConfig   Configuration of the APE run.
 	 * @param domainSetup Domain information, including all the existing tools and
 	 *                    types.
 	 */
-	public static void debugPrintout(boolean debug, APEDomainSetup domainSetup) {
-		if (debug) {
+	public static void debugPrintout(APERunConfig runConfig, APEDomainSetup domainSetup) {
+		if (runConfig.getDebugMode()) {
 
 			/*
 			 * Printing the constraint templates
@@ -387,6 +383,17 @@ public final class APEUtils {
 			}
 			if (domainSetup.getUnformattedConstr().isEmpty()) {
 				System.out.println("\tNo constraints.");
+			}
+			System.out.println("-------------------------------------------------------------");
+			
+			int i = 1;
+			for (Type input : runConfig.getProgramInputs()) {
+				System.out.println((i++) + ". program input is " + input.toShortString());
+			}
+			System.out.println("-------------------------------------------------------------");
+			i = 1;
+			for (Type output : runConfig.getProgramOutputs()) {
+				System.out.println((i++) + ". program output is " + output.toShortString());
 			}
 			System.out.println("-------------------------------------------------------------");
 		}
@@ -703,12 +710,11 @@ public final class APEUtils {
 
 			if (intAtom > 0) {
 				Atom atom = mappings.findOriginal(intAtom);
-				humanReadable.append(atom.getPredicate().getPredicateID()).append("(")
-						.append(atom.getUsedInStateArgument().getPredicateID()).append(") ");
+				
+				humanReadable.append(atom.toString()).append(" ");
 			} else if (intAtom < 0) {
 				Atom atom = mappings.findOriginal(-intAtom);
-				humanReadable.append("-").append(atom.getPredicate().getPredicateID()).append("(")
-						.append(atom.getUsedInStateArgument().getPredicateID()).append(") ");
+				humanReadable.append("-").append(atom.toString()).append(" ");
 			} else {
 				humanReadable.append("\n");
 			}
@@ -716,6 +722,20 @@ public final class APEUtils {
 		scanner.close();
 
 		return humanReadable.toString();
+	}
+	
+	public static void write2file(InputStream temp_sat_input, File file, Boolean append) throws IOException {
+		StringBuilder humanReadable = new StringBuilder();
+		Scanner scanner = new Scanner(temp_sat_input);
+		
+		while (scanner.hasNextLine()) {
+			String str = scanner.nextLine();
+
+			humanReadable = humanReadable.append(str).append("\n");
+		}
+		scanner.close();
+
+		APEUtils.write2file(humanReadable.toString(), file, append);
 	}
 
 	/**
@@ -777,7 +797,6 @@ public final class APEUtils {
 	/**
 	 * Disable System.err temporarily, enable again with {@link #enableErr}.
 	 * 
-	 * @param debug
 	 */
 	public static void disableErr() {
 		System.setErr(nullStream);
@@ -786,7 +805,6 @@ public final class APEUtils {
 	/**
 	 * Reset System.err to normal.
 	 * 
-	 * @param debug
 	 */
 	public static void enableErr() {
 		System.setErr(original);
