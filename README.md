@@ -33,7 +33,7 @@ Building APE from source is not required to run it, as the latest stable version
 | Date       | Version | Download                                                                             |
 |------------|---------|--------------------------------------------------------------------------------------|
 | 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
-| 02-05-2021 | 1.1.7   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.1.7.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.1.7-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.1.7-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.1.7-sources.jar)|
+| 02-05-2021 | 1.1.7   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-sources.jar)|
 
 ### Add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
