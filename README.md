@@ -131,12 +131,12 @@ For one of the bioinformatics use cases our intern Karl Allgaeuer developed a pr
 A Docker version of this demonstrator is available at https://github.com/sanctuuary/Burke_Docker
 
 ## The APE team
-* Vedran Kasalica (v.kasalica@uu.nl), lead developer
+* Vedran Kasalica (v.kasalica[at]uu.nl), lead developer
 * Maurin Voshol, student developer
-* Anna-Lena Lamprecht (a.l.lamprecht@uu.nl), project initiator and principal investigator
+* Anna-Lena Lamprecht (a.l.lamprecht[at]uu.nl), project initiator and principal investigator
 
 ## Contact
-For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica@uu.nl).
+For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica[at]uu.nl).
 
 ## Contributions
 We welcome contributions (bug reports, bug fixes, feature requests, extensions, use cases, ...) to APE. Please get in touch with Vedran Kasalica (v.kasalica@uu.nl) to coordinate your contribution. We expect all contributors to follow our [Code of Conduct](https://github.com/sanctuuary/APE/blob/master/CODE_OF_CONDUCT.md).
