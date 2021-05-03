@@ -129,10 +129,10 @@ For more information see [APE javadoc.io](https://javadoc.io/doc/io.github.sanct
 ## APE Web
 
 <div align="left">
-  <a href="https://ape.science.uu.nl/" target="_blank"><img src="https://user-images.githubusercontent.com/11068408/116879352-dce72980-ac20-11eb-8051-f486bf14a912.png" alt="APE Web" width=30%></a>
+  <a href="https://ape.science.uu.nl/" target="_blank"><img src="https://user-images.githubusercontent.com/11068408/116879352-dce72980-ac20-11eb-8051-f486bf14a912.png" alt="APE Web" width=50%></a>
 </div>
 
-Graphical web interface for the library is available at https://ape.science.uu.nl/
+Graphical Web Interface for the APE library is available at https://ape.science.uu.nl/
 
 ## Use Cases and Demos
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatics, GIS [[3]](#3)). Different examples are available at the [APE Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
