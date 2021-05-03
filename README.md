@@ -22,7 +22,7 @@ For our paper at [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) [[2]](#2) w
 #### For detailed information please visit [our page](https://ape-framework.readthedocs.io).
 
 ## Requirements
-To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
+To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE locally you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
 
 To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
 
@@ -125,11 +125,18 @@ SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 
 For more information see [APE javadoc.io](https://javadoc.io/doc/io.github.sanctuuary/APE/latest/nl/uu/cs/ape/sat/APE.html) page.
 
+
+## APE Web
+
+<div align="left">
+  <a href="https://ape.science.uu.nl/" target="_blank"><img src="https://user-images.githubusercontent.com/11068408/116879352-dce72980-ac20-11eb-8051-f486bf14a912.png" alt="APE Web" width=30%></a>
+</div>
+
+Graphical web interface for the library is available at http://ape.science.uu.nl/
+
 ## Use Cases and Demos
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatics, GIS [[3]](#3)). Different examples are available at the [APE Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
-For one of the bioinformatics use cases our intern Karl Allgaeuer developed a prototype of a web-based interface to APE. It is available at http://ape.science.uu.nl/ (alpha).
-A Docker version of this demonstrator is available at https://github.com/sanctuuary/Burke_Docker
 
 ## The APE team
 * Vedran Kasalica (v.kasalica[at]uu.nl), lead developer
