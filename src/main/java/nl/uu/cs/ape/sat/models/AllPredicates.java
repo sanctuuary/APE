@@ -61,7 +61,7 @@ public abstract class AllPredicates {
      *
      * @param newPredicate the new predicate
      * @return the taxonomy predicate
-     * @throws Exception the exception
+     * @throws ExceptionInInitializerError the exception
      */
     public abstract TaxonomyPredicate addPredicate(TaxonomyPredicate newPredicate) throws ExceptionInInitializerError;
 

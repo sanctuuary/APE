@@ -39,7 +39,7 @@ public class AllTypes extends AllPredicates {
     private Type emptyLabelType;
    
     /**
-     * Instantiates a new All types.
+     * Instantiates a new AllTypes object.
      *
      * @param config the config
      */
@@ -56,10 +56,10 @@ public class AllTypes extends AllPredicates {
         emptyLabelType.addSuperPredicate(apeLabelRoot);
     }
     
-	/**
-     * Instantiates a new All modules.
+    /**
+     * Instantiates a new AllTypes object.
      *
-     * @param config the config
+     * @param typeTaxonomyRoots the list of data dimension roots
      */
     public AllTypes(List<String> typeTaxonomyRoots) {
     	super(Stream.concat(typeTaxonomyRoots.stream(), Stream.of(apeLabel))
@@ -158,13 +158,13 @@ public class AllTypes extends AllPredicates {
      * Returns the type to which the specified key is mapped to under the given dimension, or null if
      * the typeID has no mappings or does not belong to the given dimension.
      *
-     * @param typeID      The key whose associated value is to be returned.
+     * @param predicateID      The key whose associated value is to be returned.
      * @param dimensionID The ID of the dimension to which the type belongs to.
      * @return {@link Type} to which the specified key is mapped to, or null if the typeID has no mappings or does not belong to the given dimension.
      */
-    public Type get(String predicateID, String dimentionID) throws APEDimensionsException {
+    public Type get(String predicateID, String dimensionID) throws APEDimensionsException {
     	Type predicate = (Type) get(predicateID);
-    	if(predicate != null && predicate.getRootNodeID().equals(dimentionID)) {
+    	if(predicate != null && predicate.getRootNodeID().equals(dimensionID)) {
     		return predicate;
     	} else {
     		return null;

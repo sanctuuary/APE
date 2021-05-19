@@ -324,8 +324,7 @@ public final class APEUtils {
 	/**
 	 * Debug printout.
 	 *
-	 * @param debug       In case that the debug mode is on, print the constraint
-	 *                    templates and tool and data taxonomy trees.
+	 * @param runConfig   Configuration of the APE run.
 	 * @param domainSetup Domain information, including all the existing tools and
 	 *                    types.
 	 */
@@ -798,7 +797,6 @@ public final class APEUtils {
 	/**
 	 * Disable System.err temporarily, enable again with {@link #enableErr}.
 	 * 
-	 * @param debug
 	 */
 	public static void disableErr() {
 		System.setErr(nullStream);
@@ -807,7 +805,6 @@ public final class APEUtils {
 	/**
 	 * Reset System.err to normal.
 	 * 
-	 * @param debug
 	 */
 	public static void enableErr() {
 		System.setErr(original);

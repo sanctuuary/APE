@@ -1,6 +1,7 @@
 package nl.uu.cs.ape.sat.constraints;
 
 import nl.uu.cs.ape.sat.models.Module;
+import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEDimensionsException;

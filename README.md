@@ -22,7 +22,7 @@ For our paper at [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) [[2]](#2) w
 #### For detailed information please visit [our page](https://ape-framework.readthedocs.io).
 
 ## Requirements
-To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
+To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE locally you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
 
 To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
 
@@ -33,6 +33,7 @@ Building APE from source is not required to run it, as the latest stable version
 | Date       | Version | Download                                                                             |
 |------------|---------|--------------------------------------------------------------------------------------|
 | 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
+| 02-05-2021 | 1.1.7   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-sources.jar)|
 
 ### Add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
@@ -41,7 +42,7 @@ To add a dependency on APE using Maven, use the following:
 <dependency>
     <groupId>io.github.sanctuuary</groupId>
     <artifactId>APE</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.7</version>
 </dependency>
 ```
 For information regarding Gradle, Ivy, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
@@ -57,7 +58,7 @@ to build the APE modules from the source tree and the built files will be genera
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
 ### How to run APE from the command line
-[APE-1.0.1-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar) is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
+[APE-1.1.7-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-executable.jar) is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
 When running APE-&lt;version>-executable.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly:
 ```shell
@@ -78,10 +79,10 @@ or
 ```shell
 git clone https://github.com/sanctuuary/APE_UseCases.git
 ```
-Download the latest version of [`APE-<version>-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
+Download the latest version of [`APE-<version>-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
 ```shell
 cd ~/git/APE_UseCases
-java -jar APE-1.0.1-executable.jar ImageMagick/Example1/config.json
+java -jar APE-1.1.7-executable.jar ImageMagick/Example1/config.json
 ```
 See [ImageMagick: Example 1](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick/Example1) for more information about the results and on how to execute the composed workflow.
 
@@ -124,19 +125,26 @@ SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 
 For more information see [APE javadoc.io](https://javadoc.io/doc/io.github.sanctuuary/APE/latest/nl/uu/cs/ape/sat/APE.html) page.
 
+
+## APE Web
+
+<div align="left">
+  <a href="https://ape.science.uu.nl/" target="_blank"><img src="https://user-images.githubusercontent.com/11068408/116879352-dce72980-ac20-11eb-8051-f486bf14a912.png" alt="APE Web" width=50%></a>
+</div>
+
+Graphical Web Interface for the APE library is available at https://ape.science.uu.nl/
+
 ## Use Cases and Demos
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatics, GIS [[3]](#3)). Different examples are available at the [APE Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
 
-For one of the bioinformatics use cases our intern Karl Allgaeuer developed a prototype of a web-based interface to APE. It is available at http://ape.science.uu.nl/ (alpha).
-A Docker version of this demonstrator is available at https://github.com/sanctuuary/Burke_Docker
 
 ## The APE team
-* Vedran Kasalica (v.kasalica@uu.nl), lead developer
+* Vedran Kasalica (v.kasalica[at]uu.nl), lead developer
 * Maurin Voshol, student developer
-* Anna-Lena Lamprecht (a.l.lamprecht@uu.nl), project initiator and principal investigator
+* Anna-Lena Lamprecht (a.l.lamprecht[at]uu.nl), project initiator and principal investigator
 
 ## Contact
-For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica@uu.nl).
+For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica[at]uu.nl).
 
 ## Contributions
 We welcome contributions (bug reports, bug fixes, feature requests, extensions, use cases, ...) to APE. Please get in touch with Vedran Kasalica (v.kasalica@uu.nl) to coordinate your contribution. We expect all contributors to follow our [Code of Conduct](https://github.com/sanctuuary/APE/blob/master/CODE_OF_CONDUCT.md).

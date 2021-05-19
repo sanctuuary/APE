@@ -276,7 +276,9 @@ public class APERunConfig {
     }
 
     /**
-     * @param constraintsPath the constraintsPath to set
+     * Set the constrains.
+     * 
+     * @param constraintsJSON JSON object that contains the constraints
      */
     public void setConstraintsJSON(JSONObject constraintsJSON) {
         CONSTRAINTS.setValue(constraintsJSON);

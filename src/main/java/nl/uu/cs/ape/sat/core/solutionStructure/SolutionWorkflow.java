@@ -23,6 +23,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.Literal;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -293,6 +294,21 @@ public class SolutionWorkflow {
             return generateFieldDataflowGraph(title, orientation);
         }
     }
+    
+    /**
+     * Get the graphical representation of the data-flow diagram with the
+     * required title and in the defined orientation.
+     *
+     * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
+     * @return The solution graph in PNG format.
+     */
+    public BufferedImage getDataflowGraphPNG(RankDir orientation) {
+        if (this.dataflowGraph != null) {
+            return this.dataflowGraph.getPNGImage(false);
+        } else {
+            return generateFieldDataflowGraph("", orientation).getPNGImage(false);
+        }
+    }
 
     /**
      * Get the graphical representation of the control-flow diagram in default
@@ -309,7 +325,7 @@ public class SolutionWorkflow {
     }
 
     /**
-     * /** Get the graphical representation of the control-flow diagram with the
+     * Get the graphical representation of the control-flow diagram with the
      * required title and in the defined orientation.
      *
      * @param title       The title of the SolutionGraph.
@@ -321,6 +337,21 @@ public class SolutionWorkflow {
             return this.controlflowGraph;
         } else {
             return generateFieldControlflowGraph(title, orientation);
+        }
+    }
+    
+    /**
+     * Get the graphical representation of the control-flow diagram with the
+     * required title and in the defined orientation.
+     *
+     * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
+     * @return The solution graph in PNG format.
+     */
+    public BufferedImage getControlflowGraphPNG(RankDir orientation) {
+        if (this.controlflowGraph != null) {
+            return this.controlflowGraph.getPNGImage(false);
+        } else {
+            return generateFieldControlflowGraph("", orientation).getPNGImage(false);
         }
     }
 

@@ -27,9 +27,9 @@ public class AllModules extends AllPredicates {
     }
     
     /**
-     * Instantiates a new All modules.
+     * Instantiates a new AllModules object.
      *
-     * @param config the config
+     * @param moduleTaxonomyRoot root module
      */
     public AllModules(String moduleTaxonomyRoot) {
         super(Arrays.asList(moduleTaxonomyRoot));

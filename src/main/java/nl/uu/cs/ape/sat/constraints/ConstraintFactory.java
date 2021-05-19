@@ -112,82 +112,82 @@ public class ConstraintFactory {
 		 * ID: ite_m 
 		 */
 		ConstraintTemplate currTemplate = new Constraint_if_then_module("ite_m", moduleParam2,
-				"If operation ${parameter_1} was used, then operation ${parameter_2} must be used subsequently.");
+				"If 1st operation is used, then 2nd operation must be used subsequently.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: itn_m 
 		 */
 		currTemplate = new Constraint_if_then_not_module("itn_m", moduleParam2,
-				"If operation ${parameter_1} was used, then operation ${parameter_2} cannot be used subsequently.");
+				"If 1st operation is used, then 2nd operation cannot be used subsequently.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: depend_m 
 		 */
 		currTemplate = new Constraint_depend_module("depend_m", moduleParam2,
-				"If operation ${parameter_1} was used, then we must have used operation ${parameter_2} prior to it.");
+				"If 1st operation is used, then we must have used 2nd operation prior to it.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: next_m 
 		 */
 		currTemplate = new Constraint_next_module("next_m", moduleParam2,
-				"If operation ${parameter_1} was used, then ${parameter_2} must be used as a next operation in the sequence.");
+				"If 1st operation is used, then 2nd operation must be used as the next operation in the sequence.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: prev_m
 		 */
 		currTemplate = new Constraint_prev_module("prev_m", moduleParam2,
-				"If operation ${parameter_1} was used, then we must have used ${parameter_2} as the previous operation in the sequence.");
+				"If 1st operation is used, then we must have used 2nd operation as a previous operation in the sequence.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: use_m 
 		 */
-		currTemplate = new Constraint_use_module("use_m", moduleParam1, "Use operation ${parameter_1} in the solution.");
+		currTemplate = new Constraint_use_module("use_m", moduleParam1, "Use operation in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: nuse_m
 		 */
 		currTemplate = new Constraint_not_use_module("nuse_m", moduleParam1,
-				"Do not use operation ${parameter_1} in the solution.");
+				"Do not use operation in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: last_m
 		 */
 		currTemplate = new Constraint_last_module("last_m", moduleParam1,
-				"Use ${parameter_1} as last operation in the solution.");
+				"Use operation as the last operation in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: use_t 
 		 */
-		currTemplate = new Constraint_use_type("use_t", typeParam1, "Use type ${parameter_1} in the solution.");
+		currTemplate = new Constraint_use_type("use_t", typeParam1, "Use type in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: nuse_t
 		 */
 		currTemplate = new Constraint_not_use_type("nuse_t", typeParam1,
-				"Do not use type ${parameter_1} in the solution.");
+				"Do not use type in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: use_ite_t
 		 */
 		currTemplate = new Constraint_if_use_then_type("use_ite_t", typeParam2,
-				"If data type ${parameter_1} was used, then data ${parameter_2} must be used subsequently.");
+				"If 1st data is used, then 2nd data must be used subsequently.");
 		addConstraintTemplate(currTemplate);
 		
 		/*
 		 * ID: use_itn_t
 		 */
 		currTemplate = new Constraint_if_use_then_not_type("use_itn_t", typeParam2,
-				"If data type ${parameter_1} was used, then data ${parameter_2} cannot be used subsequently.");
+				"If 1st data is used, then 2nd data cannot be used subsequently.");
 		addConstraintTemplate(currTemplate);
 		
 		
