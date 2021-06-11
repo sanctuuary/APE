@@ -1,8 +1,8 @@
 package nl.uu.cs.ape.sat;
 
 import guru.nidi.graphviz.attribute.Rank.RankDir;
-import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
+import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -45,7 +45,7 @@ public class Main {
             return;
         }
 
-        SATsolutionsList solutions;
+        SolutionsList solutions;
         try {
 
             // run the synthesis and retrieve the solutions

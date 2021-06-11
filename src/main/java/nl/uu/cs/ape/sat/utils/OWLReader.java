@@ -80,7 +80,7 @@ public class OWLReader {
 		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
 
 		/* Get a root of the operations taxonomy. */
-		String moduleRootIRI = allModules.getRootsIDs().get(0);
+		String moduleRootIRI = allModules.getAllRootIDs().get(0);
 		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
 		if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
 			/* Handle scenario when the tool taxonomy root was not defined properly. */
@@ -89,7 +89,7 @@ public class OWLReader {
 
 		/* Get roots for each of the data dimensions. */
 		List<OWLClass> dimensionRootClasses = new ArrayList<OWLClass>();
-		for (String dimensionIRI : allTypes.getRootsIDs()) {
+		for (String dimensionIRI : allTypes.getDataTaxonomyDimensionIDs()) {
 			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionIRI));
 			if (!ontology.containsClassInSignature(IRI.create(dimensionIRI))) {
 				throw APEDimensionsException.notExistingDimension(String.format("Data dimension %s does not exist in the ontology.", dimensionIRI));
@@ -127,7 +127,7 @@ public class OWLReader {
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		
 		/* Get a root of the operations taxonomy. */
-		String moduleRootIRI = allModules.getRootsIDs().get(0);
+		String moduleRootIRI = allModules.getAllRootIDs().get(0);
 		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
 		if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
 			/* Handle scenario when the tool taxonomy root was not defined properly. */
@@ -136,7 +136,7 @@ public class OWLReader {
 
 		/* Get roots for each of the data dimensions. */
 		List<OWLClass> dimensionRootClasses = new ArrayList<OWLClass>();
-		for (String dimensionIRI : allTypes.getRootsIDs()) {
+		for (String dimensionIRI : allTypes.getDataTaxonomyDimensionIDs()) {
 			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionIRI));
 			if (!ontology.containsClassInSignature(IRI.create(dimensionIRI))) {
 				/* Handle scenario when the type taxonomy root was not defined properly. */
@@ -188,7 +188,7 @@ public class OWLReader {
 		 * Defining the Node Type based on the node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if (getIRI(currClass).equals(allModules.getRootsIDs().get(0))) {
+		if (getIRI(currClass).equals(allModules.getAllRootIDs().get(0))) {
 			currNodeType = NodeType.ROOT;
 			currRootClass = currClass;
 		} else {
@@ -241,7 +241,7 @@ public class OWLReader {
 			currRoot = rootClass;
 		}
 
-		currType = addNewTypeToAllTypes(getLabel(currClass), getIRI(currClass), currRoot, currNodeType);
+		currType = addNewTypeToAllTypes(getLabel(currClass), getIRI(currClass), getIRI(currRoot), currNodeType);
 
 		
 		/* Add the current type as a sub-type of the super type. */
@@ -259,29 +259,29 @@ public class OWLReader {
 		subClasses.forEach(child -> exploreTypeOntologyRec(reasoner, child, currClass, currRoot));
 
 		if (subClasses.isEmpty()) {
-			currType.setToSimplePredicate();
+			currType.setNodePredicate(NodeType.LEAF);
 		} else if (useStrictToolAnnotations) {
 			Type artificialSubType = addNewTypeToAllTypes(getLabel(currClass) + "_p", getIRI(currClass) + "_plain",
-					currRoot, NodeType.ARTIFICIAL_LEAF);
+					getIRI(currRoot), NodeType.ARTIFICIAL_LEAF);
 			if (artificialSubType != null) {
 				currType.addSubPredicate(artificialSubType);
 				currType.setPlainType(artificialSubType);
 				
 				artificialSubType.addSuperPredicate(currType);
-				artificialSubType.setToSimplePredicate();
+				artificialSubType.setNodePredicate(NodeType.LEAF);
 			} else {
 				System.err.println("Artificial predicate '" + getLabel(currClass) + "' was not created correctly.");
 			}
 		}
 	}
 	
-	private Type addNewTypeToAllTypes(String classLabel, String classID, OWLClass currRoot, NodeType currNodeType) {
+	private Type addNewTypeToAllTypes(String classLabel, String classID, String rootID, NodeType currNodeType) {
 		Type currType = null;
 		/* Generate the Type that corresponds to the taxonomy class. */
 		try {
 			currType = allTypes
-					.addPredicate(new Type(classLabel, classID, getIRI(currRoot), currNodeType));
-			typeDimensions.get(getIRI(currRoot)).add(classID);
+					.addPredicate(new Type(classLabel, classID, rootID, currNodeType));
+			typeDimensions.get(rootID).add(classID);
 		} catch (ExceptionInInitializerError e) {
 			e.printStackTrace();
 		}

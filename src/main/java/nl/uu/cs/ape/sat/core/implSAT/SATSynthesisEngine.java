@@ -4,9 +4,8 @@ import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
 import nl.uu.cs.ape.sat.core.SynthesisEngine;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
+import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.sat.models.AtomMappings;
-import nl.uu.cs.ape.sat.models.SATEncodingUtils.SATModuleUtils;
-import nl.uu.cs.ape.sat.models.SATEncodingUtils.SATTypeUtils;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The {@code SAT_SynthesisEngine} class represents a <b>synthesis instance</b>,
+ * The {@code SATSynthesisEngine} class represents a <b>synthesis instance</b>,
  * i.e. it is represented with the set of inputs (tools, types, constraints and
  * workflow length that is being explored).
  * <p>
@@ -39,7 +38,7 @@ import java.util.List;
  *
  * @author Vedran Kasalica
  */
-public class SAT_SynthesisEngine implements SynthesisEngine {
+public class SATSynthesisEngine implements SynthesisEngine {
 
     /**
      * Object that contains all the domain information.
@@ -59,7 +58,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     /**
      * Set of all the solutions found by the library.
      */
-    private final SATsolutionsList allSolutions;
+    private final SolutionsList allSolutions;
 
     /**
      * CNF encoding of the problem.
@@ -90,7 +89,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
      * @param workflowLength         Workflow length
      * @throws IOException - Error if the temp file cannot be created
      */
-    public SAT_SynthesisEngine(APEDomainSetup domainSetup, SATsolutionsList allSolutions,
+    public SATSynthesisEngine(APEDomainSetup domainSetup, SolutionsList allSolutions,
                                APERunConfig runConfig, int workflowLength) throws IOException {
         this.domainSetup = domainSetup;
         this.allSolutions = allSolutions;
@@ -173,6 +172,12 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
         	APEUtils.appendToFile(cnfEncoding, APEUtils.encodeAPEConstraints(domainSetup, mappings, moduleAutomaton, typeAutomaton));
             APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
         }
+        
+        /*
+         * Encode data instance dependency constraints.
+         */
+        APEUtils.appendToFile(cnfEncoding, SATModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton, mappings));
+
         /*
          * Encode the workflow input. Workflow I/O are encoded the last in order to
          * reuse the mappings for states, instead of introducing new ones, using the I/O
@@ -214,9 +219,10 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
 
         
         /* testing sat input */
-//		InputStream tmpSat = IOUtils.toInputStream(mknfEncoding.toString(), "ASCII");
+//        File actualFile = new File ("/home/vedran/Desktop/tmpt.txt");
+//		InputStream tmpSat = IOUtils.toInputStream(satInputFile.toString(), "ASCII");
 //		tmpSat.close();
-//		String encoding = APEUtils.convertCNF2humanReadable(tmpSat, mappings);
+//		String encoding = APEUtils.convertCNF2humanReadable(new FileInputStream(satInputFile), mappings);
 //		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
@@ -252,11 +258,11 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
     }
 
     /**
-     * Returns a set of {@link SAT_solution SAT_solutions} by parsing the SAT
+     * Returns a set of {@link SATSolution SAT_solutions} by parsing the SAT
      * output. In case of the UNSAT the list is empty.
      *
      * @param sat_input CNF formula in dimacs form.
-     * @return List of {@link SAT_solution SAT_solutions}. Possibly empty list.
+     * @return List of {@link SATSolution SAT_solutions}. Possibly empty list.
      */
     private List<SolutionWorkflow> runMiniSAT(InputStream sat_input, int solutionsFound, int solutionsFoundMax) {
         List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
@@ -295,6 +301,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
             sat_input.close();
         } catch (ParseFormatException e) {
             System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
+            System.err.println(e.getMessage());
         } catch (ContradictionException e) {
             if (solutionsFound == 0) {
                 System.err.println("Unsatisfiable");
@@ -347,7 +354,7 @@ public class SAT_SynthesisEngine implements SynthesisEngine {
      *
      * @return the all solutions
      */
-    public SATsolutionsList getAllSolutions() {
+    public SolutionsList getAllSolutions() {
         return allSolutions;
     }
 

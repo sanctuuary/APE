@@ -14,7 +14,7 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 import java.util.*;
 
 /**
- * The {@code SAT_solution} class describes the solution produced by the SAT
+ * The {@code SATSolution} class describes the solution produced by the SAT
  * solver. It stores the original solution and the mapped one. In case of the
  * parameter <b>unsat</b> being true, there are no solutions.
  * <p>
@@ -22,7 +22,7 @@ import java.util.*;
  *
  * @author Vedran Kasalica
  */
-public class SAT_solution extends SolutionInterpreter {
+public class SATSolution extends SolutionInterpreter {
 
     /**
      * List of all the literals provided by the solution.
@@ -66,7 +66,7 @@ public class SAT_solution extends SolutionInterpreter {
      * @param satSolution       list of mapped literals given as a list of integers (library SAT output)
      * @param synthesisInstance Mapping of the atoms.
      */
-    public SAT_solution(int[] satSolution, SAT_SynthesisEngine synthesisInstance) {
+    public SATSolution(int[] satSolution, SATSynthesisEngine synthesisInstance) {
         unsat = false;
         literals = new ArrayList<Literal>();
         positiveLiterals = new ArrayList<Literal>();
@@ -89,6 +89,7 @@ public class SAT_solution extends SolutionInterpreter {
                         relevantModules.add(currLiteral);
                     } else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE
                             && currLiteral.getWorkflowElementType() != WorkflowElement.MEM_TYPE_REFERENCE
+                            && currLiteral.getWorkflowElementType() != WorkflowElement.TYPE_DEPENDENCY
                             && (currLiteral.getPredicate() instanceof Type)
                             && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
                         /* add all positive literals that describe simple types */
@@ -116,7 +117,7 @@ public class SAT_solution extends SolutionInterpreter {
     /**
      * Creating an empty solution, for UNSAT problem. The list <b>literals</b> is null.
      */
-    public SAT_solution() {
+    public SATSolution() {
         unsat = true;
         literals = null;
         positiveLiterals = null;
@@ -138,7 +139,7 @@ public class SAT_solution extends SolutionInterpreter {
             solution = new StringBuilder("UNSAT");
         } else {
             for (Literal literal : positiveLiterals) {
-                solution = solution.append(literal.toString()).append(" ");
+                solution.append(literal.toString()).append(" ");
             }
         }
         return solution.toString();
@@ -155,7 +156,7 @@ public class SAT_solution extends SolutionInterpreter {
             solution = new StringBuilder("UNSAT");
         } else {
             for (Literal literal : literals) {
-                solution = solution.append(literal.toString()).append(" ");
+                solution.append(literal.toString()).append(" ");
             }
         }
         return solution.toString();
@@ -174,7 +175,7 @@ public class SAT_solution extends SolutionInterpreter {
             solution = new StringBuilder("UNSAT");
         } else {
             for (Literal literal : relevantModules) {
-                solution = solution.append(literal.getPredicate().getPredicateLabel()).append(" -> ");
+                solution.append(literal.getPredicate().getPredicateLabel()).append(" -> ");
             }
         }
         return APEUtils.removeNLastChar(solution.toString(), 4);
@@ -193,7 +194,7 @@ public class SAT_solution extends SolutionInterpreter {
             solution = new StringBuilder("UNSAT");
         } else {
             for (Literal relevantElement : relevantElements) {
-                solution = solution.append(relevantElement.toString() + " ");
+                solution.append(relevantElement.toString() + " ");
             }
         }
         return solution.toString();
@@ -227,7 +228,7 @@ public class SAT_solution extends SolutionInterpreter {
         StringBuilder solution = new StringBuilder();
         if (!unsat) {
             for (Literal literal : literals) {
-                solution = solution.append(literal.toMappedString()).append(" ");
+                solution.append(literal.toMappedString()).append(" ");
             }
         }
         return solution.toString();

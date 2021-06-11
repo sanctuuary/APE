@@ -170,15 +170,15 @@ public class TypeNode extends SolutionWorkflowNode {
     public String toString() {
         StringBuilder printString = new StringBuilder();
 
-        printString = printString.append("[");
+        printString.append("[");
         int i = 0;
         for (Type type : this.usedTypes) {
-            printString = printString.append(type.getPredicateID());
+            printString.append(type.getPredicateID());
             if (++i < this.usedTypes.size()) {
-                printString = printString.append(", ");
+                printString.append(", ");
             }
         }
-        printString = printString.append(" (" + super.getAutomatonState().getPredicateID() + ")]");
+        printString.append(" (" + super.getAutomatonState().getPredicateID() + ")]");
 
         return printString.toString();
     }
@@ -214,9 +214,9 @@ public class TypeNode extends SolutionWorkflowNode {
         		 // remove "_plain" suffix
         		 typeLabel = APEUtils.removeNLastChar(typeLabel, 2);
         	 }
-            printString = printString.append(typeLabel);
+            printString.append(typeLabel);
             if (++i < this.usedTypes.size()) {
-                printString = printString.append(", ");
+                printString.append(", ");
             }
         }
         return printString.toString();
@@ -230,12 +230,12 @@ public class TypeNode extends SolutionWorkflowNode {
 
         int i = 0;
         for (Type type : this.usedTypes) {
-            printString = printString.append(type.getPredicateID());
+            printString.append(type.getPredicateID());
             if (++i < this.usedTypes.size()) {
-                printString = printString.append(",");
+                printString.append(",");
             }
         }
-        printString = printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
+        printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
 
         return printString.toString();
     }
@@ -248,9 +248,9 @@ public class TypeNode extends SolutionWorkflowNode {
          int i = 0;
          for (Type type : this.usedTypes) {
         	 String typeLabel = type.getPredicateLongLabel();
-             printString = printString.append(typeLabel);
+             printString.append(typeLabel);
              if (++i < this.usedTypes.size()) {
-                 printString = printString.append(", ");
+                 printString.append(", ");
              }
          }
          return printString.toString();

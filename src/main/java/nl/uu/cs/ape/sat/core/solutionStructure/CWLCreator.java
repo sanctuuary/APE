@@ -46,20 +46,20 @@ public class CWLCreator {
      * @param apeConfig
      */
     private void generateCWLRepresentation(SolutionWorkflow solution, APECoreConfig apeConfig) {
-        cwlRepresentation = cwlRepresentation.append("inputs:").append("\n");
+        cwlRepresentation.append("inputs:").append("\n");
         for (TypeNode typeNode : solution.getWorkflowInputTypeStates()) {
             getNewCWLDataInstance(typeNode, apeConfig, 1);
         }
-        cwlRepresentation = cwlRepresentation.append("steps:").append("\n");
+        cwlRepresentation.append("steps:").append("\n");
         for (ModuleNode moduleNode : solution.getModuleNodes()) {
             defineCWLStep(moduleNode, apeConfig, 1);
         }
 
-        cwlRepresentation = cwlRepresentation.append("outputs:").append("\n");
+        cwlRepresentation.append("outputs:").append("\n");
         for (TypeNode typeNode : solution.getWorkflowOutputTypeStates()) {
             getExistingCWLDataInstance(typeNode, apeConfig, 1, "workflowOut");
         }
-
+        
     }
 
     /**
@@ -69,29 +69,29 @@ public class CWLCreator {
      * @param i
      */
     private void defineCWLStep(ModuleNode moduleNode, APECoreConfig apeConfig, int i) {
-        cwlRepresentation = cwlRepresentation.append(tabs(i) + moduleNode.getNodeID() + ":");
+        cwlRepresentation.append(tabs(i) + moduleNode.getNodeID() + ":");
         /// TODO split the function into smaller functions
-        cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "in:").append("\n");
+        cwlRepresentation.append(tabs(i + 1) + "in:").append("\n");
         int index = 1;
         for (TypeNode typeNode : moduleNode.getInputTypes()) {
             cwlRepresentation = cwlRepresentation
                     .append(tabs(i + 2) + (moduleNode.getNodeID() + (index++)) + "_" + typeNode.getNodeID() + ":");
             if (typeNode.getCreatedByModule() != null) {
-                cwlRepresentation = cwlRepresentation.append(typeNode.getCreatedByModule().getNodeID()).append("/");
+                cwlRepresentation.append(typeNode.getCreatedByModule().getNodeID()).append("/");
             }
-            cwlRepresentation = cwlRepresentation.append(typeNode.getNodeID()).append("\n");
+            cwlRepresentation.append(typeNode.getNodeID()).append("\n");
         }
 
-        cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "out: ");
+        cwlRepresentation.append(tabs(i + 1) + "out: ");
         String outputTypes = "[";
         for (TypeNode typeNode : moduleNode.getOutputTypes()) {
             outputTypes = outputTypes + typeNode.getNodeID() + ",";
         }
         outputTypes = APEUtils.removeLastChar(outputTypes) + "]";
-        cwlRepresentation = cwlRepresentation.append(outputTypes).append("\n");
+        cwlRepresentation.append(outputTypes).append("\n");
 
         ///
-        cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "run:").append("\n");
+        cwlRepresentation.append(tabs(i + 1) + "run:").append("\n");
 
         getOperationRun(moduleNode, apeConfig, i + 2);
 
@@ -104,23 +104,23 @@ public class CWLCreator {
      * @param i
      */
     private void getOperationRun(ModuleNode moduleNode, APECoreConfig apeConfig, int i) {
-        cwlRepresentation = cwlRepresentation.append(tabs(i) + "class: Operation").append("\n");
-        cwlRepresentation = cwlRepresentation.append(tabs(i) + "inputs:").append("\n");
+        cwlRepresentation.append(tabs(i) + "class: Operation").append("\n");
+        cwlRepresentation.append(tabs(i) + "inputs:").append("\n");
         int index = 1;
         for (TypeNode typeNode : moduleNode.getInputTypes()) {
             getExistingCWLDataInstance(typeNode, apeConfig, i + 1, moduleNode.getNodeID() + (index++));
         }
-        cwlRepresentation = cwlRepresentation.append(tabs(i) + "outputs:").append("\n");
+        cwlRepresentation.append(tabs(i) + "outputs:").append("\n");
         for (TypeNode typeNode : moduleNode.getOutputTypes()) {
             getNewCWLDataInstance(typeNode, apeConfig, i + 1);
         }
-        cwlRepresentation = cwlRepresentation.append(tabs(i) + "hints:").append("\n");
-        cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "SoftwareRequirement:").append("\n");
-        cwlRepresentation = cwlRepresentation.append(tabs(i + 2) + "packages:").append("\n");
-        cwlRepresentation = cwlRepresentation.append(
+        cwlRepresentation.append(tabs(i) + "hints:").append("\n");
+        cwlRepresentation.append(tabs(i + 1) + "SoftwareRequirement:").append("\n");
+        cwlRepresentation.append(tabs(i + 2) + "packages:").append("\n");
+        cwlRepresentation.append(
                 tabs(i + 2) + moduleNode.getNodeLabel() + ": [" + moduleNode.getUsedModule().getPredicateID() + "]")
                 .append("\n");
-        cwlRepresentation = cwlRepresentation.append(tabs(i) + "intent:")
+        cwlRepresentation.append(tabs(i) + "intent:")
                 .append(toYmlArray(moduleNode.getUsedModule().getSuperPredicates())).append("\n");
 
     }
@@ -132,15 +132,15 @@ public class CWLCreator {
      * @param i
      */
     private void getNewCWLDataInstance(TypeNode typeNode, APECoreConfig apeConfig, int i) {
-        cwlRepresentation = cwlRepresentation.append(tabs(i) + typeNode.getNodeID() + ":").append("\n");
-        cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "type: File").append("\n");
+        cwlRepresentation.append(tabs(i) + typeNode.getNodeID() + ":").append("\n");
+        cwlRepresentation.append(tabs(i + 1) + "type: File").append("\n");
         String formatRoot = apeConfig.getCWLFormatRoot();
         List<TaxonomyPredicate> formats = new ArrayList<TaxonomyPredicate>();
         typeNode.getTypes().forEach(type -> {
             if (type.getRootNodeID().equals(formatRoot))
                 formats.add(type);
         });
-        cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "format: " + toYmlArray(formats) + "").append("\n");
+        cwlRepresentation.append(tabs(i + 1) + "format: " + toYmlArray(formats) + "").append("\n");
     }
 
     /**
@@ -151,15 +151,15 @@ public class CWLCreator {
      * @param prefix
      */
     private void getExistingCWLDataInstance(TypeNode typeNode, APECoreConfig apeConfig, int i, String prefix) {
-        cwlRepresentation = cwlRepresentation.append(tabs(i) + prefix + "_" + typeNode.getNodeID() + ":").append("\n");
-        cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "type: File").append("\n");
+        cwlRepresentation.append(tabs(i) + prefix + "_" + typeNode.getNodeID() + ":").append("\n");
+        cwlRepresentation.append(tabs(i + 1) + "type: File").append("\n");
         String formatRoot = apeConfig.getCWLFormatRoot();
         List<TaxonomyPredicate> formats = new ArrayList<TaxonomyPredicate>();
         typeNode.getTypes().forEach(type -> {
             if (type.getRootNodeID().equals(formatRoot))
                 formats.add(type);
         });
-        cwlRepresentation = cwlRepresentation.append(tabs(i + 1) + "format: " + toYmlArray(formats) + "").append("\n");
+        cwlRepresentation.append(tabs(i + 1) + "format: " + toYmlArray(formats) + "").append("\n");
     }
 
     /**

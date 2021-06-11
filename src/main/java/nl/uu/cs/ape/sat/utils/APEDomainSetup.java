@@ -210,22 +210,22 @@ public class APEDomainSetup {
                      * Ensures that if the abstract predicate is used, at least one of the
                      * disjointLabels has to be used.
                      */
-                    constraints = constraints.append("-")
+                    constraints.append("-")
                             .append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
 
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints = constraints.append(mappings.add(subLabel, currState, workflowElem)).append(" ");
+                        constraints.append(mappings.add(subLabel, currState, workflowElem)).append(" ");
                     }
-                    constraints = constraints.append(" 0\n");
+                    constraints.append(" 0\n");
 
                     /*
                      * Ensures that if at least one of the disjointLabels was used, the abstract
                      * predicate has to be used as well.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints = constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
+                        constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
                                 .append(" ");
-                        constraints = constraints.append(mappings.add(helperPredicate, currState, workflowElem))
+                        constraints.append(mappings.add(helperPredicate, currState, workflowElem))
                                 .append(" 0\n");
                     }
                 } else if (helperPredicate.getLogicOp() == LogicOperation.AND) {
@@ -235,10 +235,10 @@ public class APEDomainSetup {
                      * have to be used.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints = constraints.append("-")
+                        constraints.append("-")
                                 .append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
 
-                        constraints = constraints.append(mappings.add(subLabel, currState, workflowElem))
+                        constraints.append(mappings.add(subLabel, currState, workflowElem))
                                 .append(" 0\n");
                     }
 
@@ -247,10 +247,10 @@ public class APEDomainSetup {
                      * has to be used as well.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints = constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
+                        constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
                                 .append(" ");
                     }
-                    constraints = constraints.append(mappings.add(helperPredicate, currState, workflowElem))
+                    constraints.append(mappings.add(helperPredicate, currState, workflowElem))
                             .append(" 0\n");
                 }
             }
@@ -381,7 +381,7 @@ public class APEDomainSetup {
         if (taxonomyModules.isEmpty()) {
             System.err.println("Tool '" + moduleURI + "' annotation issue. "
                     + "None of the referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "' can be found in the Tool Taxonomy.");
-            taxonomyModules.add(allModules.getRootsIDs().get(0));
+            taxonomyModules.add(allModules.getAllRootIDs().get(0));
         }
 
         String executionCode = null;
@@ -432,7 +432,7 @@ public class APEDomainSetup {
          * Add the module and make it sub module of the currSuperModule (if it was not
          * previously defined)
          */
-        Module currModule = (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootsIDs().get(0), moduleExecutionImpl));
+        Module currModule = (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getAllRootIDs().get(0), moduleExecutionImpl));
 
         /*	For each supermodule add the current module as a subset and vice versa. */
         for (String superModuleID : taxonomyModules) {

@@ -240,7 +240,7 @@ public class ModuleNode extends SolutionWorkflowNode {
             return "[]";
         }
         StringBuilder printString = new StringBuilder();
-        printString = printString.append("[").append(this.usedModule.getPredicateID()).append("]");
+        printString.append("[").append(this.usedModule.getPredicateID()).append("]");
 
         return printString.toString();
     }
@@ -270,8 +270,8 @@ public class ModuleNode extends SolutionWorkflowNode {
      */
     public String getNodeID() {
         StringBuilder printString = new StringBuilder();
-        printString = printString.append("\"").append(this.usedModule.getPredicateID());
-        printString = printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
+        printString.append("\"").append(this.usedModule.getPredicateID());
+        printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
 
         return printString.toString();
     }
