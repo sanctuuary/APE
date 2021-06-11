@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.core.implSAT;
+package nl.uu.cs.ape.sat.core.solutionStructure;
 
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.models.AtomMappings;
@@ -16,7 +16,7 @@ import java.util.stream.Stream;
  *
  * @author Vedran Kasalica
  */
-public class SATsolutionsList {
+public class SolutionsList {
 
     private List<SolutionWorkflow> solutions;
 
@@ -50,7 +50,7 @@ public class SATsolutionsList {
      *
      * @param runConfig - setup configuration for the synthesis run.
      */
-    public SATsolutionsList(APERunConfig runConfig) {
+    public SolutionsList(APERunConfig runConfig) {
         this.solutions = new ArrayList<SolutionWorkflow>();
         this.runConfig = runConfig;
         /* Provides mapping from each atom to a number, and vice versa */
@@ -86,7 +86,7 @@ public class SATsolutionsList {
      *
      * @return The {@link AtomMappings} object.
      */
-    protected AtomMappings getMappings() {
+    public AtomMappings getMappings() {
         return mappings;
     }
 
@@ -110,7 +110,7 @@ public class SATsolutionsList {
     /**
      * The procedure resets the encodings specific for a synthesis run (such as auxiliary variables).
      */
-    protected void newEncoding() {
+    public void newEncoding() {
         mappings.resetAuxVariables();
     }
     

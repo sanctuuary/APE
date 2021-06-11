@@ -115,13 +115,13 @@ public abstract class SLTL_formula {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
-            constraints = constraints.append("-"
+            constraints.append("-"
                     + mappings.add(if_predicate, moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)
                     + " ");
             for (int j = i + 1; j < automatonSize; j++) {
-                constraints = constraints.append(mappings.add(then_predicate, moduleAutomaton.get(j), WorkflowElement.MODULE)).append(" ");
+                constraints.append(mappings.add(then_predicate, moduleAutomaton.get(j), WorkflowElement.MODULE)).append(" ");
             }
-            constraints = constraints.append("0\n");
+            constraints.append("0\n");
         }
         return constraints.toString();
     }
@@ -148,18 +148,18 @@ public abstract class SLTL_formula {
             for (int i_state = 0; i_state < numberOfStates; i_state++) {
 
                 /* If if_predicate is used in any state of a certain block */
-                constraints = constraints.append("-").append(mappings.add(if_predicate,
+                constraints.append("-").append(mappings.add(if_predicate,
                         typeBlocks.get(i_block).getState(i_state), typeElement)).append(" ");
 
                 /* then then_predicate must be used in a state of the subsequent blocks. */
                 for (int j_block = i_block + 1; j_block < numberOfBlocks; j_block++) {
                     for (int j_state = i_state + 1; j_state < numberOfBlocks; j_state++) {
-                        constraints = constraints.append(mappings.add(then_predicate,
+                        constraints.append(mappings.add(then_predicate,
                                 typeBlocks.get(j_block).getState(j_state), typeElement)).append(" ");
                     }
 
                 }
-                constraints = constraints.append("0\n");
+                constraints.append("0\n");
             }
         }
         return constraints.toString();
@@ -182,8 +182,8 @@ public abstract class SLTL_formula {
         for (int i = 0; i < automatonSize - 1; i++) {
             State currModuleState = moduleAutomaton.getAllStates().get(i);
             for (int j = i + 1; j < automatonSize; j++) {
-                constraints = constraints.append("-").append(mappings.add(if_predicate, currModuleState, WorkflowElement.MODULE)).append(" ");
-                constraints = constraints.append("-"
+                constraints.append("-").append(mappings.add(if_predicate, currModuleState, WorkflowElement.MODULE)).append(" ");
+                constraints.append("-"
                         + mappings.add(then_not_predicate, moduleAutomaton.get(j), WorkflowElement.MODULE)
                         + " 0\n");
             }
@@ -217,12 +217,12 @@ public abstract class SLTL_formula {
                         /*
                          * If if_predicate is used in any state of a certain block
                          */
-                        constraints = constraints.append("-").append(mappings.add(if_predicate,
+                        constraints.append("-").append(mappings.add(if_predicate,
                                 typeBlocks.get(i_block).getState(i_state), typeElement)).append(" ");
                         /*
                          * then then_predicate cannot be used in a state of the subsequent blocks.
                          */
-                        constraints = constraints.append("-").append(mappings.add(then_not_predicate,
+                        constraints.append("-").append(mappings.add(then_not_predicate,
                                 typeBlocks.get(j_block).getState(j_state), typeElement)).append(" 0\n");
                     }
 
@@ -248,13 +248,13 @@ public abstract class SLTL_formula {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
-            constraints = constraints.append("-").append(mappings.add(second_module_in_sequence,
+            constraints.append("-").append(mappings.add(second_module_in_sequence,
                     moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)).append(" ");
             for (int j = 0; j < i; j++) {
-                constraints = constraints.append(mappings.add(first_module_in_sequence,
+                constraints.append(mappings.add(first_module_in_sequence,
                         moduleAutomaton.get(j), WorkflowElement.MODULE)).append(" ");
             }
-            constraints = constraints.append("0\n");
+            constraints.append("0\n");
         }
         return constraints.toString();
     }
@@ -275,15 +275,15 @@ public abstract class SLTL_formula {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
-            constraints = constraints.append("-").append(mappings.add(first_module_in_sequence,
+            constraints.append("-").append(mappings.add(first_module_in_sequence,
                     moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)).append(" ");
 
             /* Clause that forbids using first_predicate as the last in the sequence */
             if (i < automatonSize - 1) {
-                constraints = constraints.append(mappings.add(second_module_in_sequence,
+                constraints.append(mappings.add(second_module_in_sequence,
                         moduleAutomaton.get(i + 1), WorkflowElement.MODULE)).append(" ");
             }
-            constraints = constraints.append("0\n");
+            constraints.append("0\n");
         }
         return constraints.toString();
     }
@@ -304,15 +304,15 @@ public abstract class SLTL_formula {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
-            constraints = constraints.append("-").append(mappings.add(second_module_in_sequence,
+            constraints.append("-").append(mappings.add(second_module_in_sequence,
                     moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)).append(" ");
 
             /* Clause that forbids using second_module_in_sequence as the first tool in the sequence */
             if (i > 0) {
-                constraints = constraints.append(mappings.add(first_module_in_sequence,
+                constraints.append(mappings.add(first_module_in_sequence,
                         moduleAutomaton.get(i - 1), WorkflowElement.MODULE)).append(" ");
             }
-            constraints = constraints.append("0\n");
+            constraints.append("0\n");
         }
         return constraints.toString();
     }
@@ -332,7 +332,7 @@ public abstract class SLTL_formula {
 
         List<State> moduleAutomatonStates = moduleAutomaton.getAllStates();
         State lastModuleState = moduleAutomatonStates.get(moduleAutomatonStates.size() - 1);
-        constraints = constraints.append(mappings.add(last_module, lastModuleState, WorkflowElement.MODULE)).append(" 0\n");
+        constraints.append(mappings.add(last_module, lastModuleState, WorkflowElement.MODULE)).append(" 0\n");
 
         return constraints.toString();
     }
@@ -353,7 +353,7 @@ public abstract class SLTL_formula {
 
         List<State> moduleAutomatonStates = moduleAutomaton.getAllStates();
         State nthModuleState = moduleAutomatonStates.get(n - 1);
-        constraints = constraints.append(mappings.add(module, nthModuleState, WorkflowElement.MODULE)).append(" 0\n");
+        constraints.append(mappings.add(module, nthModuleState, WorkflowElement.MODULE)).append(" 0\n");
 
         return constraints.toString();
     }
@@ -374,7 +374,7 @@ public abstract class SLTL_formula {
 //
 //		List<State> moduleAutomatonStates = moduleAutomaton.getModuleStates();
 //		ModuleState nthModuleState = moduleAutomatonStates.get(index - 1);
-//		constraints = constraints.append(mappings.add(module, nthModuleState)).append(" 0\n";
+//		constraints.append(mappings.add(module, nthModuleState)).append(" 0\n";
 
         return null;
     }
@@ -400,7 +400,7 @@ public abstract class SLTL_formula {
             /* ..and for each input state of that module state.. */
             List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
             /* Encode: if module was used in the module state */
-            constraints = constraints.append("-")
+            constraints.append("-")
                     .append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
             for (State currInputState : currInputStates) {
                         /*
@@ -411,7 +411,7 @@ public abstract class SLTL_formula {
                                 .append(mappings.add(inputType, currInputState, WorkflowElement.USED_TYPE))
                                 .append(" ");
             }
-            constraints = constraints.append("0\n");
+            constraints.append("0\n");
 		}
         return constraints.toString();
 	}
@@ -435,7 +435,7 @@ public abstract class SLTL_formula {
             /* ..and for each input state of that module state.. */
             List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
             /* Encode: if module was used in the module state */
-            constraints = constraints.append("-")
+            constraints.append("-")
                     .append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
             for (State currInputState : currInputStates) {
                         /*
@@ -445,7 +445,7 @@ public abstract class SLTL_formula {
                                 .append(mappings.add(typeAutomaton.getWorkflowInputBlock().getState(inputNo-1), currInputState, WorkflowElement.TYPE_DEPENDENCY))
                                 .append(" ");
             }
-            constraints = constraints.append("0\n");
+            constraints.append("0\n");
 		}
         return constraints.toString();
 	}

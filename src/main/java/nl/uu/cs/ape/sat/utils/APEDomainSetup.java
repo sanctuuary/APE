@@ -210,22 +210,22 @@ public class APEDomainSetup {
                      * Ensures that if the abstract predicate is used, at least one of the
                      * disjointLabels has to be used.
                      */
-                    constraints = constraints.append("-")
+                    constraints.append("-")
                             .append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
 
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints = constraints.append(mappings.add(subLabel, currState, workflowElem)).append(" ");
+                        constraints.append(mappings.add(subLabel, currState, workflowElem)).append(" ");
                     }
-                    constraints = constraints.append(" 0\n");
+                    constraints.append(" 0\n");
 
                     /*
                      * Ensures that if at least one of the disjointLabels was used, the abstract
                      * predicate has to be used as well.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints = constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
+                        constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
                                 .append(" ");
-                        constraints = constraints.append(mappings.add(helperPredicate, currState, workflowElem))
+                        constraints.append(mappings.add(helperPredicate, currState, workflowElem))
                                 .append(" 0\n");
                     }
                 } else if (helperPredicate.getLogicOp() == LogicOperation.AND) {
@@ -235,10 +235,10 @@ public class APEDomainSetup {
                      * have to be used.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints = constraints.append("-")
+                        constraints.append("-")
                                 .append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
 
-                        constraints = constraints.append(mappings.add(subLabel, currState, workflowElem))
+                        constraints.append(mappings.add(subLabel, currState, workflowElem))
                                 .append(" 0\n");
                     }
 
@@ -247,10 +247,10 @@ public class APEDomainSetup {
                      * has to be used as well.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints = constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
+                        constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
                                 .append(" ");
                     }
-                    constraints = constraints.append(mappings.add(helperPredicate, currState, workflowElem))
+                    constraints.append(mappings.add(helperPredicate, currState, workflowElem))
                             .append(" 0\n");
                 }
             }

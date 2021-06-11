@@ -6,9 +6,9 @@ package nl.uu.cs.ape.sat;
 import guru.nidi.graphviz.attribute.Rank.RankDir;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
-import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
+import nl.uu.cs.ape.sat.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
+import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
@@ -218,7 +218,7 @@ public class APE {
 	 * @throws IOException Error in case of not providing a proper configuration
 	 *                     file.
 	 */
-	public SATsolutionsList runSynthesis(JSONObject configObject) throws IOException, APEConfigException {
+	public SolutionsList runSynthesis(JSONObject configObject) throws IOException, APEConfigException {
 		return runSynthesis(configObject, this.getDomainSetup());
 	}
 
@@ -230,7 +230,7 @@ public class APE {
 	 * @throws IOException Error in case of not providing a proper configuration
 	 *                     file.
 	 */
-	public SATsolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException {
+	public SolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException {
 		JSONObject configObject = APEUtils.readFileToJSONObject(new File(runConfigPath));
 		return runSynthesis(configObject, this.getDomainSetup());
 	}
@@ -243,7 +243,7 @@ public class APE {
 	 * @throws IOException Error in case of not providing a proper configuration
 	 *                     file.
 	 */
-	public SATsolutionsList runSynthesis(APERunConfig runConfig) throws IOException {
+	public SolutionsList runSynthesis(APERunConfig runConfig) throws IOException {
 		runConfig.apeDomainSetup.clearConstraints();
 		return executeSynthesis(runConfig);
 	}
@@ -259,11 +259,11 @@ public class APE {
 	 *                       file.
 	 * @throws JSONException Error in configuration object.
 	 */
-	private SATsolutionsList runSynthesis(JSONObject runConfigJson, APEDomainSetup apeDomainSetup)
+	private SolutionsList runSynthesis(JSONObject runConfigJson, APEDomainSetup apeDomainSetup)
 			throws IOException, JSONException, APEConfigException {
 		apeDomainSetup.clearConstraints();
 		APERunConfig runConfig = new APERunConfig(runConfigJson, apeDomainSetup);
-		SATsolutionsList solutions = executeSynthesis(runConfig);
+		SolutionsList solutions = executeSynthesis(runConfig);
 
 		return solutions;
 	}
@@ -277,12 +277,12 @@ public class APE {
 	 * @throws IOException Error in case of not providing a proper configuration
 	 *                     file.
 	 */
-	private SATsolutionsList executeSynthesis(APERunConfig runConfig) throws IOException, JSONException {
+	private SolutionsList executeSynthesis(APERunConfig runConfig) throws IOException, JSONException {
 //    	APEUtils.write2file(apeDomainSetup.emptyTools.toString(), new File("~/Desktop/tools"), false);
 //		APEUtils.write2file(apeDomainSetup.wrongToolIO.toString(), new File("~/Desktop/wrongToolIO"), false);
 
 		/* List of all the solutions */
-		SATsolutionsList allSolutions = new SATsolutionsList(runConfig);
+		SolutionsList allSolutions = new SolutionsList(runConfig);
 
 		apeDomainSetup.updateConstraints(runConfig.getConstraintsJSON());
 
@@ -299,7 +299,7 @@ public class APE {
 		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
 				&& solutionLength <= runConfig.getSolutionLength().getMax() && APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) > 0) {
 
-			SAT_SynthesisEngine implSATsynthesis = new SAT_SynthesisEngine(apeDomainSetup, allSolutions, runConfig,
+			SATSynthesisEngine implSATsynthesis = new SATSynthesisEngine(apeDomainSetup, allSolutions, runConfig,
 					solutionLength);
 
 			APEUtils.printHeader(implSATsynthesis.getSolutionSize(), "Workflow discovery - length");
@@ -364,11 +364,11 @@ public class APE {
 	 * @return true if the writing was successfully performed, false otherwise.
 	 * @throws IOException Exception if file not found.
 	 */
-	public static boolean writeSolutionToFile(SATsolutionsList allSolutions) throws IOException {
+	public static boolean writeSolutionToFile(SolutionsList allSolutions) throws IOException {
 		StringBuilder solutions2write = new StringBuilder();
 
 		for (int i = 0; i < allSolutions.size(); i++) {
-			solutions2write = solutions2write
+			solutions2write
 					.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution()).append("\n");
 		}
 		APEUtils.write2file(solutions2write.toString(),
@@ -384,7 +384,7 @@ public class APE {
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @return true if the execution was successfully performed, false otherwise.
 	 */
-	public static boolean writeExecutableWorkflows(SATsolutionsList allSolutions) {
+	public static boolean writeExecutableWorkflows(SolutionsList allSolutions) {
 		Path executionsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Executables();
 		Integer noExecutions = allSolutions.getRunConfiguration().getNoExecutions();
 		if (executionsFolder == null || noExecutions == null || noExecutions == 0 || allSolutions.isEmpty()) {
@@ -430,7 +430,7 @@ public class APE {
 	 * @return true if the generating was successfully performed, false otherwise.
 	 * @throws IOException Exception if graph cannot be written to the file system.
 	 */
-	public static boolean writeDataFlowGraphs(SATsolutionsList allSolutions) throws IOException {
+	public static boolean writeDataFlowGraphs(SolutionsList allSolutions) throws IOException {
 		return writeDataFlowGraphs(allSolutions, RankDir.TOP_TO_BOTTOM);
 	}
 
@@ -444,7 +444,7 @@ public class APE {
 	 * @return true if the generating was successfully performed, false otherwise.
 	 * @throws IOException Exception if graph cannot be written to the file system.
 	 */
-	public static boolean writeDataFlowGraphs(SATsolutionsList allSolutions, RankDir orientation) throws IOException {
+	public static boolean writeDataFlowGraphs(SolutionsList allSolutions, RankDir orientation) throws IOException {
 		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
 		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -491,7 +491,7 @@ public class APE {
 	 * @return true if the generating was successfully performed, false otherwise.
 	 * @throws IOException Exception if graphs cannot be written to the file system.
 	 */
-	public static boolean writeControlFlowGraphs(SATsolutionsList allSolutions) throws IOException {
+	public static boolean writeControlFlowGraphs(SolutionsList allSolutions) throws IOException {
 		return writeControlFlowGraphs(allSolutions, RankDir.LEFT_TO_RIGHT);
 	}
 
@@ -505,7 +505,7 @@ public class APE {
 	 * @return true if the generating was successfully performed, false otherwise.
 	 * @throws IOException Exception if graphs cannot be written to the file system.
 	 */
-	public static boolean writeControlFlowGraphs(SATsolutionsList allSolutions, RankDir orientation)
+	public static boolean writeControlFlowGraphs(SolutionsList allSolutions, RankDir orientation)
 			throws IOException {
 		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
 		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();

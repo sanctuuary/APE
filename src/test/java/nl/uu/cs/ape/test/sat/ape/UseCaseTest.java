@@ -2,7 +2,7 @@ package nl.uu.cs.ape.test.sat.ape;
 
 import nl.uu.cs.ape.sat.APE;
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
-import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
+import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.sat.test.utils.GitHubRepo;
 import nl.uu.cs.ape.sat.test.utils.TestResources;
 import nl.uu.cs.ape.sat.utils.APEUtils;
@@ -87,7 +87,7 @@ class UseCaseTest {
              * For each N[i] in N: (S[N[i] - 1] == v + i) AND (S[N[i]] == v + i + 1)
              */
 
-            final SATsolutionsList solutions = new APE(config).runSynthesis(config);
+            final SolutionsList solutions = new APE(config).runSynthesis(config);
 
             // Generate workflow images
             // APE.writeDataFlowGraphs(solutions, Rank.RankDir.TOP_TO_BOTTOM);

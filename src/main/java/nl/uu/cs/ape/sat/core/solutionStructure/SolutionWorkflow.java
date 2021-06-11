@@ -12,8 +12,8 @@ import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
-import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
+import nl.uu.cs.ape.sat.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.sat.core.implSAT.SATSolution;
 import nl.uu.cs.ape.sat.models.AbstractModule;
 import nl.uu.cs.ape.sat.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.sat.models.Module;
@@ -81,7 +81,7 @@ public class SolutionWorkflow {
     /**
      * Non-structured solution obtained directly from the SAT output.
      */
-    private SAT_solution nativeSolution;
+    private SATSolution nativeSolution;
 
     /**
      * Graph representation of the data-flow workflow solution.
@@ -165,11 +165,11 @@ public class SolutionWorkflow {
      * @param satSolution       SAT solution, presented as array of integers.
      * @param synthesisInstance Current synthesis instance
      */
-    public SolutionWorkflow(int[] satSolution, SAT_SynthesisEngine synthesisInstance) {
+    public SolutionWorkflow(int[] satSolution, SATSynthesisEngine synthesisInstance) {
         /* Call for the default constructor. */
         this(synthesisInstance.getModuleAutomaton(), synthesisInstance.getTypeAutomaton());
 
-        this.nativeSolution = new SAT_solution(satSolution, synthesisInstance);
+        this.nativeSolution = new SATSolution(satSolution, synthesisInstance);
 
         for (int mappedLiteral : satSolution) {
             if (mappedLiteral > synthesisInstance.getMappings().getMaxNumOfMappedAuxVar()) {
@@ -259,9 +259,9 @@ public class SolutionWorkflow {
     /**
      * Get non-structured solution obtained directly from the SAT output.
      *
-     * @return A {@link SAT_solution} object, that contains information about the native SAT encoding, and how it translates into human readable text.
+     * @return A {@link SATSolution} object, that contains information about the native SAT encoding, and how it translates into human readable text.
      */
-    public SAT_solution getNativeSATsolution() {
+    public SATSolution getNativeSATsolution() {
         return this.nativeSolution;
     }
 
@@ -374,49 +374,49 @@ public class SolutionWorkflow {
     public String getReadableSolution() {
         StringBuilder solution = new StringBuilder();
 
-        solution = solution.append("WORKFLOW_IN:{");
+        solution.append("WORKFLOW_IN:{");
         int i = 0;
         for (TypeNode workflowInput : this.workflowInputTypeStates) {
-            solution = solution.append(workflowInput.toString());
+            solution.append(workflowInput.toString());
             if (++i < this.workflowInputTypeStates.size()) {
-                solution = solution.append(", ");
+                solution.append(", ");
             }
         }
-        solution = solution.append("} |");
+        solution.append("} |");
 
         for (ModuleNode currTool : this.moduleNodes) {
-            solution = solution.append(" IN:{");
+            solution.append(" IN:{");
             i = 0;
             for (TypeNode toolInput : currTool.getInputTypes()) {
                 if (!toolInput.isEmpty()) {
                     if (i++ > 1) {
-                        solution = solution.append(", ");
+                        solution.append(", ");
                     }
-                    solution = solution.append(toolInput.toString());
+                    solution.append(toolInput.toString());
                 }
             }
-            solution = solution.append("} ").append(currTool.toString());
-            solution = solution.append(" OUT:{");
+            solution.append("} ").append(currTool.toString());
+            solution.append(" OUT:{");
             i = 0;
             for (TypeNode toolOutput : currTool.getOutputTypes()) {
                 if (!toolOutput.isEmpty()) {
                     if (i++ > 1) {
-                        solution = solution.append(", ");
+                        solution.append(", ");
                     }
-                    solution = solution.append(toolOutput.toString());
+                    solution.append(toolOutput.toString());
                 }
             }
-            solution = solution.append("} |");
+            solution.append("} |");
         }
         i = 0;
-        solution = solution.append("WORKFLOW_OUT:{");
+        solution.append("WORKFLOW_OUT:{");
         for (TypeNode workflowOutput : this.workflowOutputTypeStates) {
-            solution = solution.append(workflowOutput.toString());
+            solution.append(workflowOutput.toString());
             if (++i < this.workflowOutputTypeStates.size()) {
-                solution = solution.append(", ");
+                solution.append(", ");
             }
         }
-        solution = solution.append("}");
+        solution.append("}");
 
         return solution.toString();
     }
@@ -438,33 +438,33 @@ public class SolutionWorkflow {
                 System.out.println(input + " [shape=box, color = red];\n");
                 inputDefined = true;
             }
-            solution = solution.append(input + "->" + workflowInput.getNodeID() + ";\n");
-            solution = solution.append(workflowInput.getDotDefinition());
+            solution.append(input + "->" + workflowInput.getNodeID() + ";\n");
+            solution.append(workflowInput.getDotDefinition());
         }
 
         for (ModuleNode currTool : this.moduleNodes) {
-            solution = solution.append(currTool.getDotDefinition());
+            solution.append(currTool.getDotDefinition());
             for (TypeNode toolInput : currTool.getInputTypes()) {
                 if (!toolInput.isEmpty()) {
-                    solution = solution.append(
+                    solution.append(
                             toolInput.getNodeID() + "->" + currTool.getNodeID() + "[label = in, fontsize = 10];\n");
                 }
             }
             for (TypeNode toolOutput : currTool.getOutputTypes()) {
                 if (!toolOutput.isEmpty()) {
-                    solution = solution.append(toolOutput.getDotDefinition());
-                    solution = solution.append(
+                    solution.append(toolOutput.getDotDefinition());
+                    solution.append(
                             currTool.getNodeID() + "->" + toolOutput.getNodeID() + " [label = out, fontsize = 10];\n");
                 }
             }
         }
         for (TypeNode workflowOutput : this.workflowOutputTypeStates) {
             if (!outputDefined) {
-                solution = solution.append(output + " [shape=box, color = red];\n");
+                solution.append(output + " [shape=box, color = red];\n");
                 outputDefined = true;
             }
-            solution = solution.append(workflowOutput.getDotDefinition());
-            solution = solution.append(workflowOutput.getNodeID() + "->" + output + ";\n");
+            solution.append(workflowOutput.getDotDefinition());
+            solution.append(workflowOutput.getNodeID() + "->" + output + ";\n");
         }
 
         return solution.toString();
@@ -592,18 +592,18 @@ public class SolutionWorkflow {
      */
     public String getScriptExecution() {
         StringBuffer script = new StringBuffer("#!/bin/bash\n");
-        script = script.append("if [ $# -ne " + workflowInputTypeStates.size() + " ]\n\tthen\n");
-        script = script
+        script.append("if [ $# -ne " + workflowInputTypeStates.size() + " ]\n\tthen\n");
+        script
                 .append("\t\techo \"" + workflowInputTypeStates.size() + " argument(s) expected.\"\n\t\texit\nfi\n");
         int in = 1;
         for (TypeNode input : workflowInputTypeStates) {
-            script = script.append(input.getShortNodeID() + "=$" + (in++) + "\n");
+            script.append(input.getShortNodeID() + "=$" + (in++) + "\n");
         }
-        script = script.append("\n");
+        script.append("\n");
         for (ModuleNode operation : moduleNodes) {
             String code = operation.getUsedModule().getExecutionCode();
             if (code == null || code.equals("")) {
-                script = script.append("\"Error. Tool '" + operation.getNodeLabel() + "' is missing the execution code.\"")
+                script.append("\"Error. Tool '" + operation.getNodeLabel() + "' is missing the execution code.\"")
                         .append("\n");
             } else {
                 for (int i = 0; i < operation.getInputTypes().size(); i++) {
@@ -612,12 +612,12 @@ public class SolutionWorkflow {
                 for (int i = 0; i < operation.getOutputTypes().size(); i++) {
                     code = code.replace("@output[" + i + "]", operation.getOutputTypes().get(i).getShortNodeID());
                 }
-                script = script.append(code).append("\n");
+                script.append(code).append("\n");
             }
         }
         int out = 1;
         for (TypeNode output : workflowOutputTypeStates) {
-            script = script.append("echo \"" + (out++) + ". output is: $" + output.getShortNodeID() + "\"");
+            script.append("echo \"" + (out++) + ". output is: $" + output.getShortNodeID() + "\"");
         }
 
         return script.toString();

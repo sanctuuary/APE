@@ -1,10 +1,10 @@
-package nl.uu.cs.ape.sat.models.SATEncodingUtils;
+package nl.uu.cs.ape.sat.core.implSAT;
 
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
+import nl.uu.cs.ape.sat.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.*;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
@@ -42,11 +42,11 @@ public final class SATModuleUtils {
 	 * @return String representation of CNF constraints regarding the required INPUT
 	 *         and OUTPUT types of the modules.
 	 */
-	public static String encodeModuleAnnotations(SAT_SynthesisEngine synthesisInstance) {
+	public static String encodeModuleAnnotations(SATSynthesisEngine synthesisInstance) {
 		StringBuilder constraints = new StringBuilder();
-		constraints = constraints.append(inputCons(synthesisInstance));
+		constraints.append(inputCons(synthesisInstance));
 
-		constraints = constraints.append(outputCons(synthesisInstance));
+		constraints.append(outputCons(synthesisInstance));
 		return constraints.toString();
 	}
 
@@ -61,14 +61,14 @@ public final class SATModuleUtils {
 	 * @return String representation of CNF constraints regarding the required
 	 *         memory structure implementation.
 	 */
-	public static String encodeMemoryStructure(SAT_SynthesisEngine synthesisInstance) {
+	public static String encodeMemoryStructure(SATSynthesisEngine synthesisInstance) {
 		StringBuilder constraints = new StringBuilder();
 
-		constraints = constraints.append(
+		constraints.append(
 				allowDataReferencingCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
-		constraints = constraints.append(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
+		constraints.append(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
 
-		constraints = constraints.append(enforceDataReferenceRules(synthesisInstance.getDomainSetup(),
+		constraints.append(enforceDataReferenceRules(synthesisInstance.getDomainSetup(),
 				synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
 		return constraints.toString();
 	}
@@ -77,9 +77,9 @@ public final class SATModuleUtils {
 		StringBuilder constraints = new StringBuilder();
 		
 		
-		constraints = constraints.append(allowDataDependencyCons(typeAutomaton, mappings));
-		constraints = constraints.append(enforceDataDependencyOverModules(typeAutomaton, mappings));
-		constraints = constraints.append(enforceDataDependencyOverDataReferencing(typeAutomaton, mappings));
+		constraints.append(allowDataDependencyCons(typeAutomaton, mappings));
+		constraints.append(enforceDataDependencyOverModules(typeAutomaton, mappings));
+		constraints.append(enforceDataDependencyOverDataReferencing(typeAutomaton, mappings));
 		
 		return constraints.toString();
 	}
@@ -92,7 +92,7 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static String inputCons(SAT_SynthesisEngine synthesisInstance) {
+	private static String inputCons(SATSynthesisEngine synthesisInstance) {
 
 		StringBuilder constraints = new StringBuilder();
 		AtomMappings mappings = synthesisInstance.getMappings();
@@ -118,7 +118,7 @@ public final class SATModuleUtils {
 							/* Get input type and/or format that are/is required by the tool */
 							TaxonomyPredicate currInputType = moduleInputs.get(currInputStateNo);
 							/* Encode: if module was used in the module state */
-							constraints = constraints.append("-")
+							constraints.append("-")
 									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
 							/*
 							 * .. the corresponding data and format types need to be provided in input
@@ -128,9 +128,9 @@ public final class SATModuleUtils {
 									.append(mappings.add(currInputType, currInputState, WorkflowElement.USED_TYPE))
 									.append(" 0\n");
 						} else {
-							constraints = constraints.append("-")
+							constraints.append("-")
 									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
-							constraints = constraints.append(mappings.add(synthesisInstance.getEmptyType(),
+							constraints.append(mappings.add(synthesisInstance.getEmptyType(),
 									currInputState, WorkflowElement.USED_TYPE)).append(" 0\n");
 						}
 					}
@@ -162,10 +162,10 @@ public final class SATModuleUtils {
 					for (State currUsedTypeState : currUsedBlock.getStates()) {
 						if (!currType.isEmptyPredicate()) {
 							/* ..the referenced memory state cannot be null.. */
-							constraints = constraints.append("-")
+							constraints.append("-")
 									.append(mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
 									.append(" ");
-							constraints = constraints.append("-").append(mappings.add(typeAutomaton.getNullState(),
+							constraints.append("-").append(mappings.add(typeAutomaton.getNullState(),
 									currUsedTypeState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" 0\n");
 
 							/* ..and for each state in which type can be created in memory .. */
@@ -175,17 +175,17 @@ public final class SATModuleUtils {
 									 * If the type (currType) is used as an input for a tool (in state
 									 * currUsedTypeState)..
 									 */
-									constraints = constraints.append("-").append(
+									constraints.append("-").append(
 											mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
 											.append(" ");
 									/*
 									 * ..and the state is referencing a memory state where the type was created
 									 * (refMemoryTypeState)
 									 */
-									constraints = constraints.append("-").append(mappings.add(refMemoryTypeState,
+									constraints.append("-").append(mappings.add(refMemoryTypeState,
 											currUsedTypeState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" ");
 									/* ..the type has to be generated in the the referenced memory type state. */
-									constraints = constraints.append(
+									constraints.append(
 											mappings.add(currType, refMemoryTypeState, WorkflowElement.MEMORY_TYPE))
 											.append(" 0\n");
 
@@ -193,10 +193,10 @@ public final class SATModuleUtils {
 							}
 							/* If the type is empty the referenced state has to be null. */
 						} else {
-							constraints = constraints.append("-")
+							constraints.append("-")
 									.append(mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
 									.append(" ");
-							constraints = constraints.append(mappings.add(typeAutomaton.getNullState(),
+							constraints.append(mappings.add(typeAutomaton.getNullState(),
 									currUsedTypeState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" 0\n");
 						}
 					}
@@ -237,14 +237,14 @@ public final class SATModuleUtils {
 							.append(mappings.add(exictingMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
 							.append(" ");
 				}
-				constraints = constraints.append(" 0\n");
+				constraints.append(" 0\n");
 
 				/* Defining that each input can reference only one state in the shared memory */
 				for (Pair<PredicateLabel> pair : getPredicatePairs(possibleMemStates)) {
-					constraints = constraints.append("-")
+					constraints.append("-")
 							.append(mappings.add(pair.getFirst(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
 							.append(" ");
-					constraints = constraints.append("-")
+					constraints.append("-")
 							.append(mappings.add(pair.getSecond(), currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
 							.append(" 0\n");
 				}
@@ -254,7 +254,7 @@ public final class SATModuleUtils {
 				 * in the shared memory.
 				 */
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
-					constraints = constraints.append("-").append(
+					constraints.append("-").append(
 							mappings.add(nonExictingMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
 							.append(" 0\n");
 				}
@@ -280,7 +280,7 @@ public final class SATModuleUtils {
 			int blockNumber = currBlock.getBlockNumber();
 			for (State currInputState : currBlock.getStates()) {
 				/* Input state does not depend on the null state */
-				constraints = constraints.append("-").append(
+				constraints.append("-").append(
 						mappings.add(currInputState, typeAutomaton.getNullState(), WorkflowElement.TYPE_DEPENDENCY))
 						.append(" 0\n");
 				/*
@@ -294,7 +294,7 @@ public final class SATModuleUtils {
 //							.append(" ");
 //				}
 //				if(possibleMemStates.size() > 0) {
-//					constraints = constraints.append(" 0\n");
+//					constraints.append(" 0\n");
 //				}
 
 				/*
@@ -302,7 +302,7 @@ public final class SATModuleUtils {
 				 * in the shared memory.
 				 */
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
-					constraints = constraints.append("-")
+					constraints.append("-")
 							.append(mappings.add(nonExictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
 							.append(" 0\n");
 				}
@@ -317,7 +317,7 @@ public final class SATModuleUtils {
 						.append(mappings.add(currMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
 						.append(" 0\n");
 				/* ..and does not depend on the null state */
-				constraints = constraints.append("-").append(
+				constraints.append("-").append(
 						mappings.add(currMemState, typeAutomaton.getNullState(), WorkflowElement.TYPE_DEPENDENCY))
 						.append(" 0\n");
 				/*
@@ -331,7 +331,7 @@ public final class SATModuleUtils {
 //							.append(" ");
 //				}
 //				if(possibleMemStates.size() > 0) {
-//					constraints = constraints.append(" 0\n");
+//					constraints.append(" 0\n");
 //				}
 
 				/*
@@ -340,7 +340,7 @@ public final class SATModuleUtils {
 				 */
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber - 1)) {
 					if (!nonExictingMemState.equals(currMemState)) {
-						constraints = constraints.append("-").append(
+						constraints.append("-").append(
 								mappings.add(nonExictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
 								.append(" 0\n");
 					}
@@ -372,30 +372,30 @@ public final class SATModuleUtils {
 					for (State currMemState : currMemBlock.getStates()) {
 						/* ..if the input state references the memory state.. */
 						for (State exictingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
-							constraints = constraints.append("-").append(
+							constraints.append("-").append(
 									mappings.add(currMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
 									.append(" ");
 							/** ..each data dependency over the memory state.. */
-							constraints = constraints.append("-").append(
+							constraints.append("-").append(
 									mappings.add(exictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
 									.append(" ");
 							/** ..is the dependency of the tool input state. */
-							constraints = constraints.append(
+							constraints.append(
 									mappings.add(exictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
 									.append(" 0\n");
 
 							// and vice versa (if it does not depend on it, neither will the tool input
 							// state)
 
-							constraints = constraints.append("-").append(
+							constraints.append("-").append(
 									mappings.add(currMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
 									.append(" ");
 							/** ..each data dependency over the memory state.. */
-							constraints = constraints.append(
+							constraints.append(
 									mappings.add(exictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
 									.append(" ");
 							/** ..is the dependency of the tool input state. */
-							constraints = constraints.append("-").append(
+							constraints.append("-").append(
 									mappings.add(exictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
 									.append(" 0\n");
 						}
@@ -404,10 +404,10 @@ public final class SATModuleUtils {
 
 				// Empty inputs have no data dependencies
 				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
-					constraints = constraints.append("-").append(mappings.add(typeAutomaton.getNullState(),
+					constraints.append("-").append(mappings.add(typeAutomaton.getNullState(),
 							currInputState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" ");
 
-					constraints = constraints.append("-")
+					constraints.append("-")
 							.append(mappings.add(existingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
 							.append(" 0\n");
 				}
@@ -427,7 +427,7 @@ public final class SATModuleUtils {
 			for (State currMemState : currMemBlock.getStates()) {
 				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
 					// if the type depends on a data from the memory
-					constraints = constraints.append("-")
+					constraints.append("-")
 							.append(mappings.add(existingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
 							.append(" ");
 					// one of the tool inputs does as well
@@ -436,12 +436,12 @@ public final class SATModuleUtils {
 								.append(mappings.add(existingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
 								.append(" ");
 					}
-					constraints = constraints.append(" 0\n");
+					constraints.append(" 0\n");
 
 					// ..and vice versa, dependence of the input types is inherited to the outputs
 
 					for (State currInputState : currInputBlock.getStates()) {
-						constraints = constraints.append("-")
+						constraints.append("-")
 								.append(mappings.add(existingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
 								.append(" ");
 
@@ -463,7 +463,7 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static String enforcingUsageOfGeneratedTypesCons(SAT_SynthesisEngine synthesisInstance) {
+	private static String enforcingUsageOfGeneratedTypesCons(SATSynthesisEngine synthesisInstance) {
 
 		AtomMappings mappings = synthesisInstance.getMappings();
 		Type emptyType = synthesisInstance.getEmptyType();
@@ -485,11 +485,11 @@ public final class SATModuleUtils {
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
 								.append(" ");
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							constraints = constraints.append(
+							constraints.append(
 									mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
 									.append(" ");
 						}
-						constraints = constraints.append(" 0\n");
+						constraints.append(" 0\n");
 					}
 					/* In case that at least one workflow input need to be used */
 				} else if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ONE) {
@@ -501,12 +501,12 @@ public final class SATModuleUtils {
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 
-							constraints = constraints.append(
+							constraints.append(
 									mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
 									.append(" ");
 						}
 					}
-					constraints = constraints.append(" 0\n");
+					constraints.append(" 0\n");
 				}
 				/* In case that none of the workflow input has to be used, do nothing. */
 			} else {
@@ -517,11 +517,11 @@ public final class SATModuleUtils {
 								.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
 								.append(" ");
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							constraints = constraints.append(
+							constraints.append(
 									mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
 									.append(" ");
 						}
-						constraints = constraints.append(" 0\n");
+						constraints.append(" 0\n");
 					}
 					/*
 					 * In case that at least one of the generated data instances per tool need to be
@@ -535,12 +535,12 @@ public final class SATModuleUtils {
 									.append(" ");
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							constraints = constraints.append(
+							constraints.append(
 									mappings.add(currMemoryState, inputState, WorkflowElement.MEM_TYPE_REFERENCE))
 									.append(" ");
 						}
 					}
-					constraints = constraints.append(" 0\n");
+					constraints.append(" 0\n");
 				}
 				/* In case that none generated data has to be used do nothing. */
 
@@ -557,7 +557,7 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static String outputCons(SAT_SynthesisEngine synthesisInstance) {
+	private static String outputCons(SATSynthesisEngine synthesisInstance) {
 
 		AtomMappings mappings = synthesisInstance.getMappings();
 		StringBuilder constraints = new StringBuilder();
@@ -579,18 +579,18 @@ public final class SATModuleUtils {
 							TaxonomyPredicate outputType = moduleOutputs.get(i);
 							// single output
 							// if module was used in the module state
-							constraints = constraints.append("-")
+							constraints.append("-")
 									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
 							// require type and/or format to be used in one of the directly
 							// proceeding output states if it exists, otherwise use empty type
 
-							constraints = constraints.append(
+							constraints.append(
 									mappings.add(outputType, currOutputStates.get(i), WorkflowElement.MEMORY_TYPE))
 									.append(" 0\n");
 						} else {
-							constraints = constraints.append("-")
+							constraints.append("-")
 									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
-							constraints = constraints.append(mappings.add(synthesisInstance.getEmptyType(),
+							constraints.append(mappings.add(synthesisInstance.getEmptyType(),
 									currOutputStates.get(i), WorkflowElement.MEMORY_TYPE)).append(" 0\n");
 						}
 					}
@@ -618,9 +618,9 @@ public final class SATModuleUtils {
 
 		for (Pair<PredicateLabel> pair : allModules.getSimplePairs()) {
 			for (State moduleState : moduleAutomaton.getAllStates()) {
-				constraints = constraints.append("-")
+				constraints.append("-")
 						.append(mappings.add(pair.getFirst(), moduleState, WorkflowElement.MODULE)).append(" ");
-				constraints = constraints.append("-")
+				constraints.append("-")
 						.append(mappings.add(pair.getSecond(), moduleState, WorkflowElement.MODULE)).append(" 0\n");
 			}
 		}
@@ -648,11 +648,11 @@ public final class SATModuleUtils {
 		for (State moduleState : moduleAutomaton.getAllStates()) {
 			for (TaxonomyPredicate tool : allModules.getModules()) {
 				if (tool instanceof Module) {
-					constraints = constraints.append(mappings.add(tool, moduleState, WorkflowElement.MODULE))
+					constraints.append(mappings.add(tool, moduleState, WorkflowElement.MODULE))
 							.append(" ");
 				}
 			}
-			constraints = constraints.append(" 0\n");
+			constraints.append(" 0\n");
 		}
 
 		return constraints.toString();
@@ -708,17 +708,17 @@ public final class SATModuleUtils {
 							+ currModule.getSubPredicates().toString());
 				}
 				String subModule_State = mappings.add(subModule, moduleState, WorkflowElement.MODULE).toString();
-				currConstraint = currConstraint.append(subModule_State).append(" ");
+				currConstraint.append(subModule_State).append(" ");
 				subModulesStates.add(subModule_State);
 				constraints = constraints
 						.append(moduleEnforceTaxonomyStructureForState(allModules, subModule, mappings, moduleState));
 			}
-			currConstraint = currConstraint.append("0\n");
+			currConstraint.append("0\n");
 			/*
 			 * Ensuring the BOTTOM-UP taxonomy tree dependency
 			 */
 			for (String subModule_State : subModulesStates) {
-				currConstraint = currConstraint.append("-").append(subModule_State).append(" ").append(superModuleState)
+				currConstraint.append("-").append(subModule_State).append(" ").append(superModuleState)
 						.append(" 0\n");
 			}
 			return currConstraint.append(constraints).toString();

@@ -79,9 +79,9 @@ public class ConstraintFactory {
 	public String printConstraintsCodes() {
 		StringBuilder templates = new StringBuilder("{\n" + "  \"constraints\": [\n");
 		for (ConstraintTemplate currConstr : constraintTemplates.values()) {
-			templates = templates.append(currConstr.printConstraintCode());
+			templates.append(currConstr.printConstraintCode());
 		}
-		templates = templates.append("    ]\n}");
+		templates.append("    ]\n}");
 		return templates.toString();
 	}
 

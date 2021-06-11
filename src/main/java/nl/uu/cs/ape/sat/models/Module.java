@@ -223,10 +223,10 @@ public class Module extends AbstractModule {
         StringBuilder outputs = new StringBuilder();
 
         for (Type inType : moduleInput) {
-        	inputs = inputs.append("{").append(inType.toShortString()).append("} ");
+        	inputs.append("{").append(inType.toShortString()).append("} ");
         }
         for (Type outType : moduleOutput) {
-            outputs = outputs.append("{").append(outType.toShortString()).append("} ");
+            outputs.append("{").append(outType.toShortString()).append("} ");
         }
 
         return "______________________________________\n|" 

@@ -731,7 +731,7 @@ public final class APEUtils {
 		while (scanner.hasNextLine()) {
 			String str = scanner.nextLine();
 
-			humanReadable = humanReadable.append(str).append("\n");
+			humanReadable.append(str).append("\n");
 		}
 		scanner.close();
 

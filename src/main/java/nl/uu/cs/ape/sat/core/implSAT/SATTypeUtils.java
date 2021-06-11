@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.sat.models.SATEncodingUtils;
+package nl.uu.cs.ape.sat.core.implSAT;
 
 import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.State;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The {@code SATTypeUtils} class is used to encode SAT constraints  based on the type annotations.
+ * The {@code SMTTypeUtils} class is used to encode SAT constraints  based on the type annotations.
  *
  * @author Vedran Kasalica
  */
@@ -47,18 +47,18 @@ public class SATTypeUtils {
             // mutual exclusion of types in all the states (those that represent general memory)
             for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
                 for (State typeState : typeBlock.getStates()) {
-                    constraints = constraints.append("-").append(mappings.add(firstPair, typeState, WorkflowElement.MEMORY_TYPE))
+                    constraints.append("-").append(mappings.add(firstPair, typeState, WorkflowElement.MEMORY_TYPE))
                             .append(" ");
-                    constraints = constraints.append("-").append(mappings.add(secondPair, typeState, WorkflowElement.MEMORY_TYPE))
+                    constraints.append("-").append(mappings.add(secondPair, typeState, WorkflowElement.MEMORY_TYPE))
                             .append(" ").append("0\n");
                 }
             }
             // mutual exclusion of types in all the states (those that represent used instances)
             for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
                 for (State typeState : typeBlock.getStates()) {
-                    constraints = constraints.append("-").append(mappings.add(firstPair, typeState, WorkflowElement.USED_TYPE))
+                    constraints.append("-").append(mappings.add(firstPair, typeState, WorkflowElement.USED_TYPE))
                             .append(" ");
-                    constraints = constraints.append("-").append(mappings.add(secondPair, typeState, WorkflowElement.USED_TYPE))
+                    constraints.append("-").append(mappings.add(secondPair, typeState, WorkflowElement.USED_TYPE))
                             .append(" ").append("0\n");
                 }
             }
@@ -84,17 +84,17 @@ public class SATTypeUtils {
         // memory and used data instances)
         for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
             for (State typeState : typeBlock.getStates()) {
-                constraints = constraints.append(mappings.add(dataType, typeState, WorkflowElement.MEMORY_TYPE))
+                constraints.append(mappings.add(dataType, typeState, WorkflowElement.MEMORY_TYPE))
                         .append(" ");
-                constraints = constraints.append(mappings.add(empty, typeState, WorkflowElement.MEMORY_TYPE))
+                constraints.append(mappings.add(empty, typeState, WorkflowElement.MEMORY_TYPE))
                         .append(" 0\n");
             }
         }
         for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
             for (State typeState : typeBlock.getStates()) {
-                constraints = constraints.append(mappings.add(dataType, typeState, WorkflowElement.USED_TYPE))
+                constraints.append(mappings.add(dataType, typeState, WorkflowElement.USED_TYPE))
                         .append(" ");
-                constraints = constraints.append(mappings.add(empty, typeState, WorkflowElement.USED_TYPE))
+                constraints.append(mappings.add(empty, typeState, WorkflowElement.USED_TYPE))
                         .append(" 0\n");
             }
         }
@@ -126,7 +126,7 @@ public class SATTypeUtils {
             }
             for (Block usedTypeBlock : typeAutomaton.getUsedTypesBlocks()) {
                 for (State usedTypeState : usedTypeBlock.getStates()) {
-                    constraints = constraints.append(typeEnforceTaxonomyStructureForState(dimension, mappings, usedTypeState, WorkflowElement.USED_TYPE));
+                    constraints.append(typeEnforceTaxonomyStructureForState(dimension, mappings, usedTypeState, WorkflowElement.USED_TYPE));
                 }
             }
         }
@@ -152,17 +152,17 @@ public class SATTypeUtils {
             for (TaxonomyPredicate subType : currType.getSubPredicates()) {
 
                 String subType_State = mappings.add(subType, typeState, typeElement).toString();
-                currConstraint = currConstraint.append(subType_State).append(" ");
+                currConstraint.append(subType_State).append(" ");
                 subTypes_States.add(subType_State);
 
-                constraints = constraints.append(typeEnforceTaxonomyStructureForState(subType, mappings, typeState, typeElement));
+                constraints.append(typeEnforceTaxonomyStructureForState(subType, mappings, typeState, typeElement));
             }
-            currConstraint = currConstraint.append("0\n");
+            currConstraint.append("0\n");
             /*
              * Ensuring the BOTTOM-UP taxonomy tree dependency
              */
             for (String subType_State : subTypes_States) {
-                currConstraint = currConstraint.append("-").append(subType_State).append(" ").append(superType_State)
+                currConstraint.append("-").append(subType_State).append(" ").append(superType_State)
                         .append(" 0\n");
             }
             return currConstraint.append(constraints).toString();
@@ -194,11 +194,11 @@ public class SATTypeUtils {
                         return null;
                     }
 
-                    encoding = encoding.append(mappings.add(currType, currState, WorkflowElement.MEMORY_TYPE))
+                    encoding.append(mappings.add(currType, currState, WorkflowElement.MEMORY_TYPE))
                             .append(" 0\n");
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
-                encoding = encoding.append(mappings.add(allTypes.getEmptyType(), currState, WorkflowElement.MEMORY_TYPE))
+                encoding.append(mappings.add(allTypes.getEmptyType(), currState, WorkflowElement.MEMORY_TYPE))
                         .append(" 0\n");
             }
         }
@@ -227,12 +227,12 @@ public class SATTypeUtils {
                                 "Program output '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
                         return null;
                     }
-                    encoding = encoding.append(mappings.add(currType, workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
+                    encoding.append(mappings.add(currType, workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
                             .append(" 0\n");
 //					currType.setAsRelevantTaxonomyTerm(allTypes);
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
-                encoding = encoding.append(mappings.add(allTypes.getEmptyType(), workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
+                encoding.append(mappings.add(allTypes.getEmptyType(), workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
                         .append(" 0\n");
             }
 
