@@ -382,7 +382,7 @@ public abstract class SLTL_formula {
 
     /**
      * Creates a CNF representation of the Constraint:<br>
-     * Use <b>module<b/> with data <b>inputType<b/> as one of the inputs.
+     * Use <b>module</b> with data <b>inputType</b> as one of the inputs.
      * 
      * @param module			Module to be used.
      * @param inputType			Type of one of the input types.
@@ -417,10 +417,10 @@ public abstract class SLTL_formula {
 	}
 	/**
      * Creates a CNF representation of the Constraint:<br>
-     * Use <b>module<b/> with data <b>inputType<b/> as one of the inputs.
+     * Use <b>module</b> with data <b>inputType</b> as one of the inputs.
      * 
      * @param module			Module to be used.
-     * @param inputType			Type of one of the input types.
+     * @param inputNo			Type of one of the input types.
      * @param moduleAutomaton	The module automaton
      * @param typeAutomaton		The type automaton.
      * @param mappings			Set of the mappings for the literals.
