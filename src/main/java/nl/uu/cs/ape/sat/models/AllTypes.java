@@ -29,6 +29,8 @@ public class AllTypes extends AllPredicates {
     private Type emptyType;
 
     /**
+<<<<<<< HEAD
+=======
      * {@link Type} object representing the "empty label root".
      */
     private Type apeLabelRoot;
@@ -39,6 +41,7 @@ public class AllTypes extends AllPredicates {
     private Type emptyLabelType;
    
     /**
+>>>>>>> master
      * Instantiates a new AllTypes object.
      *
      * @param config the config
