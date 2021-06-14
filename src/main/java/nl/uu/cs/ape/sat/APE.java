@@ -321,7 +321,7 @@ public class APE {
 		if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)) {
 			allSolutions.setFlag(SynthesisFlag.NONE);
 		} else if (solutionLength == runConfig.getSolutionLength().getMax()) {
-			allSolutions.setFlag(SynthesisFlag.MAX_LENGHT);
+			allSolutions.setFlag(SynthesisFlag.MAX_LENGTH);
 		} else if(APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) <= 0) {
 			allSolutions.setFlag(SynthesisFlag.TIMEOUT);
 		} else {
@@ -450,7 +450,7 @@ public class APE {
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
-		APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 		System.out.println();
 		/* Removing the existing files from the file system. */

@@ -17,7 +17,7 @@ public enum SynthesisFlag {
     /**
      * Synthesis search was interrupted because it reached the maximum workflow length.
      */
-    MAX_LENGHT,
+    MAX_LENGTH,
     
     /**
      * Synthesis was interrupted because it reached the TIMEOUT.
@@ -37,7 +37,7 @@ public enum SynthesisFlag {
     public String getMessage() {
         if (this == SynthesisFlag.NONE) {
             return "";
-        } else if(this == SynthesisFlag.MAX_LENGHT) {
+        } else if(this == SynthesisFlag.MAX_LENGTH) {
             return "Synthesis was interrupted because it reached the maximum workflow length.";
         } else if(this == SynthesisFlag.TIMEOUT){
         	return "Synthesis was interrupted because it reached the TIMEOUT.";
