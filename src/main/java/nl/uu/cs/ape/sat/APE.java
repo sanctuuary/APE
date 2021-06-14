@@ -450,7 +450,7 @@ public class APE {
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
-		APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 		System.out.println();
 		/* Removing the existing files from the file system. */
