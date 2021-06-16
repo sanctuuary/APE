@@ -55,6 +55,11 @@ public class APERunConfig {
      */
    private final APEConfigTag<Integer> NO_GRAPHS = new APEConfigTagFactory.TAGS.NO_GRAPHS();
     /**
+     * Number of CWL files that should be generated from candidate workflows.
+     * Default is 0.
+     */
+   private final APEConfigTag<Integer> NO_CWL = new APEConfigTagFactory.TAGS.NO_CWL();
+    /**
      * Determines the required usage for the data instances that are given as
      * workflow input:<br>
      * {@link ConfigEnum#ALL} if all the workflow inputs have to be used,<br>
@@ -102,6 +107,7 @@ public class APERunConfig {
             this.MAX_NO_SOLUTIONS,
             this.NO_EXECUTIONS,
             this.NO_GRAPHS,
+            this.NO_CWL,
             this.USE_WORKFLOW_INPUT,
             this.USE_ALL_GENERATED_DATA,
             this.DEBUG_MODE,
@@ -121,6 +127,7 @@ public class APERunConfig {
             new MAX_NO_SOLUTIONS(),
             new NO_EXECUTIONS(),
             new NO_GRAPHS(),
+            new NO_CWL(),
             new USE_WORKFLOW_INPUT(),
             new USE_ALL_GENERATED_DATA(),
             new DEBUG_MODE(),
@@ -155,6 +162,7 @@ public class APERunConfig {
         setSolutionPath(builder.solutionDirPath);
         setNoExecutions(builder.noExecutions);
         setNoGraphs(builder.noGraphs);
+        setNoCWL(builder.noCWL);
         setUseWorkflowInput(builder.useWorkflowInput);
         setUseAllGeneratedData(builder.useAllGeneratedData);
         setDebugMode(builder.debugMode);
@@ -348,6 +356,16 @@ public class APERunConfig {
         return getSolutionDirPath2(FIGURES_FOLDER_NAME);
     }
 
+    public static final String CWL_FOLDER_NAME = "CWL";
+    /**
+     * Get the path to the directory where the CWL scripts corresponding the given solutions should be stored.
+     *
+     * @return the path to the directory where the CWL scripts corresponding to the given solutions should be stored
+     */
+    public Path getSolutionDirPath2CWL() {
+        return getSolutionDirPath2(CWL_FOLDER_NAME);
+    }
+
     /**
      * @param solutionPath the solutionPath to set
      */
@@ -410,6 +428,22 @@ public class APERunConfig {
      */
     public void setNoGraphs(int noGraphs) {
         NO_GRAPHS.setValue(noGraphs);
+    }
+
+    /**
+     * Gets number of CWL files.
+     * @return The value of {@link #NO_CWL}
+     */
+    public int getNoCWL() {
+        return NO_CWL.getValue();
+    }
+
+    /**
+     * Set the number of CWL files.
+     * @param noCWL The number to set.
+     */
+    public void setNoCWL(int noCWL) {
+        NO_CWL.setValue(noCWL);
     }
 
     /**
@@ -564,6 +598,8 @@ public class APERunConfig {
 
         IBuildStage withNoGraphs(int noGraphs);
 
+        IBuildStage withNoCWL(int noCWL);
+
         IBuildStage withProgramInputs(List<Type> programInputs);
 
         IBuildStage withProgramOutputs(List<Type> programOutputs);
@@ -593,6 +629,7 @@ public class APERunConfig {
         private String solutionDirPath;
         private int noExecutions;
         private int noGraphs;
+        private int noCWL;
         private List<Type> programInputs = Collections.emptyList();
         private List<Type> programOutputs = Collections.emptyList();
         private ConfigEnum useWorkflowInput;
@@ -655,6 +692,12 @@ public class APERunConfig {
         @Override
         public IBuildStage withNoGraphs(int noGraphs) {
             this.noGraphs = noGraphs;
+            return this;
+        }
+
+        @Override
+        public IBuildStage withNoCWL(int noCWL) {
+            this.noCWL = noCWL;
             return this;
         }
 
