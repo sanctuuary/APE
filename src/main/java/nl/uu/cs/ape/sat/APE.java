@@ -10,7 +10,6 @@ import nl.uu.cs.ape.sat.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.sat.core.solutionStructure.CWLCreator;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
-import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
@@ -546,10 +545,9 @@ public class APE {
 	/**
 	 * Generate CWL scripts that represent executable versions of the workflows solutions.
 	 * @param allSolutions Set of {@link SolutionWorkflow} which should be represented in CWL.
-	 * @param coreConfig The {@link APECoreConfig} of the APE configuration.
 	 * @return true if the execution was successfully performed, false otherwise.
 	 */
-	public static boolean writeCWLWorkflows(SolutionsList allSolutions, APECoreConfig coreConfig) {
+	public static boolean writeCWLWorkflows(SolutionsList allSolutions) {
 		// Check the configuration before continuing.
 		Path cwlFolder = allSolutions.getRunConfiguration().getSolutionDirPath2CWL();
 		int noCWLFiles = allSolutions.getRunConfiguration().getNoCWL();
@@ -586,7 +584,7 @@ public class APE {
 			try {
 				String title = String.format("%s_%o.cwl", filePrefix, solution.getIndex());
 				File script = cwlFolder.resolve(title).toFile();
-				CWLCreator cwlCreator = new CWLCreator(solution, coreConfig);
+				CWLCreator cwlCreator = new CWLCreator(solution);
 				APEUtils.write2file(cwlCreator.getCWL(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
