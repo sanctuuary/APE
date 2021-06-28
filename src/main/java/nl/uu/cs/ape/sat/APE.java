@@ -585,7 +585,7 @@ public class APE {
 				String title = String.format("%s_%o.cwl", filePrefix, solution.getIndex());
 				File script = cwlFolder.resolve(title).toFile();
 				CWLCreator cwlCreator = new CWLCreator(solution);
-				APEUtils.write2file(cwlCreator.getCWL(), script, false);
+				APEUtils.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
 				System.err.println("Error occurred while writing a CWL file to the file system.");
