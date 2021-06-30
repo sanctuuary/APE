@@ -1,12 +1,12 @@
 package nl.uu.cs.ape.sat.test.configuration;
 
-import nl.uu.cs.ape.sat.APE;
-import nl.uu.cs.ape.sat.configuration.APEConfigException;
-import nl.uu.cs.ape.sat.configuration.APECoreConfig;
-import nl.uu.cs.ape.sat.configuration.APERunConfig;
-import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
-import nl.uu.cs.ape.sat.models.Range;
-import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
+import nl.uu.cs.ape.APE;
+import nl.uu.cs.ape.configuration.APEConfigException;
+import nl.uu.cs.ape.configuration.APECoreConfig;
+import nl.uu.cs.ape.configuration.APERunConfig;
+import nl.uu.cs.ape.configuration.tags.APEConfigTag;
+import nl.uu.cs.ape.models.Range;
+import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.test.utils.Evaluation;
 import nl.uu.cs.ape.sat.test.utils.TestResources;
 

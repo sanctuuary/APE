@@ -1,13 +1,14 @@
 package nl.uu.cs.ape.sat.test.configuration;
 
-import nl.uu.cs.ape.sat.APE;
-import nl.uu.cs.ape.sat.configuration.APECoreConfig;
-import nl.uu.cs.ape.sat.configuration.APERunConfig;
-import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
-import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
+import nl.uu.cs.ape.APE;
+import nl.uu.cs.ape.configuration.APECoreConfig;
+import nl.uu.cs.ape.configuration.APERunConfig;
+import nl.uu.cs.ape.configuration.tags.APEConfigTag;
+import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.test.utils.TestResources;
-import nl.uu.cs.ape.sat.utils.APEDomainSetup;
-import nl.uu.cs.ape.sat.utils.APEUtils;
+import nl.uu.cs.ape.utils.APEDomainSetup;
+import nl.uu.cs.ape.utils.APEUtils;
+
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
