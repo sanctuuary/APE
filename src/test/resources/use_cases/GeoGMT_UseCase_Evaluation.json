@@ -81,6 +81,12 @@
       "solution_length_start": 6,
       "expected_no_solutions": [32, 1000],
       "config": { "inputs": [] }
+    },
+    {
+      "description": "Are the correct number of CWL files generated?",
+      "solution_length_start": 5,
+      "expected_no_solutions": [32, 1000],
+      "number_of_cwl_files": 3
     }
   ]
 }
