@@ -262,10 +262,10 @@ public class AllTypes extends AllPredicates {
             } else if (type.isEmptyPredicate()) {
 
                 /*
-                 * Add empty type to each mutual exclusive dimension
+                 * Add empty type to each mutual exclusive dimension (excluding labels)
                  */
-                this.getDataTaxonomyDimensionIDs().stream().map(
-                						dimensionID -> subTreesMap.get(dimensionID).add(type));
+            	 this.getDataTaxonomyDimensionIDs().stream().forEach(
+ 						dimensionID -> subTreesMap.get(dimensionID).add(type));
             }
         }
 

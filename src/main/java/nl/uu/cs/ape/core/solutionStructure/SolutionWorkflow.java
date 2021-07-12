@@ -431,10 +431,9 @@ public class SolutionWorkflow {
      * @param toolSeqRepeat variable defining if the provided solutions should be distinguished based on the tool sequences alone
      * @return int[] representing the negated solution
      */
-    public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
-    	return null;
+//    public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
 //        return this.nativeSolution.getNegatedMappedSolutionArray(toolSeqRepeat);
-    }
+//    }
 
     /**
      * Get a readable version of the workflow solution.
