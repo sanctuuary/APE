@@ -1,8 +1,6 @@
 package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
 import nl.uu.cs.ape.models.SMTPredicateMappings;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
  * Structure used to model (and x y) statement in smt2lib.

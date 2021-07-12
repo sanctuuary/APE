@@ -6,6 +6,9 @@ import nl.uu.cs.ape.models.logic.constructs.APEPredicate;
  * Defines the values describing the states in the workflow.
  * <p>
  * Values: [{@code MODULE}, {@code MEMORY_TYPE}, {@code USED_TYPE}, {@code MEM_TYPE_REFERENCE}]
+ * 
+ * 
+ *  @author Vedran Kasalica
  */
 public enum WorkflowElement implements APEPredicate {
 

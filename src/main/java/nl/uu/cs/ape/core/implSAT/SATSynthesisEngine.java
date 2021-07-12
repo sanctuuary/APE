@@ -1,6 +1,5 @@
 package nl.uu.cs.ape.core.implSAT;
 
-import org.apache.commons.io.IOUtils;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.reader.DimacsReader;
@@ -22,10 +21,8 @@ import nl.uu.cs.ape.utils.APEUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,7 +142,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the tools - from taxonomy.
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        
         APEUtils.appendToFile(cnfEncoding, SATModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton, mappings));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
         
@@ -153,6 +149,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         
         APEUtils.appendToFile(cnfEncoding, SATModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton, mappings));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
+        
         /*
          * Create the constraints enforcing:
          * 1. Mutual exclusion of the types/formats (according to the search model)
@@ -167,6 +164,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         
         APEUtils.appendToFile(cnfEncoding, SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton, mappings));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
+        
         /*
          * Encode the constraints from the file based on the templates (manual templates)
          */
@@ -297,7 +295,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
                  * Adding the negation of the positive part of the solution as a constraint
                  * (default negation does not work)
                  */
-                IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray(runConfig.getToolSeqRepeat()));
+                IVecInt negSol = new VecInt(((SATSolution)sat_solution.getNativeSolution()).getNegatedMappedSolutionArray(runConfig.getAllowToolSeqRepeat()));
                 solver.addClause(negSol);
             }
             sat_input.close();

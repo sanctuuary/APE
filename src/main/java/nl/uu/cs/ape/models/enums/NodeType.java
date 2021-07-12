@@ -4,6 +4,8 @@ package nl.uu.cs.ape.models.enums;
  * Defines the values describing the nodes in the taxonomy trees.
  * <p>
  * Values: [{@code ROOT}, {@code SUBROOT}, {@code ABSTRACT}, {@code LEAF}, {@code INSTANCE}, {@code EMPTY}]
+ * 
+ *  @author Vedran Kasalica
  */
 public enum NodeType {
 

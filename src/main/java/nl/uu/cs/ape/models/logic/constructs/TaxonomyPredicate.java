@@ -263,7 +263,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
-     * Function is used to return the predicate identifier defined as String.
+     * Function is used to return the unique predicate identifier defined as String.
      *
      * @return String representation of the predicate, used to uniquely identify the predicate.
      */

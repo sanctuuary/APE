@@ -2,8 +2,6 @@ package nl.uu.cs.ape.models.enums;
 
 /**
  * The {@code SynthesisFlag} class is used to model the reason why the synthesis search was interrupted.
-
-
  *
  * @author Vedran Kasalica
  */

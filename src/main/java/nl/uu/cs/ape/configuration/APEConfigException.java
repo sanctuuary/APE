@@ -1,11 +1,8 @@
 package nl.uu.cs.ape.configuration;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
-
-import java.io.IOException;
 
 /**
  * This {@link APEConfigException} will be thrown if the configuration is incorrect.

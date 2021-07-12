@@ -39,19 +39,12 @@ public class OrStatement implements Fact {
 		if(disjointFacts.size() == 1) {
 			return disjointFacts.get(0).toString(mapping);
 		}
-//		dijoint the first two statements
-		constraints
-			.append("(or ")
-				.append(disjointFacts.get(0).toString(mapping)).append(" ")
-				.append(disjointFacts.get(1).toString(mapping))
-			.append(")");
-//		add the rest of the statements to the dijunction
-		for(int i = 2; i < disjointFacts.size(); i++) {
-			constraints
-			.insert(0, "(or ")
-				.append(disjointFacts.get(i).toString(mapping))
-			.append(")");
+		constraints.append("(or");
+//		add the statements to the dijunction
+		for(Fact fact : disjointFacts) {
+			constraints.append(" ").append(fact.toString(mapping));
 		}
+		constraints.append(")");
 		
 		return constraints.toString();
 	}

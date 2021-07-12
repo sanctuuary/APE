@@ -262,11 +262,10 @@ public class AllTypes extends AllPredicates {
             } else if (type.isEmptyPredicate()) {
 
                 /*
-                 * Add empty type to each mutual exclusive class
+                 * Add empty type to each mutual exclusive dimension
                  */
-                for (List<TaxonomyPredicate> currSubTree : subTreesMap.values()) {
-                    currSubTree.add(type);
-                }
+                this.getDataTaxonomyDimensionIDs().stream().map(
+                						dimensionID -> subTreesMap.get(dimensionID).add(type));
             }
         }
 
@@ -280,7 +279,7 @@ public class AllTypes extends AllPredicates {
 
         return pairs;
     }
-
+    
     /**
      * Return the list of dimensions that represent the data. Each dimension represents
      * a node in the data taxonomy and the root for the corresponding dimension (this excludes the "APE label" dimension).

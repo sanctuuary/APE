@@ -131,6 +131,14 @@ public class Literal implements Comparable<Literal> {
     }
 
     /**
+     * Return the atom that is part of the literal.
+     * @return Atom object that is the base for the literal.
+     */
+    public Atom getAtom() {
+    	return atom;
+    }
+    
+    /**
      * Returns the predicate/label used to depict {@code AbstractModule, Module, Type} or {@code State}.
      * Each of those refers to the element that is described by the Literal (e.g. PredicateLabel(State)).
      *

@@ -75,15 +75,21 @@ public class BinarySMTPredicate implements SMTPredicate {
 				}
 			}
 		} else {
-
 			constraints
 			.append("(")
 				.append(predicate.toString(mapping)).append(" ")
 					.append(argument1.toString(mapping)).append(" ")
 					.append(mapping.add(newArgument2))
 			.append(")");
-		
 		}
+		
+//		if((newArgument2.getPredicateID() == argument2.getPredicate().getPredicateID()) & (argument2.getPredicate() instanceof AuxiliaryPredicate)) {
+//			System.out.println("-------------------");
+//			System.out.println("--!-------"+((AuxiliaryPredicate) argument2.getPredicate()).getPredicateLabel()+"----------");
+//			System.out.println("-------------------");
+//			System.out.println(constraints.toString());
+//			}
+		
 		return constraints.toString();
 	}
 }

@@ -7,7 +7,6 @@ import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.*;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
@@ -63,18 +62,24 @@ public final class SATModuleUtils {
 	public static String encodeMemoryStructure(SATSynthesisEngine synthesisInstance) {
 		StringBuilder constraints = new StringBuilder();
 
-		constraints.append(
-				allowDataReferencingCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+		constraints.append(allowDataReferencingCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
 		constraints.append(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
-
 		constraints.append(enforceDataReferenceRules(synthesisInstance.getDomainSetup(),
 				synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
 		return constraints.toString();
 	}
+
 	
+	/**
+	 * Return a CNF formula that preserves the dependency between data instances. Instance A depends on Instance B if it was 
+	 * computed by using Instance B, directly or indirectly.
+	 * 
+	 * @param typeAutomaton
+	 * @param mappings
+	 * @return
+	 */
 	public static String encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
-		
 		
 		constraints.append(allowDataDependencyCons(typeAutomaton, mappings));
 		constraints.append(enforceDataDependencyOverModules(typeAutomaton, mappings));

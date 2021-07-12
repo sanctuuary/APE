@@ -66,8 +66,10 @@ public final class SMTModuleUtils {
 	 */
 	public static List<SMT2LibRow> encodeModuleAnnotations(SMTSynthesisEngine synthesisInstance) {
 		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		
 		allClauses.add(new SMTComment("Encoding tool input dependencies."));
 		allClauses.addAll(inputCons(synthesisInstance));
+		
 		allClauses.add(new SMTComment("Encoding tool output dependencies."));
 		allClauses.addAll(outputCons(synthesisInstance));
 		return allClauses;
@@ -145,15 +147,18 @@ public final class SMTModuleUtils {
 	 */
 	public static List<SMT2LibRow> encodeMemoryStructure(SMTSynthesisEngine synthesisInstance) {
 		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		
 		allClauses.add(new SMTComment("Encoding rules of shared memory referencing (reference only the memory states already available)."));
-		allClauses.addAll(allowDataReferencingCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+		allClauses.addAll(allowDataReferencingCons(synthesisInstance.getTypeAutomaton()));
 		
 		allClauses.add(new SMTComment("Encoding rules that enforce usage of data generated in memory."));
 		allClauses.addAll(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
 
-		allClauses.add(new SMTComment("Encoding rules that ensure that the data used bu the tool as input and the data referenced in memory are the same."));
-		allClauses.addAll(enforceDataReferenceRules(synthesisInstance.getDomainSetup(),
-				synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+		allClauses.add(new SMTComment("Encoding rules that ensure that the data used by the tool as input and the data referenced in memory are the same."));
+		allClauses.addAll(enforceDataReferenceRules(synthesisInstance.getDomainSetup().getAllTypes(),
+				synthesisInstance.getTypeAutomaton()));
+		
+//		allClauses.add(new Assertion(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), synthesisInstance.getEmptyType(), synthesisInstance.getTypeAutomaton().getNullState())));
 		return allClauses;
 	}
 	
@@ -161,9 +166,9 @@ public final class SMTModuleUtils {
 		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
 		
 		
-		allClauses.addAll(allowDataDependencyCons(typeAutomaton, mappings));
-		allClauses.addAll(enforceDataDependencyOverModules(typeAutomaton, mappings));
-		allClauses.addAll(enforceDataDependencyOverDataReferencing(typeAutomaton, mappings));
+//		allClauses.addAll(allowDataDependencyCons(typeAutomaton));
+//		allClauses.addAll(enforceDataDependencyOverModules(typeAutomaton, mappings));
+//		allClauses.addAll(enforceDataDependencyOverDataReferencing(typeAutomaton, mappings));
 		
 		return allClauses;
 	}
@@ -229,15 +234,15 @@ public final class SMTModuleUtils {
 	 * correctly.
 	 *                          
 
-	 * @param domainSetup
+	 * @param allTypes
 	 * @param typeAutomaton
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static List<SMT2LibRow> enforceDataReferenceRules(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
+	private static List<SMT2LibRow> enforceDataReferenceRules(AllTypes allTypes, TypeAutomaton typeAutomaton) {
 		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
 
-		for(TaxonomyPredicate currTypeDimension : domainSetup.getAllTypes().getDataTaxonomyDimensionsAndLabel()) {
+		for(TaxonomyPredicate currTypeDimension : allTypes.getDataTaxonomyDimensionsAndLabel()) {
 			/* 
 			 * For each type dimension, the Used type states have to be equal to the referenced state values.
 			 */
@@ -253,20 +258,21 @@ public final class SMTModuleUtils {
 										new SMTBoundedVar("dim"),
 										new SMTDataType(currTypeDimension),
 										new ImplicationStatement(
-												new BinarySMTPredicate(
-														new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
-														new SMTFunctionArgument(new SMTBoundedVar("use")), 
-														new SMTFunctionArgument(new SMTBoundedVar("mem"))),
-												new EqualStatement(
-													new BinarySMTPredicate(
-															new SMTFunctionName(WorkflowElement.USED_TYPE), 
+												new AndStatement(
+														new BinarySMTPredicate(
+															new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
 															new SMTFunctionArgument(new SMTBoundedVar("use")), 
-															new SMTFunctionArgument(new SMTBoundedVar("dim"))),
+															new SMTFunctionArgument(new SMTBoundedVar("mem"))),
+											
+														new BinarySMTPredicate(
+																new SMTFunctionName(WorkflowElement.USED_TYPE), 
+																new SMTFunctionArgument(new SMTBoundedVar("use")), 
+																new SMTFunctionArgument(new SMTBoundedVar("dim")))),
 													new BinarySMTPredicate(
 															new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
 															new SMTFunctionArgument(new SMTBoundedVar("mem")), 
 															new SMTFunctionArgument(new SMTBoundedVar("dim")))
-												)))))));
+												))))));
 		}
 		
 		/* 
@@ -280,7 +286,7 @@ public final class SMTModuleUtils {
 										new BinarySMTPredicate(
 												new SMTFunctionName(WorkflowElement.USED_TYPE), 
 												new SMTFunctionArgument(new SMTBoundedVar("use")), 
-												new SMTFunctionArgument(domainSetup.getAllTypes().getEmptyType())),
+												new SMTFunctionArgument(allTypes.getEmptyType())),
 										new BinarySMTPredicate(
 												new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
 												new SMTFunctionArgument(new SMTBoundedVar("use")), 
@@ -298,14 +304,14 @@ public final class SMTModuleUtils {
 						new BinarySMTPredicate(
 								new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
 								new SMTFunctionArgument(typeAutomaton.getNullState()), 
-								new SMTFunctionArgument(domainSetup.getAllTypes().getEmptyType())
+								new SMTFunctionArgument(allTypes.getEmptyType())
 								)
 						));
 		allClauses.add(new Assertion(
 						new BinarySMTPredicate(
 								new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
 								new SMTFunctionArgument(typeAutomaton.getNullState()), 
-								new SMTFunctionArgument(domainSetup.getAllTypes().getEmptyAPELabel())
+								new SMTFunctionArgument(allTypes.getEmptyAPELabel())
 								)
 						));
 
@@ -377,163 +383,163 @@ public final class SMTModuleUtils {
 	 * 
 	 * @return String representation of constraints.
 	 */
-	private static List<SMT2LibRow> allowDataDependencyCons(TypeAutomaton typeAutomaton) {
-
-		// setting up dependency constraints
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
-		/** For each input state... */
-		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
-			int blockNumber = currBlock.getBlockNumber();
-			for (State currInputState : currBlock.getStates()) {
-				/* Input state does not depend on the null state */
-				constraints.append("-").append(
-						mappings.add(currInputState, typeAutomaton.getNullState(), WorkflowElement.TYPE_DEPENDENCY))
-						.append(" 0\n");
-
-				/*
-				 * Used state cannot depend on states that are yet to be created, i.e. not yet
-				 * in the shared memory.
-				 */
-				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
-					constraints.append("-")
-							.append(mappings.add(nonExictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
-							.append(" 0\n");
-				}
-			}
-		}
-		/** For each memory state... */
-		for (Block currBlock : typeAutomaton.getMemoryTypesBlocks()) {
-			int blockNumber = currBlock.getBlockNumber();
-			for (State currMemState : currBlock.getStates()) {
-				/* Memory state depends on itself */
-				constraints = constraints
-						.append(mappings.add(currMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
-						.append(" 0\n");
-				/* ..and does not depend on the null state */
-				constraints.append("-").append(
-						mappings.add(currMemState, typeAutomaton.getNullState(), WorkflowElement.TYPE_DEPENDENCY))
-						.append(" 0\n");
-
-				/*
-				 * Memory state cannot depend on states that are yet to be created or that were
-				 * just, i.e. not yet in the shared memory.
-				 */
-				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber - 1)) {
-					if (!nonExictingMemState.equals(currMemState)) {
-						constraints.append("-").append(
-								mappings.add(nonExictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
-								.append(" 0\n");
-					}
-				}
-			}
-		}
-		return allClauses;
-	}
-
-	/**
-	 * Generate constraints that ensure that tool inputs that reference data in
-	 * memory depend on the same data as the referenced data instance.
-	 * 
-	 * @return String representation of constraints.
-	 */
-	private static List<SMT2LibRow> enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
-
-		// setting up dependency constraints
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
-		/** For each input state... */
-		for (Block currInputBlock : typeAutomaton.getUsedTypesBlocks()) {
-			int blockNumber = currInputBlock.getBlockNumber();
-			for (State currInputState : currInputBlock.getStates()) {
-				/*
-				 * and for each available memory state..
-				 */
-				for (int i = 0; i <= blockNumber; i++) {
-					Block currMemBlock = typeAutomaton.getMemoryTypesBlock(i);
-					for (State currMemState : currMemBlock.getStates()) {
-						/* ..if the input state references the memory state.. */
-						for (State exictingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
-							constraints.append("-").append(
-									mappings.add(currMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
-									.append(" ");
-							/** ..each data dependency over the memory state.. */
-							constraints.append("-").append(
-									mappings.add(exictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
-									.append(" ");
-							/** ..is the dependency of the tool input state. */
-							constraints.append(
-									mappings.add(exictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
-									.append(" 0\n");
-
-							// and vice versa (if it does not depend on it, neither will the tool input
-							// state)
-
-							constraints.append("-").append(
-									mappings.add(currMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
-									.append(" ");
-							/** ..each data dependency over the memory state.. */
-							constraints.append(
-									mappings.add(exictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
-									.append(" ");
-							/** ..is the dependency of the tool input state. */
-							constraints.append("-").append(
-									mappings.add(exictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
-									.append(" 0\n");
-						}
-					}
-				}
-
-				// Empty inputs have no data dependencies
-				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
-					constraints.append("-").append(mappings.add(typeAutomaton.getNullState(),
-							currInputState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" ");
-
-					constraints.append("-")
-							.append(mappings.add(existingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
-							.append(" 0\n");
-				}
-			}
-		}
-		return allClauses;
-	}
-
-	private static List<SMT2LibRow> enforceDataDependencyOverModules(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
-		/** For tool inputs and outputs */
-		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
-			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
-			Block currMemBlock = typeAutomaton.getMemoryTypesBlock(i + 1);
-
-			// For each output state
-			for (State currMemState : currMemBlock.getStates()) {
-				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
-					// if the type depends on a data from the memory
-					constraints.append("-")
-							.append(mappings.add(existingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
-							.append(" ");
-					// one of the tool inputs does as well
-					for (State currInputState : currInputBlock.getStates()) {
-						constraints = constraints
-								.append(mappings.add(existingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
-								.append(" ");
-					}
-					constraints.append(" 0\n");
-
-					// ..and vice versa, dependence of the input types is inherited to the outputs
-
-					for (State currInputState : currInputBlock.getStates()) {
-						constraints.append("-")
-								.append(mappings.add(existingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
-								.append(" ");
-
-						constraints = constraints
-								.append(mappings.add(existingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
-								.append(" 0\n");
-					}
-				}
-			}
-		}
-		return allClauses;
-	}
+//	private static List<SMT2LibRow> allowDataDependencyCons(TypeAutomaton typeAutomaton) {
+//
+//		// setting up dependency constraints
+//		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+//		/** For each input state... */
+//		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
+//			int blockNumber = currBlock.getBlockNumber();
+//			for (State currInputState : currBlock.getStates()) {
+//				/* Input state does not depend on the null state */
+//				constraints.append("-").append(
+//						mappings.add(currInputState, typeAutomaton.getNullState(), WorkflowElement.TYPE_DEPENDENCY))
+//						.append(" 0\n");
+//
+//				/*
+//				 * Used state cannot depend on states that are yet to be created, i.e. not yet
+//				 * in the shared memory.
+//				 */
+//				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
+//					constraints.append("-")
+//							.append(mappings.add(nonExictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
+//							.append(" 0\n");
+//				}
+//			}
+//		}
+//		/** For each memory state... */
+//		for (Block currBlock : typeAutomaton.getMemoryTypesBlocks()) {
+//			int blockNumber = currBlock.getBlockNumber();
+//			for (State currMemState : currBlock.getStates()) {
+//				/* Memory state depends on itself */
+//				constraints = constraints
+//						.append(mappings.add(currMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
+//						.append(" 0\n");
+//				/* ..and does not depend on the null state */
+//				constraints.append("-").append(
+//						mappings.add(currMemState, typeAutomaton.getNullState(), WorkflowElement.TYPE_DEPENDENCY))
+//						.append(" 0\n");
+//
+//				/*
+//				 * Memory state cannot depend on states that are yet to be created or that were
+//				 * just, i.e. not yet in the shared memory.
+//				 */
+//				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber - 1)) {
+//					if (!nonExictingMemState.equals(currMemState)) {
+//						constraints.append("-").append(
+//								mappings.add(nonExictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
+//								.append(" 0\n");
+//					}
+//				}
+//			}
+//		}
+//		return allClauses;
+//	}
+//
+//	/**
+//	 * Generate constraints that ensure that tool inputs that reference data in
+//	 * memory depend on the same data as the referenced data instance.
+//	 * 
+//	 * @return String representation of constraints.
+//	 */
+//	private static List<SMT2LibRow> enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
+//
+//		// setting up dependency constraints
+//		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+//		/** For each input state... */
+//		for (Block currInputBlock : typeAutomaton.getUsedTypesBlocks()) {
+//			int blockNumber = currInputBlock.getBlockNumber();
+//			for (State currInputState : currInputBlock.getStates()) {
+//				/*
+//				 * and for each available memory state..
+//				 */
+//				for (int i = 0; i <= blockNumber; i++) {
+//					Block currMemBlock = typeAutomaton.getMemoryTypesBlock(i);
+//					for (State currMemState : currMemBlock.getStates()) {
+//						/* ..if the input state references the memory state.. */
+//						for (State exictingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
+//							constraints.append("-").append(
+//									mappings.add(currMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
+//									.append(" ");
+//							/** ..each data dependency over the memory state.. */
+//							constraints.append("-").append(
+//									mappings.add(exictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
+//									.append(" ");
+//							/** ..is the dependency of the tool input state. */
+//							constraints.append(
+//									mappings.add(exictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
+//									.append(" 0\n");
+//
+//							// and vice versa (if it does not depend on it, neither will the tool input
+//							// state)
+//
+//							constraints.append("-").append(
+//									mappings.add(currMemState, currInputState, WorkflowElement.MEM_TYPE_REFERENCE))
+//									.append(" ");
+//							/** ..each data dependency over the memory state.. */
+//							constraints.append(
+//									mappings.add(exictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
+//									.append(" ");
+//							/** ..is the dependency of the tool input state. */
+//							constraints.append("-").append(
+//									mappings.add(exictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
+//									.append(" 0\n");
+//						}
+//					}
+//				}
+//
+//				// Empty inputs have no data dependencies
+//				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
+//					constraints.append("-").append(mappings.add(typeAutomaton.getNullState(),
+//							currInputState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" ");
+//
+//					constraints.append("-")
+//							.append(mappings.add(existingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
+//							.append(" 0\n");
+//				}
+//			}
+//		}
+//		return allClauses;
+//	}
+//
+//	private static List<SMT2LibRow> enforceDataDependencyOverModules(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
+//		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+//		/** For tool inputs and outputs */
+//		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
+//			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
+//			Block currMemBlock = typeAutomaton.getMemoryTypesBlock(i + 1);
+//
+//			// For each output state
+//			for (State currMemState : currMemBlock.getStates()) {
+//				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
+//					// if the type depends on a data from the memory
+//					constraints.append("-")
+//							.append(mappings.add(existingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
+//							.append(" ");
+//					// one of the tool inputs does as well
+//					for (State currInputState : currInputBlock.getStates()) {
+//						constraints = constraints
+//								.append(mappings.add(existingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
+//								.append(" ");
+//					}
+//					constraints.append(" 0\n");
+//
+//					// ..and vice versa, dependence of the input types is inherited to the outputs
+//
+//					for (State currInputState : currInputBlock.getStates()) {
+//						constraints.append("-")
+//								.append(mappings.add(existingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
+//								.append(" ");
+//
+//						constraints = constraints
+//								.append(mappings.add(existingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
+//								.append(" 0\n");
+//					}
+//				}
+//			}
+//		}
+//		return allClauses;
+//	}
 
 	/**
 	 * Function returns the encoding that ensures that tool outputs are used
@@ -733,24 +739,26 @@ public final class SMTModuleUtils {
 								tool,
 								new SMTDataType(allModules.getRootModule()),
 								new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), new SMTFunctionArgument(state), new SMTFunctionArgument(tool))
-								)
 						)
-				));
+				)
+		));
 
 		return allClauses;
 	}
 
 	/**
 	 * Generating the mandatory usage of a submodules in case of the parent module
-	 * being used, with respect to the Module Taxonomy. The rule starts from
-	 * the @rootModule and it's valid in each state of @moduleAutomaton.
+	 * being used, and vice-versa, with respect to the Module Taxonomy. The rule starts from
+	 * the @rootModule and it's valid in each state of @moduleAutomaton.<br><br>
+	 * 
+	 * Taxonomy is enforced top-down and bottom-up, i.e., the subsumption relation is complete.
 	 *
-	 * @param currModule      Module that should be used.
+	 * @param parentModule      parent module for which the rules are curently created
 	 * @param firstCall       true if it is the first time that the method is call
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications.
 	 */
-	public static List<SMT2LibRow> moduleEnforceTaxonomyStructure(TaxonomyPredicate currModule, boolean firstCall) {
+	public static List<SMT2LibRow> moduleEnforceTaxonomyStructure(TaxonomyPredicate parentModule, boolean firstCall) {
 
 		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
 		if(firstCall) {
@@ -758,14 +766,14 @@ public final class SMTModuleUtils {
 		}
 		
 		SMTBoundedVar state = new SMTBoundedVar("state");
-		if (!(currModule.getSubPredicates() == null || currModule.getSubPredicates().isEmpty())) {
+		if (!(parentModule.getSubPredicates() == null || parentModule.getSubPredicates().isEmpty())) {
 			allClauses.add(new Assertion(
 							new ForallStatement(
 									state,
 									new SMTDataType(WorkflowElement.MODULE),
 									new EqualStatement(
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), new SMTFunctionArgument(state), new SMTFunctionArgument(currModule)),
-											new OrStatement(currModule.getSubPredicates().stream()
+											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), new SMTFunctionArgument(state), new SMTFunctionArgument(parentModule)),
+											new OrStatement(parentModule.getSubPredicates().stream()
 													.map(subModule -> new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), new SMTFunctionArgument(state), new SMTFunctionArgument(subModule)))
 													.collect(Collectors.toList())
 													)
@@ -773,12 +781,11 @@ public final class SMTModuleUtils {
 									)
 					));
 			
-			for (TaxonomyPredicate subModule : APEUtils.safe(currModule.getSubPredicates())) {
+			for (TaxonomyPredicate subModule : APEUtils.safe(parentModule.getSubPredicates())) {
 				allClauses.addAll(moduleEnforceTaxonomyStructure(subModule, false));
 			}
 		}
 		
 		return allClauses;
 	}
-
 }

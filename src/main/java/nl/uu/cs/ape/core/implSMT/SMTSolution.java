@@ -10,13 +10,14 @@ import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.Literal;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
- * The {@code SATSolution} class describes the solution produced by the SAT
- * solver. It stores the original solution and the mapped one. In case of the
+ * The {@code SMTSolution} class describes the solution produced by the SMT
+ * solver. In case of the
  * parameter <b>unsat</b> being true, there are no solutions.
  * <p>
  * It also implements general solution interface {@link SolutionInterpreter}.
@@ -26,34 +27,29 @@ import nl.uu.cs.ape.utils.APEUtils;
 public class SMTSolution extends SolutionInterpreter {
 
     /**
-     * List of all the literals provided by the solution.
-     */
-    private final List<Literal> literals;
-
-    /**
      * List of all the positive literals provided by the solution.
      */
-    private final List<Literal> positiveLiterals;
+    private final List<Atom> positiveLiterals;
 
     /**
      * List of only relevant (positive) literals that represent implemented modules/tools.
      */
-    private final List<Literal> relevantModules;
+    private final List<Atom> relevantModules;
 
     /**
      * List of only relevant (positive) literals that represent simple types.
      */
-    private final List<Literal> relevantTypes;
+    private final List<Atom> relevantTypes;
 
     /**
      * List of all the relevant types and modules combined.
      */
-    private final List<Literal> relevantElements;
+    private final List<Atom> relevantElements;
 
     /**
      * List of all the references for the types in the memory, when used as tool inputs.
      */
-    private final List<Literal> references2MemTypes;
+    private final List<Atom> references2MemTypes;
     private final Set<PredicateLabel> usedTypeStates;
 
     /**
@@ -61,66 +57,59 @@ public class SMTSolution extends SolutionInterpreter {
      */
     private final boolean unsat;
 
+
     /**
      * Creating a list of Literals to represent the solution.
      *
      * @param satSolution       list of mapped literals given as a list of integers (library SAT output)
      * @param synthesisInstance Mapping of the atoms.
      */
-    public SMTSolution(int[] satSolution, SATSynthesisEngine synthesisInstance) {
+    public SMTSolution(List<Atom> facts, SMTSynthesisEngine smtSynthesisEngine) {
         unsat = false;
-        literals = new ArrayList<Literal>();
-        positiveLiterals = new ArrayList<Literal>();
-        relevantModules = new ArrayList<Literal>();
-        relevantTypes = new ArrayList<Literal>();
-        relevantElements = new ArrayList<Literal>();
-        references2MemTypes = new ArrayList<Literal>();
+        positiveLiterals = new ArrayList<Atom>();
+        relevantModules = new ArrayList<Atom>();
+        relevantTypes = new ArrayList<Atom>();
+        relevantElements = new ArrayList<Atom>();
+        references2MemTypes = new ArrayList<Atom>();
         usedTypeStates = new HashSet<PredicateLabel>();
-        for (int mappedLiteral : satSolution) {
-            if (mappedLiteral > synthesisInstance.getMappings().getMaxNumOfMappedAuxVar()) {
-                Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
-                literals.add(currLiteral);
-                if (!currLiteral.isNegated()) {
-                    positiveLiterals.add(currLiteral);
-                    if (currLiteral.getPredicate() instanceof AuxiliaryPredicate) {
+        for (Atom currAtom : facts) {
+                    positiveLiterals.add(currAtom);
+                    if (currAtom.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
-                    } else if (currLiteral.getPredicate() instanceof Module) {
+                    } else if (currAtom.getPredicate() instanceof Module) {
                         /* add all positive literals that describe tool implementations */
-                        relevantElements.add(currLiteral);
-                        relevantModules.add(currLiteral);
-                    } else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE
-                            && currLiteral.getWorkflowElementType() != WorkflowElement.MEM_TYPE_REFERENCE
-                            && currLiteral.getWorkflowElementType() != WorkflowElement.TYPE_DEPENDENCY
-                            && (currLiteral.getPredicate() instanceof Type)
-                            && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
+                        relevantElements.add(currAtom);
+                        relevantModules.add(currAtom);
+                    } else if (currAtom.getWorkflowElementType() != WorkflowElement.MODULE
+                            && currAtom.getWorkflowElementType() != WorkflowElement.MEM_TYPE_REFERENCE
+                            && currAtom.getWorkflowElementType() != WorkflowElement.TYPE_DEPENDENCY
+                            && (currAtom.getPredicate() instanceof Type)
+                            && ((Type) currAtom.getPredicate()).isSimplePredicate()) {
                         /* add all positive literals that describe simple types */
-                        relevantElements.add(currLiteral);
-                        relevantTypes.add(currLiteral);
-                        usedTypeStates.add(currLiteral.getUsedInStateArgument());
-                    } else if (currLiteral.getPredicate() instanceof State
-                            && ((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {
+                        relevantElements.add(currAtom);
+                        relevantTypes.add(currAtom);
+                        usedTypeStates.add(currAtom.getUsedInStateArgument());
+                    } else if (currAtom.getPredicate() instanceof State
+                            && ((State) (currAtom.getPredicate())).getAbsoluteStateNumber() != -1) {
                         /*
                          * add all positive literals that describe memory type references that are not
                          * pointing to null state (NULL state has AbsoluteStateNumber == -1)
                          */
-                        references2MemTypes.add(currLiteral);
-                        relevantElements.add(currLiteral);
+                        references2MemTypes.add(currAtom);
+                        relevantElements.add(currAtom);
                     }
-                }
-            }
         }
         Collections.sort(relevantModules);
         Collections.sort(relevantTypes);
         Collections.sort(references2MemTypes);
         Collections.sort(relevantElements);
     }
-
+    
     /**
      * Creating an empty solution, for UNSAT problem. The list <b>literals</b> is null.
      */
     public SMTSolution() {
         unsat = true;
-        literals = null;
         positiveLiterals = null;
         relevantModules = null;
         relevantTypes = null;
@@ -129,7 +118,7 @@ public class SMTSolution extends SolutionInterpreter {
         usedTypeStates = null;
     }
 
-    /**
+	/**
      * Returns the solution in human readable format.
      *
      * @return String representing the solution (only positive literals).
@@ -139,25 +128,8 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Literal literal : positiveLiterals) {
-                solution = solution.append(literal.toString()).append(" ");
-            }
-        }
-        return solution.toString();
-    }
-
-    /**
-     * Returns the complete solution in human readable format, including the negative predicates.
-     *
-     * @return String representing the solution positive and negative literals).
-     */
-    public String getCompleteSolution() {
-        StringBuilder solution = new StringBuilder();
-        if (unsat) {
-            solution = new StringBuilder("UNSAT");
-        } else {
-            for (Literal literal : literals) {
-                solution = solution.append(literal.toString()).append(" ");
+            for (Atom literal : positiveLiterals) {
+                solution.append(literal.toString()).append(" ");
             }
         }
         return solution.toString();
@@ -175,8 +147,8 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Literal literal : relevantModules) {
-                solution = solution.append(literal.getPredicate().getPredicateLabel()).append(" -> ");
+            for (Atom literal : relevantModules) {
+                solution.append(literal.getPredicate().getPredicateLabel()).append(" -> ");
             }
         }
         return APEUtils.removeNLastChar(solution.toString(), 4);
@@ -194,8 +166,8 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Literal relevantElement : relevantElements) {
-                solution = solution.append(relevantElement.toString() + " ");
+            for (Atom relevantElement : relevantElements) {
+                solution.append(relevantElement.toString() + " ");
             }
         }
         return solution.toString();
@@ -213,27 +185,13 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             return null;
         } else {
-            for (Literal literal : relevantModules) {
+            for (Atom literal : relevantModules) {
                 solutionModules.add((Module) allModules.get(literal.getPredicate().getPredicateID()));
             }
         }
         return solutionModules;
     }
 
-    /**
-     * Returns the solution in mapped format. The original solution created by the SAT solver.
-     *
-     * @return String representing the mapped solution created by SAT solver.
-     */
-    public String getOriginalSATSolution() {
-        StringBuilder solution = new StringBuilder();
-        if (!unsat) {
-            for (Literal literal : literals) {
-                solution = solution.append(literal.toMappedString()).append(" ");
-            }
-        }
-        return solution.toString();
-    }
 
 	/**
 	 * Returns the negated solution in mapped format. Negating the original solution
@@ -243,28 +201,28 @@ public class SMTSolution extends SolutionInterpreter {
      * @param toolSeqRepeat variable defining if the provided solutions should be distinguished based on the tool sequences alone
 	 * @return int[] representing the negated solution
 	 */
-	public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
-		List<Integer> negSol = new ArrayList<Integer>();
-		if (!unsat) {
-			if(!toolSeqRepeat) {
-				for (Literal literal : relevantModules) {
-					negSol.add(literal.toNegatedMappedInt());
-				}
-			} else {
-			for (Literal literal : relevantElements) {
-				if (literal.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
-					negSol.add(literal.toNegatedMappedInt());
-				}
-			}
-			}
-		}
-		int[] negSolList = new int[negSol.size()];
-		for (int i = 0; i < negSol.size(); i++) {
-			negSolList[i] = negSol.get(i);
-		}
-
-        return negSolList;
-    }
+//	public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
+//		List<Integer> negSol = new ArrayList<Integer>();
+//		if (!unsat) {
+//			if(!toolSeqRepeat) {
+//				for (Atom literal : relevantModules) {
+//					negSol.add(literal.toNegatedMappedInt());
+//				}
+//			} else {
+//			for (Atom literal : relevantElements) {
+//				if (literal.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
+//					negSol.add(literal.toNegatedMappedInt());
+//				}
+//			}
+//			}
+//		}
+//		int[] negSolList = new int[negSol.size()];
+//		for (int i = 0; i < negSol.size(); i++) {
+//			negSolList[i] = negSol.get(i);
+//		}
+//
+//        return negSolList;
+//    }
 
     /**
      * Returns the satisfiability of the problem. Returns true if the problem is
@@ -274,6 +232,12 @@ public class SMTSolution extends SolutionInterpreter {
      */
     public boolean isSat() {
         return !unsat;
+    }
+    
+    
+	@Override
+	public String getCompleteSolution() {
+		return getSolution();
     }
 
 }

@@ -1,35 +1,29 @@
 package nl.uu.cs.ape.core.implSMT;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.sat4j.core.VecInt;
-import org.sat4j.minisat.SolverFactory;
-import org.sat4j.reader.DimacsReader;
-import org.sat4j.reader.ParseFormatException;
-import org.sat4j.reader.Reader;
-import org.sat4j.specs.*;
 
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
+import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
-import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.SMTPredicateMappings;
 import nl.uu.cs.ape.models.Type;
+import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.logic.constructs.Atom;
+import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The {@code SATSynthesisEngine} class represents a <b>synthesis instance</b>,
@@ -100,6 +94,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         this.mappings = (SMTPredicateMappings) allSolutions.getMappings();
         this.smtInputFile = null;
         this.smtEncoding = File.createTempFile("smt2lib_" + workflowLength, null);
+//        APEUtils.appendToFile(smtEncoding, "(set-option :produce-unsat-cores true)\n"); 
 
         int maxNoToolInputs = Math.max(domainSetup.getMaxNoToolInputs(), runConfig.getProgramOutputs().size());
         int maxNoToolOutputs = Math.max(domainSetup.getMaxNoToolOutputs(), runConfig.getProgramInputs().size());
@@ -134,7 +129,6 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         /* Define the structure of the workflow. Define each operation and data state. */
         SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeWorkflowStructure(this), mappings);
         
-        
         /* Create constraints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
         SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeModuleAnnotations(this), mappings);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
@@ -157,9 +151,10 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
         
         SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules()), mappings);
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
         
         SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleEnforceTaxonomyStructure(rootModule, true), mappings);
-        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool taxonomy  encoding");
         /*
          * Create the constraints enforcing:
          * 1. Mutual exclusion of the types/formats (according to the search model)
@@ -170,10 +165,11 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.typeMutualExclusion(domainSetup.getAllTypes()), mappings);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
         
-        APEUtils.appendToFile(smtEncoding, SMTTypeUtils.typeMandatoryUsage(domainSetup, typeAutomaton, mappings));
-        
-        APEUtils.appendToFile(smtEncoding, SMTTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton, mappings));
+        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.typeMandatoryUsage(domainSetup), mappings);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
+        
+        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes()), mappings);
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Type taxonomy encoding");
         /*
          * Encode the constraints from the file based on the templates (manual templates)
          */
@@ -182,53 +178,41 @@ public class SMTSynthesisEngine implements SynthesisEngine {
 //            APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
 //        }
 //        
-//        /*
-//         * Encode data instance dependency constraints.
-//         */
-//        APEUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton, mappings));
+        /*
+         * Encode data instance dependency constraints.
+         */
+//        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton), mappings);
 
         /*
          * Encode the workflow input. Workflow I/O are encoded the last in order to
          * reuse the mappings for states, instead of introducing new ones, using the I/O
          * types of NodeType.UNKNOWN.
          */
-        System.out.println(smtEncoding);
-        APEUtils.appendToFile(smtEncoding, "\n(check-sat)");    
-        FileUtils.copyFile(smtEncoding, new File("/home/vedran/Desktop/tmp.smt"));
-       
-        
-        String inputDataEncoding = SMTTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton, mappings);
-        if (inputDataEncoding == null) {
-            return false;
-        }
-        APEUtils.appendToFile(smtEncoding, inputDataEncoding);
+        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton), mappings);
         /*
          * Encode the workflow output
          */
-        String outputDataEncoding = SMTTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton, mappings);
-        if (outputDataEncoding == null) {
-            return false;
-        }
-        APEUtils.appendToFile(smtEncoding, outputDataEncoding);
+        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton), mappings);
 
+        
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-//        APEUtils.appendToFile(smtEncoding, domainSetup.getConstraintsForAuxiliaryPredicates(mappings, moduleAutomaton, typeAutomaton));
+//        SMTUtils.appendToFile(smtEncoding, domainSetup.getConstraintsForAuxiliaryPredicates(mappings, moduleAutomaton, typeAutomaton), mappings);
 
+        
+        
         /*
-         * Counting the number of variables and clauses that will be given to the SAT solver
-         * TODO Improve this approach, no need to read the whole String again to count lines.
+         * Create the file that contains the encoding
          */
-        int variables = mappings.getSize();
-        int clauses = APEUtils.countLines(smtEncoding);
+        System.out.println(smtEncoding);
+        APEUtils.appendToFile(smtEncoding, "\n(check-sat)"); 
+        APEUtils.appendToFile(smtEncoding, "\n(get-model)");
+//        APEUtils.appendToFile(smtEncoding, "\n(get-unsat-core)"); 
         
-        String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
-        APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
-        System.out.println();
-        
-        smtInputFile = APEUtils.concatIntoFile(sat_input_header, smtEncoding);
-        smtEncoding.delete();
+        smtInputFile = new File("/home/vedran/Desktop/tmp.smt");
+        FileUtils.copyFile(smtEncoding, smtInputFile);
+//        smtEncoding.delete();
 //		APEUtils.write2file(mknfEncoding.toString(), new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime), false);
 
         
@@ -254,74 +238,61 @@ public class SMTSynthesisEngine implements SynthesisEngine {
      */
     public List<SolutionWorkflow> synthesisExecution() throws IOException {
 
-    	InputStream tmpSatInput = new FileInputStream(smtInputFile);
-        List<SolutionWorkflow> currSolutions = runZ3(tmpSatInput,
+    	 /* Add current solutions to list of all solutions. */
+        List<SolutionWorkflow> currSolutions = runZ3Once(smtInputFile.getAbsolutePath(),
                 allSolutions.getNumberOfSolutions(), allSolutions.getMaxNumberOfSolutions());
-        tmpSatInput.close();
-        /* Add current solutions to list of all solutions. */
+       
         return currSolutions;
     }
 
     /**
-     * Gets cnf encoding.
+     * Gets SMTLIB2 encoding.
      *
-     * @return the cnf encoding
+     * @return the SMTLIB2 encoding
      */
-    public String getCnfEncoding() {
+    public String getSMT2Encoding() {
         return smtEncoding.toString();
     }
-
-    /**
-     * Returns a set of {@link SATSolution SAT_solutions} by parsing the SAT
-     * output. In case of the UNSAT the list is empty.
-     *
-     * @param sat_input CNF formula in dimacs form.
-     * @return List of {@link SATSolution SAT_solutions}. Possibly empty list.
-     */
-    private List<SolutionWorkflow> runZ3(InputStream sat_input, int solutionsFound, int solutionsFoundMax) {
+    
+    
+    private List<SolutionWorkflow> runZ3Once(String absolutePath, int solutionsFound, int solutionsFoundMax) {
         List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
-        ISolver solver = SolverFactory.newDefault();
+//        ISolver solver = SolverFactory.newDefault();
         long globalTimeoutMs = runConfig.getTimeoutMs();
-		long currTimeout = APEUtils.timerTimeLeft("globalTimer", globalTimeoutMs);
-		if (currTimeout <= 0) {
-			System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
-			return solutions;
-		}
         // set timeout (in ms)
-        solver.setTimeoutMs(currTimeout);
+//        solver.setTimeoutMs(currTimeout);
         long realStartTime = 0;
         long realTimeElapsedMillis;
-        Reader reader = new DimacsReader(solver);
+//        Reader reader = new DimacsReader(solver);
         try {
             // loading CNF encoding of the problem
-            IProblem problem = reader.parseInstance(sat_input);
             realStartTime = System.currentTimeMillis();
-            while (solutionsFound < solutionsFoundMax && problem.isSatisfiable()) {
-                SolutionWorkflow sat_solution = new SolutionWorkflow(problem.model(), this);
-                solutions.add(sat_solution);
-                solutionsFound++;
-                if (solutionsFound % 500 == 0) {
-                    realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-                    System.out.println("Found in total " + solutionsFound + " solutions. Solving time: "
-                            + (realTimeElapsedMillis / 1000F) + " sec.");
-                }
-                /*
-                 * Adding the negation of the positive part of the solution as a constraint
-                 * (default negation does not work)
-                 */
-                IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray(runConfig.getToolSeqRepeat()));
-                solver.addClause(negSol);
+            boolean satisfiable = true;
+            while (solutionsFound < solutionsFoundMax && satisfiable) {
+	            ProcessBuilder builder = new ProcessBuilder("/home/vedran/git/z3/build/z3", absolutePath);
+	            builder.redirectErrorStream(true);
+	            final Process process = builder.start();
+            
+	            // Watch the process
+	            List<Atom> facts = readTerminalOutput(process);
+	            if(facts == null) {
+	            	satisfiable = false;
+	            	continue;
+	            }
+	            SolutionWorkflow sat_solution = new SolutionWorkflow(facts, this);
+	            solutionsFound++;
+	            solutions.add(sat_solution);
+	            realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
+	            System.out.println("Found in total " + solutionsFound + " solutions. Solving time: "
+	                    + (realTimeElapsedMillis / 1000F) + " sec.");
+            /*
+             * Adding the negation of the positive part of the solution as a constraint
+             * (default negation does not work)
+             */
+//                IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray(runConfig.getToolSeqRepeat()));
+//                solver.addClause(negSol);
+	            process.destroy();
             }
-            sat_input.close();
-        } catch (ParseFormatException e) {
-            System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
-            System.err.println(e.getMessage());
-        } catch (ContradictionException e) {
-            if (solutionsFound == 0) {
-                System.err.println("Unsatisfiable");
-            }
-        } catch (TimeoutException e) {
-            System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
         } catch (IOException e) {
             System.err.println("Internal error while parsing the encoding.");
         }
@@ -334,8 +305,140 @@ public class SMTSynthesisEngine implements SynthesisEngine {
 
         return solutions;
     }
-
-
+    
+    
+    /**
+     * TODO implement better
+     * @param process
+     * @return
+     */
+    private List<Atom> readTerminalOutput(final Process process) {
+    	List<Atom> atoms = new ArrayList<Atom>();
+                BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line = null; 
+                try {
+                	WorkflowElement currFun = null;
+                    while ((line = input.readLine()) != null) {
+                    	if(line.equals("unsat")) {
+                    		return null;
+                    	} else if(line.startsWith("(error ")) {
+                    		System.err.println("SMT_error: " +line);
+                    		return null;
+                    	}
+                    	System.out.println("SMT: " +line);
+                    	if(line.contains("nullMem")) {
+                    		continue;
+                    	} else if(line.trim().startsWith("(define-fun ")) {
+                    		String[] words =  line.trim().replace(")", "").split(" ");
+                    		currFun = getElement(words[1]);
+                    	} else if ((currFun != null) & line.contains("x!0")) {
+                    		String trimmedLine = cutUntil(line, "x!0");
+                    		String[] words =  trimmedLine.trim().replace(")", "").split(" ");
+                    		
+                    		String stateS = words[1];
+                    		String predicateS = words[4];
+                    		
+                    		PredicateLabel arg1 = mappings.findOriginal(stateS);
+                    		PredicateLabel arg2 = mappings.findOriginal(predicateS);
+                    		Atom currAtom  = new Atom(arg2, (State) arg1, currFun);
+                    		atoms.add(currAtom);
+                    	}
+                    	
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        return atoms;
+    }
+    
+    private WorkflowElement getElement(String string) {
+		switch (string) {
+		case "module":
+			return WorkflowElement.MODULE;
+		case "usedType":
+			return WorkflowElement.USED_TYPE;
+		case "memType":
+			return WorkflowElement.MEMORY_TYPE;
+		case "memRef":
+			return WorkflowElement.MEM_TYPE_REFERENCE;
+		default:
+			return null;
+		}
+	}
+    
+    private static String cutUntil(String text, String subStr) {
+    	if(text.contains(subStr)) {
+    		return text.substring(text.indexOf(subStr));
+    	} else {
+    		return text;
+    	}
+    	
+    }
+    
+    /**
+     * Returns a set of {@link SATSolution SAT_solutions} by parsing the SAT
+     * output. In case of the UNSAT the list is empty.
+     *
+     * @param sat_input CNF formula in dimacs form.
+     * @return List of {@link SATSolution SAT_solutions}. Possibly empty list.
+     */
+//    private List<SolutionWorkflow> runZ3(String absolutePath, int solutionsFound, int solutionsFoundMax) {
+//        List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
+////        ISolver solver = SolverFactory.newDefault();
+//        long globalTimeoutMs = runConfig.getTimeoutMs();
+//		long currTimeout = APEUtils.timerTimeLeft("globalTimer", globalTimeoutMs);
+//		if (currTimeout <= 0) {
+//			System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
+//			return solutions;
+//		}
+//        // set timeout (in ms)
+////        solver.setTimeoutMs(currTimeout);
+//        long realStartTime = 0;
+//        long realTimeElapsedMillis;
+////        Reader reader = new DimacsReader(solver);
+//        try {
+//            // loading CNF encoding of the problem
+//            IProblem problem = reader.parseInstance(sat_input);
+//            realStartTime = System.currentTimeMillis();
+//            while (solutionsFound < solutionsFoundMax && problem.isSatisfiable()) {
+//                SolutionWorkflow sat_solution = new SolutionWorkflow(problem.model(), this);
+//                solutions.add(sat_solution);
+//                solutionsFound++;
+//                if (solutionsFound % 500 == 0) {
+//                    realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
+//                    System.out.println("Found in total " + solutionsFound + " solutions. Solving time: "
+//                            + (realTimeElapsedMillis / 1000F) + " sec.");
+//                }
+//                /*
+//                 * Adding the negation of the positive part of the solution as a constraint
+//                 * (default negation does not work)
+//                 */
+//                IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray(runConfig.getToolSeqRepeat()));
+//                solver.addClause(negSol);
+//            }
+//            sat_input.close();
+//        } catch (ParseFormatException e) {
+//            System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
+//            System.err.println(e.getMessage());
+//        } catch (ContradictionException e) {
+//            if (solutionsFound == 0) {
+//                System.err.println("Unsatisfiable");
+//            }
+//        } catch (TimeoutException e) {
+//            System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
+//        } catch (IOException e) {
+//            System.err.println("Internal error while parsing the encoding.");
+//        }
+//
+//        if (solutionsFound == 0 || solutionsFound % 500 != 0) {
+//            realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
+//            System.out.println("Found " + solutionsFound + " solutions. Solving time: "
+//                    + (realTimeElapsedMillis / 1000F) + " sec.");
+//        }
+//
+//        return solutions;
+//    }
+    
     /**
      * Gets run configuration.
      *
@@ -413,7 +516,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
      */
 	public void deleteTempFiles() {
 		smtEncoding.delete();
-		smtInputFile.delete();
+//		smtInputFile.delete();
 		
 	}
 

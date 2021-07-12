@@ -12,14 +12,18 @@ import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
+import nl.uu.cs.ape.core.SolutionInterpreter;
 import nl.uu.cs.ape.core.implSAT.SATSolution;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.core.implSMT.SMTSolution;
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.Literal;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -81,7 +85,7 @@ public class SolutionWorkflow {
     /**
      * Non-structured solution obtained directly from the SAT output.
      */
-    private SATSolution nativeSolution;
+    private SolutionInterpreter nativeSolution;
 
     /**
      * Graph representation of the data-flow workflow solution.
@@ -229,6 +233,70 @@ public class SolutionWorkflow {
     }
 
     /**
+     * TODO Add description
+     * @param facts
+     * @param smtSynthesisEngine
+     */
+    public SolutionWorkflow(List<Atom> facts, SMTSynthesisEngine smtSynthesisEngine) {
+        /* Call for the default constructor. */
+        this(smtSynthesisEngine.getModuleAutomaton(), smtSynthesisEngine.getTypeAutomaton());
+
+        this.nativeSolution = new SMTSolution(facts, smtSynthesisEngine);
+        
+        for (Atom currAtom : facts) {
+        	System.out.println(currAtom.toString());
+                    if (currAtom.getPredicate() instanceof AuxiliaryPredicate) {
+                        continue;
+                    } else if (currAtom.isWorkflowElementType(WorkflowElement.MODULE)) {
+                        ModuleNode currNode = this.mappedModuleNodes.get(currAtom.getUsedInStateArgument());
+                        if (currAtom.getPredicate() instanceof Module) {
+                            currNode.setUsedModule((Module) currAtom.getPredicate());
+                        } else {
+                            currNode.addAbstractDescriptionOfUsedType((AbstractModule) currAtom.getPredicate());
+                        }
+                    } else if (currAtom.isWorkflowElementType(WorkflowElement.MEMORY_TYPE)) {
+                        TypeNode currNode = this.mappedMemoryTypeNodes.get(currAtom.getUsedInStateArgument());
+                        if (currAtom.getPredicate() instanceof Type
+                                && ((Type) currAtom.getPredicate()).isNodeType(NodeType.LEAF)) {
+                            currNode.addUsedType((Type) currAtom.getPredicate());
+                        } else if ((currAtom.getPredicate() instanceof Type) && !(((Type) currAtom.getPredicate()).isNodeType(NodeType.EMPTY_LABEL) || (currAtom.getPredicate() == smtSynthesisEngine.getDomainSetup().getAllTypes().getLabelRoot()) ))  {
+                            currNode.addAbstractDescriptionOfUsedType((Type) currAtom.getPredicate());
+                        } else {
+                            /* Memory type cannot be anything else except a Type. */
+                        }
+                    } else if (currAtom.isWorkflowElementType(WorkflowElement.USED_TYPE)
+                            && ((Type) currAtom.getPredicate()).isSimplePredicate()) {
+                        continue;
+                    } else if (currAtom.isWorkflowElementType(WorkflowElement.MEM_TYPE_REFERENCE)
+                            && ((State) (currAtom.getPredicate())).getAbsoluteStateNumber() != -1) {
+                        /*
+                         * Add all positive literals that describe memory type references that are not
+                         * pointing to null state (NULL state has AbsoluteStateNumber == -1), i.e. that
+                         * are valid.
+                         */
+                        ModuleNode usedTypeNode = this.usedType2ToolMap.get(currAtom.getUsedInStateArgument());
+                        TypeNode memoryTypeNode = this.mappedMemoryTypeNodes.get(currAtom.getPredicate());
+                        int inputIndex = currAtom.getUsedInStateArgument().getStateNumber();
+                        /* = Keep the order of inputs as they were defined in the solution file. */
+                        if (usedTypeNode != null) {
+                            usedTypeNode.setInputType(inputIndex, memoryTypeNode);
+                        } else {
+                            APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
+                        }
+                        memoryTypeNode.addUsedByTool(usedTypeNode);
+                    } else if (currAtom.isWorkflowElementType(WorkflowElement.TYPE_DEPENDENCY)) {
+                    	// skip
+                    }
+            }
+
+        /* Remove empty elements of the sets. */
+        this.workflowInputTypeStates.removeIf(node -> node.isEmpty());
+
+        this.workflowOutputTypeStates.removeIf(node -> node.isEmpty());
+
+    }
+
+	/**
      * Method returns the list of nodes that represent operations in the workflow,
      * in order in which they should be executed.
      *
@@ -261,7 +329,7 @@ public class SolutionWorkflow {
      *
      * @return A {@link SATSolution} object, that contains information about the native SAT encoding, and how it translates into human readable text.
      */
-    public SATSolution getNativeSATsolution() {
+    public SolutionInterpreter getNativeSolution() {
         return this.nativeSolution;
     }
 
@@ -356,6 +424,7 @@ public class SolutionWorkflow {
     }
 
     /**
+     * TODO Make it to work for both, SMT and SAT to work
      * Returns the negated solution in mapped format. Negating the original solution
      * created by the SAT solver. Usually used to add to the solver to find new solutions.
      *
@@ -363,7 +432,8 @@ public class SolutionWorkflow {
      * @return int[] representing the negated solution
      */
     public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
-        return this.nativeSolution.getNegatedMappedSolutionArray(toolSeqRepeat);
+    	return null;
+//        return this.nativeSolution.getNegatedMappedSolutionArray(toolSeqRepeat);
     }
 
     /**

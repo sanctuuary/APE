@@ -80,7 +80,7 @@ public class OWLReader {
 		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
 
 		/* Get a root of the operations taxonomy. */
-		String moduleRootIRI = allModules.getAllRootIDs().get(0);
+		String moduleRootIRI = allModules.getRootModuleID();
 		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
 		if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
 			/* Handle scenario when the tool taxonomy root was not defined properly. */
@@ -127,7 +127,7 @@ public class OWLReader {
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		
 		/* Get a root of the operations taxonomy. */
-		String moduleRootIRI = allModules.getAllRootIDs().get(0);
+		String moduleRootIRI = allModules.getRootModuleID();
 		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
 		if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
 			/* Handle scenario when the tool taxonomy root was not defined properly. */
@@ -188,7 +188,7 @@ public class OWLReader {
 		 * Defining the Node Type based on the node.
 		 */
 		NodeType currNodeType = NodeType.ABSTRACT;
-		if (getIRI(currClass).equals(allModules.getAllRootIDs().get(0))) {
+		if (getIRI(currClass).equals(allModules.getRootModuleID())) {
 			currNodeType = NodeType.ROOT;
 			currRootClass = currClass;
 		} else {

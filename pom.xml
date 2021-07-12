@@ -120,6 +120,12 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.30</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.antlr/antlr4-runtime -->
+		<dependency>
+		    <groupId>org.antlr</groupId>
+		    <artifactId>antlr4-runtime</artifactId>
+		    <version>4.9.2</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.sosy-lab/java-smt 
 		<dependency>
 			<groupId>org.sosy-lab</groupId>

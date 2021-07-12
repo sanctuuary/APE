@@ -14,7 +14,6 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
-import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.SolverType;
 import nl.uu.cs.ape.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
@@ -380,7 +379,7 @@ public class APE {
 
 		for (int i = 0; i < allSolutions.size(); i++) {
 			solutions2write
-					.append(allSolutions.get(i).getNativeSATsolution().getRelevantSolution()).append("\n");
+					.append(allSolutions.get(i).getNativeSolution().getCompleteSolution()).append("\n");
 		}
 		APEUtils.write2file(solutions2write.toString(),
 				allSolutions.getRunConfiguration().getSolutionDirPath2("solutions.txt").toFile(), false);

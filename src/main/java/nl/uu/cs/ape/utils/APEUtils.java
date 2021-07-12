@@ -18,7 +18,6 @@ import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.smtStruc.SMT2LibRow;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -347,7 +346,7 @@ public final class APEUtils {
 			System.out.println("-------------------------------------------------------------");
 			System.out.println("\tTool Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
-			domainSetup.getAllModules().getRootPredicates().get(0).printTree(" ", domainSetup.getAllModules());
+			domainSetup.getAllModules().getRootModule().printTree(" ", domainSetup.getAllModules());
 			System.out.println("\n-------------------------------------------------------------");
 			System.out.println("\tData Taxonomy dimensions:");
 			for (TaxonomyPredicate dimension : domainSetup.getAllTypes().getRootPredicates()) {
@@ -356,6 +355,11 @@ public final class APEUtils {
 				System.out.println("-------------------------------------------------------------");
 				dimension.printTree(" ", domainSetup.getAllTypes());
 			}
+			System.out.println("-------------------------------------------------------------");
+			System.out.println("\tLabels Taxonomy:");
+			System.out.println("-------------------------------------------------------------");
+			domainSetup.getAllTypes().getLabelRoot().printTree(" ", domainSetup.getAllTypes());
+			
 
 			/*
 			 * Printing the tool annotations
@@ -404,8 +408,8 @@ public final class APEUtils {
 	/**
 	 * Print header to illustrate the part of the synthesis that is being performed.
 	 *
-	 * @param argument TODO
-	 * @param title    TODO
+	 * @param argument Order number of the (sub)title.
+	 * @param title    The mail content of the title.
 	 */
 	public static void printHeader(Integer argument, String... title) {
 		String arg = (argument == null) ? "" : (" " + argument);

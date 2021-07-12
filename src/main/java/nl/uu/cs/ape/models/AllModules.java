@@ -138,6 +138,14 @@ public class AllModules extends AllPredicates {
     public AbstractModule getRootModule() {
     	return (AbstractModule) getRootPredicates().get(0);
     }
+    
+    /**
+     * Returns the unique ID of the root predicate of the module taxonomy.
+     * @return String representing the ID of the root operation.
+     */
+    public String getRootModuleID() {
+    	return getAllRootIDs().get(0);
+    }
 
     /**
      * Returns true if this set contains the specified element. More formally,

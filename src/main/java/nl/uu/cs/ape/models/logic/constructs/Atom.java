@@ -11,7 +11,7 @@ import nl.uu.cs.ape.models.enums.WorkflowElement;
  *
  * @author Vedran Kasalica
  */
-public class Atom {
+public class Atom implements Comparable<Atom> {
 
     /**
      * PredicateLabel that is referred (tool or type).
@@ -133,6 +133,39 @@ public class Atom {
             return "R(" + predicate.getPredicateID() + "," + argumentState.getPredicateID() + ")";
         } else {
             return predicate.getPredicateID() + "(" + argumentState.getPredicateID() + ")";
+        }
+    }
+
+    /**
+     * Return true if the current workflow element is of the given {@link WorkflowElement} type.
+     *
+     * @param workflowElemType Element type that is current Atom is compared to.
+     * @return true if the current workflow element corresponds to the given {@link WorkflowElement}, false otherwise.
+     */
+    public boolean isWorkflowElementType(WorkflowElement workflowElemType) {
+        return getWorkflowElementType() == workflowElemType;
+    }
+
+    /**
+     * Compare the two Atoms according to the state they are used in.
+     * Returns a negative integer, zero, or a positive integer as this
+     * Atom's state comes before than, is equal to, or comes after
+     * than the @otherAtom's state.
+     *
+     * @param otherAtom The Atom to be compared
+     * @return The value 0 if the argument Atom's state is equal to this Atom's state;
+     * a value less than 0 if this Atom's state comes before the @otherAtom's state;
+     * and a value greater than 0 if this Atom's state comes after the @otherAtom's state.
+     */
+	public int compareTo(Atom otherAtom) {
+
+        int thisAtomState = this.getUsedInStateArgument().getAbsoluteStateNumber();
+        int otherAtomState = otherAtom.getUsedInStateArgument().getAbsoluteStateNumber();
+        int diff = 0;
+        if ((diff = Integer.compare(thisAtomState, otherAtomState)) != 0) {
+            return diff;
+        } else {
+            return this.getPredicate().compareTo(otherAtom.getPredicate());
         }
     }
     

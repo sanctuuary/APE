@@ -290,11 +290,11 @@ public class APERunConfig {
      * tool sequences alone, i.e. tool sequences cannot repeat, ignoring the types
      * in the solutions.
      *
-     * @return true if tool sequences cannot repeat, ignoring the types in the
-     * solutions, or false in case that the tool sequences can repeat as
+     * @return {@code false} if tool sequences cannot repeat, ignoring the types in the
+     * solutions, or {@code true} in case that the tool sequences can repeat as
      * long as the corresponding types differ.
      */
-    public boolean getToolSeqRepeat() {
+    public boolean getAllowToolSeqRepeat() {
         return TOOL_SEQ_REPEAT.getValue();
     }
 
@@ -539,7 +539,7 @@ public class APERunConfig {
      * @return {@link SolverType} that corresponds to the solver type
      */
     public SolverType getSolverType() {
-		return SolverType.SMT;
+		return SolverType.SAT;
 	}
 
     /**

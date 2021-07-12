@@ -2,10 +2,11 @@ package nl.uu.cs.ape.core.implSMT;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
+import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.models.*;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
@@ -13,8 +14,10 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.smtStruc.SMTComment;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.EqualStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.ForallStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.NandStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.OrStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBoundedVar;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionArgument;
@@ -22,6 +25,7 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
 import nl.uu.cs.ape.models.smtStruc.Assertion;
 import nl.uu.cs.ape.models.smtStruc.SMT2LibRow;
 import nl.uu.cs.ape.utils.APEDomainSetup;
+import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code SMTTypeUtils} class is used to encode SAT constraints  based on the type annotations.
@@ -56,6 +60,8 @@ public class SMTTypeUtils {
             firstPair = pair.getFirst();
             secondPair = pair.getSecond();
             
+//            System.out.println("-------------->" + firstPair.getPredicateLabel() + "_______and______" +secondPair.getPredicateLabel());
+            
             // mutual exclusion of types in all the states (those that represent general memory)
             allClauses.add(new Assertion(
 					new ForallStatement(
@@ -64,9 +70,9 @@ public class SMTTypeUtils {
 							new NandStatement(
 									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(firstPair)), 
 									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(secondPair))
-									)
 							)
-					));
+					)
+			));
             
             // mutual exclusion of types in all the states (those that represent used instances)
             allClauses.add(new Assertion(
@@ -76,117 +82,125 @@ public class SMTTypeUtils {
 							new NandStatement(
 									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(firstPair)), 
 									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(secondPair))
-									)
 							)
-					));
+					)
+			));
         }
         return allClauses;
     }
 
     /**
      * Generating the mandatory usage constraints of root type @rootType in each
-     * state of @moduleAutomaton. It enforces that each type instance is either
+     * state of @toolAutomaton. It enforces that each type instance is either
      * defined on all the dimensions or is empty.
      *
-     * @param domainSetup   TODO
-     * @param typeAutomaton TODO
-     * @param mappings      TODO
+     * @param allTypes   - all data types in the domain
      * @return String representation of constraints.
      */
-    public static List<SMT2LibRow> typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+    public static List<SMT2LibRow> typeMandatoryUsage(APEDomainSetup domainSetup) {
         List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+        allClauses.add(new SMTComment("Encoding rules of mandatory usage of types."));
+		
         Type empty = domainSetup.getAllTypes().getEmptyType();
         Type dataType = AuxTypePredicate.generateAuxiliaryPredicate(domainSetup.getAllTypes().getDataTaxonomyDimensionsAsSortedSet(), LogicOperation.AND, domainSetup);
-        // enforcement of types in in all the states (those that represent general
-        // memory and used data instances)
-        for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
-            for (State typeState : typeBlock.getStates()) {
-                constraints = constraints.append(mappings.add(dataType, typeState, WorkflowElement.MEMORY_TYPE))
-                        .append(" ");
-                constraints = constraints.append(mappings.add(empty, typeState, WorkflowElement.MEMORY_TYPE))
-                        .append(" 0\n");
-            }
-        }
-        for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
-            for (State typeState : typeBlock.getStates()) {
-                constraints = constraints.append(mappings.add(dataType, typeState, WorkflowElement.USED_TYPE))
-                        .append(" ");
-                constraints = constraints.append(mappings.add(empty, typeState, WorkflowElement.USED_TYPE))
-                        .append(" 0\n");
-            }
-        }
+        // enforcement of types in in all the states (those that represent general memory and used data instances)
+        SMTBoundedVar state = new SMTBoundedVar("state");
+    	allClauses.add(new Assertion(
+    			new ForallStatement(
+    				state,
+    				new SMTDataType(WorkflowElement.MEMORY_TYPE),
+        			new OrStatement(
+        					new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(dataType)),
+        					new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(empty))
+        					)
+        			)
+    	));
+    	
+    	allClauses.add(new Assertion(
+    			new ForallStatement(
+    				state,
+    				new SMTDataType(WorkflowElement.USED_TYPE),
+        			new OrStatement(
+        					new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(dataType)),
+        					new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(empty))
+        					)
+        			)
+    	));
 
         return allClauses;
     }
 
     /**
-     * Generating the mandatory usage of a subtypes in case of the parent type being
-     * used, with respect to the Type Taxonomy. The rule starts from the @rootType
-     * and it's valid in each state of @typeAutomaton. @emptyType denotes the type
-     * that is being used if the state has no type.
+     * Generating the mandatory usage of a parent type in case of one of the child types being
+     * used, with respect to the Type Taxonomy. The rule starts from the @rootType and works its way down the taxonomy,
+     * and it's valid in each state of @typeAutomaton.
+     * 
+     * Taxonomy structure is enforced bottom-up, i.e., the subsumption relation is not complete. 
      *
-     * @param allTypes      TODO
-     * @param typeAutomaton TODO
-     * @param mappings      TODO
-     * @return The String representation of constraints enforcing taxonomy classifications.
+     * @param allTypes    - all data types in the domain
+     * @return The list of {@link SMT2LibRow}s representation of constraints enforcing taxonomy classifications.
      */
-    public static List<SMT2LibRow> typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+    public static List<SMT2LibRow> typeEnforceTaxonomyStructure(AllTypes allTypes) {
         List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
-        // taxonomy enforcement of types in in all the states (those that represent
-        // general memory and used data instances)
-        for (TaxonomyPredicate dimension : allTypes.getRootPredicates()) {
-            for (Block memTypeBlock : typeAutomaton.getMemoryTypesBlocks()) {
-                for (State memTypeState : memTypeBlock.getStates()) {
-                    constraints = constraints
-                            .append(typeEnforceTaxonomyStructureForState(dimension, mappings, memTypeState, WorkflowElement.MEMORY_TYPE));
-                }
-            }
-            for (Block usedTypeBlock : typeAutomaton.getUsedTypesBlocks()) {
-                for (State usedTypeState : usedTypeBlock.getStates()) {
-                    constraints = constraints.append(typeEnforceTaxonomyStructureForState(dimension, mappings, usedTypeState, WorkflowElement.USED_TYPE));
-                }
-            }
+        allClauses.add(new SMTComment("Encoding rules to preserve the structure of the type taxonomies."));
+
+        for (TaxonomyPredicate dimension : allTypes.getDataTaxonomyDimensionsAndLabel()) {
+        	allClauses.addAll(typeEnforceTaxonomyStructurePerDimension(dimension));
         }
         return allClauses;
     }
-
+    
     /**
-     * Supporting recursive method for typeEnforceTaxonomyStructure.
+     * Generating the mandatory usage of a parent type in case of one of the child types being
+     * used, with respect to the Type Taxonomy.
+     * 
+     * Taxonomy structure is enforced bottom-up, i.e., the subsumption relation is not complete. 
+     * 
+     * @param parentType - parent type for which the rules are created
+     * @return The list of {@link SMT2LibRow}s  representation of constraints enforcing subtaxonomy classifications.
      */
-    private static List<SMT2LibRow> typeEnforceTaxonomyStructureForState(TaxonomyPredicate currType,
-                                                               SATAtomMappings mappings, State typeState, WorkflowElement typeElement) {
+    private static List<SMT2LibRow> typeEnforceTaxonomyStructurePerDimension(TaxonomyPredicate parentType) {
 
-        String superType_State = mappings.add(currType, typeState, typeElement).toString();
+		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		
+		SMTBoundedVar state = new SMTBoundedVar("state");
+		if (!(parentType.getSubPredicates() == null || parentType.getSubPredicates().isEmpty())) {
+			allClauses.add(new Assertion(
+				new ForallStatement(
+					state,
+					new SMTDataType(WorkflowElement.USED_TYPE),
+					new EqualStatement(
+						new OrStatement(parentType.getSubPredicates().stream()
+								.map(subModule -> new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(subModule)))
+								.collect(Collectors.toList())
+								),
+						new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(parentType))
+						)
+					)
+				));
+			
+			allClauses.add(new Assertion(
+					new ForallStatement(
+						state,
+						new SMTDataType(WorkflowElement.MEMORY_TYPE),
+						new EqualStatement(
+							new OrStatement(parentType.getSubPredicates().stream()
+									.map(subModule -> new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(subModule)))
+									.collect(Collectors.toList())
+									),
+							new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(parentType))
+							)
+						)
+					));
+			
+			for (TaxonomyPredicate subModule : APEUtils.safe(parentType.getSubPredicates())) {
+				allClauses.addAll(typeEnforceTaxonomyStructurePerDimension(subModule));
+			}
+		}
+		
+		return allClauses;
+	}
 
-        List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
-        StringBuilder currConstraint = new StringBuilder("-").append(superType_State).append(" ");
-
-        List<String> subTypes_States = new ArrayList<String>();
-        if (!(currType.getSubPredicates() == null || currType.getSubPredicates().isEmpty())) {
-            /*
-             * Ensuring the TOP-DOWN taxonomy tree dependency
-             */
-            for (TaxonomyPredicate subType : currType.getSubPredicates()) {
-
-                String subType_State = mappings.add(subType, typeState, typeElement).toString();
-                currConstraint = currConstraint.append(subType_State).append(" ");
-                subTypes_States.add(subType_State);
-
-                constraints = constraints.append(typeEnforceTaxonomyStructureForState(subType, mappings, typeState, typeElement));
-            }
-            currConstraint = currConstraint.append("0\n");
-            /*
-             * Ensuring the BOTTOM-UP taxonomy tree dependency
-             */
-            for (String subType_State : subTypes_States) {
-                currConstraint = currConstraint.append("-").append(subType_State).append(" ").append(superType_State)
-                        .append(" 0\n");
-            }
-            return currConstraint.append(constraints).toString();
-        } else {
-            return "";
-        }
-    }
 
     /**
      * Encoding the initial workflow input.
@@ -197,28 +211,24 @@ public class SMTTypeUtils {
      * @param mappings       All the atom mappings
      * @return The String representation of the initial input encoding.
      */
-    public static List<SMT2LibRow> encodeInputData(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
+    public static List<SMT2LibRow> encodeInputData(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton) throws APEConfigException {
         List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
-
+        allClauses.add(new SMTComment("Encoding the defined workflow inputs."));
+        
         List<State> workflowInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
-//        for (int i = 0; i < workflowInputStates.size(); i++) {
-//        	State currState = workflowInputStates.get(i);
-//            if (i < program_inputs.size()) {
-//                Type currType = program_inputs.get(i);
-//                    if (allTypes.get(currType.getPredicateID()) == null) {
-//                        System.err.println(
-//                                "Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
-//                        return null;
-//                    }
-//
-//                    encoding = encoding.append(mappings.add(currType, currState, WorkflowElement.MEMORY_TYPE))
-//                            .append(" 0\n");
-//            } else {
-//                /* Forcing in the rest of the input states to be empty types. */
-//                encoding = encoding.append(mappings.add(allTypes.getEmptyType(), currState, WorkflowElement.MEMORY_TYPE))
-//                        .append(" 0\n");
-//            }
-//        }
+        for (int i = 0; i < workflowInputStates.size(); i++) {
+        	State currState = workflowInputStates.get(i);
+            if (i < program_inputs.size()) {
+                Type currType = program_inputs.get(i);
+                    if (allTypes.get(currType.getPredicateID()) == null) {
+                    	throw APEConfigException.invalidValue("input", currType.toString(), "Invalid workflow input value.");
+                    }
+                    allClauses.add(new Assertion(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), currState, currType)));
+            } else {
+                /* Forcing in the rest of the input states to be empty types. */
+                allClauses.add(new Assertion(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), currState, allTypes.getEmptyType())));
+            }
+        }
         return allClauses;
     }
 
@@ -232,28 +242,25 @@ public class SMTTypeUtils {
      * @param mappings       All the atom mappings
      * @return String representation of the workflow output encoding.
      */
-    public static List<SMT2LibRow> encodeOutputData(AllTypes allTypes, List<Type> program_outputs, TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
+    public static List<SMT2LibRow> encodeOutputData(AllTypes allTypes, List<Type> program_outputs, TypeAutomaton typeAutomaton) throws APEConfigException{
         List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
-
+        allClauses.add(new SMTComment("Encoding the desired workflow outputs."));
+        
         List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
-//        for (int i = 0; i < workflowOutputStates.size(); i++) {
-//            if (i < program_outputs.size()) {
-//            	TaxonomyPredicate currType = program_outputs.get(i);
-//                    if (allTypes.get(currType.getPredicateID()) == null) {
-//                        System.err.println(
-//                                "Program output '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
-//                        return null;
-//                    }
-//                    encoding = encoding.append(mappings.add(currType, workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
-//                            .append(" 0\n");
-////					currType.setAsRelevantTaxonomyTerm(allTypes);
-//            } else {
-//                /* Forcing in the rest of the input states to be empty types. */
-//                encoding = encoding.append(mappings.add(allTypes.getEmptyType(), workflowOutputStates.get(i), WorkflowElement.USED_TYPE))
-//                        .append(" 0\n");
-//            }
-//
-//        }
+        for (int i = 0; i < workflowOutputStates.size(); i++) {
+            if (i < program_outputs.size()) {
+            	TaxonomyPredicate currType = program_outputs.get(i);
+                    if (allTypes.get(currType.getPredicateID()) == null) {
+                    	throw APEConfigException.invalidValue("output", currType.toString(), "Invalid workflow output value.");
+                    }
+                    allClauses.add(new Assertion(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), workflowOutputStates.get(i), currType)));
+//					currType.setAsRelevantTaxonomyTerm(allTypes);
+            } else {
+                /* Forcing in the rest of the input states to be empty types. */
+            	allClauses.add(new Assertion(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), workflowOutputStates.get(i), allTypes.getEmptyType())));
+            }
+
+        }
 
         return allClauses;
     }
