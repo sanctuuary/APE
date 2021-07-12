@@ -15,12 +15,15 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
 import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * The {@code UseCaseTest} test is an initial version for functional testing that makes use of the API.
@@ -118,6 +121,24 @@ class UseCaseTest {
                 assertEquals(0, no_solutions, String.format("APE found '%s' solutions, while for this use case APE should have found 0.", no_solutions));
                 success("APE did not find any solutions as expected.");
             }
+
+            // Test the generation of CWL files if they should be generated
+            if (mutation.number_of_cwl_files != 0) {
+                boolean writingSuccess = APE.writeCWLWorkflows(solutions);
+                assertTrue(writingSuccess);
+
+                String cwl_path = config.get("solutions_dir_path").toString();
+                Path cwlFolder = Paths.get(cwl_path).resolve("CWL");
+                assertTrue(cwlFolder.toFile().exists());
+
+                File[] files = cwlFolder.toFile().listFiles();
+                assertNotNull(files);
+                assertEquals(mutation.number_of_cwl_files, files.length);
+                for (File f : files) {
+                    assertTrue(f.getName().startsWith("workflowSolution_"));
+                }
+                success("All %s expected CWL files were generated", mutation.number_of_cwl_files);
+            }
         }
 
         success("Use case '%s' ran successfully!", useCase.name);
@@ -167,6 +188,7 @@ class UseCaseTest {
             private final static String CONSTRAINTS = "constraints";
             private final static String CONSTRAINTS_PATH = "constraints_path";
             private final static String DESCRIPTION = "description";
+            private final static String NO_CWL = "number_of_cwl_files";
 
             public final int solution_length_start;
             public final int[] expected_no_solutions;
@@ -175,12 +197,14 @@ class UseCaseTest {
             public JSONArray add_constraints;
             public String constraints_path;
             public String description;
+            public int number_of_cwl_files;
 
             public Mutation(JSONObject mutation, String const_path, GitHubRepo folder) {
 
                 this.config_mutations = mutation.has(CONFIG) ? mutation.getJSONObject(CONFIG) : null;
                 this.solution_length_start = mutation.getInt(START_LENGTH);
                 this.description = mutation.has(DESCRIPTION) ? mutation.getString(DESCRIPTION) : null;
+                this.number_of_cwl_files = mutation.has(NO_CWL) ? mutation.getInt(NO_CWL) : 0;
 
                 JSONArray jsonArray = mutation.getJSONArray(NO_SOLUTIONS);
                 this.expected_no_solutions = new int[jsonArray.length()];
@@ -216,6 +240,11 @@ class UseCaseTest {
                     config.put(CONSTRAINTS_PATH, this.constraints_path);
                 }
 
+                // Add the "number_of_cwl_files" configuration option
+                if (this.number_of_cwl_files != 0) {
+                    config.put(NO_CWL, this.number_of_cwl_files);
+                }
+
                 return config;
             }
 
@@ -237,6 +266,10 @@ class UseCaseTest {
 
                 if (replace_constraints != null) {
                     System.out.println("    REPLACE CONSTRAINTS: " + replace_constraints.getJSONArray(CONSTRAINTS).toString());
+                }
+
+                if (number_of_cwl_files != 0) {
+                    System.out.println("    NUMBER OF CWL FILES: " + number_of_cwl_files);
                 }
 
                 System.out.println("    MINIMAL SOLUTION LENGTH: " + solution_length_start);

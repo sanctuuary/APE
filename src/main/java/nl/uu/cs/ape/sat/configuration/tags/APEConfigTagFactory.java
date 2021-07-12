@@ -745,6 +745,37 @@ public class APEConfigTagFactory {
                 return results;
             }
         }
+
+        public static class NO_CWL extends TYPES.Int {
+            public NO_CWL() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
+
+            @Override
+            public APEConfigDefaultValue<Integer> getDefault() {
+                return APEConfigDefaultValue.withDefault(0);
+            }
+
+            @Override
+            public String getTagName() {
+                return "number_of_cwl_files";
+            }
+
+            @Override
+            public String getLabel() {
+                return "Number of CWL files";
+            }
+
+            @Override
+            public String getDescription() {
+                return "The number of CWL representations of solutions should be generated.";
+            }
+
+            @Override
+            protected  ValidationResults validate(Integer value, ValidationResults results) {
+                return results;
+            }
+        }
         
         public static class TIMEOUT_SEC extends TYPES.Int {
 
