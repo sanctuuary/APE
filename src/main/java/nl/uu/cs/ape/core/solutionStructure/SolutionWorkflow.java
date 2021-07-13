@@ -77,7 +77,7 @@ public class SolutionWorkflow {
      * Mapping used to allow us to determine the correlation between the usage of
      * data instances and the actual tools that take the instance as input.
      * A mapping is a pair of an Automaton {@link State} that depicts
-     * {@link WorkflowElement#USED_TYPE} and a {@link ModuleNode}.<br>
+     * {@link SMTDataType#USED_TYPE} and a {@link ModuleNode}.<br>
      * If the second is NULL, the data is used as WORKFLOW OUTPUT.
      */
     private Map<State, ModuleNode> usedType2ToolMap;
@@ -244,7 +244,7 @@ public class SolutionWorkflow {
         this.nativeSolution = new SMTSolution(facts, smtSynthesisEngine);
         
         for (Atom currAtom : facts) {
-        	System.out.println(currAtom.toString());
+//        	System.out.println(currAtom.toString());
                     if (currAtom.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
                     } else if (currAtom.isWorkflowElementType(WorkflowElement.MODULE)) {

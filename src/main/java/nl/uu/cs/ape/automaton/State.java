@@ -137,7 +137,7 @@ public class State implements PredicateLabel {
     /**
      * Get the type of the state (e.g. tool, memory type, etc.).
      *
-     * @return The {@link WorkflowElement} that describes the state.
+     * @return The {@link SMTDataType} that describes the state.
      */
     public WorkflowElement getWorkflowStateType() {
         return workflowStateType;
@@ -146,9 +146,9 @@ public class State implements PredicateLabel {
     /**
      * Function used to calculate the absolute order number of a state based on the information regarding its block number, order number within the block and type of the state.
      * <p>
-     * {@link WorkflowElement#MEMORY_TYPE} corresponds to the Memory Type State,<br>
-     * {@link WorkflowElement#USED_TYPE} corresponds to the Used Type State,<br>
-     * {@link WorkflowElement#MODULE} corresponds to the Module/Tool State.
+     * {@link SMTDataType#MEMORY_TYPE} corresponds to the Memory Type State,<br>
+     * {@link SMTDataType#USED_TYPE} corresponds to the Used Type State,<br>
+     * {@link SMTDataType#MODULE} corresponds to the Module/Tool State.
      *
      * @param blockNumber     Corresponds to the block number within the type automaton (not applicable for the module automaton).
      * @param stateNumber     Corresponds to the state number within block.

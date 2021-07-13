@@ -1,32 +1,53 @@
 package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
-import nl.uu.cs.ape.models.SMTPredicateMappings;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.APEPredicate;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.smtStruc.SMT2LibElem;
 
 /**
- * Interface used to present any predicate in the smt2lib structure.
- * @author Vedran Kasalica
- *
+ * Defines the values describing the states in the workflow.
+ * <p>
+ * Values: [{@code MODULE}, {@code MEMORY_TYPE}, {@code USED_TYPE}, {@code MEM_TYPE_REFERENCE}]
+ * 
+ * 
+ *  @author Vedran Kasalica
  */
-public class SMTDataType implements SMT2LibElem {
+public enum SMTDataType implements APEPredicate {
 
-	private APEPredicate dataType; 
-	
-	public SMTDataType(APEPredicate element) {
-		this.dataType = element;
-	}
-	
-	
-	public String toString(SMTPredicateMappings mapping) {
-		if(dataType instanceof WorkflowElement) {
-			return "data_" + ((WorkflowElement) dataType).toString(); 
-		} else {
-			return "data_" + mapping.add((PredicateLabel) dataType);
-		}
-	}
+    /**
+     * Depicts a tool/module.
+     */
+    MODULE("module"),
+
+    /**
+     * Depicts a data type.
+     */
+    TYPE("type"),
+
+    /**
+     * State that represents tools used in the workflow.
+     */
+    MODULE_STATE("moduleState"),
+
+    /**
+     * State that represents data types available in memory.
+     */
+    MEMORY_TYPE_STATE("memTypeState"),
+    
+	/**
+     * State that represents data types used by tools.
+     */
+    USED_TYPE_STATE("usedTypeState");
 
 	
+	 private final String text;
+
+	 private SMTDataType(String s) {
+         this.text = s;
+     }
+	
+	    
+	 public String toString() {
+	     return this.text;
+	 }
+	 
+
 }

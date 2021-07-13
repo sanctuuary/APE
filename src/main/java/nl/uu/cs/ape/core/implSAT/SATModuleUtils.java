@@ -148,11 +148,11 @@ public final class SATModuleUtils {
 	/**
 	 * Constraints that ensure that the referenced memory states contain the same
 	 * data type as the one that is used as the input for the tool. Constraints
-	 * ensure that the {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented
+	 * ensure that the {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented
 	 * correctly.
 	 *
 	 * @return String representing the constraints required to ensure that the
-	 *         {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
+	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
 	private static String enforceDataReferenceRules(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton,
 			SATAtomMappings mappings) {
@@ -294,7 +294,7 @@ public final class SATModuleUtils {
 //				List<State> possibleMemStates = typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber);
 //				for (State exictingMemState : possibleMemStates) {
 //					constraints = constraints
-//							.append(mappings.add(exictingMemState, currInputState, WorkflowElement.TYPE_DEPENDENCY))
+//							.append(mappings.add(exictingMemState, currInputState, SMTDataType.TYPE_DEPENDENCY))
 //							.append(" ");
 //				}
 //				if(possibleMemStates.size() > 0) {
@@ -331,7 +331,7 @@ public final class SATModuleUtils {
 //				List<State> possibleMemStates = typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber - 1);
 //				for (State exictingMemState : possibleMemStates) {
 //					constraints = constraints
-//							.append(mappings.add(exictingMemState, currMemState, WorkflowElement.TYPE_DEPENDENCY))
+//							.append(mappings.add(exictingMemState, currMemState, SMTDataType.TYPE_DEPENDENCY))
 //							.append(" ");
 //				}
 //				if(possibleMemStates.size() > 0) {

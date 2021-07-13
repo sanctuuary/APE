@@ -33,8 +33,8 @@ public class BinaryBoolFuncDeclaration implements SMT2LibRow {
 		.append("(declare-fun ")
 			.append(predicate.toString(mapping))
 			.append(" (")
-				.append(argument1.toString(mapping)).append(" ")
-				.append(argument2.toString(mapping))
+				.append(argument1.toString()).append(" ")
+				.append(argument2.toString())
 			.append(") Bool")
 		.append(")");
 		

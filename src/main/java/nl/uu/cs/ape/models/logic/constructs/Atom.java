@@ -34,7 +34,7 @@ public class Atom implements Comparable<Atom> {
      *
      * @param predicate   Predicate used.
      * @param usedInState State in the automaton it was used/created in.
-     * @param elementType Element that defines what type of a predicate is described (such as {@link WorkflowElement#MODULE}.
+     * @param elementType Element that defines what type of a predicate is described (such as {@link SMTDataType#MODULE}.
      */
     public Atom(PredicateLabel predicate, State usedInState, WorkflowElement elementType) {
         this.predicate = predicate;
@@ -114,14 +114,14 @@ public class Atom implements Comparable<Atom> {
     /**
      * Return the type of the element in the workflow (tool, memory type, etc.)
      *
-     * @return The {@link WorkflowElement} that corresponds to the atom usage.
+     * @return The {@link SMTDataType} that corresponds to the atom usage.
      */
     public WorkflowElement getWorkflowElementType() {
         return elementType;
     }
 
     /**
-     * Returns the string representation of the WorkflowElement, used for the textual solution representation. In case of the atom depicting
+     * Returns the string representation of the SMTDataType, used for the textual solution representation. In case of the atom depicting
      * a usage of a type in the workflow, the structure of the representation contains an additional attribute, state in which the type was initially added to the memory.
      *
      * @return String representing the workflow element in a textual form.
@@ -137,10 +137,10 @@ public class Atom implements Comparable<Atom> {
     }
 
     /**
-     * Return true if the current workflow element is of the given {@link WorkflowElement} type.
+     * Return true if the current workflow element is of the given {@link SMTDataType} type.
      *
      * @param workflowElemType Element type that is current Atom is compared to.
-     * @return true if the current workflow element corresponds to the given {@link WorkflowElement}, false otherwise.
+     * @return true if the current workflow element corresponds to the given {@link SMTDataType}, false otherwise.
      */
     public boolean isWorkflowElementType(WorkflowElement workflowElemType) {
         return getWorkflowElementType() == workflowElemType;

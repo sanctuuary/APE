@@ -581,14 +581,16 @@ public final class APEUtils {
 	 *
 	 * @param timerID        the timer id
 	 * @param solutionsFound the solutions found
+	 * @return The time counted by the timer.
 	 */
-	public static void timerPrintSolutions(String timerID, int solutionsFound) {
+	public static long timerPrintSolutions(String timerID, int solutionsFound) {
 		if (timers.get(timerID) == -1) {
-			return;
+			return -1;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
 		System.out.println(
 				"\nAPE found " + solutionsFound + " solutions. Total solving time: " + (printTime / 1000F) + " sec.");
+		return printTime;
 	}
 
 	/**

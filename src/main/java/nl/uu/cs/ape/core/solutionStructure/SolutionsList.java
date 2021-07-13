@@ -49,7 +49,17 @@ public class SolutionsList {
      */
     private SynthesisFlag runFlag;
     
-    private List<Pair<Integer>> solutionsPerLength;
+    /**
+     * Total synthesis solving time in MS.
+     */
+    private long synthesisTimeMS;
+    
+    /**
+     * Pars of the numbeR of solutions found at each workflow length.
+     */
+	private List<Pair<Integer>> solutionsPerLength;
+	
+	
     /**
      * Create an object that will contain all the solutions of the synthesis.
      *
@@ -211,7 +221,22 @@ public class SolutionsList {
      */
 	public SynthesisFlag getFlag() {
 		return runFlag;
-		
+	}
+	
+	/**
+	 * Get total synthesis time (in MS).
+	 * @return the total synthesis time in MS.
+	 */
+	public long getSolvingTime() {
+		return this.synthesisTimeMS;
+	}
+
+	/**
+	 * Set total synthesis time (in MS).
+	 * @param synthesisTimeMS the synthesis time in MS
+	 */
+	public void setSolvingTime(long synthesisTimeMS) {
+		this.synthesisTimeMS = synthesisTimeMS;
 	}
 	
 }

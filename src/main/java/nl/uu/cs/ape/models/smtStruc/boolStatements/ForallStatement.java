@@ -25,7 +25,7 @@ public class ForallStatement implements Fact {
 			.append("(forall ")
 				.append("((")
 					.append(boundedVar.toString(mapping)).append(" ")
-					.append(this.dataType.toString(mapping))
+					.append(this.dataType.toString())
 				.append(")) ")
 				.append(content.toString(mapping))
 			.append(")");

@@ -66,7 +66,7 @@ public class SMTTypeUtils {
             allClauses.add(new Assertion(
 					new ForallStatement(
 							state,
-							new SMTDataType(WorkflowElement.MEMORY_TYPE),
+							SMTDataType.MEMORY_TYPE_STATE,
 							new NandStatement(
 									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(firstPair)), 
 									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(secondPair))
@@ -78,7 +78,7 @@ public class SMTTypeUtils {
             allClauses.add(new Assertion(
 					new ForallStatement(
 							state,
-							new SMTDataType(WorkflowElement.USED_TYPE),
+							SMTDataType.USED_TYPE_STATE,
 							new NandStatement(
 									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(firstPair)), 
 									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(secondPair))
@@ -108,7 +108,7 @@ public class SMTTypeUtils {
     	allClauses.add(new Assertion(
     			new ForallStatement(
     				state,
-    				new SMTDataType(WorkflowElement.MEMORY_TYPE),
+    				SMTDataType.MEMORY_TYPE_STATE,
         			new OrStatement(
         					new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(dataType)),
         					new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(empty))
@@ -119,7 +119,7 @@ public class SMTTypeUtils {
     	allClauses.add(new Assertion(
     			new ForallStatement(
     				state,
-    				new SMTDataType(WorkflowElement.USED_TYPE),
+    				SMTDataType.USED_TYPE_STATE,
         			new OrStatement(
         					new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(dataType)),
         					new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(empty))
@@ -168,7 +168,7 @@ public class SMTTypeUtils {
 			allClauses.add(new Assertion(
 				new ForallStatement(
 					state,
-					new SMTDataType(WorkflowElement.USED_TYPE),
+					SMTDataType.USED_TYPE_STATE,
 					new EqualStatement(
 						new OrStatement(parentType.getSubPredicates().stream()
 								.map(subModule -> new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(subModule)))
@@ -182,7 +182,7 @@ public class SMTTypeUtils {
 			allClauses.add(new Assertion(
 					new ForallStatement(
 						state,
-						new SMTDataType(WorkflowElement.MEMORY_TYPE),
+						SMTDataType.MEMORY_TYPE_STATE,
 						new EqualStatement(
 							new OrStatement(parentType.getSubPredicates().stream()
 									.map(subModule -> new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), new SMTFunctionArgument(state), new SMTFunctionArgument(subModule)))

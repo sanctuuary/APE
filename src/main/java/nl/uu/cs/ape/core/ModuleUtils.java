@@ -87,11 +87,11 @@ public abstract class ModuleUtils {
 	/**
 	 * Constraints that ensure that the referenced memory states contain the same
 	 * data type as the one that is used as the input for the tool. Constraints
-	 * ensure that the {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented
+	 * ensure that the {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented
 	 * correctly.
 	 *
 	 * @return String representing the constraints required to ensure that the
-	 *         {@link WorkflowElement#MEM_TYPE_REFERENCE} are implemented correctly.
+	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
 	public abstract String enforceDataReferenceRules(Class<? extends SynthesisEngine> synthesisInstance);
 	/**

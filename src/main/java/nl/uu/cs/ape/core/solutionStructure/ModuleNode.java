@@ -25,7 +25,7 @@ import static guru.nidi.graphviz.model.Factory.node;
  * Each {@code ModuleNode} represents an action/tool in the solution workflow.
  * <p>
  * When compared to the {@link ModuleAutomaton} representation of the problem, a Workflow {@code TypeNode}
- * correspond to a {@link State} of a {@link WorkflowElement#MODULE} element.
+ * correspond to a {@link State} of a {@link SMTDataType#MODULE} element.
  *
  * @author Vedran Kasalica
  */
@@ -65,7 +65,7 @@ public class ModuleNode extends SolutionWorkflowNode {
      * Creating Workflow Node that corresponds to a tool usage.
      *
      * @param automatonState state in the {@link ModuleAutomaton} that corresponds to the workflow node.
-     * @throws ExceptionInInitializerError Exception when the Tool Workflow Node is instantiated using                                     a State in ModuleAutomaton that does not correspond to a                                     {@code WorkflowElement#MODULE}..
+     * @throws ExceptionInInitializerError Exception when the Tool Workflow Node is instantiated using                                     a State in ModuleAutomaton that does not correspond to a                                     {@code SMTDataType#MODULE}..
      */
     public ModuleNode(State automatonState) throws ExceptionInInitializerError {
         super(automatonState);
@@ -75,7 +75,7 @@ public class ModuleNode extends SolutionWorkflowNode {
         this.nextModuleNode = null;
         if (automatonState.getWorkflowStateType() != WorkflowElement.MODULE) {
             throw new ExceptionInInitializerError(
-                    "Class ModuleNode can only be instantiated using State that is of type WorkflowElement.MODULE, as a parameter.");
+                    "Class ModuleNode can only be instantiated using State that is of type SMTDataType.MODULE, as a parameter.");
         }
         inputTypes = new ArrayList<TypeNode>();
         outputTypes = new ArrayList<TypeNode>();

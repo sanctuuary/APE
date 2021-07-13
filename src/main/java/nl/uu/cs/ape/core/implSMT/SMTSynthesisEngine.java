@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.FileUtils;
 
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
@@ -22,6 +24,7 @@ import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.smtStruc.LogicFragmentDeclaration;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -94,6 +97,9 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         this.mappings = (SMTPredicateMappings) allSolutions.getMappings();
         this.smtInputFile = null;
         this.smtEncoding = File.createTempFile("smt2lib_" + workflowLength, null);
+        if(runConfig.getZ3LogicFragment() != null) {
+        	APEUtils.appendToFile(smtEncoding, new LogicFragmentDeclaration(runConfig.getZ3LogicFragment()).toString(mappings));
+        }
 //        APEUtils.appendToFile(smtEncoding, "(set-option :produce-unsat-cores true)\n"); 
 
         int maxNoToolInputs = Math.max(domainSetup.getMaxNoToolInputs(), runConfig.getProgramOutputs().size());
@@ -255,26 +261,31 @@ public class SMTSynthesisEngine implements SynthesisEngine {
     }
     
     
-    private List<SolutionWorkflow> runZ3Once(String absolutePath, int solutionsFound, int solutionsFoundMax) {
+    private List<SolutionWorkflow> runZ3Once(String absolutePath, int solutionsFound, int solutionsFoundMax)  {
         List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
-//        ISolver solver = SolverFactory.newDefault();
         long globalTimeoutMs = runConfig.getTimeoutMs();
-        // set timeout (in ms)
-//        solver.setTimeoutMs(currTimeout);
+
         long realStartTime = 0;
         long realTimeElapsedMillis;
-//        Reader reader = new DimacsReader(solver);
         try {
             // loading CNF encoding of the problem
             realStartTime = System.currentTimeMillis();
             boolean satisfiable = true;
             while (solutionsFound < solutionsFoundMax && satisfiable) {
 	            ProcessBuilder builder = new ProcessBuilder("/home/vedran/git/z3/build/z3", absolutePath);
+	            List<Atom> facts = null;
+	            
 	            builder.redirectErrorStream(true);
 	            final Process process = builder.start();
-            
+           
+	            if(!process.waitFor(globalTimeoutMs, TimeUnit.MILLISECONDS)) {
+	                //timeout - kill the process. 
+	                process.destroy(); // consider using destroyForcibly instead
+	            } else {
+	            	facts = readTerminalOutput(process);
+	            }
+	            
 	            // Watch the process
-	            List<Atom> facts = readTerminalOutput(process);
 	            if(facts == null) {
 	            	satisfiable = false;
 	            	continue;
@@ -295,7 +306,9 @@ public class SMTSynthesisEngine implements SynthesisEngine {
             }
         } catch (IOException e) {
             System.err.println("Internal error while parsing the encoding.");
-        }
+        } catch (InterruptedException e) {
+        	System.err.println("Z3 processs was interrupted.");
+		}
 
         if (solutionsFound == 0 || solutionsFound % 500 != 0) {
             realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
@@ -325,7 +338,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
                     		System.err.println("SMT_error: " +line);
                     		return null;
                     	}
-                    	System.out.println("SMT: " +line);
+//                    	System.out.println("SMT: " +line);
                     	if(line.contains("nullMem")) {
                     		continue;
                     	} else if(line.trim().startsWith("(define-fun ")) {
@@ -335,6 +348,10 @@ public class SMTSynthesisEngine implements SynthesisEngine {
                     		String trimmedLine = cutUntil(line, "x!0");
                     		String[] words =  trimmedLine.trim().replace(")", "").split(" ");
                     		
+                    		if(words.length < 5) {
+//                    			System.out.println("Skip");
+                    			continue;
+                    		}
                     		String stateS = words[1];
                     		String predicateS = words[4];
                     		

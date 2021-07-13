@@ -26,7 +26,7 @@ public class DataTypeDeclaration implements SMT2LibRow {
 		StringBuilder constraints = new StringBuilder();
 		constraints
 			.append("(declare-datatypes () ((")
-				.append(dataTypeName.toString(mapping));
+				.append(dataTypeName.toString());
 		
 				for(PredicateLabel dataTypeVal : dataTypeValues) {
 					constraints.append(" ").append(mapping.add(dataTypeVal));

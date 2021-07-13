@@ -210,7 +210,7 @@ public class SMTSolution extends SolutionInterpreter {
 //				}
 //			} else {
 //			for (Atom literal : relevantElements) {
-//				if (literal.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
+//				if (literal.getWorkflowElementType() != SMTDataType.MEMORY_TYPE) {
 //					negSol.add(literal.toNegatedMappedInt());
 //				}
 //			}

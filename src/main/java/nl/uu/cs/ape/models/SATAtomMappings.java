@@ -59,7 +59,7 @@ public class SATAtomMappings implements Mappings {
      *
      * @param predicate   Predicate of the mapped atom.
      * @param usedInState SMTFunctionArgument of the mapped atom (usually name of the type/module state).
-     * @param elementType Element that defines what type of a predicate is described (such as {@link WorkflowElement#MODULE}.
+     * @param elementType Element that defines what type of a predicate is described (such as {@link SMTDataType#MODULE}.
      * @return Mapping number of the atom (number is always &gt; 0).
      */
     public Integer add(PredicateLabel predicate, State usedInState, WorkflowElement elementType) throws MappingsException {

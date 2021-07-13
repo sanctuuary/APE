@@ -334,13 +334,14 @@ public class APE {
 			allSolutions.setFlag(SynthesisFlag.MAX_LENGHT);
 		} else if(APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) <= 0) {
 			allSolutions.setFlag(SynthesisFlag.TIMEOUT);
+			System.err.println("TIMEOUT was reached.");
 		} else {
 			allSolutions.setFlag(SynthesisFlag.UNKNOWN);
 		}
 		
 		System.out.println(allSolutions.getFlag().getMessage());
-		APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
-
+		long runTimeMS = APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
+		allSolutions.setSolvingTime(runTimeMS);
 		return allSolutions;
 	}
 
