@@ -4,6 +4,7 @@
 package nl.uu.cs.ape;
 
 import guru.nidi.graphviz.attribute.Rank.RankDir;
+
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.APERunConfig;
@@ -12,6 +13,7 @@ import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
+import nl.uu.cs.ape.core.solutionStructure.CWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.enums.SolverType;
@@ -21,6 +23,7 @@ import nl.uu.cs.ape.utils.APEDimensionsException;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.utils.OWLReader;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -331,7 +334,7 @@ public class APE {
 		if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)) {
 			allSolutions.setFlag(SynthesisFlag.NONE);
 		} else if (solutionLength == runConfig.getSolutionLength().getMax()) {
-			allSolutions.setFlag(SynthesisFlag.MAX_LENGHT);
+			allSolutions.setFlag(SynthesisFlag.MAX_LENGTH);
 		} else if(APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) <= 0) {
 			allSolutions.setFlag(SynthesisFlag.TIMEOUT);
 			System.err.println("TIMEOUT was reached.");
@@ -461,7 +464,7 @@ public class APE {
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
-		APEUtils.printHeader(null, "Geneating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 		System.out.println();
 		/* Removing the existing files from the file system. */
@@ -553,4 +556,58 @@ public class APE {
 		return true;
 	}
 
+	/**
+	 * Generate CWL scripts that represent executable versions of the workflows solutions.
+	 * @param allSolutions Set of {@link SolutionWorkflow} which should be represented in CWL.
+	 * @return true if the execution was successfully performed, false otherwise.
+	 */
+	public static boolean writeCWLWorkflows(SolutionsList allSolutions) {
+		// Check the configuration before continuing.
+		Path cwlFolder = allSolutions.getRunConfiguration().getSolutionDirPath2CWL();
+		int noCWLFiles = allSolutions.getRunConfiguration().getNoCWL();
+		if (cwlFolder == null || noCWLFiles == 0 || allSolutions.isEmpty()) {
+			return false;
+		}
+		final String timerID = "writingCWL";
+		APEUtils.printHeader(null, String.format("Writing the first %o solution(s) to CWL files", noCWLFiles));
+		APEUtils.timerStart(timerID, true);
+
+		final String filePrefix = "workflowSolution_";
+		final File cwlDir = cwlFolder.toFile();
+		if (cwlDir.isDirectory()) {
+			// If the CWL directory already exists, empty it first
+			File[] oldFiles = cwlDir.listFiles((dir, name) -> name.toLowerCase().startsWith(filePrefix.toLowerCase()));
+			if (oldFiles != null) {
+				Arrays.stream(oldFiles).forEach((f) -> {
+					if(!f.delete()) {
+						System.err.printf("Failed to delete file %s%n", f.getName());
+					}
+				});
+			}
+		} else {
+			// Create the CWL directory if it does not already exist
+			boolean dirMade = cwlDir.mkdir();
+			if (!dirMade) {
+				System.err.println("Could not create CWL directory.");
+			}
+		}
+		System.out.print("Loading");
+
+		// Write the CWL files
+		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noCWLFiles).forEach(solution -> {
+			try {
+				String title = String.format("%s_%o.cwl", filePrefix, solution.getIndex());
+				File script = cwlFolder.resolve(title).toFile();
+				CWLCreator cwlCreator = new CWLCreator(solution);
+				APEUtils.write2file(cwlCreator.generate(), script, false);
+				System.out.print(".");
+			} catch (IOException e) {
+				System.err.println("Error occurred while writing a CWL file to the file system.");
+				e.printStackTrace();
+			}
+		});
+
+		APEUtils.timerPrintText(timerID, "\nCWL files have been generated.");
+		return true;
+	}
 }
