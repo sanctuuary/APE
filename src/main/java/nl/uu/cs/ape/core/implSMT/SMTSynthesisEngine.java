@@ -16,6 +16,7 @@ import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.core.SynthesisEngine;
+import nl.uu.cs.ape.core.implSAT.SATSolution;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.SMTPredicateMappings;
@@ -97,6 +98,8 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         this.mappings = (SMTPredicateMappings) allSolutions.getMappings();
         this.smtInputFile = null;
         this.smtEncoding = File.createTempFile("smt2lib_" + workflowLength, null);
+        this.smtEncoding.deleteOnExit();
+        
         if(runConfig.getZ3LogicFragment() != null) {
         	APEUtils.appendToFile(smtEncoding, new LogicFragmentDeclaration(runConfig.getZ3LogicFragment()).toString(mappings));
         }
@@ -211,13 +214,15 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         /*
          * Create the file that contains the encoding
          */
-        System.out.println(smtEncoding);
-        APEUtils.appendToFile(smtEncoding, "\n(check-sat)"); 
-        APEUtils.appendToFile(smtEncoding, "\n(get-model)");
-//        APEUtils.appendToFile(smtEncoding, "\n(get-unsat-core)"); 
+//        System.out.println(smtEncoding);
         
-        smtInputFile = new File("/home/vedran/Desktop/tmp.smt");
+        
+        smtInputFile = File.createTempFile("smt2lib_", null);
+        smtInputFile.deleteOnExit();
+        
+//        smtInputFile = new File("/home/vedran/Desktop/tmp.smt");
         FileUtils.copyFile(smtEncoding, smtInputFile);
+        addSMTFooter(smtInputFile);
 //        smtEncoding.delete();
 //		APEUtils.write2file(mknfEncoding.toString(), new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime), false);
 
@@ -236,7 +241,14 @@ public class SMTSynthesisEngine implements SynthesisEngine {
     }
 
 
-    /**
+    private void addSMTFooter(File currSmtEncoding) throws IOException {
+    	APEUtils.appendToFile(currSmtEncoding, "\n(check-sat)"); 
+        APEUtils.appendToFile(currSmtEncoding, "\n(get-model)");
+//        APEUtils.appendToFile(smtEncoding, "\n(get-unsat-core)"); 
+		
+	}
+
+	/**
      * Using the SAT input generated from SAT encoding and running MiniSAT solver to find the solutions.
      *
      * @return The list of new solutions.
@@ -245,8 +257,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
     public List<SolutionWorkflow> synthesisExecution() throws IOException {
 
     	 /* Add current solutions to list of all solutions. */
-        List<SolutionWorkflow> currSolutions = runZ3Once(smtInputFile.getAbsolutePath(),
-                allSolutions.getNumberOfSolutions(), allSolutions.getMaxNumberOfSolutions());
+        List<SolutionWorkflow> currSolutions = runZ3Once(allSolutions.getNumberOfSolutions(), allSolutions.getMaxNumberOfSolutions());
        
         return currSolutions;
     }
@@ -261,7 +272,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
     }
     
     
-    private List<SolutionWorkflow> runZ3Once(String absolutePath, int solutionsFound, int solutionsFoundMax)  {
+    private List<SolutionWorkflow> runZ3Once(int solutionsFound, int solutionsFoundMax)  {
         List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
         long globalTimeoutMs = runConfig.getTimeoutMs();
 
@@ -272,7 +283,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
             realStartTime = System.currentTimeMillis();
             boolean satisfiable = true;
             while (solutionsFound < solutionsFoundMax && satisfiable) {
-	            ProcessBuilder builder = new ProcessBuilder("/home/vedran/git/z3/build/z3", absolutePath);
+	            ProcessBuilder builder = new ProcessBuilder("/home/vedran/git/z3/build/z3", smtInputFile.getAbsolutePath());
 	            List<Atom> facts = null;
 	            
 	            builder.redirectErrorStream(true);
@@ -290,19 +301,22 @@ public class SMTSynthesisEngine implements SynthesisEngine {
 	            	satisfiable = false;
 	            	continue;
 	            }
-	            SolutionWorkflow sat_solution = new SolutionWorkflow(facts, this);
+	            SolutionWorkflow smtSolution = new SolutionWorkflow(facts, this);
 	            solutionsFound++;
-	            solutions.add(sat_solution);
-	            realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-	            System.out.println("Found in total " + solutionsFound + " solutions. Solving time: "
-	                    + (realTimeElapsedMillis / 1000F) + " sec.");
+	            solutions.add(smtSolution);
+	            if (solutionsFound % 500 == 0) {
+		            realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
+		            System.out.println("Found in total " + solutionsFound + " solutions. Solving time: "
+		                    + (realTimeElapsedMillis / 1000F) + " sec.");
+	            }
             /*
              * Adding the negation of the positive part of the solution as a constraint
              * (default negation does not work)
              */
-//                IVecInt negSol = new VecInt(sat_solution.getNegatedMappedSolutionArray(runConfig.getToolSeqRepeat()));
-//                solver.addClause(negSol);
 	            process.destroy();
+	            SMTUtils.appendToFile(smtEncoding, ((SMTSolution)smtSolution.getNativeSolution()).getSMTnegatedSolution(runConfig.getAllowToolSeqRepeat()), mappings);
+	            FileUtils.copyFile(smtEncoding, smtInputFile);
+	            addSMTFooter(smtInputFile);
             }
         } catch (IOException e) {
             System.err.println("Internal error while parsing the encoding.");

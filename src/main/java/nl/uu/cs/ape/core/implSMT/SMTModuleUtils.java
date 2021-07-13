@@ -1,29 +1,30 @@
 package nl.uu.cs.ape.core.implSMT;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import nl.uu.cs.ape.automaton.Block;
-import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.core.implSAT.SATModuleUtils;
-import nl.uu.cs.ape.models.*;
+import nl.uu.cs.ape.models.AllModules;
+import nl.uu.cs.ape.models.AllTypes;
+import nl.uu.cs.ape.models.Module;
+import nl.uu.cs.ape.models.Pair;
+import nl.uu.cs.ape.models.SMTPredicateMappings;
+import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.smtStruc.Assertion;
 import nl.uu.cs.ape.models.smtStruc.BinaryBoolFuncDeclaration;
-import nl.uu.cs.ape.models.smtStruc.SMTComment;
 import nl.uu.cs.ape.models.smtStruc.DataTypeDeclaration;
 import nl.uu.cs.ape.models.smtStruc.SMT2LibRow;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.AndStatement;
+import nl.uu.cs.ape.models.smtStruc.SMTComment;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.EqualStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.ExistsStatement;
@@ -37,7 +38,6 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBoundedVar;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionArgument;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
-import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
@@ -308,23 +308,103 @@ public final class SMTModuleUtils {
 		 * Where the null state has no type.
 		 * TODO: MaybE we could remove this statement
 		 */
-		allClauses.add(new Assertion(
-						new BinarySMTPredicate(
-								new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
-								new SMTFunctionArgument(typeAutomaton.getNullState()), 
-								new SMTFunctionArgument(allTypes.getEmptyType())
-								)
-						));
-		allClauses.add(new Assertion(
-						new BinarySMTPredicate(
-								new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
-								new SMTFunctionArgument(typeAutomaton.getNullState()), 
-								new SMTFunctionArgument(allTypes.getEmptyAPELabel())
-								)
-						));
+//		allClauses.add(new Assertion(
+//						new BinarySMTPredicate(
+//								new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
+//								new SMTFunctionArgument(typeAutomaton.getNullState()), 
+//								new SMTFunctionArgument(allTypes.getEmptyType())
+//								)
+//						));
+//		allClauses.add(new Assertion(
+//						new BinarySMTPredicate(
+//								new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
+//								new SMTFunctionArgument(typeAutomaton.getNullState()), 
+//								new SMTFunctionArgument(allTypes.getEmptyAPELabel())
+//								)
+//						));
 
 		return allClauses;
 	}
+	
+//	private static List<SMT2LibRow> enforceDataReferenceRules2(AllTypes allTypes, TypeAutomaton typeAutomaton) {
+//		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+//
+//			/* 
+//			 * For each type dimension, the Used type states have to be equal to the referenced state values.
+//			 */
+//		/* For each type instance */
+//		for (TaxonomyPredicate currType : allTypes.getTypes()) {
+//			if (currType.isSimplePredicate() || currType.isEmptyPredicate()) {
+//				/* ..for each state in which type can be used .. */
+//				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
+//					for (State currUsedTypeState : currUsedBlock.getStates()) {
+//						if (!currType.isEmptyPredicate()) {
+//							/* ..the referenced memory state cannot be null.. */
+//							allClauses.add(new Assertion(
+//									new NandStatement(
+//											new BinarySMTPredicate(
+//													new SMTFunctionName(WorkflowElement.USED_TYPE), 
+//													new SMTFunctionArgument(currUsedTypeState), 
+//													new SMTFunctionArgument(currType)
+//													),
+//											new BinarySMTPredicate(
+//													new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
+//													new SMTFunctionArgument(currUsedTypeState), 
+//													new SMTFunctionArgument(typeAutomaton.getNullState())
+//													))
+//									));
+//
+//							/* ..and for each state in which type can be created in memory .. */
+//							for (Block memoryBlock : typeAutomaton.getMemoryTypesBlocks()) {
+//								for (State refMemoryTypeState : memoryBlock.getStates()) {
+//									/*
+//									 * If the type (currType) is used as an input for a tool (in state
+//									 * currUsedTypeState)
+//									 * ..and the state is referencing a memory state where the type was created
+//									 * (refMemoryTypeState)
+//									 * the type has to be generated in the the referenced memory type state. */
+//									allClauses.add(new Assertion(
+//											new ImplicationStatement(
+//													new AndStatement(
+//														new BinarySMTPredicate(
+//															new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
+//															new SMTFunctionArgument(currUsedTypeState), 
+//															new SMTFunctionArgument(refMemoryTypeState)),
+//														new BinarySMTPredicate(
+//																new SMTFunctionName(WorkflowElement.USED_TYPE), 
+//																new SMTFunctionArgument(currUsedTypeState), 
+//																new SMTFunctionArgument(currType))),
+//													new BinarySMTPredicate(
+//															new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
+//															new SMTFunctionArgument(refMemoryTypeState), 
+//															new SMTFunctionArgument(currType))
+//												)
+//											));
+//								}
+//							}
+//							/* If the type is empty the referenced state has to be null. */
+//						} else {
+//							allClauses.add(new Assertion(
+//									new ImplicationStatement(
+//											new BinarySMTPredicate(
+//													new SMTFunctionName(WorkflowElement.USED_TYPE), 
+//													new SMTFunctionArgument(currUsedTypeState), 
+//													new SMTFunctionArgument(currType)
+//													),
+//											new BinarySMTPredicate(
+//													new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
+//													new SMTFunctionArgument(currUsedTypeState), 
+//													new SMTFunctionArgument(typeAutomaton.getNullState())
+//													))
+//									));
+//						}
+//					}
+//				}
+//			}
+//		}
+//		
+//		return allClauses;
+//	}
 
 	/**
 	 * Generate constraints that ensure that the all tool inputs can reference data

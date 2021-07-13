@@ -1,5 +1,8 @@
 package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.uu.cs.ape.models.SMTPredicateMappings;
 
 /**
@@ -10,26 +13,34 @@ import nl.uu.cs.ape.models.SMTPredicateMappings;
  */
 public class AndStatement implements Fact {
 
-	private Fact arg1;
-	private Fact arg2;
+private List<Fact> conjunctedFacts;
 	
 	
-	
-	public AndStatement(Fact ifStatement, Fact thanStatement) {
+	public AndStatement(Fact arg1, Fact arg2) {
 		super();
-		this.arg1 = ifStatement;
-		this.arg2 = thanStatement;
+		conjunctedFacts = new ArrayList<Fact>();
+		conjunctedFacts.add(arg1);
+		conjunctedFacts.add(arg2);
 	}
 
 
 
+	public AndStatement(List<Fact> conjunctedFacts) {
+		this.conjunctedFacts = conjunctedFacts;
+	}
+
+
 	public String toString(SMTPredicateMappings mapping) {
 		StringBuilder constraints = new StringBuilder();
-		constraints
-			.append("(and ")
-				.append(arg1.toString(mapping)).append(" ")
-				.append(arg2.toString(mapping))
-			.append(")");
+		if(conjunctedFacts.size() == 1) {
+			return conjunctedFacts.get(0).toString(mapping);
+		}
+		constraints.append("(and");
+//		add the statements to the conjunction
+		for(Fact fact : conjunctedFacts) {
+			constraints.append(" ").append(fact.toString(mapping));
+		}
+		constraints.append(")");
 		
 		return constraints.toString();
 	}

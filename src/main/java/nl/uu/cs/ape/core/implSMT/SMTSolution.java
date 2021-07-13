@@ -13,6 +13,13 @@ import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.Literal;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.smtStruc.Assertion;
+import nl.uu.cs.ape.models.smtStruc.SMT2LibRow;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.AndStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.NotStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
@@ -223,6 +230,39 @@ public class SMTSolution extends SolutionInterpreter {
 //
 //        return negSolList;
 //    }
+    
+    /**
+	 * Returns the negated solution in mapped format. Negating the original solution
+	 * created by the SAT solver. Usually used to add to the solver to find new
+	 * solutions.
+	 *
+     * @param toolSeqRepeat variable defining if the provided solutions should be distinguished based on the tool sequences alone
+	 * @return int[] representing the negated solution
+	 */
+	public List<SMT2LibRow> getSMTnegatedSolution(boolean allowToolSeqRepeat) {
+		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		List<Fact> facts = new ArrayList<Fact>();
+		if (!unsat) {
+			if(!allowToolSeqRepeat) {
+				for (Atom atom : relevantModules) {
+					facts.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), atom.getUsedInStateArgument(), atom.getPredicate()));
+				}
+			} else {
+				for (Atom atom : relevantElements) {
+					if (atom.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
+						facts.add(new BinarySMTPredicate(new SMTFunctionName(atom.getWorkflowElementType()), atom.getUsedInStateArgument(), atom.getPredicate()));
+					}
+				}
+			}
+			
+			allClauses.add(new Assertion(
+					new NotStatement(
+							new AndStatement(facts)
+							)));
+		}
+
+        return allClauses;
+    }
 
     /**
      * Returns the satisfiability of the problem. Returns true if the problem is

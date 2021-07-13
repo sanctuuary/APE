@@ -20,11 +20,11 @@ public class OrStatement implements Fact {
 	private List<Fact> disjointFacts;
 	
 	
-	public OrStatement(Fact ifStatement, Fact thanStatement) {
+	public OrStatement(Fact arg1, Fact arg2) {
 		super();
 		disjointFacts = new ArrayList<Fact>();
-		disjointFacts.add(ifStatement);
-		disjointFacts.add(thanStatement);
+		disjointFacts.add(arg1);
+		disjointFacts.add(arg2);
 	}
 
 

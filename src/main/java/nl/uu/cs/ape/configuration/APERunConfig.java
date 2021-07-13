@@ -139,8 +139,11 @@ public class APERunConfig {
     
     /** Logic fragment used by the Z3 solver. */
 	private SMTLogicFragment logicFragment;
+	
+	/** Solver type that should be used (SMT or SAT). */
+	private SolverType solverType = SolverType.SAT;
 
-    /**
+	/**
      * Constructor used to implement the Builder Pattern.
      *
      * @param builder Builder object
@@ -543,7 +546,14 @@ public class APERunConfig {
      * @return {@link SolverType} that corresponds to the solver type
      */
     public SolverType getSolverType() {
-		return SolverType.SAT;
+		return this.solverType;
+	}
+    
+    /**
+	 * @param solverType the solverType to set
+	 */
+	public void setSolverType(SolverType solverType) {
+		this.solverType = solverType;
 	}
     
     public void setZ3LogicFragment(SMTLogicFragment logicFragment) {
