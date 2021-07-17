@@ -172,7 +172,7 @@ public class CWLCreator {
                 .append(stepName(typeNode.getCreatedByModule()))
                 .append("/");
             // Get the id of the step run's output bound to this workflow output (step_name/output_name_ID)
-            int outId = typeNode.getCreatedByModule().getOutputTypes().get(i - 1).getAutomatonState().getStateNumber();
+            int outId = typeNode.getCreatedByModule().getOutputTypes().get(i - 1).getAutomatonState().getLocalStateNumber();
             cwlRepresentation
                 .append(inOutName(typeNode.getCreatedByModule(), "out", outId + 1))
                 .append("\n");
@@ -424,7 +424,7 @@ public class CWLCreator {
      */
     private String stepName(ModuleNode moduleNode) {
         return moduleNode.getUsedModule().getPredicateLabel() +
-                moduleNode.getAutomatonState().getStateNumber();
+                moduleNode.getAutomatonState().getLocalStateNumber();
     }
 
     /**

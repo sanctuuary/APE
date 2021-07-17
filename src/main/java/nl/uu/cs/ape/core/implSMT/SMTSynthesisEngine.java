@@ -16,7 +16,6 @@ import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.core.SynthesisEngine;
-import nl.uu.cs.ape.core.implSAT.SATSolution;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.SMTPredicateMappings;
@@ -26,6 +25,7 @@ import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.smtStruc.LogicFragmentDeclaration;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -97,11 +97,11 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         this.runConfig = runConfig;
         this.mappings = (SMTPredicateMappings) allSolutions.getMappings();
         this.smtInputFile = null;
-        this.smtEncoding = File.createTempFile("smt2lib_" + workflowLength, null);
+        this.smtEncoding = File.createTempFile("smtlib2_" + workflowLength, null);
         this.smtEncoding.deleteOnExit();
         
         if(runConfig.getZ3LogicFragment() != null) {
-        	APEUtils.appendToFile(smtEncoding, new LogicFragmentDeclaration(runConfig.getZ3LogicFragment()).toString(mappings));
+        	APEUtils.appendToFile(smtEncoding, new LogicFragmentDeclaration(runConfig.getZ3LogicFragment()).getSMT2Encoding(this));
         }
 //        APEUtils.appendToFile(smtEncoding, "(set-option :produce-unsat-cores true)\n"); 
 
@@ -133,20 +133,20 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
         /* Define the SMT data types that correspond to taxonomy terms. */
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeTaxonomyTerms(this), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeTaxonomyTerms(this), this);
         
         /* Define the structure of the workflow. Define each operation and data state. */
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeWorkflowStructure(this), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeWorkflowStructure(this), this);
         
         /* Create constraints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeModuleAnnotations(this), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeModuleAnnotations(this), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
         /*
          * The constraints preserve the memory structure, i.e. preserve the data available in memory and the
          * logic of referencing data from memory in case of tool inputs.
          */
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeMemoryStructure(this), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeMemoryStructure(this), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Memory structure encoding");
 
         /*
@@ -156,13 +156,13 @@ public class SMTSynthesisEngine implements SynthesisEngine {
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
         
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleMutualExclusion(domainSetup.getAllModules()), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleMutualExclusion(this), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
         
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules()), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleMandatoryUsage(this), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
         
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleEnforceTaxonomyStructure(rootModule, true), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleEnforceTaxonomyStructure(this, rootModule, true), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool taxonomy  encoding");
         /*
          * Create the constraints enforcing:
@@ -171,13 +171,13 @@ public class SMTSynthesisEngine implements SynthesisEngine {
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
         
-        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.typeMutualExclusion(domainSetup.getAllTypes()), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.typeMutualExclusion(domainSetup.getAllTypes()), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
         
-        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.typeMandatoryUsage(domainSetup), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.typeMandatoryUsage(domainSetup), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
         
-        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes()), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes()), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type taxonomy encoding");
         /*
          * Encode the constraints from the file based on the templates (manual templates)
@@ -190,24 +190,24 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         /*
          * Encode data instance dependency constraints.
          */
-//        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton), mappings);
+//        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton), this);
 
         /*
          * Encode the workflow input. Workflow I/O are encoded the last in order to
          * reuse the mappings for states, instead of introducing new ones, using the I/O
          * types of NodeType.UNKNOWN.
          */
-        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton), this);
         /*
          * Encode the workflow output
          */
-        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton), mappings);
+        SMTUtils.appendToFile(smtEncoding, SMTTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton), this);
 
         
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-//        SMTUtils.appendToFile(smtEncoding, domainSetup.getConstraintsForAuxiliaryPredicates(mappings, moduleAutomaton, typeAutomaton), mappings);
+//        SMTUtils.appendToFile(smtEncoding, domainSetup.getConstraintsForAuxiliaryPredicates(mappings, moduleAutomaton, typeAutomaton), this);
 
         
         
@@ -217,12 +217,14 @@ public class SMTSynthesisEngine implements SynthesisEngine {
 //        System.out.println(smtEncoding);
         
         
-        smtInputFile = File.createTempFile("smt2lib_", null);
-        smtInputFile.deleteOnExit();
+//        smtInputFile = File.createTempFile("smtlib2_", null);
+//        smtInputFile.deleteOnExit();
         
-//        smtInputFile = new File("/home/vedran/Desktop/tmp.smt");
+        smtInputFile = new File("/home/vedran/Desktop/tmp.smt");
         FileUtils.copyFile(smtEncoding, smtInputFile);
         addSMTFooter(smtInputFile);
+        
+        
 //        smtEncoding.delete();
 //		APEUtils.write2file(mknfEncoding.toString(), new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime), false);
 
@@ -231,7 +233,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
 //        File actualFile = new File ("/home/vedran/Desktop/tmpt.txt");
 //		InputStream tmpSat = IOUtils.toInputStream(smtInputFile.toString(), "ASCII");
 //		tmpSat.close();
-//		String encoding = APEUtils.convertCNF2humanReadable(new FileInputStream(smtInputFile), mappings);
+//		String encoding = APEUtils.convertCNF2humanReadable(new FileInputStream(smtInputFile), this);
 //		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
@@ -314,7 +316,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
              * (default negation does not work)
              */
 	            process.destroy();
-	            SMTUtils.appendToFile(smtEncoding, ((SMTSolution)smtSolution.getNativeSolution()).getSMTnegatedSolution(runConfig.getAllowToolSeqRepeat()), mappings);
+	            SMTUtils.appendToFile(smtEncoding, ((SMTSolution)smtSolution.getNativeSolution()).getSMTnegatedSolution(runConfig.getAllowToolSeqRepeat()), this);
 	            FileUtils.copyFile(smtEncoding, smtInputFile);
 	            addSMTFooter(smtInputFile);
             }
@@ -480,18 +482,18 @@ public class SMTSynthesisEngine implements SynthesisEngine {
     }
 
     /**
-     * Gets domain setup.
+     * Gets the general domain information and given constraints that have to be encoded.
      *
-     * @return the domain setup
+     * @return The general domain information.
      */
     public APEDomainSetup getDomainSetup() {
         return domainSetup;
     }
 
     /**
-     * Gets mappings.
+     * Gets SMT mappings object used to store the data used for representing the predicates with unique strings.
      *
-     * @return the mappings
+     * @return The SMT mappings object.
      */
     public SMTPredicateMappings getMappings() {
         return mappings;
@@ -523,6 +525,48 @@ public class SMTSynthesisEngine implements SynthesisEngine {
     public TypeAutomaton getTypeAutomaton() {
         return typeAutomaton;
     }
+    
+    /**
+     * Gets number of states used in the workflow for the specific type (module, data instances in the memory or data instances used by tools).
+     * @return Integer representing the number of states (or -1 in case of an error).
+     */
+    public int getAutomatonSize(SMTDataType dataType) {
+    	switch (dataType) {
+		case MODULE_STATE:
+			return moduleAutomaton.size(); 
+		case MEMORY_TYPE_STATE:
+			return typeAutomaton.getAllMemoryTypesStates().size() + 1;
+		case USED_TYPE_STATE:
+			return typeAutomaton.getAllUsedTypesStates().size();
+		default:
+			return -1;
+		}
+    	
+    }
+    
+//    /**
+//     * Gets number of tools used in the workflow.
+//     * @return Integer representing the number of module states.
+//     */
+//    public int getModuleAutomatonSize() {
+//    	return moduleAutomaton.size();
+//    }
+//    
+//    /**
+//     * Gets number of memory data instances available in the workflow.
+//     * @return Integer representing the number of states that represent data instances available in memory.
+//     */
+//    public int getMemoryTypeAutomatonSize() {
+//    	return typeAutomaton.getAllMemoryTypesStates().size();
+//    }
+//    
+//    /**
+//     * Gets number of used data instances expected in the workflow.
+//     * @return Integer representing the number of states that define data instances used by tools.
+//     */
+//    public int getUsedTypeAutomatonSize() {
+//    	return typeAutomaton.getAllUsedTypesStates().size();
+//    }
 
     /**
      * Gets empty type.

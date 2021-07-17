@@ -1,11 +1,9 @@
 package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
-import nl.uu.cs.ape.models.SMTPredicateMappings;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
- * Structure used to model (= x y) statement in smt2lib.
+ * Structure used to model (= x y) statement in SMTLib2.
  * 
  * @author Vedran Kasalica
  *
@@ -25,12 +23,12 @@ public class EqualStatement implements Fact {
 
 
 
-	public String toString(SMTPredicateMappings mapping) {
+	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 		constraints
 			.append("(= ")
-				.append(arg1.toString(mapping)).append(" ")
-				.append(arg2.toString(mapping))
+				.append(arg1.getSMT2Encoding(synthesisEngine)).append(" ")
+				.append(arg2.getSMT2Encoding(synthesisEngine))
 			.append(")");
 		
 		return constraints.toString();

@@ -1,11 +1,9 @@
 package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
-import nl.uu.cs.ape.models.SMTPredicateMappings;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
- * Structure used to model (=> x y) statement in smt2lib.
+ * Structure used to model (=> x y) statement in SMTLib2.
  * @author Vedran Kasalica
  *
  */
@@ -24,12 +22,12 @@ public class ImplicationStatement implements Fact {
 
 
 
-	public String toString(SMTPredicateMappings mapping) {
+	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 		constraints
 			.append("(=> ")
-				.append(ifStatement.toString(mapping)).append(" ")
-				.append(thanStatement.toString(mapping))
+				.append(ifStatement.getSMT2Encoding(synthesisEngine)).append(" ")
+				.append(thanStatement.getSMT2Encoding(synthesisEngine))
 			.append(")");
 		
 		return constraints.toString();

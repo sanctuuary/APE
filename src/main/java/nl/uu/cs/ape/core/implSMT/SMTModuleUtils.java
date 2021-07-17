@@ -23,7 +23,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.smtStruc.Assertion;
 import nl.uu.cs.ape.models.smtStruc.BinaryBoolFuncDeclaration;
 import nl.uu.cs.ape.models.smtStruc.DataTypeDeclaration;
-import nl.uu.cs.ape.models.smtStruc.SMT2LibRow;
+import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.models.smtStruc.SMTComment;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.EqualStatement;
@@ -34,10 +34,10 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.ImplicationStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.NandStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.NotStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.OrStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBitVec;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBoundedVar;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionArgument;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTPredicateFunArg;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
@@ -56,17 +56,17 @@ public final class SMTModuleUtils {
 	}
 
 	/**
-	 * Return a SMT2LIB representation of the INPUT and OUTPUT type constraints.
+	 * Return a SMTLib2 representation of the INPUT and OUTPUT type constraints.
 	 * Depending on the parameter pipeline, the INPUT constraints will be based on a
 	 * pipeline or general memory approach.
 	 *
 	 * @param synthesisInstance A specific synthesis run that contains all the
 	 *                          information specific for it.
-	 * @return String representation of SMT2LIB constraints regarding the required INPUT
+	 * @return String representation of SMTLib2 constraints regarding the required INPUT
 	 *         and OUTPUT types of the modules.
 	 */
-	public static List<SMT2LibRow> encodeModuleAnnotations(SMTSynthesisEngine synthesisInstance) {
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+	public static List<SMTLib2Row> encodeModuleAnnotations(SMTSynthesisEngine synthesisInstance) {
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		
 		allClauses.add(new SMTComment("Encoding tool input dependencies."));
 		allClauses.addAll(inputCons(synthesisInstance));
@@ -77,12 +77,12 @@ public final class SMTModuleUtils {
 	}
 
 	/**
-	 * Define taxonomy terms and workflow states as data types in SMT encoding.
+	 * Define taxonomy terms as data types in SMT encoding.
 	 * @param synthesisInstance
-	 * @return List of smt2lib clauses.
+	 * @return List of SMTLib2 clauses.
 	 */
-	public static List<SMT2LibRow> encodeTaxonomyTerms(SMTSynthesisEngine synthesisInstance) {
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+	public static List<SMTLib2Row> encodeTaxonomyTerms(SMTSynthesisEngine synthesisInstance) {
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		allClauses.add(new SMTComment("Encoding taxonomy terms and workflow states."));
 		//define tools as data types
 		AllModules allModules = synthesisInstance.getDomainSetup().getAllModules();
@@ -106,58 +106,186 @@ public final class SMTModuleUtils {
 //		allClauses.add(new DataTypeDeclaration(new SMTDataType(labelRoot), allTypes.getElementsFromSubTaxonomy(labelRoot)));
 		
 		// define workflow states as data types
-		allClauses.add(new DataTypeDeclaration(SMTDataType.MODULE_STATE, synthesisInstance.getModuleAutomaton().getAllStates()));
-		List<State> memoryStates = synthesisInstance.getTypeAutomaton().getAllMemoryTypesStates();
-		memoryStates.add(synthesisInstance.getTypeAutomaton().getNullState());
-		allClauses.add(new DataTypeDeclaration(SMTDataType.MEMORY_TYPE_STATE, memoryStates));
-		allClauses.add(new DataTypeDeclaration(SMTDataType.USED_TYPE_STATE, synthesisInstance.getTypeAutomaton().getAllUsedTypesStates()));
+//		allClauses.add(new DataTypeDeclaration(SMTDataType.MODULE_STATE, synthesisInstance.getModuleAutomaton().getAllStates()));
+//		List<State> memoryStates = synthesisInstance.getTypeAutomaton().getAllMemoryTypesStates();
+//		memoryStates.add(synthesisInstance.getTypeAutomaton().getNullState());
+//		allClauses.add(new DataTypeDeclaration(SMTDataType.MEMORY_TYPE_STATE, memoryStates));
+//		allClauses.add(new DataTypeDeclaration(SMTDataType.USED_TYPE_STATE, synthesisInstance.getTypeAutomaton().getAllUsedTypesStates()));
 		
 		return allClauses;
 	}
 	
 	/**
-	 * Generate the unary functions that represent the  
+	 * Generate the binary functions that map pairs of states (represented as BitVec that corresponding 
+	 * to the order number of the state) and Modules/Types
+	 * to boolean values, depending of the truth value of the pair.
+	 * 
 	 * @param synthesisInstance A specific synthesis run that contains all the
 	 *                          information specific for it.
-	 * @return
+	 * @return List of SMTLib2 clauses.
 	 */
-	public static List<SMT2LibRow> encodeWorkflowStructure(SMTSynthesisEngine synthesisInstance) {
+	public static List<SMTLib2Row> encodeWorkflowStructure(SMTSynthesisEngine synthesisInstance) {
 
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		System.out.println(synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE));
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		allClauses.add(new SMTComment("Encoding workflow structure functions."));
-		// encode that each tool state is defined over an operation
-			allClauses.add(new BinaryBoolFuncDeclaration(new SMTFunctionName(WorkflowElement.MODULE), SMTDataType.MODULE_STATE, SMTDataType.MODULE));
+		// encode that each tool state is defined over an operation (where tool states are represented as BitVec that corresponding to the order number of the state)
+		allClauses.add(new BinaryBoolFuncDeclaration(
+									WorkflowElement.MODULE, 
+									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE)), 
+									SMTDataType.MODULE));
+
+		SMTBoundedVar moduleState = new SMTBoundedVar("moduleState");
+		SMTBoundedVar module = new SMTBoundedVar("module");
+//		allClauses.add(new Assertion(
+//							new ForallStatement(
+//								module,
+//								SMTDataType.MODULE,
+//								new ForallStatement(
+//										moduleState,
+//										SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE)),
+//										new ImplicationStatement(
+//												new BinarySMTPredicate(
+//														SMTBitVectorOp.GREATER_OR_EQUAL, 
+//														moduleState, 
+//														new SMTBitVec(
+//																SMTDataType.	, 
+//																synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE))),
+//												new NotStatement(
+//														new BinarySMTPredicate(
+//																WorkflowElement.MODULE,
+//																moduleState, 
+//																module)
+//														)
+//												)
+//										)
+//								
+//						)
+//				));
+
+		allClauses.add(new BinaryBoolFuncDeclaration(
+									WorkflowElement.USED_TYPE, 
+									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)), 
+									SMTDataType.TYPE));
 		
-		// encode that each type state is defined over each data dimension and 'APE labels' dimension
-//		for(TaxonomyPredicate dimension : synthesisInstance.getDomainSetup().getAllTypes().getDataTaxonomyDimensionsAndLabel()) {
-			allClauses.add(new BinaryBoolFuncDeclaration(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), SMTDataType.MEMORY_TYPE_STATE, SMTDataType.TYPE));
-			allClauses.add(new BinaryBoolFuncDeclaration(new SMTFunctionName(WorkflowElement.USED_TYPE), SMTDataType.USED_TYPE_STATE, SMTDataType.TYPE));
-//		}
-//		Type empty = synthesisInstance.getDomainSetup().getAllTypes().getEmptyType();
-//		allClauses.add(new BinaryBoolFuncDeclaration(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), SMTDataType.MEMORY_TYPE_STATE, new SMTDataType(empty)));
-//		allClauses.add(new BinaryBoolFuncDeclaration(new SMTFunctionName(WorkflowElement.USED_TYPE), SMTDataType.USED_TYPE_STATE, new SMTDataType(empty)));
-	
+		SMTBoundedVar usedState = new SMTBoundedVar("usedState");
+		SMTBoundedVar type = new SMTBoundedVar("type");
+		
+//		allClauses.add(new Assertion(
+//							new ForallStatement(
+//								type,
+//								SMTDataType.TYPE,
+//								new ForallStatement(
+//										usedState,
+//										SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)),
+//										new ImplicationStatement(
+//												new BinarySMTPredicate(
+//														SMTBitVectorOp.GREATER_OR_EQUAL, 
+//														usedState, 
+//														new SMTBitVec(
+//																SMTDataType.USED_TYPE_STATE, 
+//																synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE))),
+//												new NotStatement(
+//														new BinarySMTPredicate(
+//																WorkflowElement.USED_TYPE,
+//																usedState, 
+//																type)
+//														)
+//												)
+//										)
+//								
+//						)
+//				));
+		
+		allClauses.add(new BinaryBoolFuncDeclaration(
+									WorkflowElement.MEMORY_TYPE, 
+									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)), 
+									SMTDataType.TYPE));
+		
+		SMTBoundedVar memoryState = new SMTBoundedVar("memoryState");
+//		allClauses.add(new Assertion(
+//							new ForallStatement(
+//								type,
+//								SMTDataType.TYPE,
+//								new ForallStatement(
+//										memoryState,
+//										SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)),
+//										new ImplicationStatement(
+//												new BinarySMTPredicate(
+//														SMTBitVectorOp.GREATER_OR_EQUAL, 
+//														memoryState, 
+//														new SMTBitVec(
+//																SMTDataType.MEMORY_TYPE_STATE, 
+//																synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE))),
+//												new NotStatement(
+//														new BinarySMTPredicate(
+//																WorkflowElement.MEMORY_TYPE,
+//																memoryState, 
+//																type)
+//														)
+//												)
+//										)
+//								
+//						)
+//				));
+			
 		
 		// encode relation between used types and types available in memory
-		allClauses.add(new BinaryBoolFuncDeclaration(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), SMTDataType.USED_TYPE_STATE, SMTDataType.MEMORY_TYPE_STATE));
+		allClauses.add(new BinaryBoolFuncDeclaration(
+									WorkflowElement.MEM_TYPE_REFERENCE, 
+									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)), 
+									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE))));
 		
+
+//		allClauses.add(new Assertion(
+//				new ForallStatement(
+//					memoryState,
+//					SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)),
+//					new ForallStatement(
+//							usedState,
+//							SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)),
+//							new ImplicationStatement(
+//									new OrStatement(
+//											new BinarySMTPredicate(
+//													SMTBitVectorOp.GREATER_OR_EQUAL, 
+//													memoryState, 
+//													new SMTBitVec(
+//															SMTDataType.MEMORY_TYPE_STATE, 
+//															synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE))),
+//											new BinarySMTPredicate(
+//													SMTBitVectorOp.GREATER_OR_EQUAL, 
+//													usedState,
+//													new SMTBitVec(
+//															SMTDataType.USED_TYPE_STATE, 
+//															synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)))),
+//									new NotStatement(
+//											new BinarySMTPredicate(
+//													WorkflowElement.MEM_TYPE_REFERENCE,
+//													usedState, 
+//													memoryState)
+//											)
+//									)
+//							)
+//					
+//			)
+//	));
 
 		return allClauses;
 	}
 	
 	/**
-	 * Return a SMT2LIB formula that preserves the memory structure that is being used
+	 * Return a SMTLib2 formula that preserves the memory structure that is being used
 	 * (e.g. 'shared memory'), i.e. ensures that the referenced items are available
 	 * according to the mem. structure and that the input type and the referenced
 	 * type from the memory represent the same data.
 	 *
 	 * @param synthesisInstance A specific synthesis run that contains all the
 	 *                          information specific for it.
-	 * @return String representation of SMT2LIB constraints regarding the required
+	 * @return String representation of SMTLib2 constraints regarding the required
 	 *         memory structure implementation.
 	 */
-	public static List<SMT2LibRow> encodeMemoryStructure(SMTSynthesisEngine synthesisInstance) {
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+	public static List<SMTLib2Row> encodeMemoryStructure(SMTSynthesisEngine synthesisInstance) {
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		
 		allClauses.add(new SMTComment("Encoding rules of shared memory referencing (reference only the memory states already available)."));
 		allClauses.addAll(allowDataReferencingCons(synthesisInstance.getTypeAutomaton()));
@@ -166,15 +294,13 @@ public final class SMTModuleUtils {
 		allClauses.addAll(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
 
 		allClauses.add(new SMTComment("Encoding rules that ensure that the data used by the tool as input and the data referenced in memory are the same."));
-		allClauses.addAll(enforceDataReferenceRules(synthesisInstance.getDomainSetup().getAllTypes(),
-				synthesisInstance.getTypeAutomaton()));
+		allClauses.addAll(enforceDataReferenceRules(synthesisInstance));
 		
-//		allClauses.add(new Assertion(new BinarySMTPredicate(new SMTFunctionName(SMTDataType.MEM_TYPE_REFERENCE), synthesisInstance.getEmptyType(), synthesisInstance.getTypeAutomaton().getNullState())));
 		return allClauses;
 	}
 	
-	public static List<SMT2LibRow> encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+	public static List<SMTLib2Row> encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		
 		
 //		allClauses.addAll(allowDataDependencyCons(typeAutomaton));
@@ -187,16 +313,16 @@ public final class SMTModuleUtils {
 	/**
 	 * Generate constraints that ensure that the set of inputs correspond to the
 	 * tool specifications.<br>
-	 * Returns the SMT2LIB representation of the input type constraints for all tools
+	 * Returns the SMTLib2 representation of the input type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.
 	 * @param synthesisInstance A specific synthesis run that contains all the
 	 *                          information specific for it.
 	 *                          
 	 * @return String representation of constraints.
 	 */
-	private static List<SMT2LibRow> inputCons(SMTSynthesisEngine synthesisInstance) {
+	private static List<SMTLib2Row> inputCons(SMTSynthesisEngine synthesisInstance) {
 
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		/* For each module.. */
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
 			/* ..which is a Tool.. */
@@ -204,13 +330,13 @@ public final class SMTModuleUtils {
 				Module module = (Module) potentialModule;
 				/* ..iterate through all the states.. */
 				for (State moduleState : synthesisInstance.getModuleAutomaton().getAllStates()) {
-					int moduleNo = moduleState.getStateNumber();
+					int moduleNo = moduleState.getLocalStateNumber();
 					/* ..and for each state and input state of that module state.. */
 					List<State> currInputStates = synthesisInstance.getTypeAutomaton().getUsedTypesBlock(moduleNo - 1)
 							.getStates();
 					List<Type> moduleInputs = module.getModuleInput();
 					for (State currInputState : currInputStates) {
-						int currInputStateNo = currInputState.getStateNumber();
+						int currInputStateNo = currInputState.getLocalStateNumber();
 						/*
 						 * ..require data type and/or format to be used in one of the directly preceding
 						 * input states, if the data type/format it exists, otherwise use empty type.
@@ -222,13 +348,31 @@ public final class SMTModuleUtils {
 							 * states*/
 							allClauses.add(new Assertion(
 									new ImplicationStatement(
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), moduleState, module), 
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), currInputState, currInputType))));
+											new BinarySMTPredicate(
+													WorkflowElement.MODULE, 
+													new SMTBitVec(SMTDataType.MODULE_STATE, moduleState),
+													new SMTPredicateFunArg(module)), 
+											new BinarySMTPredicate(
+													WorkflowElement.USED_TYPE, 
+													new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
+													new SMTPredicateFunArg(currInputType)
+													)
+											)
+									));
 						} else {
 							allClauses.add(new Assertion(
 									new ImplicationStatement(
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), moduleState, module), 
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.USED_TYPE), currInputState, synthesisInstance.getEmptyType()))));
+											new BinarySMTPredicate(
+													WorkflowElement.MODULE, 
+													new SMTBitVec(SMTDataType.MODULE_STATE, moduleState),
+													new SMTPredicateFunArg(module)), 
+											new BinarySMTPredicate(
+													WorkflowElement.USED_TYPE, 
+													new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
+													new SMTPredicateFunArg(synthesisInstance.getEmptyType())
+													)
+											)
+									));
 						}
 					}
 				}
@@ -250,55 +394,62 @@ public final class SMTModuleUtils {
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static List<SMT2LibRow> enforceDataReferenceRules(AllTypes allTypes, TypeAutomaton typeAutomaton) {
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
-
+	private static List<SMTLib2Row> enforceDataReferenceRules(SMTSynthesisEngine synthesisInstance) {
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
+//		moduleState,
+//		SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE)),
+		SMTBoundedVar useState = new SMTBoundedVar("useState");
+		SMTBoundedVar memState = new SMTBoundedVar("memState");
+		SMTBoundedVar type = new SMTBoundedVar("type");
 			/* 
 			 * For each type dimension, the Used type states have to be equal to the referenced state values.
 			 */
 			allClauses.add(
 					new Assertion(
 							new ForallStatement(
-								new SMTBoundedVar("use"),
-								SMTDataType.USED_TYPE_STATE,
+								useState,
+								SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)),
 								new ForallStatement(
-									new SMTBoundedVar("mem"),
-									SMTDataType.MEMORY_TYPE_STATE,
+									memState,
+									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)),
 									new ForallStatement(
-										new SMTBoundedVar("dim"),
+										type,
 										SMTDataType.TYPE,
 										new ImplicationStatement(
 													new BinarySMTPredicate(
-														new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
-														new SMTFunctionArgument(new SMTBoundedVar("use")), 
-														new SMTFunctionArgument(new SMTBoundedVar("mem"))),
+														WorkflowElement.MEM_TYPE_REFERENCE, 
+														useState, 
+														memState),
 													new EqualStatement(
 														new BinarySMTPredicate(
-																new SMTFunctionName(WorkflowElement.USED_TYPE), 
-																new SMTFunctionArgument(new SMTBoundedVar("use")), 
-																new SMTFunctionArgument(new SMTBoundedVar("dim"))),
+																WorkflowElement.USED_TYPE, 
+																useState, 
+																type
+																),
 														new BinarySMTPredicate(
-																new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
-																new SMTFunctionArgument(new SMTBoundedVar("mem")), 
-																new SMTFunctionArgument(new SMTBoundedVar("dim"))))
-												))))));
+																WorkflowElement.MEMORY_TYPE, 
+																memState, 
+																type
+																)
+														)
+										))))));
 		
 		/* 
 		 * Empty states reference the null state.
 		 */
 		allClauses.add(new Assertion(
 						new ForallStatement(
-								new SMTBoundedVar("use"),
-								SMTDataType.USED_TYPE_STATE,
+								useState,
+								SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)),
 								new EqualStatement(
 										new BinarySMTPredicate(
-												new SMTFunctionName(WorkflowElement.USED_TYPE), 
-												new SMTFunctionArgument(new SMTBoundedVar("use")), 
-												new SMTFunctionArgument(allTypes.getEmptyType())),
+												WorkflowElement.USED_TYPE, 
+												useState, 
+												new SMTPredicateFunArg(synthesisInstance.getEmptyType())),
 										new BinarySMTPredicate(
-												new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
-												new SMTFunctionArgument(new SMTBoundedVar("use")), 
-												new SMTFunctionArgument(typeAutomaton.getNullState())
+												WorkflowElement.MEM_TYPE_REFERENCE, 
+												useState, 
+												new SMTPredicateFunArg(synthesisInstance.getTypeAutomaton().getNullState())
 												)
 										)
 								)
@@ -310,14 +461,14 @@ public final class SMTModuleUtils {
 		 */
 //		allClauses.add(new Assertion(
 //						new BinarySMTPredicate(
-//								new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
+//								WorkflowElement.MEMORY_TYPE, 
 //								new SMTFunctionArgument(typeAutomaton.getNullState()), 
 //								new SMTFunctionArgument(allTypes.getEmptyType())
 //								)
 //						));
 //		allClauses.add(new Assertion(
 //						new BinarySMTPredicate(
-//								new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
+//								WorkflowElement.MEMORY_TYPE, 
 //								new SMTFunctionArgument(typeAutomaton.getNullState()), 
 //								new SMTFunctionArgument(allTypes.getEmptyAPELabel())
 //								)
@@ -326,102 +477,22 @@ public final class SMTModuleUtils {
 		return allClauses;
 	}
 	
-//	private static List<SMT2LibRow> enforceDataReferenceRules2(AllTypes allTypes, TypeAutomaton typeAutomaton) {
-//		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
-//
-//			/* 
-//			 * For each type dimension, the Used type states have to be equal to the referenced state values.
-//			 */
-//		/* For each type instance */
-//		for (TaxonomyPredicate currType : allTypes.getTypes()) {
-//			if (currType.isSimplePredicate() || currType.isEmptyPredicate()) {
-//				/* ..for each state in which type can be used .. */
-//				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
-//					for (State currUsedTypeState : currUsedBlock.getStates()) {
-//						if (!currType.isEmptyPredicate()) {
-//							/* ..the referenced memory state cannot be null.. */
-//							allClauses.add(new Assertion(
-//									new NandStatement(
-//											new BinarySMTPredicate(
-//													new SMTFunctionName(WorkflowElement.USED_TYPE), 
-//													new SMTFunctionArgument(currUsedTypeState), 
-//													new SMTFunctionArgument(currType)
-//													),
-//											new BinarySMTPredicate(
-//													new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
-//													new SMTFunctionArgument(currUsedTypeState), 
-//													new SMTFunctionArgument(typeAutomaton.getNullState())
-//													))
-//									));
-//
-//							/* ..and for each state in which type can be created in memory .. */
-//							for (Block memoryBlock : typeAutomaton.getMemoryTypesBlocks()) {
-//								for (State refMemoryTypeState : memoryBlock.getStates()) {
-//									/*
-//									 * If the type (currType) is used as an input for a tool (in state
-//									 * currUsedTypeState)
-//									 * ..and the state is referencing a memory state where the type was created
-//									 * (refMemoryTypeState)
-//									 * the type has to be generated in the the referenced memory type state. */
-//									allClauses.add(new Assertion(
-//											new ImplicationStatement(
-//													new AndStatement(
-//														new BinarySMTPredicate(
-//															new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
-//															new SMTFunctionArgument(currUsedTypeState), 
-//															new SMTFunctionArgument(refMemoryTypeState)),
-//														new BinarySMTPredicate(
-//																new SMTFunctionName(WorkflowElement.USED_TYPE), 
-//																new SMTFunctionArgument(currUsedTypeState), 
-//																new SMTFunctionArgument(currType))),
-//													new BinarySMTPredicate(
-//															new SMTFunctionName(WorkflowElement.MEMORY_TYPE), 
-//															new SMTFunctionArgument(refMemoryTypeState), 
-//															new SMTFunctionArgument(currType))
-//												)
-//											));
-//								}
-//							}
-//							/* If the type is empty the referenced state has to be null. */
-//						} else {
-//							allClauses.add(new Assertion(
-//									new ImplicationStatement(
-//											new BinarySMTPredicate(
-//													new SMTFunctionName(WorkflowElement.USED_TYPE), 
-//													new SMTFunctionArgument(currUsedTypeState), 
-//													new SMTFunctionArgument(currType)
-//													),
-//											new BinarySMTPredicate(
-//													new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), 
-//													new SMTFunctionArgument(currUsedTypeState), 
-//													new SMTFunctionArgument(typeAutomaton.getNullState())
-//													))
-//									));
-//						}
-//					}
-//				}
-//			}
-//		}
-//		
-//		return allClauses;
-//	}
-
 	/**
 	 * Generate constraints that ensure that the all tool inputs can reference data
 	 * that is available in memory at the time (where order number of the state is lower).
 	 *
 	 * <br>
-	 * Return the SMT2LIB representation of the input type constraints for all modules,
+	 * Return the SMTLib2 representation of the input type constraints for all modules,
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
 	 * the Shared Memory Approach.
 	 *
 	 * @param typeAutomaton
 	 * @return String representation of constraints.
 	 */
-	private static List<SMT2LibRow> allowDataReferencingCons(TypeAutomaton typeAutomaton) {
+	private static List<SMTLib2Row> allowDataReferencingCons(TypeAutomaton typeAutomaton) {
 
 		// setting up input constraints (Shared Memory Approach)
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		/** For each input state... */
 		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
@@ -434,7 +505,11 @@ public final class SMTModuleUtils {
 				possibleMemStates.add(typeAutomaton.getNullState());
 				List<Fact> allPossibilities = new ArrayList<Fact>();
 				for (State exictingMemState : possibleMemStates) {
-					allPossibilities.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), currInputState, exictingMemState));
+					allPossibilities.add(new BinarySMTPredicate(
+												WorkflowElement.MEM_TYPE_REFERENCE, 
+												new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
+												new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, exictingMemState)
+												));
 				}
 				allClauses.add(new Assertion(
 							new OrStatement(allPossibilities)));
@@ -442,8 +517,16 @@ public final class SMTModuleUtils {
 				for (Pair<PredicateLabel> pair : SATModuleUtils.getPredicatePairs(possibleMemStates)) {
 					allClauses.add(new Assertion(
 							new NandStatement(
-									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), currInputState, pair.getFirst()), 
-									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), currInputState, pair.getSecond())
+									new BinarySMTPredicate(
+											WorkflowElement.MEM_TYPE_REFERENCE, 
+											new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
+											new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, ((State) pair.getFirst()))
+											), 
+									new BinarySMTPredicate(
+											WorkflowElement.MEM_TYPE_REFERENCE, 
+											new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
+											new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, ((State) pair.getSecond()))
+											)
 									)
 							));
 				}
@@ -455,7 +538,12 @@ public final class SMTModuleUtils {
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
 					allClauses.add(new Assertion(
 							new NotStatement(
-									new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), currInputState, nonExictingMemState))
+									new BinarySMTPredicate(
+											WorkflowElement.MEM_TYPE_REFERENCE, 
+											new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
+											new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, nonExictingMemState)
+											)
+									)
 							));
 				}
 			}
@@ -471,10 +559,10 @@ public final class SMTModuleUtils {
 	 * 
 	 * @return String representation of constraints.
 	 */
-//	private static List<SMT2LibRow> allowDataDependencyCons(TypeAutomaton typeAutomaton) {
+//	private static List<SMTLib2Row> allowDataDependencyCons(TypeAutomaton typeAutomaton) {
 //
 //		// setting up dependency constraints
-//		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+//		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 //		/** For each input state... */
 //		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
 //			int blockNumber = currBlock.getBlockNumber();
@@ -530,10 +618,10 @@ public final class SMTModuleUtils {
 //	 * 
 //	 * @return String representation of constraints.
 //	 */
-//	private static List<SMT2LibRow> enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
+//	private static List<SMTLib2Row> enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
 //
 //		// setting up dependency constraints
-//		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+//		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 //		/** For each input state... */
 //		for (Block currInputBlock : typeAutomaton.getUsedTypesBlocks()) {
 //			int blockNumber = currInputBlock.getBlockNumber();
@@ -590,8 +678,8 @@ public final class SMTModuleUtils {
 //		return allClauses;
 //	}
 //
-//	private static List<SMT2LibRow> enforceDataDependencyOverModules(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
-//		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+//	private static List<SMTLib2Row> enforceDataDependencyOverModules(TypeAutomaton typeAutomaton, SMTPredicateMappings mappings) {
+//		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 //		/** For tool inputs and outputs */
 //		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
 //			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
@@ -639,11 +727,11 @@ public final class SMTModuleUtils {
 	 *                          
 	 * @return String representation of constraints.
 	 */
-	private static List<SMT2LibRow> enforcingUsageOfGeneratedTypesCons(SMTSynthesisEngine synthesisInstance) {
+	private static List<SMTLib2Row> enforcingUsageOfGeneratedTypesCons(SMTSynthesisEngine synthesisInstance) {
 
 		Type emptyType = synthesisInstance.getEmptyType();
 		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		/*
 		 * Setting up the constraints that ensure usage of the generated types in the
 		 * memory, (e.g. all workflow inputs and at least one of each of the tool
@@ -658,9 +746,15 @@ public final class SMTModuleUtils {
 					for (State currMemoryState : currBlock.getStates()) {
 
 						List<Fact> allPossibilities = new ArrayList<Fact>();
-						allPossibilities.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), currMemoryState, emptyType));
+						allPossibilities.add(new BinarySMTPredicate(
+													WorkflowElement.MEMORY_TYPE, 
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState),
+													new SMTPredicateFunArg(emptyType)));
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							allPossibilities.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), inputState, currMemoryState));
+							allPossibilities.add(new BinarySMTPredicate(
+													WorkflowElement.MEM_TYPE_REFERENCE, 
+													new SMTBitVec(SMTDataType.USED_TYPE_STATE, inputState), 
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState)));
 						}
 						allClauses.add(new Assertion(
 								new OrStatement(allPossibilities)));
@@ -669,11 +763,17 @@ public final class SMTModuleUtils {
 				} else if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ONE) {
 					List<Fact> allPossibilities = new ArrayList<Fact>();
 					for (State currMemoryState : currBlock.getStates()) {
-						if (currMemoryState.getStateNumber() == 0) {
-							allPossibilities.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), currMemoryState, emptyType));
+						if (currMemoryState.getLocalStateNumber() == 0) {
+							allPossibilities.add(new BinarySMTPredicate(
+													WorkflowElement.MEMORY_TYPE, 
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState), 
+													new SMTPredicateFunArg(emptyType)));
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							allPossibilities.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), inputState, currMemoryState));
+							allPossibilities.add(new BinarySMTPredicate(
+													WorkflowElement.MEM_TYPE_REFERENCE,
+													new SMTBitVec(SMTDataType.USED_TYPE_STATE, inputState),
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState)));
 						}
 					}
 					allClauses.add(new Assertion(
@@ -685,9 +785,15 @@ public final class SMTModuleUtils {
 				if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
 						List<Fact> allPossibilities = new ArrayList<Fact>();
-						allPossibilities.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE),currMemoryState, emptyType));
+						allPossibilities.add(new BinarySMTPredicate(
+													WorkflowElement.MEMORY_TYPE,
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState), 
+													new SMTPredicateFunArg(emptyType)));
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							allPossibilities.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), inputState, currMemoryState));
+							allPossibilities.add(new BinarySMTPredicate(
+													WorkflowElement.MEM_TYPE_REFERENCE, 
+													new SMTBitVec(SMTDataType.USED_TYPE_STATE, inputState), 
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState)));
 						}
 						allClauses.add(new Assertion(
 								new OrStatement(allPossibilities)));
@@ -699,11 +805,17 @@ public final class SMTModuleUtils {
 				} else if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ONE) {
 					List<Fact> allPossibilities = new ArrayList<Fact>();
 					for (State currMemoryState : currBlock.getStates()) {
-						if (currMemoryState.getStateNumber() == 0) {
-							allPossibilities.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), currMemoryState, emptyType));
+						if (currMemoryState.getLocalStateNumber() == 0) {
+							allPossibilities.add(new BinarySMTPredicate(
+													WorkflowElement.MEMORY_TYPE, 
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState), 
+													new SMTPredicateFunArg(emptyType)));
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							allPossibilities.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEM_TYPE_REFERENCE), inputState, currMemoryState));
+							allPossibilities.add(new BinarySMTPredicate(
+													WorkflowElement.MEM_TYPE_REFERENCE, 
+													new SMTBitVec(SMTDataType.USED_TYPE_STATE, inputState), 
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState)));
 						}
 					}
 					allClauses.add(new Assertion(
@@ -718,7 +830,7 @@ public final class SMTModuleUtils {
 	}
 
 	/**
-	 * Return the SMT2LIB representation of the output type constraints for all tools
+	 * Return the SMTLib2 representation of the output type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.<br>
 	 * Generate constraints that preserve tool outputs.
 	 * @param synthesisInstance A specific synthesis run that contains all the
@@ -726,9 +838,9 @@ public final class SMTModuleUtils {
 	 *                          
 	 * @return String representation of constraints.
 	 */
-	private static List<SMT2LibRow> outputCons(SMTSynthesisEngine synthesisInstance) {
+	private static List<SMTLib2Row> outputCons(SMTSynthesisEngine synthesisInstance) {
 		
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		// for each module
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
 			// that is a Tool
@@ -736,7 +848,7 @@ public final class SMTModuleUtils {
 				Module module = (Module) potentialModule;
 				// iterate through all the states
 				for (State moduleState : synthesisInstance.getModuleAutomaton().getAllStates()) {
-					int moduleNo = moduleState.getStateNumber();
+					int moduleNo = moduleState.getLocalStateNumber();
 					// and for each state and output state of that module state
 					List<State> currOutputStates = synthesisInstance.getTypeAutomaton().getMemoryTypesBlock(moduleNo)
 							.getStates();
@@ -751,16 +863,28 @@ public final class SMTModuleUtils {
 
 							allClauses.add(new Assertion(
 									new ImplicationStatement(
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), moduleState, module), 
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), currOutputStates.get(i), outputType)
+											new BinarySMTPredicate(
+													WorkflowElement.MODULE,
+													new SMTBitVec(SMTDataType.MODULE_STATE, moduleState),
+													new SMTPredicateFunArg(module)),
+											new BinarySMTPredicate(
+													WorkflowElement.MEMORY_TYPE, 
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currOutputStates.get(i)),
+													new SMTPredicateFunArg(outputType))
 											)
 									));
 							
 						} else {
 							allClauses.add(new Assertion(
 									new ImplicationStatement(
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), moduleState, module), 
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MEMORY_TYPE), currOutputStates.get(i), synthesisInstance.getEmptyType())
+											new BinarySMTPredicate(
+													WorkflowElement.MODULE, 
+													new SMTBitVec(SMTDataType.MODULE_STATE, moduleState), 
+													new SMTPredicateFunArg(module)), 
+											new BinarySMTPredicate(
+													WorkflowElement.MEMORY_TYPE, 
+													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currOutputStates.get(i)),
+													new SMTPredicateFunArg(synthesisInstance.getEmptyType()))
 											)
 									));
 						}
@@ -780,20 +904,26 @@ public final class SMTModuleUtils {
 	 * @param allModules      All the modules.
 	 * @return The String representation of constraints.
 	 */
-	public static List<SMT2LibRow> moduleMutualExclusion(AllModules allModules) {
+	public static List<SMTLib2Row> moduleMutualExclusion(SMTSynthesisEngine synthesisInstance) {
 
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		allClauses.add(new SMTComment("Encoding rules of mutual exclusion of tools."));
 		
-		SMTBoundedVar state = new SMTBoundedVar("state");
-		for (Pair<PredicateLabel> pair : allModules.getSimplePairs()) {
+		SMTBoundedVar moduleState = new SMTBoundedVar("state");
+		for (Pair<PredicateLabel> pair : synthesisInstance.getDomainSetup().getAllModules().getSimplePairs()) {
 				allClauses.add(new Assertion(
 						new ForallStatement(
-								state,
-								SMTDataType.MODULE_STATE,
+								moduleState,
+								SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE)),
 								new NandStatement(
-										new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), new SMTFunctionArgument(state), new SMTFunctionArgument(pair.getFirst())), 
-										new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), new SMTFunctionArgument(state), new SMTFunctionArgument(pair.getSecond()))
+										new BinarySMTPredicate(
+												WorkflowElement.MODULE, 
+												moduleState,
+												new SMTPredicateFunArg(pair.getFirst())), 
+										new BinarySMTPredicate(
+												WorkflowElement.MODULE, 
+												moduleState,
+												new SMTPredicateFunArg(pair.getSecond()))
 										)
 								)
 						));
@@ -809,24 +939,27 @@ public final class SMTModuleUtils {
 	 * @param allModules      All the modules.
 	 * @return String representation of constraints.
 	 */
-	public static List<SMT2LibRow> moduleMandatoryUsage(AllModules allModules) {
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+	public static List<SMTLib2Row> moduleMandatoryUsage(SMTSynthesisEngine synthesisInstance) {
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		allClauses.add(new SMTComment("Encoding rules of mandatory usage of tools."));
 		
-		if (allModules.getModules().isEmpty()) {
+		if (synthesisInstance.getDomainSetup().getAllModules().getModules().isEmpty()) {
 			System.err.println("No tools were I/O annotated.");
 			return allClauses;
 		}
-		SMTBoundedVar state = new SMTBoundedVar("state");
+		SMTBoundedVar moduleState = new SMTBoundedVar("state");
 		SMTBoundedVar tool = new SMTBoundedVar("tool");
 		allClauses.add(new Assertion(
 				new ForallStatement(
-						state,
-						SMTDataType.MODULE_STATE,
+						moduleState,
+						SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE)),
 						new ExistsStatement(
 								tool,
 								SMTDataType.MODULE,
-								new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), new SMTFunctionArgument(state), new SMTFunctionArgument(tool))
+								new BinarySMTPredicate(
+										WorkflowElement.MODULE, 
+										moduleState, 
+										tool)
 						)
 				)
 		));
@@ -846,23 +979,29 @@ public final class SMTModuleUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications.
 	 */
-	public static List<SMT2LibRow> moduleEnforceTaxonomyStructure(TaxonomyPredicate parentModule, boolean firstCall) {
+	public static List<SMTLib2Row> moduleEnforceTaxonomyStructure(SMTSynthesisEngine synthesisInstance, TaxonomyPredicate parentModule, boolean firstCall) {
 
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		if(firstCall) {
 			allClauses.add(new SMTComment("Encoding rules to preserve the structure of the tool taxonomy."));
 		}
 		
-		SMTBoundedVar state = new SMTBoundedVar("state");
+		SMTBoundedVar moduleState = new SMTBoundedVar("state");
 		if (!(parentModule.getSubPredicates() == null || parentModule.getSubPredicates().isEmpty())) {
 			allClauses.add(new Assertion(
 							new ForallStatement(
-									state,
-									SMTDataType.MODULE_STATE,
+									moduleState,
+									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE)),
 									new EqualStatement(
-											new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), new SMTFunctionArgument(state), new SMTFunctionArgument(parentModule)),
+											new BinarySMTPredicate(
+													WorkflowElement.MODULE, 
+													moduleState, 
+													new SMTPredicateFunArg(parentModule)),
 											new OrStatement(parentModule.getSubPredicates().stream()
-													.map(subModule -> new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), new SMTFunctionArgument(state), new SMTFunctionArgument(subModule)))
+													.map(subModule -> new BinarySMTPredicate(
+																			WorkflowElement.MODULE, 
+																			moduleState, 
+																			new SMTPredicateFunArg(subModule)))
 													.collect(Collectors.toList())
 													)
 											)
@@ -870,7 +1009,7 @@ public final class SMTModuleUtils {
 					));
 			
 			for (TaxonomyPredicate subModule : APEUtils.safe(parentModule.getSubPredicates())) {
-				allClauses.addAll(moduleEnforceTaxonomyStructure(subModule, false));
+				allClauses.addAll(moduleEnforceTaxonomyStructure(synthesisInstance, subModule, false));
 			}
 		}
 		

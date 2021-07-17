@@ -25,7 +25,7 @@ import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.Literal;
-import nl.uu.cs.ape.models.smtStruc.SMT2LibRow;
+import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.utils.APEUtils;
 
 import java.awt.image.BufferedImage;
@@ -211,7 +211,7 @@ public class SolutionWorkflow {
                          */
                         ModuleNode usedTypeNode = this.usedType2ToolMap.get(currLiteral.getUsedInStateArgument());
                         TypeNode memoryTypeNode = this.mappedMemoryTypeNodes.get(currLiteral.getPredicate());
-                        int inputIndex = currLiteral.getUsedInStateArgument().getStateNumber();
+                        int inputIndex = currLiteral.getUsedInStateArgument().getLocalStateNumber();
                         /* = Keep the order of inputs as they were defined in the solution file. */
                         if (usedTypeNode != null) {
                             usedTypeNode.setInputType(inputIndex, memoryTypeNode);
@@ -277,7 +277,7 @@ public class SolutionWorkflow {
                          */
                         ModuleNode usedTypeNode = this.usedType2ToolMap.get(currAtom.getUsedInStateArgument());
                         TypeNode memoryTypeNode = this.mappedMemoryTypeNodes.get(currAtom.getPredicate());
-                        int inputIndex = currAtom.getUsedInStateArgument().getStateNumber();
+                        int inputIndex = currAtom.getUsedInStateArgument().getLocalStateNumber();
                         /* = Keep the order of inputs as they were defined in the solution file. */
                         if (usedTypeNode != null) {
                             usedTypeNode.setInputType(inputIndex, memoryTypeNode);

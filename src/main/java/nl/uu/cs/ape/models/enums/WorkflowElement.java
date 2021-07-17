@@ -1,6 +1,6 @@
 package nl.uu.cs.ape.models.enums;
 
-import nl.uu.cs.ape.models.logic.constructs.APEPredicate;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
 
 /**
  * Defines the values describing the states in the workflow.
@@ -10,7 +10,7 @@ import nl.uu.cs.ape.models.logic.constructs.APEPredicate;
  * 
  *  @author Vedran Kasalica
  */
-public enum WorkflowElement implements APEPredicate {
+public enum WorkflowElement implements SMTFunctionName {
 
     /**
      * Depicts usage of a tool/module.

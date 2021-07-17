@@ -1,37 +1,35 @@
 package nl.uu.cs.ape.models.smtStruc;
 
-import nl.uu.cs.ape.models.SMTPredicateMappings;
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
 
 /**
  * Structure used to model binary predicate - (predicate x y) statement in smt2lib.
  * @author Vedran Kasalica
  *
  */
-public class BinaryBoolFuncDeclaration implements SMT2LibRow {
+public class BinaryBoolFuncDeclaration implements SMTLib2Row {
 
-	private SMTFunctionName predicate;
+	private WorkflowElement predicate;
 	private SMTDataType argument1;
 	private SMTDataType argument2;
 	
 	
 	
-	public BinaryBoolFuncDeclaration(SMTFunctionName predicate, SMTDataType argument1, SMTDataType argument2) {
+	public BinaryBoolFuncDeclaration(WorkflowElement predicate, SMTDataType argument1, SMTDataType argument2) {
 		super();
 		this.predicate = predicate;
 		this.argument1 = argument1;
 		this.argument2 = argument2;
 	}
 
-	public String toString(SMTPredicateMappings mapping) {
+	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 
 		constraints
 		.append("(declare-fun ")
-			.append(predicate.toString(mapping))
+			.append(predicate.toString())
 			.append(" (")
 				.append(argument1.toString()).append(" ")
 				.append(argument2.toString())

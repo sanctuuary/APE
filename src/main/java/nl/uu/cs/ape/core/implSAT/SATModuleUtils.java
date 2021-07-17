@@ -111,13 +111,13 @@ public final class SATModuleUtils {
 				Module module = (Module) potentialModule;
 				/* ..iterate through all the states.. */
 				for (State moduleState : synthesisInstance.getModuleAutomaton().getAllStates()) {
-					int moduleNo = moduleState.getStateNumber();
+					int moduleNo = moduleState.getLocalStateNumber();
 					/* ..and for each state and input state of that module state.. */
 					List<State> currInputStates = synthesisInstance.getTypeAutomaton().getUsedTypesBlock(moduleNo - 1)
 							.getStates();
 					List<Type> moduleInputs = module.getModuleInput();
 					for (State currInputState : currInputStates) {
-						int currInputStateNo = currInputState.getStateNumber();
+						int currInputStateNo = currInputState.getLocalStateNumber();
 						/*
 						 * ..require data type and/or format to be used in one of the directly preceding
 						 * input states, if the data type/format it exists, otherwise use empty type.
@@ -502,7 +502,7 @@ public final class SATModuleUtils {
 					/* In case that at least one workflow input need to be used */
 				} else if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ONE) {
 					for (State currMemoryState : currBlock.getStates()) {
-						if (currMemoryState.getStateNumber() == 0) {
+						if (currMemoryState.getLocalStateNumber() == 0) {
 							constraints = constraints
 									.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
 									.append(" ");
@@ -537,7 +537,7 @@ public final class SATModuleUtils {
 					 */
 				} else if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ONE) {
 					for (State currMemoryState : currBlock.getStates()) {
-						if (currMemoryState.getStateNumber() == 0) {
+						if (currMemoryState.getLocalStateNumber() == 0) {
 							constraints = constraints
 									.append(mappings.add(emptyType, currMemoryState, WorkflowElement.MEMORY_TYPE))
 									.append(" ");
@@ -577,7 +577,7 @@ public final class SATModuleUtils {
 				Module module = (Module) potentialModule;
 				// iterate through all the states
 				for (State moduleState : synthesisInstance.getModuleAutomaton().getAllStates()) {
-					int moduleNo = moduleState.getStateNumber();
+					int moduleNo = moduleState.getLocalStateNumber();
 					// and for each state and output state of that module state
 					List<State> currOutputStates = synthesisInstance.getTypeAutomaton().getMemoryTypesBlock(moduleNo)
 							.getStates();

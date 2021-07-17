@@ -5,7 +5,6 @@ import java.util.Map;
 
 import nl.uu.cs.ape.core.implSMT.SMTUtils;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBoundedVar;
 
 /**
  * The {@code SMTPredicateMappings} class is used to store the data used for representing the predicates with unique strings.
@@ -39,7 +38,7 @@ public class SMTPredicateMappings implements Mappings {
     }
 
     /**
-     * Function is returning the mapping String of the <b>predicate</b>. The mapping string follows the syntax of an identifier in SMT2Lib. If the PredicateLabel did not occur before,
+     * Function is returning the mapping String of the <b>predicate</b>. The mapping string follows the syntax of an identifier in SMTLib2. If the PredicateLabel did not occur before,
      * it is added to the mapping set and the mapping value is returned, otherwise the existing mapping value is returned.
      *
      * @param predicate   The mapped predicate.
@@ -53,7 +52,7 @@ public class SMTPredicateMappings implements Mappings {
                 throw MappingsException.mappedPredicateSignaturesOverlap("Encoding error. Two or more mappings map share same string: '" + predicate.toString() + "' as ID.");
             }
             size++;
-            // provide identifier supported by SMT2Lib
+            // provide identifier supported by SMTLib2
             
             
             String smtSupportedID = SMTUtils.removeUnsupportedCharacters(predicate.getPredicateLabel());
@@ -98,7 +97,7 @@ public class SMTPredicateMappings implements Mappings {
     }
 
     /**
-     * Gets size.
+     * Gets number of the mapped predicates.
      *
      * @return The size of the mapping set.
      */

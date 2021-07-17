@@ -5,6 +5,6 @@ package nl.uu.cs.ape.models.smtStruc;
  * @author Vedran Kasalica
  *
  */
-public interface SMT2LibRow extends SMT2LibElem {
+public interface SMTLib2Row extends SMTLib2Elem {
 
 }

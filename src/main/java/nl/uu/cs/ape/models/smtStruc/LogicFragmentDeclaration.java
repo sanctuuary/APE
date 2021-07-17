@@ -1,6 +1,6 @@
 package nl.uu.cs.ape.models.smtStruc;
 
-import nl.uu.cs.ape.models.SMTPredicateMappings;
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.models.enums.SMTLogicFragment;
 
 /**
@@ -9,7 +9,7 @@ import nl.uu.cs.ape.models.enums.SMTLogicFragment;
  * @author Vedran Kasalica
  *
  */
-public class LogicFragmentDeclaration implements SMT2LibRow {
+public class LogicFragmentDeclaration implements SMTLib2Row {
 
 	private SMTLogicFragment fragment;
 	
@@ -17,7 +17,7 @@ public class LogicFragmentDeclaration implements SMT2LibRow {
 		this.fragment = fragment;
 	}
 	
-	public String toString(SMTPredicateMappings mapping) {
+	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 		constraints
 			.append("(set-logic ")

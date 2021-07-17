@@ -396,7 +396,7 @@ public abstract class SLTL_formula {
 		StringBuilder constraints = new StringBuilder();
 		/* For each module state in the workflow */
 		for (State moduleState : moduleAutomaton.getAllStates()) {
-			int moduleNo = moduleState.getStateNumber();
+			int moduleNo = moduleState.getLocalStateNumber();
             /* ..and for each input state of that module state.. */
             List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
             /* Encode: if module was used in the module state */
@@ -431,7 +431,7 @@ public abstract class SLTL_formula {
 		StringBuilder constraints = new StringBuilder();
 		/* For each module state in the workflow */
 		for (State moduleState : moduleAutomaton.getAllStates()) {
-			int moduleNo = moduleState.getStateNumber();
+			int moduleNo = moduleState.getLocalStateNumber();
             /* ..and for each input state of that module state.. */
             List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
             /* Encode: if module was used in the module state */

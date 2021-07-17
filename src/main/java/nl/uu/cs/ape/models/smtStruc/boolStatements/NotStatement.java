@@ -1,11 +1,12 @@
 package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.models.SMTPredicateMappings;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
- * Structure used to model nand - (not x)) statement in smt2lib.
+ * Structure used to model nand - (not x)) statement in SMTLib2.
  * @author Vedran Kasalica
  *
  */
@@ -22,11 +23,11 @@ public class NotStatement implements Fact {
 
 
 
-	public String toString(SMTPredicateMappings mapping) {
+	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 		constraints
 			.append("(not ")
-				.append(negatedStatement.toString(mapping))
+				.append(negatedStatement.getSMT2Encoding(synthesisEngine))
 			.append(")");
 		
 		return constraints.toString();

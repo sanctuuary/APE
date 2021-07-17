@@ -1,6 +1,6 @@
 package nl.uu.cs.ape.models.smtStruc;
 
-import nl.uu.cs.ape.models.SMTPredicateMappings;
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
 
 /**
@@ -8,7 +8,7 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
  * @author Vedran Kasalica
  *
  */
-public class Assertion implements SMT2LibRow {
+public class Assertion implements SMTLib2Row {
 
 	private Fact content;
 	
@@ -16,11 +16,11 @@ public class Assertion implements SMT2LibRow {
 		this.content = content;
 	}
 	
-	public String toString(SMTPredicateMappings mapping) {
+	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 		constraints
 			.append("(assert ")
-				.append(content.toString(mapping))
+				.append(content.getSMT2Encoding(synthesisEngine))
 			.append(")");
 		return constraints.append("\n").toString();
 	}

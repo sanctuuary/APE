@@ -13,9 +13,15 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  */
 public class State implements PredicateLabel {
 
+	/** Unique name of the state */
     private final String stateName;
-    private final int stateNumber;
+    /** Local number of the state (within the block) */
+    private final int localStateNumber;
+    /** Order number of the state with respect to the state type (i.e., unique number within the same type) */
+    private final int typeDependantStateNumber;
+    /** Absolute order number of the state (i.e., unique number per state). */
     private final int absoluteStateNumber;
+    /** Type of the state */
     private final WorkflowElement workflowStateType;
 
     /**
@@ -23,14 +29,15 @@ public class State implements PredicateLabel {
      *
      * @param workflowStateType Parameter determining the state type.
      * @param blockNumber       Corresponds to the block number within the type automaton (not applicable for the module automaton).
-     * @param stateNumber       Corresponds to the state number within block.
+     * @param localStateNumber       Corresponds to the state number within block.
      * @param inputBranching   Max number of inputs per module.
      * @param outputBranching   Max number of outputs per module.
      */
     public State(WorkflowElement workflowStateType, Integer blockNumber, int stateNumber, int inputBranching, int outputBranching) {
 
         this.stateName = WorkflowElement.getStringShortcut(workflowStateType, blockNumber, stateNumber);
-        this.stateNumber = stateNumber;
+        this.localStateNumber = stateNumber;
+        this.typeDependantStateNumber = calculateAutomatonStateNumber(blockNumber, stateNumber, inputBranching, outputBranching, workflowStateType);
         this.absoluteStateNumber = calculateAbsStateNumber(blockNumber, stateNumber, inputBranching, outputBranching, workflowStateType);
         this.workflowStateType = workflowStateType;
     }
@@ -94,7 +101,7 @@ public class State implements PredicateLabel {
      * @return String representation of the state.
      */
     public String getPredicateID() {
-        return stateName;
+        return this.stateName;
     }
 
     /**
@@ -103,7 +110,7 @@ public class State implements PredicateLabel {
      * @return String representation of the state.
      */
     public String getPredicateLabel() {
-        return stateName;
+        return this.stateName;
     }
     
     /**
@@ -112,18 +119,28 @@ public class State implements PredicateLabel {
      * @return String representation of the state.
      */
     public String getPredicateLongLabel() {
-        return stateName;
+        return this.stateName;
     }
 
     /**
      * Returns the order number of the state in the respective array of states.
      *
-     * @return Order number of the state (within the block).
+     * @return Order number of the state (within the block). Unlike the type states, tool state indexing starts with index 1.
      */
-    public int getStateNumber() {
-        return stateNumber;
+    public int getLocalStateNumber() {
+        return this.localStateNumber;
     }
 
+    /**
+     * Returns the  order number of the state with respect to the State Type ({@link WorkflowElement}). Unlike {@link #getStateNumber}, this function returns number that can be used to compare ordering of any 2 states of the same type in the system,
+     * disregarding the block. null memory state has {@link #typeDependantStateNumber} = -1.
+     *
+     * @return Non-negative number that corresponds to the order number of the state within the same type or -1 for null memory state.
+     */
+    public int getTypeDependantStateNumber() {
+        return this.typeDependantStateNumber;
+    }
+    
     /**
      * Returns the absolute order number of the state within the whole workflow. Unlike {@link #getStateNumber}, this function returns number that can be used to compare ordering of any 2 states in the system,
      * disregarding the block or their type (data type, tool, etc.). null state has AbsoluteStateNumber -1.
@@ -131,7 +148,7 @@ public class State implements PredicateLabel {
      * @return Non-negative number that corresponds to the absolute order number of the state or -1 for null state.
      */
     public int getAbsoluteStateNumber() {
-        return absoluteStateNumber;
+        return this.absoluteStateNumber;
     }
 
     /**
@@ -140,7 +157,7 @@ public class State implements PredicateLabel {
      * @return The {@link SMTDataType} that describes the state.
      */
     public WorkflowElement getWorkflowStateType() {
-        return workflowStateType;
+        return this.workflowStateType;
     }
 
     /**
@@ -151,7 +168,7 @@ public class State implements PredicateLabel {
      * {@link SMTDataType#MODULE} corresponds to the Module/Tool State.
      *
      * @param blockNumber     Corresponds to the block number within the type automaton (not applicable for the module automaton).
-     * @param stateNumber     Corresponds to the state number within block.
+     * @param localStateNumber     Corresponds to the state number within block.
      * @param inputBranching   Max number of inputs per module.
      * @param outputBranching   Max number of outputs per module.
      * @param typeOfTheState  Parameter determining the state type.
@@ -169,5 +186,34 @@ public class State implements PredicateLabel {
         }
 
         return absOrderNumber;
+    }
+    
+    /**
+     * Function used to calculate the order number of a state within the corresponding automaton (e.g., order number of a MemoryState in a MemoryState Automaton)
+     * The information is calculated based on the  block number, order number within the block and type of the state.
+     * <p>
+     * {@link SMTDataType#MEMORY_TYPE} corresponds to the Memory Type State,<br>
+     * {@link SMTDataType#USED_TYPE} corresponds to the Used Type State,<br>
+     * {@link SMTDataType#MODULE} corresponds to the Module/Tool State.
+     *
+     * @param blockNumber     Corresponds to the block number within the type automaton (not applicable for the module automaton).
+     * @param localStateNumber     Corresponds to the state number within block.
+     * @param inputBranching   Max number of inputs per module.
+     * @param outputBranching   Max number of outputs per module.
+     * @param typeOfTheState  Parameter determining the state type.
+     * @return The calculated order number of this type of state (where indexing starts from 0).
+     */
+    private static int calculateAutomatonStateNumber(Integer blockNumber, int stateNumber, int inputBranching, int outputBranching, WorkflowElement typeOfTheState) {
+        int orderNumber = 0;
+
+        if (typeOfTheState == WorkflowElement.MEMORY_TYPE) {        /* Case: Memory Type State */
+            orderNumber = (blockNumber *  outputBranching) + stateNumber + 1;
+        } else if (typeOfTheState == WorkflowElement.USED_TYPE) {    /* Case: Used Type State */
+            orderNumber = (blockNumber * inputBranching) + stateNumber;
+        } else if (typeOfTheState == WorkflowElement.MODULE) {        /* Case: Module/Tool State */
+            orderNumber =  stateNumber - 1;
+        }
+
+        return orderNumber;
     }
 }

@@ -54,7 +54,7 @@ public class ModuleAutomaton implements Automaton {
     }
 
     /**
-     * Return {@code i}-th Module state from the automaton.
+     * Return {@code i}-th Module state from the automaton (where 0 is the first index).
      *
      * @param i Ordering number of the state to be returned.
      * @return Module State.

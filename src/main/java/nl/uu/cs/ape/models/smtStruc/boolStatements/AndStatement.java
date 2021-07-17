@@ -3,10 +3,10 @@ package nl.uu.cs.ape.models.smtStruc.boolStatements;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.uu.cs.ape.models.SMTPredicateMappings;
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
- * Structure used to model (and x y) statement in smt2lib.
+ * Structure used to model (and x y) statement in SMTLib2.
  * 
  * @author Vedran Kasalica
  *
@@ -30,15 +30,15 @@ private List<Fact> conjunctedFacts;
 	}
 
 
-	public String toString(SMTPredicateMappings mapping) {
+	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 		if(conjunctedFacts.size() == 1) {
-			return conjunctedFacts.get(0).toString(mapping);
+			return conjunctedFacts.get(0).getSMT2Encoding(synthesisEngine);
 		}
 		constraints.append("(and");
 //		add the statements to the conjunction
 		for(Fact fact : conjunctedFacts) {
-			constraints.append(" ").append(fact.toString(mapping));
+			constraints.append(" ").append(fact.getSMT2Encoding(synthesisEngine));
 		}
 		constraints.append(")");
 		

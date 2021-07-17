@@ -14,12 +14,14 @@ import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.Literal;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.smtStruc.Assertion;
-import nl.uu.cs.ape.models.smtStruc.SMT2LibRow;
+import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.AndStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.NotStatement;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBitVec;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTPredicateFunArg;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
@@ -200,37 +202,6 @@ public class SMTSolution extends SolutionInterpreter {
     }
 
 
-	/**
-	 * Returns the negated solution in mapped format. Negating the original solution
-	 * created by the SAT solver. Usually used to add to the solver to find new
-	 * solutions.
-	 *
-     * @param toolSeqRepeat variable defining if the provided solutions should be distinguished based on the tool sequences alone
-	 * @return int[] representing the negated solution
-	 */
-//	public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
-//		List<Integer> negSol = new ArrayList<Integer>();
-//		if (!unsat) {
-//			if(!toolSeqRepeat) {
-//				for (Atom literal : relevantModules) {
-//					negSol.add(literal.toNegatedMappedInt());
-//				}
-//			} else {
-//			for (Atom literal : relevantElements) {
-//				if (literal.getWorkflowElementType() != SMTDataType.MEMORY_TYPE) {
-//					negSol.add(literal.toNegatedMappedInt());
-//				}
-//			}
-//			}
-//		}
-//		int[] negSolList = new int[negSol.size()];
-//		for (int i = 0; i < negSol.size(); i++) {
-//			negSolList[i] = negSol.get(i);
-//		}
-//
-//        return negSolList;
-//    }
-    
     /**
 	 * Returns the negated solution in mapped format. Negating the original solution
 	 * created by the SAT solver. Usually used to add to the solver to find new
@@ -239,18 +210,34 @@ public class SMTSolution extends SolutionInterpreter {
      * @param toolSeqRepeat variable defining if the provided solutions should be distinguished based on the tool sequences alone
 	 * @return int[] representing the negated solution
 	 */
-	public List<SMT2LibRow> getSMTnegatedSolution(boolean allowToolSeqRepeat) {
-		List<SMT2LibRow> allClauses = new ArrayList<SMT2LibRow>();
+	public List<SMTLib2Row> getSMTnegatedSolution(boolean allowToolSeqRepeat) {
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		List<Fact> facts = new ArrayList<Fact>();
 		if (!unsat) {
 			if(!allowToolSeqRepeat) {
 				for (Atom atom : relevantModules) {
-					facts.add(new BinarySMTPredicate(new SMTFunctionName(WorkflowElement.MODULE), atom.getUsedInStateArgument(), atom.getPredicate()));
+					facts.add(new BinarySMTPredicate(
+									WorkflowElement.MODULE, 
+									new SMTBitVec(SMTDataType.MODULE_STATE, atom.getUsedInStateArgument()), 
+									new SMTPredicateFunArg(atom.getPredicate())
+								));
 				}
 			} else {
 				for (Atom atom : relevantElements) {
-					if (atom.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
-						facts.add(new BinarySMTPredicate(new SMTFunctionName(atom.getWorkflowElementType()), atom.getUsedInStateArgument(), atom.getPredicate()));
+					if (atom.getWorkflowElementType() == WorkflowElement.MODULE) {
+							facts.add(new BinarySMTPredicate(
+										WorkflowElement.MODULE, 
+										new SMTBitVec(SMTDataType.MODULE_STATE, atom.getUsedInStateArgument()), 
+										new SMTPredicateFunArg(atom.getPredicate())
+									));
+					} else if (atom.getWorkflowElementType() == WorkflowElement.USED_TYPE) {
+							facts.add(new BinarySMTPredicate(
+									WorkflowElement.USED_TYPE, 
+									new SMTBitVec(SMTDataType.USED_TYPE_STATE, atom.getUsedInStateArgument()), 
+									new SMTPredicateFunArg(atom.getPredicate())
+								));
+					} else {
+						// SKIP Memory Type
 					}
 				}
 			}

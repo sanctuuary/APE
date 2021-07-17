@@ -1,9 +1,9 @@
 package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
-import nl.uu.cs.ape.models.SMTPredicateMappings;
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
- * Structure used to model (assert x) statement in smt2lib.
+ * Structure used to model (assert x) statement in SMTLib2.
  * @author Vedran Kasalica
  *
  */
@@ -19,16 +19,35 @@ public class ExistsStatement implements Fact {
 		this.content = content;
 	}
 	
-	public String toString(SMTPredicateMappings mapping) {
+
+	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 		constraints
 			.append("(exists ")
 				.append("((")
-					.append(boundedVar.toString(mapping)).append(" ")
+					.append(boundedVar.getSMT2Encoding(synthesisEngine)).append(" ")
 					.append(this.dataType.toString())
 				.append(")) ")
-				.append(content.toString(mapping))
+				.append("(and ")
+					.append(boundedVarIsInBounds(synthesisEngine))
+					.append(" ")
+					.append(content.getSMT2Encoding(synthesisEngine))
+				.append(")")
 			.append(")");
+		return constraints.toString();
+	}
+	
+	private String boundedVarIsInBounds(SMTSynthesisEngine synthesisEngine) {
+		StringBuilder constraints = new StringBuilder();
+		
+		constraints.append("(")
+						.append(SMTBitVectorOp.LESS_THAN.toString())
+						.append(" ")
+						.append(boundedVar.getSMT2Encoding(synthesisEngine))
+						.append(" ")
+						.append(synthesisEngine.getAutomatonSize(dataType))
+					.append(")");
+		
 		return constraints.toString();
 	}
 }
