@@ -5,16 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
-import javax.lang.model.element.Element;
 
 import org.apache.commons.io.FileUtils;
-import org.semanticweb.owlapi.io.SystemOutDocumentTarget;
 
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
@@ -108,8 +102,11 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         if(runConfig.getZ3LogicFragment() != null) {
         	APEUtils.appendToFile(smtEncoding, new LogicFragmentDeclaration(runConfig.getZ3LogicFragment()).getSMT2Encoding(this));
         }
-        APEUtils.appendToFile(smtEncoding, "(set-option :pp.bv-literals false)\n");
-        APEUtils.appendToFile(smtEncoding, "(set-option :produce-models true)\n");
+        
+        
+        APEUtils.appendToFile(smtEncoding, runConfig.getSMTOptions());
+//        APEUtils.appendToFile(smtEncoding, "(set-option :pp.bv-literals false)\n");
+//        APEUtils.appendToFile(smtEncoding, "(set-option :produce-models true)\n");
         APEUtils.appendToFile(smtEncoding, "(set-option :timeout " + runConfig.getTimeoutMs() + ")\n");
         
 //        APEUtils.appendToFile(smtEncoding, "(set-option :produce-unsat-cores true)\n"); 
@@ -395,11 +392,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
                     				int a2 = Integer.parseInt(words[2].replace("bv", ""));
                     				State arg2 = typeAutomaton.getState(SMTDataType.MEMORY_TYPE_STATE, a2);
                     				
-                    				if(arg2 == null || tmpState == null){
-										System.out.println("__________________^^^^^^^^^^^^^^^^^^__________________");
-									}
                     				Atom currAtom  = new Atom(arg2, tmpState, currFun);
-                    				System.out.println(currAtom.toString());
     	                    		atoms.add(currAtom);
                     			}
                     			
@@ -410,11 +403,8 @@ public class SMTSynthesisEngine implements SynthesisEngine {
 									while(recur.contains("x!0")) {
 										String[] words =  splitFromChar(recur, "x!0");
 										String a2 = words[1];
-										
 										PredicateLabel arg2 = mappings.findOriginal(a2);
-										if(arg2 == null || tmpState == null){
-											System.out.println("__________________^^^^^^^^^^^^^^^^^^__________________");
-										}
+
 										Atom currAtom  = new Atom(arg2, tmpState, currFun);
 			                    		atoms.add(currAtom);
 			                    		

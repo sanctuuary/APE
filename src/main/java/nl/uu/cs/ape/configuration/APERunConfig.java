@@ -775,4 +775,12 @@ public class APERunConfig {
         }
     }
 
+    private String options;
+    public void setSMTOptions(String options) {
+    	this.options = options;
+    }
+	public String getSMTOptions() {
+		return this.options;
+	}
+
 }
