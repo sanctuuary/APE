@@ -13,6 +13,7 @@ public class ForallStatement implements Fact {
 	private SMTBoundedVar boundedVar;
 	private SMTDataType dataType;
 	private Fact content;
+	private boolean explicit;
 	
 	public ForallStatement(SMTBoundedVar boundedVar, SMTDataType dataType, Fact content) {
 		this.boundedVar = boundedVar;
@@ -20,13 +21,21 @@ public class ForallStatement implements Fact {
 		this.content = content;
 	}
 	
+	public ForallStatement(boolean explicit, SMTBoundedVar boundedVar, SMTDataType dataType, Fact content) {
+		this.boundedVar = boundedVar;
+		this.dataType = dataType;
+		this.content = content;
+		this.explicit = explicit;
+	}
+	
 	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
-		if(synthesisEngine.getAutomatonSize(dataType) == -1) {
+		if((synthesisEngine.getAutomatonSize(dataType) == -1) || explicit) {
 			constraints
 			.append("(forall ")
 				.append("((")
-					.append(boundedVar.getSMT2Encoding(synthesisEngine)).append(" ")
+					.append(boundedVar.getSMT2Encoding(synthesisEngine))
+					.append(" ")
 					.append(this.dataType.toString())
 				.append(")) ")
 				.append(content.getSMT2Encoding(synthesisEngine))
@@ -35,8 +44,9 @@ public class ForallStatement implements Fact {
 		constraints
 			.append("(forall ")
 				.append("((")
-					.append(boundedVar.getSMT2Encoding(synthesisEngine)).append(" ")
-					.append(this.dataType.toString())
+					.append(boundedVar.getSMT2Encoding(synthesisEngine))
+					.append(" ")
+					.append(this.dataType.toBitVector(synthesisEngine))
 				.append(")) ")
 				.append("(or ")
 					.append(boundedVarIsOutOfBounds(synthesisEngine))

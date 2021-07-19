@@ -18,6 +18,7 @@ import nl.uu.cs.ape.models.SMTPredicateMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.smtStruc.Assertion;
@@ -26,6 +27,7 @@ import nl.uu.cs.ape.models.smtStruc.DataTypeDeclaration;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.models.smtStruc.SMTComment;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.DeclareSimplifiedFunction;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.EqualStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.ExistsStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
@@ -37,7 +39,9 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.OrStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBitVec;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBoundedVar;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionArgument;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTPredicateFunArg;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBitVectorOp;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
@@ -96,21 +100,20 @@ public final class SMTModuleUtils {
 		allTypes.getDataTaxonomyDimensionsAndLabel().stream().forEach(
 			 dimension -> types.addAll(allTypes.getElementsFromSubTaxonomy(dimension))
 		);
-		// define empty type as datatype
 		
 		allClauses.add(new DataTypeDeclaration(SMTDataType.TYPE, types));
 		
 		
 		// define labels as data type TODO test if this is working with empty being a data type
 //		Type labelRoot = synthesisInstance.getDomainSetup().getAllTypes().getLabelRoot();
-//		allClauses.add(new DataTypeDeclaration(new SMTDataType(labelRoot), allTypes.getElementsFromSubTaxonomy(labelRoot)));
+//		allClauses.add(new DeclareSimplifiedFunction(new SMTDataType(labelRoot), allTypes.getElementsFromSubTaxonomy(labelRoot)));
 		
 		// define workflow states as data types
-//		allClauses.add(new DataTypeDeclaration(SMTDataType.MODULE_STATE, synthesisInstance.getModuleAutomaton().getAllStates()));
+//		allClauses.add(new DeclareSimplifiedFunction(SMTDataType.MODULE_STATE, synthesisInstance.getModuleAutomaton().getAllStates()));
 //		List<State> memoryStates = synthesisInstance.getTypeAutomaton().getAllMemoryTypesStates();
 //		memoryStates.add(synthesisInstance.getTypeAutomaton().getNullState());
-//		allClauses.add(new DataTypeDeclaration(SMTDataType.MEMORY_TYPE_STATE, memoryStates));
-//		allClauses.add(new DataTypeDeclaration(SMTDataType.USED_TYPE_STATE, synthesisInstance.getTypeAutomaton().getAllUsedTypesStates()));
+//		allClauses.add(new DeclareSimplifiedFunction(SMTDataType.MEMORY_TYPE_STATE, memoryStates));
+//		allClauses.add(new DeclareSimplifiedFunction(SMTDataType.USED_TYPE_STATE, synthesisInstance.getTypeAutomaton().getAllUsedTypesStates()));
 		
 		return allClauses;
 	}
@@ -126,7 +129,6 @@ public final class SMTModuleUtils {
 	 */
 	public static List<SMTLib2Row> encodeWorkflowStructure(SMTSynthesisEngine synthesisInstance) {
 
-		System.out.println(synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE));
 		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		allClauses.add(new SMTComment("Encoding workflow structure functions."));
 		// encode that each tool state is defined over an operation (where tool states are represented as BitVec that corresponding to the order number of the state)
@@ -135,13 +137,13 @@ public final class SMTModuleUtils {
 									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE)), 
 									SMTDataType.MODULE));
 
-		SMTBoundedVar moduleState = new SMTBoundedVar("moduleState");
-		SMTBoundedVar module = new SMTBoundedVar("module");
+//		SMTBoundedVar moduleState = new SMTBoundedVar("moduleState");
+//		SMTBoundedVar module = new SMTBoundedVar("module");
 //		allClauses.add(new Assertion(
 //							new ForallStatement(
 //								module,
 //								SMTDataType.MODULE,
-//								new ForallStatement(
+//								new ForallStatement(true,
 //										moduleState,
 //										SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE)),
 //										new ImplicationStatement(
@@ -149,7 +151,7 @@ public final class SMTModuleUtils {
 //														SMTBitVectorOp.GREATER_OR_EQUAL, 
 //														moduleState, 
 //														new SMTBitVec(
-//																SMTDataType.	, 
+//																SMTDataType.MODULE_STATE, 
 //																synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE))),
 //												new NotStatement(
 //														new BinarySMTPredicate(
@@ -168,14 +170,14 @@ public final class SMTModuleUtils {
 									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)), 
 									SMTDataType.TYPE));
 		
-		SMTBoundedVar usedState = new SMTBoundedVar("usedState");
-		SMTBoundedVar type = new SMTBoundedVar("type");
-		
+//		SMTBoundedVar usedState = new SMTBoundedVar("usedState");
+//		SMTBoundedVar type = new SMTBoundedVar("type");
+//		
 //		allClauses.add(new Assertion(
 //							new ForallStatement(
 //								type,
 //								SMTDataType.TYPE,
-//								new ForallStatement(
+//								new ForallStatement(true,
 //										usedState,
 //										SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)),
 //										new ImplicationStatement(
@@ -202,12 +204,12 @@ public final class SMTModuleUtils {
 									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)), 
 									SMTDataType.TYPE));
 		
-		SMTBoundedVar memoryState = new SMTBoundedVar("memoryState");
+//		SMTBoundedVar memoryState = new SMTBoundedVar("memoryState");
 //		allClauses.add(new Assertion(
 //							new ForallStatement(
 //								type,
 //								SMTDataType.TYPE,
-//								new ForallStatement(
+//								new ForallStatement(true,
 //										memoryState,
 //										SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)),
 //										new ImplicationStatement(
@@ -238,10 +240,10 @@ public final class SMTModuleUtils {
 		
 
 //		allClauses.add(new Assertion(
-//				new ForallStatement(
+//				new ForallStatement(true,
 //					memoryState,
 //					SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)),
-//					new ForallStatement(
+//					new ForallStatement(true,
 //							usedState,
 //							SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)),
 //							new ImplicationStatement(
@@ -294,7 +296,8 @@ public final class SMTModuleUtils {
 		allClauses.addAll(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
 
 		allClauses.add(new SMTComment("Encoding rules that ensure that the data used by the tool as input and the data referenced in memory are the same."));
-		allClauses.addAll(enforceDataReferenceRules(synthesisInstance));
+		allClauses.addAll(enforceDataReferenceRules(synthesisInstance.getDomainSetup().getAllTypes(),
+				synthesisInstance.getTypeAutomaton()));
 		
 		return allClauses;
 	}
@@ -394,7 +397,7 @@ public final class SMTModuleUtils {
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static List<SMTLib2Row> enforceDataReferenceRules(SMTSynthesisEngine synthesisInstance) {
+	private static List<SMTLib2Row> enforceDataReferenceRules(AllTypes allTypes, TypeAutomaton typeAutomaton) {
 		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 //		moduleState,
 //		SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE)),
@@ -408,10 +411,10 @@ public final class SMTModuleUtils {
 					new Assertion(
 							new ForallStatement(
 								useState,
-								SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)),
+								SMTDataType.USED_TYPE_STATE,
 								new ForallStatement(
 									memState,
-									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)),
+									SMTDataType.MEMORY_TYPE_STATE,
 									new ForallStatement(
 										type,
 										SMTDataType.TYPE,
@@ -440,16 +443,16 @@ public final class SMTModuleUtils {
 		allClauses.add(new Assertion(
 						new ForallStatement(
 								useState,
-								SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)),
+								SMTDataType.USED_TYPE_STATE,
 								new EqualStatement(
 										new BinarySMTPredicate(
 												WorkflowElement.USED_TYPE, 
 												useState, 
-												new SMTPredicateFunArg(synthesisInstance.getEmptyType())),
+												new SMTPredicateFunArg(allTypes.getEmptyType())),
 										new BinarySMTPredicate(
 												WorkflowElement.MEM_TYPE_REFERENCE, 
 												useState, 
-												new SMTPredicateFunArg(synthesisInstance.getTypeAutomaton().getNullState())
+												new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, typeAutomaton.getNullState())
 												)
 										)
 								)
@@ -904,17 +907,17 @@ public final class SMTModuleUtils {
 	 * @param allModules      All the modules.
 	 * @return The String representation of constraints.
 	 */
-	public static List<SMTLib2Row> moduleMutualExclusion(SMTSynthesisEngine synthesisInstance) {
+	public static List<SMTLib2Row> moduleMutualExclusion(AllModules allModules) {
 
 		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		allClauses.add(new SMTComment("Encoding rules of mutual exclusion of tools."));
 		
 		SMTBoundedVar moduleState = new SMTBoundedVar("state");
-		for (Pair<PredicateLabel> pair : synthesisInstance.getDomainSetup().getAllModules().getSimplePairs()) {
+		for (Pair<PredicateLabel> pair : allModules.getSimplePairs()) {
 				allClauses.add(new Assertion(
 						new ForallStatement(
 								moduleState,
-								SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE)),
+								SMTDataType.MODULE_STATE,
 								new NandStatement(
 										new BinarySMTPredicate(
 												WorkflowElement.MODULE, 
@@ -939,11 +942,11 @@ public final class SMTModuleUtils {
 	 * @param allModules      All the modules.
 	 * @return String representation of constraints.
 	 */
-	public static List<SMTLib2Row> moduleMandatoryUsage(SMTSynthesisEngine synthesisInstance) {
+	public static List<SMTLib2Row> moduleMandatoryUsage(AllModules allModules) {
 		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		allClauses.add(new SMTComment("Encoding rules of mandatory usage of tools."));
 		
-		if (synthesisInstance.getDomainSetup().getAllModules().getModules().isEmpty()) {
+		if (allModules.getModules().isEmpty()) {
 			System.err.println("No tools were I/O annotated.");
 			return allClauses;
 		}
@@ -952,7 +955,7 @@ public final class SMTModuleUtils {
 		allClauses.add(new Assertion(
 				new ForallStatement(
 						moduleState,
-						SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE)),
+						SMTDataType.MODULE_STATE,
 						new ExistsStatement(
 								tool,
 								SMTDataType.MODULE,
@@ -979,7 +982,7 @@ public final class SMTModuleUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications.
 	 */
-	public static List<SMTLib2Row> moduleEnforceTaxonomyStructure(SMTSynthesisEngine synthesisInstance, TaxonomyPredicate parentModule, boolean firstCall) {
+	public static List<SMTLib2Row> moduleEnforceTaxonomyStructure(TaxonomyPredicate parentModule, boolean firstCall) {
 
 		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
 		if(firstCall) {
@@ -991,7 +994,7 @@ public final class SMTModuleUtils {
 			allClauses.add(new Assertion(
 							new ForallStatement(
 									moduleState,
-									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE)),
+									SMTDataType.MODULE_STATE,
 									new EqualStatement(
 											new BinarySMTPredicate(
 													WorkflowElement.MODULE, 
@@ -1009,9 +1012,41 @@ public final class SMTModuleUtils {
 					));
 			
 			for (TaxonomyPredicate subModule : APEUtils.safe(parentModule.getSubPredicates())) {
-				allClauses.addAll(moduleEnforceTaxonomyStructure(synthesisInstance, subModule, false));
+				allClauses.addAll(moduleEnforceTaxonomyStructure(subModule, false));
 			}
 		}
+		
+		return allClauses;
+	}
+	
+	/**
+     * Define SMT functions that can be easily parsed from the model into the {@link Atom} objects..
+     * 
+     *  @param synthesisInstance A specific synthesis run that contains all the
+	 *                          information specific for it.
+	 *                          
+	 * @return String representation of the function definitions..
+     */
+	public static List<SMTLib2Row> encodeDefineParsablePredicates(SMTSynthesisEngine smtSynthesisEngine) {
+		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
+		allClauses.add(new SMTComment("Define new functions that are easy to parse from the model."));
+		
+		for(int i = 0; i < smtSynthesisEngine.getSolutionSize(); i++) {
+			allClauses.add(new DeclareSimplifiedFunction(WorkflowElement.MODULE, i, SMTDataType.MODULE, SMTDataType.MODULE_STATE));
+		}
+		
+		for(int i = 0; i < smtSynthesisEngine.getAutomatonSize(SMTDataType.USED_TYPE_STATE); i++) {
+			allClauses.add(new DeclareSimplifiedFunction(WorkflowElement.USED_TYPE, i, SMTDataType.TYPE, SMTDataType.USED_TYPE_STATE));
+		}
+		
+		for(int i = 0; i < smtSynthesisEngine.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE); i++) {
+			allClauses.add(new DeclareSimplifiedFunction(WorkflowElement.MEMORY_TYPE, i, SMTDataType.TYPE, SMTDataType.MEMORY_TYPE_STATE));
+		}
+		
+		for(int i = 0; i < smtSynthesisEngine.getAutomatonSize(SMTDataType.USED_TYPE_STATE); i++) {
+			allClauses.add(new DeclareSimplifiedFunction(WorkflowElement.MEM_TYPE_REFERENCE, i, SMTDataType.BITVECTOR(smtSynthesisEngine.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)), SMTDataType.USED_TYPE_STATE));
+		}
+		
 		
 		return allClauses;
 	}

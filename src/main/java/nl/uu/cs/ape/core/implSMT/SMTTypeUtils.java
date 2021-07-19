@@ -24,7 +24,6 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.OrStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBitVec;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBoundedVar;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionArgument;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTPredicateFunArg;
 import nl.uu.cs.ape.models.smtStruc.Assertion;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
@@ -320,4 +319,5 @@ public class SMTTypeUtils {
 
         return allClauses;
     }
+
 }

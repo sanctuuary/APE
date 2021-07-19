@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 
 /**
  * The {@code ModuleAutomaton} class is used to represent the module automaton. Module Automaton represents the structure that tools in the provided solutions will follow.
@@ -84,4 +86,14 @@ public class ModuleAutomaton implements Automaton {
         System.out.println("-------------------------------------------------------------");
 
     }
+    
+    /**
+     * Gets state object which corresponds to the type and order number (w.r.t. the type) of the state.
+     * @param usedTypeState - type of the state
+     * @param typeDependantStateNumber - order number of the state within the type
+     * @return State no {@code typeDependantStateNumber} of the type {@code usedTypeState}
+     */
+	public State getState(int typeDependantStateNumber) {
+		return get(typeDependantStateNumber);
+	}
 }

@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 
 /**
  * Class is used to represent the type automaton. Type Automaton represents the structure that data instances in the provided solutions will follow.
@@ -308,4 +310,33 @@ public class TypeAutomaton implements Automaton {
         }
         return allUsedStates;
     }
+
+    /**
+     * Gets state object which corresponds to the type and order number (w.r.t. the type) of the state.
+     * @param usedTypeState - type of the state
+     * @param typeDependantStateNumber - order number of the state within the type
+     * @return State no {@code typeDependantStateNumber} of the type {@code usedTypeState}
+     */
+	public State getState(SMTDataType usedTypeState, int typeDependantStateNumber) {
+		List<State> states = null;
+		switch (usedTypeState) {
+		case MEMORY_TYPE_STATE:
+			states= getAllMemoryTypesStates();
+			break;
+		case USED_TYPE_STATE:
+			states= getAllUsedTypesStates();
+			break;
+		default:
+			break;
+		}
+		for(State state : states) {
+			if(state.getTypeDependantStateNumber() == typeDependantStateNumber) {
+				return state;
+			}
+		}
+		if(usedTypeState == SMTDataType.MEMORY_TYPE_STATE && typeDependantStateNumber == 0) {
+			return nullState;
+		}
+		return null;
+	}
 }

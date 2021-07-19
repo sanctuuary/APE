@@ -1,5 +1,6 @@
 package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
+import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTUtils;
 import nl.uu.cs.ape.models.logic.constructs.APEPredicate;
 
@@ -13,27 +14,27 @@ public enum SMTDataType implements APEPredicate {
     /**
      * Depicts a tool/module.
      */
-    MODULE("module"),
+    MODULE("Module"),
 
     /**
      * Depicts a data type.
      */
-    TYPE("type"),
+    TYPE("Type"),
 
     /**
      * State that represents tools used in the workflow.
      */
-    MODULE_STATE("moduleState"),
+    MODULE_STATE("ModuleState"),
 
     /**
      * State that represents data types available in memory.
      */
-    MEMORY_TYPE_STATE("memTypeState"),
+    MEMORY_TYPE_STATE("MemTypeState"),
     
 	/**
      * State that represents data types used by tools.
      */
-    USED_TYPE_STATE("usedTypeState"),
+    USED_TYPE_STATE("UsedTypeState"),
     
     /**
      * Integers represent the type states in the system.
@@ -70,6 +71,10 @@ public enum SMTDataType implements APEPredicate {
 	  */
 	 public String toString() {
 	     return this.text;
+	 }
+	 
+	 public String toBitVector(SMTSynthesisEngine synthesisInstance) {
+		 return "(_ BitVec " + SMTUtils.countBits(synthesisInstance.getAutomatonSize(this)) + ")";
 	 }
 	 
 	 /**

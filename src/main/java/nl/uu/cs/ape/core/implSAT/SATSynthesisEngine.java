@@ -211,7 +211,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
         
         String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
-        System.out.println();
         
         satInputFile = APEUtils.concatIntoFile(sat_input_header, cnfEncoding);
         cnfEncoding.delete();

@@ -22,11 +22,23 @@ public class ExistsStatement implements Fact {
 
 	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
+		if(synthesisEngine.getAutomatonSize(dataType) == -1) {
+			constraints
+			.append("(exists ")
+				.append("((")
+					.append(boundedVar.getSMT2Encoding(synthesisEngine))
+					.append(" ")
+					.append(this.dataType.toString())
+				.append(")) ")
+				.append(content.getSMT2Encoding(synthesisEngine))
+			.append(")");
+		} else {
 		constraints
 			.append("(exists ")
 				.append("((")
-					.append(boundedVar.getSMT2Encoding(synthesisEngine)).append(" ")
-					.append(this.dataType.toString())
+					.append(boundedVar.getSMT2Encoding(synthesisEngine))
+					.append(" ")
+					.append(this.dataType.toBitVector(synthesisEngine))
 				.append(")) ")
 				.append("(and ")
 					.append(boundedVarIsInBounds(synthesisEngine))
@@ -34,6 +46,8 @@ public class ExistsStatement implements Fact {
 					.append(content.getSMT2Encoding(synthesisEngine))
 				.append(")")
 			.append(")");
+		}
+		
 		return constraints.toString();
 	}
 	

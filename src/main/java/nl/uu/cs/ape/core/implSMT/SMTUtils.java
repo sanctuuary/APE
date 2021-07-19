@@ -70,5 +70,6 @@ public final class SMTUtils {
                      Math.log(2) + 1);
     }
 	
+	
 
 }

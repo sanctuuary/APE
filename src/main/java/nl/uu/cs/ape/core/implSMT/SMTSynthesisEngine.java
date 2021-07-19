@@ -5,11 +5,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
+
+import javax.lang.model.element.Element;
 
 import org.apache.commons.io.FileUtils;
+import org.semanticweb.owlapi.io.SystemOutDocumentTarget;
 
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
@@ -103,6 +108,10 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         if(runConfig.getZ3LogicFragment() != null) {
         	APEUtils.appendToFile(smtEncoding, new LogicFragmentDeclaration(runConfig.getZ3LogicFragment()).getSMT2Encoding(this));
         }
+        APEUtils.appendToFile(smtEncoding, "(set-option :pp.bv-literals false)\n");
+        APEUtils.appendToFile(smtEncoding, "(set-option :produce-models true)\n");
+        APEUtils.appendToFile(smtEncoding, "(set-option :timeout " + runConfig.getTimeoutMs() + ")\n");
+        
 //        APEUtils.appendToFile(smtEncoding, "(set-option :produce-unsat-cores true)\n"); 
 
         int maxNoToolInputs = Math.max(domainSetup.getMaxNoToolInputs(), runConfig.getProgramOutputs().size());
@@ -156,13 +165,13 @@ public class SMTSynthesisEngine implements SynthesisEngine {
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
         
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleMutualExclusion(this), this);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleMutualExclusion(domainSetup.getAllModules()), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
         
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleMandatoryUsage(this), this);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules()), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
         
-        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleEnforceTaxonomyStructure(this, rootModule, true), this);
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.moduleEnforceTaxonomyStructure(rootModule, true), this);
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool taxonomy  encoding");
         /*
          * Create the constraints enforcing:
@@ -219,6 +228,12 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         
 //        smtInputFile = File.createTempFile("smtlib2_", null);
 //        smtInputFile.deleteOnExit();
+        
+        /*
+         * Encode predicates that can be easily parsable as the part of the SMT model.
+         */
+        SMTUtils.appendToFile(smtEncoding, SMTModuleUtils.encodeDefineParsablePredicates(this), this);
+
         
         smtInputFile = new File("/home/vedran/Desktop/tmp.smt");
         FileUtils.copyFile(smtEncoding, smtInputFile);
@@ -291,16 +306,17 @@ public class SMTSynthesisEngine implements SynthesisEngine {
 	            builder.redirectErrorStream(true);
 	            final Process process = builder.start();
            
-	            if(!process.waitFor(globalTimeoutMs, TimeUnit.MILLISECONDS)) {
-	                //timeout - kill the process. 
-	                process.destroy(); // consider using destroyForcibly instead
-	            } else {
+//	            if(!process.waitFor(globalTimeoutMs, TimeUnit.MILLISECONDS)) {
+//	                //timeout - kill the process. 
+//	                process.destroy(); // consider using destroyForcibly instead
+//	            } else {
 	            	facts = readTerminalOutput(process);
-	            }
+//	            }
 	            
 	            // Watch the process
 	            if(facts == null) {
 	            	satisfiable = false;
+	            	process.destroy();
 	            	continue;
 	            }
 	            SolutionWorkflow smtSolution = new SolutionWorkflow(facts, this);
@@ -322,8 +338,8 @@ public class SMTSynthesisEngine implements SynthesisEngine {
             }
         } catch (IOException e) {
             System.err.println("Internal error while parsing the encoding.");
-        } catch (InterruptedException e) {
-        	System.err.println("Z3 processs was interrupted.");
+//        } catch (InterruptedException e) {
+//        	System.err.println("Z3 processs was interrupted.");
 		}
 
         if (solutionsFound == 0 || solutionsFound % 500 != 0) {
@@ -347,34 +363,65 @@ public class SMTSynthesisEngine implements SynthesisEngine {
                 String line = null; 
                 try {
                 	WorkflowElement currFun = null;
+                	State tmpState = null;
                     while ((line = input.readLine()) != null) {
                     	if(line.equals("unsat")) {
                     		return null;
-                    	} else if(line.startsWith("(error ")) {
+                    	} else if(line.contains("(error ")) {
                     		System.err.println("SMT_error: " +line);
                     		return null;
                     	}
 //                    	System.out.println("SMT: " +line);
-                    	if(line.contains("nullMem")) {
+                    	if(line.trim().startsWith(")")) {
                     		continue;
                     	} else if(line.trim().startsWith("(define-fun ")) {
                     		String[] words =  line.trim().replace(")", "").split(" ");
                     		currFun = getElement(words[1]);
-                    	} else if ((currFun != null) & line.contains("x!0")) {
-                    		String trimmedLine = cutUntil(line, "x!0");
-                    		String[] words =  trimmedLine.trim().replace(")", "").split(" ");
-                    		
-                    		if(words.length < 5) {
-//                    			System.out.println("Skip");
-                    			continue;
+                    		if(currFun != null) {
+                    			int stateNo = Integer.parseInt(words[1].replace(currFun.toString(), ""));
+	                    		if(currFun == WorkflowElement.MODULE) {
+	                    			tmpState = moduleAutomaton.getState(stateNo);
+	                    		} else if(currFun == WorkflowElement.MEMORY_TYPE) {
+	                    			tmpState = typeAutomaton.getState(SMTDataType.MEMORY_TYPE_STATE, stateNo);
+	                    		} else {
+	                    			// in case of USED_TYPE or MEM_TYPE_REFERENCE
+	                    			tmpState = typeAutomaton.getState(SMTDataType.USED_TYPE_STATE, stateNo);
+	                    		}
                     		}
-                    		String stateS = words[1];
-                    		String predicateS = words[4];
-                    		
-                    		PredicateLabel arg1 = mappings.findOriginal(stateS);
-                    		PredicateLabel arg2 = mappings.findOriginal(predicateS);
-                    		Atom currAtom  = new Atom(arg2, (State) arg1, currFun);
-                    		atoms.add(currAtom);
+                    	} else if(currFun != null) {
+                    		if(currFun == WorkflowElement.MEM_TYPE_REFERENCE) {
+                    			if(!line.trim().startsWith("(not")) {
+                    				String[] words =  splitFromChar(line, "x!0");
+                    				int a2 = Integer.parseInt(words[2].replace("bv", ""));
+                    				State arg2 = typeAutomaton.getState(SMTDataType.MEMORY_TYPE_STATE, a2);
+                    				
+                    				if(arg2 == null || tmpState == null){
+										System.out.println("__________________^^^^^^^^^^^^^^^^^^__________________");
+									}
+                    				Atom currAtom  = new Atom(arg2, tmpState, currFun);
+                    				System.out.println(currAtom.toString());
+    	                    		atoms.add(currAtom);
+                    			}
+                    			
+                    		} else {
+								if(line.contains("x!0")) {
+									// parse in one line both the state and the type of the module
+									String recur = cutUntil(line, "x!0");
+									while(recur.contains("x!0")) {
+										String[] words =  splitFromChar(recur, "x!0");
+										String a2 = words[1];
+										
+										PredicateLabel arg2 = mappings.findOriginal(a2);
+										if(arg2 == null || tmpState == null){
+											System.out.println("__________________^^^^^^^^^^^^^^^^^^__________________");
+										}
+										Atom currAtom  = new Atom(arg2, tmpState, currFun);
+			                    		atoms.add(currAtom);
+			                    		
+			                    		recur = cutUntil(recur.substring(3), "x!0");;
+									}
+								}
+							}
                     	}
                     	
                     }
@@ -384,19 +431,21 @@ public class SMTSynthesisEngine implements SynthesisEngine {
         return atoms;
     }
     
-    private WorkflowElement getElement(String string) {
-		switch (string) {
-		case "module":
-			return WorkflowElement.MODULE;
-		case "usedType":
-			return WorkflowElement.USED_TYPE;
-		case "memType":
-			return WorkflowElement.MEMORY_TYPE;
-		case "memRef":
-			return WorkflowElement.MEM_TYPE_REFERENCE;
-		default:
-			return null;
+    /**
+     * Get element that the string correposnds to.
+     * @param string parsed string from the SMT2 model.
+     * @return
+     */
+	private WorkflowElement getElement(String string) {
+		
+		for(WorkflowElement element : WorkflowElement.values()) {
+			if(string.equals(element.toString())){
+				return null;
+			} else if(string.startsWith(element.toString())) {
+				return element;
+			}
 		}
+		return null;
 	}
     
     private static String cutUntil(String text, String subStr) {
@@ -405,7 +454,11 @@ public class SMTSynthesisEngine implements SynthesisEngine {
     	} else {
     		return text;
     	}
-    	
+    }
+    
+    private static String[] splitFromChar(String line, String cutChar) {
+    	String trimmedLine = cutUntil(line, cutChar);
+		return trimmedLine.trim().replace("(", "").replace(")", "").split(" ");
     }
     
     /**

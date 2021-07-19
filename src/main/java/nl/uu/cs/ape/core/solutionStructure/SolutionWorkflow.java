@@ -234,7 +234,8 @@ public class SolutionWorkflow {
     }
 
     /**
-     * TODO Add description
+     * Create a solution workflow, based on the output of the SMT solver and the defined smt synthesis instance.
+     * 
      * @param facts
      * @param smtSynthesisEngine
      */
@@ -255,8 +256,12 @@ public class SolutionWorkflow {
                         } else {
                             currNode.addAbstractDescriptionOfUsedType((AbstractModule) currAtom.getPredicate());
                         }
-                    } else if (currAtom.isWorkflowElementType(WorkflowElement.MEMORY_TYPE)) {
+                    } else if (currAtom.isWorkflowElementType(WorkflowElement.MEMORY_TYPE) ) {
                         TypeNode currNode = this.mappedMemoryTypeNodes.get(currAtom.getUsedInStateArgument());
+                        if(currNode == null) {
+                        	//skip null memory type
+                        	continue;
+                        }
                         if (currAtom.getPredicate() instanceof Type
                                 && ((Type) currAtom.getPredicate()).isNodeType(NodeType.LEAF)) {
                             currNode.addUsedType((Type) currAtom.getPredicate());
