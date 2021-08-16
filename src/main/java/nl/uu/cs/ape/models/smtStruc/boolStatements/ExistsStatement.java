@@ -1,5 +1,8 @@
 package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
@@ -9,59 +12,74 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  */
 public class ExistsStatement implements Fact {
 
-	private SMTBoundedVar boundedVar;
-	private SMTDataType dataType;
+	private List<SMTBoundedVar> boundedVars;
+	private List<SMTDataType> dataTypes;
 	private Fact content;
+	private boolean explicit;
 	
 	public ExistsStatement(SMTBoundedVar boundedVar, SMTDataType dataType, Fact content) {
-		this.boundedVar = boundedVar;
-		this.dataType = dataType;
+		this.boundedVars = new ArrayList<SMTBoundedVar>();
+		this.boundedVars.add(boundedVar);
+		this.dataTypes = new ArrayList<SMTDataType>();
+		this.dataTypes.add(dataType);
 		this.content = content;
+	}
+	
+	public ExistsStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, Fact content) {
+		this.boundedVars = boundedVars;
+		this.dataTypes = dataTypes;
+		this.content = content;
+	}
+	
+	public ExistsStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, Fact content, boolean explicit) {
+		this.boundedVars = boundedVars;
+		this.dataTypes = dataTypes;
+		this.content = content;
+		this.explicit = explicit;
 	}
 	
 
 	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
-		if(synthesisEngine.getAutomatonSize(dataType) == -1) {
-			constraints
-			.append("(exists ")
-				.append("((")
-					.append(boundedVar.getSMT2Encoding(synthesisEngine))
+		StringBuilder variables = new StringBuilder();
+		List<Fact> additionalConstrints = new ArrayList<>();
+		
+		for(int i = 0; i < dataTypes.size(); i++) {
+			String smtDataType = this.dataTypes.get(i).toString();
+			
+			if((synthesisEngine.getAutomatonSize(dataTypes.get(i)) > -1) && !explicit) {
+				additionalConstrints.add(boundedVarIsInBounds(boundedVars.get(i), dataTypes.get(i),synthesisEngine));
+				smtDataType = this.dataTypes.get(i).toBitVector(synthesisEngine);
+			}
+			
+			variables
+			.append("(")
+					.append(boundedVars.get(i).getSMT2Encoding(synthesisEngine))
 					.append(" ")
-					.append(this.dataType.toString())
-				.append(")) ")
-				.append(content.getSMT2Encoding(synthesisEngine))
-			.append(")");
-		} else {
-		constraints
-			.append("(exists ")
-				.append("((")
-					.append(boundedVar.getSMT2Encoding(synthesisEngine))
-					.append(" ")
-					.append(this.dataType.toBitVector(synthesisEngine))
-				.append(")) ")
-				.append("(and ")
-					.append(boundedVarIsInBounds(synthesisEngine))
-					.append(" ")
-					.append(content.getSMT2Encoding(synthesisEngine))
-				.append(")")
-			.append(")");
+					.append(smtDataType)
+				.append(") ");
 		}
+		Fact allRules = content;
+		// add the limitations if they were generated
+		if(additionalConstrints.size() > 0) {
+			allRules = new AndStatement(
+							new AndStatement(additionalConstrints), 
+							content
+						);
+		}
+		
+		constraints
+			.append("(exists (")
+				.append(variables)
+			.append(") ")
+			.append(allRules.getSMT2Encoding(synthesisEngine))
+			.append(")");
+		;
 		
 		return constraints.toString();
 	}
 	
-	private String boundedVarIsInBounds(SMTSynthesisEngine synthesisEngine) {
-		StringBuilder constraints = new StringBuilder();
-		
-		constraints.append("(")
-						.append(SMTBitVectorOp.LESS_THAN.toString())
-						.append(" ")
-						.append(boundedVar.getSMT2Encoding(synthesisEngine))
-						.append(" ")
-						.append(synthesisEngine.getAutomatonSize(dataType))
-					.append(")");
-		
-		return constraints.toString();
+	private BitVecComparisonStatement boundedVarIsInBounds(SMTBoundedVar boundedVar, SMTDataType dataType, SMTSynthesisEngine synthesisEngine) {
+		return new BitVecComparisonStatement(SMTBitVectorOp.LESS_THAN, boundedVar, new SMTBitVec(dataType, synthesisEngine.getAutomatonSize(dataType)));
 	}
 }
