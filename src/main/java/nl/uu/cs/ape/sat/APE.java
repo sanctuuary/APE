@@ -582,7 +582,7 @@ public class APE {
 		// Write the CWL files
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noCWLFiles).forEach(solution -> {
 			try {
-				String title = String.format("%s_%o.cwl", filePrefix, solution.getIndex());
+				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = cwlFolder.resolve(title).toFile();
 				CWLCreator cwlCreator = new CWLCreator(solution);
 				APEUtils.write2file(cwlCreator.generate(), script, false);
