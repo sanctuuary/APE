@@ -63,7 +63,7 @@ public class APERunConfig {
      * Number of executable CWL files that should be generated from candidate workflows.
      * Default is 0.
      */
-    private final APEConfigTag<Integer> NO_EXECUTABLE_CWL = new APEConfigTagFactory.TAGS.NO_CWL();
+    private final APEConfigTag<Integer> NO_EXECUTABLE_CWL = new APEConfigTagFactory.TAGS.NO_EXECUTABLE_CWL();
     /**
      * Determines the required usage for the data instances that are given as
      * workflow input:<br>
