@@ -11,10 +11,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExecutableCWLCreator extends CWLCreatorBase {
-    Map<String, Object> cwlAnnotations;
-    HashMap<String, String> inputMap = new HashMap<>();
-    HashMap<String, String> stepNames = new HashMap<>();
-    int stepIndex = 1;
+    private Map<String, Object> cwlAnnotations;
+    // Keep track of the inputs that are available in the workflow (key: TypeNode NodeID, value: input name).
+    private final HashMap<String, String> inputMap = new HashMap<>();
+    // Keep track of the step names related to the ModuleNode NodeIDs (key: NodeID, value: step name).
+    private final HashMap<String, String> stepNames = new HashMap<>();
+    // Keep track the current step number being added to the result.
+    private int stepIndex = 1;
 
     public ExecutableCWLCreator(SolutionsList solutionsList, SolutionWorkflow solution) {
         super(solution);
@@ -62,12 +65,25 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
      */
     private void generateInputs() {
         cwlRepresentation.append("inputs:").append("\n");
+
         // Keep track of the inputs that need to be appended.
-        ArrayList<Object> toAppend = new ArrayList<>();
-        // Keep track of the name replacements that need to be done.
-        HashMap<String, String> toReplace = new HashMap<>();
-        // Keep track of how many times a certain input name appears. Used to prevent duplicate names.
-        HashMap<String, Integer> nameCounter = new HashMap<>();
+        LinkedHashMap<TypeNode, Object> toAppend = new LinkedHashMap<>();
+
+        // Find all input TypeNodes
+        for (TypeNode inputState : solution.getWorkflowInputTypeStates()) {
+            ModuleNode module = inputState.getUsedByModules().get(0);
+            Map<String, Object> tool = (Map<String, Object>) this.cwlAnnotations.get(module.getNodeLabel());
+            ArrayList<LinkedHashMap<String, String>> cwlInputs = (ArrayList<LinkedHashMap<String, String>>) tool.get("inputs");
+
+            int index = 0;
+            for (TypeNode t : module.getInputTypes()) {
+                if (t.getNodeID().equals(inputState.getNodeID())) {
+                    break;
+                }
+                index++;
+            }
+            toAppend.put(inputState, cwlInputs.get(index));
+        }
 
         for (ModuleNode module : solution.getModuleNodes()) {
             Map<String, Object> tool = (Map<String, Object>) this.cwlAnnotations.get(module.getNodeLabel());
@@ -78,69 +94,44 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
                 for (int i = 0; i < module.getOutputTypes().size(); i++) {
                     TypeNode node = module.getOutputTypes().get(i);
                     if (!node.getUsedByModules().isEmpty()) {
-                        generateInput(node, cwlInputs, toAppend, toReplace, nameCounter, i);
-                    }
-                }
-            } else {
-                // If the input type of a module is not created by another module, it is assumed to be a workflow input
-                List<TypeNode> inputTypes = module.getInputTypes();
-                for (int i = 0; i < inputTypes.size(); i++) {
-                    TypeNode node = inputTypes.get(i);
-                    if (node.getCreatedByModule() == null) {
-                        generateInput(node, cwlInputs, toAppend, toReplace, nameCounter, i);
+                        toAppend.put(node, cwlInputs.get(i));
                     }
                 }
             }
         }
 
-        // Convert the ArrayList to a HashMap to make sure it will be in the right format when it is dumped by SnakeYAML.
+        // Keep track of the name replacements that need to be done.
+        ArrayList<String> toReplace = new ArrayList<>();
+        // Keep track of how many times a certain input name appears. Used to prevent duplicate names.
+        HashMap<String, Integer> nameCounter = new HashMap<>();
+        Yaml yaml = new Yaml();
+        // Give each input a unique name
+        for (Map.Entry<TypeNode, Object> entry : toAppend.entrySet()) {
+            String inputName = getInputName(yaml.dump(entry.getValue()));
+            String newName = inputName;
+            if (nameCounter.containsKey(inputName)) {
+                int count = nameCounter.get(inputName);
+                newName += count + 1;
+                nameCounter.replace(inputName, count + 1);
+            } else {
+                newName += 1;
+                nameCounter.put(inputName, 1);
+            }
+            toReplace.add(newName);
+            inputMap.put(entry.getKey().getNodeID(), newName);
+        }
+
+        // Create the CWL data to append
         HashMap<String, Object> appending = new HashMap<>();
-        for (Object obj : toAppend.toArray()) {
+        Object[] h = toAppend.values().toArray();
+        int index = 0;
+        for (Object obj : toAppend.values()) {
             LinkedHashMap<String, Object> entry = (LinkedHashMap<String, Object>) obj;
             Map.Entry<String, Object> e = (Map.Entry<String, Object>) entry.entrySet().toArray()[0];
-            appending.put(e.getKey(), e.getValue());
+            appending.put(toReplace.get(index), e.getValue());
+            index++;
         }
-
-        // Perform the necessary name replacement from their names in the CWL annotations to the names in the generated CWL file.
-        String data = new Yaml().dump(appending);
-        for (Map.Entry<String, String> entry : toReplace.entrySet()) {
-            data = replaceInputName(data, entry.getKey(), entry.getValue());
-        }
-        // Append all input data
-        appendYamlData(data, 1);
-    }
-
-    /**
-     * Generate all data needed to add the input to the CWL file.
-     * @param node The {@link TypeNode} the input represents.
-     * @param cwlInputs The "inputs" from the CWL annotations of this tool / {@link ModuleNode}.
-     * @param toAppend The inputs that will be appended.
-     * @param toReplace The name replacements that need to be done after the inputs have been generated.
-     * @param nameCounter A counter keeping track of duplicate input names.
-     * @param i The index of the TypeNodes of this {@link ModuleNode}.
-     */
-    private void generateInput(
-        TypeNode node,
-        ArrayList<LinkedHashMap<String, String>> cwlInputs,
-        ArrayList<Object> toAppend,
-        HashMap<String, String> toReplace,
-        HashMap<String, Integer> nameCounter,
-        int i
-    ) {
-        String code = new Yaml().dump(cwlInputs.get(i));
-        String inputName = getInputName(code);
-        String newName = inputName;
-        if (nameCounter.containsKey(inputName)) {
-            int count = nameCounter.get(inputName);
-            newName += count + 1;
-            nameCounter.replace(inputName, count + 1);
-        } else {
-            newName += 1;
-            nameCounter.put(inputName, 1);
-        }
-        inputMap.put(node.getNodeID(), newName);
-        toAppend.add(cwlInputs.get(i));
-        toReplace.put(inputName, newName);
+        appendYamlData(yaml.dump(appending), 1);
     }
 
     /**
@@ -297,7 +288,7 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
      */
     private void appendYamlData(String data, int indentLevel) {
         for (String line : data.split("\\r?\\n")) {
-            this.cwlRepresentation.append(ind(1)).append(line).append("\n");
+            this.cwlRepresentation.append(ind(indentLevel)).append(line).append("\n");
         }
     }
 }
