@@ -27,4 +27,4 @@ jobs:
         - java -jar ../target/APE-*-executable.jar ./GeoGMT/E0/config.json
         # Validate with CWL runner
         - cd ./GeoGMT/E0/CWL
-        - cwltool --enable-dev --validate workflowSolution__0.cwl
+        - cwltool --enable-dev --validate workflowSolution_0.cwl
