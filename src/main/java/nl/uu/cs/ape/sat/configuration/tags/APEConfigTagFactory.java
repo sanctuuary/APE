@@ -557,6 +557,34 @@ public class APEConfigTagFactory {
             }
         }
 
+        public static class CWL_ANNOTATIONS extends TYPES.ExistingFile {
+
+            @Override
+            protected APEFiles.Permission[] getRequiredPermissions() {
+                return new APEFiles.Permission[]{APEFiles.Permission.READ};
+            }
+
+            @Override
+            public String getTagName() {
+                return "cwl_annotations_path";
+            }
+
+            @Override
+            public String getLabel() {
+                return "CWL annotations";
+            }
+
+            @Override
+            public String getDescription() {
+                return "This tag should be a path to an existing .yaml file.";
+            }
+
+            @Override
+            public APEConfigDefaultValue<Path> getDefault() {
+                return APEConfigDefaultValue.withDefault(null);
+            }
+        }
+
         public static class CONSTRAINTS extends TYPES.JSON {
 
             @Override

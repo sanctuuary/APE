@@ -601,9 +601,16 @@ public class APE {
 	/**
 	 * Generate executable CWL scripts that represent executable versions of the workflows solutions.
 	 * @param allSolutions Set of {@link SolutionWorkflow} which should be represented in CWL.
+	 * @param coreConfig The core configuration of APE.
 	 * @return true if the execution was successfully performed, false otherwise.
 	 */
-	public static boolean writeExecutableCWLWorkflows(SolutionsList allSolutions) {
+	public static boolean writeExecutableCWLWorkflows(SolutionsList allSolutions, APECoreConfig coreConfig) {
+		// Check if the CWL annotations file is configured.
+		if (!coreConfig.getCwlAnnotationsFile().isPresent()) {
+			System.out.println("CWL annotations file not configured. No executable CWL files are generated.");
+			return false;
+		}
+
 		// Check the configuration before continuing.
 		Path executableCWLFolder = allSolutions.getRunConfiguration().getSolutionDirPath2ExecutableCWL();
 		int noFiles = allSolutions.getRunConfiguration().getNoExecutableCWL();
@@ -640,7 +647,7 @@ public class APE {
 			try {
 				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = executableCWLFolder.resolve(title).toFile();
-				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(allSolutions, solution);
+				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(coreConfig.getCwlAnnotationsFile().get(), solution);
 				APEUtils.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {

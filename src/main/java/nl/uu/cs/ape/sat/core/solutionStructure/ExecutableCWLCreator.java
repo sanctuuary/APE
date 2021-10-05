@@ -1,5 +1,6 @@
 package nl.uu.cs.ape.sat.core.solutionStructure;
 
+import nl.uu.cs.ape.sat.configuration.APECoreConfig;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -19,15 +20,13 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
     // Keep track the current step number being added to the result.
     private int stepIndex = 1;
 
-    public ExecutableCWLCreator(SolutionsList solutionsList, SolutionWorkflow solution) {
+    public ExecutableCWLCreator(File cwlAnnotationsFile, SolutionWorkflow solution) {
         super(solution);
 
         // TODO: load CWL annotations elsewhere
-        Path configPath = solutionsList.getRunConfiguration().getSolutionDirPath().getParent();
         Yaml yaml = new Yaml();
-        File cwlYamlFile = configPath.resolve("cwl.yaml").toFile();
         try {
-            this.cwlAnnotations = yaml.load(new FileInputStream(cwlYamlFile));
+            this.cwlAnnotations = yaml.load(new FileInputStream(cwlAnnotationsFile));
         } catch (FileNotFoundException e) {
             System.err.println("Could not find CWL yaml configuration file!");
             e.printStackTrace();
