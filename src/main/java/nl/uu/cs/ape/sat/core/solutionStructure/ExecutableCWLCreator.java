@@ -93,7 +93,7 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
             if (module.getInputTypes().isEmpty()) {
                 for (int i = 0; i < module.getOutputTypes().size(); i++) {
                     TypeNode node = module.getOutputTypes().get(i);
-                    if (!node.getUsedByModules().isEmpty()) {
+                    if (!node.getUsedByModules().isEmpty() && !cwlInputs.isEmpty()) {
                         toAppend.put(node, cwlInputs.get(i));
                     }
                 }
