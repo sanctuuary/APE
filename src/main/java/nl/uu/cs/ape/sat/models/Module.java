@@ -3,7 +3,6 @@ package nl.uu.cs.ape.sat.models;
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.sat.configuration.APECoreConfig;
 import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
@@ -35,6 +34,17 @@ public class Module extends AbstractModule {
      * Tool execution command.
      */
     private String executionCommand;
+
+    /**
+     * CWL inputs.
+     * Optional because CWL annotations are not required.
+     */
+    private Optional<ArrayList<LinkedHashMap<String, String>>> cwlInputs = Optional.empty();
+    /**
+     * CWL implementation.
+     * Optional because CWL annotations are not required, and the implementation in CWL annotations is not required either.
+     */
+    private Optional<Map<String, Object>> cwlImplementation = Optional.empty();
 
     /**
      * Constructs a new Module with already defined lists of input and output types.
@@ -148,6 +158,42 @@ public class Module extends AbstractModule {
      */
     public String getExecutionCode() {
         return this.executionCommand;
+    }
+
+    /**
+     * Return the CWL inputs.
+     * Empty when the CWL annotations were not provided (or not yet set).
+     *
+     * @return An ArrayList containing the CWL inputs types.
+     */
+    public Optional<ArrayList<LinkedHashMap<String, String>>> getCwlInputs() {
+        return cwlInputs;
+    }
+
+    /**
+     * Set the CWL inputs.
+     * @param cwlInputs The inputs to set.
+     */
+    public void setCwlInputs(Optional<ArrayList<LinkedHashMap<String, String>>> cwlInputs) {
+        this.cwlInputs = cwlInputs;
+    }
+
+    /**
+     * Return the CWL implementation.
+     * Empty when the CWL annotations were not provided (or not yet set), or the implementation for this module does not exist.
+     *
+     * @return A map representing the implementation.
+     */
+    public Optional<Map<String, Object>> getCwlImplementation() {
+        return cwlImplementation;
+    }
+
+    /**
+     * Set the CWL implementation.
+     * @param cwlImplementation The implementation to set.
+     */
+    public void setCwlImplementation(Optional<Map<String, Object>> cwlImplementation) {
+        this.cwlImplementation = cwlImplementation;
     }
 
     /**

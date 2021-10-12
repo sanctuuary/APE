@@ -1,18 +1,13 @@
 package nl.uu.cs.ape.sat.core.solutionStructure;
 
-import nl.uu.cs.ape.sat.configuration.APECoreConfig;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExecutableCWLCreator extends CWLCreatorBase {
-    private Map<String, Object> cwlAnnotations;
     // Keep track of the inputs that are available in the workflow (key: TypeNode NodeID, value: input name).
     private final HashMap<String, String> inputMap = new HashMap<>();
     // Keep track of the step names related to the ModuleNode NodeIDs (key: NodeID, value: step name).
@@ -20,17 +15,8 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
     // Keep track the current step number being added to the result.
     private int stepIndex = 1;
 
-    public ExecutableCWLCreator(File cwlAnnotationsFile, SolutionWorkflow solution) {
+    public ExecutableCWLCreator(SolutionWorkflow solution) {
         super(solution);
-
-        // TODO: load CWL annotations elsewhere
-        Yaml yaml = new Yaml();
-        try {
-            this.cwlAnnotations = yaml.load(new FileInputStream(cwlAnnotationsFile));
-        } catch (FileNotFoundException e) {
-            System.err.println("Could not find CWL yaml configuration file!");
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -43,7 +29,16 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
         generateRequirements();
         cwlRepresentation.append("\n");
 
-        generateInputs();
+        /*
+         * A tool may not have its CWL inputs, catch this and print en error to the console.
+         * A tool is allowed to not have an implementation, therefore it is not in the try/catch block.
+         */
+        try {
+            generateInputs();
+        } catch (APEConfigException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
         int offset = cwlRepresentation.length();
         generateSteps();
         generateOutputs(offset);
@@ -62,7 +57,7 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
     /**
      * Generate the top-level inputs of the CWL workflow.
      */
-    private void generateInputs() {
+    private void generateInputs() throws APEConfigException {
         cwlRepresentation.append("inputs:").append("\n");
 
         // Keep track of the inputs that need to be appended.
@@ -71,8 +66,9 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
         // Find all input TypeNodes
         for (TypeNode inputState : solution.getWorkflowInputTypeStates()) {
             ModuleNode module = inputState.getUsedByModules().get(0);
-            Map<String, Object> tool = (Map<String, Object>) this.cwlAnnotations.get(module.getNodeLabel());
-            ArrayList<LinkedHashMap<String, String>> cwlInputs = (ArrayList<LinkedHashMap<String, String>>) tool.get("inputs");
+            ArrayList<LinkedHashMap<String, String>> cwlInputs = module.getUsedModule().getCwlInputs().orElseThrow(
+                () -> new APEConfigException(String.format("Tool \"%s\" is missing its CWL implementation!", module.getNodeLabel()))
+            );
 
             int index = 0;
             for (TypeNode t : module.getInputTypes()) {
@@ -85,8 +81,9 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
         }
 
         for (ModuleNode module : solution.getModuleNodes()) {
-            Map<String, Object> tool = (Map<String, Object>) this.cwlAnnotations.get(module.getNodeLabel());
-            ArrayList<LinkedHashMap<String, String>> cwlInputs = (ArrayList<LinkedHashMap<String, String>>) tool.get("inputs");
+            ArrayList<LinkedHashMap<String, String>> cwlInputs = module.getUsedModule().getCwlInputs().orElseThrow(
+                () -> new APEConfigException(String.format("Tool \"%s\" is missing its CWL implementation!", module.getNodeLabel()))
+            );
 
             // If a module does not have any input types, it is assumed it is a workflow input
             if (module.getInputTypes().isEmpty()) {
@@ -160,8 +157,7 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
         cwlRepresentation.append("steps:").append("\n");
 
         for (ModuleNode moduleNode : solution.getModuleNodes()) {
-            Map<String, Object> tool = (Map<String, Object>) this.cwlAnnotations.get(moduleNode.getNodeLabel());
-            Map<String, Object> implementation = (Map<String, Object>) tool.get("implementation");
+            Map<String, Object> implementation = moduleNode.getUsedModule().getCwlImplementation().orElse(null);
             if (implementation == null) {
                 stepIndex++;
                 continue;
@@ -262,22 +258,6 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
             inputMap.put(outputType.getNodeID(), outName);
             i++;
         }
-    }
-
-    /**
-     * Append the CWL implementation code of a certain tool to the generated CWL file.
-     * @param toolName The name of the tool whose code should be appended.
-     */
-    private void appendCWLImplementation(String toolName) {
-        Map<String, Object> tool = (Map<String, Object>) this.cwlAnnotations.get(toolName);
-        Map<String, Object> implementation = (Map<String, Object>) tool.get("implementation");
-        if (implementation == null) {
-            return;
-        }
-
-        Yaml yaml = new Yaml();
-        String data = yaml.dump(implementation);
-        appendYamlData(data, 1);
     }
 
     /**

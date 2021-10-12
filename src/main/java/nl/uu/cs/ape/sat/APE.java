@@ -24,8 +24,11 @@ import nl.uu.cs.ape.sat.utils.OWLReader;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
@@ -128,8 +131,28 @@ public class APE {
 		}
 
 		// Update allModules and allTypes sets based on the tool annotations
-		succRun &= apeDomainSetup
-				.updateToolAnnotationsFromJson(APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()));
+		if (config.getCwlAnnotationsFile().isPresent()) {
+			try {
+				Yaml yaml = new Yaml();
+				File file = config.getCwlAnnotationsFile().get();
+				Map<String, Object> cwlAnnotations = yaml.load(new FileInputStream(file));
+				succRun &= apeDomainSetup
+					.updateToolAnnotationsFromJson(
+						APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()),
+						Optional.of(cwlAnnotations)
+					);
+			} catch (FileNotFoundException e) {
+				System.err.println("Could not find CWL yaml configuration file!");
+				e.printStackTrace();
+			}
+		}
+		else {
+			succRun &= apeDomainSetup
+				.updateToolAnnotationsFromJson(
+					APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()),
+					Optional.empty()
+				);
+		}
 
 		succRun &= apeDomainSetup.trimTaxonomy();
 
@@ -647,7 +670,7 @@ public class APE {
 			try {
 				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = executableCWLFolder.resolve(title).toFile();
-				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(coreConfig.getCwlAnnotationsFile().get(), solution);
+				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(solution);
 				APEUtils.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {

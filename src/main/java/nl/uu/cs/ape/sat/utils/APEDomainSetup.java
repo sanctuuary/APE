@@ -22,11 +22,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -331,11 +327,11 @@ public class APEDomainSetup {
 	 *                     annotations.
 	 * @throws JSONException Error if the tool annotation JSON file, bad format
 	 */
-	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException, JSONException {
+	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile, Optional<Map<String, Object>> cwlAnnotations) throws IOException, JSONException {
 		int currModule = 0;
 		for (JSONObject jsonModule : APEUtils.safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG, JSONObject.class))) {
 			currModule++;
-			updateModuleFromJson(jsonModule);
+			updateModuleFromJson(jsonModule, cwlAnnotations);
 		}
 		if (currModule == 0) {
 			System.err.println("No tools were annotated.");
@@ -349,11 +345,11 @@ public class APEDomainSetup {
      * Creates/updates a module from a tool annotation instance from a JSON file and updates the list of modules ({@link AllModules}) in the domain accordingly.
      *
      * @param jsonModule  JSON representation of a module
-     * @param domainSetup Domain information, including all the existing tools and types
+     * @param cwlAnnotations The CWL annotations.
      * @return {@code true} if the domain was updated, false otherwise.
      * @throws JSONException Error if the JSON file was not properly formatted.
      */
-    private boolean updateModuleFromJson(JSONObject jsonModule)
+    private boolean updateModuleFromJson(JSONObject jsonModule, Optional<Map<String, Object>> cwlAnnotations)
             throws JSONException, APEDimensionsException {
         String ontologyPrefixURI = getOntologyPrefixURI();
         AllModules allModules = getAllModules();
@@ -446,6 +442,22 @@ public class APEDomainSetup {
         currModule.setModuleInput(inputs);
         currModule.setModuleOutput(outputs);
         currModule.setAsRelevantTaxonomyTerm(allModules);
+
+        // CWL annotations
+        if (cwlAnnotations.isPresent()) {
+            Map<String, Object> tool = (Map<String, Object>) cwlAnnotations.get().get(currModule.getPredicateLabel());
+
+            Optional<ArrayList<LinkedHashMap<String, String>>> cwlInputs = Optional.empty();
+            Optional<Map<String, Object>> implementation = Optional.empty();
+            if (tool != null) {
+                ArrayList<LinkedHashMap<String, String>> cwlInp = (ArrayList<LinkedHashMap<String, String>>) tool.get("inputs");
+                Map<String, Object> imp = (Map<String, Object>) tool.get("implementation");
+                cwlInputs = cwlInp != null ? Optional.of(cwlInp) : Optional.empty();
+                implementation = imp != null ? Optional.of(imp) : Optional.empty();
+            }
+            currModule.setCwlInputs(cwlInputs);
+            currModule.setCwlImplementation(implementation);
+        }
 
         return currModule != null;
     }
