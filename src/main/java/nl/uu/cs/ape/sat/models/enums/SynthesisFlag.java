@@ -14,6 +14,12 @@ public enum SynthesisFlag {
      */
     NONE,
     
+    
+    /**
+     * Synthesis couldn't find any solutions for the given specification and length.
+     */
+    UNSAT,
+    
     /**
      * Synthesis search was interrupted because it reached the maximum workflow length.
      */
@@ -23,6 +29,7 @@ public enum SynthesisFlag {
      * Synthesis was interrupted because it reached the TIMEOUT.
      */
     TIMEOUT,
+    
     
     /**
      * Synthesis was interrupted for an unknown reason.
@@ -37,6 +44,8 @@ public enum SynthesisFlag {
     public String getMessage() {
         if (this == SynthesisFlag.NONE) {
             return "";
+        } else if(this == SynthesisFlag.UNSAT){
+        	return "No solutions can be found for the given specification.";
         } else if(this == SynthesisFlag.MAX_LENGTH) {
             return "Synthesis was interrupted because it reached the maximum workflow length.";
         } else if(this == SynthesisFlag.TIMEOUT){

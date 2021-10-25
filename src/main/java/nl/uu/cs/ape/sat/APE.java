@@ -320,10 +320,12 @@ public class APE {
 		
 		if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)) {
 			allSolutions.setFlag(SynthesisFlag.NONE);
-		} else if (solutionLength == runConfig.getSolutionLength().getMax()) {
-			allSolutions.setFlag(SynthesisFlag.MAX_LENGTH);
 		} else if(APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) <= 0) {
 			allSolutions.setFlag(SynthesisFlag.TIMEOUT);
+		} else if (allSolutions.getNumberOfSolutions() == 0) {
+			allSolutions.setFlag(SynthesisFlag.UNSAT);
+		} else if (solutionLength == runConfig.getSolutionLength().getMax()) {
+			allSolutions.setFlag(SynthesisFlag.MAX_LENGTH);
 		} else {
 			allSolutions.setFlag(SynthesisFlag.UNKNOWN);
 		}
