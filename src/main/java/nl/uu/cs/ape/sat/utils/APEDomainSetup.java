@@ -466,13 +466,13 @@ public class APEDomainSetup {
             Module currModule = (Module) allModules.get(id);
             Map<String, Object> tool = (Map<String, Object>) cwlAnnotations.get(currModule.getPredicateLabel());
 
-            Optional<ArrayList<LinkedHashMap<String, String>>> cwlInputs = Optional.empty();
-            Optional<Map<String, Object>> implementation = Optional.empty();
+            ArrayList<LinkedHashMap<String, String>> cwlInputs = null;
+            Map<String, Object> implementation = null;
             if (tool != null) {
                 ArrayList<LinkedHashMap<String, String>> cwlInp = (ArrayList<LinkedHashMap<String, String>>) tool.get("inputs");
                 Map<String, Object> imp = (Map<String, Object>) tool.get("implementation");
-                cwlInputs = cwlInp != null ? Optional.of(cwlInp) : Optional.empty();
-                implementation = imp != null ? Optional.of(imp) : Optional.empty();
+                cwlInputs = cwlInp;
+                implementation = imp;
             }
             currModule.setCwlInputs(cwlInputs);
             currModule.setCwlImplementation(implementation);

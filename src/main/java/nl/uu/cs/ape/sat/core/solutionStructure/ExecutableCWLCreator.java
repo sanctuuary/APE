@@ -66,9 +66,10 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
         // Find all input TypeNodes
         for (TypeNode inputState : solution.getWorkflowInputTypeStates()) {
             ModuleNode module = inputState.getUsedByModules().get(0);
-            ArrayList<LinkedHashMap<String, String>> cwlInputs = module.getUsedModule().getCwlInputs().orElseThrow(
-                () -> new APEConfigException(String.format("Tool \"%s\" is missing its CWL implementation!", module.getNodeLabel()))
-            );
+            ArrayList<LinkedHashMap<String, String>> cwlInputs = module.getUsedModule().getCwlInputs();
+            if (cwlInputs == null) {
+                throw new APEConfigException(String.format("Tool \"%s\" is missing its CWL implementation!", module.getNodeLabel()));
+            }
 
             int index = 0;
             for (TypeNode t : module.getInputTypes()) {
@@ -81,9 +82,10 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
         }
 
         for (ModuleNode module : solution.getModuleNodes()) {
-            ArrayList<LinkedHashMap<String, String>> cwlInputs = module.getUsedModule().getCwlInputs().orElseThrow(
-                () -> new APEConfigException(String.format("Tool \"%s\" is missing its CWL implementation!", module.getNodeLabel()))
-            );
+            ArrayList<LinkedHashMap<String, String>> cwlInputs = module.getUsedModule().getCwlInputs();
+            if (cwlInputs == null) {
+                throw new APEConfigException(String.format("Tool \"%s\" is missing its CWL implementation!", module.getNodeLabel()));
+            }
 
             // If a module does not have any input types, it is assumed it is a workflow input
             if (module.getInputTypes().isEmpty()) {
@@ -157,7 +159,7 @@ public class ExecutableCWLCreator extends CWLCreatorBase {
         cwlRepresentation.append("steps:").append("\n");
 
         for (ModuleNode moduleNode : solution.getModuleNodes()) {
-            Map<String, Object> implementation = moduleNode.getUsedModule().getCwlImplementation().orElse(null);
+            Map<String, Object> implementation = moduleNode.getUsedModule().getCwlImplementation();
             if (implementation == null) {
                 stepIndex++;
                 continue;

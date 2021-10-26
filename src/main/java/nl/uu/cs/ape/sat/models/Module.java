@@ -39,12 +39,12 @@ public class Module extends AbstractModule {
      * CWL inputs.
      * Optional because CWL annotations are not required.
      */
-    private Optional<ArrayList<LinkedHashMap<String, String>>> cwlInputs = Optional.empty();
+    private ArrayList<LinkedHashMap<String, String>> cwlInputs;
     /**
      * CWL implementation.
      * Optional because CWL annotations are not required, and the implementation in CWL annotations is not required either.
      */
-    private Optional<Map<String, Object>> cwlImplementation = Optional.empty();
+    private Map<String, Object> cwlImplementation;
 
     /**
      * Constructs a new Module with already defined lists of input and output types.
@@ -166,15 +166,15 @@ public class Module extends AbstractModule {
      *
      * @return An ArrayList containing the CWL inputs types.
      */
-    public Optional<ArrayList<LinkedHashMap<String, String>>> getCwlInputs() {
-        return cwlInputs;
+    public ArrayList<LinkedHashMap<String, String>> getCwlInputs() {
+        return this.cwlInputs;
     }
 
     /**
      * Set the CWL inputs.
      * @param cwlInputs The inputs to set.
      */
-    public void setCwlInputs(Optional<ArrayList<LinkedHashMap<String, String>>> cwlInputs) {
+    public void setCwlInputs(ArrayList<LinkedHashMap<String, String>> cwlInputs) {
         this.cwlInputs = cwlInputs;
     }
 
@@ -184,7 +184,7 @@ public class Module extends AbstractModule {
      *
      * @return A map representing the implementation.
      */
-    public Optional<Map<String, Object>> getCwlImplementation() {
+    public Map<String, Object> getCwlImplementation() {
         return cwlImplementation;
     }
 
@@ -192,7 +192,7 @@ public class Module extends AbstractModule {
      * Set the CWL implementation.
      * @param cwlImplementation The implementation to set.
      */
-    public void setCwlImplementation(Optional<Map<String, Object>> cwlImplementation) {
+    public void setCwlImplementation(Map<String, Object> cwlImplementation) {
         this.cwlImplementation = cwlImplementation;
     }
 
