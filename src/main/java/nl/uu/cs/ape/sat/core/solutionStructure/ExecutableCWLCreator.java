@@ -7,6 +7,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Class to generate executable CWL workflows from a given workflow solution.
+ */
 public class ExecutableCWLCreator extends CWLCreatorBase {
     // Keep track of the inputs that are available in the workflow (key: TypeNode NodeID, value: input name).
     private final HashMap<String, String> inputMap = new HashMap<>();

@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Class to generate a CWL workflow structure from a given workflow solution.
  */
-public class CWLCreator extends CWLCreatorBase {
+public class AbstractCWLCreator extends CWLCreatorBase {
     /**
      * Maintain a list of the CWL parameter names which represent {@link TypeNode}s.
      * I.e. this hashmap has TypeNode IDs as keys and their names in the CWL file as values.
@@ -19,7 +19,7 @@ public class CWLCreator extends CWLCreatorBase {
      * Instantiates a new CWL creator.
      * @param solution The solution to represent in CWL.
      */
-    public CWLCreator(SolutionWorkflow solution) {
+    public AbstractCWLCreator(SolutionWorkflow solution) {
         super(solution);
     }
 

@@ -7,7 +7,7 @@ import guru.nidi.graphviz.attribute.Rank.RankDir;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.sat.core.solutionStructure.CWLCreator;
+import nl.uu.cs.ape.sat.core.solutionStructure.AbstractCWLCreator;
 import nl.uu.cs.ape.sat.core.solutionStructure.ExecutableCWLCreator;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
@@ -602,7 +602,7 @@ public class APE {
 			try {
 				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = cwlFolder.resolve(title).toFile();
-				CWLCreator cwlCreator = new CWLCreator(solution);
+				AbstractCWLCreator cwlCreator = new AbstractCWLCreator(solution);
 				APEUtils.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
