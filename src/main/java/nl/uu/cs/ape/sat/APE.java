@@ -131,27 +131,21 @@ public class APE {
 		}
 
 		// Update allModules and allTypes sets based on the tool annotations
+		succRun &= apeDomainSetup
+			.updateToolAnnotationsFromJson(APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()));
+
+		// Update allModules with CWL annotations, if CWL annotations file is given
 		if (config.getCwlAnnotationsFile().isPresent()) {
 			try {
 				Yaml yaml = new Yaml();
 				File file = config.getCwlAnnotationsFile().get();
 				Map<String, Object> cwlAnnotations = yaml.load(new FileInputStream(file));
 				succRun &= apeDomainSetup
-					.updateToolAnnotationsFromJson(
-						APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()),
-						Optional.of(cwlAnnotations)
-					);
+					.updateCWLAnnotationsFromYaml(cwlAnnotations);
 			} catch (FileNotFoundException e) {
 				System.err.println("Could not find CWL yaml configuration file!");
 				e.printStackTrace();
 			}
-		}
-		else {
-			succRun &= apeDomainSetup
-				.updateToolAnnotationsFromJson(
-					APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()),
-					Optional.empty()
-				);
 		}
 
 		succRun &= apeDomainSetup.trimTaxonomy();

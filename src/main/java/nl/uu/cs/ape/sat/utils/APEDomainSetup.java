@@ -327,11 +327,11 @@ public class APEDomainSetup {
 	 *                     annotations.
 	 * @throws JSONException Error if the tool annotation JSON file, bad format
 	 */
-	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile, Optional<Map<String, Object>> cwlAnnotations) throws IOException, JSONException {
+	public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException, JSONException {
 		int currModule = 0;
 		for (JSONObject jsonModule : APEUtils.safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG, JSONObject.class))) {
 			currModule++;
-			updateModuleFromJson(jsonModule, cwlAnnotations);
+			updateModuleFromJson(jsonModule);
 		}
 		if (currModule == 0) {
 			System.err.println("No tools were annotated.");
@@ -345,11 +345,10 @@ public class APEDomainSetup {
      * Creates/updates a module from a tool annotation instance from a JSON file and updates the list of modules ({@link AllModules}) in the domain accordingly.
      *
      * @param jsonModule  JSON representation of a module
-     * @param cwlAnnotations The CWL annotations.
      * @return {@code true} if the domain was updated, false otherwise.
      * @throws JSONException Error if the JSON file was not properly formatted.
      */
-    private boolean updateModuleFromJson(JSONObject jsonModule, Optional<Map<String, Object>> cwlAnnotations)
+    private boolean updateModuleFromJson(JSONObject jsonModule)
             throws JSONException, APEDimensionsException {
         String ontologyPrefixURI = getOntologyPrefixURI();
         AllModules allModules = getAllModules();
@@ -443,9 +442,29 @@ public class APEDomainSetup {
         currModule.setModuleOutput(outputs);
         currModule.setAsRelevantTaxonomyTerm(allModules);
 
-        // CWL annotations
-        if (cwlAnnotations.isPresent()) {
-            Map<String, Object> tool = (Map<String, Object>) cwlAnnotations.get().get(currModule.getPredicateLabel());
+        return currModule != null;
+    }
+
+    /**
+     * Updates the list of All Modules to include the CWL annotations.
+     * @param cwlAnnotations A Map of the content of the CWL annotations file.
+     * @return Whether the update was successful.
+     */
+    public boolean updateCWLAnnotationsFromYaml(Map<String, Object> cwlAnnotations) {
+        for (Map.Entry<String, Object> entry : cwlAnnotations.entrySet()) {
+            Object[] ids = allModules.getModules().stream()
+                .filter(m -> m.getPredicateID().toLowerCase().contains(entry.getKey().toLowerCase()) && m.getType().equals("module"))
+                .toArray();
+            String id;
+            if (ids.length > 0) {
+                TaxonomyPredicate predicate = (TaxonomyPredicate) ids[0];
+                id = predicate.getPredicateID();
+            } else {
+                // Could not find module related to annotation entry, skip the entry.
+                continue;
+            }
+            Module currModule = (Module) allModules.get(id);
+            Map<String, Object> tool = (Map<String, Object>) cwlAnnotations.get(currModule.getPredicateLabel());
 
             Optional<ArrayList<LinkedHashMap<String, String>>> cwlInputs = Optional.empty();
             Optional<Map<String, Object>> implementation = Optional.empty();
@@ -458,8 +477,7 @@ public class APEDomainSetup {
             currModule.setCwlInputs(cwlInputs);
             currModule.setCwlImplementation(implementation);
         }
-
-        return currModule != null;
+        return true;
     }
 
     /**
