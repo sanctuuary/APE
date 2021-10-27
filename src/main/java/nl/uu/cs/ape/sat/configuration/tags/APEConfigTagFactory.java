@@ -557,6 +557,34 @@ public class APEConfigTagFactory {
             }
         }
 
+        public static class CWL_ANNOTATIONS extends TYPES.ExistingFile {
+
+            @Override
+            protected APEFiles.Permission[] getRequiredPermissions() {
+                return new APEFiles.Permission[]{APEFiles.Permission.READ};
+            }
+
+            @Override
+            public String getTagName() {
+                return "cwl_annotations_path";
+            }
+
+            @Override
+            public String getLabel() {
+                return "CWL annotations";
+            }
+
+            @Override
+            public String getDescription() {
+                return "This tag should be a path to an existing .yaml file.";
+            }
+
+            @Override
+            public APEConfigDefaultValue<Path> getDefault() {
+                return APEConfigDefaultValue.withDefault(null);
+            }
+        }
+
         public static class CONSTRAINTS extends TYPES.JSON {
 
             @Override
@@ -769,6 +797,37 @@ public class APEConfigTagFactory {
             @Override
             public String getDescription() {
                 return "The number of CWL representations of solutions should be generated.";
+            }
+
+            @Override
+            protected  ValidationResults validate(Integer value, ValidationResults results) {
+                return results;
+            }
+        }
+
+        public static class NO_EXECUTABLE_CWL extends TYPES.Int {
+            public NO_EXECUTABLE_CWL() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
+
+            @Override
+            public APEConfigDefaultValue<Integer> getDefault() {
+                return APEConfigDefaultValue.withDefault(0);
+            }
+
+            @Override
+            public String getTagName() {
+                return "number_of_executable_cwl_files";
+            }
+
+            @Override
+            public String getLabel() {
+                return "Number of executable CWL files";
+            }
+
+            @Override
+            public String getDescription() {
+                return "The number of CWL representations of executable solutions should be generated.";
             }
 
             @Override

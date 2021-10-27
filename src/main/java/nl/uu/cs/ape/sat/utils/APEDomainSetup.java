@@ -22,11 +22,7 @@ import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -349,7 +345,6 @@ public class APEDomainSetup {
      * Creates/updates a module from a tool annotation instance from a JSON file and updates the list of modules ({@link AllModules}) in the domain accordingly.
      *
      * @param jsonModule  JSON representation of a module
-     * @param domainSetup Domain information, including all the existing tools and types
      * @return {@code true} if the domain was updated, false otherwise.
      * @throws JSONException Error if the JSON file was not properly formatted.
      */
@@ -448,6 +443,41 @@ public class APEDomainSetup {
         currModule.setAsRelevantTaxonomyTerm(allModules);
 
         return currModule != null;
+    }
+
+    /**
+     * Updates the list of All Modules to include the CWL annotations.
+     * @param cwlAnnotations A Map of the content of the CWL annotations file.
+     * @return Whether the update was successful.
+     */
+    public boolean updateCWLAnnotationsFromYaml(Map<String, Object> cwlAnnotations) {
+        for (Map.Entry<String, Object> entry : cwlAnnotations.entrySet()) {
+            Object[] ids = allModules.getModules().stream()
+                .filter(m -> m.getPredicateID().toLowerCase().contains(entry.getKey().toLowerCase()) && m.getType().equals("module"))
+                .toArray();
+            String id;
+            if (ids.length > 0) {
+                TaxonomyPredicate predicate = (TaxonomyPredicate) ids[0];
+                id = predicate.getPredicateID();
+            } else {
+                // Could not find module related to annotation entry, skip the entry.
+                continue;
+            }
+            Module currModule = (Module) allModules.get(id);
+            Map<String, Object> tool = (Map<String, Object>) cwlAnnotations.get(currModule.getPredicateLabel());
+
+            ArrayList<LinkedHashMap<String, String>> cwlInputs = null;
+            Map<String, Object> implementation = null;
+            if (tool != null) {
+                ArrayList<LinkedHashMap<String, String>> cwlInp = (ArrayList<LinkedHashMap<String, String>>) tool.get("inputs");
+                Map<String, Object> imp = (Map<String, Object>) tool.get("implementation");
+                cwlInputs = cwlInp;
+                implementation = imp;
+            }
+            currModule.setCwlInputs(cwlInputs);
+            currModule.setCwlImplementation(implementation);
+        }
+        return true;
     }
 
     /**

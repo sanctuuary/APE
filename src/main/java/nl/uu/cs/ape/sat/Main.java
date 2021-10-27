@@ -77,6 +77,7 @@ public class Main {
 //				APE.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
                 APE.writeExecutableWorkflows(solutions);
                 APE.writeCWLWorkflows(solutions);
+                APE.writeExecutableCWLWorkflows(solutions, apeFramework.getConfig());
             } catch (IOException e) {
                 System.err.println("Error in writing the solutions. to the file system.");
                 e.printStackTrace();

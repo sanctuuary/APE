@@ -7,7 +7,8 @@ import guru.nidi.graphviz.attribute.Rank.RankDir;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.sat.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.sat.core.solutionStructure.CWLCreator;
+import nl.uu.cs.ape.sat.core.solutionStructure.AbstractCWLCreator;
+import nl.uu.cs.ape.sat.core.solutionStructure.ExecutableCWLCreator;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.sat.models.enums.SynthesisFlag;
@@ -23,8 +24,11 @@ import nl.uu.cs.ape.sat.utils.OWLReader;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
@@ -128,7 +132,21 @@ public class APE {
 
 		// Update allModules and allTypes sets based on the tool annotations
 		succRun &= apeDomainSetup
-				.updateToolAnnotationsFromJson(APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()));
+			.updateToolAnnotationsFromJson(APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()));
+
+		// Update allModules with CWL annotations, if CWL annotations file is given
+		if (config.getCwlAnnotationsFile().isPresent()) {
+			try {
+				Yaml yaml = new Yaml();
+				File file = config.getCwlAnnotationsFile().get();
+				Map<String, Object> cwlAnnotations = yaml.load(new FileInputStream(file));
+				succRun &= apeDomainSetup
+					.updateCWLAnnotationsFromYaml(cwlAnnotations);
+			} catch (FileNotFoundException e) {
+				System.err.println("Could not find CWL yaml configuration file!");
+				e.printStackTrace();
+			}
+		}
 
 		succRun &= apeDomainSetup.trimTaxonomy();
 
@@ -584,9 +602,9 @@ public class APE {
 		// Write the CWL files
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noCWLFiles).forEach(solution -> {
 			try {
-				String title = String.format("%s_%o.cwl", filePrefix, solution.getIndex());
+				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = cwlFolder.resolve(title).toFile();
-				CWLCreator cwlCreator = new CWLCreator(solution);
+				AbstractCWLCreator cwlCreator = new AbstractCWLCreator(solution);
 				APEUtils.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
@@ -596,6 +614,68 @@ public class APE {
 		});
 
 		APEUtils.timerPrintText(timerID, "\nCWL files have been generated.");
+		return true;
+	}
+
+	/**
+	 * Generate executable CWL scripts that represent executable versions of the workflows solutions.
+	 * @param allSolutions Set of {@link SolutionWorkflow} which should be represented in CWL.
+	 * @param coreConfig The core configuration of APE.
+	 * @return true if the execution was successfully performed, false otherwise.
+	 */
+	public static boolean writeExecutableCWLWorkflows(SolutionsList allSolutions, APECoreConfig coreConfig) {
+		// Check if the CWL annotations file is configured.
+		if (!coreConfig.getCwlAnnotationsFile().isPresent()) {
+			System.out.println("CWL annotations file not configured. No executable CWL files are generated.");
+			return false;
+		}
+
+		// Check the configuration before continuing.
+		Path executableCWLFolder = allSolutions.getRunConfiguration().getSolutionDirPath2ExecutableCWL();
+		int noFiles = allSolutions.getRunConfiguration().getNoExecutableCWL();
+		if (executableCWLFolder == null || noFiles == 0 || allSolutions.isEmpty()) {
+			return false;
+		}
+		final String timerID = "writingExecutableCWL";
+		APEUtils.printHeader(null, String.format("Writing the first %o solution(s) to executable CWL files", noFiles));
+		APEUtils.timerStart(timerID, true);
+
+		final String filePrefix = "workflowSolution_";
+		final File cwlDir = executableCWLFolder.toFile();
+		if (cwlDir.isDirectory()) {
+			// If the CWL directory already exists, empty it first
+			File[] oldFiles = cwlDir.listFiles((dir, name) -> name.toLowerCase().startsWith(filePrefix.toLowerCase()));
+			if (oldFiles != null) {
+				Arrays.stream(oldFiles).forEach((f) -> {
+					if(!f.delete()) {
+						System.err.printf("Failed to delete file %s%n", f.getName());
+					}
+				});
+			}
+		} else {
+			// Create the CWL directory if it does not already exist
+			boolean dirMade = cwlDir.mkdir();
+			if (!dirMade) {
+				System.err.println("Could not create CWL directory.");
+			}
+		}
+		System.out.print("Loading");
+
+		// Write the CWL files
+		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noFiles).forEach(solution -> {
+			try {
+				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
+				File script = executableCWLFolder.resolve(title).toFile();
+				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(solution);
+				APEUtils.write2file(cwlCreator.generate(), script, false);
+				System.out.print(".");
+			} catch (IOException e) {
+				System.err.println("Error occurred while writing an executable CWL file to the file system.");
+				e.printStackTrace();
+			}
+		});
+
+		APEUtils.timerPrintText(timerID, "\nExecutable CWL files have been generated.");
 		return true;
 	}
 }
