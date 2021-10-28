@@ -26,7 +26,7 @@ public abstract class AllPredicates {
     /**
      * Instantiates a new All mappedPredicates.
      *
-     * @param dimensionRoots the taxonomy roots
+     * @param taxonomyRoots the taxonomy roots
      */
     public AllPredicates(List<String> taxonomyRoots) {
         this.dimensionRoots = taxonomyRoots;
