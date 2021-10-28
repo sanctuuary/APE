@@ -127,7 +127,7 @@
 		      </executions>
 		    </plugin>
 		</plugins>
-	</build>j
+	</build>
 
 	<dependencies>
 		<dependency>
