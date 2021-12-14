@@ -152,7 +152,7 @@ public class SLTLxSMTVisitor extends SLTLxBaseVisitor<SMTLib2Elem> {
 	//TODO
 	@Override
 	public SMTLib2Elem visitFunction(SLTLxParser.FunctionContext ctx) {
-		new BinarySMTPredicate(WorkflowElement.MEMORY_TYPE, new SMTPredicateFunArg(null), null)
+//		new BinarySMTPredicate(WorkflowElement.MEMORY_TYPE, new SMTPredicateFunArg(null), null)
 		return visitChildren(ctx);
 	}
 	
