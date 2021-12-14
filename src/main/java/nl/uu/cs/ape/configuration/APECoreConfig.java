@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +54,10 @@ public class APECoreConfig {
      * restrictive message passing structure.
      */
     public final APEConfigTag<Boolean> STRICT_TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.STRICT_TOOL_ANNOTATIONS();
+    /**
+     * The CWL file with all CWL annotations.
+     */
+    public final APEConfigTag<Path> CWL_ANNOTATIONS = new APEConfigTagFactory.TAGS.CWL_ANNOTATIONS();
 
     /**
      * All the Tags specified in this class. Should be in correct order of dependencies.
@@ -63,7 +68,8 @@ public class APECoreConfig {
             this.TOOL_ONTOLOGY_ROOT,
             this.DIMENSIONS_ONTOLOGY,
             this.TOOL_ANNOTATIONS,
-            this.STRICT_TOOL_ANNOTATIONS
+            this.STRICT_TOOL_ANNOTATIONS,
+            this.CWL_ANNOTATIONS
     };
 
     /**
@@ -76,7 +82,8 @@ public class APECoreConfig {
             new TOOL_ONTOLOGY_ROOT(null),
             new DIMENSIONS_ONTOLOGY(null),
             new TOOL_ANNOTATIONS(),
-            new STRICT_TOOL_ANNOTATIONS()
+            new STRICT_TOOL_ANNOTATIONS(),
+            new CWL_ANNOTATIONS()
     );
 
     /**
@@ -308,6 +315,19 @@ public class APECoreConfig {
      */
     public void setToolAnnotationsFile(File toolAnnotations) {
         TOOL_ANNOTATIONS.setValue(toolAnnotations.toPath());
+    }
+
+    /**
+     * Gets CWL annotations path.
+     *
+     * @return the value of tag {@link #TOOL_ANNOTATIONS}
+     */
+    public Optional<File> getCwlAnnotationsFile() {
+        if (CWL_ANNOTATIONS.getValue() == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(CWL_ANNOTATIONS.getValue().toFile());
+        }
     }
 
     /**
