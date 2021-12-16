@@ -1,7 +1,9 @@
-package nl.uu.cs.ape.models.logic.constructs;
+package nl.uu.cs.ape.models.satStruc;
 
 import nl.uu.cs.ape.automaton.State;
+import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
  * The {@code Atom} class represents elements of the workflow, that consists
@@ -11,7 +13,7 @@ import nl.uu.cs.ape.models.enums.WorkflowElement;
  *
  * @author Vedran Kasalica
  */
-public class Atom implements Comparable<Atom> {
+public class Atom implements SATFact, Comparable<Atom> {
 
     /**
      * PredicateLabel that is referred (tool or type).
@@ -168,5 +170,11 @@ public class Atom implements Comparable<Atom> {
             return this.getPredicate().compareTo(otherAtom.getPredicate());
         }
     }
+
+	@Override
+	public String getPropositionalEncoding(SATSynthesisEngine synthesisEngine) {
+		// TODO Auto-generated method stub
+		return null;
+	}
     
 }

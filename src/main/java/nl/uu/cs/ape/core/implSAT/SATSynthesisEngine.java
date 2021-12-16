@@ -16,6 +16,7 @@ import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.satStruc.SATClause;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -61,7 +62,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
     /**
      * CNF encoding of the problem.
      */
-    private File cnfEncoding;
+    private List<SATClause> cnfClauses;
+    private File cnfEncodingx;
 
     /**
      * File used as an input for the SAT solver.
@@ -96,7 +98,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
         this.mappings.resetAuxVariables();
         
         this.satInputFile = null;
-        this.cnfEncoding = File.createTempFile("satCNF" + workflowLength, null);
+        this.cnfClauses = new ArrayList<SATClause>();
+        this.cnfEncodingx = File.createTempFile("satCNF" + workflowLength, null);
 
         int maxNoToolInputs = Math.max(domainSetup.getMaxNoToolInputs(), runConfig.getProgramOutputs().size());
         int maxNoToolOutputs = Math.max(domainSetup.getMaxNoToolOutputs(), runConfig.getProgramInputs().size());
@@ -125,8 +128,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
 
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
-        /* Create constraints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
-        APEUtils.appendToFile(cnfEncoding, SATModuleUtils.encodeModuleAnnotations(this));
+        /* Create const raints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
+        cnfClauses.addAll(SATModuleUtils.encodeModuleAnnotations(this)));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
         /*

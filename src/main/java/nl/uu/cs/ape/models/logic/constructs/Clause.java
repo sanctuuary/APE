@@ -2,6 +2,8 @@ package nl.uu.cs.ape.models.logic.constructs;
 
 import java.util.ArrayList;
 
+import nl.uu.cs.ape.models.satStruc.Literal;
+
 /**
  * An ordered collection of Literals. In practice it TODO
  *

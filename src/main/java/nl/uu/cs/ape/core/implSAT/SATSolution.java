@@ -9,8 +9,8 @@ import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
-import nl.uu.cs.ape.models.logic.constructs.Literal;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.satStruc.Literal;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**

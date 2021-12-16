@@ -16,6 +16,7 @@ import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.satStruc.SATClause;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -44,12 +45,12 @@ public final class SATModuleUtils {
 	 * @return String representation of CNF constraints regarding the required INPUT
 	 *         and OUTPUT types of the modules.
 	 */
-	public static String encodeModuleAnnotations(SATSynthesisEngine synthesisInstance) {
-		StringBuilder constraints = new StringBuilder();
-		constraints.append(inputCons(synthesisInstance));
+	public static List<SATClause> encodeModuleAnnotations(SATSynthesisEngine synthesisInstance) {
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
+		cnfClauses.addAll(inputCons(synthesisInstance));
 
-		constraints.append(outputCons(synthesisInstance));
-		return constraints.toString();
+		cnfClauses.addAll(outputCons(synthesisInstance));
+		return cnfClauses;
 	}
 
 	/**
@@ -63,14 +64,14 @@ public final class SATModuleUtils {
 	 * @return String representation of CNF constraints regarding the required
 	 *         memory structure implementation.
 	 */
-	public static String encodeMemoryStructure(SATSynthesisEngine synthesisInstance) {
-		StringBuilder constraints = new StringBuilder();
+	public static List<SATClause> encodeMemoryStructure(SATSynthesisEngine synthesisInstance) {
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 
-		constraints.append(allowDataReferencingCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
-		constraints.append(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
-		constraints.append(enforceDataReferenceRules(synthesisInstance.getDomainSetup(),
+		cnfClauses.addAll(allowDataReferencingCons(synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
+		cnfClauses.addAll(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
+		cnfClauses.addAll(enforceDataReferenceRules(synthesisInstance.getDomainSetup(),
 				synthesisInstance.getTypeAutomaton(), synthesisInstance.getMappings()));
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	
@@ -82,14 +83,14 @@ public final class SATModuleUtils {
 	 * @param mappings
 	 * @return
 	 */
-	public static String encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
-		StringBuilder constraints = new StringBuilder();
+	public static List<SATClause> encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		
-		constraints.append(allowDataDependencyCons(typeAutomaton, mappings));
-		constraints.append(enforceDataDependencyOverModules(typeAutomaton, mappings));
-		constraints.append(enforceDataDependencyOverDataReferencing(typeAutomaton, mappings));
+		cnfClauses.addAll(allowDataDependencyCons(typeAutomaton, mappings));
+		cnfClauses.addAll(enforceDataDependencyOverModules(typeAutomaton, mappings));
+		cnfClauses.addAll(enforceDataDependencyOverDataReferencing(typeAutomaton, mappings));
 		
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -100,9 +101,10 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static String inputCons(SATSynthesisEngine synthesisInstance) {
+	private static List<SATClause> inputCons(SATSynthesisEngine synthesisInstance) {
 
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> allClauses = new ArrayList<>();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		SATAtomMappings mappings = synthesisInstance.getMappings();
 		/* For each module.. */
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
@@ -126,6 +128,7 @@ public final class SATModuleUtils {
 							/* Get input type and/or format that are/is required by the tool */
 							TaxonomyPredicate currInputType = moduleInputs.get(currInputStateNo);
 							/* Encode: if module was used in the module state */
+							
 							constraints.append("-")
 									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
 							/*
@@ -146,7 +149,7 @@ public final class SATModuleUtils {
 			}
 		}
 
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -158,9 +161,9 @@ public final class SATModuleUtils {
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static String enforceDataReferenceRules(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton,
+	private static List<SATClause> enforceDataReferenceRules(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton,
 			SATAtomMappings mappings) {
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 
 		/* For each type instance */
 		for (TaxonomyPredicate currType : domainSetup.getAllTypes().getTypes()) {
@@ -212,7 +215,7 @@ public final class SATModuleUtils {
 			}
 		}
 
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -226,10 +229,10 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static String allowDataReferencingCons(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+	private static List<SATClause> allowDataReferencingCons(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 
 		// setting up input constraints (Shared Memory Approach)
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		/** For each input state... */
 		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
@@ -269,7 +272,7 @@ public final class SATModuleUtils {
 			}
 		}
 
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -279,10 +282,10 @@ public final class SATModuleUtils {
 	 * 
 	 * @return String representation of constraints.
 	 */
-	private static String allowDataDependencyCons(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+	private static List<SATClause> allowDataDependencyCons(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 
 		// setting up dependency constraints
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		/** For each input state... */
 		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
@@ -355,7 +358,7 @@ public final class SATModuleUtils {
 				}
 			}
 		}
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -364,10 +367,10 @@ public final class SATModuleUtils {
 	 * 
 	 * @return String representation of constraints.
 	 */
-	private static String enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+	private static List<SATClause> enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 
 		// setting up dependency constraints
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		/** For each input state... */
 		for (Block currInputBlock : typeAutomaton.getUsedTypesBlocks()) {
 			int blockNumber = currInputBlock.getBlockNumber();
@@ -421,11 +424,11 @@ public final class SATModuleUtils {
 				}
 			}
 		}
-		return constraints.toString();
+		return cnfClauses;
 	}
 
-	private static String enforceDataDependencyOverModules(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
-		StringBuilder constraints = new StringBuilder();
+	private static List<SATClause> enforceDataDependencyOverModules(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		/** For tool inputs and outputs */
 		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
 			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
@@ -460,7 +463,7 @@ public final class SATModuleUtils {
 				}
 			}
 		}
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -471,12 +474,12 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static String enforcingUsageOfGeneratedTypesCons(SATSynthesisEngine synthesisInstance) {
+	private static List<SATClause> enforcingUsageOfGeneratedTypesCons(SATSynthesisEngine synthesisInstance) {
 
 		SATAtomMappings mappings = synthesisInstance.getMappings();
 		Type emptyType = synthesisInstance.getEmptyType();
 		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		/*
 		 * Setting up the constraints that ensure usage of the generated types in the
 		 * memory, (e.g. all workflow inputs and at least one of each of the tool
@@ -555,7 +558,7 @@ public final class SATModuleUtils {
 			}
 		}
 
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -565,10 +568,10 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static String outputCons(SATSynthesisEngine synthesisInstance) {
+	private static List<SATClause> outputCons(SATSynthesisEngine synthesisInstance) {
 
 		SATAtomMappings mappings = synthesisInstance.getMappings();
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 
 		// for each module
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
@@ -606,7 +609,7 @@ public final class SATModuleUtils {
 			}
 		}
 
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -619,10 +622,10 @@ public final class SATModuleUtils {
 	 * @param mappings        Mapping function.
 	 * @return The String representation of constraints.
 	 */
-	public static String moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton,
+	public static List<SATClause> moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton,
 			SATAtomMappings mappings) {
 
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 
 		for (Pair<PredicateLabel> pair : allModules.getSimplePairs()) {
 			for (State moduleState : moduleAutomaton.getAllStates()) {
@@ -633,7 +636,7 @@ public final class SATModuleUtils {
 			}
 		}
 
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -645,13 +648,13 @@ public final class SATModuleUtils {
 	 * @param mappings        Mapping function.
 	 * @return String representation of constraints.
 	 */
-	public static String moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton,
+	public static List<SATClause> moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton,
 			SATAtomMappings mappings) {
 		if (allModules.getModules().isEmpty()) {
 			System.err.println("No tools were I/O annotated.");
 			return "";
 		}
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 
 		for (State moduleState : moduleAutomaton.getAllStates()) {
 			for (TaxonomyPredicate tool : allModules.getModules()) {
@@ -663,7 +666,7 @@ public final class SATModuleUtils {
 			constraints.append(" 0\n");
 		}
 
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -678,15 +681,15 @@ public final class SATModuleUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications.
 	 */
-	public static String moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
+	public static List<SATClause> moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
 			ModuleAutomaton moduleAutomaton, SATAtomMappings mappings) {
 
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		for (State moduleState : moduleAutomaton.getAllStates()) {
 			constraints = constraints
 					.append(moduleEnforceTaxonomyStructureForState(allModules, currModule, mappings, moduleState));
 		}
-		return constraints.toString();
+		return cnfClauses;
 	}
 
 	/**
@@ -698,11 +701,11 @@ public final class SATModuleUtils {
 	 * @param moduleState State in which the module should be used.
 	 * @param mappings    Mapping function.
 	 */
-	private static String moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule,
+	private static List<SATClause> moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule,
 			SATAtomMappings mappings, State moduleState) {
 		String superModuleState = mappings.add(currModule, moduleState, WorkflowElement.MODULE).toString();
 
-		StringBuilder constraints = new StringBuilder();
+		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		StringBuilder currConstraint = new StringBuilder("-").append(superModuleState).append(" ");
 
 		List<String> subModulesStates = new ArrayList<String>();

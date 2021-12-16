@@ -5,9 +5,9 @@ import java.util.Map;
 
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
-import nl.uu.cs.ape.models.logic.constructs.Atom;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.satStruc.Atom;
 
 /**
  * The {@code SATAtomMappings} class is used to store the data used for representing the atoms with integer numbers.

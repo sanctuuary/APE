@@ -1,8 +1,10 @@
-package nl.uu.cs.ape.models.logic.constructs;
+package nl.uu.cs.ape.models.satStruc;
 
 import nl.uu.cs.ape.automaton.State;
+import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
  * The {@code Literal} class represents literals (atoms that can be negated) corresponding to the usage of the modules
@@ -18,7 +20,7 @@ import nl.uu.cs.ape.models.enums.WorkflowElement;
  *
  * @author Vedran Kasalica
  */
-public class Literal implements Comparable<Literal> {
+public class Literal implements SATElem, Comparable<Literal> {
 
     /**
      * Integer value used to encode the atom into cnf form.
@@ -215,4 +217,10 @@ public class Literal implements Comparable<Literal> {
             return atom.toString();
         }
     }
+
+	@Override
+	public String getPropositionalEncoding(SATSynthesisEngine synthesisEngine) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -23,8 +23,8 @@ import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
-import nl.uu.cs.ape.models.logic.constructs.Atom;
-import nl.uu.cs.ape.models.logic.constructs.Literal;
+import nl.uu.cs.ape.models.satStruc.Atom;
+import nl.uu.cs.ape.models.satStruc.Literal;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.utils.APEUtils;
 
