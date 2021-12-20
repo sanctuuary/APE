@@ -3,6 +3,7 @@ package nl.uu.cs.ape.models.satStruc;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 
@@ -14,39 +15,53 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
  */
 public class SATImplicationStatement implements SATFact {
 
-private List<SATFact> impliedFacts;
+private SATFact ifFact;
+private SATFact thenFact;
 	
 	
-	public SATImplicationStatement(SATFact arg1, SATFact arg2) {
-		super();
-		this.impliedFacts = new ArrayList<SATFact>();
-		this.impliedFacts.add(arg1);
-		this.impliedFacts.add(arg2);
-	}
 
-	public SATImplicationStatement(List<? extends SATFact> conjunctedFacts) {
-		super();
-		this.impliedFacts = new ArrayList<SATFact>();
-		conjunctedFacts.forEach(fact -> this.impliedFacts.add(fact));
-	}
+	public SATImplicationStatement(SATFact ifFact, SATFact thenFact) {
+	super();
+	this.ifFact = ifFact;
+	this.thenFact = thenFact;
+}
 
 	@Override
 	public String getPropositionalEncoding(SATSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
-		if(impliedFacts.size() == 1) {
-			return impliedFacts.get(0).getPropositionalEncoding(synthesisEngine);
-		}
 
-		Iterator<SATFact> currFact = impliedFacts.iterator();
-		if (currFact.hasNext()) {
-			constraints.append("(").append(currFact.next().getPropositionalEncoding(synthesisEngine));
-		  while (currFact.hasNext()) {
-			  constraints.append(" & ").append(currFact.next().getPropositionalEncoding(synthesisEngine));
-		  }
-		  constraints.append(")");
-		}
+		constraints.append("(").append(ifFact.getPropositionalEncoding(synthesisEngine));
+		constraints.append(" -> ").append(thenFact.getPropositionalEncoding(synthesisEngine));
+		constraints.append(")");
 		
 		return constraints.toString();
+	}
+
+	@Override
+	public List<SATClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		List<SATClause> allClauses = new ArrayList<SATClause>();
+
+		/* Add the first elements of the disjunction to the list of clauses.. */
+		if (currDisjFact.hasNext()) {
+			allClauses.addAll(currDisjFact.next().getCNFEncoding(synthesisEngine));
+		  while (currDisjFact.hasNext()) {
+			  List<SATClause> newClauses = currDisjFact.next().getCNFEncoding(synthesisEngine);
+			  /* .. and combine it with all the other elements. */
+			  ListIterator<SATClause> allClausesIt = allClauses.listIterator();
+			  while (allClausesIt.hasNext()) {
+				  /* Remove the existing element .. */
+				  SATClause existingClause = allClausesIt.next();
+				  allClausesIt.remove();
+				  
+				  /* ... and add all the combinations of that elements and the new elements. */
+				  for(SATClause newClause : newClauses) {
+					  allClausesIt.add(SATClause.combine2Clauses(existingClause, newClause));
+				  }
+			  }
+		  }
+		}
+		
+		return allClauses;
 	}
 
 }

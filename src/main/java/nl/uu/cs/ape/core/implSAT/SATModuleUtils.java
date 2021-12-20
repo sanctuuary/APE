@@ -16,7 +16,9 @@ import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.satStruc.BinarySATPredicate;
 import nl.uu.cs.ape.models.satStruc.SATClause;
+import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -103,7 +105,6 @@ public final class SATModuleUtils {
 	 */
 	private static List<SATClause> inputCons(SATSynthesisEngine synthesisInstance) {
 
-		List<SATClause> allClauses = new ArrayList<>();
 		List<SATClause> cnfClauses = new ArrayList<SATClause>();
 		SATAtomMappings mappings = synthesisInstance.getMappings();
 		/* For each module.. */
@@ -127,22 +128,30 @@ public final class SATModuleUtils {
 						if (currInputStateNo < moduleInputs.size()) {
 							/* Get input type and/or format that are/is required by the tool */
 							TaxonomyPredicate currInputType = moduleInputs.get(currInputStateNo);
-							/* Encode: if module was used in the module state */
-							
-							constraints.append("-")
-									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
-							/*
-							 * .. the corresponding data and format types need to be provided in input
-							 * states
-							 */
-							constraints = constraints
-									.append(mappings.add(currInputType, currInputState, WorkflowElement.USED_TYPE))
-									.append(" 0\n");
+							/* Encode: if module was used in the module state
+							 * the corresponding data and format types need to be provided in input
+							 * states */
+							cnfClauses.add(
+									new SATImplicationStatement(
+												new BinarySATPredicate(
+														WorkflowElement.MODULE, 
+														module, 
+														moduleState),
+												new BinarySATPredicate(
+														WorkflowElement.USED_TYPE, 
+														currInputType, 
+														currInputState)));
 						} else {
-							constraints.append("-")
-									.append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
-							constraints.append(mappings.add(synthesisInstance.getEmptyType(),
-									currInputState, WorkflowElement.USED_TYPE)).append(" 0\n");
+							cnfClauses.add(
+									new SATImplicationStatement(
+												new BinarySATPredicate(
+														WorkflowElement.MODULE, 
+														module, 
+														moduleState),
+												new BinarySATPredicate(
+														WorkflowElement.USED_TYPE, 
+														synthesisInstance.getEmptyType(), 
+														currInputState)));
 						}
 					}
 				}
@@ -173,11 +182,16 @@ public final class SATModuleUtils {
 					for (State currUsedTypeState : currUsedBlock.getStates()) {
 						if (!currType.isEmptyPredicate()) {
 							/* ..the referenced memory state cannot be null.. */
-							constraints.append("-")
-									.append(mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
-									.append(" ");
-							constraints.append("-").append(mappings.add(typeAutomaton.getNullState(),
-									currUsedTypeState, WorkflowElement.MEM_TYPE_REFERENCE)).append(" 0\n");
+							cnfClauses.add(
+									new SATNandStatement(
+												new BinarySATPredicate(
+														WorkflowElement.USED_TYPE, 
+														currType, 
+														currUsedTypeState),
+												new BinarySATPredicate(
+														WorkflowElement.MEM_TYPE_REFERENCE, 
+														typeAutomaton.getNullState(), 
+														currUsedTypeState)));
 
 							/* ..and for each state in which type can be created in memory .. */
 							for (Block memoryBlock : typeAutomaton.getMemoryTypesBlocks()) {
@@ -186,6 +200,19 @@ public final class SATModuleUtils {
 									 * If the type (currType) is used as an input for a tool (in state
 									 * currUsedTypeState)..
 									 */
+									
+									cnfClauses.add(
+											new SATImplicationStatement(
+													new BinarySATPredicate(
+															WorkflowElement.MEM_TYPE_REFERENCE, 
+															refMemoryTypeState,
+															currUsedTypeState),
+													new SATEqualStatement
+														new BinarySATPredicate(
+																WorkflowElement.USED_TYPE, 
+																currType, 
+																currUsedTypeState),
+														));
 									constraints.append("-").append(
 											mappings.add(currType, currUsedTypeState, WorkflowElement.USED_TYPE))
 											.append(" ");

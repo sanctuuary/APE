@@ -31,4 +31,15 @@ private SATFact negatedFact;
 		return constraints.toString();
 	}
 
+	@Override
+	public List<SATClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SATFact getNegated() {
+		return negatedFact;
+	}
+
 }

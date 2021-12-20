@@ -13,7 +13,7 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  *
  * @author Vedran Kasalica
  */
-public class Atom implements SATFact, Comparable<Atom> {
+public class Atom implements Comparable<Atom> {
 
     /**
      * PredicateLabel that is referred (tool or type).
@@ -171,10 +171,4 @@ public class Atom implements SATFact, Comparable<Atom> {
         }
     }
 
-	@Override
-	public String getPropositionalEncoding(SATSynthesisEngine synthesisEngine) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-    
 }

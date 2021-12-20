@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+
+import javax.swing.SpringLayout.Constraints;
 
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
@@ -51,5 +54,35 @@ private List<SATFact> disjointFacts;
 		
 		return constraints.toString();
 	}
+
+	@Override
+	public List<SATClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		List<SATClause> allClauses = new ArrayList<SATClause>();
+
+		Iterator<SATFact> currDisjFact = disjointFacts.iterator();
+		/* Add the first elements of the disjunction to the list of clauses.. */
+		if (currDisjFact.hasNext()) {
+			allClauses.addAll(currDisjFact.next().getCNFEncoding(synthesisEngine));
+		  while (currDisjFact.hasNext()) {
+			  List<SATClause> newClauses = currDisjFact.next().getCNFEncoding(synthesisEngine);
+			  /* .. and combine it with all the other elements. */
+			  ListIterator<SATClause> allClausesIt = allClauses.listIterator();
+			  while (allClausesIt.hasNext()) {
+				  /* Remove the existing element .. */
+				  SATClause existingClause = allClausesIt.next();
+				  allClausesIt.remove();
+				  
+				  /* ... and add all the combinations of that elements and the new elements. */
+				  for(SATClause newClause : newClauses) {
+					  allClausesIt.add(SATClause.combine2Clauses(existingClause, newClause));
+				  }
+			  }
+		  }
+		}
+		
+		return allClauses;
+	}
+	
+	
 
 }

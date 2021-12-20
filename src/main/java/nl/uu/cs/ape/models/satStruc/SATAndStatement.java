@@ -52,4 +52,16 @@ private List<SATFact> conjunctedFacts;
 		return constraints.toString();
 	}
 
+	
+	@Override
+	public List<SATClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		List<SATClause> constraints = new ArrayList<SATClause>();
+		/* Add each element of the conjunction as a separate clause/case .*/
+		for(SATFact fact : conjunctedFacts) {
+			constraints.addAll(fact.getCNFEncoding(synthesisEngine));
+		}
+		
+		return constraints;
+	}
+
 }
