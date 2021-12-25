@@ -16,7 +16,9 @@ import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.satStruc.SATAtom;
 import nl.uu.cs.ape.models.satStruc.SATClause;
+import nl.uu.cs.ape.models.satStruc.SATFact;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The {@code SATSynthesisEngine} class represents a <b>synthesis instance</b>,
@@ -62,8 +65,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
     /**
      * CNF encoding of the problem.
      */
-    private List<SATClause> cnfClauses;
-    private File cnfEncodingx;
+    private List<SATFact> cnfClauses;
+    private File cnfEncoding;
 
     /**
      * File used as an input for the SAT solver.
@@ -98,8 +101,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
         this.mappings.resetAuxVariables();
         
         this.satInputFile = null;
-        this.cnfClauses = new ArrayList<SATClause>();
-        this.cnfEncodingx = File.createTempFile("satCNF" + workflowLength, null);
+        this.cnfClauses = new ArrayList<SATFact>();
+        this.cnfEncoding = File.createTempFile("satCNF" + workflowLength, null);
 
         int maxNoToolInputs = Math.max(domainSetup.getMaxNoToolInputs(), runConfig.getProgramOutputs().size());
         int maxNoToolOutputs = Math.max(domainSetup.getMaxNoToolOutputs(), runConfig.getProgramInputs().size());
@@ -129,14 +132,14 @@ public class SATSynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
         /* Create const raints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
-        cnfClauses.addAll(SATModuleUtils.encodeModuleAnnotations(this)));
+        cnfClauses.addAll(SATModuleUtils.encodeModuleAnnotations(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
         /*
          * The constraints preserve the memory structure, i.e. preserve the data available in memory and the
          * logic of referencing data from memory in case of tool inputs.
          */
-        APEUtils.appendToFile(cnfEncoding, SATModuleUtils.encodeMemoryStructure(this));
+        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.encodeMemoryStructure(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Memory structure encoding");
 
         /*
@@ -145,12 +148,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the tools - from taxonomy.
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        APEUtils.appendToFile(cnfEncoding, SATModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton, mappings));
+        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
         
-        APEUtils.appendToFile(cnfEncoding, SATModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton, mappings));
+        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
         
-        APEUtils.appendToFile(cnfEncoding, SATModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton, mappings));
+        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
         
         /*
@@ -160,50 +163,50 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
         
-        APEUtils.appendToFile(cnfEncoding, SATTypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton, mappings));
+        SATFact.encodeNappendToFile(cnfEncoding, this, SATTypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
         
-        APEUtils.appendToFile(cnfEncoding, SATTypeUtils.typeMandatoryUsage(domainSetup, typeAutomaton, mappings));
+        SATFact.encodeNappendToFile(cnfEncoding, this, SATTypeUtils.typeMandatoryUsage(domainSetup, typeAutomaton));
         
-        APEUtils.appendToFile(cnfEncoding, SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton, mappings));
+        SATFact.encodeNappendToFile(cnfEncoding, this, SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
         
         /*
          * Encode the constraints from the file based on the templates (manual templates)
          */
-        if (domainSetup.getUnformattedConstr() != null && !domainSetup.getUnformattedConstr().isEmpty()) {
-        	APEUtils.appendToFile(cnfEncoding, APEUtils.encodeAPEConstraints(domainSetup, mappings, moduleAutomaton, typeAutomaton));
-            APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
-        }
+//        if (domainSetup.getUnformattedConstr() != null && !domainSetup.getUnformattedConstr().isEmpty()) {
+//        	SATFact.encodeNappendToFile(cnfEncoding, this, APEUtils.encodeAPEConstraints(domainSetup, moduleAutomaton, typeAutomaton));
+//            APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
+//        }
         
         /*
          * Encode data instance dependency constraints.
          */
-        APEUtils.appendToFile(cnfEncoding, SATModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton, mappings));
+        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton));
 
         /*
          * Encode the workflow input. Workflow I/O are encoded the last in order to
          * reuse the mappings for states, instead of introducing new ones, using the I/O
          * types of NodeType.UNKNOWN.
          */
-        String inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton, mappings);
+        Set<SATFact> inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton);
         if (inputDataEncoding == null) {
             return false;
         }
-        APEUtils.appendToFile(cnfEncoding, inputDataEncoding);
+        SATFact.encodeNappendToFile(cnfEncoding, this, inputDataEncoding);
         /*
          * Encode the workflow output
          */
-        String outputDataEncoding = SATTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton, mappings);
+        Set<SATFact> outputDataEncoding = SATTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton);
         if (outputDataEncoding == null) {
             return false;
         }
-        APEUtils.appendToFile(cnfEncoding, outputDataEncoding);
+        SATFact.encodeNappendToFile(cnfEncoding, this, outputDataEncoding);
 
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-        APEUtils.appendToFile(cnfEncoding, domainSetup.getConstraintsForAuxiliaryPredicates(mappings, moduleAutomaton, typeAutomaton));
+        SATFact.encodeNappendToFile(cnfEncoding, this, domainSetup.getConstraintsForAuxiliaryPredicates(moduleAutomaton, typeAutomaton));
 
         /*
          * Counting the number of variables and clauses that will be given to the SAT solver
@@ -224,7 +227,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
 //        File actualFile = new File ("/home/vedran/Desktop/tmpt.txt");
 //		InputStream tmpSat = IOUtils.toInputStream(satInputFile.toString(), "ASCII");
 //		tmpSat.close();
-//		String encoding = APEUtils.convertCNF2humanReadable(new FileInputStream(satInputFile), mappings);
+//		String encoding = APEUtils.convertCNF2humanReadable(new FileInputStream(satInputFile));
 //		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;

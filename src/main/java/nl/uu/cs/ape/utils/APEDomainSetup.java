@@ -26,6 +26,12 @@ import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.satStruc.SATAtom;
+import nl.uu.cs.ape.models.satStruc.SATClause;
+import nl.uu.cs.ape.models.satStruc.SATFact;
+import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
+import nl.uu.cs.ape.models.satStruc.SATNotStatement;
+import nl.uu.cs.ape.models.satStruc.SATOrStatement;
 
 /**
  * The {@code APEDomainSetup} class is used to store the domain information and initial constraints that have to be encoded.
@@ -188,8 +194,9 @@ public class APEDomainSetup {
      * @param typeAutomaton   Graph representing all the type states in the current workflow (one synthesis run might iterate though workflows of different lengths).
      * @return CNF encoding of that ensures the correctness of the helper predicates.
      */
-    public String getConstraintsForAuxiliaryPredicates(SATAtomMappings mappings, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
-        StringBuilder constraints = new StringBuilder();
+    public Set<SATFact> getConstraintsForAuxiliaryPredicates(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
+    	Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+    	
         Automaton automaton = null;
         WorkflowElement workflowElem = null;
         for (AuxiliaryPredicate helperPredicate : helperPredicates) {
@@ -206,23 +213,38 @@ public class APEDomainSetup {
                      * Ensures that if the abstract predicate is used, at least one of the
                      * disjointLabels has to be used.
                      */
-                    constraints.append("-")
-                            .append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
+                	Set<SATFact> allPossibilities = new HashSet<SATFact>();
+                	allPossibilities.add(
+                			new SATNotStatement(
+								new SATAtom(
+									workflowElem, 
+									helperPredicate, 
+									currState)));
 
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints.append(mappings.add(subLabel, currState, workflowElem)).append(" ");
+                    	allPossibilities.add(
+								new SATAtom(
+									workflowElem, 
+									subLabel, 
+									currState));
                     }
-                    constraints.append(" 0\n");
+                    cnfEncoding.add(new SATOrStatement(allPossibilities));
 
                     /*
                      * Ensures that if at least one of the disjointLabels was used, the abstract
                      * predicate has to be used as well.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
-                                .append(" ");
-                        constraints.append(mappings.add(helperPredicate, currState, workflowElem))
-                                .append(" 0\n");
+                    	cnfEncoding.add(
+                    			new SATImplicationStatement(
+    								new SATAtom(
+    									workflowElem, 
+    									subLabel, 
+    									currState),
+    								new SATAtom(
+    									workflowElem, 
+    									helperPredicate, 
+    									currState)));
                     }
                 } else if (helperPredicate.getLogicOp() == LogicOperation.AND) {
 
@@ -231,28 +253,44 @@ public class APEDomainSetup {
                      * have to be used.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints.append("-")
-                                .append(mappings.add(helperPredicate, currState, workflowElem)).append(" ");
-
-                        constraints.append(mappings.add(subLabel, currState, workflowElem))
-                                .append(" 0\n");
+                    	cnfEncoding.add(
+                    			new SATImplicationStatement(
+    								new SATAtom(
+    									workflowElem, 
+    									helperPredicate, 
+    									currState),
+    								new SATAtom(
+    									workflowElem, 
+    									subLabel, 
+    									currState)));
                     }
 
                     /*
                      * Ensures that if all of the disjointLabels were used, the abstract predicate
                      * has to be used as well.
                      */
+                    Set<SATFact> allPossibilities = new HashSet<SATFact>();
+                	
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                        constraints.append("-").append(mappings.add(subLabel, currState, workflowElem))
-                                .append(" ");
+                    	allPossibilities.add(
+                    			new SATNotStatement(
+    								new SATAtom(
+    									workflowElem, 
+    									subLabel, 
+    									currState)));
                     }
-                    constraints.append(mappings.add(helperPredicate, currState, workflowElem))
-                            .append(" 0\n");
+                    allPossibilities.add(
+							new SATAtom(
+								workflowElem, 
+								helperPredicate, 
+								currState));
+                    
+                    cnfEncoding.add(new SATOrStatement(allPossibilities));
                 }
             }
 
         }
-        return constraints.toString();
+        return cnfEncoding;
     }
     
     /**

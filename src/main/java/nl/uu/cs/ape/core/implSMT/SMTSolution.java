@@ -11,7 +11,7 @@ import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.satStruc.Atom;
+import nl.uu.cs.ape.models.satStruc.SATAtom;
 import nl.uu.cs.ape.models.satStruc.Literal;
 import nl.uu.cs.ape.models.smtStruc.Assertion;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
@@ -38,27 +38,27 @@ public class SMTSolution extends SolutionInterpreter {
     /**
      * List of all the positive literals provided by the solution.
      */
-    private final List<Atom> positiveLiterals;
+    private final List<SATAtom> positiveLiterals;
 
     /**
      * List of only relevant (positive) literals that represent implemented modules/tools.
      */
-    private final List<Atom> relevantModules;
+    private final List<SATAtom> relevantModules;
 
     /**
      * List of only relevant (positive) literals that represent simple types.
      */
-    private final List<Atom> relevantTypes;
+    private final List<SATAtom> relevantTypes;
 
     /**
      * List of all the relevant types and modules combined.
      */
-    private final List<Atom> relevantElements;
+    private final List<SATAtom> relevantElements;
 
     /**
      * List of all the references for the types in the memory, when used as tool inputs.
      */
-    private final List<Atom> references2MemTypes;
+    private final List<SATAtom> references2MemTypes;
     private final Set<PredicateLabel> usedTypeStates;
 
     /**
@@ -73,15 +73,15 @@ public class SMTSolution extends SolutionInterpreter {
      * @param satSolution       list of mapped literals given as a list of integers (library SAT output)
      * @param synthesisInstance Mapping of the atoms.
      */
-    public SMTSolution(List<Atom> facts, SMTSynthesisEngine smtSynthesisEngine) {
+    public SMTSolution(List<SATAtom> facts, SMTSynthesisEngine smtSynthesisEngine) {
         unsat = false;
-        positiveLiterals = new ArrayList<Atom>();
-        relevantModules = new ArrayList<Atom>();
-        relevantTypes = new ArrayList<Atom>();
-        relevantElements = new ArrayList<Atom>();
-        references2MemTypes = new ArrayList<Atom>();
+        positiveLiterals = new ArrayList<SATAtom>();
+        relevantModules = new ArrayList<SATAtom>();
+        relevantTypes = new ArrayList<SATAtom>();
+        relevantElements = new ArrayList<SATAtom>();
+        references2MemTypes = new ArrayList<SATAtom>();
         usedTypeStates = new HashSet<PredicateLabel>();
-        for (Atom currAtom : facts) {
+        for (SATAtom currAtom : facts) {
                     positiveLiterals.add(currAtom);
                     if (currAtom.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
@@ -137,7 +137,7 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Atom literal : positiveLiterals) {
+            for (SATAtom literal : positiveLiterals) {
                 solution.append(literal.toString()).append(" ");
             }
         }
@@ -156,7 +156,7 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Atom literal : relevantModules) {
+            for (SATAtom literal : relevantModules) {
                 solution.append(literal.getPredicate().getPredicateLabel()).append(" -> ");
             }
         }
@@ -175,7 +175,7 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Atom relevantElement : relevantElements) {
+            for (SATAtom relevantElement : relevantElements) {
                 solution.append(relevantElement.toString() + " ");
             }
         }
@@ -194,7 +194,7 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             return null;
         } else {
-            for (Atom literal : relevantModules) {
+            for (SATAtom literal : relevantModules) {
                 solutionModules.add((Module) allModules.get(literal.getPredicate().getPredicateID()));
             }
         }
@@ -215,7 +215,7 @@ public class SMTSolution extends SolutionInterpreter {
 		List<Fact> facts = new ArrayList<Fact>();
 		if (!unsat) {
 			if(!allowToolSeqRepeat) {
-				for (Atom atom : relevantModules) {
+				for (SATAtom atom : relevantModules) {
 					facts.add(new BinarySMTPredicate(
 									WorkflowElement.MODULE, 
 									new SMTBitVec(SMTDataType.MODULE_STATE, atom.getUsedInStateArgument()), 
@@ -223,7 +223,7 @@ public class SMTSolution extends SolutionInterpreter {
 								));
 				}
 			} else {
-				for (Atom atom : relevantElements) {
+				for (SATAtom atom : relevantElements) {
 					if (atom.getWorkflowElementType() == WorkflowElement.MODULE) {
 							facts.add(new BinarySMTPredicate(
 										WorkflowElement.MODULE, 

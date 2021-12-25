@@ -28,7 +28,7 @@ public class SMTPredicateMappings implements Mappings {
     private int size;
 
     /**
-     * Instantiates a new Atom mappings.
+     * Instantiates a new SATAtom mappings.
      */
     public SMTPredicateMappings() {
         mappings = new HashMap<PredicateLabel, String>();

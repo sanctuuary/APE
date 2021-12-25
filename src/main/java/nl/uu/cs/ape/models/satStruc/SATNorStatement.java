@@ -18,34 +18,34 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class SATNandStatement implements SATFact {
+public class SATNorStatement implements SATFact {
 
-private Set<SATFact> nconjunctedFacts;
+private Set<SATFact> ndisjointFacts;
 	
 	
-	public SATNandStatement(SATFact arg1, SATFact arg2) {
+	public SATNorStatement(SATFact arg1, SATFact arg2) {
 		super();
-		this.nconjunctedFacts = new HashSet<SATFact>();
-		this.nconjunctedFacts.add(arg1);
-		this.nconjunctedFacts.add(arg2);
+		this.ndisjointFacts = new HashSet<SATFact>();
+		this.ndisjointFacts.add(arg1);
+		this.ndisjointFacts.add(arg2);
 	}
 
-	public SATNandStatement(Collection<? extends SATFact> nconjunctedFacts) {
+	public SATNorStatement(Collection<? extends SATFact> ndisjointFacts) {
 		super();
-		this.nconjunctedFacts = new HashSet<SATFact>();
-		nconjunctedFacts.forEach(fact -> this.nconjunctedFacts.add(fact));
+		this.ndisjointFacts = new HashSet<SATFact>();
+		ndisjointFacts.forEach(fact -> this.ndisjointFacts.add(fact));
 	}
 
 
 	@Override
 	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return new SATAndStatement(nconjunctedFacts).createNegatedCNFEncoding(synthesisEngine);
+		return new SATOrStatement(ndisjointFacts).createNegatedCNFEncoding(synthesisEngine);
 	}
 
 	
 	@Override
 	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return new SATAndStatement(nconjunctedFacts).createCNFEncoding(synthesisEngine);
+		return new SATOrStatement(ndisjointFacts).createCNFEncoding(synthesisEngine);
 	}
 
 }

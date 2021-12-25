@@ -3,9 +3,12 @@ package nl.uu.cs.ape.models.satStruc;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import javax.swing.SpringLayout.Constraints;
 
@@ -20,51 +23,32 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  */
 public class SATOrStatement implements SATFact {
 
-private List<SATFact> disjointFacts;
+private Set<SATFact> disjointFacts;
 	
 	
 	public SATOrStatement(SATFact arg1, SATFact arg2) {
 		super();
-		this.disjointFacts = new ArrayList<SATFact>();
+		this.disjointFacts = new HashSet<SATFact>();
 		this.disjointFacts.add(arg1);
 		this.disjointFacts.add(arg2);
 	}
 
-	public SATOrStatement(List<? extends SATFact> conjunctedFacts) {
+	public SATOrStatement(Collection<? extends SATFact> conjunctedFacts) {
 		super();
-		this.disjointFacts = new ArrayList<SATFact>();
+		this.disjointFacts = new HashSet<SATFact>();
 		conjunctedFacts.forEach(fact -> this.disjointFacts.add(fact));
 	}
 
 	@Override
-	public String getPropositionalEncoding(SATSynthesisEngine synthesisEngine) {
-		StringBuilder constraints = new StringBuilder();
-		if(disjointFacts.size() == 1) {
-			return disjointFacts.get(0).getPropositionalEncoding(synthesisEngine);
-		}
-
-		Iterator<SATFact> currFact = disjointFacts.iterator();
-		if (currFact.hasNext()) {
-			constraints.append("(").append(currFact.next().getPropositionalEncoding(synthesisEngine));
-		  while (currFact.hasNext()) {
-			  constraints.append(" & ").append(currFact.next().getPropositionalEncoding(synthesisEngine));
-		  }
-		  constraints.append(")");
-		}
-		
-		return constraints.toString();
-	}
-
-	@Override
-	public List<SATClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
 		List<SATClause> allClauses = new ArrayList<SATClause>();
 
 		Iterator<SATFact> currDisjFact = disjointFacts.iterator();
 		/* Add the first elements of the disjunction to the list of clauses.. */
 		if (currDisjFact.hasNext()) {
-			allClauses.addAll(currDisjFact.next().getCNFEncoding(synthesisEngine));
+			allClauses.addAll(currDisjFact.next().createCNFEncoding(synthesisEngine));
 		  while (currDisjFact.hasNext()) {
-			  List<SATClause> newClauses = currDisjFact.next().getCNFEncoding(synthesisEngine);
+			  Set<SATClause> newClauses = currDisjFact.next().createCNFEncoding(synthesisEngine);
 			  /* .. and combine it with all the other elements. */
 			  ListIterator<SATClause> allClausesIt = allClauses.listIterator();
 			  while (allClausesIt.hasNext()) {
@@ -79,9 +63,23 @@ private List<SATFact> disjointFacts;
 			  }
 		  }
 		}
-		
-		return allClauses;
+		Set<SATClause> fullClauses = new HashSet<>();
+		fullClauses.addAll(allClauses);
+		return fullClauses;
 	}
+
+	@Override
+	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		Set<SATClause> constraints = new HashSet<SATClause>();
+		/* Add each element of the conjunction as a separate clause/case .*/
+		for(SATFact fact : disjointFacts) {
+			constraints.addAll(fact.createNegatedCNFEncoding(synthesisEngine));
+		}
+		return constraints;
+	}
+	
+	
+	
 	
 	
 

@@ -1,19 +1,23 @@
 package nl.uu.cs.ape.models.satStruc;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
- * The {@code Atom} class represents elements of the workflow, that consists
+ * The {@code SATAtom} class represents elements of the workflow, that consists
  * of the operation or type used, state where it is used and potentially
  * a state that it refers to, i.e. input type elements refer to a state
  * when the type was created.
  *
  * @author Vedran Kasalica
  */
-public class Atom implements Comparable<Atom> {
+public class SATAtom implements SATFact, Comparable<SATAtom> {
 
     /**
      * PredicateLabel that is referred (tool or type).
@@ -29,27 +33,34 @@ public class Atom implements Comparable<Atom> {
      * Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.)
      */
     private WorkflowElement elementType;
+    
+    
+    /**
+     * Clause that represents the SATAtom.
+     */
+    private SATClause clause = null;
+    
 
     /**
      * Creates an atom that can represent usage of the tool, creation or usage of a type,
      * or a reference between an input type and the state in which it was generated..
      *
+     * @param elementType Element that defines what type of a predicate is described (such as {@link SMTDataType#MODULE}.
      * @param predicate   Predicate used.
      * @param usedInState State in the automaton it was used/created in.
-     * @param elementType Element that defines what type of a predicate is described (such as {@link SMTDataType#MODULE}.
      */
-    public Atom(PredicateLabel predicate, State usedInState, WorkflowElement elementType) {
+    public SATAtom(WorkflowElement elementType, PredicateLabel predicate, State usedInState) {
         this.predicate = predicate;
         this.argumentState = usedInState;
         this.elementType = elementType;
     }
 
-    /**
+    /**TODO: What is the point of this?
      * Creates a state in the automaton that corresponds to a usage of a data type as input, by a tool.
-     *
-     * @param atom Atom that is being copied.
+      
+     * @param atom SATAtom that is being copied.
      */
-    public Atom(Atom atom) {
+    public SATAtom(SATAtom atom) {
         this.predicate = atom.predicate;
         this.argumentState = atom.argumentState;
         this.elementType = atom.elementType;
@@ -88,7 +99,7 @@ public class Atom implements Comparable<Atom> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Atom other = (Atom) obj;
+        SATAtom other = (SATAtom) obj;
         if (argumentState == null) {
             if (other.argumentState != null)
                 return false;
@@ -141,7 +152,7 @@ public class Atom implements Comparable<Atom> {
     /**
      * Return true if the current workflow element is of the given {@link SMTDataType} type.
      *
-     * @param workflowElemType Element type that is current Atom is compared to.
+     * @param workflowElemType Element type that is current SATAtom is compared to.
      * @return true if the current workflow element corresponds to the given {@link SMTDataType}, false otherwise.
      */
     public boolean isWorkflowElementType(WorkflowElement workflowElemType) {
@@ -151,15 +162,15 @@ public class Atom implements Comparable<Atom> {
     /**
      * Compare the two Atoms according to the state they are used in.
      * Returns a negative integer, zero, or a positive integer as this
-     * Atom's state comes before than, is equal to, or comes after
+     * SATAtom's state comes before than, is equal to, or comes after
      * than the @otherAtom's state.
      *
-     * @param otherAtom The Atom to be compared
-     * @return The value 0 if the argument Atom's state is equal to this Atom's state;
-     * a value less than 0 if this Atom's state comes before the @otherAtom's state;
-     * and a value greater than 0 if this Atom's state comes after the @otherAtom's state.
+     * @param otherAtom The SATAtom to be compared
+     * @return The value 0 if the argument SATAtom's state is equal to this SATAtom's state;
+     * a value less than 0 if this SATAtom's state comes before the @otherAtom's state;
+     * and a value greater than 0 if this SATAtom's state comes after the @otherAtom's state.
      */
-	public int compareTo(Atom otherAtom) {
+	public int compareTo(SATAtom otherAtom) {
 
         int thisAtomState = this.getUsedInStateArgument().getAbsoluteStateNumber();
         int otherAtomState = otherAtom.getUsedInStateArgument().getAbsoluteStateNumber();
@@ -170,5 +181,25 @@ public class Atom implements Comparable<Atom> {
             return this.getPredicate().compareTo(otherAtom.getPredicate());
         }
     }
+	
+	
+
+	@Override
+	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		if(this.clause == null) {
+			int encoding = synthesisEngine.getMappings().add(this);
+			this.clause = new SATClause(encoding);
+		}
+		return this.clause.createCNFEncoding(synthesisEngine);
+	}
+
+	@Override
+	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		if(this.clause == null) {
+			int encoding = synthesisEngine.getMappings().add(this);
+			this.clause = new SATClause(encoding);
+		}
+		return this.clause.createNegatedCNFEncoding(synthesisEngine);
+	}
 
 }

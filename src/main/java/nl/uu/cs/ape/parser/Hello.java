@@ -11,16 +11,16 @@ public class Hello {
 	public static void main(String[] args) throws Exception {
 
 		
-		SLTLxLexer lexer = new SLTLxLexer(CharStreams.fromString("Exists _a, _b true \\/ false "));
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		SLTLxParser parser = new SLTLxParser(tokens);
-		ParseTree tree = parser.formula();
-		SLTLxSMTVisitor visitor = new SLTLxSMTVisitor();
+//		SLTLxLexer lexer = new SLTLxLexer(CharStreams.fromString("Exists _a, _b true \\/ false "));
+//		CommonTokenStream tokens = new CommonTokenStream(lexer);
+//		SLTLxParser parser = new SLTLxParser(tokens);
+//		ParseTree tree = parser.formula();
+//		SLTLxSMTVisitor visitor = new SLTLxSMTVisitor();
 //		ParseTreeWalker walker = new ParseTreeWalker();
 //		SLTLxWalker listener = new SLTLxWalker();
-		
+//		
 //		walker.walk(listener, tree);
-		SMTLib2Elem res = visitor.visit(tree);
+//		SMTLib2Elem res = visitor.visit(tree);
 
 		
 		System.out.println("Done.");

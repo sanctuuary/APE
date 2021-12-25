@@ -23,7 +23,7 @@ import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
-import nl.uu.cs.ape.models.satStruc.Atom;
+import nl.uu.cs.ape.models.satStruc.SATAtom;
 import nl.uu.cs.ape.models.satStruc.Literal;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -239,13 +239,13 @@ public class SolutionWorkflow {
      * @param facts
      * @param smtSynthesisEngine
      */
-    public SolutionWorkflow(List<Atom> facts, SMTSynthesisEngine smtSynthesisEngine) {
+    public SolutionWorkflow(List<SATAtom> facts, SMTSynthesisEngine smtSynthesisEngine) {
         /* Call for the default constructor. */
         this(smtSynthesisEngine.getModuleAutomaton(), smtSynthesisEngine.getTypeAutomaton());
 
         this.nativeSolution = new SMTSolution(facts, smtSynthesisEngine);
         
-        for (Atom currAtom : facts) {
+        for (SATAtom currAtom : facts) {
 //        	System.out.println(currAtom.toString());
                     if (currAtom.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;

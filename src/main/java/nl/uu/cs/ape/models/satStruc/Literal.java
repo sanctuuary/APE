@@ -20,7 +20,7 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  *
  * @author Vedran Kasalica
  */
-public class Literal implements SATElem, Comparable<Literal> {
+public class Literal implements Comparable<Literal> {
 
     /**
      * Integer value used to encode the atom into cnf form.
@@ -33,9 +33,9 @@ public class Literal implements SATElem, Comparable<Literal> {
     private Boolean negated;
 
     /**
-     * The {@link Atom} class represents elements of the workflow, that can be true or not (depending of the truth value of the literal).
+     * The {@link SATAtom} class represents elements of the workflow, that can be true or not (depending of the truth value of the literal).
      */
-    private Atom atom;
+    private SATAtom atom;
 
     /**
      * Generating an object from a mapped representation of the Literal.
@@ -134,9 +134,9 @@ public class Literal implements SATElem, Comparable<Literal> {
 
     /**
      * Return the atom that is part of the literal.
-     * @return Atom object that is the base for the literal.
+     * @return SATAtom object that is the base for the literal.
      */
-    public Atom getAtom() {
+    public SATAtom getAtom() {
     	return atom;
     }
     
@@ -206,7 +206,7 @@ public class Literal implements SATElem, Comparable<Literal> {
 
     /**
      * Returns the Original (human readable) value of the literal. The atom of the
-     * Literal is transformed using the {@link Atom#toString} function.
+     * Literal is transformed using the {@link SATAtom#toString} function.
      *
      * @return The value of the original literal
      */
@@ -218,9 +218,4 @@ public class Literal implements SATElem, Comparable<Literal> {
         }
     }
 
-	@Override
-	public String getPropositionalEncoding(SATSynthesisEngine synthesisEngine) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

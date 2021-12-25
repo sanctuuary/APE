@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
@@ -24,22 +25,15 @@ private SATFact negatedFact;
 		this.negatedFact = arg1; 
 	}
 
+
 	@Override
-	public String getPropositionalEncoding(SATSynthesisEngine synthesisEngine) {
-		StringBuilder constraints = new StringBuilder();
-		constraints.append(negatedFact.getPropositionalEncoding(synthesisEngine).toString());
-		return constraints.toString();
+	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		return negatedFact.createNegatedCNFEncoding(synthesisEngine);
 	}
 
 	@Override
-	public List<SATClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public SATFact getNegated() {
-		return negatedFact;
+	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		return negatedFact.createCNFEncoding(synthesisEngine);
 	}
 
 }

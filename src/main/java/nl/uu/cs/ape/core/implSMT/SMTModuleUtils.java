@@ -20,7 +20,7 @@ import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.Atom;
+import nl.uu.cs.ape.models.satStruc.SATAtom;
 import nl.uu.cs.ape.models.smtStruc.Assertion;
 import nl.uu.cs.ape.models.smtStruc.BinaryBoolFuncDeclaration;
 import nl.uu.cs.ape.models.smtStruc.DataTypeDeclaration;
@@ -1020,7 +1020,7 @@ public final class SMTModuleUtils {
 	}
 	
 	/**
-     * Define SMT functions that can be easily parsed from the model into the {@link Atom} objects..
+     * Define SMT functions that can be easily parsed from the model into the {@link SATAtom} objects..
      * 
      *  @param synthesisInstance A specific synthesis run that contains all the
 	 *                          information specific for it.

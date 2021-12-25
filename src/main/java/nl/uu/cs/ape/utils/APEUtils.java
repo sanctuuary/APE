@@ -17,7 +17,7 @@ import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.Atom;
+import nl.uu.cs.ape.models.satStruc.SATAtom;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -717,11 +717,11 @@ public final class APEUtils {
 			int intAtom = scanner.nextInt();
 
 			if (intAtom > 0) {
-				Atom atom = mappings.findOriginal(intAtom);
+				SATAtom atom = mappings.findOriginal(intAtom);
 				
 				humanReadable.append(atom.toString()).append(" ");
 			} else if (intAtom < 0) {
-				Atom atom = mappings.findOriginal(-intAtom);
+				SATAtom atom = mappings.findOriginal(-intAtom);
 				humanReadable.append("-").append(atom.toString()).append(" ");
 			} else {
 				humanReadable.append("\n");
@@ -830,11 +830,12 @@ public final class APEUtils {
 
 	/**
 	 * Append text to the existing file. It adds the text at the end of the content of the file.
-	 * @param file
-	 * @param content
-	 * @throws IOException
+	 * @param file 		- 	existing file
+	 * @param content 	- content that should be appended
+	 * @throws IOException in case of an I/O error
+	 * @throws NullPointerException if the file is null
 	 */
-	public static void appendToFile(File file, String content) throws IOException {
+	public static void appendToFile(File file, String content) throws IOException, NullPointerException {
 		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
 		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
 		writer.write(content);
