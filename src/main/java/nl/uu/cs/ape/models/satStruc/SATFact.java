@@ -40,7 +40,7 @@ public interface SATFact extends SATElem {
 	 * @param formulas - collection of formulas that should be encoded
 	 * @throws IOException  in case of an I/O error
 	 */
-	public static void encodeNappendToFile(File file, SATSynthesisEngine synthesisEngine,  Collection<SATFact> formulas) throws IOException {
+	public static void appendCNFToFile(File file, SATSynthesisEngine synthesisEngine,  Collection<SATFact> formulas) throws IOException {
 		StringBuilder cnf = new StringBuilder();
 		createCNFEncoding(formulas, synthesisEngine)
 							.forEach(clause -> cnf.append(clause.toCNF()));

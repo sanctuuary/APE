@@ -128,14 +128,14 @@ public class SATSynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
         /* Create const raints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
-        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.encodeModuleAnnotations(this));
+        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeModuleAnnotations(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
         /*
          * The constraints preserve the memory structure, i.e. preserve the data available in memory and the
          * logic of referencing data from memory in case of tool inputs.
          */
-        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.encodeMemoryStructure(this));
+        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeMemoryStructure(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Memory structure encoding");
 
         /*
@@ -144,12 +144,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the tools - from taxonomy.
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton));
+        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
         
-        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
+        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
         
-        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
+        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
         
         /*
@@ -159,12 +159,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
         
-        SATFact.encodeNappendToFile(cnfEncoding, this, SATTypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
+        SATFact.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
         
-        SATFact.encodeNappendToFile(cnfEncoding, this, SATTypeUtils.typeMandatoryUsage(domainSetup, typeAutomaton));
+        SATFact.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeMandatoryUsage(domainSetup, typeAutomaton));
         
-        SATFact.encodeNappendToFile(cnfEncoding, this, SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
+        SATFact.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
         
         /*
@@ -178,7 +178,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Encode data instance dependency constraints.
          */
-        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton));
+        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton));
 
         /*
          * Encode the workflow input. Workflow I/O are encoded the last in order to
@@ -189,7 +189,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         if (inputDataEncoding == null) {
             return false;
         }
-        SATFact.encodeNappendToFile(cnfEncoding, this, inputDataEncoding);
+        SATFact.appendCNFToFile(cnfEncoding, this, inputDataEncoding);
         /*
          * Encode the workflow output
          */
@@ -197,12 +197,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
         if (outputDataEncoding == null) {
             return false;
         }
-        SATFact.encodeNappendToFile(cnfEncoding, this, outputDataEncoding);
+        SATFact.appendCNFToFile(cnfEncoding, this, outputDataEncoding);
 
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-        SATFact.encodeNappendToFile(cnfEncoding, this, domainSetup.getConstraintsForAuxiliaryPredicates(moduleAutomaton, typeAutomaton));
+        SATFact.appendCNFToFile(cnfEncoding, this, domainSetup.getConstraintsForAuxiliaryPredicates(moduleAutomaton, typeAutomaton));
 
         /*
          * Counting the number of variables and clauses that will be given to the SAT solver
@@ -220,11 +220,13 @@ public class SATSynthesisEngine implements SynthesisEngine {
 
         
         /* testing sat input */
-//        File actualFile = new File ("/home/vedran/Desktop/tmpt.txt");
+//      File actualFile = new File ("/home/vedran/Desktop/tmpt.txt");
 //		InputStream tmpSat = IOUtils.toInputStream(satInputFile.toString(), "ASCII");
 //		tmpSat.close();
-//		String encoding = APEUtils.convertCNF2humanReadable(new FileInputStream(satInputFile));
-//		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
+        FileInputStream cnfStream = new FileInputStream(satInputFile);
+		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
+		cnfStream.close();
+		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
         System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");

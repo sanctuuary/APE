@@ -200,6 +200,7 @@ public class APEDomainSetup {
         Automaton automaton = null;
         WorkflowElement workflowElem = null;
         for (AuxiliaryPredicate helperPredicate : helperPredicates) {
+        	System.out.println(helperPredicate.getPredicateLabel());
             if (helperPredicate.getGeneralizedPredicates().first() instanceof Type) {
                 automaton = typeAutomaton;
             } else {
@@ -213,8 +214,8 @@ public class APEDomainSetup {
                      * Ensures that if the abstract predicate is used, at least one of the
                      * disjointLabels has to be used.
                      */
-                	Set<SATFact> allPossibilities = new HashSet<SATFact>();
-                	allPossibilities.add(
+                	Set<SATFact> allORPossibilities = new HashSet<SATFact>();
+                	allORPossibilities.add(
                 			new SATNotStatement(
 								new SATAtom(
 									workflowElem, 
@@ -222,13 +223,13 @@ public class APEDomainSetup {
 									currState)));
 
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	allPossibilities.add(
+                    	allORPossibilities.add(
 								new SATAtom(
 									workflowElem, 
 									subLabel, 
 									currState));
                     }
-                    cnfEncoding.add(new SATOrStatement(allPossibilities));
+                    cnfEncoding.add(new SATOrStatement(allORPossibilities));
 
                     /*
                      * Ensures that if at least one of the disjointLabels was used, the abstract
@@ -269,23 +270,23 @@ public class APEDomainSetup {
                      * Ensures that if all of the disjointLabels were used, the abstract predicate
                      * has to be used as well.
                      */
-                    Set<SATFact> allPossibilities = new HashSet<SATFact>();
+                    Set<SATFact> allANDPossibilities = new HashSet<SATFact>();
                 	
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	allPossibilities.add(
+                    	allANDPossibilities.add(
                     			new SATNotStatement(
     								new SATAtom(
     									workflowElem, 
     									subLabel, 
     									currState)));
                     }
-                    allPossibilities.add(
+                    allANDPossibilities.add(
 							new SATAtom(
 								workflowElem, 
 								helperPredicate, 
 								currState));
                     
-                    cnfEncoding.add(new SATOrStatement(allPossibilities));
+                    cnfEncoding.add(new SATOrStatement(allANDPossibilities));
                 }
             }
 
