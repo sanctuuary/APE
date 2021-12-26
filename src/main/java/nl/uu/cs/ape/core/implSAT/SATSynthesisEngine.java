@@ -16,8 +16,6 @@ import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.SATClause;
 import nl.uu.cs.ape.models.satStruc.SATFact;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -65,7 +63,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
     /**
      * CNF encoding of the problem.
      */
-    private List<SATFact> cnfClauses;
     private File cnfEncoding;
 
     /**
@@ -101,7 +98,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
         this.mappings.resetAuxVariables();
         
         this.satInputFile = null;
-        this.cnfClauses = new ArrayList<SATFact>();
         this.cnfEncoding = File.createTempFile("satCNF" + workflowLength, null);
 
         int maxNoToolInputs = Math.max(domainSetup.getMaxNoToolInputs(), runConfig.getProgramOutputs().size());
@@ -132,7 +128,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
         /* Create const raints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
-        cnfClauses.addAll(SATModuleUtils.encodeModuleAnnotations(this));
+        SATFact.encodeNappendToFile(cnfEncoding, this, SATModuleUtils.encodeModuleAnnotations(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
         /*
@@ -174,10 +170,10 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Encode the constraints from the file based on the templates (manual templates)
          */
-//        if (domainSetup.getUnformattedConstr() != null && !domainSetup.getUnformattedConstr().isEmpty()) {
-//        	SATFact.encodeNappendToFile(cnfEncoding, this, APEUtils.encodeAPEConstraints(domainSetup, moduleAutomaton, typeAutomaton));
-//            APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
-//        }
+        if (domainSetup.getUnformattedConstr() != null && !domainSetup.getUnformattedConstr().isEmpty()) {
+        	APEUtils.appendToFile(cnfEncoding, APEUtils.encodeAPEConstraints(domainSetup, mappings, moduleAutomaton, typeAutomaton));
+            APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
+        }
         
         /*
          * Encode data instance dependency constraints.
