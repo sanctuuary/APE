@@ -223,10 +223,10 @@ public class SATSynthesisEngine implements SynthesisEngine {
 //        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
         
         /* add human readable version of the cnf encoding file to Desktop */
-        FileInputStream cnfStream = new FileInputStream(satInputFile);
-		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
-		cnfStream.close();
-		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
+//        FileInputStream cnfStream = new FileInputStream(satInputFile);
+//		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
+//		cnfStream.close();
+//		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
 		
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
