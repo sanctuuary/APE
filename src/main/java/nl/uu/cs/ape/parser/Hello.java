@@ -18,10 +18,10 @@ public class Hello {
 		ParseTree tree = parser.formula();
 		SLTLxSATVisitor visitor = new SLTLxSATVisitor(0, new SATAtomMappings());
 		ParseTreeWalker walker = new ParseTreeWalker();
-		SLTLxWalker listener = new SLTLxWalker();
-		
-		walker.walk(listener, tree);
-		SMTLib2Elem res = visitor.visit(tree);
+//		SLTLxWalker listener = new SLTLxWalker();
+//		
+//		walker.walk(listener, tree);
+//		SMTLib2Elem res = visitor.visit(tree);
 
 		
 		System.out.println("Done.");
