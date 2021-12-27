@@ -27,7 +27,7 @@ import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.SATClause;
+import nl.uu.cs.ape.models.satStruc.CNFClause;
 import nl.uu.cs.ape.models.satStruc.SATFact;
 import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
 import nl.uu.cs.ape.models.satStruc.SATNotStatement;
@@ -200,7 +200,6 @@ public class APEDomainSetup {
         Automaton automaton = null;
         WorkflowElement workflowElem = null;
         for (AuxiliaryPredicate helperPredicate : helperPredicates) {
-        	System.out.println(helperPredicate.getPredicateLabel());
             if (helperPredicate.getGeneralizedPredicates().first() instanceof Type) {
                 automaton = typeAutomaton;
             } else {

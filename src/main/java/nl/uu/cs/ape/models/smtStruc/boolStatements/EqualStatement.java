@@ -8,14 +8,14 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class EqualStatement implements Fact {
+public class EqualStatement implements SMTFact {
 
-	private Fact arg1;
-	private Fact arg2;
+	private SMTFact arg1;
+	private SMTFact arg2;
 	
 	
 	
-	public EqualStatement(Fact arg1, Fact arg2) {
+	public EqualStatement(SMTFact arg1, SMTFact arg2) {
 		super();
 		this.arg1 = arg1;
 		this.arg2 = arg2;

@@ -38,7 +38,7 @@ public class SATAtom implements SATFact, Comparable<SATAtom> {
     /**
      * Clause that represents the SATAtom.
      */
-    private SATClause clause = null;
+    private CNFClause clause = null;
     
 
     /**
@@ -185,19 +185,19 @@ public class SATAtom implements SATFact, Comparable<SATAtom> {
 	
 
 	@Override
-	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);
-			this.clause = new SATClause(encoding);
+			this.clause = new CNFClause(encoding);
 		}
 		return this.clause.createCNFEncoding(synthesisEngine);
 	}
 
 	@Override
-	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);
-			this.clause = new SATClause(encoding);
+			this.clause = new CNFClause(encoding);
 		}
 		return this.clause.createNegatedCNFEncoding(synthesisEngine);
 	}

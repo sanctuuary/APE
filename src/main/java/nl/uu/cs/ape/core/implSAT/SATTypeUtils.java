@@ -63,11 +63,11 @@ public class SATTypeUtils {
     						new SATNandStatement(
     									new SATAtom(
     											WorkflowElement.MEMORY_TYPE, 
-    											pair.getFirst(), 
+    											firstPair, 
     											memTypeState),
     									new SATAtom(
     											WorkflowElement.MEMORY_TYPE, 
-    											pair.getSecond(), 
+    											secondPair, 
     											memTypeState)));
                 }
             }
@@ -78,11 +78,11 @@ public class SATTypeUtils {
     						new SATNandStatement(
     									new SATAtom(
     											WorkflowElement.USED_TYPE, 
-    											pair.getFirst(), 
+    											firstPair, 
     											usedTypeState),
     									new SATAtom(
     											WorkflowElement.USED_TYPE, 
-    											pair.getSecond(), 
+    											secondPair, 
     											usedTypeState)));
                 }
             }

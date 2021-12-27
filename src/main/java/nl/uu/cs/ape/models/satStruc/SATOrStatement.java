@@ -40,40 +40,40 @@ private Set<SATFact> disjointFacts;
 	}
 
 	@Override
-	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		List<SATClause> allClauses = new ArrayList<SATClause>();
+	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		List<CNFClause> allClauses = new ArrayList<CNFClause>();
 
 		Iterator<SATFact> currDisjFact = disjointFacts.iterator();
 		/* Add the first elements of the disjunction to the list of clauses.. */
 		if (currDisjFact.hasNext()) {
-			allClauses.addAll(currDisjFact.next().createCNFEncoding(synthesisEngine));
+			allClauses.addAll(currDisjFact.next().getCNFEncoding(synthesisEngine));
 		  while (currDisjFact.hasNext()) {
-			  Set<SATClause> newClauses = currDisjFact.next().createCNFEncoding(synthesisEngine);
+			  Set<CNFClause> newClauses = currDisjFact.next().getCNFEncoding(synthesisEngine);
 			  /* .. and combine it with all the other elements. */
-			  ListIterator<SATClause> allClausesIt = allClauses.listIterator();
+			  ListIterator<CNFClause> allClausesIt = allClauses.listIterator();
 			  while (allClausesIt.hasNext()) {
 				  /* Remove the existing element .. */
-				  SATClause existingClause = allClausesIt.next();
+				  CNFClause existingClause = allClausesIt.next();
 				  allClausesIt.remove();
 				  
 				  /* ... and add all the combinations of that elements and the new elements. */
-				  for(SATClause newClause : newClauses) {
-					  allClausesIt.add(SATClause.combine2Clauses(existingClause, newClause));
+				  for(CNFClause newClause : newClauses) {
+					  allClausesIt.add(CNFClause.combine2Clauses(existingClause, newClause));
 				  }
 			  }
 		  }
 		}
-		Set<SATClause> fullClauses = new HashSet<>();
+		Set<CNFClause> fullClauses = new HashSet<>();
 		fullClauses.addAll(allClauses);
 		return fullClauses;
 	}
 
 	@Override
-	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		Set<SATClause> constraints = new HashSet<SATClause>();
+	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		Set<CNFClause> constraints = new HashSet<CNFClause>();
 		/* Add each element of the conjunction as a separate clause/case .*/
 		for(SATFact fact : disjointFacts) {
-			constraints.addAll(fact.createNegatedCNFEncoding(synthesisEngine));
+			constraints.addAll(fact.getNegatedCNFEncoding(synthesisEngine));
 		}
 		return constraints;
 	}

@@ -6,7 +6,7 @@ package nl.uu.cs.ape.models.smtStruc.boolStatements;
  * @author Vedran Kasalica
  *
  */
-public interface SMTPredicate extends Fact {
+public interface SMTPredicate extends SMTFact {
 
 	
 }

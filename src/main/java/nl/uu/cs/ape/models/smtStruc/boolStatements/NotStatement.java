@@ -10,13 +10,13 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  * @author Vedran Kasalica
  *
  */
-public class NotStatement implements Fact {
+public class NotStatement implements SMTFact {
 
-	private Fact negatedStatement;
+	private SMTFact negatedStatement;
 	
 	
 	
-	public NotStatement(Fact negatedStatement) {
+	public NotStatement(SMTFact negatedStatement) {
 		super();
 		this.negatedStatement = negatedStatement;
 	}

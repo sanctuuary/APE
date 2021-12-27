@@ -9,14 +9,14 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  * @author Vedran Kasalica
  *
  */
-public class NandStatement implements Fact {
+public class NandStatement implements SMTFact {
 
-	private Fact arg1;
-	private Fact arg2;
+	private SMTFact arg1;
+	private SMTFact arg2;
 	
 	
 	
-	public NandStatement(Fact ifStatement, Fact thanStatement) {
+	public NandStatement(SMTFact ifStatement, SMTFact thanStatement) {
 		super();
 		this.arg1 = ifStatement;
 		this.arg2 = thanStatement;

@@ -16,7 +16,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  * @author Vedran Kasalica
  *
  */
-public class BoolVal implements Fact {
+public class BoolVal implements SMTFact {
 
 	private String boolVal;
 	

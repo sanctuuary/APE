@@ -30,7 +30,7 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.DeclareSimplifiedFunction;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.EqualStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.ExistsStatement;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFact;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.ForallStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.ImplicationStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.NandStatement;
@@ -506,7 +506,7 @@ public final class SMTModuleUtils {
 				 */
 				List<State> possibleMemStates = typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber);
 				possibleMemStates.add(typeAutomaton.getNullState());
-				List<Fact> allPossibilities = new ArrayList<Fact>();
+				List<SMTFact> allPossibilities = new ArrayList<SMTFact>();
 				for (State exictingMemState : possibleMemStates) {
 					allPossibilities.add(new BinarySMTPredicate(
 												WorkflowElement.MEM_TYPE_REFERENCE, 
@@ -748,7 +748,7 @@ public final class SMTModuleUtils {
 				if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
 
-						List<Fact> allPossibilities = new ArrayList<Fact>();
+						List<SMTFact> allPossibilities = new ArrayList<SMTFact>();
 						allPossibilities.add(new BinarySMTPredicate(
 													WorkflowElement.MEMORY_TYPE, 
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState),
@@ -764,7 +764,7 @@ public final class SMTModuleUtils {
 					}
 					/* In case that at least one workflow input need to be used */
 				} else if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ONE) {
-					List<Fact> allPossibilities = new ArrayList<Fact>();
+					List<SMTFact> allPossibilities = new ArrayList<SMTFact>();
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getLocalStateNumber() == 0) {
 							allPossibilities.add(new BinarySMTPredicate(
@@ -787,7 +787,7 @@ public final class SMTModuleUtils {
 				/* In case that all generated data need to be used. */
 				if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
-						List<Fact> allPossibilities = new ArrayList<Fact>();
+						List<SMTFact> allPossibilities = new ArrayList<SMTFact>();
 						allPossibilities.add(new BinarySMTPredicate(
 													WorkflowElement.MEMORY_TYPE,
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState), 
@@ -806,7 +806,7 @@ public final class SMTModuleUtils {
 					 * used.
 					 */
 				} else if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ONE) {
-					List<Fact> allPossibilities = new ArrayList<Fact>();
+					List<SMTFact> allPossibilities = new ArrayList<SMTFact>();
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getLocalStateNumber() == 0) {
 							allPossibilities.add(new BinarySMTPredicate(

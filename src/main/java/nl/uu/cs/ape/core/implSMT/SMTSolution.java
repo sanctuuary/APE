@@ -17,7 +17,7 @@ import nl.uu.cs.ape.models.smtStruc.Assertion;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.AndStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFact;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.NotStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBitVec;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
@@ -212,7 +212,7 @@ public class SMTSolution extends SolutionInterpreter {
 	 */
 	public List<SMTLib2Row> getSMTnegatedSolution(boolean allowToolSeqRepeat) {
 		List<SMTLib2Row> allClauses = new ArrayList<SMTLib2Row>();
-		List<Fact> facts = new ArrayList<Fact>();
+		List<SMTFact> facts = new ArrayList<SMTFact>();
 		if (!unsat) {
 			if(!allowToolSeqRepeat) {
 				for (SATAtom atom : relevantModules) {

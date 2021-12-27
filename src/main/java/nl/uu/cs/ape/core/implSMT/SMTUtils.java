@@ -21,7 +21,7 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.smtStruc.Assertion;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFact;
 
 /**
  * The {@code ModuleUtils} class is used for storing {@code Static} methods related to the SMT encoding of the problem.

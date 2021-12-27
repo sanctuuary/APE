@@ -13,7 +13,7 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class SATClause implements SATFact {
+public class CNFClause {
 
 	List<Integer> atoms;
 	
@@ -21,7 +21,7 @@ public class SATClause implements SATFact {
 	 * Create clause based on the list of elements (integers, > 0)
 	 * @param atoms
 	 */
-	public SATClause(List<Integer> atoms) {
+	public CNFClause(List<Integer> atoms) {
 		super();
 		this.atoms = new ArrayList<Integer>();
 		atoms.forEach(atom -> this.atoms.add(atom));
@@ -32,7 +32,7 @@ public class SATClause implements SATFact {
 	 * 
 	 * @param atom
 	 */
-	public SATClause(Integer atom) {
+	public CNFClause(Integer atom) {
 		super();
 		this.atoms = new ArrayList<Integer>();
 		this.atoms.add(atom);
@@ -45,27 +45,24 @@ public class SATClause implements SATFact {
 	 * @param clause2 - 2nd clause that should be combined
 	 * @return
 	 */
-	public static SATClause combine2Clauses(SATClause clause1, SATClause clause2) {
+	public static CNFClause combine2Clauses(CNFClause clause1, CNFClause clause2) {
 		List<Integer> combinedAtoms = new ArrayList<Integer>();
 		clause1.atoms.forEach(existingAtom -> combinedAtoms.add(existingAtom));
 		clause2.atoms.forEach(newAtom -> combinedAtoms.add(newAtom));
-		return new SATClause(combinedAtoms);
+		return new CNFClause(combinedAtoms);
 	}
 	
-//	public String get
 
-	@Override
-	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		Set<SATClause> clause = new HashSet<>();
+	public Set<CNFClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		Set<CNFClause> clause = new HashSet<>();
 		clause.add(this);
 		return clause;
 	}
 
-	@Override
-	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		Set<SATClause> clauses = new HashSet<>();
+	public Set<CNFClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		Set<CNFClause> clauses = new HashSet<>();
 		for(int element : this.atoms) {
-			clauses.add(new SATClause(-element));
+			clauses.add(new CNFClause(-element));
 		}
 		
 		return clauses;

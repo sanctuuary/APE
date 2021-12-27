@@ -11,21 +11,21 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class AndStatement implements Fact {
+public class AndStatement implements SMTFact {
 
-private List<Fact> conjunctedFacts;
+private List<SMTFact> conjunctedFacts;
 	
 	
-	public AndStatement(Fact arg1, Fact arg2) {
+	public AndStatement(SMTFact arg1, SMTFact arg2) {
 		super();
-		conjunctedFacts = new ArrayList<Fact>();
+		conjunctedFacts = new ArrayList<SMTFact>();
 		conjunctedFacts.add(arg1);
 		conjunctedFacts.add(arg2);
 	}
 
 
 
-	public AndStatement(List<Fact> conjunctedFacts) {
+	public AndStatement(List<SMTFact> conjunctedFacts) {
 		this.conjunctedFacts = conjunctedFacts;
 	}
 
@@ -37,7 +37,7 @@ private List<Fact> conjunctedFacts;
 		}
 		constraints.append("(and");
 //		add the statements to the conjunction
-		for(Fact fact : conjunctedFacts) {
+		for(SMTFact fact : conjunctedFacts) {
 			constraints.append(" ").append(fact.getSMT2Encoding(synthesisEngine));
 		}
 		constraints.append(")");

@@ -18,7 +18,7 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.ImplicationStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.NotStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.BoolVal;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.ExistsStatement;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFact;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBoundedVar;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
@@ -71,7 +71,7 @@ public class SLTLxSMTVisitor extends SLTLxBaseVisitor<SMTLib2Elem> {
 			List<SMTDataType> types = new ArrayList<>();
 			boundedVars.forEach(var -> types.add(SMTDataType.MEMORY_TYPE_STATE));
 			
-			return new ExistsStatement(boundedVars, types, (Fact) visit(ctx.proposition()));
+			return new ExistsStatement(boundedVars, types, (SMTFact) visit(ctx.proposition()));
 		}
 	}
 
@@ -111,20 +111,20 @@ public class SLTLxSMTVisitor extends SLTLxBaseVisitor<SMTLib2Elem> {
 			return new AndStatement(
 							ctx.proposition().stream()
 							.map(prop 
-									-> (Fact) visit(prop))
+									-> (SMTFact) visit(prop))
 							.collect(Collectors.toList()));
 		}
 		if(ctx.OR() != null) {
 			return new OrStatement(
 							ctx.proposition().stream()
 							.map(prop 
-									-> (Fact) visit(prop))
+									-> (SMTFact) visit(prop))
 							.collect(Collectors.toList()));
 		}
 		if(ctx.IMPL() != null) {
 			return new ImplicationStatement(
-						(Fact) visit(ctx.proposition().get(0)),
-						(Fact) visit(ctx.proposition().get(1)));
+						(SMTFact) visit(ctx.proposition().get(0)),
+						(SMTFact) visit(ctx.proposition().get(1)));
 		}
 			
 		return null;
@@ -133,7 +133,7 @@ public class SLTLxSMTVisitor extends SLTLxBaseVisitor<SMTLib2Elem> {
 	@Override
 	public SMTLib2Elem visitUnaryBool(SLTLxParser.UnaryBoolContext ctx) {
 		return new NotStatement(
-				(Fact) visit(ctx.proposition()));
+				(SMTFact) visit(ctx.proposition()));
 	}
 	//TODO
 	@Override

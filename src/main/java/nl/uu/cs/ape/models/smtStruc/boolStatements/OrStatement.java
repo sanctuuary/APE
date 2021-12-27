@@ -16,21 +16,21 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  * @author Vedran Kasalica
  *
  */
-public class OrStatement implements Fact {
+public class OrStatement implements SMTFact {
 
-	private List<Fact> disjointFacts;
+	private List<SMTFact> disjointFacts;
 	
 	
-	public OrStatement(Fact arg1, Fact arg2) {
+	public OrStatement(SMTFact arg1, SMTFact arg2) {
 		super();
-		disjointFacts = new ArrayList<Fact>();
+		disjointFacts = new ArrayList<SMTFact>();
 		disjointFacts.add(arg1);
 		disjointFacts.add(arg2);
 	}
 
 
 
-	public OrStatement(List<Fact> disjointFacts) {
+	public OrStatement(List<SMTFact> disjointFacts) {
 		this.disjointFacts = disjointFacts;
 	}
 
@@ -42,7 +42,7 @@ public class OrStatement implements Fact {
 		}
 		constraints.append("(or");
 //		add the statements to the dijunction
-		for(Fact fact : disjointFacts) {
+		for(SMTFact fact : disjointFacts) {
 			constraints.append(" ").append(fact.getSMT2Encoding(synthesisEngine));
 		}
 		constraints.append(")");

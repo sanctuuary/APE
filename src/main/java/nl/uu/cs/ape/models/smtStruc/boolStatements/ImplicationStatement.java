@@ -7,14 +7,14 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class ImplicationStatement implements Fact {
+public class ImplicationStatement implements SMTFact {
 
-	private Fact ifStatement;
-	private Fact thanStatement;
+	private SMTFact ifStatement;
+	private SMTFact thanStatement;
 	
 	
 	
-	public ImplicationStatement(Fact ifStatement, Fact thanStatement) {
+	public ImplicationStatement(SMTFact ifStatement, SMTFact thanStatement) {
 		super();
 		this.ifStatement = ifStatement;
 		this.thanStatement = thanStatement;

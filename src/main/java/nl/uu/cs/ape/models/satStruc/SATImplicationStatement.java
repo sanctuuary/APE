@@ -29,36 +29,36 @@ private SATFact thenFact;
 }
 
 	@Override
-	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
 		
-		List<SATClause> allClauses = new ArrayList<SATClause>();
+		List<CNFClause> allClauses = new ArrayList<CNFClause>();
 
 		/* Add the elements of the if element of the implication.. */
-		allClauses.addAll(ifFact.createNegatedCNFEncoding(synthesisEngine));
-		Set<SATClause> newClauses = thenFact.createCNFEncoding(synthesisEngine);
+		allClauses.addAll(ifFact.getNegatedCNFEncoding(synthesisEngine));
+		Set<CNFClause> newClauses = thenFact.getCNFEncoding(synthesisEngine);
 		/* .. and combine it with all the other elements of the then term. */
-		ListIterator<SATClause> allClausesIt = allClauses.listIterator();
+		ListIterator<CNFClause> allClausesIt = allClauses.listIterator();
 		while (allClausesIt.hasNext()) {
 			  /* Remove the existing element .. */
-			  SATClause existingClause = allClausesIt.next();
+			  CNFClause existingClause = allClausesIt.next();
 			  allClausesIt.remove();
 			  
 			  /* ... and add all the combinations of that elements and the new elements. */
-			  for(SATClause newClause : newClauses) {
-				  allClausesIt.add(SATClause.combine2Clauses(existingClause, newClause));
+			  for(CNFClause newClause : newClauses) {
+				  allClausesIt.add(CNFClause.combine2Clauses(existingClause, newClause));
 			  }
 		  }
 		
-		Set<SATClause> fullClauses = new HashSet<>();
+		Set<CNFClause> fullClauses = new HashSet<>();
 		fullClauses.addAll(allClauses);
 		return fullClauses;
 	}
 
 	@Override
-	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		Set<SATClause> constraints = new HashSet<SATClause>();
-		constraints.addAll(ifFact.createCNFEncoding(synthesisEngine));
-		constraints.addAll(thenFact.createNegatedCNFEncoding(synthesisEngine));
+	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		Set<CNFClause> constraints = new HashSet<CNFClause>();
+		constraints.addAll(ifFact.getCNFEncoding(synthesisEngine));
+		constraints.addAll(thenFact.getNegatedCNFEncoding(synthesisEngine));
 		return constraints;
 	}
 

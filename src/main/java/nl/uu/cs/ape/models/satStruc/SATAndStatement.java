@@ -38,42 +38,42 @@ private Set<SATFact> conjunctedFacts;
 	}
 
 	@Override
-	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		Set<SATClause> constraints = new HashSet<SATClause>();
+	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		Set<CNFClause> constraints = new HashSet<CNFClause>();
 		/* Add each element of the conjunction as a separate clause/case .*/
 		for(SATFact fact : conjunctedFacts) {
-			constraints.addAll(fact.createCNFEncoding(synthesisEngine));
+			constraints.addAll(fact.getCNFEncoding(synthesisEngine));
 		}
 		return constraints;
 	}
 
 	@Override
-	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
 
-		List<SATClause> allClauses = new ArrayList<SATClause>();
+		List<CNFClause> allClauses = new ArrayList<CNFClause>();
 
-		Iterator<SATFact> currDisjFact = conjunctedFacts.iterator();
+		Iterator<SATFact> currConjFact = conjunctedFacts.iterator();
 		/* Add the first elements of the disjunction to the list of clauses.. */
-		if (currDisjFact.hasNext()) {
-			allClauses.addAll(currDisjFact.next().createNegatedCNFEncoding(synthesisEngine));
-		  while (currDisjFact.hasNext()) {
-			  Set<SATClause> newClauses = currDisjFact.next().createNegatedCNFEncoding(synthesisEngine);
+		if (currConjFact.hasNext()) {
+			allClauses.addAll(currConjFact.next().getNegatedCNFEncoding(synthesisEngine));
+		  while (currConjFact.hasNext()) {
+			  Set<CNFClause> newClauses = currConjFact.next().getNegatedCNFEncoding(synthesisEngine);
 			  /* .. and combine it with all the other elements. */
-			  ListIterator<SATClause> allClausesIt = allClauses.listIterator();
+			  ListIterator<CNFClause> allClausesIt = allClauses.listIterator();
 			  while (allClausesIt.hasNext()) {
 				  /* Remove the existing element .. */
-				  SATClause existingClause = allClausesIt.next();
+				  CNFClause existingClause = allClausesIt.next();
 				  allClausesIt.remove();
 				  
 				  /* ... and add all the combinations of that elements and the new elements. */
-				  for(SATClause newClause : newClauses) {
-					  allClausesIt.add(SATClause.combine2Clauses(existingClause, newClause));
+				  for(CNFClause newClause : newClauses) {
+					  allClausesIt.add(CNFClause.combine2Clauses(existingClause, newClause));
 				  }
 			  }
 		  }
 		}
 		
-		Set<SATClause> fullClauses = new HashSet<>();
+		Set<CNFClause> fullClauses = new HashSet<>();
 		fullClauses.addAll(allClauses);
 		return fullClauses;
 	}

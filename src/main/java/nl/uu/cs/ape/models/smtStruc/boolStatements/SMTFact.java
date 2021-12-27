@@ -7,6 +7,6 @@ import nl.uu.cs.ape.models.smtStruc.SMTLib2Elem;
  * @author Vedran Kasalica
  *
  */
-public interface Fact extends SMTLib2Elem {
+public interface SMTFact extends SMTLib2Elem {
 
 }

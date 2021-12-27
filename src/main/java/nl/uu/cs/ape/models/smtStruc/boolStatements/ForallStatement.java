@@ -11,14 +11,14 @@ import nl.uu.cs.ape.core.implSMT.SMTUtils;
  * @author Vedran Kasalica
  *
  */
-public class ForallStatement implements Fact {
+public class ForallStatement implements SMTFact {
 
 	private List<SMTBoundedVar> boundedVars;
 	private List<SMTDataType> dataTypes;
-	private Fact content;
+	private SMTFact content;
 	private boolean explicit;
 	
-	public ForallStatement(SMTBoundedVar boundedVar, SMTDataType dataType, Fact content) {
+	public ForallStatement(SMTBoundedVar boundedVar, SMTDataType dataType, SMTFact content) {
 		this.boundedVars = new ArrayList<SMTBoundedVar>();
 		this.boundedVars.add(boundedVar);
 		this.dataTypes = new ArrayList<SMTDataType>();
@@ -26,13 +26,13 @@ public class ForallStatement implements Fact {
 		this.content = content;
 	}
 	
-	public ForallStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, Fact content) {
+	public ForallStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, SMTFact content) {
 		this.boundedVars = boundedVars;
 		this.dataTypes = dataTypes;
 		this.content = content;
 	}
 	
-	public ForallStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, Fact content, boolean explicit) {
+	public ForallStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, SMTFact content, boolean explicit) {
 		this.boundedVars = boundedVars;
 		this.dataTypes = dataTypes;
 		this.content = content;
@@ -43,7 +43,7 @@ public class ForallStatement implements Fact {
 	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 		StringBuilder variables = new StringBuilder();
-		List<Fact> additionalConstrints = new ArrayList<>();
+		List<SMTFact> additionalConstrints = new ArrayList<>();
 		
 		for(int i = 0; i < dataTypes.size(); i++) {
 			String smtDataType = this.dataTypes.get(i).toString();
@@ -60,7 +60,7 @@ public class ForallStatement implements Fact {
 					.append(smtDataType)
 				.append(") ");
 		}
-		Fact allRules = content;
+		SMTFact allRules = content;
 		// add the limitations if they were generated
 		if(additionalConstrints.size() > 0) {
 			allRules = new OrStatement(

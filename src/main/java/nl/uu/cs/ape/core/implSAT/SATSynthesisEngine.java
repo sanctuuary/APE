@@ -7,6 +7,8 @@ import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.*;
 
+import com.google.common.io.Files;
+
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
@@ -216,18 +218,17 @@ public class SATSynthesisEngine implements SynthesisEngine {
         
         satInputFile = APEUtils.concatIntoFile(sat_input_header, cnfEncoding);
         cnfEncoding.delete();
-//		APEUtils.write2file(mknfEncoding.toString(), new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime), false);
-
         
-        /* testing sat input */
-//      File actualFile = new File ("/home/vedran/Desktop/tmpt.txt");
-//		InputStream tmpSat = IOUtils.toInputStream(satInputFile.toString(), "ASCII");
-//		tmpSat.close();
+        /* add the cnf encoding file to Desktop */
+//        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
+        
+        /* add human readable version of the cnf encoding file to Desktop */
         FileInputStream cnfStream = new FileInputStream(satInputFile);
 		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
 		cnfStream.close();
 		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
+		
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
         System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");
 

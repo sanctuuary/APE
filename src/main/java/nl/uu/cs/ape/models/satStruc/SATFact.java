@@ -22,7 +22,7 @@ public interface SATFact extends SATElem {
 	 * @param synthesisEngine - synthesis engine used to encode the problem.
 	 * @return a list of clauses that represent cnf clauses.
 	 */
-	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine);
+	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine);
 	
 	/**
 	 * CreatE the CNF encoding of the negation of the statement and return the list of clauses.
@@ -30,7 +30,7 @@ public interface SATFact extends SATElem {
 	 * @param synthesisEngine - synthesis engine used to encode the problem.
 	 * @return a list of clauses that represent the negated cnf clauses.
 	 */
-	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine);
+	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine);
 	
 	/**
 	 * Encode a collection of SLTLx formulas to CNF and append it to the existing CNF file. It adds the encoding at the end of the content of the file.
@@ -49,15 +49,15 @@ public interface SATFact extends SATElem {
 	}
 	
 	/**
-	 * Create the CNF encoding of the facts and return the set of corresponding {@link SATClause}s.
+	 * Create the CNF encoding of the facts and return the set of corresponding {@link CNFClause}s.
 	 * 
 	 * @param facts				- all facts that should be encoded
 	 * @param synthesisEngine	- synthesis engine used for encoding
-	 * @return Set of {@link SATClause}s that encode the given collector of formulas.
+	 * @return Set of {@link CNFClause}s that encode the given collector of formulas.
 	 */
-	public static Set<SATClause> createCNFEncoding(Collection<SATFact> facts, SATSynthesisEngine synthesisEngine) {
-		Set<SATClause> clauses = new HashSet<>();
-		facts.forEach(fact -> clauses.addAll(fact.createCNFEncoding(synthesisEngine)));
+	public static Set<CNFClause> createCNFEncoding(Collection<SATFact> facts, SATSynthesisEngine synthesisEngine) {
+		Set<CNFClause> clauses = new HashSet<>();
+		facts.forEach(fact -> clauses.addAll(fact.getCNFEncoding(synthesisEngine)));
 		
 		return clauses;
 	}

@@ -29,23 +29,23 @@ private SATFact secondArg;
 }
 
 	@Override
-	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		Set<SATClause> allClauses = new HashSet<SATClause>();
+	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		Set<CNFClause> allClauses = new HashSet<CNFClause>();
 
 		/* Add the elements that represent the 2 way implication. */
-		allClauses.addAll(new SATImplicationStatement(firstArg, secondArg).createCNFEncoding(synthesisEngine));
-		allClauses.addAll(new SATImplicationStatement(secondArg, firstArg).createCNFEncoding(synthesisEngine));
+		allClauses.addAll(new SATImplicationStatement(firstArg, secondArg).getCNFEncoding(synthesisEngine));
+		allClauses.addAll(new SATImplicationStatement(secondArg, firstArg).getCNFEncoding(synthesisEngine));
 		
 		return allClauses;
 	}
 
 	@Override
-	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		Set<SATClause> allClauses = new HashSet<SATClause>();
+	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		Set<CNFClause> allClauses = new HashSet<CNFClause>();
 
 		/* Ensure that the 2 arguments are not the same. */
-		allClauses.addAll(new SATOrStatement(firstArg, secondArg).createCNFEncoding(synthesisEngine));
-		allClauses.addAll(new SATNandStatement(firstArg, secondArg).createCNFEncoding(synthesisEngine));
+		allClauses.addAll(new SATOrStatement(firstArg, secondArg).getCNFEncoding(synthesisEngine));
+		allClauses.addAll(new SATNandStatement(firstArg, secondArg).getCNFEncoding(synthesisEngine));
 		
 		return allClauses;
 	}

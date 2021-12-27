@@ -38,14 +38,14 @@ private Set<SATFact> nconjunctedFacts;
 
 
 	@Override
-	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return new SATAndStatement(nconjunctedFacts).createNegatedCNFEncoding(synthesisEngine);
+	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		return new SATAndStatement(nconjunctedFacts).getNegatedCNFEncoding(synthesisEngine);
 	}
 
 	
 	@Override
-	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return new SATAndStatement(nconjunctedFacts).createCNFEncoding(synthesisEngine);
+	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		return new SATAndStatement(nconjunctedFacts).getCNFEncoding(synthesisEngine);
 	}
 
 }

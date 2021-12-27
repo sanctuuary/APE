@@ -569,6 +569,13 @@ public final class SATModuleUtils {
 				if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
 						Set<SATFact> allPossibilities = new HashSet<SATFact>();
+
+						allPossibilities.add(
+								new SATAtom(
+									WorkflowElement.MEMORY_TYPE, 
+									emptyType, 
+									currMemoryState));
+					
 						
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(

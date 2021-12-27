@@ -27,13 +27,13 @@ private SATFact negatedFact;
 
 
 	@Override
-	public Set<SATClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return negatedFact.createNegatedCNFEncoding(synthesisEngine);
+	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		return negatedFact.getNegatedCNFEncoding(synthesisEngine);
 	}
 
 	@Override
-	public Set<SATClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return negatedFact.createCNFEncoding(synthesisEngine);
+	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		return negatedFact.getCNFEncoding(synthesisEngine);
 	}
 
 }

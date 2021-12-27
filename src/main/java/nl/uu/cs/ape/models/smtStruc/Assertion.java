@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.models.smtStruc;
 
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFact;
 
 /**
  * Structure used to model (assert x) statement in smt2lib.
@@ -10,9 +10,9 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.Fact;
  */
 public class Assertion implements SMTLib2Row {
 
-	private Fact content;
+	private SMTFact content;
 	
-	public Assertion(Fact content) {
+	public Assertion(SMTFact content) {
 		this.content = content;
 	}
 	

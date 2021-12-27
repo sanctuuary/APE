@@ -16,14 +16,14 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  * @author Vedran Kasalica
  *
  */
-public class BitVecComparisonStatement implements Fact {
+public class BitVecComparisonStatement implements SMTFact {
 
 	private SMTBitVectorOp operation;
 	private SMTBoundedVar boundedVar;
 	private SMTBitVec bitVecNumber;
 	
 	
-	public BitVecComparisonStatement(Fact arg1, Fact arg2) {
+	public BitVecComparisonStatement(SMTFact arg1, SMTFact arg2) {
 		super();
 	}
 

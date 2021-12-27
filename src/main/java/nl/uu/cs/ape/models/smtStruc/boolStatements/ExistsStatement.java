@@ -10,14 +10,14 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class ExistsStatement implements Fact {
+public class ExistsStatement implements SMTFact {
 
 	private List<SMTBoundedVar> boundedVars;
 	private List<SMTDataType> dataTypes;
-	private Fact content;
+	private SMTFact content;
 	private boolean explicit;
 	
-	public ExistsStatement(SMTBoundedVar boundedVar, SMTDataType dataType, Fact content) {
+	public ExistsStatement(SMTBoundedVar boundedVar, SMTDataType dataType, SMTFact content) {
 		this.boundedVars = new ArrayList<SMTBoundedVar>();
 		this.boundedVars.add(boundedVar);
 		this.dataTypes = new ArrayList<SMTDataType>();
@@ -25,13 +25,13 @@ public class ExistsStatement implements Fact {
 		this.content = content;
 	}
 	
-	public ExistsStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, Fact content) {
+	public ExistsStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, SMTFact content) {
 		this.boundedVars = boundedVars;
 		this.dataTypes = dataTypes;
 		this.content = content;
 	}
 	
-	public ExistsStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, Fact content, boolean explicit) {
+	public ExistsStatement(List<SMTBoundedVar> boundedVars, List<SMTDataType> dataTypes, SMTFact content, boolean explicit) {
 		this.boundedVars = boundedVars;
 		this.dataTypes = dataTypes;
 		this.content = content;
@@ -42,7 +42,7 @@ public class ExistsStatement implements Fact {
 	public String getSMT2Encoding(SMTSynthesisEngine synthesisEngine) {
 		StringBuilder constraints = new StringBuilder();
 		StringBuilder variables = new StringBuilder();
-		List<Fact> additionalConstrints = new ArrayList<>();
+		List<SMTFact> additionalConstrints = new ArrayList<>();
 		
 		for(int i = 0; i < dataTypes.size(); i++) {
 			String smtDataType = this.dataTypes.get(i).toString();
@@ -59,7 +59,7 @@ public class ExistsStatement implements Fact {
 					.append(smtDataType)
 				.append(") ");
 		}
-		Fact allRules = content;
+		SMTFact allRules = content;
 		// add the limitations if they were generated
 		if(additionalConstrints.size() > 0) {
 			allRules = new AndStatement(
