@@ -15,15 +15,15 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class SATEquivalenceStatement implements SATFact {
+public class SATEquivalenceStatement extends SATFact {
 
 private SATFact firstArg;
 private SATFact secondArg;
 	
 	
 
-	public SATEquivalenceStatement(SATFact firstArg, SATFact secondArg) {
-	super();
+	public SATEquivalenceStatement(int stateNo, SATFact firstArg, SATFact secondArg) {
+	super(stateNo);
 	this.firstArg = firstArg;
 	this.secondArg = secondArg;
 }
@@ -33,8 +33,8 @@ private SATFact secondArg;
 		Set<CNFClause> allClauses = new HashSet<CNFClause>();
 
 		/* Add the elements that represent the 2 way implication. */
-		allClauses.addAll(new SATImplicationStatement(firstArg, secondArg).getCNFEncoding(synthesisEngine));
-		allClauses.addAll(new SATImplicationStatement(secondArg, firstArg).getCNFEncoding(synthesisEngine));
+		allClauses.addAll(new SATImplicationStatement(this.getStateNo(), firstArg, secondArg).getCNFEncoding(synthesisEngine));
+		allClauses.addAll(new SATImplicationStatement(this.getStateNo(), secondArg, firstArg).getCNFEncoding(synthesisEngine));
 		
 		return allClauses;
 	}
@@ -44,8 +44,8 @@ private SATFact secondArg;
 		Set<CNFClause> allClauses = new HashSet<CNFClause>();
 
 		/* Ensure that the 2 arguments are not the same. */
-		allClauses.addAll(new SATOrStatement(firstArg, secondArg).getCNFEncoding(synthesisEngine));
-		allClauses.addAll(new SATNandStatement(firstArg, secondArg).getCNFEncoding(synthesisEngine));
+		allClauses.addAll(new SATOrStatement(this.getStateNo(), firstArg, secondArg).getCNFEncoding(synthesisEngine));
+		allClauses.addAll(new SATNandStatement(this.getStateNo(), firstArg, secondArg).getCNFEncoding(synthesisEngine));
 		
 		return allClauses;
 	}

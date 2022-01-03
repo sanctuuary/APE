@@ -15,18 +15,18 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class SATImplicationStatement implements SATFact {
+public class SATImplicationStatement extends SATFact {
 
 private SATFact ifFact;
 private SATFact thenFact;
 	
 	
 
-	public SATImplicationStatement(SATFact ifFact, SATFact thenFact) {
-	super();
-	this.ifFact = ifFact;
-	this.thenFact = thenFact;
-}
+	public SATImplicationStatement(int stateNo, SATFact ifFact, SATFact thenFact) {
+		super(stateNo);
+		this.ifFact = ifFact;
+		this.thenFact = thenFact;
+	}
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {

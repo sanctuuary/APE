@@ -16,12 +16,12 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class SATNotStatement implements SATFact {
+public class SATNotStatement extends SATFact {
 
 private SATFact negatedFact;
 	
-	public SATNotStatement(SATFact arg1) {
-		super();
+	public SATNotStatement(int stateNo, SATFact arg1) {
+		super(stateNo);
 		this.negatedFact = arg1; 
 	}
 

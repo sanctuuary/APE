@@ -1,5 +1,5 @@
 // Generated from SLTLx.g4 by ANTLR 4.9.2
-package nl.uu.cs.ape.parser.smtlib2;
+package nl.uu.cs.ape.parser.sltlx2cnf;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -16,13 +16,13 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFormula(SLTLxParser.FormulaContext ctx) { }
+	@Override public void enterCondition(SLTLxParser.ConditionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFormula(SLTLxParser.FormulaContext ctx) { }
+	@Override public void exitCondition(SLTLxParser.ConditionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -64,13 +64,13 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBackets(SLTLxParser.BacketsContext ctx) { }
+	@Override public void enterNegUnary(SLTLxParser.NegUnaryContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBackets(SLTLxParser.BacketsContext ctx) { }
+	@Override public void exitNegUnary(SLTLxParser.NegUnaryContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -88,6 +88,18 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterForall(SLTLxParser.ForallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitForall(SLTLxParser.ForallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterFunction(SLTLxParser.FunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -95,30 +107,6 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFunction(SLTLxParser.FunctionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterBinaryModal(SLTLxParser.BinaryModalContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBinaryModal(SLTLxParser.BinaryModalContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterUnaryBool(SLTLxParser.UnaryBoolContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitUnaryBool(SLTLxParser.UnaryBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -136,6 +124,90 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBinaryModal(SLTLxParser.BinaryModalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBinaryModal(SLTLxParser.BinaryModalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNegBinaryBool(SLTLxParser.NegBinaryBoolContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNegBinaryBool(SLTLxParser.NegBinaryBoolContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBrackets(SLTLxParser.BracketsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBrackets(SLTLxParser.BracketsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterVarEq(SLTLxParser.VarEqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVarEq(SLTLxParser.VarEqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBin_connective(SLTLxParser.Bin_connectiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBin_connective(SLTLxParser.Bin_connectiveContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUn_modal(SLTLxParser.Un_modalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUn_modal(SLTLxParser.Un_modalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBin_modal(SLTLxParser.Bin_modalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBin_modal(SLTLxParser.Bin_modalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterModule(SLTLxParser.ModuleContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -148,25 +220,13 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAtomics(SLTLxParser.AtomicsContext ctx) { }
+	@Override public void enterVars(SLTLxParser.VarsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAtomics(SLTLxParser.AtomicsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAtomic(SLTLxParser.AtomicContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAtomic(SLTLxParser.AtomicContext ctx) { }
+	@Override public void exitVars(SLTLxParser.VarsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -179,6 +239,30 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBool(SLTLxParser.BoolContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSeparator(SLTLxParser.SeparatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSeparator(SLTLxParser.SeparatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterVariable(SLTLxParser.VariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVariable(SLTLxParser.VariableContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

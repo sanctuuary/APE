@@ -14,24 +14,34 @@ import org.apache.commons.io.output.FileWriterWithEncoding;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.utils.APEUtils;
 
-public interface SATFact extends SATElem {
+/**
+ * Abstract class thar represents any SLTLx formula.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
+public abstract class SATFact implements SATElem {
 
-	/**
-	 * Create the CNF encoding of the statement and return the list of clauses.
-	 * 
-	 * @param synthesisEngine - synthesis engine used to encode the problem.
-	 * @return a list of clauses that represent cnf clauses.
-	 */
-	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine);
+	private final Set<SATBoundVar> variables;
+	private final int stateNo;
 	
-	/**
-	 * CreatE the CNF encoding of the negation of the statement and return the list of clauses.
-	 * 
-	 * @param synthesisEngine - synthesis engine used to encode the problem.
-	 * @return a list of clauses that represent the negated cnf clauses.
-	 */
-	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine);
 	
+	protected SATFact(int stateNo) {
+		this.variables = new HashSet<SATBoundVar>();
+		this.stateNo = stateNo;
+	}
+	
+	protected int getStateNo() {
+		return stateNo;
+	}
+	/**
+	 * Add a new variable to the formula. 
+	 * @param newVar - new variable
+	 * @return {@code true} if the variable was added, {@code false} otherwise.
+	 */
+	public boolean addVariable(SATBoundVar newVar) {
+		return variables.add(newVar);
+	}
 	/**
 	 * Encode a collection of SLTLx formulas to CNF and append it to the existing CNF file. It adds the encoding at the end of the content of the file.
 	 * 

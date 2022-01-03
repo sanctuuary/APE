@@ -18,20 +18,20 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class SATNandStatement implements SATFact {
+public class SATNandStatement extends SATFact {
 
 private Set<SATFact> nconjunctedFacts;
 	
-	
-	public SATNandStatement(SATFact arg1, SATFact arg2) {
-		super();
+		
+	public SATNandStatement(int stateNo, SATFact arg1, SATFact arg2) {
+		super(stateNo);
 		this.nconjunctedFacts = new HashSet<SATFact>();
 		this.nconjunctedFacts.add(arg1);
 		this.nconjunctedFacts.add(arg2);
 	}
 
-	public SATNandStatement(Collection<? extends SATFact> nconjunctedFacts) {
-		super();
+	public SATNandStatement(int stateNo, Collection<? extends SATFact> nconjunctedFacts) {
+		super(stateNo);
 		this.nconjunctedFacts = new HashSet<SATFact>();
 		nconjunctedFacts.forEach(fact -> this.nconjunctedFacts.add(fact));
 	}
@@ -39,13 +39,13 @@ private Set<SATFact> nconjunctedFacts;
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return new SATAndStatement(nconjunctedFacts).getNegatedCNFEncoding(synthesisEngine);
+		return new SATAndStatement(this.getStateNo(), nconjunctedFacts).getNegatedCNFEncoding(synthesisEngine);
 	}
 
 	
 	@Override
 	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return new SATAndStatement(nconjunctedFacts).getCNFEncoding(synthesisEngine);
+		return new SATAndStatement(this.getStateNo(), nconjunctedFacts).getCNFEncoding(synthesisEngine);
 	}
 
 }

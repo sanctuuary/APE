@@ -21,20 +21,20 @@ import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
  * @author Vedran Kasalica
  *
  */
-public class SATOrStatement implements SATFact {
+public class SATOrStatement extends SATFact {
 
 private Set<SATFact> disjointFacts;
 	
 	
-	public SATOrStatement(SATFact arg1, SATFact arg2) {
-		super();
+	public SATOrStatement(int stateNo, SATFact arg1, SATFact arg2) {
+		super(stateNo);
 		this.disjointFacts = new HashSet<SATFact>();
 		this.disjointFacts.add(arg1);
 		this.disjointFacts.add(arg2);
 	}
 
-	public SATOrStatement(Collection<? extends SATFact> conjunctedFacts) {
-		super();
+	public SATOrStatement(int stateNo, Collection<? extends SATFact> conjunctedFacts) {
+		super(stateNo);
 		this.disjointFacts = new HashSet<SATFact>();
 		conjunctedFacts.forEach(fact -> this.disjointFacts.add(fact));
 	}

@@ -17,7 +17,7 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  *
  * @author Vedran Kasalica
  */
-public class SATAtom implements SATFact, Comparable<SATAtom> {
+public class SATAtom extends SATFact implements Comparable<SATAtom> {
 
     /**
      * PredicateLabel that is referred (tool or type).
@@ -50,6 +50,7 @@ public class SATAtom implements SATFact, Comparable<SATAtom> {
      * @param usedInState State in the automaton it was used/created in.
      */
     public SATAtom(WorkflowElement elementType, PredicateLabel predicate, State usedInState) {
+    	super(0);
         this.predicate = predicate;
         this.argumentState = usedInState;
         this.elementType = elementType;
@@ -61,6 +62,7 @@ public class SATAtom implements SATFact, Comparable<SATAtom> {
      * @param atom SATAtom that is being copied.
      */
     public SATAtom(SATAtom atom) {
+    	super(0);
         this.predicate = atom.predicate;
         this.argumentState = atom.argumentState;
         this.elementType = atom.elementType;

@@ -14,25 +14,25 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
- * Structure used to model conjunction of terms in cnf.
+ * Structure used to model conjunction of terms in SLTLx.
  * 
  * @author Vedran Kasalica
  *
  */
-public class SATAndStatement implements SATFact {
+public class SATAndStatement extends SATFact {
 
 private Set<SATFact> conjunctedFacts;
 	
 	
-	public SATAndStatement(SATFact arg1, SATFact arg2) {
-		super();
+	public SATAndStatement(int stateNo, SATFact arg1, SATFact arg2) {
+		super(stateNo);
 		this.conjunctedFacts = new HashSet<SATFact>();
 		this.conjunctedFacts.add(arg1);
 		this.conjunctedFacts.add(arg2);
 	}
 
-	public SATAndStatement(Collection<? extends SATFact> conjunctedFacts) {
-		super();
+	public SATAndStatement(int stateNo, Collection<? extends SATFact> conjunctedFacts) {
+		super(stateNo);
 		this.conjunctedFacts = new HashSet<SATFact>();
 		conjunctedFacts.forEach(fact -> this.conjunctedFacts.add(fact));
 	}
