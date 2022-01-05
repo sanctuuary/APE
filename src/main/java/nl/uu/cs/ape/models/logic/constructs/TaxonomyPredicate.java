@@ -9,7 +9,7 @@ import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
- * The {@code PredicateLabel} class (interface) represents a single
+ * The {@code StateInterface} class (interface) represents a single
  * predicate/label used to depict an operation or a data type/format.<br>
  * <b>Note:</b> In order to be an atom, a relation needs to be added.
  *
@@ -298,7 +298,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Print the ID of the current predicate.
      *
-     * @return PredicateLabel ID as a String
+     * @return StateInterface ID as a String
      */
     public String toShortString() {
         return getPredicateLabel();

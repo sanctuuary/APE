@@ -20,20 +20,20 @@ public class SATNotStatement extends SATFact {
 
 private SATFact negatedFact;
 	
-	public SATNotStatement(int stateNo, SATFact arg1) {
-		super(stateNo);
+	public SATNotStatement(SATFact arg1) {
+		super();
 		this.negatedFact = arg1; 
 	}
 
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return negatedFact.getNegatedCNFEncoding(synthesisEngine);
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+		return negatedFact.getNegatedCNFEncoding(stateNo, synthesisEngine);
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return negatedFact.getCNFEncoding(synthesisEngine);
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+		return negatedFact.getCNFEncoding(stateNo, synthesisEngine);
 	}
 
 }

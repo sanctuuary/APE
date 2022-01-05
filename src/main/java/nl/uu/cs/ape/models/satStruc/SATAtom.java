@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import nl.uu.cs.ape.automaton.State;
+import nl.uu.cs.ape.automaton.StateInterface;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
@@ -20,14 +21,14 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 public class SATAtom extends SATFact implements Comparable<SATAtom> {
 
     /**
-     * PredicateLabel that is referred (tool or type).
+     * StateInterface that is referred (tool or type).
      */
     private final PredicateLabel predicate;
 
     /**
      * State in which the type/operation was used.
      */
-    private final State argumentState;
+    private final StateInterface argumentState;
 
     /**
      * Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.)
@@ -49,8 +50,8 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
      * @param predicate   Predicate used.
      * @param usedInState State in the automaton it was used/created in.
      */
-    public SATAtom(WorkflowElement elementType, PredicateLabel predicate, State usedInState) {
-    	super(0);
+    public SATAtom(WorkflowElement elementType, PredicateLabel predicate, StateInterface usedInState) {
+    	super();
         this.predicate = predicate;
         this.argumentState = usedInState;
         this.elementType = elementType;
@@ -62,13 +63,24 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
      * @param atom SATAtom that is being copied.
      */
     public SATAtom(SATAtom atom) {
-    	super(0);
+    	super();
         this.predicate = atom.predicate;
         this.argumentState = atom.argumentState;
         this.elementType = atom.elementType;
     }
 
     /**
+     * Private constructor used to create auxiliary {@code true} and {@code false} atoms.
+     * @param string
+     */
+    private SATAtom(int mapping) {
+    	super();
+    	this.predicate = null;
+    	this.argumentState = null;
+    	this.clause = new CNFClause(mapping);
+	}
+
+	/**
      * Gets predicate.
      *
      * @return Field {@link #predicate}.
@@ -122,7 +134,7 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
      *
      * @return Field {@link #argumentState}.
      */
-    public State getUsedInStateArgument() {
+    public StateInterface getUsedInStateArgument() {
         return argumentState;
     }
 
@@ -184,10 +196,25 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
         }
     }
 	
+	/**
+	 * Method returns atom that corresponds to the {@code true} statement.
+	 * @return
+	 */
+	public static SATAtom builderTrue() {
+		return new SATAtom(1);
+	}
+	
+	/**
+	 * Method returns atom that corresponds to the {@code false} statement.
+	 * @return
+	 */
+	public static SATAtom builderFalse() {
+		return new SATAtom(2);
+	}
 	
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);
 			this.clause = new CNFClause(encoding);
@@ -196,7 +223,7 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);
 			this.clause = new CNFClause(encoding);

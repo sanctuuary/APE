@@ -135,7 +135,7 @@ public class AllTypes extends AllPredicates {
                 this.put((Type) newType);
                 tmpType = (Type) newType;
             } else {
-                throw new ExceptionInInitializerError(String.format("Type error. Only 'Type' PredicateLabel can be added to the set of all types. '%s' is not a type", newType.getPredicateID()));
+                throw new ExceptionInInitializerError(String.format("Type error. Only 'Type' StateInterface can be added to the set of all types. '%s' is not a type", newType.getPredicateID()));
             }
         }
         return tmpType;

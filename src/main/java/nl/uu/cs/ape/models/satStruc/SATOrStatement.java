@@ -26,29 +26,29 @@ public class SATOrStatement extends SATFact {
 private Set<SATFact> disjointFacts;
 	
 	
-	public SATOrStatement(int stateNo, SATFact arg1, SATFact arg2) {
-		super(stateNo);
+	public SATOrStatement(SATFact arg1, SATFact arg2) {
+		super();
 		this.disjointFacts = new HashSet<SATFact>();
 		this.disjointFacts.add(arg1);
 		this.disjointFacts.add(arg2);
 	}
 
-	public SATOrStatement(int stateNo, Collection<? extends SATFact> conjunctedFacts) {
-		super(stateNo);
+	public SATOrStatement(Collection<? extends SATFact> conjunctedFacts) {
+		super();
 		this.disjointFacts = new HashSet<SATFact>();
 		conjunctedFacts.forEach(fact -> this.disjointFacts.add(fact));
 	}
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		List<CNFClause> allClauses = new ArrayList<CNFClause>();
 
 		Iterator<SATFact> currDisjFact = disjointFacts.iterator();
 		/* Add the first elements of the disjunction to the list of clauses.. */
 		if (currDisjFact.hasNext()) {
-			allClauses.addAll(currDisjFact.next().getCNFEncoding(synthesisEngine));
+			allClauses.addAll(currDisjFact.next().getCNFEncoding(stateNo, synthesisEngine));
 		  while (currDisjFact.hasNext()) {
-			  Set<CNFClause> newClauses = currDisjFact.next().getCNFEncoding(synthesisEngine);
+			  Set<CNFClause> newClauses = currDisjFact.next().getCNFEncoding(stateNo, synthesisEngine);
 			  /* .. and combine it with all the other elements. */
 			  ListIterator<CNFClause> allClausesIt = allClauses.listIterator();
 			  while (allClausesIt.hasNext()) {
@@ -69,11 +69,11 @@ private Set<SATFact> disjointFacts;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> constraints = new HashSet<CNFClause>();
 		/* Add each element of the conjunction as a separate clause/case .*/
 		for(SATFact fact : disjointFacts) {
-			constraints.addAll(fact.getNegatedCNFEncoding(synthesisEngine));
+			constraints.addAll(fact.getNegatedCNFEncoding(stateNo, synthesisEngine));
 		}
 		return constraints;
 	}

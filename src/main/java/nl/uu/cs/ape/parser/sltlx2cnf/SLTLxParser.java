@@ -17,36 +17,34 @@ public class SLTLxParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, LPAREN=8, RPAREN=9, 
-		CONSTANT=10, SLTL_R=11, SLTL_UNTIL=12, SLTL_GLOBALLY=13, SLTL_FINALLY=14, 
-		SLTL_NEXT=15, OR=16, AND=17, IMPL=18, EQUIVALENT=19, EQUAL=20, NOT=21, 
-		EXISTS=22, FORALL=23, CHARACTER=24, ENDLINE=25, WHITESPACE=26;
+		T__0=1, T__1=2, T__2=3, T__3=4, BIN_CONNECTIVE=5, UN_MODAL=6, BIN_MODAL=7, 
+		BOOL=8, LPAREN=9, RPAREN=10, VARIABLE=11, CONSTANT=12, R_REL=13, SLTL_UNTIL=14, 
+		SLTL_GLOBALLY=15, SLTL_FINALLY=16, SLTL_NEXT=17, OR=18, AND=19, IMPL=20, 
+		EQUIVALENT=21, EQUAL=22, NOT=23, EXISTS=24, FORALL=25, CHARACTER=26, ENDLINE=27, 
+		WHITESPACE=28;
 	public static final int
-		RULE_condition = 0, RULE_formula = 1, RULE_bin_connective = 2, RULE_un_modal = 3, 
-		RULE_bin_modal = 4, RULE_module = 5, RULE_vars = 6, RULE_bool = 7, RULE_separator = 8, 
-		RULE_variable = 9;
+		RULE_condition = 0, RULE_formula = 1, RULE_module = 2, RULE_vars = 3;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"condition", "formula", "bin_connective", "un_modal", "bin_modal", "module", 
-			"vars", "bool", "separator", "variable"
+			"condition", "formula", "module", "vars"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'<'", "'>'", "','", "';'", "'true'", "'false'", "'?'", "'('", 
-			"')'", null, "'R'", "'U'", "'G'", "'F'", "'X'", "'|'", "'&'", "'->'", 
-			"'<=-'", "'='", "'!'", "'Exists'", "'Forall'"
+			null, "'<'", "'>'", "','", "';'", null, null, null, null, "'('", "')'", 
+			null, null, "'R'", "'U'", "'G'", "'F'", "'X'", "'|'", "'&'", "'->'", 
+			"'<->'", "'='", "'!'", "'Exists'", "'Forall'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, "LPAREN", "RPAREN", "CONSTANT", 
-			"SLTL_R", "SLTL_UNTIL", "SLTL_GLOBALLY", "SLTL_FINALLY", "SLTL_NEXT", 
-			"OR", "AND", "IMPL", "EQUIVALENT", "EQUAL", "NOT", "EXISTS", "FORALL", 
-			"CHARACTER", "ENDLINE", "WHITESPACE"
+			null, null, null, null, null, "BIN_CONNECTIVE", "UN_MODAL", "BIN_MODAL", 
+			"BOOL", "LPAREN", "RPAREN", "VARIABLE", "CONSTANT", "R_REL", "SLTL_UNTIL", 
+			"SLTL_GLOBALLY", "SLTL_FINALLY", "SLTL_NEXT", "OR", "AND", "IMPL", "EQUIVALENT", 
+			"EQUAL", "NOT", "EXISTS", "FORALL", "CHARACTER", "ENDLINE", "WHITESPACE"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -139,41 +137,41 @@ public class SLTLxParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(20);
+			setState(8);
 			formula(0);
-			setState(25);
+			setState(13);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,0,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
-					setState(21);
+					setState(9);
 					match(ENDLINE);
-					setState(22);
+					setState(10);
 					formula(0);
 					}
 					} 
 				}
-				setState(27);
+				setState(15);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,0,_ctx);
 			}
-			setState(31);
+			setState(19);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==ENDLINE) {
 				{
 				{
-				setState(28);
+				setState(16);
 				match(ENDLINE);
 				}
 				}
-				setState(33);
+				setState(21);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(34);
+			setState(22);
 			match(EOF);
 			}
 		}
@@ -222,9 +220,7 @@ public class SLTLxParser extends Parser {
 		}
 	}
 	public static class UnaryModalContext extends FormulaContext {
-		public Un_modalContext un_modal() {
-			return getRuleContext(Un_modalContext.class,0);
-		}
+		public TerminalNode UN_MODAL() { return getToken(SLTLxParser.UN_MODAL, 0); }
 		public FormulaContext formula() {
 			return getRuleContext(FormulaContext.class,0);
 		}
@@ -244,9 +240,7 @@ public class SLTLxParser extends Parser {
 		}
 	}
 	public static class BooleanContext extends FormulaContext {
-		public BoolContext bool() {
-			return getRuleContext(BoolContext.class,0);
-		}
+		public TerminalNode BOOL() { return getToken(SLTLxParser.BOOL, 0); }
 		public BooleanContext(FormulaContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -282,6 +276,29 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
+	public static class R_relationContext extends FormulaContext {
+		public TerminalNode R_REL() { return getToken(SLTLxParser.R_REL, 0); }
+		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
+		public List<TerminalNode> VARIABLE() { return getTokens(SLTLxParser.VARIABLE); }
+		public TerminalNode VARIABLE(int i) {
+			return getToken(SLTLxParser.VARIABLE, i);
+		}
+		public TerminalNode RPAREN() { return getToken(SLTLxParser.RPAREN, 0); }
+		public R_relationContext(FormulaContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterR_relation(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitR_relation(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitR_relation(this);
+			else return visitor.visitChildren(this);
+		}
+	}
 	public static class BinaryBoolContext extends FormulaContext {
 		public List<FormulaContext> formula() {
 			return getRuleContexts(FormulaContext.class);
@@ -289,9 +306,7 @@ public class SLTLxParser extends Parser {
 		public FormulaContext formula(int i) {
 			return getRuleContext(FormulaContext.class,i);
 		}
-		public Bin_connectiveContext bin_connective() {
-			return getRuleContext(Bin_connectiveContext.class,0);
-		}
+		public TerminalNode BIN_CONNECTIVE() { return getToken(SLTLxParser.BIN_CONNECTIVE, 0); }
 		public BinaryBoolContext(FormulaContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -310,9 +325,7 @@ public class SLTLxParser extends Parser {
 	public static class ForallContext extends FormulaContext {
 		public TerminalNode FORALL() { return getToken(SLTLxParser.FORALL, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
-		public VariableContext variable() {
-			return getRuleContext(VariableContext.class,0);
-		}
+		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
 		public TerminalNode RPAREN() { return getToken(SLTLxParser.RPAREN, 0); }
 		public FormulaContext formula() {
 			return getRuleContext(FormulaContext.class,0);
@@ -333,16 +346,10 @@ public class SLTLxParser extends Parser {
 		}
 	}
 	public static class FunctionContext extends FormulaContext {
-		public TerminalNode SLTL_R() { return getToken(SLTLxParser.SLTL_R, 0); }
-		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
-		public List<VariableContext> variable() {
-			return getRuleContexts(VariableContext.class);
-		}
-		public VariableContext variable(int i) {
-			return getRuleContext(VariableContext.class,i);
-		}
-		public TerminalNode RPAREN() { return getToken(SLTLxParser.RPAREN, 0); }
 		public TerminalNode CONSTANT() { return getToken(SLTLxParser.CONSTANT, 0); }
+		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
+		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
+		public TerminalNode RPAREN() { return getToken(SLTLxParser.RPAREN, 0); }
 		public FunctionContext(FormulaContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -361,9 +368,7 @@ public class SLTLxParser extends Parser {
 	public static class ExistsContext extends FormulaContext {
 		public TerminalNode EXISTS() { return getToken(SLTLxParser.EXISTS, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
-		public VariableContext variable() {
-			return getRuleContext(VariableContext.class,0);
-		}
+		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
 		public TerminalNode RPAREN() { return getToken(SLTLxParser.RPAREN, 0); }
 		public FormulaContext formula() {
 			return getRuleContext(FormulaContext.class,0);
@@ -390,9 +395,7 @@ public class SLTLxParser extends Parser {
 		public FormulaContext formula(int i) {
 			return getRuleContext(FormulaContext.class,i);
 		}
-		public Bin_modalContext bin_modal() {
-			return getRuleContext(Bin_modalContext.class,0);
-		}
+		public TerminalNode BIN_MODAL() { return getToken(SLTLxParser.BIN_MODAL, 0); }
 		public BinaryModalContext(FormulaContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -405,32 +408,6 @@ public class SLTLxParser extends Parser {
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitBinaryModal(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class NegBinaryBoolContext extends FormulaContext {
-		public TerminalNode NOT() { return getToken(SLTLxParser.NOT, 0); }
-		public List<FormulaContext> formula() {
-			return getRuleContexts(FormulaContext.class);
-		}
-		public FormulaContext formula(int i) {
-			return getRuleContext(FormulaContext.class,i);
-		}
-		public Bin_connectiveContext bin_connective() {
-			return getRuleContext(Bin_connectiveContext.class,0);
-		}
-		public NegBinaryBoolContext(FormulaContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterNegBinaryBool(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitNegBinaryBool(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitNegBinaryBool(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -456,11 +433,9 @@ public class SLTLxParser extends Parser {
 		}
 	}
 	public static class VarEqContext extends FormulaContext {
-		public List<VariableContext> variable() {
-			return getRuleContexts(VariableContext.class);
-		}
-		public VariableContext variable(int i) {
-			return getRuleContext(VariableContext.class,i);
+		public List<TerminalNode> VARIABLE() { return getTokens(SLTLxParser.VARIABLE); }
+		public TerminalNode VARIABLE(int i) {
+			return getToken(SLTLxParser.VARIABLE, i);
 		}
 		public TerminalNode EQUAL() { return getToken(SLTLxParser.EQUAL, 0); }
 		public VarEqContext(FormulaContext ctx) { copyFrom(ctx); }
@@ -494,168 +469,155 @@ public class SLTLxParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(85);
+			setState(62);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,2,_ctx) ) {
-			case 1:
+			switch (_input.LA(1)) {
+			case BOOL:
 				{
 				_localctx = new BooleanContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(37);
-				bool();
+				setState(25);
+				match(BOOL);
 				}
 				break;
-			case 2:
+			case LPAREN:
 				{
 				_localctx = new BracketsContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(38);
+				setState(26);
 				match(LPAREN);
-				setState(39);
+				setState(27);
 				formula(0);
-				setState(40);
+				setState(28);
 				match(RPAREN);
 				}
 				break;
-			case 3:
-				{
-				_localctx = new NegBinaryBoolContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(42);
-				match(NOT);
-				setState(43);
-				formula(0);
-				setState(44);
-				bin_connective();
-				setState(45);
-				formula(10);
-				}
-				break;
-			case 4:
+			case NOT:
 				{
 				_localctx = new NegUnaryContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(47);
+				setState(30);
 				match(NOT);
-				setState(48);
+				setState(31);
 				formula(9);
 				}
 				break;
-			case 5:
+			case FORALL:
 				{
 				_localctx = new ForallContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(49);
+				setState(32);
 				match(FORALL);
-				setState(50);
+				setState(33);
 				match(LPAREN);
-				setState(51);
-				variable();
-				setState(52);
+				setState(34);
+				match(VARIABLE);
+				setState(35);
 				match(RPAREN);
-				setState(53);
+				setState(36);
 				formula(8);
 				}
 				break;
-			case 6:
+			case EXISTS:
 				{
 				_localctx = new ExistsContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(55);
+				setState(37);
 				match(EXISTS);
-				setState(56);
+				setState(38);
 				match(LPAREN);
-				setState(57);
-				variable();
-				setState(58);
+				setState(39);
+				match(VARIABLE);
+				setState(40);
 				match(RPAREN);
-				setState(59);
+				setState(41);
 				formula(7);
 				}
 				break;
-			case 7:
+			case UN_MODAL:
 				{
 				_localctx = new UnaryModalContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(61);
-				un_modal();
-				setState(62);
+				setState(42);
+				match(UN_MODAL);
+				setState(43);
 				formula(6);
 				}
 				break;
-			case 8:
+			case T__0:
 				{
 				_localctx = new ToolRefContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(64);
+				setState(44);
 				match(T__0);
-				setState(65);
+				setState(45);
 				module();
-				setState(66);
+				setState(46);
 				match(T__1);
-				setState(67);
+				setState(47);
 				formula(5);
 				}
 				break;
-			case 9:
+			case R_REL:
 				{
-				_localctx = new FunctionContext(_localctx);
+				_localctx = new R_relationContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(69);
-				match(SLTL_R);
-				setState(70);
+				setState(49);
+				match(R_REL);
+				setState(50);
 				match(LPAREN);
-				setState(71);
-				variable();
-				setState(72);
+				setState(51);
+				match(VARIABLE);
+				setState(52);
 				match(T__2);
-				setState(73);
-				variable();
-				setState(74);
+				setState(53);
+				match(VARIABLE);
+				setState(54);
 				match(RPAREN);
 				}
 				break;
-			case 10:
+			case CONSTANT:
 				{
 				_localctx = new FunctionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(76);
+				setState(55);
 				match(CONSTANT);
-				setState(77);
+				setState(56);
 				match(LPAREN);
-				setState(78);
-				variable();
-				setState(79);
+				setState(57);
+				match(VARIABLE);
+				setState(58);
 				match(RPAREN);
 				}
 				break;
-			case 11:
+			case VARIABLE:
 				{
 				_localctx = new VarEqContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(81);
-				variable();
-				setState(82);
+				setState(59);
+				match(VARIABLE);
+				setState(60);
 				match(EQUAL);
-				setState(83);
-				variable();
+				setState(61);
+				match(VARIABLE);
 				}
 				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(97);
+			setState(72);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -663,37 +625,37 @@ public class SLTLxParser extends Parser {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(95);
+					setState(70);
 					_errHandler.sync(this);
 					switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 					case 1:
 						{
 						_localctx = new BinaryBoolContext(new FormulaContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_formula);
-						setState(87);
-						if (!(precpred(_ctx, 11))) throw new FailedPredicateException(this, "precpred(_ctx, 11)");
-						setState(88);
-						bin_connective();
-						setState(89);
-						formula(12);
+						setState(64);
+						if (!(precpred(_ctx, 10))) throw new FailedPredicateException(this, "precpred(_ctx, 10)");
+						setState(65);
+						match(BIN_CONNECTIVE);
+						setState(66);
+						formula(11);
 						}
 						break;
 					case 2:
 						{
 						_localctx = new BinaryModalContext(new FormulaContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_formula);
-						setState(91);
+						setState(67);
 						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
-						setState(92);
-						bin_modal();
-						setState(93);
+						setState(68);
+						match(BIN_MODAL);
+						setState(69);
 						formula(5);
 						}
 						break;
 					}
 					} 
 				}
-				setState(99);
+				setState(74);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
 			}
@@ -706,155 +668,6 @@ public class SLTLxParser extends Parser {
 		}
 		finally {
 			unrollRecursionContexts(_parentctx);
-		}
-		return _localctx;
-	}
-
-	public static class Bin_connectiveContext extends ParserRuleContext {
-		public TerminalNode AND() { return getToken(SLTLxParser.AND, 0); }
-		public TerminalNode OR() { return getToken(SLTLxParser.OR, 0); }
-		public TerminalNode IMPL() { return getToken(SLTLxParser.IMPL, 0); }
-		public TerminalNode EQUIVALENT() { return getToken(SLTLxParser.EQUIVALENT, 0); }
-		public Bin_connectiveContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_bin_connective; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterBin_connective(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitBin_connective(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitBin_connective(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Bin_connectiveContext bin_connective() throws RecognitionException {
-		Bin_connectiveContext _localctx = new Bin_connectiveContext(_ctx, getState());
-		enterRule(_localctx, 4, RULE_bin_connective);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(100);
-			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OR) | (1L << AND) | (1L << IMPL) | (1L << EQUIVALENT))) != 0)) ) {
-			_errHandler.recoverInline(this);
-			}
-			else {
-				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-				_errHandler.reportMatch(this);
-				consume();
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Un_modalContext extends ParserRuleContext {
-		public TerminalNode SLTL_GLOBALLY() { return getToken(SLTLxParser.SLTL_GLOBALLY, 0); }
-		public TerminalNode SLTL_FINALLY() { return getToken(SLTLxParser.SLTL_FINALLY, 0); }
-		public TerminalNode SLTL_NEXT() { return getToken(SLTLxParser.SLTL_NEXT, 0); }
-		public Un_modalContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_un_modal; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterUn_modal(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitUn_modal(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitUn_modal(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Un_modalContext un_modal() throws RecognitionException {
-		Un_modalContext _localctx = new Un_modalContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_un_modal);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(102);
-			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << SLTL_GLOBALLY) | (1L << SLTL_FINALLY) | (1L << SLTL_NEXT))) != 0)) ) {
-			_errHandler.recoverInline(this);
-			}
-			else {
-				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-				_errHandler.reportMatch(this);
-				consume();
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class Bin_modalContext extends ParserRuleContext {
-		public TerminalNode SLTL_UNTIL() { return getToken(SLTLxParser.SLTL_UNTIL, 0); }
-		public Bin_modalContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_bin_modal; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterBin_modal(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitBin_modal(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitBin_modal(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final Bin_modalContext bin_modal() throws RecognitionException {
-		Bin_modalContext _localctx = new Bin_modalContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_bin_modal);
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(104);
-			match(SLTL_UNTIL);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
 		}
 		return _localctx;
 	}
@@ -890,38 +703,38 @@ public class SLTLxParser extends Parser {
 
 	public final ModuleContext module() throws RecognitionException {
 		ModuleContext _localctx = new ModuleContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_module);
+		enterRule(_localctx, 4, RULE_module);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(106);
+			setState(75);
 			match(CONSTANT);
-			setState(107);
+			setState(76);
 			match(LPAREN);
-			setState(109);
+			setState(78);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__6) {
+			if (_la==VARIABLE) {
 				{
-				setState(108);
+				setState(77);
 				vars();
 				}
 			}
 
-			setState(111);
+			setState(80);
 			match(T__3);
-			setState(113);
+			setState(82);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__6) {
+			if (_la==VARIABLE) {
 				{
-				setState(112);
+				setState(81);
 				vars();
 				}
 			}
 
-			setState(115);
+			setState(84);
 			match(RPAREN);
 			}
 		}
@@ -937,11 +750,9 @@ public class SLTLxParser extends Parser {
 	}
 
 	public static class VarsContext extends ParserRuleContext {
-		public List<VariableContext> variable() {
-			return getRuleContexts(VariableContext.class);
-		}
-		public VariableContext variable(int i) {
-			return getRuleContext(VariableContext.class,i);
+		public List<TerminalNode> VARIABLE() { return getTokens(SLTLxParser.VARIABLE); }
+		public TerminalNode VARIABLE(int i) {
+			return getToken(SLTLxParser.VARIABLE, i);
 		}
 		public VarsContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -964,186 +775,29 @@ public class SLTLxParser extends Parser {
 
 	public final VarsContext vars() throws RecognitionException {
 		VarsContext _localctx = new VarsContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_vars);
+		enterRule(_localctx, 6, RULE_vars);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(117);
-			variable();
-			setState(122);
+			setState(86);
+			match(VARIABLE);
+			setState(91);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T__2) {
 				{
 				{
-				setState(118);
+				setState(87);
 				match(T__2);
-				setState(119);
-				variable();
+				setState(88);
+				match(VARIABLE);
 				}
 				}
-				setState(124);
+				setState(93);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class BoolContext extends ParserRuleContext {
-		public BoolContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_bool; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterBool(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitBool(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitBool(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final BoolContext bool() throws RecognitionException {
-		BoolContext _localctx = new BoolContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_bool);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(125);
-			_la = _input.LA(1);
-			if ( !(_la==T__4 || _la==T__5) ) {
-			_errHandler.recoverInline(this);
-			}
-			else {
-				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-				_errHandler.reportMatch(this);
-				consume();
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class SeparatorContext extends ParserRuleContext {
-		public SeparatorContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_separator; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterSeparator(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitSeparator(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitSeparator(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final SeparatorContext separator() throws RecognitionException {
-		SeparatorContext _localctx = new SeparatorContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_separator);
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(127);
-			match(T__2);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class VariableContext extends ParserRuleContext {
-		public List<TerminalNode> CHARACTER() { return getTokens(SLTLxParser.CHARACTER); }
-		public TerminalNode CHARACTER(int i) {
-			return getToken(SLTLxParser.CHARACTER, i);
-		}
-		public VariableContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_variable; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterVariable(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitVariable(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitVariable(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-
-	public final VariableContext variable() throws RecognitionException {
-		VariableContext _localctx = new VariableContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_variable);
-		try {
-			int _alt;
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(129);
-			match(T__6);
-			setState(131); 
-			_errHandler.sync(this);
-			_alt = 1;
-			do {
-				switch (_alt) {
-				case 1:
-					{
-					{
-					setState(130);
-					match(CHARACTER);
-					}
-					}
-					break;
-				default:
-					throw new NoViableAltException(this);
-				}
-				setState(133); 
-				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,8,_ctx);
-			} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
 			}
 		}
 		catch (RecognitionException re) {
@@ -1167,7 +821,7 @@ public class SLTLxParser extends Parser {
 	private boolean formula_sempred(FormulaContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 11);
+			return precpred(_ctx, 10);
 		case 1:
 			return precpred(_ctx, 4);
 		}
@@ -1175,41 +829,31 @@ public class SLTLxParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\34\u008a\4\2\t\2"+
-		"\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
-		"\t\13\3\2\3\2\3\2\7\2\32\n\2\f\2\16\2\35\13\2\3\2\7\2 \n\2\f\2\16\2#\13"+
-		"\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\36a\4\2\t\2\4\3\t"+
+		"\3\4\4\t\4\4\5\t\5\3\2\3\2\3\2\7\2\16\n\2\f\2\16\2\21\13\2\3\2\7\2\24"+
+		"\n\2\f\2\16\2\27\13\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
 		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3"+
-		"X\n\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\7\3b\n\3\f\3\16\3e\13\3\3\4\3\4"+
-		"\3\5\3\5\3\6\3\6\3\7\3\7\3\7\5\7p\n\7\3\7\3\7\5\7t\n\7\3\7\3\7\3\b\3\b"+
-		"\3\b\7\b{\n\b\f\b\16\b~\13\b\3\t\3\t\3\n\3\n\3\13\3\13\6\13\u0086\n\13"+
-		"\r\13\16\13\u0087\3\13\2\3\4\f\2\4\6\b\n\f\16\20\22\24\2\5\3\2\22\25\3"+
-		"\2\17\21\3\2\7\b\2\u0091\2\26\3\2\2\2\4W\3\2\2\2\6f\3\2\2\2\bh\3\2\2\2"+
-		"\nj\3\2\2\2\fl\3\2\2\2\16w\3\2\2\2\20\177\3\2\2\2\22\u0081\3\2\2\2\24"+
-		"\u0083\3\2\2\2\26\33\5\4\3\2\27\30\7\33\2\2\30\32\5\4\3\2\31\27\3\2\2"+
-		"\2\32\35\3\2\2\2\33\31\3\2\2\2\33\34\3\2\2\2\34!\3\2\2\2\35\33\3\2\2\2"+
-		"\36 \7\33\2\2\37\36\3\2\2\2 #\3\2\2\2!\37\3\2\2\2!\"\3\2\2\2\"$\3\2\2"+
-		"\2#!\3\2\2\2$%\7\2\2\3%\3\3\2\2\2&\'\b\3\1\2\'X\5\20\t\2()\7\n\2\2)*\5"+
-		"\4\3\2*+\7\13\2\2+X\3\2\2\2,-\7\27\2\2-.\5\4\3\2./\5\6\4\2/\60\5\4\3\f"+
-		"\60X\3\2\2\2\61\62\7\27\2\2\62X\5\4\3\13\63\64\7\31\2\2\64\65\7\n\2\2"+
-		"\65\66\5\24\13\2\66\67\7\13\2\2\678\5\4\3\n8X\3\2\2\29:\7\30\2\2:;\7\n"+
-		"\2\2;<\5\24\13\2<=\7\13\2\2=>\5\4\3\t>X\3\2\2\2?@\5\b\5\2@A\5\4\3\bAX"+
-		"\3\2\2\2BC\7\3\2\2CD\5\f\7\2DE\7\4\2\2EF\5\4\3\7FX\3\2\2\2GH\7\r\2\2H"+
-		"I\7\n\2\2IJ\5\24\13\2JK\7\5\2\2KL\5\24\13\2LM\7\13\2\2MX\3\2\2\2NO\7\f"+
-		"\2\2OP\7\n\2\2PQ\5\24\13\2QR\7\13\2\2RX\3\2\2\2ST\5\24\13\2TU\7\26\2\2"+
-		"UV\5\24\13\2VX\3\2\2\2W&\3\2\2\2W(\3\2\2\2W,\3\2\2\2W\61\3\2\2\2W\63\3"+
-		"\2\2\2W9\3\2\2\2W?\3\2\2\2WB\3\2\2\2WG\3\2\2\2WN\3\2\2\2WS\3\2\2\2Xc\3"+
-		"\2\2\2YZ\f\r\2\2Z[\5\6\4\2[\\\5\4\3\16\\b\3\2\2\2]^\f\6\2\2^_\5\n\6\2"+
-		"_`\5\4\3\7`b\3\2\2\2aY\3\2\2\2a]\3\2\2\2be\3\2\2\2ca\3\2\2\2cd\3\2\2\2"+
-		"d\5\3\2\2\2ec\3\2\2\2fg\t\2\2\2g\7\3\2\2\2hi\t\3\2\2i\t\3\2\2\2jk\7\16"+
-		"\2\2k\13\3\2\2\2lm\7\f\2\2mo\7\n\2\2np\5\16\b\2on\3\2\2\2op\3\2\2\2pq"+
-		"\3\2\2\2qs\7\6\2\2rt\5\16\b\2sr\3\2\2\2st\3\2\2\2tu\3\2\2\2uv\7\13\2\2"+
-		"v\r\3\2\2\2w|\5\24\13\2xy\7\5\2\2y{\5\24\13\2zx\3\2\2\2{~\3\2\2\2|z\3"+
-		"\2\2\2|}\3\2\2\2}\17\3\2\2\2~|\3\2\2\2\177\u0080\t\4\2\2\u0080\21\3\2"+
-		"\2\2\u0081\u0082\7\5\2\2\u0082\23\3\2\2\2\u0083\u0085\7\t\2\2\u0084\u0086"+
-		"\7\32\2\2\u0085\u0084\3\2\2\2\u0086\u0087\3\2\2\2\u0087\u0085\3\2\2\2"+
-		"\u0087\u0088\3\2\2\2\u0088\25\3\2\2\2\13\33!Wacos|\u0087";
+		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3A\n\3\3\3\3\3\3\3\3\3\3"+
+		"\3\3\3\7\3I\n\3\f\3\16\3L\13\3\3\4\3\4\3\4\5\4Q\n\4\3\4\3\4\5\4U\n\4\3"+
+		"\4\3\4\3\5\3\5\3\5\7\5\\\n\5\f\5\16\5_\13\5\3\5\2\3\4\6\2\4\6\b\2\2\2"+
+		"l\2\n\3\2\2\2\4@\3\2\2\2\6M\3\2\2\2\bX\3\2\2\2\n\17\5\4\3\2\13\f\7\35"+
+		"\2\2\f\16\5\4\3\2\r\13\3\2\2\2\16\21\3\2\2\2\17\r\3\2\2\2\17\20\3\2\2"+
+		"\2\20\25\3\2\2\2\21\17\3\2\2\2\22\24\7\35\2\2\23\22\3\2\2\2\24\27\3\2"+
+		"\2\2\25\23\3\2\2\2\25\26\3\2\2\2\26\30\3\2\2\2\27\25\3\2\2\2\30\31\7\2"+
+		"\2\3\31\3\3\2\2\2\32\33\b\3\1\2\33A\7\n\2\2\34\35\7\13\2\2\35\36\5\4\3"+
+		"\2\36\37\7\f\2\2\37A\3\2\2\2 !\7\31\2\2!A\5\4\3\13\"#\7\33\2\2#$\7\13"+
+		"\2\2$%\7\r\2\2%&\7\f\2\2&A\5\4\3\n\'(\7\32\2\2()\7\13\2\2)*\7\r\2\2*+"+
+		"\7\f\2\2+A\5\4\3\t,-\7\b\2\2-A\5\4\3\b./\7\3\2\2/\60\5\6\4\2\60\61\7\4"+
+		"\2\2\61\62\5\4\3\7\62A\3\2\2\2\63\64\7\17\2\2\64\65\7\13\2\2\65\66\7\r"+
+		"\2\2\66\67\7\5\2\2\678\7\r\2\28A\7\f\2\29:\7\16\2\2:;\7\13\2\2;<\7\r\2"+
+		"\2<A\7\f\2\2=>\7\r\2\2>?\7\30\2\2?A\7\r\2\2@\32\3\2\2\2@\34\3\2\2\2@ "+
+		"\3\2\2\2@\"\3\2\2\2@\'\3\2\2\2@,\3\2\2\2@.\3\2\2\2@\63\3\2\2\2@9\3\2\2"+
+		"\2@=\3\2\2\2AJ\3\2\2\2BC\f\f\2\2CD\7\7\2\2DI\5\4\3\rEF\f\6\2\2FG\7\t\2"+
+		"\2GI\5\4\3\7HB\3\2\2\2HE\3\2\2\2IL\3\2\2\2JH\3\2\2\2JK\3\2\2\2K\5\3\2"+
+		"\2\2LJ\3\2\2\2MN\7\16\2\2NP\7\13\2\2OQ\5\b\5\2PO\3\2\2\2PQ\3\2\2\2QR\3"+
+		"\2\2\2RT\7\6\2\2SU\5\b\5\2TS\3\2\2\2TU\3\2\2\2UV\3\2\2\2VW\7\f\2\2W\7"+
+		"\3\2\2\2X]\7\r\2\2YZ\7\5\2\2Z\\\7\r\2\2[Y\3\2\2\2\\_\3\2\2\2][\3\2\2\2"+
+		"]^\3\2\2\2^\t\3\2\2\2_]\3\2\2\2\n\17\25@HJPT]";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

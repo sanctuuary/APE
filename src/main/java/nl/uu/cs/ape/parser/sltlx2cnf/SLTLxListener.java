@@ -66,6 +66,18 @@ public interface SLTLxListener extends ParseTreeListener {
 	 */
 	void exitNegUnary(SLTLxParser.NegUnaryContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code r_relation}
+	 * labeled alternative in {@link SLTLxParser#formula}.
+	 * @param ctx the parse tree
+	 */
+	void enterR_relation(SLTLxParser.R_relationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code r_relation}
+	 * labeled alternative in {@link SLTLxParser#formula}.
+	 * @param ctx the parse tree
+	 */
+	void exitR_relation(SLTLxParser.R_relationContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code binaryBool}
 	 * labeled alternative in {@link SLTLxParser#formula}.
 	 * @param ctx the parse tree
@@ -126,18 +138,6 @@ public interface SLTLxListener extends ParseTreeListener {
 	 */
 	void exitBinaryModal(SLTLxParser.BinaryModalContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code negBinaryBool}
-	 * labeled alternative in {@link SLTLxParser#formula}.
-	 * @param ctx the parse tree
-	 */
-	void enterNegBinaryBool(SLTLxParser.NegBinaryBoolContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code negBinaryBool}
-	 * labeled alternative in {@link SLTLxParser#formula}.
-	 * @param ctx the parse tree
-	 */
-	void exitNegBinaryBool(SLTLxParser.NegBinaryBoolContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code brackets}
 	 * labeled alternative in {@link SLTLxParser#formula}.
 	 * @param ctx the parse tree
@@ -162,36 +162,6 @@ public interface SLTLxListener extends ParseTreeListener {
 	 */
 	void exitVarEq(SLTLxParser.VarEqContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link SLTLxParser#bin_connective}.
-	 * @param ctx the parse tree
-	 */
-	void enterBin_connective(SLTLxParser.Bin_connectiveContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SLTLxParser#bin_connective}.
-	 * @param ctx the parse tree
-	 */
-	void exitBin_connective(SLTLxParser.Bin_connectiveContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SLTLxParser#un_modal}.
-	 * @param ctx the parse tree
-	 */
-	void enterUn_modal(SLTLxParser.Un_modalContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SLTLxParser#un_modal}.
-	 * @param ctx the parse tree
-	 */
-	void exitUn_modal(SLTLxParser.Un_modalContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SLTLxParser#bin_modal}.
-	 * @param ctx the parse tree
-	 */
-	void enterBin_modal(SLTLxParser.Bin_modalContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SLTLxParser#bin_modal}.
-	 * @param ctx the parse tree
-	 */
-	void exitBin_modal(SLTLxParser.Bin_modalContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link SLTLxParser#module}.
 	 * @param ctx the parse tree
 	 */
@@ -211,34 +181,4 @@ public interface SLTLxListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitVars(SLTLxParser.VarsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SLTLxParser#bool}.
-	 * @param ctx the parse tree
-	 */
-	void enterBool(SLTLxParser.BoolContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SLTLxParser#bool}.
-	 * @param ctx the parse tree
-	 */
-	void exitBool(SLTLxParser.BoolContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SLTLxParser#separator}.
-	 * @param ctx the parse tree
-	 */
-	void enterSeparator(SLTLxParser.SeparatorContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SLTLxParser#separator}.
-	 * @param ctx the parse tree
-	 */
-	void exitSeparator(SLTLxParser.SeparatorContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SLTLxParser#variable}.
-	 * @param ctx the parse tree
-	 */
-	void enterVariable(SLTLxParser.VariableContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SLTLxParser#variable}.
-	 * @param ctx the parse tree
-	 */
-	void exitVariable(SLTLxParser.VariableContext ctx);
 }

@@ -76,7 +76,7 @@ public class AllModules extends AllPredicates {
                 getMappedPredicates().put(module.getPredicateID(), module);
                 return (AbstractModule) module;
             } else {
-                throw new ExceptionInInitializerError(String.format("Type error. Only 'AbstractModule' PredicateLabel can be added to the set of all modules. '%s' is not a type", module.getPredicateID()));
+                throw new ExceptionInInitializerError(String.format("Type error. Only 'AbstractModule' StateInterface can be added to the set of all modules. '%s' is not a type", module.getPredicateID()));
             }
         }
     }

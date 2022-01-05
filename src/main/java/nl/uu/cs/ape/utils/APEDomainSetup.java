@@ -215,7 +215,7 @@ public class APEDomainSetup {
                      */
                 	Set<SATFact> allORPossibilities = new HashSet<SATFact>();
                 	allORPossibilities.add(
-                			new SATNotStatement(0,
+                			new SATNotStatement(
 								new SATAtom(
 									workflowElem, 
 									helperPredicate, 
@@ -228,7 +228,7 @@ public class APEDomainSetup {
 									subLabel, 
 									currState));
                     }
-                    cnfEncoding.add(new SATOrStatement(0,allORPossibilities));
+                    cnfEncoding.add(new SATOrStatement(allORPossibilities));
 
                     /*
                      * Ensures that if at least one of the disjointLabels was used, the abstract
@@ -236,7 +236,7 @@ public class APEDomainSetup {
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                     	cnfEncoding.add(
-                    			new SATImplicationStatement(0,
+                    			new SATImplicationStatement(
     								new SATAtom(
     									workflowElem, 
     									subLabel, 
@@ -254,7 +254,7 @@ public class APEDomainSetup {
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                     	cnfEncoding.add(
-                    			new SATImplicationStatement(0,
+                    			new SATImplicationStatement(
     								new SATAtom(
     									workflowElem, 
     									helperPredicate, 
@@ -273,7 +273,7 @@ public class APEDomainSetup {
                 	
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                     	allANDPossibilities.add(
-                    			new SATNotStatement(0,
+                    			new SATNotStatement(
     								new SATAtom(
     									workflowElem, 
     									subLabel, 
@@ -285,7 +285,7 @@ public class APEDomainSetup {
 								helperPredicate, 
 								currState));
                     
-                    cnfEncoding.add(new SATOrStatement(0,allANDPossibilities));
+                    cnfEncoding.add(new SATOrStatement(allANDPossibilities));
                 }
             }
 

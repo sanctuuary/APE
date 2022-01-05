@@ -32,7 +32,7 @@ public class SATAtomMappings implements Mappings {
     private int size;
 
     /**
-     * Number  of auxiliary introduced variables.
+     * Number  of auxiliary introduced variables. Numbers 1 and 2 are special symbols. 1 is {@code true} and 2 is {@code false}. 
      */
     private int auxiliary;
 
@@ -50,7 +50,7 @@ public class SATAtomMappings implements Mappings {
         mapped = new HashMap<String, SATAtom>();
         /* First auxMax variables are reserved for auxiliary variables */
         size = auxMax + 1;
-        auxiliary = 1;
+        auxiliary = 3;
     }
 
     /**

@@ -60,7 +60,7 @@ public class SATTypeUtils {
             for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
                 for (State memTypeState : typeBlock.getStates()) {
                 	cnfEncoding.add(
-    						new SATNandStatement(0,
+    						new SATNandStatement(
     									new SATAtom(
     											WorkflowElement.MEMORY_TYPE, 
     											firstPair, 
@@ -75,7 +75,7 @@ public class SATTypeUtils {
             for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
                 for (State usedTypeState : typeBlock.getStates()) {
                 	cnfEncoding.add(
-    						new SATNandStatement(0,
+    						new SATNandStatement(
     									new SATAtom(
     											WorkflowElement.USED_TYPE, 
     											firstPair, 
@@ -109,7 +109,7 @@ public class SATTypeUtils {
         for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
             for (State memTypeState : typeBlock.getStates()) {
             	cnfEncoding.add(
-						new SATOrStatement(0,
+						new SATOrStatement(
 									new SATAtom(
 											WorkflowElement.MEMORY_TYPE, 
 											dataType, 
@@ -123,7 +123,7 @@ public class SATTypeUtils {
         for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
             for (State usedTypeState : typeBlock.getStates()) {
             	cnfEncoding.add(
-						new SATOrStatement(0,
+						new SATOrStatement(
 									new SATAtom(
 											WorkflowElement.USED_TYPE, 
 											dataType, 
@@ -180,7 +180,7 @@ public class SATTypeUtils {
 		Set<SATFact> currCNFEncoding = new HashSet<SATFact>();
 		
 		currCNFEncoding.add(
-				new SATNotStatement(0,superTypeState));
+				new SATNotStatement(superTypeState));
 
         List<SATAtom> subTypesStates = new ArrayList<SATAtom>();
         if (!(currType.getSubPredicates() == null || currType.getSubPredicates().isEmpty())) {
@@ -195,13 +195,13 @@ public class SATTypeUtils {
 
                 fullCNFEncoding.addAll(typeEnforceTaxonomyStructureForState(subType, typeState, typeElement));
             }
-            fullCNFEncoding.add(new SATOrStatement(0,currCNFEncoding));
+            fullCNFEncoding.add(new SATOrStatement(currCNFEncoding));
             /*
              * Ensuring the BOTTOM-UP taxonomy tree dependency
              */
             for (SATAtom subTypeState : subTypesStates) {
             	fullCNFEncoding.add(
-						new SATImplicationStatement(0,
+						new SATImplicationStatement(
 								subTypeState,
 								superTypeState));
             }

@@ -35,7 +35,12 @@ public enum WorkflowElement implements SMTFunctionName {
 	/**
      * Depicts the dependency between two data instances (states). It depicts that a data instance is dependent (was derived from) on another data instance.
      */
-    TYPE_DEPENDENCY("typeDep");
+    TYPE_DEPENDENCY("typeDep"),
+    
+	/**
+     * Depicts the existence of a data type in a type (memory or usage) state. The state is given as a variable.
+     */
+    TYPE_VAR("typeVar");
 
 	
 	 private final String text;
@@ -68,6 +73,7 @@ public enum WorkflowElement implements SMTFunctionName {
         } else if(elem == null) {
         	return "nullMem";
         }
+        /** In case it is a element that should not have short string representation. */
         return "NaN";
     }
 

@@ -22,20 +22,20 @@ private SATFact thenFact;
 	
 	
 
-	public SATImplicationStatement(int stateNo, SATFact ifFact, SATFact thenFact) {
-		super(stateNo);
+	public SATImplicationStatement(SATFact ifFact, SATFact thenFact) {
+		super();
 		this.ifFact = ifFact;
 		this.thenFact = thenFact;
 	}
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		
 		List<CNFClause> allClauses = new ArrayList<CNFClause>();
 
 		/* Add the elements of the if element of the implication.. */
-		allClauses.addAll(ifFact.getNegatedCNFEncoding(synthesisEngine));
-		Set<CNFClause> newClauses = thenFact.getCNFEncoding(synthesisEngine);
+		allClauses.addAll(ifFact.getNegatedCNFEncoding(stateNo, synthesisEngine));
+		Set<CNFClause> newClauses = thenFact.getCNFEncoding(stateNo, synthesisEngine);
 		/* .. and combine it with all the other elements of the then term. */
 		ListIterator<CNFClause> allClausesIt = allClauses.listIterator();
 		while (allClausesIt.hasNext()) {
@@ -55,10 +55,10 @@ private SATFact thenFact;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> constraints = new HashSet<CNFClause>();
-		constraints.addAll(ifFact.getCNFEncoding(synthesisEngine));
-		constraints.addAll(thenFact.getNegatedCNFEncoding(synthesisEngine));
+		constraints.addAll(ifFact.getCNFEncoding(stateNo, synthesisEngine));
+		constraints.addAll(thenFact.getNegatedCNFEncoding(stateNo, synthesisEngine));
 		return constraints;
 	}
 

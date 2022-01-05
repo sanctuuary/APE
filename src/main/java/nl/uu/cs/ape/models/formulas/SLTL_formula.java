@@ -75,7 +75,7 @@ public abstract class SLTL_formula {
      * Function returns the formula that was specified under the SLTL operator.<br>
      * Currently only predicates.
      *
-     * @return PredicateLabel ({@link AbstractModule}, {@link Module} or {@link Type}).
+     * @return StateInterface ({@link AbstractModule}, {@link Module} or {@link Type}).
      */
     public TaxonomyPredicate getSubFormula() {
         return predicate;

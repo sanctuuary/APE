@@ -8,8 +8,8 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
  * The {@code Literal} class represents literals (atoms that can be negated) corresponding to the usage of the modules
- * and types in the solution. It is of the form {@code PredicateLabel(Attribute)} where
- * {@code PredicateLabel} represents a single predicate/label used to depict {@code AbstractModule, Module}
+ * and types in the solution. It is of the form {@code StateInterface(Attribute)} where
+ * {@code StateInterface} represents a single predicate/label used to depict {@code AbstractModule, Module}
  * or {@code Type}, while {@code State} represents the state in the module/type automaton where the
  * module/type is used (or not used if the literal is negative). The second attribute (referredStateArgument) is optional and used when
  * the Literal represent the type that is used as tool input - referred state is the state when the type was created.
@@ -142,9 +142,9 @@ public class Literal implements Comparable<Literal> {
     
     /**
      * Returns the predicate/label used to depict {@code AbstractModule, Module, Type} or {@code State}.
-     * Each of those refers to the element that is described by the Literal (e.g. PredicateLabel(State)).
+     * Each of those refers to the element that is described by the Literal (e.g. StateInterface(State)).
      *
-     * @return PredicateLabel object that is referred by the literal.
+     * @return StateInterface object that is referred by the literal.
      */
     public PredicateLabel getPredicate() {
         return atom.getPredicate();

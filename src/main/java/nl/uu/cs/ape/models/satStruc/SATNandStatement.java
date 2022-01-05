@@ -23,29 +23,29 @@ public class SATNandStatement extends SATFact {
 private Set<SATFact> nconjunctedFacts;
 	
 		
-	public SATNandStatement(int stateNo, SATFact arg1, SATFact arg2) {
-		super(stateNo);
+	public SATNandStatement(SATFact arg1, SATFact arg2) {
+		super();
 		this.nconjunctedFacts = new HashSet<SATFact>();
 		this.nconjunctedFacts.add(arg1);
 		this.nconjunctedFacts.add(arg2);
 	}
 
-	public SATNandStatement(int stateNo, Collection<? extends SATFact> nconjunctedFacts) {
-		super(stateNo);
+	public SATNandStatement(Collection<? extends SATFact> nconjunctedFacts) {
+		super();
 		this.nconjunctedFacts = new HashSet<SATFact>();
 		nconjunctedFacts.forEach(fact -> this.nconjunctedFacts.add(fact));
 	}
 
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return new SATAndStatement(this.getStateNo(), nconjunctedFacts).getNegatedCNFEncoding(synthesisEngine);
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+		return new SATAndStatement(nconjunctedFacts).getNegatedCNFEncoding(stateNo, synthesisEngine);
 	}
 
 	
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
-		return new SATAndStatement(this.getStateNo(), nconjunctedFacts).getCNFEncoding(synthesisEngine);
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+		return new SATAndStatement(nconjunctedFacts).getCNFEncoding(stateNo, synthesisEngine);
 	}
 
 }

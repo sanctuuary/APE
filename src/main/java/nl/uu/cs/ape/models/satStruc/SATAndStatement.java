@@ -24,40 +24,40 @@ public class SATAndStatement extends SATFact {
 private Set<SATFact> conjunctedFacts;
 	
 	
-	public SATAndStatement(int stateNo, SATFact arg1, SATFact arg2) {
-		super(stateNo);
+	public SATAndStatement(SATFact arg1, SATFact arg2) {
+		super();
 		this.conjunctedFacts = new HashSet<SATFact>();
 		this.conjunctedFacts.add(arg1);
 		this.conjunctedFacts.add(arg2);
 	}
 
-	public SATAndStatement(int stateNo, Collection<? extends SATFact> conjunctedFacts) {
-		super(stateNo);
+	public SATAndStatement(Collection<? extends SATFact> conjunctedFacts) {
+		super();
 		this.conjunctedFacts = new HashSet<SATFact>();
 		conjunctedFacts.forEach(fact -> this.conjunctedFacts.add(fact));
 	}
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> constraints = new HashSet<CNFClause>();
 		/* Add each element of the conjunction as a separate clause/case .*/
 		for(SATFact fact : conjunctedFacts) {
-			constraints.addAll(fact.getCNFEncoding(synthesisEngine));
+			constraints.addAll(fact.getCNFEncoding(stateNo, synthesisEngine));
 		}
 		return constraints;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 
 		List<CNFClause> allClauses = new ArrayList<CNFClause>();
 
 		Iterator<SATFact> currConjFact = conjunctedFacts.iterator();
 		/* Add the first elements of the disjunction to the list of clauses.. */
 		if (currConjFact.hasNext()) {
-			allClauses.addAll(currConjFact.next().getNegatedCNFEncoding(synthesisEngine));
+			allClauses.addAll(currConjFact.next().getNegatedCNFEncoding(stateNo, synthesisEngine));
 		  while (currConjFact.hasNext()) {
-			  Set<CNFClause> newClauses = currConjFact.next().getNegatedCNFEncoding(synthesisEngine);
+			  Set<CNFClause> newClauses = currConjFact.next().getNegatedCNFEncoding(stateNo, synthesisEngine);
 			  /* .. and combine it with all the other elements. */
 			  ListIterator<CNFClause> allClausesIt = allClauses.listIterator();
 			  while (allClausesIt.hasNext()) {

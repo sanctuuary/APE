@@ -38,7 +38,7 @@ public class SMTPredicateMappings implements Mappings {
     }
 
     /**
-     * Function is returning the mapping String of the <b>predicate</b>. The mapping string follows the syntax of an identifier in SMTLib2. If the PredicateLabel did not occur before,
+     * Function is returning the mapping String of the <b>predicate</b>. The mapping string follows the syntax of an identifier in SMTLib2. If the StateInterface did not occur before,
      * it is added to the mapping set and the mapping value is returned, otherwise the existing mapping value is returned.
      *
      * @param predicate   The mapped predicate.

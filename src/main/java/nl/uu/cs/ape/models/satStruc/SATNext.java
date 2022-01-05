@@ -16,36 +16,29 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
- * Structure used to model not statement in cnf.
+ * Structure used to model Next (N) modal statement in SLTLx.
  * 
  * @author Vedran Kasalica
  *
  */
-public class SATExists extends SATQuantification {
+public class SATNext extends SATModalOp {
 
-private TypeStateVar boundBariable;
 private SATFact formula;
 	
-	public SATExists(TypeStateVar boundBariable,  SATFact formula) {
+	public SATNext(SATFact formula) {
 		super();
-		this.boundBariable = boundBariable; 
 		this.formula = formula;
 	}
 
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> clauses = new HashSet<CNFClause>();
-		clauses.addAll(boundBariable.getExistentialCNFEncoding(stateNo, synthesisEngine));
-		
-		formula.addVariable(boundBariable);
-		clauses.addAll(formula.getCNFEncoding(stateNo, synthesisEngine));
-		return clauses;
+		return formula.getCNFEncoding(stateNo + 1, synthesisEngine);
 	}
 
 	@Override
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		return new SATForall(boundBariable, formula).getNegatedCNFEncoding(stateNo, synthesisEngine);
+		return formula.getNegatedCNFEncoding(stateNo + 1, synthesisEngine);
 	}
 
 }

@@ -19,8 +19,8 @@ public class SMTPredicateFunArg implements SMTFunctionArgument {
 	}
 	
 	/**
-	 * Get {@link PredicateLabel} if it exists, otherwise return null. 
-	 * @return {@link PredicateLabel} or null.
+	 * Get {@link StateInterface} if it exists, otherwise return null. 
+	 * @return {@link StateInterface} or null.
 	 */
 	public PredicateLabel getPredicate() {
 			return predicate;

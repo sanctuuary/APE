@@ -11,35 +11,34 @@ condition
    ;
    
 formula
-   : bool										# boolean
+   : BOOL										# boolean
    | LPAREN formula RPAREN						# brackets
-   | formula bin_connective formula 			# binaryBool	
-   | NOT formula bin_connective formula			# negBinaryBool
+   | formula BIN_CONNECTIVE formula 			# binaryBool	
    | NOT formula 								# negUnary
-   | FORALL LPAREN variable RPAREN formula 		# forall
-   | EXISTS LPAREN variable RPAREN formula		# exists
-   | un_modal formula							# unaryModal
+   | FORALL LPAREN VARIABLE RPAREN formula 		# forall
+   | EXISTS LPAREN VARIABLE RPAREN formula		# exists
+   | UN_MODAL formula							# unaryModal
    | '<' module '>' formula						# toolRef
-   | formula bin_modal formula					# binaryModal
-   | SLTL_R LPAREN variable ',' variable RPAREN	# function
-   | CONSTANT '(' variable ')'					# function
-   | variable EQUAL variable					# varEq
+   | formula BIN_MODAL formula					# binaryModal
+   | R_REL LPAREN VARIABLE ',' VARIABLE RPAREN	# r_relation
+   | CONSTANT '(' VARIABLE ')'					# function
+   | VARIABLE EQUAL VARIABLE					# varEq
    ;
    
-bin_connective
+BIN_CONNECTIVE
    : AND
    | OR
    | IMPL
    | EQUIVALENT
    ;
  
-un_modal
+UN_MODAL
    : SLTL_GLOBALLY
    | SLTL_FINALLY
    | SLTL_NEXT
    ;
   
-bin_modal
+BIN_MODAL
    : SLTL_UNTIL
    ;
 
@@ -48,11 +47,11 @@ module
    ;
 
 vars
-   : variable ( ',' variable )*
+   : VARIABLE ( ',' VARIABLE )*
    ;
 
   
-bool
+BOOL
    : 'true'
    | 'false'
    ;
@@ -63,19 +62,16 @@ LPAREN
 RPAREN
    :')'
    ;
-separator
-   :','
-   ;
-
-variable
+   
+VARIABLE
    : '?' CHARACTER+
    ;
 
 CONSTANT
-   : '_' CHARACTER+
+   : '\'' CHARACTER+ '\''
    ;
 
-SLTL_R
+R_REL
    : 'R'
    ;
 
@@ -105,7 +101,7 @@ IMPL
    :'->'
    ;
 EQUIVALENT
-   :'<=-'
+   :'<->'
    ;
 EQUAL
    :'='

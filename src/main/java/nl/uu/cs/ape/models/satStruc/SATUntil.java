@@ -16,36 +16,37 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
- * Structure used to model not statement in cnf.
+ * Structure used to model Until (U) modal statement in SLTLx.
  * 
  * @author Vedran Kasalica
  *
  */
-public class SATExists extends SATQuantification {
+public class SATUntil extends SATModalOp {
 
-private TypeStateVar boundBariable;
-private SATFact formula;
+private SATFact formulaFrom;
+private SATFact formulaUntil;
 	
-	public SATExists(TypeStateVar boundBariable,  SATFact formula) {
-		super();
-		this.boundBariable = boundBariable; 
-		this.formula = formula;
-	}
 
+
+	public SATUntil(SATFact formulaFrom, SATFact formulaUntil) {
+	super();
+	this.formulaFrom = formulaFrom;
+	this.formulaUntil = formulaUntil;
+}
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> clauses = new HashSet<CNFClause>();
-		clauses.addAll(boundBariable.getExistentialCNFEncoding(stateNo, synthesisEngine));
 		
-		formula.addVariable(boundBariable);
-		clauses.addAll(formula.getCNFEncoding(stateNo, synthesisEngine));
+		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
+			clauses.addAll(formula.getCNFEncoding(i, synthesisEngine));
+		}
 		return clauses;
 	}
 
 	@Override
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		return new SATForall(boundBariable, formula).getNegatedCNFEncoding(stateNo, synthesisEngine);
+		return new SATForall(this.stateNo, boundBariable, formula).getNegatedCNFEncoding(synthesisEngine);
 	}
 
 }

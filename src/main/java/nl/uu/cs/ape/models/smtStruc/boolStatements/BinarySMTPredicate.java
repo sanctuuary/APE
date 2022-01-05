@@ -21,7 +21,7 @@ public class BinarySMTPredicate implements SMTPredicate {
 	private SMTFunctionArgument argument2;
 	
 	
-//	public BinarySATPredicate(WorkflowElement predicate, PredicateLabel argument1, PredicateLabel argument2) {
+//	public BinarySATPredicate(WorkflowElement predicate, StateInterface argument1, StateInterface argument2) {
 //		super();
 //		this.predicate = predicate;
 //		this.argument1 = new SMTFunctionArgument(argument1);
