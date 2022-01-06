@@ -39,43 +39,24 @@ private Set<SATFact> conjunctedFacts;
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> constraints = new HashSet<CNFClause>();
-		/* Add each element of the conjunction as a separate clause/case .*/
-		for(SATFact fact : conjunctedFacts) {
-			constraints.addAll(fact.getCNFEncoding(stateNo, synthesisEngine));
+		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+
+		/* Conjunct the collection of clauses that encode each of the conjucted elements. */
+		for(SATFact formula : conjunctedFacts) {
+			allClauses.add(formula.getCNFEncoding(stateNo, synthesisEngine));
 		}
-		return constraints;
+		return CNFClause.conjunctClausesCollection(allClauses);
 	}
 
 	@Override
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
-		List<CNFClause> allClauses = new ArrayList<CNFClause>();
-
-		Iterator<SATFact> currConjFact = conjunctedFacts.iterator();
-		/* Add the first elements of the disjunction to the list of clauses.. */
-		if (currConjFact.hasNext()) {
-			allClauses.addAll(currConjFact.next().getNegatedCNFEncoding(stateNo, synthesisEngine));
-		  while (currConjFact.hasNext()) {
-			  Set<CNFClause> newClauses = currConjFact.next().getNegatedCNFEncoding(stateNo, synthesisEngine);
-			  /* .. and combine it with all the other elements. */
-			  ListIterator<CNFClause> allClausesIt = allClauses.listIterator();
-			  while (allClausesIt.hasNext()) {
-				  /* Remove the existing element .. */
-				  CNFClause existingClause = allClausesIt.next();
-				  allClausesIt.remove();
-				  
-				  /* ... and add all the combinations of that elements and the new elements. */
-				  for(CNFClause newClause : newClauses) {
-					  allClausesIt.add(CNFClause.combine2Clauses(existingClause, newClause));
-				  }
-			  }
-		  }
+		/* Disjoint the collection of clauses that encode negatioNs of each of the disjoint elements. */
+		for(SATFact formula : conjunctedFacts) {
+			allClauses.add(formula.getNegatedCNFEncoding(stateNo, synthesisEngine));
 		}
-		
-		Set<CNFClause> fullClauses = new HashSet<>();
-		fullClauses.addAll(allClauses);
-		return fullClauses;
+		return CNFClause.disjoinClausesCollection(allClauses);
 	}
 
 }

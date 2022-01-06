@@ -1,11 +1,14 @@
 package nl.uu.cs.ape.automaton;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.enums.WorkflowElement;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.satStruc.CNFClause;
+import nl.uu.cs.ape.models.satStruc.SATAtom;
+import nl.uu.cs.ape.models.satStruc.SATOrStatement;
 
 /***
  * The {@code State} class is used to represent a variable for type states. The variable only represents states from the type automatons, excluding the module automaton states. 
@@ -30,7 +33,6 @@ public class TypeStateVar implements StateInterface {
 		this.variableID = variableName;
 	}
 
-
 	/**
 	 * @return the variableID
 	 */
@@ -38,8 +40,6 @@ public class TypeStateVar implements StateInterface {
 		return variableID;
 	}
 
-	
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -47,7 +47,6 @@ public class TypeStateVar implements StateInterface {
 		result = prime * result + ((variableID == null) ? 0 : variableID.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -74,7 +73,12 @@ public class TypeStateVar implements StateInterface {
 
 
 	public Set<CNFClause> getExistentialCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		// TODO Auto-generated method stub
+		Set<SATAtom> varRefs = new HashSet<SATAtom>();
+		for(State state :synthesisEngine.getTypeAutomaton().getAllStatesUntilBlockNo(stateNo)) {
+			varRefs.add(new SATAtom(WorkflowElement.VAR_REF, state, this));
+		}
+		SATOrStatement allVars = new SATOrStatement(varRefs);
+		
 		return null;
 	}
 	

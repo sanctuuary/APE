@@ -17,17 +17,19 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
- * Structure used to model Globally (G) modal statement in SLTLx.
+ * Structure used to model Next (N) modal statement in SLTLx.
  * 
  * @author Vedran Kasalica
  *
  */
-public class SATGlobally extends SATModalOp {
+public class SATNextOp extends SATModalOp {
 
-private SATFact formula;
+	private SATOperation operation;
+	private SATFact formula;
 	
-	public SATGlobally(SATFact formula) {
+	public SATNextOp(SATOperation operation, SATFact formula) {
 		super();
+		this.operation = operation;
 		this.formula = formula;
 	}
 
@@ -36,10 +38,10 @@ private SATFact formula;
 	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
-		/* Conjunct the collection of clauses that encode the formula at each of the workflow steps. */
-		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
-			allClauses.add(formula.getCNFEncoding(i, synthesisEngine));
-		}
+		/* Conjunct the collection of clauses that encode the operation and the formula */
+		allClauses.add(operation.getCNFEncoding(stateNo, synthesisEngine));
+		allClauses.add(formula.getCNFEncoding(stateNo + 1, synthesisEngine));
+		
 		return CNFClause.conjunctClausesCollection(allClauses);
 	}
 
@@ -47,11 +49,11 @@ private SATFact formula;
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
-		/* Disjoint the collection of clauses that encode negation of the formula at each of the workflow steps. */
-		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
-			allClauses.add(formula.getNegatedCNFEncoding(i, synthesisEngine));
-		}
-		return CNFClause.disjoinClausesCollection(allClauses);
+		/* Disjunction the collection of clauses that encode the negation of the operation and of the formula */
+		allClauses.add(operation.getNegatedCNFEncoding(stateNo, synthesisEngine));
+		allClauses.add(formula.getNegatedCNFEncoding(stateNo + 1, synthesisEngine));
+		
+		return CNFClause.conjunctClausesCollection(allClauses);
 	}
 
 }

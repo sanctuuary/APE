@@ -200,7 +200,7 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
 	 * Method returns atom that corresponds to the {@code true} statement.
 	 * @return
 	 */
-	public static SATAtom builderTrue() {
+	public static SATAtom getTrue() {
 		return new SATAtom(1);
 	}
 	
@@ -208,7 +208,7 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
 	 * Method returns atom that corresponds to the {@code false} statement.
 	 * @return
 	 */
-	public static SATAtom builderFalse() {
+	public static SATAtom getFalse() {
 		return new SATAtom(2);
 	}
 	

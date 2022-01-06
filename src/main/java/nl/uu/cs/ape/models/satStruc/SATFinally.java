@@ -3,6 +3,7 @@ package nl.uu.cs.ape.models.satStruc;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,18 +34,24 @@ private SATFact formula;
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> clauses = new HashSet<CNFClause>();
-		return clauses;
+		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+
+		/* Disjoint the collection of clauses that encode the formula at each of the workflow steps. */
+		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
+			allClauses.add(formula.getCNFEncoding(i, synthesisEngine));
+		}
+		return CNFClause.disjoinClausesCollection(allClauses);
 	}
 
 	@Override
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> clauses = new HashSet<CNFClause>();
-		
+		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+
+		/* Conjunct the collection of clauses that encode negation the formula at each of the workflow steps. */
 		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
-			clauses.addAll(formula.getNegatedCNFEncoding(i, synthesisEngine));
+			allClauses.add(formula.getNegatedCNFEncoding(i, synthesisEngine));
 		}
-		return clauses;
+		return CNFClause.conjunctClausesCollection(allClauses);
 	}
 
 }

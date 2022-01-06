@@ -45,7 +45,7 @@ private SATFact thenFact;
 			  
 			  /* ... and add all the combinations of that elements and the new elements. */
 			  for(CNFClause newClause : newClauses) {
-				  allClausesIt.add(CNFClause.combine2Clauses(existingClause, newClause));
+				  allClausesIt.add(CNFClause.disjoin2Clauses(existingClause, newClause));
 			  }
 		  }
 		

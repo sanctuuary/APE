@@ -40,7 +40,12 @@ public enum WorkflowElement implements SMTFunctionName {
 	/**
      * Depicts the existence of a data type in a type (memory or usage) state. The state is given as a variable.
      */
-    TYPE_VAR("typeVar");
+    TYPE_VAR("typeVar"),
+    
+    /**
+     * Depicts the instantiation of a variable to a specific type state. It references state that the variable represents.
+     */
+    VAR_REF("varRef");
 
 	
 	 private final String text;

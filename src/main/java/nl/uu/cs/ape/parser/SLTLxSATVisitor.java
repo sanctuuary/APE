@@ -26,6 +26,7 @@ import nl.uu.cs.ape.models.satStruc.SATForall;
 import nl.uu.cs.ape.models.satStruc.SATNext;
 import nl.uu.cs.ape.models.satStruc.SATNotStatement;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxBaseVisitor;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.*;
 
 public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
@@ -89,9 +90,9 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 	@Override
 	public SATFact visitBoolean(BooleanContext ctx) {
 		if(ctx.getChild(0).getText().equals("'true'")) {
-			return SATAtom.builderTrue();
+			return SATAtom.getTrue();
 		} else {
-			return SATAtom.builderFalse();
+			return SATAtom.getFalse();
 		}
 	}
 
@@ -169,7 +170,11 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 		return visit(ctx.getChild(1));
 	}
 
-
+	@Override
+	public SATFact visitR_relation(R_relationContext ctx) {
+		// TODO Auto-generated method stub
+		return visitChildren(ctx);
+	}
 
 	@Override
 	public SATFact visitVarEq(VarEqContext ctx) {
