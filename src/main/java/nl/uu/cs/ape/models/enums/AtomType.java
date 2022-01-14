@@ -4,13 +4,11 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
 
 /**
  * Defines the values describing the states in the workflow.
- * <p>
- * Values: [{@code MODULE}, {@code MEMORY_TYPE}, {@code USED_TYPE}, {@code MEM_TYPE_REFERENCE}]
  * 
  * 
  *  @author Vedran Kasalica
  */
-public enum WorkflowElement implements SMTFunctionName {
+public enum AtomType implements SMTFunctionName {
 
     /**
      * Depicts usage of a tool/module.
@@ -32,25 +30,21 @@ public enum WorkflowElement implements SMTFunctionName {
      */
     MEM_TYPE_REFERENCE("memRef"),
     
-	/**
+    /**
      * Depicts the dependency between two data instances (states). It depicts that a data instance is dependent (was derived from) on another data instance.
      */
     TYPE_DEPENDENCY("typeDep"),
     
-	/**
-     * Depicts the existence of a data type in a type (memory or usage) state. The state is given as a variable.
-     */
-    TYPE_VAR("typeVar"),
-    
     /**
-     * Depicts the instantiation of a variable to a specific type state. It references state that the variable represents.
+     * Depicts data instances that are equal.
      */
-    VAR_REF("varRef");
+    TYPE_EQUIVALENCE("typeEq");
+    
 
 	
 	 private final String text;
 
-	 private WorkflowElement(String s) {
+	 private AtomType(String s) {
          this.text = s;
      }
 	
@@ -58,6 +52,31 @@ public enum WorkflowElement implements SMTFunctionName {
 	 public String toString() {
 	     return this.text;
 	 }
+	 
+	 /**
+	  * Check if the Atom represent a unary property.
+	  * @return {@code true} if it is a unary property, {@code false} otherwise. 
+	  */
+	 public boolean isUnaryProperty() {
+		 if(this.equals(MODULE) | this.equals(MEMORY_TYPE) | this.equals(USED_TYPE)) {
+			 return true;
+		 } else {
+			 return false;
+		 }
+	 }
+	 
+	 /**
+	  * Check if the Atom represent a binary relation.
+	  * @return {@code true} if it is a unary property, {@code false} otherwise. 
+	  */
+	 public boolean isBinaryRel() {
+		 if(this.equals(TYPE_DEPENDENCY) | this.equals(MEM_TYPE_REFERENCE)) {
+			 return true;
+		 } else {
+			 return false;
+		 }
+	 }
+	 
 	 
     /**
      * Gets string shortcut.
@@ -67,7 +86,7 @@ public enum WorkflowElement implements SMTFunctionName {
      * @param stateNumber the state number
      * @return the string shortcut
      */
-    public static String getStringShortcut(WorkflowElement elem, Integer blockNumber, int stateNumber) {
+    public static String getStringShortcut(AtomType elem, Integer blockNumber, int stateNumber) {
 
         if (elem == MODULE) {
             return "Tool" + stateNumber;

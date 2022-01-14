@@ -2,17 +2,10 @@ package nl.uu.cs.ape.models.satStruc;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.TypeStateVar;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -24,26 +17,10 @@ import nl.uu.cs.ape.utils.APEUtils;
  */
 public abstract class SATFact implements SATElem {
 
-	private final Map<TypeStateVar, Set<SATAtom>> variables;
-	
 	
 	protected SATFact() {
-		this.variables = new HashMap<TypeStateVar, Set<SATAtom>>();
 	}
 	
-	/**
-	 * Add a new variable to the formula. 
-	 * @param newVar - new variable
-	 * @return {@code true} if the variable was added, {@code false} in case that it already existed.
-	 */
-	public boolean addVariable(TypeStateVar newVar) {
-		if(variables.containsKey(newVar)) {
-			return false;
-		} else {
-			variables.put(newVar, new HashSet<SATAtom>());
-			return true;
-		}
-	}
 	/**
 	 * Encode a collection of SLTLx formulas to CNF and append it to the existing CNF file. It adds the encoding at the end of the content of the file.
 	 * 
@@ -54,7 +31,7 @@ public abstract class SATFact implements SATElem {
 	 */
 	public static void appendCNFToFile(File file, SATSynthesisEngine synthesisEngine,  Collection<SATFact> formulas) throws IOException {
 		StringBuilder cnf = new StringBuilder();
-		createCNFEncoding(formulas, synthesisEngine, 0)
+		createCNFEncoding(formulas, 0, synthesisEngine)
 							.forEach(clause -> cnf.append(clause.toCNF()));
 		
 		APEUtils.appendToFile(file, cnf.toString());
@@ -67,9 +44,9 @@ public abstract class SATFact implements SATElem {
 	 * @param synthesisEngine	- synthesis engine used for encoding
 	 * @return Set of {@link CNFClause}s that encode the given collector of formulas.
 	 */
-	public static Set<CNFClause> createCNFEncoding(Collection<SATFact> facts, SATSynthesisEngine synthesisEngine, int stateNo) {
+	public static Set<CNFClause> createCNFEncoding(Collection<SATFact> facts, int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> clauses = new HashSet<>();
-		facts.forEach(fact -> clauses.addAll(fact.getCNFEncoding(stateNo, synthesisEngine)));
+		facts.forEach(fact -> clauses.addAll(fact.getCNFEncoding(stateNo, new SATVariableFlattening(), synthesisEngine)));
 		
 		return clauses;
 	}

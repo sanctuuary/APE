@@ -19,7 +19,7 @@ import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.SMTPredicateMappings;
 import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
@@ -359,7 +359,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
                 BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line = null; 
                 try {
-                	WorkflowElement currFun = null;
+                	AtomType currFun = null;
                 	State tmpState = null;
                     while ((line = input.readLine()) != null) {
                     	if(line.equals("unsat")) {
@@ -376,9 +376,9 @@ public class SMTSynthesisEngine implements SynthesisEngine {
                     		currFun = getElement(words[1]);
                     		if(currFun != null) {
                     			int stateNo = Integer.parseInt(words[1].replace(currFun.toString(), ""));
-	                    		if(currFun == WorkflowElement.MODULE) {
+	                    		if(currFun == AtomType.MODULE) {
 	                    			tmpState = moduleAutomaton.getState(stateNo);
-	                    		} else if(currFun == WorkflowElement.MEMORY_TYPE) {
+	                    		} else if(currFun == AtomType.MEMORY_TYPE) {
 	                    			tmpState = typeAutomaton.getState(SMTDataType.MEMORY_TYPE_STATE, stateNo);
 	                    		} else {
 	                    			// in case of USED_TYPE or MEM_TYPE_REFERENCE
@@ -386,7 +386,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
 	                    		}
                     		}
                     	} else if(currFun != null) {
-                    		if(currFun == WorkflowElement.MEM_TYPE_REFERENCE) {
+                    		if(currFun == AtomType.MEM_TYPE_REFERENCE) {
                     			if(!line.trim().startsWith("(not")) {
                     				String[] words =  splitFromChar(line, "x!0");
                     				int a2 = Integer.parseInt(words[2].replace("bv", ""));
@@ -426,9 +426,9 @@ public class SMTSynthesisEngine implements SynthesisEngine {
      * @param string parsed string from the SMT2 model.
      * @return
      */
-	private WorkflowElement getElement(String string) {
+	private AtomType getElement(String string) {
 		
-		for(WorkflowElement element : WorkflowElement.values()) {
+		for(AtomType element : AtomType.values()) {
 			if(string.equals(element.toString())){
 				return null;
 			} else if(string.startsWith(element.toString())) {

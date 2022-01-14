@@ -4,10 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.uu.cs.ape.automaton.State;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
+import nl.uu.cs.ape.models.satStruc.SATAtomVar;
 
 /**
  * The {@code SATAtomMappings} class is used to store the data used for representing the atoms with integer numbers.
@@ -19,27 +20,45 @@ import nl.uu.cs.ape.models.satStruc.SATAtom;
  */
 public class SATAtomMappings implements Mappings {
 
+	/** 
+	 * First variable that can be used for auxiliary variables.
+	 * Numbers 1 and 2 are reserved for special symbols. 1 is {@code true} and 2 is {@code false}.
+	 */
+	private static final int auxDefaultInit = 3;
+	/** Max number of all auxiliary variables. */
+	private static final int auxMax = 100000;
+	/** Max number of all expected atoms containing variables. */
+	private static final int atomVarMaxNo = 100000;
 	/** Mapping of the atoms to integers. */
     private Map<SATAtom, Integer> mappings;
     /** Inverse mapping from integers to atoms. */
     private Map<Integer, SATAtom> reverseMapping;
     /** Map of all the IDs that were mapped to atoms. */
     private Map<String, SATAtom> mapped;
+    
+    /** Mapping of the atoms over variables to integers. */
+    private Map<SATAtomVar, Integer> vMappings;
+    /** Inverse mapping from integers to atoms containing variables. */
+    private Map<Integer, SATAtomVar> vReverseMapping;
+    /** Map of all the IDs that were mapped to atoms containing variables. */
+    private Map<String, SATAtomVar> vMapped;
+    
 
     /**
-     * Number of mapped predicates.
+     * Number of mapped atoms.
      */
-    private int size;
+    private int atomNo;
+    
+    /**
+     * Number of mapped atoms containing variables.
+     */
+    private int atomVarNo;
 
     /**
-     * Number  of auxiliary introduced variables. Numbers 1 and 2 are special symbols. 1 is {@code true} and 2 is {@code false}. 
+     * Last number used to represent auxiliary introduced variables. 
+     * Numbers 1 and 2 are special symbols. 1 is {@code true} and 2 is {@code false}. 
      */
     private int auxiliary;
-
-    /**
-     * Number of all auxiliary variables.
-     */
-    private int auxMax = 100000;
 
     /**
      * Instantiates a new SATAtom mappings.
@@ -49,8 +68,9 @@ public class SATAtomMappings implements Mappings {
         reverseMapping = new HashMap<Integer, SATAtom>();
         mapped = new HashMap<String, SATAtom>();
         /* First auxMax variables are reserved for auxiliary variables */
-        size = auxMax + 1;
-        auxiliary = 3;
+        auxiliary = auxDefaultInit;
+        atomVarNo = auxMax + 1;
+        atomNo = auxMax + atomVarMaxNo + 1;
     }
 
     /**
@@ -62,7 +82,7 @@ public class SATAtomMappings implements Mappings {
      * @param elementType Element that defines what type of a predicate is described (such as {@link SMTDataType#MODULE}.
      * @return Mapping number of the atom (number is always &gt; 0).
      */
-    public Integer add(PredicateLabel predicate, State usedInState, WorkflowElement elementType) throws MappingsException {
+    public Integer add(PredicateLabel predicate, State usedInState, AtomType elementType) throws MappingsException {
         SATAtom atom = new SATAtom(elementType, predicate, usedInState);
 
         Integer id;
@@ -71,11 +91,11 @@ public class SATAtomMappings implements Mappings {
             	SATAtom tmp = mapped.get(atom.toString());
                 throw MappingsException.mappedAtomsSignaturesOverlap("Encoding error. Two or more mappings map share same string: '" + atom.toString() + "' as ID.");
             }
-            size++;
-            mappings.put(atom, size);
-            reverseMapping.put(size, atom);
+            atomNo++;
+            mappings.put(atom, atomNo);
+            reverseMapping.put(atomNo, atom);
             mapped.put(atom.toString(), atom);
-            return size;
+            return atomNo;
         }
         return id;
     }
@@ -95,13 +115,41 @@ public class SATAtomMappings implements Mappings {
             	SATAtom tmp = mapped.get(atom.toString());
                 throw MappingsException.mappedAtomsSignaturesOverlap("Encoding error. Two or more mappings map share same string: '" + atom.toString() + "' as ID.");
             }
-            size++;
-            mappings.put(atom, size);
-            reverseMapping.put(size, atom);
+            atomNo++;
+            mappings.put(atom, atomNo);
+            reverseMapping.put(atomNo, atom);
             mapped.put(atom.toString(), atom);
-            return size;
+            return atomNo;
         }
         return id;
+    }
+    
+    /**
+     * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. 
+     * If the SATAtomVar did not occur before,
+     * it is added to the mapping set and the mapping value is returned, 
+     * otherwise the existing mapping value is returned.
+     *
+     * @param atomVar   atom containing variable(s) that is added
+     * @return Mapping number of the atom (number is always &gt; 0).
+     */
+    public Integer add(SATAtomVar atomVar) throws MappingsException {
+
+        Integer id;
+        if ((id = vMappings.get(atomVar)) == null) {
+            if (vMapped.get(atomVar.toString()) != null) {
+            	SATAtomVar tmp = vMapped.get(atomVar.toString());
+                throw MappingsException.mappedAtomsSignaturesOverlap("Encoding error. Two or more mappings map share same string: '" + atomVar.toString() + "' as ID.");
+            }
+            atomVarNo++;
+            vMappings.put(atomVar, atomVarNo);
+            vReverseMapping.put(atomVarNo, atomVar);
+            vMapped.put(atomVar.toString(), atomVar);
+            return atomVarNo;
+        } else {       
+        	return id;
+        }
+        
     }
 
     /**
@@ -128,12 +176,12 @@ public class SATAtomMappings implements Mappings {
     }
 
     /**
-     * Gets size.
+     * Gets atomNo.
      *
-     * @return The size of the mapping set.
+     * @return The atomNo of the mapping set.
      */
     public int getSize() {
-        return size;
+        return atomNo;
     }
 
     /**
@@ -149,7 +197,7 @@ public class SATAtomMappings implements Mappings {
      * Reset aux variables.
      */
     public void resetAuxVariables() {
-        auxiliary = 1;
+        auxiliary = auxDefaultInit;
     }
 
 

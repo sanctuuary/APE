@@ -5,12 +5,13 @@ import java.util.Set;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import nl.uu.cs.ape.automaton.TypeStateVar;
+import nl.uu.cs.ape.automaton.SATVariable;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.SATAtomMappings;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
+import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATAndStatement;
 import nl.uu.cs.ape.models.satStruc.SATOrStatement;
@@ -19,6 +20,7 @@ import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
 import nl.uu.cs.ape.models.satStruc.SATEquivalenceStatement;
 import nl.uu.cs.ape.models.satStruc.SATExists;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
+import nl.uu.cs.ape.models.satStruc.SATAtomVar;
 import nl.uu.cs.ape.models.satStruc.SATFact;
 import nl.uu.cs.ape.models.satStruc.SATGlobally;
 import nl.uu.cs.ape.models.satStruc.SATFinally;
@@ -129,7 +131,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 	@Override
 	public SATFact visitForall(ForallContext ctx) {
-		TypeStateVar variable = new TypeStateVar(ctx.getChild(2).getText());
+		SATVariable variable = new SATVariable(ctx.getChild(2).getText());
 		SATFact subFormula = visit(ctx.getChild(4));
 		return new SATForall(variable, subFormula);
 	}
@@ -142,14 +144,14 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 		String variableID = ctx.getChild(2).getText();
 		TaxonomyPredicate typePred = allTypes.get(typePredicateID);
 		
-		return new SATAtom(WorkflowElement.TYPE_VAR, typePred, new TypeStateVar(variableID));
+		return new SATAtomVar(AtomVarType.TYPE_VAR, typePred, new SATVariable(variableID));
 	}
 
 
 
 	@Override
 	public SATFact visitExists(ExistsContext ctx) {
-		TypeStateVar variable = new TypeStateVar(ctx.getChild(2).getText());
+		SATVariable variable = new SATVariable(ctx.getChild(2).getText());
 		SATFact subFormula = visit(ctx.getChild(4));
 		return new SATExists(variable, subFormula);
 	}
@@ -172,14 +174,18 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 	@Override
 	public SATFact visitR_relation(R_relationContext ctx) {
-		// TODO Auto-generated method stub
-		return visitChildren(ctx);
+		String variableID1 = ctx.getChild(2).getText();
+		String variableID2 = ctx.getChild(4).getText();
+		
+		return new SATAtomVar(AtomVarType.TYPE_DEPENDENCY_VAR, new SATVariable(variableID1), new SATVariable(variableID2));
 	}
 
 	@Override
 	public SATFact visitVarEq(VarEqContext ctx) {
-		// TODO Auto-generated method stub
-		return visitChildren(ctx);
+		String variableID1 = ctx.getChild(0).getText();
+		String variableID2 = ctx.getChild(2).getText();
+		
+		return new SATAtomVar(AtomVarType.VAR_EQUIVALENCE, new SATVariable(variableID1), new SATVariable(variableID2));
 	}
 
 

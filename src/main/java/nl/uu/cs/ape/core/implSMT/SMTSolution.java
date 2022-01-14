@@ -9,7 +9,7 @@ import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
 import nl.uu.cs.ape.models.satStruc.Literal;
@@ -89,9 +89,9 @@ public class SMTSolution extends SolutionInterpreter {
                         /* add all positive literals that describe tool implementations */
                         relevantElements.add(currAtom);
                         relevantModules.add(currAtom);
-                    } else if (currAtom.getWorkflowElementType() != WorkflowElement.MODULE
-                            && currAtom.getWorkflowElementType() != WorkflowElement.MEM_TYPE_REFERENCE
-                            && currAtom.getWorkflowElementType() != WorkflowElement.TYPE_DEPENDENCY
+                    } else if (currAtom.getWorkflowElementType() != AtomType.MODULE
+                            && currAtom.getWorkflowElementType() != AtomType.MEM_TYPE_REFERENCE
+                            && currAtom.getWorkflowElementType() != AtomType.TYPE_DEPENDENCY
                             && (currAtom.getPredicate() instanceof Type)
                             && ((Type) currAtom.getPredicate()).isSimplePredicate()) {
                         /* add all positive literals that describe simple types */
@@ -217,22 +217,22 @@ public class SMTSolution extends SolutionInterpreter {
 			if(!allowToolSeqRepeat) {
 				for (SATAtom atom : relevantModules) {
 					facts.add(new BinarySMTPredicate(
-									WorkflowElement.MODULE, 
+									AtomType.MODULE, 
 									new SMTBitVec(SMTDataType.MODULE_STATE, atom.getUsedInStateArgument()), 
 									new SMTPredicateFunArg(atom.getPredicate())
 								));
 				}
 			} else {
 				for (SATAtom atom : relevantElements) {
-					if (atom.getWorkflowElementType() == WorkflowElement.MODULE) {
+					if (atom.getWorkflowElementType() == AtomType.MODULE) {
 							facts.add(new BinarySMTPredicate(
-										WorkflowElement.MODULE, 
+										AtomType.MODULE, 
 										new SMTBitVec(SMTDataType.MODULE_STATE, atom.getUsedInStateArgument()), 
 										new SMTPredicateFunArg(atom.getPredicate())
 									));
-					} else if (atom.getWorkflowElementType() == WorkflowElement.USED_TYPE) {
+					} else if (atom.getWorkflowElementType() == AtomType.USED_TYPE) {
 							facts.add(new BinarySMTPredicate(
-									WorkflowElement.USED_TYPE, 
+									AtomType.USED_TYPE, 
 									new SMTBitVec(SMTDataType.USED_TYPE_STATE, atom.getUsedInStateArgument()), 
 									new SMTPredicateFunArg(atom.getPredicate())
 								));

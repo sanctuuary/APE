@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.checkerframework.checker.units.qual.s;
 
-import nl.uu.cs.ape.automaton.TypeStateVar;
+import nl.uu.cs.ape.automaton.SATVariable;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
@@ -35,17 +35,17 @@ private SATFact formulaUntil;
 }
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> clauses = new HashSet<CNFClause>();
 		
 		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
-			clauses.addAll(formula.getCNFEncoding(i, synthesisEngine));
+			clauses.addAll(formula.getCNFEncoding(i, variableMapping, synthesisEngine));
 		}
 		return clauses;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		return new SATForall(this.stateNo, boundBariable, formula).getNegatedCNFEncoding(synthesisEngine);
 	}
 

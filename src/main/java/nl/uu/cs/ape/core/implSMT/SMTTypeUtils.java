@@ -12,7 +12,7 @@ import nl.uu.cs.ape.models.AuxTypePredicate;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.smtStruc.SMTComment;
@@ -72,11 +72,11 @@ public class SMTTypeUtils {
 							SMTDataType.MEMORY_TYPE_STATE,
 							new NandStatement(
 									new BinarySMTPredicate(
-											WorkflowElement.MEMORY_TYPE, 
+											AtomType.MEMORY_TYPE, 
 											state,
 											new SMTPredicateFunArg(firstPair)), 
 									new BinarySMTPredicate(
-											WorkflowElement.MEMORY_TYPE, 
+											AtomType.MEMORY_TYPE, 
 											state,
 											new SMTPredicateFunArg(secondPair))
 							)
@@ -90,11 +90,11 @@ public class SMTTypeUtils {
 							SMTDataType.USED_TYPE_STATE,
 							new NandStatement(
 									new BinarySMTPredicate(
-											WorkflowElement.USED_TYPE, 
+											AtomType.USED_TYPE, 
 											state,
 											new SMTPredicateFunArg(firstPair)), 
 									new BinarySMTPredicate(
-											WorkflowElement.USED_TYPE, 
+											AtomType.USED_TYPE, 
 											state,
 											new SMTPredicateFunArg(secondPair))
 							)
@@ -126,11 +126,11 @@ public class SMTTypeUtils {
     				SMTDataType.MEMORY_TYPE_STATE,
         			new OrStatement(
         					new BinarySMTPredicate(
-        							WorkflowElement.MEMORY_TYPE, 
+        							AtomType.MEMORY_TYPE, 
         							state,
         							new SMTPredicateFunArg(dataType)),
         					new BinarySMTPredicate(
-        							WorkflowElement.MEMORY_TYPE, 
+        							AtomType.MEMORY_TYPE, 
         							state,
         							new SMTPredicateFunArg(empty))
         					)
@@ -143,11 +143,11 @@ public class SMTTypeUtils {
     				SMTDataType.USED_TYPE_STATE,
         			new OrStatement(
         					new BinarySMTPredicate(
-        							WorkflowElement.USED_TYPE, 
+        							AtomType.USED_TYPE, 
         							state,
         							new SMTPredicateFunArg(dataType)),
         					new BinarySMTPredicate(
-        							WorkflowElement.USED_TYPE, 
+        							AtomType.USED_TYPE, 
         							state,
         							new SMTPredicateFunArg(empty))
         					)
@@ -199,13 +199,13 @@ public class SMTTypeUtils {
 					new EqualStatement(
 						new OrStatement(parentType.getSubPredicates().stream()
 								.map(subModule -> new BinarySMTPredicate(
-										WorkflowElement.USED_TYPE, 
+										AtomType.USED_TYPE, 
 										state,
 										new SMTPredicateFunArg(subModule)))
 								.collect(Collectors.toList())
 								),
 						new BinarySMTPredicate(
-								WorkflowElement.USED_TYPE, 
+								AtomType.USED_TYPE, 
 								state,
 								new SMTPredicateFunArg(parentType))
 						)
@@ -219,13 +219,13 @@ public class SMTTypeUtils {
 						new EqualStatement(
 							new OrStatement(parentType.getSubPredicates().stream()
 									.map(subModule -> new BinarySMTPredicate(
-											WorkflowElement.MEMORY_TYPE, 
+											AtomType.MEMORY_TYPE, 
 											state,
 											new SMTPredicateFunArg(subModule)))
 									.collect(Collectors.toList())
 									),
 							new BinarySMTPredicate(
-									WorkflowElement.MEMORY_TYPE, 
+									AtomType.MEMORY_TYPE, 
 									state,
 									new SMTPredicateFunArg(parentType))
 							)
@@ -263,14 +263,14 @@ public class SMTTypeUtils {
                     	throw APEConfigException.invalidValue("input", currType.toString(), "Invalid workflow input value.");
                     }
                     allClauses.add(new Assertion(new BinarySMTPredicate(
-                    									WorkflowElement.MEMORY_TYPE, 
+                    									AtomType.MEMORY_TYPE, 
                     									new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currState),
     													new SMTPredicateFunArg(currType)
     											)));
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
                 allClauses.add(new Assertion(new BinarySMTPredicate(
-                									WorkflowElement.MEMORY_TYPE, 
+                									AtomType.MEMORY_TYPE, 
                 									new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currState),
 													new SMTPredicateFunArg(allTypes.getEmptyType()))
                 							));
@@ -301,7 +301,7 @@ public class SMTTypeUtils {
                     	throw APEConfigException.invalidValue("output", currType.toString(), "Invalid workflow output value.");
                     }
                     allClauses.add(new Assertion(new BinarySMTPredicate(
-                    									WorkflowElement.USED_TYPE,
+                    									AtomType.USED_TYPE,
                     									new SMTBitVec(SMTDataType.USED_TYPE_STATE, workflowOutputStates.get(i)),
     													new SMTPredicateFunArg(currType)
                     							)));
@@ -309,7 +309,7 @@ public class SMTTypeUtils {
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
             	allClauses.add(new Assertion(new BinarySMTPredicate(
-            										WorkflowElement.USED_TYPE, 
+            										AtomType.USED_TYPE, 
             										new SMTBitVec(SMTDataType.USED_TYPE_STATE, workflowOutputStates.get(i)),
 													new SMTPredicateFunArg(allTypes.getEmptyType())
             								)));

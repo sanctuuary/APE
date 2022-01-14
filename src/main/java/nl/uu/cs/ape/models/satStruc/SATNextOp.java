@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.checkerframework.checker.units.qual.s;
 
-import nl.uu.cs.ape.automaton.TypeStateVar;
+import nl.uu.cs.ape.automaton.SATVariable;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
@@ -35,23 +35,23 @@ public class SATNextOp extends SATModalOp {
 
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
 		/* Conjunct the collection of clauses that encode the operation and the formula */
-		allClauses.add(operation.getCNFEncoding(stateNo, synthesisEngine));
-		allClauses.add(formula.getCNFEncoding(stateNo + 1, synthesisEngine));
+		allClauses.add(operation.getCNFEncoding(stateNo, variableMapping, synthesisEngine));
+		allClauses.add(formula.getCNFEncoding(stateNo + 1, variableMapping, synthesisEngine));
 		
 		return CNFClause.conjunctClausesCollection(allClauses);
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
 		/* Disjunction the collection of clauses that encode the negation of the operation and of the formula */
-		allClauses.add(operation.getNegatedCNFEncoding(stateNo, synthesisEngine));
-		allClauses.add(formula.getNegatedCNFEncoding(stateNo + 1, synthesisEngine));
+		allClauses.add(operation.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine));
+		allClauses.add(formula.getNegatedCNFEncoding(stateNo + 1, variableMapping, synthesisEngine));
 		
 		return CNFClause.conjunctClausesCollection(allClauses);
 	}

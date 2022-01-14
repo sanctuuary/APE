@@ -40,23 +40,23 @@ private Set<SATFact> disjointFacts;
 	}
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
 		/* Disjoint the collection of clauses that encode each of the disjoint elements. */
 		for(SATFact formula : disjointFacts) {
-			allClauses.add(formula.getCNFEncoding(stateNo, synthesisEngine));
+			allClauses.add(formula.getCNFEncoding(stateNo, variableMapping, synthesisEngine));
 		}
 		return CNFClause.disjoinClausesCollection(allClauses);
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
 		/* Conjunct the collection of clauses that encode negations of each of the disjoint elements. */
 		for(SATFact formula : disjointFacts) {
-			allClauses.add(formula.getNegatedCNFEncoding(stateNo, synthesisEngine));
+			allClauses.add(formula.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine));
 		}
 		return CNFClause.conjunctClausesCollection(allClauses);
 	}

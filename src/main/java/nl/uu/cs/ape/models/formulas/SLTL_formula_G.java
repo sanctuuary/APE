@@ -6,7 +6,7 @@ import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.SATAtomMappings;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
@@ -45,7 +45,7 @@ public class SLTL_formula_G extends SLTL_formula {
      * @return The CNF representation of the SLTL formula.
      */
     @Override
-    public String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement workflowElement, SATAtomMappings mappings) {
+    public String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, AtomType workflowElement, SATAtomMappings mappings) {
 
         String constraints = "";
         String negSign;

@@ -19,6 +19,7 @@ import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATFact;
+import nl.uu.cs.ape.models.satStruc.SATVariableOccurance;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -83,6 +84,11 @@ public class SATSynthesisEngine implements SynthesisEngine {
     private TypeAutomaton typeAutomaton;
     
     /**
+     * Mapping of all the variables that are utilised in the encoding to the predicates use them.
+     */
+    private SATVariableOccurance varUsage;
+    
+    /**
      * Setup of an instance of the SAT synthesis engine.
      *
      * @param domainSetup  Domain information, including all the existing tools and types.
@@ -98,6 +104,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         this.runConfig = runConfig;
         this.mappings = (SATAtomMappings) allSolutions.getMappings();
         this.mappings.resetAuxVariables();
+        this.varUsage = new SATVariableOccurance();
         
         this.satInputFile = null;
         this.cnfEncoding = File.createTempFile("satCNF" + workflowLength, null);
@@ -397,6 +404,14 @@ public class SATSynthesisEngine implements SynthesisEngine {
      */
     public int getSolutionSize() {
         return moduleAutomaton.size();
+    }
+    
+    /**
+     * Get mapping of all the variables that are utilised in the encoding to the predicates use them.
+     * @return Variable usage class {@link SATVariableOccurance}.
+     */
+    public SATVariableOccurance getVariableUsage() {
+    	return varUsage;
     }
 
     /**

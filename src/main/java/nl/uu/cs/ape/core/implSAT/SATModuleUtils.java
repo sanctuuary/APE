@@ -15,7 +15,7 @@ import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATAndStatement;
@@ -140,22 +140,22 @@ public final class SATModuleUtils {
 							cnfEncoding.add(
 									new SATImplicationStatement(
 												new SATAtom(
-														WorkflowElement.MODULE, 
+														AtomType.MODULE, 
 														module, 
 														moduleState),
 												new SATAtom(
-														WorkflowElement.USED_TYPE, 
+														AtomType.USED_TYPE, 
 														currInputType, 
 														currInputState)));
 						} else {
 							cnfEncoding.add(
 									new SATImplicationStatement(
 												new SATAtom(
-														WorkflowElement.MODULE, 
+														AtomType.MODULE, 
 														module, 
 														moduleState),
 												new SATAtom(
-														WorkflowElement.USED_TYPE, 
+														AtomType.USED_TYPE, 
 														synthesisInstance.getEmptyType(), 
 														currInputState)));
 						}
@@ -190,11 +190,11 @@ public final class SATModuleUtils {
 							cnfEncoding.add(
 									new SATNandStatement(
 												new SATAtom(
-														WorkflowElement.USED_TYPE, 
+														AtomType.USED_TYPE, 
 														currType, 
 														currUsedTypeState),
 												new SATAtom(
-														WorkflowElement.MEM_TYPE_REFERENCE, 
+														AtomType.MEM_TYPE_REFERENCE, 
 														typeAutomaton.getNullState(), 
 														currUsedTypeState)));
 
@@ -208,16 +208,16 @@ public final class SATModuleUtils {
 									cnfEncoding.add(
 											new SATImplicationStatement(
 													new SATAtom(
-															WorkflowElement.MEM_TYPE_REFERENCE, 
+															AtomType.MEM_TYPE_REFERENCE, 
 															refMemoryTypeState,
 															currUsedTypeState),
 													new SATEquivalenceStatement(
 														new SATAtom(
-																WorkflowElement.USED_TYPE, 
+																AtomType.USED_TYPE, 
 																currType, 
 																currUsedTypeState),
 														new SATAtom(
-																WorkflowElement.MEMORY_TYPE, 
+																AtomType.MEMORY_TYPE, 
 																currType, 
 																refMemoryTypeState)
 														)));
@@ -229,11 +229,11 @@ public final class SATModuleUtils {
 							cnfEncoding.add(
 									new SATImplicationStatement(
 												new SATAtom(
-														WorkflowElement.USED_TYPE, 
+														AtomType.USED_TYPE, 
 														currType, 
 														currUsedTypeState),
 												new SATAtom(
-														WorkflowElement.MEM_TYPE_REFERENCE, 
+														AtomType.MEM_TYPE_REFERENCE, 
 														typeAutomaton.getNullState(), 
 														currUsedTypeState)));
 							
@@ -273,7 +273,7 @@ public final class SATModuleUtils {
 				possibleMemStates.add(typeAutomaton.getNullState());
 				Set<SATFact> allPossibilities = new HashSet<SATFact>();
 				for (State exictingMemState : possibleMemStates) {
-					allPossibilities.add(new SATAtom(WorkflowElement.MEM_TYPE_REFERENCE, exictingMemState, currInputState));
+					allPossibilities.add(new SATAtom(AtomType.MEM_TYPE_REFERENCE, exictingMemState, currInputState));
 				}
 				cnfEncoding.add(new SATOrStatement(allPossibilities));
 				
@@ -283,11 +283,11 @@ public final class SATModuleUtils {
 					cnfEncoding.add(
 							new SATNandStatement(
 										new SATAtom(
-												WorkflowElement.MEM_TYPE_REFERENCE, 
+												AtomType.MEM_TYPE_REFERENCE, 
 												pair.getFirst(), 
 												currInputState),
 										new SATAtom(
-												WorkflowElement.MEM_TYPE_REFERENCE, 
+												AtomType.MEM_TYPE_REFERENCE, 
 												pair.getSecond(), 
 												currInputState)));
 					
@@ -302,7 +302,7 @@ public final class SATModuleUtils {
 					cnfEncoding.add(
 							new SATNotStatement(
 									new SATAtom(
-										WorkflowElement.MEM_TYPE_REFERENCE, 
+										AtomType.MEM_TYPE_REFERENCE, 
 										nonExictingMemState,
 										currInputState)));
 				}
@@ -331,7 +331,7 @@ public final class SATModuleUtils {
 				cnfEncoding.add(
 						new SATNotStatement(
 								new SATAtom(
-									WorkflowElement.TYPE_DEPENDENCY, 
+									AtomType.TYPE_DEPENDENCY, 
 									currInputState,
 									typeAutomaton.getNullState())));
 				/*
@@ -356,7 +356,7 @@ public final class SATModuleUtils {
 					cnfEncoding.add(
 							new SATNotStatement(
 									new SATAtom(
-										WorkflowElement.TYPE_DEPENDENCY, 
+										AtomType.TYPE_DEPENDENCY, 
 										nonExictingMemState,
 										currInputState)));
 				}
@@ -369,14 +369,14 @@ public final class SATModuleUtils {
 				/* Memory state depends on itself */
 				cnfEncoding.add(
 							new SATAtom(
-								WorkflowElement.TYPE_DEPENDENCY, 
+								AtomType.TYPE_DEPENDENCY, 
 								currMemState,
 								currMemState));
 				/* ..and does not depend on the null state */ 
 			cnfEncoding.add(
 						new SATNotStatement(
 								new SATAtom(
-									WorkflowElement.TYPE_DEPENDENCY, 
+									AtomType.TYPE_DEPENDENCY, 
 									currMemState,
 									typeAutomaton.getNullState())));
 				/*
@@ -402,7 +402,7 @@ public final class SATModuleUtils {
 						cnfEncoding.add(
 								new SATNotStatement(
 										new SATAtom(
-											WorkflowElement.TYPE_DEPENDENCY, 
+											AtomType.TYPE_DEPENDENCY, 
 											nonExictingMemState,
 											currMemState)));
 					}
@@ -438,16 +438,16 @@ public final class SATModuleUtils {
 										new SATImplicationStatement(
 												new SATAndStatement(
 														new SATAtom(
-																WorkflowElement.MEM_TYPE_REFERENCE, 
+																AtomType.MEM_TYPE_REFERENCE, 
 																currMemState, 
 																currInputState),
 														new SATAtom(
-																WorkflowElement.TYPE_DEPENDENCY, 
+																AtomType.TYPE_DEPENDENCY, 
 																existingMemState,
 																currMemState)
 														),
 												new SATAtom(
-														WorkflowElement.TYPE_DEPENDENCY, 
+														AtomType.TYPE_DEPENDENCY, 
 														existingMemState, 
 														currInputState)
 												));
@@ -459,16 +459,16 @@ public final class SATModuleUtils {
 									new SATImplicationStatement(
 											new SATAndStatement(
 													new SATAtom(
-															WorkflowElement.MEM_TYPE_REFERENCE, 
+															AtomType.MEM_TYPE_REFERENCE, 
 															currMemState, 
 															currInputState),
 													new SATAtom(
-															WorkflowElement.TYPE_DEPENDENCY, 
+															AtomType.TYPE_DEPENDENCY, 
 															existingMemState, 
 															currInputState)
 													),
 											new SATAtom(
-													WorkflowElement.TYPE_DEPENDENCY, 
+													AtomType.TYPE_DEPENDENCY, 
 													existingMemState,
 													currMemState)
 											));
@@ -480,11 +480,11 @@ public final class SATModuleUtils {
 				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
 					cnfEncoding.add(new SATNandStatement(
 							new SATAtom(
-									WorkflowElement.MEM_TYPE_REFERENCE, 
+									AtomType.MEM_TYPE_REFERENCE, 
 									typeAutomaton.getNullState(), 
 									currInputState),
 							new SATAtom(
-									WorkflowElement.TYPE_DEPENDENCY, 
+									AtomType.TYPE_DEPENDENCY, 
 									existingMemState, 
 									currInputState)
 							));
@@ -510,14 +510,14 @@ public final class SATModuleUtils {
 					cnfDependency.add(
 							new SATNotStatement(
 									new SATAtom(
-											WorkflowElement.TYPE_DEPENDENCY, 
+											AtomType.TYPE_DEPENDENCY, 
 											existingMemState, 
 											currMemState)));
 					// one of the tool inputs does as well
 					for (State currInputState : currInputBlock.getStates()) {
 						cnfDependency.add(
 								new SATAtom(
-										WorkflowElement.TYPE_DEPENDENCY, 
+										AtomType.TYPE_DEPENDENCY, 
 										existingMemState, 
 										currInputState));
 					}
@@ -529,11 +529,11 @@ public final class SATModuleUtils {
 						cnfEncoding.add(
 								new SATImplicationStatement(
 										new SATAtom(
-												WorkflowElement.TYPE_DEPENDENCY, 
+												AtomType.TYPE_DEPENDENCY, 
 												existingMemState, 
 												currInputState),
 										new SATAtom(
-												WorkflowElement.TYPE_DEPENDENCY, 
+												AtomType.TYPE_DEPENDENCY, 
 												existingMemState, 
 												currMemState)));
 					}
@@ -572,7 +572,7 @@ public final class SATModuleUtils {
 
 						allPossibilities.add(
 								new SATAtom(
-									WorkflowElement.MEMORY_TYPE, 
+									AtomType.MEMORY_TYPE, 
 									emptyType, 
 									currMemoryState));
 					
@@ -580,7 +580,7 @@ public final class SATModuleUtils {
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(
 									new SATAtom(
-										WorkflowElement.MEM_TYPE_REFERENCE, 
+										AtomType.MEM_TYPE_REFERENCE, 
 										currMemoryState, 
 										inputState));
 						}
@@ -593,14 +593,14 @@ public final class SATModuleUtils {
 						if (currMemoryState.getLocalStateNumber() == 0) {
 							allPossibilities.add(
 									new SATAtom(
-										WorkflowElement.MEMORY_TYPE, 
+										AtomType.MEMORY_TYPE, 
 										emptyType, 
 										currMemoryState));
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(
 									new SATAtom(
-										WorkflowElement.MEM_TYPE_REFERENCE, 
+										AtomType.MEM_TYPE_REFERENCE, 
 										currMemoryState, 
 										inputState));
 						}
@@ -615,13 +615,13 @@ public final class SATModuleUtils {
 						Set<SATFact> allPossibilities = new HashSet<SATFact>();
 						allPossibilities.add(
 								new SATAtom(
-									WorkflowElement.MEMORY_TYPE, 
+									AtomType.MEMORY_TYPE, 
 									emptyType, 
 									currMemoryState));
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(
 									new SATAtom(
-										WorkflowElement.MEM_TYPE_REFERENCE, 
+										AtomType.MEM_TYPE_REFERENCE, 
 										currMemoryState, 
 										inputState));
 						}
@@ -637,14 +637,14 @@ public final class SATModuleUtils {
 						if (currMemoryState.getLocalStateNumber() == 0) {
 							allPossibilities.add(
 									new SATAtom(
-										WorkflowElement.MEMORY_TYPE, 
+										AtomType.MEMORY_TYPE, 
 										emptyType, 
 										currMemoryState));
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(
 									new SATAtom(
-										WorkflowElement.MEM_TYPE_REFERENCE, 
+										AtomType.MEM_TYPE_REFERENCE, 
 										currMemoryState, 
 										inputState));
 						}
@@ -693,11 +693,11 @@ public final class SATModuleUtils {
 							cnfEncoding.add(
 									new SATImplicationStatement(
 												new SATAtom(
-														WorkflowElement.MODULE, 
+														AtomType.MODULE, 
 														module, 
 														moduleState),
 												new SATAtom(
-														WorkflowElement.MEMORY_TYPE, 
+														AtomType.MEMORY_TYPE, 
 														outputType, 
 														currOutputStates.get(i))));
 
@@ -705,11 +705,11 @@ public final class SATModuleUtils {
 							cnfEncoding.add(
 									new SATImplicationStatement(
 												new SATAtom(
-														WorkflowElement.MODULE, 
+														AtomType.MODULE, 
 														module, 
 														moduleState),
 												new SATAtom(
-														WorkflowElement.MEMORY_TYPE, 
+														AtomType.MEMORY_TYPE, 
 														synthesisInstance.getEmptyType(), 
 														currOutputStates.get(i))));
 						}
@@ -741,11 +741,11 @@ public final class SATModuleUtils {
 				cnfEncoding.add(
 						new SATNandStatement(
 									new SATAtom(
-											WorkflowElement.MODULE, 
+											AtomType.MODULE, 
 											pair.getFirst(), 
 											moduleState),
 									new SATAtom(
-											WorkflowElement.MODULE, 
+											AtomType.MODULE, 
 											pair.getSecond(), 
 											moduleState)));
 			}
@@ -778,7 +778,7 @@ public final class SATModuleUtils {
 				if (tool instanceof Module) {
 					allPossibilities.add(
 							new SATAtom(
-								WorkflowElement.MODULE, 
+								AtomType.MODULE, 
 								tool, 
 								moduleState));
 				}
@@ -821,7 +821,7 @@ public final class SATModuleUtils {
 	 * @param mappings    Mapping function.
 	 */
 	private static Set<SATFact> moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule, State moduleState) {
-		SATAtom superModuleState = new SATAtom(WorkflowElement.MODULE, currModule, moduleState);
+		SATAtom superModuleState = new SATAtom(AtomType.MODULE, currModule, moduleState);
 
 		Set<SATFact> fullCNFEncoding = new HashSet<SATFact>();
 		Set<SATFact> currCNFEncoding = new HashSet<SATFact>();
@@ -838,7 +838,7 @@ public final class SATModuleUtils {
 					System.out.println("Null error: " + currModule.getPredicateID() + " ->"
 							+ currModule.getSubPredicates().toString());
 				}
-				SATAtom subModuleState = new SATAtom(WorkflowElement.MODULE,subModule, moduleState);
+				SATAtom subModuleState = new SATAtom(AtomType.MODULE,subModule, moduleState);
 				currCNFEncoding.add(subModuleState);
 				subModulesStates.add(subModuleState);
 				

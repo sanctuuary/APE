@@ -24,7 +24,7 @@ import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
 import nl.uu.cs.ape.models.satStruc.CNFClause;
@@ -198,13 +198,13 @@ public class APEDomainSetup {
     	Set<SATFact> cnfEncoding = new HashSet<SATFact>();
     	
         Automaton automaton = null;
-        WorkflowElement workflowElem = null;
+        AtomType workflowElem = null;
         for (AuxiliaryPredicate helperPredicate : helperPredicates) {
             if (helperPredicate.getGeneralizedPredicates().first() instanceof Type) {
                 automaton = typeAutomaton;
             } else {
                 automaton = moduleAutomaton;
-                workflowElem = WorkflowElement.MODULE;
+                workflowElem = AtomType.MODULE;
             }
             for (State currState : automaton.getAllStates()) {
                 workflowElem = currState.getWorkflowStateType();

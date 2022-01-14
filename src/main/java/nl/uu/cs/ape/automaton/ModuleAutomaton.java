@@ -3,7 +3,7 @@ package nl.uu.cs.ape.automaton;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 
@@ -32,7 +32,7 @@ public class ModuleAutomaton implements Automaton {
         automataBound = Math.max(automataBound, 1);
 
         for (int i = 1; i <= automataBound; i++) {
-            State tmpState = new State(WorkflowElement.MODULE, null, i, inputBranching, outputBranching);
+            State tmpState = new State(AtomType.MODULE, null, i, inputBranching, outputBranching);
             moduleStates.add(tmpState);
         }
     }

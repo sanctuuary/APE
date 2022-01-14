@@ -3,7 +3,7 @@ package nl.uu.cs.ape.models.smtStruc.boolStatements;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTUtils;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Elem;
 
 /**

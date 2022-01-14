@@ -10,7 +10,7 @@ import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.utils.APEUtils;
 
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class ModuleNode extends SolutionWorkflowNode {
         this.abstractModules = new HashSet<AbstractModule>();
         this.prevModuleNode = null;
         this.nextModuleNode = null;
-        if (automatonState.getWorkflowStateType() != WorkflowElement.MODULE) {
+        if (automatonState.getWorkflowStateType() != AtomType.MODULE) {
             throw new ExceptionInInitializerError(
                     "Class ModuleNode can only be instantiated using State that is of type SMTDataType.MODULE, as a parameter.");
         }

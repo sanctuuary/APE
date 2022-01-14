@@ -17,7 +17,7 @@ import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SMTPredicateMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
@@ -133,7 +133,7 @@ public final class SMTModuleUtils {
 		allClauses.add(new SMTComment("Encoding workflow structure functions."));
 		// encode that each tool state is defined over an operation (where tool states are represented as BitVec that corresponding to the order number of the state)
 		allClauses.add(new BinaryBoolFuncDeclaration(
-									WorkflowElement.MODULE, 
+									AtomType.MODULE, 
 									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE)), 
 									SMTDataType.MODULE));
 
@@ -155,7 +155,7 @@ public final class SMTModuleUtils {
 //																synthesisInstance.getAutomatonSize(SMTDataType.MODULE_STATE))),
 //												new NotStatement(
 //														new BinarySATPredicate(
-//																WorkflowElement.MODULE,
+//																AtomType.MODULE,
 //																moduleState, 
 //																module)
 //														)
@@ -166,7 +166,7 @@ public final class SMTModuleUtils {
 //				));
 
 		allClauses.add(new BinaryBoolFuncDeclaration(
-									WorkflowElement.USED_TYPE, 
+									AtomType.USED_TYPE, 
 									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)), 
 									SMTDataType.TYPE));
 		
@@ -189,7 +189,7 @@ public final class SMTModuleUtils {
 //																synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE))),
 //												new NotStatement(
 //														new BinarySATPredicate(
-//																WorkflowElement.USED_TYPE,
+//																AtomType.USED_TYPE,
 //																usedState, 
 //																type)
 //														)
@@ -200,7 +200,7 @@ public final class SMTModuleUtils {
 //				));
 		
 		allClauses.add(new BinaryBoolFuncDeclaration(
-									WorkflowElement.MEMORY_TYPE, 
+									AtomType.MEMORY_TYPE, 
 									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)), 
 									SMTDataType.TYPE));
 		
@@ -221,7 +221,7 @@ public final class SMTModuleUtils {
 //																synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE))),
 //												new NotStatement(
 //														new BinarySATPredicate(
-//																WorkflowElement.MEMORY_TYPE,
+//																AtomType.MEMORY_TYPE,
 //																memoryState, 
 //																type)
 //														)
@@ -234,7 +234,7 @@ public final class SMTModuleUtils {
 		
 		// encode relation between used types and types available in memory
 		allClauses.add(new BinaryBoolFuncDeclaration(
-									WorkflowElement.MEM_TYPE_REFERENCE, 
+									AtomType.MEM_TYPE_REFERENCE, 
 									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)), 
 									SMTDataType.BITVECTOR(synthesisInstance.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE))));
 		
@@ -262,7 +262,7 @@ public final class SMTModuleUtils {
 //															synthesisInstance.getAutomatonSize(SMTDataType.USED_TYPE_STATE)))),
 //									new NotStatement(
 //											new BinarySATPredicate(
-//													WorkflowElement.MEM_TYPE_REFERENCE,
+//													AtomType.MEM_TYPE_REFERENCE,
 //													usedState, 
 //													memoryState)
 //											)
@@ -352,11 +352,11 @@ public final class SMTModuleUtils {
 							allClauses.add(new Assertion(
 									new ImplicationStatement(
 											new BinarySMTPredicate(
-													WorkflowElement.MODULE, 
+													AtomType.MODULE, 
 													new SMTBitVec(SMTDataType.MODULE_STATE, moduleState),
 													new SMTPredicateFunArg(module)), 
 											new BinarySMTPredicate(
-													WorkflowElement.USED_TYPE, 
+													AtomType.USED_TYPE, 
 													new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
 													new SMTPredicateFunArg(currInputType)
 													)
@@ -366,11 +366,11 @@ public final class SMTModuleUtils {
 							allClauses.add(new Assertion(
 									new ImplicationStatement(
 											new BinarySMTPredicate(
-													WorkflowElement.MODULE, 
+													AtomType.MODULE, 
 													new SMTBitVec(SMTDataType.MODULE_STATE, moduleState),
 													new SMTPredicateFunArg(module)), 
 											new BinarySMTPredicate(
-													WorkflowElement.USED_TYPE, 
+													AtomType.USED_TYPE, 
 													new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
 													new SMTPredicateFunArg(synthesisInstance.getEmptyType())
 													)
@@ -420,17 +420,17 @@ public final class SMTModuleUtils {
 										SMTDataType.TYPE,
 										new ImplicationStatement(
 													new BinarySMTPredicate(
-														WorkflowElement.MEM_TYPE_REFERENCE, 
+														AtomType.MEM_TYPE_REFERENCE, 
 														useState, 
 														memState),
 													new EqualStatement(
 														new BinarySMTPredicate(
-																WorkflowElement.USED_TYPE, 
+																AtomType.USED_TYPE, 
 																useState, 
 																type
 																),
 														new BinarySMTPredicate(
-																WorkflowElement.MEMORY_TYPE, 
+																AtomType.MEMORY_TYPE, 
 																memState, 
 																type
 																)
@@ -446,11 +446,11 @@ public final class SMTModuleUtils {
 								SMTDataType.USED_TYPE_STATE,
 								new EqualStatement(
 										new BinarySMTPredicate(
-												WorkflowElement.USED_TYPE, 
+												AtomType.USED_TYPE, 
 												useState, 
 												new SMTPredicateFunArg(allTypes.getEmptyType())),
 										new BinarySMTPredicate(
-												WorkflowElement.MEM_TYPE_REFERENCE, 
+												AtomType.MEM_TYPE_REFERENCE, 
 												useState, 
 												new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, typeAutomaton.getNullState())
 												)
@@ -464,14 +464,14 @@ public final class SMTModuleUtils {
 		 */
 //		allClauses.add(new Assertion(
 //						new BinarySATPredicate(
-//								WorkflowElement.MEMORY_TYPE, 
+//								AtomType.MEMORY_TYPE, 
 //								new SMTFunctionArgument(typeAutomaton.getNullState()), 
 //								new SMTFunctionArgument(allTypes.getEmptyType())
 //								)
 //						));
 //		allClauses.add(new Assertion(
 //						new BinarySATPredicate(
-//								WorkflowElement.MEMORY_TYPE, 
+//								AtomType.MEMORY_TYPE, 
 //								new SMTFunctionArgument(typeAutomaton.getNullState()), 
 //								new SMTFunctionArgument(allTypes.getEmptyAPELabel())
 //								)
@@ -509,7 +509,7 @@ public final class SMTModuleUtils {
 				List<SMTFact> allPossibilities = new ArrayList<SMTFact>();
 				for (State exictingMemState : possibleMemStates) {
 					allPossibilities.add(new BinarySMTPredicate(
-												WorkflowElement.MEM_TYPE_REFERENCE, 
+												AtomType.MEM_TYPE_REFERENCE, 
 												new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
 												new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, exictingMemState)
 												));
@@ -521,12 +521,12 @@ public final class SMTModuleUtils {
 					allClauses.add(new Assertion(
 							new NandStatement(
 									new BinarySMTPredicate(
-											WorkflowElement.MEM_TYPE_REFERENCE, 
+											AtomType.MEM_TYPE_REFERENCE, 
 											new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
 											new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, ((State) pair.getFirst()))
 											), 
 									new BinarySMTPredicate(
-											WorkflowElement.MEM_TYPE_REFERENCE, 
+											AtomType.MEM_TYPE_REFERENCE, 
 											new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
 											new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, ((State) pair.getSecond()))
 											)
@@ -542,7 +542,7 @@ public final class SMTModuleUtils {
 					allClauses.add(new Assertion(
 							new NotStatement(
 									new BinarySMTPredicate(
-											WorkflowElement.MEM_TYPE_REFERENCE, 
+											AtomType.MEM_TYPE_REFERENCE, 
 											new SMTBitVec(SMTDataType.USED_TYPE_STATE, currInputState),
 											new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, nonExictingMemState)
 											)
@@ -750,12 +750,12 @@ public final class SMTModuleUtils {
 
 						List<SMTFact> allPossibilities = new ArrayList<SMTFact>();
 						allPossibilities.add(new BinarySMTPredicate(
-													WorkflowElement.MEMORY_TYPE, 
+													AtomType.MEMORY_TYPE, 
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState),
 													new SMTPredicateFunArg(emptyType)));
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(new BinarySMTPredicate(
-													WorkflowElement.MEM_TYPE_REFERENCE, 
+													AtomType.MEM_TYPE_REFERENCE, 
 													new SMTBitVec(SMTDataType.USED_TYPE_STATE, inputState), 
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState)));
 						}
@@ -768,13 +768,13 @@ public final class SMTModuleUtils {
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getLocalStateNumber() == 0) {
 							allPossibilities.add(new BinarySMTPredicate(
-													WorkflowElement.MEMORY_TYPE, 
+													AtomType.MEMORY_TYPE, 
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState), 
 													new SMTPredicateFunArg(emptyType)));
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(new BinarySMTPredicate(
-													WorkflowElement.MEM_TYPE_REFERENCE,
+													AtomType.MEM_TYPE_REFERENCE,
 													new SMTBitVec(SMTDataType.USED_TYPE_STATE, inputState),
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState)));
 						}
@@ -789,12 +789,12 @@ public final class SMTModuleUtils {
 					for (State currMemoryState : currBlock.getStates()) {
 						List<SMTFact> allPossibilities = new ArrayList<SMTFact>();
 						allPossibilities.add(new BinarySMTPredicate(
-													WorkflowElement.MEMORY_TYPE,
+													AtomType.MEMORY_TYPE,
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState), 
 													new SMTPredicateFunArg(emptyType)));
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(new BinarySMTPredicate(
-													WorkflowElement.MEM_TYPE_REFERENCE, 
+													AtomType.MEM_TYPE_REFERENCE, 
 													new SMTBitVec(SMTDataType.USED_TYPE_STATE, inputState), 
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState)));
 						}
@@ -810,13 +810,13 @@ public final class SMTModuleUtils {
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getLocalStateNumber() == 0) {
 							allPossibilities.add(new BinarySMTPredicate(
-													WorkflowElement.MEMORY_TYPE, 
+													AtomType.MEMORY_TYPE, 
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState), 
 													new SMTPredicateFunArg(emptyType)));
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(new BinarySMTPredicate(
-													WorkflowElement.MEM_TYPE_REFERENCE, 
+													AtomType.MEM_TYPE_REFERENCE, 
 													new SMTBitVec(SMTDataType.USED_TYPE_STATE, inputState), 
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currMemoryState)));
 						}
@@ -867,11 +867,11 @@ public final class SMTModuleUtils {
 							allClauses.add(new Assertion(
 									new ImplicationStatement(
 											new BinarySMTPredicate(
-													WorkflowElement.MODULE,
+													AtomType.MODULE,
 													new SMTBitVec(SMTDataType.MODULE_STATE, moduleState),
 													new SMTPredicateFunArg(module)),
 											new BinarySMTPredicate(
-													WorkflowElement.MEMORY_TYPE, 
+													AtomType.MEMORY_TYPE, 
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currOutputStates.get(i)),
 													new SMTPredicateFunArg(outputType))
 											)
@@ -881,11 +881,11 @@ public final class SMTModuleUtils {
 							allClauses.add(new Assertion(
 									new ImplicationStatement(
 											new BinarySMTPredicate(
-													WorkflowElement.MODULE, 
+													AtomType.MODULE, 
 													new SMTBitVec(SMTDataType.MODULE_STATE, moduleState), 
 													new SMTPredicateFunArg(module)), 
 											new BinarySMTPredicate(
-													WorkflowElement.MEMORY_TYPE, 
+													AtomType.MEMORY_TYPE, 
 													new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currOutputStates.get(i)),
 													new SMTPredicateFunArg(synthesisInstance.getEmptyType()))
 											)
@@ -920,11 +920,11 @@ public final class SMTModuleUtils {
 								SMTDataType.MODULE_STATE,
 								new NandStatement(
 										new BinarySMTPredicate(
-												WorkflowElement.MODULE, 
+												AtomType.MODULE, 
 												moduleState,
 												new SMTPredicateFunArg(pair.getFirst())), 
 										new BinarySMTPredicate(
-												WorkflowElement.MODULE, 
+												AtomType.MODULE, 
 												moduleState,
 												new SMTPredicateFunArg(pair.getSecond()))
 										)
@@ -960,7 +960,7 @@ public final class SMTModuleUtils {
 								tool,
 								SMTDataType.MODULE,
 								new BinarySMTPredicate(
-										WorkflowElement.MODULE, 
+										AtomType.MODULE, 
 										moduleState, 
 										tool)
 						)
@@ -997,12 +997,12 @@ public final class SMTModuleUtils {
 									SMTDataType.MODULE_STATE,
 									new EqualStatement(
 											new BinarySMTPredicate(
-													WorkflowElement.MODULE, 
+													AtomType.MODULE, 
 													moduleState, 
 													new SMTPredicateFunArg(parentModule)),
 											new OrStatement(parentModule.getSubPredicates().stream()
 													.map(subModule -> new BinarySMTPredicate(
-																			WorkflowElement.MODULE, 
+																			AtomType.MODULE, 
 																			moduleState, 
 																			new SMTPredicateFunArg(subModule)))
 													.collect(Collectors.toList())
@@ -1032,19 +1032,19 @@ public final class SMTModuleUtils {
 		allClauses.add(new SMTComment("Define new functions that are easy to parse from the model."));
 		
 		for(int i = 0; i < smtSynthesisEngine.getSolutionSize(); i++) {
-			allClauses.add(new DeclareSimplifiedFunction(WorkflowElement.MODULE, i, SMTDataType.MODULE, SMTDataType.MODULE_STATE));
+			allClauses.add(new DeclareSimplifiedFunction(AtomType.MODULE, i, SMTDataType.MODULE, SMTDataType.MODULE_STATE));
 		}
 		
 		for(int i = 0; i < smtSynthesisEngine.getAutomatonSize(SMTDataType.USED_TYPE_STATE); i++) {
-			allClauses.add(new DeclareSimplifiedFunction(WorkflowElement.USED_TYPE, i, SMTDataType.TYPE, SMTDataType.USED_TYPE_STATE));
+			allClauses.add(new DeclareSimplifiedFunction(AtomType.USED_TYPE, i, SMTDataType.TYPE, SMTDataType.USED_TYPE_STATE));
 		}
 		
 		for(int i = 0; i < smtSynthesisEngine.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE); i++) {
-			allClauses.add(new DeclareSimplifiedFunction(WorkflowElement.MEMORY_TYPE, i, SMTDataType.TYPE, SMTDataType.MEMORY_TYPE_STATE));
+			allClauses.add(new DeclareSimplifiedFunction(AtomType.MEMORY_TYPE, i, SMTDataType.TYPE, SMTDataType.MEMORY_TYPE_STATE));
 		}
 		
 		for(int i = 0; i < smtSynthesisEngine.getAutomatonSize(SMTDataType.USED_TYPE_STATE); i++) {
-			allClauses.add(new DeclareSimplifiedFunction(WorkflowElement.MEM_TYPE_REFERENCE, i, SMTDataType.BITVECTOR(smtSynthesisEngine.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)), SMTDataType.USED_TYPE_STATE));
+			allClauses.add(new DeclareSimplifiedFunction(AtomType.MEM_TYPE_REFERENCE, i, SMTDataType.BITVECTOR(smtSynthesisEngine.getAutomatonSize(SMTDataType.MEMORY_TYPE_STATE)), SMTDataType.USED_TYPE_STATE));
 		}
 		
 		

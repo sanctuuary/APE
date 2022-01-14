@@ -1,13 +1,10 @@
 package nl.uu.cs.ape.models.satStruc;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import nl.uu.cs.ape.automaton.State;
-import nl.uu.cs.ape.automaton.StateInterface;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
@@ -18,7 +15,7 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  *
  * @author Vedran Kasalica
  */
-public class SATAtom extends SATFact implements Comparable<SATAtom> {
+public class SATAtom extends SATFact implements SATAbstractAtom, Comparable<SATAtom> {
 
     /**
      * StateInterface that is referred (tool or type).
@@ -28,12 +25,12 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
     /**
      * State in which the type/operation was used.
      */
-    private final StateInterface argumentState;
+    private final State argumentState;
 
     /**
      * Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.)
      */
-    private WorkflowElement elementType;
+    private AtomType elementType;
     
     
     /**
@@ -50,14 +47,14 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
      * @param predicate   Predicate used.
      * @param usedInState State in the automaton it was used/created in.
      */
-    public SATAtom(WorkflowElement elementType, PredicateLabel predicate, StateInterface usedInState) {
+    public SATAtom(AtomType elementType, PredicateLabel predicate, State usedInState) {
     	super();
         this.predicate = predicate;
         this.argumentState = usedInState;
         this.elementType = elementType;
     }
 
-    /**TODO: What is the point of this?
+    /** TODO: Not clear what is the point of this?
      * Creates a state in the automaton that corresponds to a usage of a data type as input, by a tool.
       
      * @param atom SATAtom that is being copied.
@@ -134,7 +131,7 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
      *
      * @return Field {@link #argumentState}.
      */
-    public StateInterface getUsedInStateArgument() {
+    public State getUsedInStateArgument() {
         return argumentState;
     }
 
@@ -143,7 +140,7 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
      *
      * @return The {@link SMTDataType} that corresponds to the atom usage.
      */
-    public WorkflowElement getWorkflowElementType() {
+    public AtomType getWorkflowElementType() {
         return elementType;
     }
 
@@ -154,12 +151,14 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
      * @return String representing the workflow element in a textual form.
      */
     public String toString() {
-        if (this.elementType == WorkflowElement.MEM_TYPE_REFERENCE) {
+    	if(this.elementType.isUnaryProperty()) {
+    		return predicate.getPredicateID() + "(" + argumentState.getPredicateID() + ")";
+    	} else if (this.elementType == AtomType.MEM_TYPE_REFERENCE) {
             return "[" + predicate.getPredicateID() + "] <- (" + argumentState.getPredicateID() + ")";
-        } else if (this.elementType == WorkflowElement.TYPE_DEPENDENCY) {
+        } else if (this.elementType == AtomType.TYPE_DEPENDENCY) {
             return "R(" + predicate.getPredicateID() + "," + argumentState.getPredicateID() + ")";
         } else {
-            return predicate.getPredicateID() + "(" + argumentState.getPredicateID() + ")";
+        	return null;
         }
     }
 
@@ -169,7 +168,7 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
      * @param workflowElemType Element type that is current SATAtom is compared to.
      * @return true if the current workflow element corresponds to the given {@link SMTDataType}, false otherwise.
      */
-    public boolean isWorkflowElementType(WorkflowElement workflowElemType) {
+    public boolean isWorkflowElementType(AtomType workflowElemType) {
         return getWorkflowElementType() == workflowElemType;
     }
 
@@ -214,7 +213,7 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
 	
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);
 			this.clause = new CNFClause(encoding);
@@ -223,7 +222,7 @@ public class SATAtom extends SATFact implements Comparable<SATAtom> {
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);
 			this.clause = new CNFClause(encoding);

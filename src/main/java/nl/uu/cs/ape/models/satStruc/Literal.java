@@ -3,7 +3,7 @@ package nl.uu.cs.ape.models.satStruc;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.SATAtomMappings;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
@@ -100,7 +100,7 @@ public class Literal implements Comparable<Literal> {
      *
      * @return The {@link SMTDataType} that corresponds to the Literal usage or not usage (in case of a negated literal).
      */
-    public WorkflowElement getWorkflowElementType() {
+    public AtomType getWorkflowElementType() {
         return atom.getWorkflowElementType();
     }
 
@@ -110,7 +110,7 @@ public class Literal implements Comparable<Literal> {
      * @param workflowElemType Element type that is current literal is compared to.
      * @return true if the current workflow element corresponds to the given {@link SMTDataType}, false otherwise.
      */
-    public boolean isWorkflowElementType(WorkflowElement workflowElemType) {
+    public boolean isWorkflowElementType(AtomType workflowElemType) {
         return atom.getWorkflowElementType() == workflowElemType;
     }
 

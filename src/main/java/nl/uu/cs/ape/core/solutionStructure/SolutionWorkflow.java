@@ -22,7 +22,7 @@ import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.NodeType;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
 import nl.uu.cs.ape.models.satStruc.Literal;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
@@ -182,14 +182,14 @@ public class SolutionWorkflow {
                 if (!currLiteral.isNegated()) {
                     if (currLiteral.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
-                    } else if (currLiteral.isWorkflowElementType(WorkflowElement.MODULE)) {
+                    } else if (currLiteral.isWorkflowElementType(AtomType.MODULE)) {
                         ModuleNode currNode = this.mappedModuleNodes.get(currLiteral.getUsedInStateArgument());
                         if (currLiteral.getPredicate() instanceof Module) {
                             currNode.setUsedModule((Module) currLiteral.getPredicate());
                         } else {
                             currNode.addAbstractDescriptionOfUsedType((AbstractModule) currLiteral.getPredicate());
                         }
-                    } else if (currLiteral.isWorkflowElementType(WorkflowElement.MEMORY_TYPE)) {
+                    } else if (currLiteral.isWorkflowElementType(AtomType.MEMORY_TYPE)) {
                         TypeNode currNode = this.mappedMemoryTypeNodes.get(currLiteral.getUsedInStateArgument());
                         if (currLiteral.getPredicate() instanceof Type
                                 && ((Type) currLiteral.getPredicate()).isNodeType(NodeType.LEAF)) {
@@ -199,10 +199,10 @@ public class SolutionWorkflow {
                         } else {
                             /* Memory type cannot be anything else except a Type. */
                         }
-                    } else if (currLiteral.isWorkflowElementType(WorkflowElement.USED_TYPE)
+                    } else if (currLiteral.isWorkflowElementType(AtomType.USED_TYPE)
                             && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
                         continue;
-                    } else if (currLiteral.isWorkflowElementType(WorkflowElement.MEM_TYPE_REFERENCE)
+                    } else if (currLiteral.isWorkflowElementType(AtomType.MEM_TYPE_REFERENCE)
                             && ((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {
                         /*
                          * Add all positive literals that describe memory type references that are not
@@ -219,7 +219,7 @@ public class SolutionWorkflow {
                             APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
                         }
                         memoryTypeNode.addUsedByTool(usedTypeNode);
-                    } else if (currLiteral.isWorkflowElementType(WorkflowElement.TYPE_DEPENDENCY)) {
+                    } else if (currLiteral.isWorkflowElementType(AtomType.TYPE_DEPENDENCY)) {
                     	// skip
                     }
                 }
@@ -249,14 +249,14 @@ public class SolutionWorkflow {
 //        	System.out.println(currAtom.toString());
                     if (currAtom.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
-                    } else if (currAtom.isWorkflowElementType(WorkflowElement.MODULE)) {
+                    } else if (currAtom.isWorkflowElementType(AtomType.MODULE)) {
                         ModuleNode currNode = this.mappedModuleNodes.get(currAtom.getUsedInStateArgument());
                         if (currAtom.getPredicate() instanceof Module) {
                             currNode.setUsedModule((Module) currAtom.getPredicate());
                         } else {
                             currNode.addAbstractDescriptionOfUsedType((AbstractModule) currAtom.getPredicate());
                         }
-                    } else if (currAtom.isWorkflowElementType(WorkflowElement.MEMORY_TYPE) ) {
+                    } else if (currAtom.isWorkflowElementType(AtomType.MEMORY_TYPE) ) {
                         TypeNode currNode = this.mappedMemoryTypeNodes.get(currAtom.getUsedInStateArgument());
                         if(currNode == null) {
                         	//skip null memory type
@@ -270,10 +270,10 @@ public class SolutionWorkflow {
                         } else {
                             /* Memory type cannot be anything else except a Type. */
                         }
-                    } else if (currAtom.isWorkflowElementType(WorkflowElement.USED_TYPE)
+                    } else if (currAtom.isWorkflowElementType(AtomType.USED_TYPE)
                             && ((Type) currAtom.getPredicate()).isSimplePredicate()) {
                         continue;
-                    } else if (currAtom.isWorkflowElementType(WorkflowElement.MEM_TYPE_REFERENCE)
+                    } else if (currAtom.isWorkflowElementType(AtomType.MEM_TYPE_REFERENCE)
                             && ((State) (currAtom.getPredicate())).getAbsoluteStateNumber() != -1) {
                         /*
                          * Add all positive literals that describe memory type references that are not
@@ -290,7 +290,7 @@ public class SolutionWorkflow {
                             APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
                         }
                         memoryTypeNode.addUsedByTool(usedTypeNode);
-                    } else if (currAtom.isWorkflowElementType(WorkflowElement.TYPE_DEPENDENCY)) {
+                    } else if (currAtom.isWorkflowElementType(AtomType.TYPE_DEPENDENCY)) {
                     	// skip
                     }
             }

@@ -10,7 +10,7 @@ import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
@@ -98,7 +98,7 @@ public abstract class SLTL_formula {
      * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the SLTL formula.
      */
-    public abstract String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, WorkflowElement workflowElement, SATAtomMappings mappings);
+    public abstract String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, AtomType workflowElement, SATAtomMappings mappings);
 
     /**
      * Creates a CNF representation of the Constraint:<br>
@@ -116,10 +116,10 @@ public abstract class SLTL_formula {
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
             constraints.append("-"
-                    + mappings.add(if_predicate, moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)
+                    + mappings.add(if_predicate, moduleAutomaton.getAllStates().get(i), AtomType.MODULE)
                     + " ");
             for (int j = i + 1; j < automatonSize; j++) {
-                constraints.append(mappings.add(then_predicate, moduleAutomaton.get(j), WorkflowElement.MODULE)).append(" ");
+                constraints.append(mappings.add(then_predicate, moduleAutomaton.get(j), AtomType.MODULE)).append(" ");
             }
             constraints.append("0\n");
         }
@@ -139,7 +139,7 @@ public abstract class SLTL_formula {
      * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the SLTL formula.
      */
-    public static String ite_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate, WorkflowElement typeElement, ModuleAutomaton moduleAutomaton,
+    public static String ite_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate, AtomType typeElement, ModuleAutomaton moduleAutomaton,
                                   List<Block> typeBlocks, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int numberOfBlocks = typeBlocks.size();
@@ -182,9 +182,9 @@ public abstract class SLTL_formula {
         for (int i = 0; i < automatonSize - 1; i++) {
             State currModuleState = moduleAutomaton.getAllStates().get(i);
             for (int j = i + 1; j < automatonSize; j++) {
-                constraints.append("-").append(mappings.add(if_predicate, currModuleState, WorkflowElement.MODULE)).append(" ");
+                constraints.append("-").append(mappings.add(if_predicate, currModuleState, AtomType.MODULE)).append(" ");
                 constraints.append("-"
-                        + mappings.add(then_not_predicate, moduleAutomaton.get(j), WorkflowElement.MODULE)
+                        + mappings.add(then_not_predicate, moduleAutomaton.get(j), AtomType.MODULE)
                         + " 0\n");
             }
         }
@@ -205,7 +205,7 @@ public abstract class SLTL_formula {
      * @param mappings           Set of the mappings for the literals.
      * @return The String CNF representation of the SLTL formula.
      */
-    public static String itn_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate, WorkflowElement typeElement, ModuleAutomaton moduleAutomaton,
+    public static String itn_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate, AtomType typeElement, ModuleAutomaton moduleAutomaton,
                                   List<Block> typeBlocks, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int numberOfBlocks = typeBlocks.size();
@@ -249,10 +249,10 @@ public abstract class SLTL_formula {
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
             constraints.append("-").append(mappings.add(second_module_in_sequence,
-                    moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)).append(" ");
+                    moduleAutomaton.getAllStates().get(i), AtomType.MODULE)).append(" ");
             for (int j = 0; j < i; j++) {
                 constraints.append(mappings.add(first_module_in_sequence,
-                        moduleAutomaton.get(j), WorkflowElement.MODULE)).append(" ");
+                        moduleAutomaton.get(j), AtomType.MODULE)).append(" ");
             }
             constraints.append("0\n");
         }
@@ -276,12 +276,12 @@ public abstract class SLTL_formula {
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
             constraints.append("-").append(mappings.add(first_module_in_sequence,
-                    moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)).append(" ");
+                    moduleAutomaton.getAllStates().get(i), AtomType.MODULE)).append(" ");
 
             /* Clause that forbids using first_predicate as the last in the sequence */
             if (i < automatonSize - 1) {
                 constraints.append(mappings.add(second_module_in_sequence,
-                        moduleAutomaton.get(i + 1), WorkflowElement.MODULE)).append(" ");
+                        moduleAutomaton.get(i + 1), AtomType.MODULE)).append(" ");
             }
             constraints.append("0\n");
         }
@@ -305,12 +305,12 @@ public abstract class SLTL_formula {
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
             constraints.append("-").append(mappings.add(second_module_in_sequence,
-                    moduleAutomaton.getAllStates().get(i), WorkflowElement.MODULE)).append(" ");
+                    moduleAutomaton.getAllStates().get(i), AtomType.MODULE)).append(" ");
 
             /* Clause that forbids using second_module_in_sequence as the first tool in the sequence */
             if (i > 0) {
                 constraints.append(mappings.add(first_module_in_sequence,
-                        moduleAutomaton.get(i - 1), WorkflowElement.MODULE)).append(" ");
+                        moduleAutomaton.get(i - 1), AtomType.MODULE)).append(" ");
             }
             constraints.append("0\n");
         }
@@ -332,7 +332,7 @@ public abstract class SLTL_formula {
 
         List<State> moduleAutomatonStates = moduleAutomaton.getAllStates();
         State lastModuleState = moduleAutomatonStates.get(moduleAutomatonStates.size() - 1);
-        constraints.append(mappings.add(last_module, lastModuleState, WorkflowElement.MODULE)).append(" 0\n");
+        constraints.append(mappings.add(last_module, lastModuleState, AtomType.MODULE)).append(" 0\n");
 
         return constraints.toString();
     }
@@ -353,7 +353,7 @@ public abstract class SLTL_formula {
 
         List<State> moduleAutomatonStates = moduleAutomaton.getAllStates();
         State nthModuleState = moduleAutomatonStates.get(n - 1);
-        constraints.append(mappings.add(module, nthModuleState, WorkflowElement.MODULE)).append(" 0\n");
+        constraints.append(mappings.add(module, nthModuleState, AtomType.MODULE)).append(" 0\n");
 
         return constraints.toString();
     }
@@ -401,14 +401,14 @@ public abstract class SLTL_formula {
             List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
             /* Encode: if module was used in the module state */
             constraints.append("-")
-                    .append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
+                    .append(mappings.add(module, moduleState, AtomType.MODULE)).append(" ");
             for (State currInputState : currInputStates) {
                         /*
                          * .. the corresponding data type needs to be provided in one of the input
                          * states
                          */
                         constraints = constraints
-                                .append(mappings.add(inputType, currInputState, WorkflowElement.USED_TYPE))
+                                .append(mappings.add(inputType, currInputState, AtomType.USED_TYPE))
                                 .append(" ");
             }
             constraints.append("0\n");
@@ -436,13 +436,13 @@ public abstract class SLTL_formula {
             List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
             /* Encode: if module was used in the module state */
             constraints.append("-")
-                    .append(mappings.add(module, moduleState, WorkflowElement.MODULE)).append(" ");
+                    .append(mappings.add(module, moduleState, AtomType.MODULE)).append(" ");
             for (State currInputState : currInputStates) {
                         /*
                          * .. one of the inputs should depend on the inputNo workflow input
                          */
                         constraints = constraints
-                                .append(mappings.add(typeAutomaton.getWorkflowInputBlock().getState(inputNo-1), currInputState, WorkflowElement.TYPE_DEPENDENCY))
+                                .append(mappings.add(typeAutomaton.getWorkflowInputBlock().getState(inputNo-1), currInputState, AtomType.TYPE_DEPENDENCY))
                                 .append(" ");
             }
             constraints.append("0\n");

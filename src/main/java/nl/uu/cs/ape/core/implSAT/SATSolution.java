@@ -8,7 +8,7 @@ import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.satStruc.Literal;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -87,9 +87,9 @@ public class SATSolution extends SolutionInterpreter {
                         /* add all positive literals that describe tool implementations */
                         relevantElements.add(currLiteral);
                         relevantModules.add(currLiteral);
-                    } else if (currLiteral.getWorkflowElementType() != WorkflowElement.MODULE
-                            && currLiteral.getWorkflowElementType() != WorkflowElement.MEM_TYPE_REFERENCE
-                            && currLiteral.getWorkflowElementType() != WorkflowElement.TYPE_DEPENDENCY
+                    } else if (currLiteral.getWorkflowElementType() != AtomType.MODULE
+                            && currLiteral.getWorkflowElementType() != AtomType.MEM_TYPE_REFERENCE
+                            && currLiteral.getWorkflowElementType() != AtomType.TYPE_DEPENDENCY
                             && (currLiteral.getPredicate() instanceof Type)
                             && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
                         /* add all positive literals that describe simple types */
@@ -251,7 +251,7 @@ public class SATSolution extends SolutionInterpreter {
 				}
 			} else {
 			for (Literal literal : relevantElements) {
-				if (literal.getWorkflowElementType() != WorkflowElement.MEMORY_TYPE) {
+				if (literal.getWorkflowElementType() != AtomType.MEMORY_TYPE) {
 					negSol.add(literal.toNegatedMappedInt());
 				}
 			}

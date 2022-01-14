@@ -1,6 +1,6 @@
 package nl.uu.cs.ape.automaton;
 
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /***
@@ -22,7 +22,7 @@ public class State implements PredicateLabel, StateInterface {
     /** Absolute order number of the state (i.e., unique number per state). */
     private final int absoluteStateNumber;
     /** Type of the state */
-    private final WorkflowElement workflowStateType;
+    private final AtomType workflowStateType;
 
     /**
      * Creates a state that corresponds to a state of the overall solution workflow.
@@ -33,9 +33,9 @@ public class State implements PredicateLabel, StateInterface {
      * @param inputBranching   Max number of inputs per module.
      * @param outputBranching   Max number of outputs per module.
      */
-    public State(WorkflowElement workflowStateType, Integer blockNumber, int stateNumber, int inputBranching, int outputBranching) {
+    public State(AtomType workflowStateType, Integer blockNumber, int stateNumber, int inputBranching, int outputBranching) {
 
-        this.stateName = WorkflowElement.getStringShortcut(workflowStateType, blockNumber, stateNumber);
+        this.stateName = AtomType.getStringShortcut(workflowStateType, blockNumber, stateNumber);
         this.localStateNumber = stateNumber;
         this.typeDependantStateNumber = calculateAutomatonStateNumber(blockNumber, stateNumber, inputBranching, outputBranching, workflowStateType);
         this.absoluteStateNumber = calculateAbsStateNumber(blockNumber, stateNumber, inputBranching, outputBranching, workflowStateType);
@@ -132,7 +132,7 @@ public class State implements PredicateLabel, StateInterface {
     }
 
     /**
-     * Returns the  order number of the state with respect to the State Type ({@link WorkflowElement}). Unlike {@link #getStateNumber}, this function returns number that can be used to compare ordering of any 2 states of the same type in the system,
+     * Returns the  order number of the state with respect to the State Type ({@link AtomType}). Unlike {@link #getStateNumber}, this function returns number that can be used to compare ordering of any 2 states of the same type in the system,
      * disregarding the block. null memory state has {@link #typeDependantStateNumber} = -1.
      *
      * @return Non-negative number that corresponds to the order number of the state within the same type or -1 for null memory state.
@@ -156,7 +156,7 @@ public class State implements PredicateLabel, StateInterface {
      *
      * @return The {@link SMTDataType} that describes the state.
      */
-    public WorkflowElement getWorkflowStateType() {
+    public AtomType getWorkflowStateType() {
         return this.workflowStateType;
     }
 
@@ -174,14 +174,14 @@ public class State implements PredicateLabel, StateInterface {
      * @param typeOfTheState  Parameter determining the state type.
      * @return The calculated absolute order number of the state.
      */
-    private static int calculateAbsStateNumber(Integer blockNumber, int stateNumber, int inputBranching, int outputBranching, WorkflowElement typeOfTheState) {
+    private static int calculateAbsStateNumber(Integer blockNumber, int stateNumber, int inputBranching, int outputBranching, AtomType typeOfTheState) {
         int absOrderNumber = -1;
 
-        if (typeOfTheState == WorkflowElement.MEMORY_TYPE) {        /* Case: Memory Type State */
+        if (typeOfTheState == AtomType.MEMORY_TYPE) {        /* Case: Memory Type State */
             absOrderNumber = (blockNumber * (inputBranching + outputBranching)) + blockNumber + stateNumber;
-        } else if (typeOfTheState == WorkflowElement.USED_TYPE) {    /* Case: Used Type State */
+        } else if (typeOfTheState == AtomType.USED_TYPE) {    /* Case: Used Type State */
             absOrderNumber = (blockNumber * (inputBranching + outputBranching)) + blockNumber + outputBranching + stateNumber;
-        } else if (typeOfTheState == WorkflowElement.MODULE) {        /* Case: Module/Tool State */
+        } else if (typeOfTheState == AtomType.MODULE) {        /* Case: Module/Tool State */
             absOrderNumber = (stateNumber * (inputBranching + outputBranching) * 2) + stateNumber - 1;
         }
 
@@ -203,14 +203,14 @@ public class State implements PredicateLabel, StateInterface {
      * @param typeOfTheState  Parameter determining the state type.
      * @return The calculated order number of this type of state (where indexing starts from 0).
      */
-    private static int calculateAutomatonStateNumber(Integer blockNumber, int stateNumber, int inputBranching, int outputBranching, WorkflowElement typeOfTheState) {
+    private static int calculateAutomatonStateNumber(Integer blockNumber, int stateNumber, int inputBranching, int outputBranching, AtomType typeOfTheState) {
         int orderNumber = 0;
 
-        if (typeOfTheState == WorkflowElement.MEMORY_TYPE) {        /* Case: Memory Type State */
+        if (typeOfTheState == AtomType.MEMORY_TYPE) {        /* Case: Memory Type State */
             orderNumber = (blockNumber *  outputBranching) + stateNumber + 1;
-        } else if (typeOfTheState == WorkflowElement.USED_TYPE) {    /* Case: Used Type State */
+        } else if (typeOfTheState == AtomType.USED_TYPE) {    /* Case: Used Type State */
             orderNumber = (blockNumber * inputBranching) + stateNumber;
-        } else if (typeOfTheState == WorkflowElement.MODULE) {        /* Case: Module/Tool State */
+        } else if (typeOfTheState == AtomType.MODULE) {        /* Case: Module/Tool State */
             orderNumber =  stateNumber - 1;
         }
 

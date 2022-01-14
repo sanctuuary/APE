@@ -8,7 +8,7 @@ import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.SATAtomMappings;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.formulas.SLTL_formula;
 import nl.uu.cs.ape.models.formulas.SLTL_formula_F;
 import nl.uu.cs.ape.models.formulas.SLTL_formula_G;
@@ -350,7 +350,7 @@ public class ConstraintFactory {
 			}
 
 			SLTL_formula_F formula = new SLTL_formula_F(parameters.get(0));
-			return formula.getCNF(moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), WorkflowElement.MEMORY_TYPE,
+			return formula.getCNF(moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), AtomType.MEMORY_TYPE,
 					mappings);
 		}
 	}
@@ -381,7 +381,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTL_formula.itn_type(parameters.get(0), parameters.get(1), WorkflowElement.MEMORY_TYPE,
+			return SLTL_formula.itn_type(parameters.get(0), parameters.get(1), AtomType.MEMORY_TYPE,
 					moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
 		}
 	}
@@ -411,7 +411,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTL_formula.ite_type(parameters.get(0), parameters.get(1), WorkflowElement.MEMORY_TYPE,
+			return SLTL_formula.ite_type(parameters.get(0), parameters.get(1), AtomType.MEMORY_TYPE,
 					moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
 		}
 	}
@@ -499,7 +499,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTL_formula.itn_type(parameters.get(0), parameters.get(1), WorkflowElement.USED_TYPE,
+			return SLTL_formula.itn_type(parameters.get(0), parameters.get(1), AtomType.USED_TYPE,
 					moduleAutomaton, typeAutomaton.getUsedTypesBlocks(), mappings);
 		}
 	}
@@ -529,7 +529,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTL_formula.ite_type(parameters.get(0), parameters.get(1), WorkflowElement.USED_TYPE,
+			return SLTL_formula.ite_type(parameters.get(0), parameters.get(1), AtomType.USED_TYPE,
 					moduleAutomaton, typeAutomaton.getUsedTypesBlocks(), mappings);
 		}
 	}
@@ -619,7 +619,7 @@ public class ConstraintFactory {
 			}
 
 			SLTL_formula_G formula = new SLTL_formula_G(false, parameters.get(0));
-			return formula.getCNF(moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), WorkflowElement.MEMORY_TYPE,
+			return formula.getCNF(moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), AtomType.MEMORY_TYPE,
 					mappings);
 		}
 	}
@@ -651,7 +651,7 @@ public class ConstraintFactory {
 			}
 
 			SLTL_formula_G formula = new SLTL_formula_G(false, parameters.get(0));
-			return formula.getCNF(moduleAutomaton, null, WorkflowElement.MODULE, mappings);
+			return formula.getCNF(moduleAutomaton, null, AtomType.MODULE, mappings);
 		}
 	}
 
@@ -682,7 +682,7 @@ public class ConstraintFactory {
 			}
 
 			SLTL_formula_G formula = new SLTL_formula_G(false, parameters.get(0));
-			return formula.getCNF(null, typeAutomaton.getUsedTypesBlocks(), WorkflowElement.USED_TYPE, mappings);
+			return formula.getCNF(null, typeAutomaton.getUsedTypesBlocks(), AtomType.USED_TYPE, mappings);
 		}
 	}
 
@@ -742,7 +742,7 @@ public class ConstraintFactory {
 			}
 
 			SLTL_formula_F formula = new SLTL_formula_F(parameters.get(0));
-			return formula.getCNF(moduleAutomaton, null, WorkflowElement.MODULE, mappings);
+			return formula.getCNF(moduleAutomaton, null, AtomType.MODULE, mappings);
 		}
 	}
 
@@ -772,7 +772,7 @@ public class ConstraintFactory {
 			}
 
 			SLTL_formula_F formula = new SLTL_formula_F(parameters.get(0));
-			return formula.getCNF(null, typeAutomaton.getUsedTypesBlocks(), WorkflowElement.USED_TYPE, mappings);
+			return formula.getCNF(null, typeAutomaton.getUsedTypesBlocks(), AtomType.USED_TYPE, mappings);
 		}
 	}
 	

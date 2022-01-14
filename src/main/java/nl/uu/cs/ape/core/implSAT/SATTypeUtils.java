@@ -14,7 +14,7 @@ import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
@@ -62,11 +62,11 @@ public class SATTypeUtils {
                 	cnfEncoding.add(
     						new SATNandStatement(
     									new SATAtom(
-    											WorkflowElement.MEMORY_TYPE, 
+    											AtomType.MEMORY_TYPE, 
     											firstPair, 
     											memTypeState),
     									new SATAtom(
-    											WorkflowElement.MEMORY_TYPE, 
+    											AtomType.MEMORY_TYPE, 
     											secondPair, 
     											memTypeState)));
                 }
@@ -77,11 +77,11 @@ public class SATTypeUtils {
                 	cnfEncoding.add(
     						new SATNandStatement(
     									new SATAtom(
-    											WorkflowElement.USED_TYPE, 
+    											AtomType.USED_TYPE, 
     											firstPair, 
     											usedTypeState),
     									new SATAtom(
-    											WorkflowElement.USED_TYPE, 
+    											AtomType.USED_TYPE, 
     											secondPair, 
     											usedTypeState)));
                 }
@@ -111,11 +111,11 @@ public class SATTypeUtils {
             	cnfEncoding.add(
 						new SATOrStatement(
 									new SATAtom(
-											WorkflowElement.MEMORY_TYPE, 
+											AtomType.MEMORY_TYPE, 
 											dataType, 
 											memTypeState),
 									new SATAtom(
-											WorkflowElement.MEMORY_TYPE, 
+											AtomType.MEMORY_TYPE, 
 											empty, 
 											memTypeState)));
             }
@@ -125,11 +125,11 @@ public class SATTypeUtils {
             	cnfEncoding.add(
 						new SATOrStatement(
 									new SATAtom(
-											WorkflowElement.USED_TYPE, 
+											AtomType.USED_TYPE, 
 											dataType, 
 											usedTypeState),
 									new SATAtom(
-											WorkflowElement.USED_TYPE, 
+											AtomType.USED_TYPE, 
 											empty, 
 											usedTypeState)));
             }
@@ -156,12 +156,12 @@ public class SATTypeUtils {
         for (TaxonomyPredicate dimension : allTypes.getRootPredicates()) {
             for (Block memTypeBlock : typeAutomaton.getMemoryTypesBlocks()) {
                 for (State memTypeState : memTypeBlock.getStates()) {
-                	cnfEncoding.addAll(typeEnforceTaxonomyStructureForState(dimension, memTypeState, WorkflowElement.MEMORY_TYPE));
+                	cnfEncoding.addAll(typeEnforceTaxonomyStructureForState(dimension, memTypeState, AtomType.MEMORY_TYPE));
                 }
             }
             for (Block usedTypeBlock : typeAutomaton.getUsedTypesBlocks()) {
                 for (State usedTypeState : usedTypeBlock.getStates()) {
-                	cnfEncoding.addAll(typeEnforceTaxonomyStructureForState(dimension, usedTypeState, WorkflowElement.USED_TYPE));
+                	cnfEncoding.addAll(typeEnforceTaxonomyStructureForState(dimension, usedTypeState, AtomType.USED_TYPE));
                 }
             }
         }
@@ -172,7 +172,7 @@ public class SATTypeUtils {
      * Supporting recursive method for typeEnforceTaxonomyStructure.
      */
     private static Set<SATFact> typeEnforceTaxonomyStructureForState(TaxonomyPredicate currType,
-                                                                State typeState, WorkflowElement typeElement) {
+                                                                State typeState, AtomType typeElement) {
 
         SATAtom superTypeState = new SATAtom(typeElement, currType, typeState);
 
@@ -233,14 +233,14 @@ public class SATTypeUtils {
                     }
                     cnfEncoding.add(
                     		new SATAtom(
-									WorkflowElement.MEMORY_TYPE, 
+									AtomType.MEMORY_TYPE, 
 									currType, 
 									currState));
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
             	cnfEncoding.add(
                 		new SATAtom(
-								WorkflowElement.MEMORY_TYPE, 
+								AtomType.MEMORY_TYPE, 
 								allTypes.getEmptyType(), 
 								currState));
             }
@@ -272,7 +272,7 @@ public class SATTypeUtils {
                     }
                     cnfEncoding.add(
                     		new SATAtom(
-									WorkflowElement.USED_TYPE, 
+									AtomType.USED_TYPE, 
 									currType, 
 									workflowOutputStates.get(i)));
                     
@@ -280,7 +280,7 @@ public class SATTypeUtils {
                 /* Forcing in the rest of the input states to be empty types. */
             	cnfEncoding.add(
                 		new SATAtom(
-								WorkflowElement.USED_TYPE, 
+								AtomType.USED_TYPE, 
 								allTypes.getEmptyType(), 
 								workflowOutputStates.get(i)));
             }

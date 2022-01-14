@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 
@@ -55,14 +55,14 @@ public class TypeAutomaton implements Automaton {
             Block tmpMemoryTypeBlock = new Block(i);
 
             for (int j = 0; j < outputBranching; j++) {
-                State tmpMemoryState = new State(WorkflowElement.MEMORY_TYPE, i, j,inputBranching, outputBranching);
+                State tmpMemoryState = new State(AtomType.MEMORY_TYPE, i, j,inputBranching, outputBranching);
                 tmpMemoryTypeBlock.addState(tmpMemoryState);
             }
             memoryTypesAutomaton.add(tmpMemoryTypeBlock);
 
             Block tmpUsedTypesBlock = new Block(i);
             for (int j = 0; j < inputBranching; j++) {
-                State tmpUsedState = new State(WorkflowElement.USED_TYPE, i, j, inputBranching, outputBranching);
+                State tmpUsedState = new State(AtomType.USED_TYPE, i, j, inputBranching, outputBranching);
                 tmpUsedTypesBlock.addState(tmpUsedState);
             }
             usedTypesAutomaton.add(tmpUsedTypesBlock);

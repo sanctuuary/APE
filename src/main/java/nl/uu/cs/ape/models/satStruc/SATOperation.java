@@ -33,13 +33,13 @@ private SATFact formula;
 
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		return formula.getCNFEncoding(stateNo + 1, synthesisEngine);
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableMapping variableMapping, SATSynthesisEngine synthesisEngine) {
+		return formula.getCNFEncoding(stateNo + 1, variableMapping, synthesisEngine);
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		return formula.getNegatedCNFEncoding(stateNo + 1, synthesisEngine);
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATVariableMapping variableMapping, SATSynthesisEngine synthesisEngine) {
+		return formula.getNegatedCNFEncoding(stateNo + 1, variableMapping, synthesisEngine);
 	}
 
 }

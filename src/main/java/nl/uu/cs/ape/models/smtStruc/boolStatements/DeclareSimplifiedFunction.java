@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTUtils;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -16,13 +16,13 @@ import nl.uu.cs.ape.utils.APEUtils;
  */
 public class DeclareSimplifiedFunction implements SMTLib2Row {
 
-	private WorkflowElement predicate;
+	private AtomType predicate;
 	private SMTDataType dataTypeName;
 	private SMTDataType automatonType;
 	private int orderNumber;
 	
 	
-	public DeclareSimplifiedFunction(WorkflowElement predicate, int orderNumber, SMTDataType dataTypeName, SMTDataType automatonType) {
+	public DeclareSimplifiedFunction(AtomType predicate, int orderNumber, SMTDataType dataTypeName, SMTDataType automatonType) {
 		this.predicate = predicate;
 		this.orderNumber = orderNumber;
 		this.dataTypeName = dataTypeName;

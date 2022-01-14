@@ -29,23 +29,23 @@ private SATFact secondArg;
 }
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> allClauses = new HashSet<CNFClause>();
 
 		/* Add the elements that represent the 2 way implication. */
-		allClauses.addAll(new SATImplicationStatement(firstArg, secondArg).getCNFEncoding(stateNo, synthesisEngine));
-		allClauses.addAll(new SATImplicationStatement(secondArg, firstArg).getCNFEncoding(stateNo, synthesisEngine));
+		allClauses.addAll(new SATImplicationStatement(firstArg, secondArg).getCNFEncoding(stateNo, variableMapping, synthesisEngine));
+		allClauses.addAll(new SATImplicationStatement(secondArg, firstArg).getCNFEncoding(stateNo, variableMapping, synthesisEngine));
 		
 		return allClauses;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> allClauses = new HashSet<CNFClause>();
 
 		/* Ensure that the 2 arguments are not the same. */
-		allClauses.addAll(new SATOrStatement(firstArg, secondArg).getCNFEncoding(stateNo, synthesisEngine));
-		allClauses.addAll(new SATNandStatement(firstArg, secondArg).getCNFEncoding(stateNo, synthesisEngine));
+		allClauses.addAll(new SATOrStatement(firstArg, secondArg).getCNFEncoding(stateNo, variableMapping, synthesisEngine));
+		allClauses.addAll(new SATNandStatement(firstArg, secondArg).getCNFEncoding(stateNo, variableMapping, synthesisEngine));
 		
 		return allClauses;
 	}

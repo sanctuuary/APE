@@ -5,7 +5,7 @@ import guru.nidi.graphviz.model.Graph;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.utils.APEUtils;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class TypeNode extends SolutionWorkflowNode {
         this.abstractTypes = new TreeSet<Type>();
         this.createdByModule = null;
         usedByModules = new ArrayList<ModuleNode>();
-        if (automatonState.getWorkflowStateType() != WorkflowElement.MEMORY_TYPE) {
+        if (automatonState.getWorkflowStateType() != AtomType.MEMORY_TYPE) {
             throw new ExceptionInInitializerError(
                     "Class MemTypeNode can only be instantiated using State that is of type SMTDataType.MEMORY_TYPE, as a parameter.");
         }

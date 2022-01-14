@@ -27,13 +27,13 @@ private SATFact negatedFact;
 
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		return negatedFact.getNegatedCNFEncoding(stateNo, synthesisEngine);
+	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+		return negatedFact.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATSynthesisEngine synthesisEngine) {
-		return negatedFact.getCNFEncoding(stateNo, synthesisEngine);
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+		return negatedFact.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 
 }

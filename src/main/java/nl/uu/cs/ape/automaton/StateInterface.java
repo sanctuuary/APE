@@ -1,5 +1,6 @@
 package nl.uu.cs.ape.automaton;
 
+
 /**
  * The {@code StateInterface} class is used to represent a label that describes predicates, such as data types, operations or states in the system.
  *
@@ -14,7 +15,7 @@ public interface StateInterface {
      */
     public String getPredicateID();
     
-    /** Bu default variable states have no absolute state number. */
+    /** By default variable states have no absolute state number. */
     public default int getAbsoluteStateNumber() { return -1; }
 	
     @Override

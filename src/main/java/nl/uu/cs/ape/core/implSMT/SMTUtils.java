@@ -16,7 +16,7 @@ import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.Mappings;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.SMTPredicateMappings;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.smtStruc.Assertion;

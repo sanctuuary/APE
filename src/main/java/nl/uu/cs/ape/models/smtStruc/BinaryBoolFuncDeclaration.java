@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.models.smtStruc;
 
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 
 /**
@@ -11,13 +11,13 @@ import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
  */
 public class BinaryBoolFuncDeclaration implements SMTLib2Row {
 
-	private WorkflowElement predicate;
+	private AtomType predicate;
 	private SMTDataType argument1;
 	private SMTDataType argument2;
 	
 	
 	
-	public BinaryBoolFuncDeclaration(WorkflowElement predicate, SMTDataType argument1, SMTDataType argument2) {
+	public BinaryBoolFuncDeclaration(AtomType predicate, SMTDataType argument1, SMTDataType argument2) {
 		super();
 		this.predicate = predicate;
 		this.argument1 = argument1;

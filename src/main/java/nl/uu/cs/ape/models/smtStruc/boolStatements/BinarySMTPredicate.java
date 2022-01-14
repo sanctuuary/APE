@@ -2,7 +2,7 @@ package nl.uu.cs.ape.models.smtStruc.boolStatements;
 
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
-import nl.uu.cs.ape.models.enums.WorkflowElement;
+import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
@@ -21,7 +21,7 @@ public class BinarySMTPredicate implements SMTPredicate {
 	private SMTFunctionArgument argument2;
 	
 	
-//	public BinarySATPredicate(WorkflowElement predicate, StateInterface argument1, StateInterface argument2) {
+//	public BinarySATPredicate(AtomType predicate, StateInterface argument1, StateInterface argument2) {
 //		super();
 //		this.predicate = predicate;
 //		this.argument1 = new SMTFunctionArgument(argument1);
