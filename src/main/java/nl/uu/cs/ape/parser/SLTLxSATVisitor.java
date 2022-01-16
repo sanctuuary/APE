@@ -1,15 +1,22 @@
 package nl.uu.cs.ape.parser;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import nl.uu.cs.ape.automaton.SATVariable;
+import nl.uu.cs.ape.constraints.ConstraintFactory;
+import nl.uu.cs.ape.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.SATAtomMappings;
+import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
@@ -26,9 +33,10 @@ import nl.uu.cs.ape.models.satStruc.SATGlobally;
 import nl.uu.cs.ape.models.satStruc.SATFinally;
 import nl.uu.cs.ape.models.satStruc.SATForall;
 import nl.uu.cs.ape.models.satStruc.SATNext;
+import nl.uu.cs.ape.models.satStruc.SATNextOp;
 import nl.uu.cs.ape.models.satStruc.SATNotStatement;
+import nl.uu.cs.ape.models.satStruc.SATOperation;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxBaseVisitor;
-import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.*;
 
 public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
@@ -66,8 +74,9 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 	@Override
 	public SATFact visitToolRef(ToolRefContext ctx) {
-		// TODO Auto-generated method stub
-		return visitChildren(ctx);
+		SATFact tool = visit(ctx.getChild(1));
+		SATFact formula = visit(ctx.getChild(3));
+		return new SATNextOp(tool, formula);
 	}
 
 
@@ -82,7 +91,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 		} else if(ctx.getChild(0).getText().equals("N")) {
 			return new SATNext(subFormula);
 		} else {
-			/* In case modal operator is not recognised return null. */
+			/* In case modal operator is not recognized return null. */
 			return null;
 		}
 	}
@@ -192,16 +201,29 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 	@Override
 	public SATFact visitModule(ModuleContext ctx) {
-		// TODO Auto-generated method stub
-		return visitChildren(ctx);
+		String operationID = ctx.getChild(0).getText();
+		AbstractModule currOperation = allModules.get(operationID);
+		if(currOperation == null) {
+			throw ConstraintFormatException.wrongSLTLxOperation("Operation '" + operationID + "' does not exist in the taxonomy/tool annotations.");
+		}
+		List<SATVariable> inputs = new ArrayList<SATVariable>();
+	
+		ParseTree inputElems = ctx.getChild(2);
+		for(int i = 0; i < inputElems.getChildCount(); i=i+2) {
+			String variableID = inputElems.getChild(i).getText();
+			inputs.add(new SATVariable(variableID));
+		}
+		
+		List<SATVariable> outputs = new ArrayList<SATVariable>();
+		
+		ParseTree outputElems = ctx.getChild(4);
+		for(int i = 0; i < outputElems.getChildCount(); i=i+2) {
+			String variableID = outputElems.getChild(i).getText();
+			outputs.add(new SATVariable(variableID));
+		}
+		
+		return new SATOperation(currOperation, inputs, outputs);
 	}
 
-
-
-	@Override
-	public SATFact visitVars(VarsContext ctx) {
-		// TODO Auto-generated method stub
-		return visitChildren(ctx);
-	}
 
 }

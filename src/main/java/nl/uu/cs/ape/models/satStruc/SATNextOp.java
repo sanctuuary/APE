@@ -17,17 +17,17 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 
 /**
- * Structure used to model Next (N) modal statement in SLTLx.
+ * Structure used to model Next operation (<Op>) modal statement in SLTLx.
  * 
  * @author Vedran Kasalica
  *
  */
 public class SATNextOp extends SATModalOp {
 
-	private SATOperation operation;
+	private SATFact operation;
 	private SATFact formula;
 	
-	public SATNextOp(SATOperation operation, SATFact formula) {
+	public SATNextOp(SATFact operation, SATFact formula) {
 		super();
 		this.operation = operation;
 		this.formula = formula;
@@ -53,7 +53,7 @@ public class SATNextOp extends SATModalOp {
 		allClauses.add(operation.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine));
 		allClauses.add(formula.getNegatedCNFEncoding(stateNo + 1, variableMapping, synthesisEngine));
 		
-		return CNFClause.conjunctClausesCollection(allClauses);
+		return CNFClause.disjoinClausesCollection(allClauses);
 	}
 
 }

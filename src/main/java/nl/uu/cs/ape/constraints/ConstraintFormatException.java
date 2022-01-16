@@ -54,4 +54,21 @@ public class ConstraintFormatException extends RuntimeException {
 		return new ConstraintFormatException(String.format("The constraints JSON error. One or more parameters cannot be instantiated. %s", message));
 	}
 	
+	/**
+     * Exception is thrown when a constraint is given wrong number of arguments.
+     * @param message - Application specific message that may help the user solve the problem.
+     * @return Constraint exception with information that may help the user solve the problem.
+     */
+	public static ConstraintFormatException wrongSLTLxOperation(String message) {
+		return new ConstraintFormatException(String.format("The SLTLx constraints error. One or more Operations used in the formula cannot be recognised. %s", message));
+	}
+	
+	/**
+     * Exception is thrown when a constraint is given wrong number of arguments.
+     * @param message - Application specific message that may help the user solve the problem.
+     * @return Constraint exception with information that may help the user solve the problem.
+     */
+	public static ConstraintFormatException wrongSLTLxType(String message) {
+		return new ConstraintFormatException(String.format("The SLTLx constraints error. One or more data types used in the formula cannot be recognised. %s", message));
+	}
 }

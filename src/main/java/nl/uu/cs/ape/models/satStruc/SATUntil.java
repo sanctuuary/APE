@@ -3,6 +3,7 @@ package nl.uu.cs.ape.models.satStruc;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,17 +37,20 @@ private SATFact formulaUntil;
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> clauses = new HashSet<CNFClause>();
+		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 		
-		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
-			clauses.addAll(formula.getCNFEncoding(i, variableMapping, synthesisEngine));
-		}
+		
+		Set<CNFClause> clauses = new HashSet<>();
+//		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
+//			clauses.addAll(formula.getCNFEncoding(i, variableMapping, synthesisEngine));
+//		}
 		return clauses;
 	}
 
 	@Override
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
-		return new SATForall(this.stateNo, boundBariable, formula).getNegatedCNFEncoding(synthesisEngine);
+		Set<CNFClause> clauses = new HashSet<>();
+		return clauses;
 	}
 
 }

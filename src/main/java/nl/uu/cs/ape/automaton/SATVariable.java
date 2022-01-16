@@ -104,9 +104,11 @@ public class SATVariable implements StateInterface, PredicateLabel {
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
 	public Set<CNFClause> getExistentialCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<SATAtomVar> varRefs = new HashSet<SATAtomVar>();
+		Set<SATFact> varRefs = new HashSet<SATFact>();
 		for(State state :synthesisEngine.getTypeAutomaton().getAllStatesUntilBlockNo(stateNo)) {
-			varRefs.add(new SATAtomVar(AtomVarType.VAR_REF, state, this));
+			SATAtomVar currAtomVar = new SATAtomVar(AtomVarType.VAR_REF, state, this);
+			SATAtom emptyState = new SATAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
+			varRefs.add(new SATOrStatement(currAtomVar, emptyState));
 		}
 		SATOrStatement allVars = new SATOrStatement(varRefs);
 		
@@ -127,9 +129,11 @@ public class SATVariable implements StateInterface, PredicateLabel {
 	 */
 	public Set<CNFClause> getUniversalCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		/** Setting up the domain of the variable. */
-		Set<SATAtomVar> varRefs = new HashSet<SATAtomVar>();
+		Set<SATFact> varRefs = new HashSet<SATFact>();
 		for(State state : this.getVariableDomain(stateNo, synthesisEngine)) {
-			varRefs.add(new SATAtomVar(AtomVarType.VAR_REF, state, this));
+			SATAtomVar currAtomVar = new SATAtomVar(AtomVarType.VAR_REF, state, this);
+			SATAtom emptyState = new SATAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
+			varRefs.add(new SATOrStatement(currAtomVar, emptyState));
 		}
 		SATAndStatement allVars = new SATAndStatement(varRefs);
 		

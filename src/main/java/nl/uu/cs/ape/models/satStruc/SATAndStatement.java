@@ -30,6 +30,14 @@ private Set<SATFact> conjunctedFacts;
 		this.conjunctedFacts.add(arg1);
 		this.conjunctedFacts.add(arg2);
 	}
+	
+	public SATAndStatement(SATFact arg1, SATFact arg2, SATFact arg3) {
+		super();
+		this.conjunctedFacts = new HashSet<SATFact>();
+		this.conjunctedFacts.add(arg1);
+		this.conjunctedFacts.add(arg2);
+		this.conjunctedFacts.add(arg3);
+	}
 
 	public SATAndStatement(Collection<? extends SATFact> conjunctedFacts) {
 		super();
