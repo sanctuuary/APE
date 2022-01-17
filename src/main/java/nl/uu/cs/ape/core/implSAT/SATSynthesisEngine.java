@@ -218,7 +218,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * TODO Improve this approach, no need to read the whole String again to count lines.
          */
         int variables = mappings.getSize();
-        int clauses = APEUtils.countLines(cnfEncoding);
+        int clauses = APEUtils.countLines(cnfEncoding) + 2;
         
         String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
         sat_input_header = sat_input_header + "1 0\n -2 0\n";
