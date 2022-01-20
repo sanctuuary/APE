@@ -19,7 +19,7 @@ import nl.uu.cs.ape.models.SMTPredicateMappings;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.smtStruc.Assertion;
+import nl.uu.cs.ape.models.smtStruc.SMTAssertion;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFact;
 

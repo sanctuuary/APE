@@ -17,7 +17,7 @@ import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -717,11 +717,11 @@ public final class APEUtils {
 			int intAtom = scanner.nextInt();
 
 			if (intAtom > 0) {
-				SATAtom atom = mappings.findOriginal(intAtom);
+				SLTLxAtom atom = mappings.findOriginal(intAtom);
 				
 				humanReadable.append(atom.toString()).append(" ");
 			} else if (intAtom < 0) {
-				SATAtom atom = mappings.findOriginal(-intAtom);
+				SLTLxAtom atom = mappings.findOriginal(-intAtom);
 				humanReadable.append("-").append(atom.toString()).append(" ");
 			} else {
 				humanReadable.append("\n");

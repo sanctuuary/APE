@@ -22,7 +22,7 @@ import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.smtStruc.LogicFragmentDeclaration;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 import nl.uu.cs.ape.utils.APEDomainSetup;
@@ -298,7 +298,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
             boolean satisfiable = true;
             while (solutionsFound < solutionsFoundMax && satisfiable) {
 	            ProcessBuilder builder = new ProcessBuilder("/home/vedran/git/z3/build/z3", smtInputFile.getAbsolutePath());
-	            List<SATAtom> facts = null;
+	            List<SLTLxAtom> facts = null;
 	            
 	            builder.redirectErrorStream(true);
 	            final Process process = builder.start();
@@ -354,8 +354,8 @@ public class SMTSynthesisEngine implements SynthesisEngine {
      * @param process
      * @return
      */
-    private List<SATAtom> readTerminalOutput(final Process process) {
-    	List<SATAtom> atoms = new ArrayList<SATAtom>();
+    private List<SLTLxAtom> readTerminalOutput(final Process process) {
+    	List<SLTLxAtom> atoms = new ArrayList<SLTLxAtom>();
                 BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line = null; 
                 try {
@@ -392,7 +392,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
                     				int a2 = Integer.parseInt(words[2].replace("bv", ""));
                     				State arg2 = typeAutomaton.getState(SMTDataType.MEMORY_TYPE_STATE, a2);
                     				
-                    				SATAtom currAtom  = new SATAtom(currFun, arg2, tmpState);
+                    				SLTLxAtom currAtom  = new SLTLxAtom(currFun, arg2, tmpState);
     	                    		atoms.add(currAtom);
                     			}
                     			
@@ -405,7 +405,7 @@ public class SMTSynthesisEngine implements SynthesisEngine {
 										String a2 = words[1];
 										PredicateLabel arg2 = mappings.findOriginal(a2);
 
-										SATAtom currAtom  = new SATAtom(currFun, arg2, tmpState);
+										SLTLxAtom currAtom  = new SLTLxAtom(currFun, arg2, tmpState);
 			                    		atoms.add(currAtom);
 			                    		
 			                    		recur = cutUntil(recur.substring(3), "x!0");;

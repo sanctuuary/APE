@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.models.satStruc.SATFact;
+import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxLexer;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser;
 
@@ -23,13 +23,13 @@ public class Hello {
 ////		SLTLxWalker listener = new SLTLxWalker();
 ////		
 ////		walker.walk(listener, tree);
-//		SATFact res = visitor.visit(tree);
+//		SLTLxFormula res = visitor.visit(tree);
 
 		System.out.println("Done.");
 	}
 
-	public static Set<SATFact> getFact(SATSynthesisEngine synthesisEngine, String formula) {
-		Set<SATFact> facts = new HashSet<>();
+	public static Set<SLTLxFormula> getFact(SATSynthesisEngine synthesisEngine, String formula) {
+		Set<SLTLxFormula> facts = new HashSet<>();
 
 		SLTLxLexer lexer = new SLTLxLexer(CharStreams.fromString(formula));
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -40,7 +40,7 @@ public class Hello {
 //		SLTLxWalker listener = new SLTLxWalker();
 //		
 //		walker.walk(listener, tree);
-		SATFact res = visitor.visit(tree);
+		SLTLxFormula res = visitor.visit(tree);
 		facts.add(res);
 
 		return facts;

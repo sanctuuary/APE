@@ -8,18 +8,16 @@ import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.CNFClause;
-import nl.uu.cs.ape.models.satStruc.SATAndStatement;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.SATAtomVar;
-import nl.uu.cs.ape.models.satStruc.SATFact;
-import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
-import nl.uu.cs.ape.models.satStruc.SATNotStatement;
-import nl.uu.cs.ape.models.satStruc.SATOrStatement;
-import nl.uu.cs.ape.models.satStruc.SATVariableFlattening;
-import nl.uu.cs.ape.models.satStruc.SATVariableOccurance;
-import uk.ac.manchester.cs.atomicdecomposition.Atom;
+import nl.uu.cs.ape.models.satStruc.SLTLxConjunction;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtomVar;
+import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
+import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
+import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
+import nl.uu.cs.ape.models.satStruc.SLTLxVariableFlattening;
+import nl.uu.cs.ape.models.satStruc.SLTLxVariableOccurance;
 
 /***
  * The {@code State} class is used to represent a variable for type states. The variable only represents states from the type automatons, excluding the module automaton states. 
@@ -103,14 +101,14 @@ public class SATVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<CNFClause> getExistentialCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<SATFact> varRefs = new HashSet<SATFact>();
+	public Set<CNFClause> getExistentialCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
 		for(State state :synthesisEngine.getTypeAutomaton().getAllStatesUntilBlockNo(stateNo)) {
-			SATAtomVar currAtomVar = new SATAtomVar(AtomVarType.VAR_REF, state, this);
-			SATAtom emptyState = new SATAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
-			varRefs.add(new SATOrStatement(currAtomVar, emptyState));
+			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_REF, state, this);
+			SLTLxAtom emptyState = new SLTLxAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
+			varRefs.add(new SLTLxDisjunction(currAtomVar, emptyState));
 		}
-		SATOrStatement allVars = new SATOrStatement(varRefs);
+		SLTLxDisjunction allVars = new SLTLxDisjunction(varRefs);
 		
 		return allVars.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
@@ -127,15 +125,15 @@ public class SATVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<CNFClause> getUniversalCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getUniversalCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		/** Setting up the domain of the variable. */
-		Set<SATFact> varRefs = new HashSet<SATFact>();
+		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
 		for(State state : this.getVariableDomain(stateNo, synthesisEngine)) {
-			SATAtomVar currAtomVar = new SATAtomVar(AtomVarType.VAR_REF, state, this);
-			SATAtom emptyState = new SATAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
-			varRefs.add(new SATOrStatement(currAtomVar, emptyState));
+			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_REF, state, this);
+			SLTLxAtom emptyState = new SLTLxAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
+			varRefs.add(new SLTLxDisjunction(currAtomVar, emptyState));
 		}
-		SATAndStatement allVars = new SATAndStatement(varRefs);
+		SLTLxConjunction allVars = new SLTLxConjunction(varRefs);
 		
 		return allVars.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
@@ -152,9 +150,9 @@ public class SATVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<CNFClause> getVariableSubstitutionEnforcingCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<SATFact> allFacts = new HashSet<>();
-		SATVariableOccurance varUsage = synthesisEngine.getVariableUsage(); 
+	public Set<CNFClause> getVariableSubstitutionEnforcingCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+		Set<SLTLxFormula> allFacts = new HashSet<>();
+		SLTLxVariableOccurance varUsage = synthesisEngine.getVariableUsage(); 
 		
 		/** Introduce rules to enforce substitution over unary predicates when needed. 
 		 * e.g., x = T1 &  P(x) ->  P(T1)
@@ -162,35 +160,35 @@ public class SATVariable implements StateInterface, PredicateLabel {
 		 * */
 		for(PredicateLabel usedPred : varUsage.getUnaryPredicates(this)) {
 			for(State varState : variableMapping.getVariableDomain(this)) {
-				allFacts.add(new SATImplicationStatement(
-										new SATAndStatement(
-												new SATAtomVar(
+				allFacts.add(new SLTLxImplication(
+										new SLTLxConjunction(
+												new SLTLxAtomVar(
 														AtomVarType.VAR_REF,
 														varState,
 														this),
-												new SATAtomVar(
+												new SLTLxAtomVar(
 														AtomVarType.TYPE_VAR,
 														usedPred,
 														this)),
-										new SATAtom(
+										new SLTLxAtom(
 												varState.getWorkflowStateType(),
 												usedPred,
 												varState)));
 				
 				/* Enforce negation of the predicate as well. */
-				allFacts.add(new SATImplicationStatement(
-						new SATAndStatement(
-								new SATAtomVar(
+				allFacts.add(new SLTLxImplication(
+						new SLTLxConjunction(
+								new SLTLxAtomVar(
 										AtomVarType.VAR_REF,
 										varState,
 										this),
-								new SATNotStatement(
-										new SATAtomVar(
+								new SLTLxNegation(
+										new SLTLxAtomVar(
 												AtomVarType.TYPE_VAR,
 												usedPred,
 												this))),
-						new SATNotStatement(
-								new SATAtom(
+						new SLTLxNegation(
+								new SLTLxAtom(
 										varState.getWorkflowStateType(),
 										usedPred,
 										varState))
@@ -214,46 +212,46 @@ public class SATVariable implements StateInterface, PredicateLabel {
 				}
 				for(State var1State : variableMapping.getVariableDomain(var1)) {
 					for(State var2State : variableMapping.getVariableDomain(var2)) {
-					allFacts.add(new SATImplicationStatement(
-											new SATAndStatement(
-													new SATAndStatement(
-															new SATAtomVar(
+					allFacts.add(new SLTLxImplication(
+											new SLTLxConjunction(
+													new SLTLxConjunction(
+															new SLTLxAtomVar(
 																	AtomVarType.VAR_REF,
 																	var1State,
 																	var1),
-															new SATAtomVar(
+															new SLTLxAtomVar(
 																	AtomVarType.VAR_REF,
 																	var2State,
 																	var2)),
-													new SATAtomVar(
+													new SLTLxAtomVar(
 															atomVarType,
 															var1,
 															var2)),
-											new SATAtom(
+											new SLTLxAtom(
 													atomType,
 													var1State,
 													var2State)
 											));
 					
 					/* Enforce negation of the predicate as well. */
-					allFacts.add(new SATImplicationStatement(
-							new SATAndStatement(
-									new SATAndStatement(
-											new SATAtomVar(
+					allFacts.add(new SLTLxImplication(
+							new SLTLxConjunction(
+									new SLTLxConjunction(
+											new SLTLxAtomVar(
 													AtomVarType.VAR_REF,
 													var1State,
 													var1),
-											new SATAtomVar(
+											new SLTLxAtomVar(
 													AtomVarType.VAR_REF,
 													var2State,
 													var2)),
-									new SATNotStatement(
-											new SATAtomVar(
+									new SLTLxNegation(
+											new SLTLxAtomVar(
 													atomVarType,
 													var1,
 													var2))),
-							new SATNotStatement(
-									new SATAtom(
+							new SLTLxNegation(
+									new SLTLxAtom(
 											atomType,
 											var1State,
 											var2State))
@@ -262,7 +260,7 @@ public class SATVariable implements StateInterface, PredicateLabel {
 				}
 			}
 		}
-		SATAndStatement andFacts = new SATAndStatement(allFacts);
+		SLTLxConjunction andFacts = new SLTLxConjunction(allFacts);
 		
 		return andFacts.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}

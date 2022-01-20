@@ -21,17 +21,15 @@ import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.Module;
-import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.CNFClause;
-import nl.uu.cs.ape.models.satStruc.SATFact;
-import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
-import nl.uu.cs.ape.models.satStruc.SATNotStatement;
-import nl.uu.cs.ape.models.satStruc.SATOrStatement;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
+import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
+import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
 
 /**
  * The {@code APEDomainSetup} class is used to store the domain information and initial constraints that have to be encoded.
@@ -194,8 +192,8 @@ public class APEDomainSetup {
      * @param typeAutomaton   Graph representing all the type states in the current workflow (one synthesis run might iterate though workflows of different lengths).
      * @return CNF encoding of that ensures the correctness of the helper predicates.
      */
-    public Set<SATFact> getConstraintsForAuxiliaryPredicates(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
-    	Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+    public Set<SLTLxFormula> getConstraintsForAuxiliaryPredicates(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
+    	Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
     	
         Automaton automaton = null;
         AtomType workflowElem = null;
@@ -213,22 +211,22 @@ public class APEDomainSetup {
                      * Ensures that if the abstract predicate is used, at least one of the
                      * disjointLabels has to be used.
                      */
-                	Set<SATFact> allORPossibilities = new HashSet<SATFact>();
+                	Set<SLTLxFormula> allORPossibilities = new HashSet<SLTLxFormula>();
                 	allORPossibilities.add(
-                			new SATNotStatement(
-								new SATAtom(
+                			new SLTLxNegation(
+								new SLTLxAtom(
 									workflowElem, 
 									helperPredicate, 
 									currState)));
 
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                     	allORPossibilities.add(
-								new SATAtom(
+								new SLTLxAtom(
 									workflowElem, 
 									subLabel, 
 									currState));
                     }
-                    cnfEncoding.add(new SATOrStatement(allORPossibilities));
+                    cnfEncoding.add(new SLTLxDisjunction(allORPossibilities));
 
                     /*
                      * Ensures that if at least one of the disjointLabels was used, the abstract
@@ -236,12 +234,12 @@ public class APEDomainSetup {
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                     	cnfEncoding.add(
-                    			new SATImplicationStatement(
-    								new SATAtom(
+                    			new SLTLxImplication(
+    								new SLTLxAtom(
     									workflowElem, 
     									subLabel, 
     									currState),
-    								new SATAtom(
+    								new SLTLxAtom(
     									workflowElem, 
     									helperPredicate, 
     									currState)));
@@ -254,12 +252,12 @@ public class APEDomainSetup {
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                     	cnfEncoding.add(
-                    			new SATImplicationStatement(
-    								new SATAtom(
+                    			new SLTLxImplication(
+    								new SLTLxAtom(
     									workflowElem, 
     									helperPredicate, 
     									currState),
-    								new SATAtom(
+    								new SLTLxAtom(
     									workflowElem, 
     									subLabel, 
     									currState)));
@@ -269,23 +267,23 @@ public class APEDomainSetup {
                      * Ensures that if all of the disjointLabels were used, the abstract predicate
                      * has to be used as well.
                      */
-                    Set<SATFact> allANDPossibilities = new HashSet<SATFact>();
+                    Set<SLTLxFormula> allANDPossibilities = new HashSet<SLTLxFormula>();
                 	
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                     	allANDPossibilities.add(
-                    			new SATNotStatement(
-    								new SATAtom(
+                    			new SLTLxNegation(
+    								new SLTLxAtom(
     									workflowElem, 
     									subLabel, 
     									currState)));
                     }
                     allANDPossibilities.add(
-							new SATAtom(
+							new SLTLxAtom(
 								workflowElem, 
 								helperPredicate, 
 								currState));
                     
-                    cnfEncoding.add(new SATOrStatement(allANDPossibilities));
+                    cnfEncoding.add(new SLTLxDisjunction(allANDPossibilities));
                 }
             }
 

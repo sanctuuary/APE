@@ -1,0 +1,45 @@
+package nl.uu.cs.ape.models.satStruc;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
+
+/**
+ * Structure used to model NAND relation of terms in SLTLx.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
+public class SLTLxNegatedConjunction extends SLTLxFormula {
+
+private Set<SLTLxFormula> nconjunctedFacts;
+	
+		
+	public SLTLxNegatedConjunction(SLTLxFormula arg1, SLTLxFormula arg2) {
+		super();
+		this.nconjunctedFacts = new HashSet<SLTLxFormula>();
+		this.nconjunctedFacts.add(arg1);
+		this.nconjunctedFacts.add(arg2);
+	}
+
+	public SLTLxNegatedConjunction(Collection<? extends SLTLxFormula> nconjunctedFacts) {
+		super();
+		this.nconjunctedFacts = new HashSet<SLTLxFormula>();
+		nconjunctedFacts.forEach(fact -> this.nconjunctedFacts.add(fact));
+	}
+
+
+	@Override
+	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+		return new SLTLxDisjunction(nconjunctedFacts).getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine);
+	}
+
+	
+	@Override
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+		return new SLTLxConjunction(nconjunctedFacts).getCNFEncoding(stateNo, variableMapping, synthesisEngine);
+	}
+
+}

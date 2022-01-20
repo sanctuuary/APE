@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 
 /**
  * The {@code ModuleAutomaton} class is used to represent the module automaton. Module Automaton represents the structure that tools in the provided solutions will follow.

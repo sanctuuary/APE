@@ -16,16 +16,16 @@ import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.smtStruc.SMTComment;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.EqualStatement;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.ForallStatement;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.NandStatement;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.OrStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBinaryPredicate;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTEqualStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTForallStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTNandStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTOrStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBitVec;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBoundedVar;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTPredicateFunArg;
-import nl.uu.cs.ape.models.smtStruc.Assertion;
+import nl.uu.cs.ape.models.smtStruc.SMTAssertion;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -66,16 +66,16 @@ public class SMTTypeUtils {
 //            System.out.println("-------------->" + firstPair.getPredicateLabel() + "_______and______" +secondPair.getPredicateLabel());
             
             // mutual exclusion of types in all the states (those that represent general memory)
-            allClauses.add(new Assertion(
-					new ForallStatement(
+            allClauses.add(new SMTAssertion(
+					new SMTForallStatement(
 							state,
 							SMTDataType.MEMORY_TYPE_STATE,
-							new NandStatement(
-									new BinarySMTPredicate(
+							new SMTNandStatement(
+									new SMTBinaryPredicate(
 											AtomType.MEMORY_TYPE, 
 											state,
 											new SMTPredicateFunArg(firstPair)), 
-									new BinarySMTPredicate(
+									new SMTBinaryPredicate(
 											AtomType.MEMORY_TYPE, 
 											state,
 											new SMTPredicateFunArg(secondPair))
@@ -84,16 +84,16 @@ public class SMTTypeUtils {
 			));
             
             // mutual exclusion of types in all the states (those that represent used instances)
-            allClauses.add(new Assertion(
-					new ForallStatement(
+            allClauses.add(new SMTAssertion(
+					new SMTForallStatement(
 							state,
 							SMTDataType.USED_TYPE_STATE,
-							new NandStatement(
-									new BinarySMTPredicate(
+							new SMTNandStatement(
+									new SMTBinaryPredicate(
 											AtomType.USED_TYPE, 
 											state,
 											new SMTPredicateFunArg(firstPair)), 
-									new BinarySMTPredicate(
+									new SMTBinaryPredicate(
 											AtomType.USED_TYPE, 
 											state,
 											new SMTPredicateFunArg(secondPair))
@@ -120,16 +120,16 @@ public class SMTTypeUtils {
         Type dataType = AuxTypePredicate.generateAuxiliaryPredicate(domainSetup.getAllTypes().getDataTaxonomyDimensionsAsSortedSet(), LogicOperation.AND, domainSetup);
         // enforcement of types in in all the states (those that represent general memory and used data instances)
         SMTBoundedVar state = new SMTBoundedVar("state");
-    	allClauses.add(new Assertion(
-    			new ForallStatement(
+    	allClauses.add(new SMTAssertion(
+    			new SMTForallStatement(
     				state,
     				SMTDataType.MEMORY_TYPE_STATE,
-        			new OrStatement(
-        					new BinarySMTPredicate(
+        			new SMTOrStatement(
+        					new SMTBinaryPredicate(
         							AtomType.MEMORY_TYPE, 
         							state,
         							new SMTPredicateFunArg(dataType)),
-        					new BinarySMTPredicate(
+        					new SMTBinaryPredicate(
         							AtomType.MEMORY_TYPE, 
         							state,
         							new SMTPredicateFunArg(empty))
@@ -137,16 +137,16 @@ public class SMTTypeUtils {
         			)
     	));
     	
-    	allClauses.add(new Assertion(
-    			new ForallStatement(
+    	allClauses.add(new SMTAssertion(
+    			new SMTForallStatement(
     				state,
     				SMTDataType.USED_TYPE_STATE,
-        			new OrStatement(
-        					new BinarySMTPredicate(
+        			new SMTOrStatement(
+        					new SMTBinaryPredicate(
         							AtomType.USED_TYPE, 
         							state,
         							new SMTPredicateFunArg(dataType)),
-        					new BinarySMTPredicate(
+        					new SMTBinaryPredicate(
         							AtomType.USED_TYPE, 
         							state,
         							new SMTPredicateFunArg(empty))
@@ -192,19 +192,19 @@ public class SMTTypeUtils {
 		
 		SMTBoundedVar state = new SMTBoundedVar("state");
 		if (!(parentType.getSubPredicates() == null || parentType.getSubPredicates().isEmpty())) {
-			allClauses.add(new Assertion(
-				new ForallStatement(
+			allClauses.add(new SMTAssertion(
+				new SMTForallStatement(
 					state,
 					SMTDataType.USED_TYPE_STATE,
-					new EqualStatement(
-						new OrStatement(parentType.getSubPredicates().stream()
-								.map(subModule -> new BinarySMTPredicate(
+					new SMTEqualStatement(
+						new SMTOrStatement(parentType.getSubPredicates().stream()
+								.map(subModule -> new SMTBinaryPredicate(
 										AtomType.USED_TYPE, 
 										state,
 										new SMTPredicateFunArg(subModule)))
 								.collect(Collectors.toList())
 								),
-						new BinarySMTPredicate(
+						new SMTBinaryPredicate(
 								AtomType.USED_TYPE, 
 								state,
 								new SMTPredicateFunArg(parentType))
@@ -212,19 +212,19 @@ public class SMTTypeUtils {
 					)
 				));
 			
-			allClauses.add(new Assertion(
-					new ForallStatement(
+			allClauses.add(new SMTAssertion(
+					new SMTForallStatement(
 						state,
 						SMTDataType.MEMORY_TYPE_STATE,
-						new EqualStatement(
-							new OrStatement(parentType.getSubPredicates().stream()
-									.map(subModule -> new BinarySMTPredicate(
+						new SMTEqualStatement(
+							new SMTOrStatement(parentType.getSubPredicates().stream()
+									.map(subModule -> new SMTBinaryPredicate(
 											AtomType.MEMORY_TYPE, 
 											state,
 											new SMTPredicateFunArg(subModule)))
 									.collect(Collectors.toList())
 									),
-							new BinarySMTPredicate(
+							new SMTBinaryPredicate(
 									AtomType.MEMORY_TYPE, 
 									state,
 									new SMTPredicateFunArg(parentType))
@@ -262,14 +262,14 @@ public class SMTTypeUtils {
                     if (allTypes.get(currType.getPredicateID()) == null) {
                     	throw APEConfigException.invalidValue("input", currType.toString(), "Invalid workflow input value.");
                     }
-                    allClauses.add(new Assertion(new BinarySMTPredicate(
+                    allClauses.add(new SMTAssertion(new SMTBinaryPredicate(
                     									AtomType.MEMORY_TYPE, 
                     									new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currState),
     													new SMTPredicateFunArg(currType)
     											)));
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
-                allClauses.add(new Assertion(new BinarySMTPredicate(
+                allClauses.add(new SMTAssertion(new SMTBinaryPredicate(
                 									AtomType.MEMORY_TYPE, 
                 									new SMTBitVec(SMTDataType.MEMORY_TYPE_STATE, currState),
 													new SMTPredicateFunArg(allTypes.getEmptyType()))
@@ -300,7 +300,7 @@ public class SMTTypeUtils {
                     if (allTypes.get(currType.getPredicateID()) == null) {
                     	throw APEConfigException.invalidValue("output", currType.toString(), "Invalid workflow output value.");
                     }
-                    allClauses.add(new Assertion(new BinarySMTPredicate(
+                    allClauses.add(new SMTAssertion(new SMTBinaryPredicate(
                     									AtomType.USED_TYPE,
                     									new SMTBitVec(SMTDataType.USED_TYPE_STATE, workflowOutputStates.get(i)),
     													new SMTPredicateFunArg(currType)
@@ -308,7 +308,7 @@ public class SMTTypeUtils {
 //					currType.setAsRelevantTaxonomyTerm(allTypes);
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
-            	allClauses.add(new Assertion(new BinarySMTPredicate(
+            	allClauses.add(new SMTAssertion(new SMTBinaryPredicate(
             										AtomType.USED_TYPE, 
             										new SMTBitVec(SMTDataType.USED_TYPE_STATE, workflowOutputStates.get(i)),
 													new SMTPredicateFunArg(allTypes.getEmptyType())

@@ -7,8 +7,8 @@ import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.SATAtomVar;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtomVar;
 
 /**
  * The {@code SATAtomMappings} class is used to store the data used for representing the atoms with integer numbers.
@@ -30,18 +30,18 @@ public class SATAtomMappings implements Mappings {
 	/** Max number of all expected atoms containing variables. */
 	private static final int atomVarMaxNo = 100000;
 	/** Mapping of the atoms to integers. */
-    private Map<SATAtom, Integer> mappings;
+    private Map<SLTLxAtom, Integer> mappings;
     /** Inverse mapping from integers to atoms. */
-    private Map<Integer, SATAtom> reverseMapping;
+    private Map<Integer, SLTLxAtom> reverseMapping;
     /** Map of all the IDs that were mapped to atoms. */
-    private Map<String, SATAtom> mapped;
+    private Map<String, SLTLxAtom> mapped;
     
     /** Mapping of the atoms over variables to integers. */
-    private Map<SATAtomVar, Integer> vMappings;
+    private Map<SLTLxAtomVar, Integer> vMappings;
     /** Inverse mapping from integers to atoms containing variables. */
-    private Map<Integer, SATAtomVar> vReverseMapping;
+    private Map<Integer, SLTLxAtomVar> vReverseMapping;
     /** Map of all the IDs that were mapped to atoms containing variables. */
-    private Map<String, SATAtomVar> vMapped;
+    private Map<String, SLTLxAtomVar> vMapped;
     
 
     /**
@@ -61,15 +61,15 @@ public class SATAtomMappings implements Mappings {
     private int auxiliary;
 
     /**
-     * Instantiates a new SATAtom mappings.
+     * Instantiates a new SLTLxAtom mappings.
      */
     public SATAtomMappings() {
-        mappings = new HashMap<SATAtom, Integer>();
-        reverseMapping = new HashMap<Integer, SATAtom>();
-        mapped = new HashMap<String, SATAtom>();
-        vMappings = new HashMap<SATAtomVar, Integer>();
-        vReverseMapping = new HashMap<Integer, SATAtomVar>();
-        vMapped = new HashMap<String, SATAtomVar>();
+        mappings = new HashMap<SLTLxAtom, Integer>();
+        reverseMapping = new HashMap<Integer, SLTLxAtom>();
+        mapped = new HashMap<String, SLTLxAtom>();
+        vMappings = new HashMap<SLTLxAtomVar, Integer>();
+        vReverseMapping = new HashMap<Integer, SLTLxAtomVar>();
+        vMapped = new HashMap<String, SLTLxAtomVar>();
        
         /* First auxMax variables are reserved for auxiliary variables */
         auxiliary = auxDefaultInit;
@@ -78,7 +78,7 @@ public class SATAtomMappings implements Mappings {
     }
 
     /**
-     * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. If the SATAtom did not occur before,
+     * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. If the SLTLxAtom did not occur before,
      * it is added to the mapping set and the mapping value is returned, otherwise the existing mapping value is returned.
      *
      * @param predicate   Predicate of the mapped atom.
@@ -87,12 +87,11 @@ public class SATAtomMappings implements Mappings {
      * @return Mapping number of the atom (number is always &gt; 0).
      */
     public Integer add(PredicateLabel predicate, State usedInState, AtomType elementType) throws MappingsException {
-        SATAtom atom = new SATAtom(elementType, predicate, usedInState);
+        SLTLxAtom atom = new SLTLxAtom(elementType, predicate, usedInState);
 
         Integer id;
         if ((id = mappings.get(atom)) == null) {
             if (mapped.get(atom.toString()) != null) {
-            	SATAtom tmp = mapped.get(atom.toString());
                 throw MappingsException.mappedAtomsSignaturesOverlap("Encoding error. Two or more mappings map share same string: '" + atom.toString() + "' as ID.");
             }
             atomNo++;
@@ -105,18 +104,17 @@ public class SATAtomMappings implements Mappings {
     }
     
     /**
-     * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. If the SATAtom did not occur before,
+     * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. If the SLTLxAtom did not occur before,
      * it is added to the mapping set and the mapping value is returned, otherwise the existing mapping value is returned.
      *
      * @param atom   atom that is added
      * @return Mapping number of the atom (number is always &gt; 0).
      */
-    public Integer add(SATAtom atom) throws MappingsException {
+    public Integer add(SLTLxAtom atom) throws MappingsException {
 
         Integer id;
         if ((id = mappings.get(atom)) == null) {
             if (mapped.get(atom.toString()) != null) {
-            	SATAtom tmp = mapped.get(atom.toString());
                 throw MappingsException.mappedAtomsSignaturesOverlap("Encoding error. Two or more mappings map share same string: '" + atom.toString() + "' as ID.");
             }
             atomNo++;
@@ -130,19 +128,18 @@ public class SATAtomMappings implements Mappings {
     
     /**
      * Function is returning the mapping number of the <b>{@code predicate(argument)}</b>. 
-     * If the SATAtomVar did not occur before,
+     * If the SLTLxAtomVar did not occur before,
      * it is added to the mapping set and the mapping value is returned, 
      * otherwise the existing mapping value is returned.
      *
      * @param atomVar   atom containing variable(s) that is added
      * @return Mapping number of the atom (number is always &gt; 0).
      */
-    public Integer add(SATAtomVar atomVar) throws MappingsException {
+    public Integer add(SLTLxAtomVar atomVar) throws MappingsException {
 
         Integer id;
         if ((id = vMappings.get(atomVar)) == null) {
             if (vMapped.get(atomVar.toString()) != null) {
-            	SATAtomVar tmp = vMapped.get(atomVar.toString());
                 throw MappingsException.mappedAtomsSignaturesOverlap("Encoding error. Two or more mappings map share same string: '" + atomVar.toString() + "' as ID.");
             }
             atomVarNo++;
@@ -163,7 +160,7 @@ public class SATAtomMappings implements Mappings {
      * @param atom String representation of the atom.
      * @return Mapping of the atom.
      */
-    public Integer findMapping(SATAtom atom) {
+    public Integer findMapping(SLTLxAtom atom) {
         return mappings.get(atom);
     }
 
@@ -175,7 +172,7 @@ public class SATAtomMappings implements Mappings {
      * @param mapping Integer mapping of the atom.
      * @return The original atom.
      */
-    public SATAtom findOriginal(Integer mapping) {
+    public SLTLxAtom findOriginal(Integer mapping) {
         return reverseMapping.get(mapping);
     }
 

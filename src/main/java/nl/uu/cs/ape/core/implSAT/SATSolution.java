@@ -10,7 +10,7 @@ import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.satStruc.Literal;
+import nl.uu.cs.ape.models.satStruc.SLTLxLiteral;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
@@ -27,32 +27,32 @@ public class SATSolution extends SolutionInterpreter {
     /**
      * List of all the literals provided by the solution.
      */
-    private final List<Literal> literals;
+    private final List<SLTLxLiteral> literals;
 
     /**
      * List of all the positive literals provided by the solution.
      */
-    private final List<Literal> positiveLiterals;
+    private final List<SLTLxLiteral> positiveLiterals;
 
     /**
      * List of only relevant (positive) literals that represent implemented modules/tools.
      */
-    private final List<Literal> relevantModules;
+    private final List<SLTLxLiteral> relevantModules;
 
     /**
      * List of only relevant (positive) literals that represent simple types.
      */
-    private final List<Literal> relevantTypes;
+    private final List<SLTLxLiteral> relevantTypes;
 
     /**
      * List of all the relevant types and modules combined.
      */
-    private final List<Literal> relevantElements;
+    private final List<SLTLxLiteral> relevantElements;
 
     /**
      * List of all the references for the types in the memory, when used as tool inputs.
      */
-    private final List<Literal> references2MemTypes;
+    private final List<SLTLxLiteral> references2MemTypes;
     private final Set<PredicateLabel> usedTypeStates;
 
     /**
@@ -68,16 +68,16 @@ public class SATSolution extends SolutionInterpreter {
      */
     public SATSolution(int[] satSolution, SATSynthesisEngine synthesisInstance) {
         unsat = false;
-        literals = new ArrayList<Literal>();
-        positiveLiterals = new ArrayList<Literal>();
-        relevantModules = new ArrayList<Literal>();
-        relevantTypes = new ArrayList<Literal>();
-        relevantElements = new ArrayList<Literal>();
-        references2MemTypes = new ArrayList<Literal>();
+        literals = new ArrayList<SLTLxLiteral>();
+        positiveLiterals = new ArrayList<SLTLxLiteral>();
+        relevantModules = new ArrayList<SLTLxLiteral>();
+        relevantTypes = new ArrayList<SLTLxLiteral>();
+        relevantElements = new ArrayList<SLTLxLiteral>();
+        references2MemTypes = new ArrayList<SLTLxLiteral>();
         usedTypeStates = new HashSet<PredicateLabel>();
         for (int mappedLiteral : satSolution) {
             if (mappedLiteral >= synthesisInstance.getMappings().getInitialNumOfMappedAtoms()) {
-                Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
+                SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
                 literals.add(currLiteral);
                 if (!currLiteral.isNegated()) {
                     positiveLiterals.add(currLiteral);
@@ -138,7 +138,7 @@ public class SATSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Literal literal : positiveLiterals) {
+            for (SLTLxLiteral literal : positiveLiterals) {
                 solution.append(literal.toString()).append(" ");
             }
         }
@@ -155,7 +155,7 @@ public class SATSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Literal literal : literals) {
+            for (SLTLxLiteral literal : literals) {
                 solution.append(literal.toString()).append(" ");
             }
         }
@@ -174,7 +174,7 @@ public class SATSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Literal literal : relevantModules) {
+            for (SLTLxLiteral literal : relevantModules) {
                 solution.append(literal.getPredicate().getPredicateLabel()).append(" -> ");
             }
         }
@@ -193,7 +193,7 @@ public class SATSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (Literal relevantElement : relevantElements) {
+            for (SLTLxLiteral relevantElement : relevantElements) {
                 solution.append(relevantElement.toString() + " ");
             }
         }
@@ -212,7 +212,7 @@ public class SATSolution extends SolutionInterpreter {
         if (unsat) {
             return null;
         } else {
-            for (Literal literal : relevantModules) {
+            for (SLTLxLiteral literal : relevantModules) {
                 solutionModules.add((Module) allModules.get(literal.getPredicate().getPredicateID()));
             }
         }
@@ -227,7 +227,7 @@ public class SATSolution extends SolutionInterpreter {
     public String getOriginalSATSolution() {
         StringBuilder solution = new StringBuilder();
         if (!unsat) {
-            for (Literal literal : literals) {
+            for (SLTLxLiteral literal : literals) {
                 solution.append(literal.toMappedString()).append(" ");
             }
         }
@@ -246,11 +246,11 @@ public class SATSolution extends SolutionInterpreter {
 		List<Integer> negSol = new ArrayList<Integer>();
 		if (!unsat) {
 			if(!toolSeqRepeat) {
-				for (Literal literal : relevantModules) {
+				for (SLTLxLiteral literal : relevantModules) {
 					negSol.add(literal.toNegatedMappedInt());
 				}
 			} else {
-			for (Literal literal : relevantElements) {
+			for (SLTLxLiteral literal : relevantElements) {
 				if (literal.getWorkflowElementType() != AtomType.MEMORY_TYPE) {
 					negSol.add(literal.toNegatedMappedInt());
 				}

@@ -23,9 +23,8 @@ import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.Literal;
-import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxLiteral;
 import nl.uu.cs.ape.utils.APEUtils;
 
 import java.awt.image.BufferedImage;
@@ -178,7 +177,7 @@ public class SolutionWorkflow {
 
         for (int mappedLiteral : satSolution) {
             if (mappedLiteral >= synthesisInstance.getMappings().getInitialNumOfMappedAtoms()) {
-                Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
+                SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
                 if (!currLiteral.isNegated()) {
                     if (currLiteral.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
@@ -239,13 +238,13 @@ public class SolutionWorkflow {
      * @param facts
      * @param smtSynthesisEngine
      */
-    public SolutionWorkflow(List<SATAtom> facts, SMTSynthesisEngine smtSynthesisEngine) {
+    public SolutionWorkflow(List<SLTLxAtom> facts, SMTSynthesisEngine smtSynthesisEngine) {
         /* Call for the default constructor. */
         this(smtSynthesisEngine.getModuleAutomaton(), smtSynthesisEngine.getTypeAutomaton());
 
         this.nativeSolution = new SMTSolution(facts, smtSynthesisEngine);
         
-        for (SATAtom currAtom : facts) {
+        for (SLTLxAtom currAtom : facts) {
 //        	System.out.println(currAtom.toString());
                     if (currAtom.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;

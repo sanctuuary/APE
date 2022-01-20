@@ -15,22 +15,22 @@ import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SATAndStatement;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.SATAtomVar;
-import nl.uu.cs.ape.models.satStruc.SATEquivalenceStatement;
-import nl.uu.cs.ape.models.satStruc.SATExists;
-import nl.uu.cs.ape.models.satStruc.SATFact;
-import nl.uu.cs.ape.models.satStruc.SATFinally;
-import nl.uu.cs.ape.models.satStruc.SATForall;
-import nl.uu.cs.ape.models.satStruc.SATGlobally;
-import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
-import nl.uu.cs.ape.models.satStruc.SATNext;
-import nl.uu.cs.ape.models.satStruc.SATNextOp;
-import nl.uu.cs.ape.models.satStruc.SATNotStatement;
-import nl.uu.cs.ape.models.satStruc.SATOperation;
-import nl.uu.cs.ape.models.satStruc.SATOrStatement;
-import nl.uu.cs.ape.models.satStruc.SATUntil;
+import nl.uu.cs.ape.models.satStruc.SLTLxConjunction;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtomVar;
+import nl.uu.cs.ape.models.satStruc.SLTLxEquivalence;
+import nl.uu.cs.ape.models.satStruc.SLTLxExists;
+import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.satStruc.SLTLxFinally;
+import nl.uu.cs.ape.models.satStruc.SLTLxForall;
+import nl.uu.cs.ape.models.satStruc.SLTLxGlobally;
+import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
+import nl.uu.cs.ape.models.satStruc.SLTLxNext;
+import nl.uu.cs.ape.models.satStruc.SLTLxNextOp;
+import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
+import nl.uu.cs.ape.models.satStruc.SLTLxOperation;
+import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
+import nl.uu.cs.ape.models.satStruc.SLTLxUntil;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxBaseVisitor;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BinaryBoolContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BinaryModalContext;
@@ -48,7 +48,7 @@ import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.UnaryModalContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.VarEqContext;
 import nl.uu.cs.ape.utils.APEUtils;
 
-public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
+public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 
 	static int usedState = 0;
 	int memIndexFactor;
@@ -67,15 +67,15 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 
 	@Override
-	public SATFact visitCondition(ConditionContext ctx) {
-		Set<SATFact> result = new HashSet<SATFact>();
+	public SLTLxFormula visitCondition(ConditionContext ctx) {
+		Set<SLTLxFormula> result = new HashSet<SLTLxFormula>();
 		int n = ctx.getChildCount();
 		for (int i=0; i<n; i++) {
 			ParseTree c = ctx.getChild(i);
-			SATFact childResult = c.accept(this);
+			SLTLxFormula childResult = c.accept(this);
 			result.add(childResult);
 		}
-		SATAndStatement allForulas = new SATAndStatement(result);
+		SLTLxConjunction allForulas = new SLTLxConjunction(result);
 		
 		return allForulas;
 	}
@@ -83,23 +83,23 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 
 	@Override
-	public SATFact visitToolRef(ToolRefContext ctx) {
-		SATFact tool = visit(ctx.getChild(1));
-		SATFact formula = visit(ctx.getChild(3));
-		return new SATNextOp(tool, formula);
+	public SLTLxFormula visitToolRef(ToolRefContext ctx) {
+		SLTLxFormula tool = visit(ctx.getChild(1));
+		SLTLxFormula formula = visit(ctx.getChild(3));
+		return new SLTLxNextOp(tool, formula);
 	}
 
 
 
 	@Override
-	public SATFact visitUnaryModal(UnaryModalContext ctx) {
-		SATFact subFormula = visit(ctx.getChild(1));
+	public SLTLxFormula visitUnaryModal(UnaryModalContext ctx) {
+		SLTLxFormula subFormula = visit(ctx.getChild(1));
 		if(ctx.getChild(0).getText().equals("G")) {
-			return new SATGlobally(subFormula);
+			return new SLTLxGlobally(subFormula);
 		} else if(ctx.getChild(0).getText().equals("F")) {
-			return new SATFinally(subFormula);
+			return new SLTLxFinally(subFormula);
 		} else if(ctx.getChild(0).getText().equals("N")) {
-			return new SATNext(subFormula);
+			return new SLTLxNext(subFormula);
 		} else {
 			/* In case modal operator is not recognized return null. */
 			return null;
@@ -109,36 +109,36 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 
 	@Override
-	public SATFact visitBoolean(BooleanContext ctx) {
+	public SLTLxFormula visitBoolean(BooleanContext ctx) {
 		if(ctx.getChild(0).getText().equals("true")) {
-			return SATAtom.getTrue();
+			return SLTLxAtom.getTrue();
 		} else {
-			return SATAtom.getFalse();
+			return SLTLxAtom.getFalse();
 		}
 	}
 
 
 
 	@Override
-	public SATFact visitNegUnary(NegUnaryContext ctx) {
-		SATFact subFormula = visit(ctx.getChild(1));
-		return new SATNotStatement(subFormula);
+	public SLTLxFormula visitNegUnary(NegUnaryContext ctx) {
+		SLTLxFormula subFormula = visit(ctx.getChild(1));
+		return new SLTLxNegation(subFormula);
 	}
 
 
 
 	@Override
-	public SATFact visitBinaryBool(BinaryBoolContext ctx) {
-		SATFact subFormula1 = visit(ctx.getChild(1));
-		SATFact subFormula2 = visit(ctx.getChild(2));
+	public SLTLxFormula visitBinaryBool(BinaryBoolContext ctx) {
+		SLTLxFormula subFormula1 = visit(ctx.getChild(1));
+		SLTLxFormula subFormula2 = visit(ctx.getChild(2));
 		if(ctx.getChild(0).getText().equals("|")) {
-			return new SATOrStatement(subFormula1, subFormula2);
+			return new SLTLxDisjunction(subFormula1, subFormula2);
 		} else if(ctx.getChild(0).getText().equals("&")) {
-			return new SATAndStatement(subFormula1, subFormula2);
+			return new SLTLxConjunction(subFormula1, subFormula2);
 		} else if(ctx.getChild(0).getText().equals("->")) {
-			return new SATImplicationStatement(subFormula1, subFormula2);
+			return new SLTLxImplication(subFormula1, subFormula2);
 		} else if(ctx.getChild(0).getText().equals("<->")) {
-			return new SATEquivalenceStatement(subFormula1, subFormula2);
+			return new SLTLxEquivalence(subFormula1, subFormula2);
 		} else {
 			/* In case binary operator is not recognised return null. */
 			return null;
@@ -149,68 +149,68 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 
 	@Override
-	public SATFact visitForall(ForallContext ctx) {
+	public SLTLxFormula visitForall(ForallContext ctx) {
 		SATVariable variable = new SATVariable(ctx.getChild(2).getText());
-		SATFact subFormula = visit(ctx.getChild(4));
-		return new SATForall(variable, subFormula);
+		SLTLxFormula subFormula = visit(ctx.getChild(4));
+		return new SLTLxForall(variable, subFormula);
 	}
 
 
 
 	@Override
-	public SATFact visitFunction(FunctionContext ctx) {
+	public SLTLxFormula visitFunction(FunctionContext ctx) {
 		String typePredicateID = ctx.getChild(0).getText().replace("'", "");
 		String variableID = ctx.getChild(2).getText();
 		TaxonomyPredicate typePred = allTypes.get(typePredicateID);
 		
-		return new SATAtomVar(AtomVarType.TYPE_VAR, typePred, new SATVariable(variableID));
+		return new SLTLxAtomVar(AtomVarType.TYPE_VAR, typePred, new SATVariable(variableID));
 	}
 
 
 
 	@Override
-	public SATFact visitExists(ExistsContext ctx) {
+	public SLTLxFormula visitExists(ExistsContext ctx) {
 		SATVariable variable = new SATVariable(ctx.getChild(2).getText());
-		SATFact subFormula = visit(ctx.getChild(4));
-		return new SATExists(variable, subFormula);
+		SLTLxFormula subFormula = visit(ctx.getChild(4));
+		return new SLTLxExists(variable, subFormula);
 	}
 
 
 
 	@Override
-	public SATFact visitBinaryModal(BinaryModalContext ctx) {
-		SATFact subFormula1 = visit(ctx.getChild(1));
-		SATFact subFormula2 = visit(ctx.getChild(2));
-		return new SATUntil(subFormula1, subFormula2);
+	public SLTLxFormula visitBinaryModal(BinaryModalContext ctx) {
+		SLTLxFormula subFormula1 = visit(ctx.getChild(1));
+		SLTLxFormula subFormula2 = visit(ctx.getChild(2));
+		return new SLTLxUntil(subFormula1, subFormula2);
 	}
 
 
 
 	@Override
-	public SATFact visitBrackets(BracketsContext ctx) {
+	public SLTLxFormula visitBrackets(BracketsContext ctx) {
 		return visit(ctx.getChild(1));
 	}
 
 	@Override
-	public SATFact visitR_relation(R_relationContext ctx) {
+	public SLTLxFormula visitR_relation(R_relationContext ctx) {
 		String variableID1 = ctx.getChild(2).getText();
 		String variableID2 = ctx.getChild(4).getText();
 		
-		return new SATAtomVar(AtomVarType.TYPE_DEPENDENCY_VAR, new SATVariable(variableID1), new SATVariable(variableID2));
+		return new SLTLxAtomVar(AtomVarType.TYPE_DEPENDENCY_VAR, new SATVariable(variableID1), new SATVariable(variableID2));
 	}
 
 	@Override
-	public SATFact visitVarEq(VarEqContext ctx) {
+	public SLTLxFormula visitVarEq(VarEqContext ctx) {
 		String variableID1 = ctx.getChild(0).getText();
 		String variableID2 = ctx.getChild(2).getText();
 		
-		return new SATAtomVar(AtomVarType.VAR_EQUIVALENCE, new SATVariable(variableID1), new SATVariable(variableID2));
+		return new SLTLxAtomVar(AtomVarType.VAR_EQUIVALENCE, new SATVariable(variableID1), new SATVariable(variableID2));
 	}
 
 
 
 	@Override
-	public SATFact visitModule(ModuleContext ctx) {
+	public SLTLxFormula visitModule(ModuleContext ctx) {
 		String operationID = ctx.getChild(0).getText().replace("'", "");
 		AbstractModule currOperation = allModules.get(operationID);
 		if(currOperation == null) {
@@ -236,7 +236,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 			outputs.add(new SATVariable(variableID));
 		}
 		
-		return new SATOperation(currOperation, inputs, outputs);
+		return new SLTLxOperation(currOperation, inputs, outputs);
 	}
 
 

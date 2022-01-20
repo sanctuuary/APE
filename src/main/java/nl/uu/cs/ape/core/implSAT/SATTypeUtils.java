@@ -17,12 +17,12 @@ import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.SATFact;
-import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
-import nl.uu.cs.ape.models.satStruc.SATNandStatement;
-import nl.uu.cs.ape.models.satStruc.SATNotStatement;
-import nl.uu.cs.ape.models.satStruc.SATOrStatement;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
+import nl.uu.cs.ape.models.satStruc.SLTLxNegatedConjunction;
+import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
+import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 
 /**
@@ -49,9 +49,9 @@ public class SATTypeUtils {
      * @param mappings      TODO
      * @return String representation of constraints.
      */
-   public static Set<SATFact> typeMutualExclusion(AllTypes allTypes, TypeAutomaton typeAutomaton) {
+   public static Set<SLTLxFormula> typeMutualExclusion(AllTypes allTypes, TypeAutomaton typeAutomaton) {
 
-        Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
         PredicateLabel firstPair, secondPair;
         for (Pair<PredicateLabel> pair : allTypes.getTypePairsForEachSubTaxonomy()) {
             firstPair = pair.getFirst();
@@ -60,12 +60,12 @@ public class SATTypeUtils {
             for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
                 for (State memTypeState : typeBlock.getStates()) {
                 	cnfEncoding.add(
-    						new SATNandStatement(
-    									new SATAtom(
+    						new SLTLxNegatedConjunction(
+    									new SLTLxAtom(
     											AtomType.MEMORY_TYPE, 
     											firstPair, 
     											memTypeState),
-    									new SATAtom(
+    									new SLTLxAtom(
     											AtomType.MEMORY_TYPE, 
     											secondPair, 
     											memTypeState)));
@@ -75,12 +75,12 @@ public class SATTypeUtils {
             for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
                 for (State usedTypeState : typeBlock.getStates()) {
                 	cnfEncoding.add(
-    						new SATNandStatement(
-    									new SATAtom(
+    						new SLTLxNegatedConjunction(
+    									new SLTLxAtom(
     											AtomType.USED_TYPE, 
     											firstPair, 
     											usedTypeState),
-    									new SATAtom(
+    									new SLTLxAtom(
     											AtomType.USED_TYPE, 
     											secondPair, 
     											usedTypeState)));
@@ -100,8 +100,8 @@ public class SATTypeUtils {
      * @param mappings      TODO
      * @return String representation of constraints.
      */
-   public static Set<SATFact> typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
-        Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+   public static Set<SLTLxFormula> typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
+        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
         Type empty = domainSetup.getAllTypes().getEmptyType();
         Type dataType = AuxTypePredicate.generateAuxiliaryPredicate(domainSetup.getAllTypes().getDataTaxonomyDimensionsAsSortedSet(), LogicOperation.AND, domainSetup);
         // enforcement of types in in all the states (those that represent general
@@ -109,12 +109,12 @@ public class SATTypeUtils {
         for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
             for (State memTypeState : typeBlock.getStates()) {
             	cnfEncoding.add(
-						new SATOrStatement(
-									new SATAtom(
+						new SLTLxDisjunction(
+									new SLTLxAtom(
 											AtomType.MEMORY_TYPE, 
 											dataType, 
 											memTypeState),
-									new SATAtom(
+									new SLTLxAtom(
 											AtomType.MEMORY_TYPE, 
 											empty, 
 											memTypeState)));
@@ -123,12 +123,12 @@ public class SATTypeUtils {
         for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
             for (State usedTypeState : typeBlock.getStates()) {
             	cnfEncoding.add(
-						new SATOrStatement(
-									new SATAtom(
+						new SLTLxDisjunction(
+									new SLTLxAtom(
 											AtomType.USED_TYPE, 
 											dataType, 
 											usedTypeState),
-									new SATAtom(
+									new SLTLxAtom(
 											AtomType.USED_TYPE, 
 											empty, 
 											usedTypeState)));
@@ -149,8 +149,8 @@ public class SATTypeUtils {
      * @param mappings      TODO
      * @return The String representation of constraints enforcing taxonomy classifications.
      */
-   public static Set<SATFact> typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton) {
-        Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+   public static Set<SLTLxFormula> typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton) {
+        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
         // taxonomy enforcement of types in in all the states (those that represent
         // general memory and used data instances)
         for (TaxonomyPredicate dimension : allTypes.getRootPredicates()) {
@@ -171,37 +171,37 @@ public class SATTypeUtils {
     /**
      * Supporting recursive method for typeEnforceTaxonomyStructure.
      */
-    private static Set<SATFact> typeEnforceTaxonomyStructureForState(TaxonomyPredicate currType,
+    private static Set<SLTLxFormula> typeEnforceTaxonomyStructureForState(TaxonomyPredicate currType,
                                                                 State typeState, AtomType typeElement) {
 
-        SATAtom superTypeState = new SATAtom(typeElement, currType, typeState);
+        SLTLxAtom superTypeState = new SLTLxAtom(typeElement, currType, typeState);
 
-        Set<SATFact> fullCNFEncoding = new HashSet<SATFact>();
-		Set<SATFact> currCNFEncoding = new HashSet<SATFact>();
+        Set<SLTLxFormula> fullCNFEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> currCNFEncoding = new HashSet<SLTLxFormula>();
 		
 		currCNFEncoding.add(
-				new SATNotStatement(superTypeState));
+				new SLTLxNegation(superTypeState));
 
-        List<SATAtom> subTypesStates = new ArrayList<SATAtom>();
+        List<SLTLxAtom> subTypesStates = new ArrayList<SLTLxAtom>();
         if (!(currType.getSubPredicates() == null || currType.getSubPredicates().isEmpty())) {
             /*
              * Ensuring the TOP-DOWN taxonomy tree dependency
              */
             for (TaxonomyPredicate subType : currType.getSubPredicates()) {
 
-            	SATAtom subTypeState = new SATAtom(typeElement, subType, typeState);
+            	SLTLxAtom subTypeState = new SLTLxAtom(typeElement, subType, typeState);
             	currCNFEncoding.add(subTypeState);
             	subTypesStates.add(subTypeState);
 
                 fullCNFEncoding.addAll(typeEnforceTaxonomyStructureForState(subType, typeState, typeElement));
             }
-            fullCNFEncoding.add(new SATOrStatement(currCNFEncoding));
+            fullCNFEncoding.add(new SLTLxDisjunction(currCNFEncoding));
             /*
              * Ensuring the BOTTOM-UP taxonomy tree dependency
              */
-            for (SATAtom subTypeState : subTypesStates) {
+            for (SLTLxAtom subTypeState : subTypesStates) {
             	fullCNFEncoding.add(
-						new SATImplicationStatement(
+						new SLTLxImplication(
 								subTypeState,
 								superTypeState));
             }
@@ -218,8 +218,8 @@ public class SATTypeUtils {
      * @param mappings       All the atom mappings
      * @return The String representation of the initial input encoding.
      */
-   public static Set<SATFact> encodeInputData(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton) {
-        Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+   public static Set<SLTLxFormula> encodeInputData(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton) {
+        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
         List<State> workflowInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
         for (int i = 0; i < workflowInputStates.size(); i++) {
@@ -232,14 +232,14 @@ public class SATTypeUtils {
                         return null;
                     }
                     cnfEncoding.add(
-                    		new SATAtom(
+                    		new SLTLxAtom(
 									AtomType.MEMORY_TYPE, 
 									currType, 
 									currState));
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
             	cnfEncoding.add(
-                		new SATAtom(
+                		new SLTLxAtom(
 								AtomType.MEMORY_TYPE, 
 								allTypes.getEmptyType(), 
 								currState));
@@ -258,8 +258,8 @@ public class SATTypeUtils {
      * @param mappings       All the atom mappings
      * @return String representation of the workflow output encoding.
      */
-   public static Set<SATFact> encodeOutputData(AllTypes allTypes, List<Type> program_outputs, TypeAutomaton typeAutomaton) {
-        Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+   public static Set<SLTLxFormula> encodeOutputData(AllTypes allTypes, List<Type> program_outputs, TypeAutomaton typeAutomaton) {
+        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
         List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
         for (int i = 0; i < workflowOutputStates.size(); i++) {
@@ -271,7 +271,7 @@ public class SATTypeUtils {
                         return null;
                     }
                     cnfEncoding.add(
-                    		new SATAtom(
+                    		new SLTLxAtom(
 									AtomType.USED_TYPE, 
 									currType, 
 									workflowOutputStates.get(i)));
@@ -279,7 +279,7 @@ public class SATTypeUtils {
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
             	cnfEncoding.add(
-                		new SATAtom(
+                		new SLTLxAtom(
 								AtomType.USED_TYPE, 
 								allTypes.getEmptyType(), 
 								workflowOutputStates.get(i)));

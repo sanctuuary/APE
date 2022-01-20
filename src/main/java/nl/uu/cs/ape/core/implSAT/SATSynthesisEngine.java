@@ -7,8 +7,6 @@ import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.*;
 
-import com.google.common.io.Files;
-
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
@@ -18,8 +16,8 @@ import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SATFact;
-import nl.uu.cs.ape.models.satStruc.SATVariableOccurance;
+import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.satStruc.SLTLxVariableOccurance;
 import nl.uu.cs.ape.parser.Hello;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -87,7 +85,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
     /**
      * Mapping of all the variables that are utilised in the encoding to the predicates use them.
      */
-    private SATVariableOccurance varUsage;
+    private SLTLxVariableOccurance varUsage;
     
     /**
      * Setup of an instance of the SAT synthesis engine.
@@ -105,7 +103,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         this.runConfig = runConfig;
         this.mappings = (SATAtomMappings) allSolutions.getMappings();
         this.mappings.resetAuxVariables();
-        this.varUsage = new SATVariableOccurance();
+        this.varUsage = new SLTLxVariableOccurance();
         
         this.satInputFile = null;
         this.cnfEncoding = File.createTempFile("satCNF" + workflowLength, null);
@@ -138,14 +136,14 @@ public class SATSynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
         /* Create const raints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
-        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeModuleAnnotations(this));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeModuleAnnotations(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
         /*
          * The constraints preserve the memory structure, i.e. preserve the data available in memory and the
          * logic of referencing data from memory in case of tool inputs.
          */
-        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeMemoryStructure(this));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeMemoryStructure(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Memory structure encoding");
 
         /*
@@ -154,12 +152,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the tools - from taxonomy.
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
         
-        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
         
-        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
         
         /*
@@ -169,12 +167,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
         
-        SATFact.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
         
-        SATFact.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeMandatoryUsage(domainSetup, typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeMandatoryUsage(domainSetup, typeAutomaton));
         
-        SATFact.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
         
         /*
@@ -188,36 +186,36 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Encode data instance dependency constraints.
          */
-        SATFact.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton));
 
         /*
          * Encode the workflow input. Workflow I/O are encoded the last in order to
          * reuse the mappings for states, instead of introducing new ones, using the I/O
          * types of NodeType.UNKNOWN.
          */
-        Set<SATFact> inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton);
+        Set<SLTLxFormula> inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton);
         if (inputDataEncoding == null) {
             return false;
         }
-        SATFact.appendCNFToFile(cnfEncoding, this, inputDataEncoding);
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, inputDataEncoding);
         /*
          * Encode the workflow output
          */
-        Set<SATFact> outputDataEncoding = SATTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton);
+        Set<SLTLxFormula> outputDataEncoding = SATTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton);
         if (outputDataEncoding == null) {
             return false;
         }
-        SATFact.appendCNFToFile(cnfEncoding, this, outputDataEncoding);
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, outputDataEncoding);
 
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-        SATFact.appendCNFToFile(cnfEncoding, this, domainSetup.getConstraintsForAuxiliaryPredicates(moduleAutomaton, typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, domainSetup.getConstraintsForAuxiliaryPredicates(moduleAutomaton, typeAutomaton));
         
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-        SATFact.appendCNFToFile(cnfEncoding, this, Hello.getFact(this, "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> <'ToolsTaxonomy'(?y;)> true)"));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, Hello.getFact(this, "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> <'ToolsTaxonomy'(?y;)> true)"));
 
         /*
          * Counting the number of variables and clauses that will be given to the SAT solver
@@ -414,9 +412,9 @@ public class SATSynthesisEngine implements SynthesisEngine {
     
     /**
      * Get mapping of all the variables that are utilised in the encoding to the predicates use them.
-     * @return Variable usage class {@link SATVariableOccurance}.
+     * @return Variable usage class {@link SLTLxVariableOccurance}.
      */
-    public SATVariableOccurance getVariableUsage() {
+    public SLTLxVariableOccurance getVariableUsage() {
     	return varUsage;
     }
 

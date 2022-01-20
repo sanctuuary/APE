@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 
 /**

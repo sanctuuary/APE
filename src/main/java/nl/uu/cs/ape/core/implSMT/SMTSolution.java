@@ -11,14 +11,14 @@ import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.Literal;
-import nl.uu.cs.ape.models.smtStruc.Assertion;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxLiteral;
+import nl.uu.cs.ape.models.smtStruc.SMTAssertion;
 import nl.uu.cs.ape.models.smtStruc.SMTLib2Row;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.AndStatement;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.BinarySMTPredicate;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTAndStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBinaryPredicate;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFact;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.NotStatement;
+import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTNotStatement;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTBitVec;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTPredicateFunArg;
@@ -38,27 +38,27 @@ public class SMTSolution extends SolutionInterpreter {
     /**
      * List of all the positive literals provided by the solution.
      */
-    private final List<SATAtom> positiveLiterals;
+    private final List<SLTLxAtom> positiveLiterals;
 
     /**
      * List of only relevant (positive) literals that represent implemented modules/tools.
      */
-    private final List<SATAtom> relevantModules;
+    private final List<SLTLxAtom> relevantModules;
 
     /**
      * List of only relevant (positive) literals that represent simple types.
      */
-    private final List<SATAtom> relevantTypes;
+    private final List<SLTLxAtom> relevantTypes;
 
     /**
      * List of all the relevant types and modules combined.
      */
-    private final List<SATAtom> relevantElements;
+    private final List<SLTLxAtom> relevantElements;
 
     /**
      * List of all the references for the types in the memory, when used as tool inputs.
      */
-    private final List<SATAtom> references2MemTypes;
+    private final List<SLTLxAtom> references2MemTypes;
     private final Set<PredicateLabel> usedTypeStates;
 
     /**
@@ -73,15 +73,15 @@ public class SMTSolution extends SolutionInterpreter {
      * @param satSolution       list of mapped literals given as a list of integers (library SAT output)
      * @param synthesisInstance Mapping of the atoms.
      */
-    public SMTSolution(List<SATAtom> facts, SMTSynthesisEngine smtSynthesisEngine) {
+    public SMTSolution(List<SLTLxAtom> facts, SMTSynthesisEngine smtSynthesisEngine) {
         unsat = false;
-        positiveLiterals = new ArrayList<SATAtom>();
-        relevantModules = new ArrayList<SATAtom>();
-        relevantTypes = new ArrayList<SATAtom>();
-        relevantElements = new ArrayList<SATAtom>();
-        references2MemTypes = new ArrayList<SATAtom>();
+        positiveLiterals = new ArrayList<SLTLxAtom>();
+        relevantModules = new ArrayList<SLTLxAtom>();
+        relevantTypes = new ArrayList<SLTLxAtom>();
+        relevantElements = new ArrayList<SLTLxAtom>();
+        references2MemTypes = new ArrayList<SLTLxAtom>();
         usedTypeStates = new HashSet<PredicateLabel>();
-        for (SATAtom currAtom : facts) {
+        for (SLTLxAtom currAtom : facts) {
                     positiveLiterals.add(currAtom);
                     if (currAtom.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
@@ -137,7 +137,7 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (SATAtom literal : positiveLiterals) {
+            for (SLTLxAtom literal : positiveLiterals) {
                 solution.append(literal.toString()).append(" ");
             }
         }
@@ -156,7 +156,7 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (SATAtom literal : relevantModules) {
+            for (SLTLxAtom literal : relevantModules) {
                 solution.append(literal.getPredicate().getPredicateLabel()).append(" -> ");
             }
         }
@@ -175,7 +175,7 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             solution = new StringBuilder("UNSAT");
         } else {
-            for (SATAtom relevantElement : relevantElements) {
+            for (SLTLxAtom relevantElement : relevantElements) {
                 solution.append(relevantElement.toString() + " ");
             }
         }
@@ -194,7 +194,7 @@ public class SMTSolution extends SolutionInterpreter {
         if (unsat) {
             return null;
         } else {
-            for (SATAtom literal : relevantModules) {
+            for (SLTLxAtom literal : relevantModules) {
                 solutionModules.add((Module) allModules.get(literal.getPredicate().getPredicateID()));
             }
         }
@@ -215,23 +215,23 @@ public class SMTSolution extends SolutionInterpreter {
 		List<SMTFact> facts = new ArrayList<SMTFact>();
 		if (!unsat) {
 			if(!allowToolSeqRepeat) {
-				for (SATAtom atom : relevantModules) {
-					facts.add(new BinarySMTPredicate(
+				for (SLTLxAtom atom : relevantModules) {
+					facts.add(new SMTBinaryPredicate(
 									AtomType.MODULE, 
 									new SMTBitVec(SMTDataType.MODULE_STATE, atom.getUsedInStateArgument()), 
 									new SMTPredicateFunArg(atom.getPredicate())
 								));
 				}
 			} else {
-				for (SATAtom atom : relevantElements) {
+				for (SLTLxAtom atom : relevantElements) {
 					if (atom.getWorkflowElementType() == AtomType.MODULE) {
-							facts.add(new BinarySMTPredicate(
+							facts.add(new SMTBinaryPredicate(
 										AtomType.MODULE, 
 										new SMTBitVec(SMTDataType.MODULE_STATE, atom.getUsedInStateArgument()), 
 										new SMTPredicateFunArg(atom.getPredicate())
 									));
 					} else if (atom.getWorkflowElementType() == AtomType.USED_TYPE) {
-							facts.add(new BinarySMTPredicate(
+							facts.add(new SMTBinaryPredicate(
 									AtomType.USED_TYPE, 
 									new SMTBitVec(SMTDataType.USED_TYPE_STATE, atom.getUsedInStateArgument()), 
 									new SMTPredicateFunArg(atom.getPredicate())
@@ -242,9 +242,9 @@ public class SMTSolution extends SolutionInterpreter {
 				}
 			}
 			
-			allClauses.add(new Assertion(
-					new NotStatement(
-							new AndStatement(facts)
+			allClauses.add(new SMTAssertion(
+					new SMTNotStatement(
+							new SMTAndStatement(facts)
 							)));
 		}
 

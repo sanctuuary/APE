@@ -18,14 +18,14 @@ import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SATAndStatement;
-import nl.uu.cs.ape.models.satStruc.SATAtom;
-import nl.uu.cs.ape.models.satStruc.SATEquivalenceStatement;
-import nl.uu.cs.ape.models.satStruc.SATFact;
-import nl.uu.cs.ape.models.satStruc.SATNandStatement;
-import nl.uu.cs.ape.models.satStruc.SATNotStatement;
-import nl.uu.cs.ape.models.satStruc.SATOrStatement;
-import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
+import nl.uu.cs.ape.models.satStruc.SLTLxConjunction;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxEquivalence;
+import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.satStruc.SLTLxNegatedConjunction;
+import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
+import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
+import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -54,8 +54,8 @@ public final class SATModuleUtils {
 	 * @return String representation of CNF constraints regarding the required INPUT
 	 *         and OUTPUT types of the modules.
 	 */
-	public static Set<SATFact> encodeModuleAnnotations(SATSynthesisEngine synthesisInstance) {
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+	public static Set<SLTLxFormula> encodeModuleAnnotations(SATSynthesisEngine synthesisInstance) {
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		cnfEncoding.addAll(inputCons(synthesisInstance));
 
 		cnfEncoding.addAll(outputCons(synthesisInstance));
@@ -73,8 +73,8 @@ public final class SATModuleUtils {
 	 * @return String representation of CNF constraints regarding the required
 	 *         memory structure implementation.
 	 */
-	public static Set<SATFact> encodeMemoryStructure(SATSynthesisEngine synthesisInstance) {
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+	public static Set<SLTLxFormula> encodeMemoryStructure(SATSynthesisEngine synthesisInstance) {
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
 		cnfEncoding.addAll(allowDataReferencingCons(synthesisInstance.getTypeAutomaton()));
 		cnfEncoding.addAll(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
@@ -92,8 +92,8 @@ public final class SATModuleUtils {
 	 * @param mappings
 	 * @return
 	 */
-	public static Set<SATFact> encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton) {
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+	public static Set<SLTLxFormula> encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton) {
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		
 		cnfEncoding.addAll(allowDataDependencyCons(typeAutomaton));
 		cnfEncoding.addAll(enforceDataDependencyOverModules(typeAutomaton));
@@ -110,9 +110,9 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static Set<SATFact> inputCons(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> inputCons(SATSynthesisEngine synthesisInstance) {
 
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/* For each module.. */
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
 			/* ..which is a Tool.. */
@@ -138,23 +138,23 @@ public final class SATModuleUtils {
 							 * the corresponding data and format types need to be provided in input
 							 * states */
 							cnfEncoding.add(
-									new SATImplicationStatement(
-												new SATAtom(
+									new SLTLxImplication(
+												new SLTLxAtom(
 														AtomType.MODULE, 
 														module, 
 														moduleState),
-												new SATAtom(
+												new SLTLxAtom(
 														AtomType.USED_TYPE, 
 														currInputType, 
 														currInputState)));
 						} else {
 							cnfEncoding.add(
-									new SATImplicationStatement(
-												new SATAtom(
+									new SLTLxImplication(
+												new SLTLxAtom(
 														AtomType.MODULE, 
 														module, 
 														moduleState),
-												new SATAtom(
+												new SLTLxAtom(
 														AtomType.USED_TYPE, 
 														synthesisInstance.getEmptyType(), 
 														currInputState)));
@@ -176,8 +176,8 @@ public final class SATModuleUtils {
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static Set<SATFact> enforceDataReferenceRules(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+	private static Set<SLTLxFormula> enforceDataReferenceRules(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
 		/* For each type instance */
 		for (TaxonomyPredicate currType : domainSetup.getAllTypes().getTypes()) {
@@ -188,12 +188,12 @@ public final class SATModuleUtils {
 						if (!currType.isEmptyPredicate()) {
 							/* ..the referenced memory state cannot be null.. */
 							cnfEncoding.add(
-									new SATNandStatement(
-												new SATAtom(
+									new SLTLxNegatedConjunction(
+												new SLTLxAtom(
 														AtomType.USED_TYPE, 
 														currType, 
 														currUsedTypeState),
-												new SATAtom(
+												new SLTLxAtom(
 														AtomType.MEM_TYPE_REFERENCE, 
 														typeAutomaton.getNullState(), 
 														currUsedTypeState)));
@@ -206,17 +206,17 @@ public final class SATModuleUtils {
 									 */
 									
 									cnfEncoding.add(
-											new SATImplicationStatement(
-													new SATAtom(
+											new SLTLxImplication(
+													new SLTLxAtom(
 															AtomType.MEM_TYPE_REFERENCE, 
 															refMemoryTypeState,
 															currUsedTypeState),
-													new SATEquivalenceStatement(
-														new SATAtom(
+													new SLTLxEquivalence(
+														new SLTLxAtom(
 																AtomType.USED_TYPE, 
 																currType, 
 																currUsedTypeState),
-														new SATAtom(
+														new SLTLxAtom(
 																AtomType.MEMORY_TYPE, 
 																currType, 
 																refMemoryTypeState)
@@ -227,12 +227,12 @@ public final class SATModuleUtils {
 						} else {
 							
 							cnfEncoding.add(
-									new SATImplicationStatement(
-												new SATAtom(
+									new SLTLxImplication(
+												new SLTLxAtom(
 														AtomType.USED_TYPE, 
 														currType, 
 														currUsedTypeState),
-												new SATAtom(
+												new SLTLxAtom(
 														AtomType.MEM_TYPE_REFERENCE, 
 														typeAutomaton.getNullState(), 
 														currUsedTypeState)));
@@ -257,10 +257,10 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static Set<SATFact> allowDataReferencingCons(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> allowDataReferencingCons(TypeAutomaton typeAutomaton) {
 
 		// setting up input constraints (Shared Memory Approach)
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/** For each input state... */
 		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
@@ -271,22 +271,22 @@ public final class SATModuleUtils {
 				 */
 				List<State> possibleMemStates = typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber);
 				possibleMemStates.add(typeAutomaton.getNullState());
-				Set<SATFact> allPossibilities = new HashSet<SATFact>();
+				Set<SLTLxFormula> allPossibilities = new HashSet<SLTLxFormula>();
 				for (State exictingMemState : possibleMemStates) {
-					allPossibilities.add(new SATAtom(AtomType.MEM_TYPE_REFERENCE, exictingMemState, currInputState));
+					allPossibilities.add(new SLTLxAtom(AtomType.MEM_TYPE_REFERENCE, exictingMemState, currInputState));
 				}
-				cnfEncoding.add(new SATOrStatement(allPossibilities));
+				cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
 				
 
 				/* Defining that each input can reference only one state in the shared memory */
 				for (Pair<PredicateLabel> pair : getPredicatePairs(possibleMemStates)) {
 					cnfEncoding.add(
-							new SATNandStatement(
-										new SATAtom(
+							new SLTLxNegatedConjunction(
+										new SLTLxAtom(
 												AtomType.MEM_TYPE_REFERENCE, 
 												pair.getFirst(), 
 												currInputState),
-										new SATAtom(
+										new SLTLxAtom(
 												AtomType.MEM_TYPE_REFERENCE, 
 												pair.getSecond(), 
 												currInputState)));
@@ -300,8 +300,8 @@ public final class SATModuleUtils {
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
 					
 					cnfEncoding.add(
-							new SATNotStatement(
-									new SATAtom(
+							new SLTLxNegation(
+									new SLTLxAtom(
 										AtomType.MEM_TYPE_REFERENCE, 
 										nonExictingMemState,
 										currInputState)));
@@ -319,18 +319,18 @@ public final class SATModuleUtils {
 	 * 
 	 * @return String representation of constraints.
 	 */
-	private static Set<SATFact> allowDataDependencyCons(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> allowDataDependencyCons(TypeAutomaton typeAutomaton) {
 
 		// setting up dependency constraints
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/** For each input state... */
 		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
 			for (State currInputState : currBlock.getStates()) {
 				/* Input state does not depend on the null state */
 				cnfEncoding.add(
-						new SATNotStatement(
-								new SATAtom(
+						new SLTLxNegation(
+								new SLTLxAtom(
 									AtomType.TYPE_DEPENDENCY, 
 									currInputState,
 									typeAutomaton.getNullState())));
@@ -354,8 +354,8 @@ public final class SATModuleUtils {
 				 */
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
 					cnfEncoding.add(
-							new SATNotStatement(
-									new SATAtom(
+							new SLTLxNegation(
+									new SLTLxAtom(
 										AtomType.TYPE_DEPENDENCY, 
 										nonExictingMemState,
 										currInputState)));
@@ -368,14 +368,14 @@ public final class SATModuleUtils {
 			for (State currMemState : currBlock.getStates()) {
 				/* Memory state depends on itself */
 				cnfEncoding.add(
-							new SATAtom(
+							new SLTLxAtom(
 								AtomType.TYPE_DEPENDENCY, 
 								currMemState,
 								currMemState));
 				/* ..and does not depend on the null state */ 
 			cnfEncoding.add(
-						new SATNotStatement(
-								new SATAtom(
+						new SLTLxNegation(
+								new SLTLxAtom(
 									AtomType.TYPE_DEPENDENCY, 
 									currMemState,
 									typeAutomaton.getNullState())));
@@ -400,8 +400,8 @@ public final class SATModuleUtils {
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber - 1)) {
 					if (!nonExictingMemState.equals(currMemState)) {
 						cnfEncoding.add(
-								new SATNotStatement(
-										new SATAtom(
+								new SLTLxNegation(
+										new SLTLxAtom(
 											AtomType.TYPE_DEPENDENCY, 
 											nonExictingMemState,
 											currMemState)));
@@ -418,10 +418,10 @@ public final class SATModuleUtils {
 	 * 
 	 * @return String representation of constraints.
 	 */
-	private static Set<SATFact> enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton) {
 
 		// setting up dependency constraints
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/** For each input state... */
 		for (Block currInputBlock : typeAutomaton.getUsedTypesBlocks()) {
 			int blockNumber = currInputBlock.getBlockNumber();
@@ -435,18 +435,18 @@ public final class SATModuleUtils {
 						/* ..if the input state references the memory state.. */
 						for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
 							cnfEncoding.add(
-										new SATImplicationStatement(
-												new SATAndStatement(
-														new SATAtom(
+										new SLTLxImplication(
+												new SLTLxConjunction(
+														new SLTLxAtom(
 																AtomType.MEM_TYPE_REFERENCE, 
 																currMemState, 
 																currInputState),
-														new SATAtom(
+														new SLTLxAtom(
 																AtomType.TYPE_DEPENDENCY, 
 																existingMemState,
 																currMemState)
 														),
-												new SATAtom(
+												new SLTLxAtom(
 														AtomType.TYPE_DEPENDENCY, 
 														existingMemState, 
 														currInputState)
@@ -456,18 +456,18 @@ public final class SATModuleUtils {
 							// state)
 
 							cnfEncoding.add(
-									new SATImplicationStatement(
-											new SATAndStatement(
-													new SATAtom(
+									new SLTLxImplication(
+											new SLTLxConjunction(
+													new SLTLxAtom(
 															AtomType.MEM_TYPE_REFERENCE, 
 															currMemState, 
 															currInputState),
-													new SATAtom(
+													new SLTLxAtom(
 															AtomType.TYPE_DEPENDENCY, 
 															existingMemState, 
 															currInputState)
 													),
-											new SATAtom(
+											new SLTLxAtom(
 													AtomType.TYPE_DEPENDENCY, 
 													existingMemState,
 													currMemState)
@@ -478,12 +478,12 @@ public final class SATModuleUtils {
 
 				// Empty inputs have no data dependencies
 				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
-					cnfEncoding.add(new SATNandStatement(
-							new SATAtom(
+					cnfEncoding.add(new SLTLxNegatedConjunction(
+							new SLTLxAtom(
 									AtomType.MEM_TYPE_REFERENCE, 
 									typeAutomaton.getNullState(), 
 									currInputState),
-							new SATAtom(
+							new SLTLxAtom(
 									AtomType.TYPE_DEPENDENCY, 
 									existingMemState, 
 									currInputState)
@@ -494,8 +494,8 @@ public final class SATModuleUtils {
 		return cnfEncoding;
 	}
 
-	private static Set<SATFact> enforceDataDependencyOverModules(TypeAutomaton typeAutomaton) {
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+	private static Set<SLTLxFormula> enforceDataDependencyOverModules(TypeAutomaton typeAutomaton) {
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/** For tool inputs and outputs */
 		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
 			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
@@ -505,34 +505,34 @@ public final class SATModuleUtils {
 			for (State currMemState : currMemBlock.getStates()) {
 				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
 					// if the type depends on a data from the memory
-					Set<SATFact> cnfDependency = new HashSet<SATFact>();
+					Set<SLTLxFormula> cnfDependency = new HashSet<SLTLxFormula>();
 					
 					cnfDependency.add(
-							new SATNotStatement(
-									new SATAtom(
+							new SLTLxNegation(
+									new SLTLxAtom(
 											AtomType.TYPE_DEPENDENCY, 
 											existingMemState, 
 											currMemState)));
 					// one of the tool inputs does as well
 					for (State currInputState : currInputBlock.getStates()) {
 						cnfDependency.add(
-								new SATAtom(
+								new SLTLxAtom(
 										AtomType.TYPE_DEPENDENCY, 
 										existingMemState, 
 										currInputState));
 					}
-					cnfEncoding.add(new SATOrStatement(cnfDependency));
+					cnfEncoding.add(new SLTLxDisjunction(cnfDependency));
 
 					// ..and vice versa, dependence of the input types is inherited to the outputs
 
 					for (State currInputState : currInputBlock.getStates()) {
 						cnfEncoding.add(
-								new SATImplicationStatement(
-										new SATAtom(
+								new SLTLxImplication(
+										new SLTLxAtom(
 												AtomType.TYPE_DEPENDENCY, 
 												existingMemState, 
 												currInputState),
-										new SATAtom(
+										new SLTLxAtom(
 												AtomType.TYPE_DEPENDENCY, 
 												existingMemState, 
 												currMemState)));
@@ -551,11 +551,11 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static Set<SATFact> enforcingUsageOfGeneratedTypesCons(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> enforcingUsageOfGeneratedTypesCons(SATSynthesisEngine synthesisInstance) {
 
 		Type emptyType = synthesisInstance.getEmptyType();
 		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/*
 		 * Setting up the constraints that ensure usage of the generated types in the
 		 * memory, (e.g. all workflow inputs and at least one of each of the tool
@@ -568,10 +568,10 @@ public final class SATModuleUtils {
 				/* In case that all workflow inputs need to be used */
 				if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
-						Set<SATFact> allPossibilities = new HashSet<SATFact>();
+						Set<SLTLxFormula> allPossibilities = new HashSet<SLTLxFormula>();
 
 						allPossibilities.add(
-								new SATAtom(
+								new SLTLxAtom(
 									AtomType.MEMORY_TYPE, 
 									emptyType, 
 									currMemoryState));
@@ -579,77 +579,77 @@ public final class SATModuleUtils {
 						
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(
-									new SATAtom(
+									new SLTLxAtom(
 										AtomType.MEM_TYPE_REFERENCE, 
 										currMemoryState, 
 										inputState));
 						}
-						cnfEncoding.add(new SATOrStatement(allPossibilities));
+						cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
 					}
 					/* In case that at least one workflow input need to be used */
 				} else if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ONE) {
-					Set<SATFact> allPossibilities = new HashSet<SATFact>();
+					Set<SLTLxFormula> allPossibilities = new HashSet<SLTLxFormula>();
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getLocalStateNumber() == 0) {
 							allPossibilities.add(
-									new SATAtom(
+									new SLTLxAtom(
 										AtomType.MEMORY_TYPE, 
 										emptyType, 
 										currMemoryState));
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(
-									new SATAtom(
+									new SLTLxAtom(
 										AtomType.MEM_TYPE_REFERENCE, 
 										currMemoryState, 
 										inputState));
 						}
 					}
-					cnfEncoding.add(new SATOrStatement(allPossibilities));
+					cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
 				}
 				/* In case that none of the workflow input has to be used, do nothing. */
 			} else {
 				/* In case that all generated data need to be used. */
 				if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ALL) {
 					for (State currMemoryState : currBlock.getStates()) {
-						Set<SATFact> allPossibilities = new HashSet<SATFact>();
+						Set<SLTLxFormula> allPossibilities = new HashSet<SLTLxFormula>();
 						allPossibilities.add(
-								new SATAtom(
+								new SLTLxAtom(
 									AtomType.MEMORY_TYPE, 
 									emptyType, 
 									currMemoryState));
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(
-									new SATAtom(
+									new SLTLxAtom(
 										AtomType.MEM_TYPE_REFERENCE, 
 										currMemoryState, 
 										inputState));
 						}
-						cnfEncoding.add(new SATOrStatement(allPossibilities));
+						cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
 					}
 					/*
 					 * In case that at least one of the generated data instances per tool need to be
 					 * used.
 					 */
 				} else if (synthesisInstance.getConfig().getUseAllGeneratedData() == ConfigEnum.ONE) {
-					Set<SATFact> allPossibilities = new HashSet<SATFact>();
+					Set<SLTLxFormula> allPossibilities = new HashSet<SLTLxFormula>();
 					for (State currMemoryState : currBlock.getStates()) {
 						if (currMemoryState.getLocalStateNumber() == 0) {
 							allPossibilities.add(
-									new SATAtom(
+									new SLTLxAtom(
 										AtomType.MEMORY_TYPE, 
 										emptyType, 
 										currMemoryState));
 						}
 						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
 							allPossibilities.add(
-									new SATAtom(
+									new SLTLxAtom(
 										AtomType.MEM_TYPE_REFERENCE, 
 										currMemoryState, 
 										inputState));
 						}
 					}
-					cnfEncoding.add(new SATOrStatement(allPossibilities));
+					cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
 				}
 				/* In case that none generated data has to be used do nothing. */
 
@@ -666,9 +666,9 @@ public final class SATModuleUtils {
 	 *
 	 * @return String representation of constraints.
 	 */
-	private static Set<SATFact> outputCons(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> outputCons(SATSynthesisEngine synthesisInstance) {
 
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
 		// for each module
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
@@ -691,24 +691,24 @@ public final class SATModuleUtils {
 							// proceeding output states if it exists, otherwise use empty type
 							
 							cnfEncoding.add(
-									new SATImplicationStatement(
-												new SATAtom(
+									new SLTLxImplication(
+												new SLTLxAtom(
 														AtomType.MODULE, 
 														module, 
 														moduleState),
-												new SATAtom(
+												new SLTLxAtom(
 														AtomType.MEMORY_TYPE, 
 														outputType, 
 														currOutputStates.get(i))));
 
 						} else {
 							cnfEncoding.add(
-									new SATImplicationStatement(
-												new SATAtom(
+									new SLTLxImplication(
+												new SLTLxAtom(
 														AtomType.MODULE, 
 														module, 
 														moduleState),
-												new SATAtom(
+												new SLTLxAtom(
 														AtomType.MEMORY_TYPE, 
 														synthesisInstance.getEmptyType(), 
 														currOutputStates.get(i))));
@@ -732,19 +732,19 @@ public final class SATModuleUtils {
 	 * @return The String representation of constraints.
 	 */
 	
-	public static Set<SATFact> moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton) {
+	public static Set<SLTLxFormula> moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton) {
 
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
 		for (Pair<PredicateLabel> pair : allModules.getSimplePairs()) {
 			for (State moduleState : moduleAutomaton.getAllStates()) {
 				cnfEncoding.add(
-						new SATNandStatement(
-									new SATAtom(
+						new SLTLxNegatedConjunction(
+									new SLTLxAtom(
 											AtomType.MODULE, 
 											pair.getFirst(), 
 											moduleState),
-									new SATAtom(
+									new SLTLxAtom(
 											AtomType.MODULE, 
 											pair.getSecond(), 
 											moduleState)));
@@ -763,8 +763,8 @@ public final class SATModuleUtils {
 	 * @param mappings        Mapping function.
 	 * @return String representation of constraints.
 	 */
-	public static Set<SATFact> moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton) {
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+	public static Set<SLTLxFormula> moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton) {
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		
 		if (allModules.getModules().isEmpty()) {
 			System.err.println("No tools were I/O annotated.");
@@ -772,18 +772,18 @@ public final class SATModuleUtils {
 		}
 
 		for (State moduleState : moduleAutomaton.getAllStates()) {
-			Set<SATFact> allPossibilities = new HashSet<SATFact>();
+			Set<SLTLxFormula> allPossibilities = new HashSet<SLTLxFormula>();
 			
 			for (TaxonomyPredicate tool : allModules.getModules()) {
 				if (tool instanceof Module) {
 					allPossibilities.add(
-							new SATAtom(
+							new SLTLxAtom(
 								AtomType.MODULE, 
 								tool, 
 								moduleState));
 				}
 			}
-			cnfEncoding.add(new SATOrStatement(allPossibilities));
+			cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
 		}
 
 		return cnfEncoding;
@@ -801,10 +801,10 @@ public final class SATModuleUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications.
 	 */
-	public static Set<SATFact> moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
+	public static Set<SLTLxFormula> moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
 			ModuleAutomaton moduleAutomaton) {
 
-		Set<SATFact> cnfEncoding = new HashSet<SATFact>();
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		for (State moduleState : moduleAutomaton.getAllStates()) {
 			cnfEncoding.addAll(moduleEnforceTaxonomyStructureForState(allModules, currModule, moduleState));
 		}
@@ -820,15 +820,15 @@ public final class SATModuleUtils {
 	 * @param moduleState State in which the module should be used.
 	 * @param mappings    Mapping function.
 	 */
-	private static Set<SATFact> moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule, State moduleState) {
-		SATAtom superModuleState = new SATAtom(AtomType.MODULE, currModule, moduleState);
+	private static Set<SLTLxFormula> moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule, State moduleState) {
+		SLTLxAtom superModuleState = new SLTLxAtom(AtomType.MODULE, currModule, moduleState);
 
-		Set<SATFact> fullCNFEncoding = new HashSet<SATFact>();
-		Set<SATFact> currCNFEncoding = new HashSet<SATFact>();
+		Set<SLTLxFormula> fullCNFEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> currCNFEncoding = new HashSet<SLTLxFormula>();
 		currCNFEncoding.add(
-				new SATNotStatement(superModuleState));
+				new SLTLxNegation(superModuleState));
 
-		List<SATAtom> subModulesStates = new ArrayList<SATAtom>();
+		List<SLTLxAtom> subModulesStates = new ArrayList<SLTLxAtom>();
 		if (!(currModule.getSubPredicates() == null || currModule.getSubPredicates().isEmpty())) {
 			/*
 			 * Ensuring the TOP-DOWN taxonomy tree dependency
@@ -838,19 +838,19 @@ public final class SATModuleUtils {
 					System.out.println("Null error: " + currModule.getPredicateID() + " ->"
 							+ currModule.getSubPredicates().toString());
 				}
-				SATAtom subModuleState = new SATAtom(AtomType.MODULE,subModule, moduleState);
+				SLTLxAtom subModuleState = new SLTLxAtom(AtomType.MODULE,subModule, moduleState);
 				currCNFEncoding.add(subModuleState);
 				subModulesStates.add(subModuleState);
 				
 				fullCNFEncoding.addAll(moduleEnforceTaxonomyStructureForState(allModules, subModule, moduleState));
 			}
-			fullCNFEncoding.add(new SATOrStatement(currCNFEncoding));
+			fullCNFEncoding.add(new SLTLxDisjunction(currCNFEncoding));
 			/*
 			 * Ensuring the BOTTOM-UP taxonomy tree dependency
 			 */
-			for (SATAtom subModuleState : subModulesStates) {
+			for (SLTLxAtom subModuleState : subModulesStates) {
 				fullCNFEncoding.add(
-						new SATImplicationStatement(
+						new SLTLxImplication(
 								subModuleState,
 								superModuleState));
 			}
