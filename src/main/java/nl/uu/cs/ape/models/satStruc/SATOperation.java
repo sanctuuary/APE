@@ -69,7 +69,10 @@ public class SATOperation extends SATFact {
 	 * @return Fact representing the existence of the operation.
 	 */
 	private SATFact enforceOperation(int stateNo, SATSynthesisEngine synthesisEngine) {
-		State modulState = synthesisEngine.getModuleAutomaton().get(stateNo);
+		State modulState = synthesisEngine.getModuleAutomaton().getSafe(stateNo);
+		if(modulState == null) {
+			return SATAtom.getFalse();
+		}
 		SATAtom moduleRule = new SATAtom(AtomType.MODULE, this.module, modulState);
 		
 		

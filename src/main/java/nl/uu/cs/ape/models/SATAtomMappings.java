@@ -67,6 +67,10 @@ public class SATAtomMappings implements Mappings {
         mappings = new HashMap<SATAtom, Integer>();
         reverseMapping = new HashMap<Integer, SATAtom>();
         mapped = new HashMap<String, SATAtom>();
+        vMappings = new HashMap<SATAtomVar, Integer>();
+        vReverseMapping = new HashMap<Integer, SATAtomVar>();
+        vMapped = new HashMap<String, SATAtomVar>();
+       
         /* First auxMax variables are reserved for auxiliary variables */
         auxiliary = auxDefaultInit;
         atomVarNo = auxMax + 1;
@@ -215,8 +219,8 @@ public class SATAtomMappings implements Mappings {
      *
      * @return Max number of possible mapped auxiliary variables.
      */
-    public int getMaxNumOfMappedAuxVar() {
-        return auxMax;
+    public int getInitialNumOfMappedAtoms() {
+        return auxMax + atomVarMaxNo + 1;
     }
 	
 }

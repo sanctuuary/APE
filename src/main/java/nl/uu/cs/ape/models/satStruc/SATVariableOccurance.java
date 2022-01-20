@@ -9,6 +9,7 @@ import nl.uu.cs.ape.automaton.SATVariable;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.utils.APEUtils;
 import uk.ac.manchester.cs.atomicdecomposition.Atom;
 
 /**
@@ -85,19 +86,21 @@ public class SATVariableOccurance {
 	/**
 	 * Get all unary predicates that include the given variable.
 	 * @param satVariable - the given variable
-	 * @return Set of unary predicates that are mentioned in combination with the given variable.
+	 * @return Set (possibly empty) of unary predicates that are mentioned in combination with the given variable. 
 	 */
 	public Set<PredicateLabel> getUnaryPredicates(SATVariable satVariable) {
-		return this.unaryPredicates.get(satVariable);
+		Set<PredicateLabel> unaryPreds = this.unaryPredicates.get(satVariable);
+		return ((unaryPreds == null) ? new HashSet<PredicateLabel>() : unaryPreds);
 	}
 	
 	/**
 	 * Get all binary relations that include the given variable pair as arguments (in the given order).
 	 * @param satVariable - the given variable pair
-	 * @return Set of binary predicates that were used over the variable pair.
+	 * @return Set (possibly empty) of binary predicates that were used over the variable pair.
 	 */
 	public Set<AtomVarType> getBinaryPredicates(Pair<SATVariable> varPair) {
-		return this.binaryPredicates.get(varPair);
+		Set<AtomVarType> binPreds = this.binaryPredicates.get(varPair);
+		return ((binPreds == null) ? new HashSet<AtomVarType>() : binPreds);
 	}
 	
 	
@@ -108,7 +111,7 @@ public class SATVariableOccurance {
 	 */
 	public Set<Pair<SATVariable>> getPairsContainingVarAsFirstArg(SATVariable firstVar) {
 		Set<Pair<SATVariable>> pairs = new HashSet<>();
-		for(SATVariable secondVar : this.variablePairs.get(firstVar)){
+		for(SATVariable secondVar : APEUtils.safe(this.variablePairs.get(firstVar))){
 			pairs.add(new Pair<SATVariable>(firstVar, secondVar));
 		}
 		return pairs;

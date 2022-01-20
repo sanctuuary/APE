@@ -64,6 +64,17 @@ public class ModuleAutomaton implements Automaton {
     public State get(int i) {
         return moduleStates.get(i);
     }
+    
+    /**
+     * Return {@code i}-th Module state from the automaton (where 0 is the first index). 
+     * It will not throw out of bound error, but return {@code null} instead.
+     *
+     * @param i Ordering number of the state to be returned.
+     * @return Module State, or {@code null} if the index is out of bounds.
+     */
+    public State getSafe(int i) {
+    	return ((i < moduleStates.size()) ? moduleStates.get(i) : null);
+    }
 
     /* (non-Javadoc)
      * @see nl.uu.cs.ape.automaton.Automaton#getAllStates()

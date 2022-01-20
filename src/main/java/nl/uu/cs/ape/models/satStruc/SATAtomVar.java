@@ -168,10 +168,12 @@ public class SATAtomVar extends SATFact implements SATAbstractAtom {
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.elementType.isUnaryProperty()) {
-			synthesisEngine.getVariableUsage().addUnaryPair(this.secondArg, this.firstArg);
+			SATVariable var = variableMapping.getVarSabstitute(this.secondArg);
+			synthesisEngine.getVariableUsage().addUnaryPair(var, this.firstArg);
 		} else if(!this.elementType.equals(AtomVarType.VAR_REF) && this.elementType.isBinaryRel()) {
-			SATVariable firstArgVar = (SATVariable) this.firstArg;
-			synthesisEngine.getVariableUsage().addBinaryPair(new Pair<SATVariable>(firstArgVar, this.secondArg), this.elementType);
+			SATVariable firstVaR = variableMapping.getVarSabstitute((SATVariable) this.firstArg);
+			SATVariable secondVar = variableMapping.getVarSabstitute(this.secondArg);
+			synthesisEngine.getVariableUsage().addBinaryPair(new Pair<SATVariable>(firstVaR, secondVar), this.elementType);
 		}
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);

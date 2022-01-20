@@ -31,8 +31,6 @@ public class SATVariableFlattening {
 	private Map<SATVariable, SATVariable> mappedVariables;
 	/** Variable mapping to its domain. */
 	private Map<SATVariable, Set<State>> variableDomain;
-	/** Variable mapping to variables it is combined with under a pair. */
-	private Map<SATVariable, Set<SATVariable>> variablePairs;
 	/** Number of variables. */
 	private int variableNo;
 	
@@ -44,7 +42,6 @@ public class SATVariableFlattening {
 		super();
 		this.mappedVariables = new HashMap<>();
 		this.variableDomain = new HashMap<>();
-		this.variablePairs = new HashMap<>();
 		this.variableNo = 1;
 	}
 	
@@ -62,10 +59,6 @@ public class SATVariableFlattening {
 		for(SATVariable key : existing.variableDomain.keySet()) {
 			this.variableDomain.put(key, existing.variableDomain.get(key));
 		}
-		this.variablePairs = new HashMap<>();
-		for(SATVariable key : existing.variablePairs.keySet()) {
-			this.variablePairs.put(key, existing.variablePairs.get(key));
-		}
 		this.variableNo = existing.variableNo;
 	}
 
@@ -80,8 +73,9 @@ public class SATVariableFlattening {
 	public SATVariable addNewVariable(SATVariable existingVar, Set<State> varDomain) {
 		SATVariable newVar = new SATVariable("uniqVar_" + this.variableNo++);
 		this.mappedVariables.put(existingVar, newVar);
-		this.variableDomain.put(existingVar, varDomain);
-		return mappedVariables.get(existingVar);
+		this.mappedVariables.put(newVar, newVar);
+		this.variableDomain.put(newVar, varDomain);
+		return newVar;
 	}
 	
 

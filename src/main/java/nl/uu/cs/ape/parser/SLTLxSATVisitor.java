@@ -1,7 +1,6 @@
 package nl.uu.cs.ape.parser;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,48 +8,59 @@ import java.util.Set;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import nl.uu.cs.ape.automaton.SATVariable;
-import nl.uu.cs.ape.constraints.ConstraintFactory;
 import nl.uu.cs.ape.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AllTypes;
-import nl.uu.cs.ape.models.SATAtomMappings;
-import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SATAndStatement;
-import nl.uu.cs.ape.models.satStruc.SATOrStatement;
-import nl.uu.cs.ape.models.satStruc.SATUntil;
-import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
-import nl.uu.cs.ape.models.satStruc.SATEquivalenceStatement;
-import nl.uu.cs.ape.models.satStruc.SATExists;
 import nl.uu.cs.ape.models.satStruc.SATAtom;
 import nl.uu.cs.ape.models.satStruc.SATAtomVar;
+import nl.uu.cs.ape.models.satStruc.SATEquivalenceStatement;
+import nl.uu.cs.ape.models.satStruc.SATExists;
 import nl.uu.cs.ape.models.satStruc.SATFact;
-import nl.uu.cs.ape.models.satStruc.SATGlobally;
 import nl.uu.cs.ape.models.satStruc.SATFinally;
 import nl.uu.cs.ape.models.satStruc.SATForall;
+import nl.uu.cs.ape.models.satStruc.SATGlobally;
+import nl.uu.cs.ape.models.satStruc.SATImplicationStatement;
 import nl.uu.cs.ape.models.satStruc.SATNext;
 import nl.uu.cs.ape.models.satStruc.SATNextOp;
 import nl.uu.cs.ape.models.satStruc.SATNotStatement;
 import nl.uu.cs.ape.models.satStruc.SATOperation;
+import nl.uu.cs.ape.models.satStruc.SATOrStatement;
+import nl.uu.cs.ape.models.satStruc.SATUntil;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxBaseVisitor;
-import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.*;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BinaryBoolContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BinaryModalContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BooleanContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BracketsContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.ConditionContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.ExistsContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.ForallContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.FunctionContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.ModuleContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.NegUnaryContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.R_relationContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.ToolRefContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.UnaryModalContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.VarEqContext;
+import nl.uu.cs.ape.utils.APEUtils;
 
 public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 	static int usedState = 0;
 	int memIndexFactor;
-	SATAtomMappings mapping;
 	private final AllTypes allTypes;
 	private final AllModules allModules;
+	private String ontologyPrexifURI;
 	
 	
 	
 	public SLTLxSATVisitor(SATSynthesisEngine synthesisEngine) {
 		super();
+		this.ontologyPrexifURI = synthesisEngine.getDomainSetup().getOntologyPrefixURI();
 		this.allTypes = synthesisEngine.getDomainSetup().getAllTypes();
 		this.allModules = synthesisEngine.getDomainSetup().getAllModules();
 	}
@@ -100,7 +110,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 	@Override
 	public SATFact visitBoolean(BooleanContext ctx) {
-		if(ctx.getChild(0).getText().equals("'true'")) {
+		if(ctx.getChild(0).getText().equals("true")) {
 			return SATAtom.getTrue();
 		} else {
 			return SATAtom.getFalse();
@@ -201,8 +211,12 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SATFact> {
 
 	@Override
 	public SATFact visitModule(ModuleContext ctx) {
-		String operationID = ctx.getChild(0).getText();
+		String operationID = ctx.getChild(0).getText().replace("'", "");
 		AbstractModule currOperation = allModules.get(operationID);
+		if(currOperation == null) {
+			String operationIRI = APEUtils.createClassURI(operationID, this.ontologyPrexifURI);
+			currOperation = allModules.get(operationIRI);
+		}
 		if(currOperation == null) {
 			throw ConstraintFormatException.wrongSLTLxOperation("Operation '" + operationID + "' does not exist in the taxonomy/tool annotations.");
 		}

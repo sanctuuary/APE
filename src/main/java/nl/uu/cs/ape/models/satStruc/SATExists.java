@@ -37,12 +37,12 @@ private SATFact formula;
 	public Set<CNFClause> getCNFEncoding(int stateNo, SATVariableFlattening curVarMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> clauses = new HashSet<CNFClause>();
 		SATVariableFlattening newVarMappping = new SATVariableFlattening(curVarMapping); 
-		newVarMappping.addNewVariable(bindedVariable, bindedVariable.getVariableDomain(stateNo, synthesisEngine));
+		SATVariable flatBindedVariable = newVarMappping.addNewVariable(bindedVariable, bindedVariable.getVariableDomain(stateNo, synthesisEngine));
 		
-		clauses.addAll(bindedVariable.getExistentialCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(flatBindedVariable.getExistentialCNFEncoding(stateNo, newVarMappping, synthesisEngine));
 		clauses.addAll(formula.getCNFEncoding(stateNo, newVarMappping, synthesisEngine));
 		/** The rules have to be applied after visiting the bound formula (as done in the previous step). */
-		clauses.addAll(bindedVariable.getVariableSubstitutionEnforcingCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(flatBindedVariable.getVariableSubstitutionEnforcingCNFEncoding(stateNo, newVarMappping, synthesisEngine));
 		
 		return clauses;
 	}
@@ -51,12 +51,12 @@ private SATFact formula;
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SATVariableFlattening curVarMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> clauses = new HashSet<CNFClause>();
 		SATVariableFlattening newVarMappping = new SATVariableFlattening(curVarMapping); 
-		newVarMappping.addNewVariable(bindedVariable, bindedVariable.getVariableDomain(stateNo, synthesisEngine));
+		SATVariable flatBindedVariable = newVarMappping.addNewVariable(bindedVariable, bindedVariable.getVariableDomain(stateNo, synthesisEngine));
 		
-		clauses.addAll(bindedVariable.getUniversalCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(flatBindedVariable.getUniversalCNFEncoding(stateNo, newVarMappping, synthesisEngine));
 		clauses.addAll(formula.getNegatedCNFEncoding(stateNo, newVarMappping, synthesisEngine));
 		/** The rules have to be applied after visiting the bound formula (as done in the previous step). */
-		clauses.addAll(bindedVariable.getVariableSubstitutionEnforcingCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(flatBindedVariable.getVariableSubstitutionEnforcingCNFEncoding(stateNo, newVarMappping, synthesisEngine));
 		
 		return clauses;
 	}

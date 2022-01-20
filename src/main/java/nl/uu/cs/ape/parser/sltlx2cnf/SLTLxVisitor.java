@@ -106,4 +106,22 @@ public interface SLTLxVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitModule(SLTLxParser.ModuleContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SLTLxParser#vars}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVars(SLTLxParser.VarsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SLTLxParser#variable}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVariable(SLTLxParser.VariableContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SLTLxParser#constant}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConstant(SLTLxParser.ConstantContext ctx);
 }

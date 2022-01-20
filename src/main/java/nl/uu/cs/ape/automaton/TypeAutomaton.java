@@ -203,7 +203,7 @@ public class TypeAutomaton implements Automaton {
      */
     public List<State> getMemoryStatesUntilBlockNo(int maxBlockNo) {
         List<State> untilStates = new ArrayList<State>();
-        for (int i = 0; i <= maxBlockNo; i++) {
+        for (int i = 0; i <= maxBlockNo && i < this.usedTypesAutomaton.size(); i++) {
             Block currBlock = this.getMemoryTypesBlock(i);
             for (State currState : currBlock.getStates()) {
                 untilStates.add(currState);
@@ -220,7 +220,7 @@ public class TypeAutomaton implements Automaton {
      */
     public List<State> getAllStatesUntilBlockNo(int maxBlockNo) {
         List<State> untilStates = new ArrayList<State>();
-        for (int i = 0; i < maxBlockNo; i++) {
+        for (int i = 0; i <= maxBlockNo && i < this.usedTypesAutomaton.size(); i++) {
             Block currBlock = this.usedTypesAutomaton.get(i);
             for (State currState : currBlock.getStates()) {
                 untilStates.add(currState);

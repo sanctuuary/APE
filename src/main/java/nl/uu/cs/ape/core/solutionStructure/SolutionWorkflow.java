@@ -177,7 +177,7 @@ public class SolutionWorkflow {
         this.nativeSolution = new SATSolution(satSolution, synthesisInstance);
 
         for (int mappedLiteral : satSolution) {
-            if (mappedLiteral > synthesisInstance.getMappings().getMaxNumOfMappedAuxVar()) {
+            if (mappedLiteral >= synthesisInstance.getMappings().getInitialNumOfMappedAtoms()) {
                 Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
                 if (!currLiteral.isNegated()) {
                     if (currLiteral.getPredicate() instanceof AuxiliaryPredicate) {

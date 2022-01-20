@@ -76,7 +76,7 @@ public class SATSolution extends SolutionInterpreter {
         references2MemTypes = new ArrayList<Literal>();
         usedTypeStates = new HashSet<PredicateLabel>();
         for (int mappedLiteral : satSolution) {
-            if (mappedLiteral > synthesisInstance.getMappings().getMaxNumOfMappedAuxVar()) {
+            if (mappedLiteral >= synthesisInstance.getMappings().getInitialNumOfMappedAtoms()) {
                 Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
                 literals.add(currLiteral);
                 if (!currLiteral.isNegated()) {
