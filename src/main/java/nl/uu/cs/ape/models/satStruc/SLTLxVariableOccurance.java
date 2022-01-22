@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.SATVariable;
+import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
@@ -20,11 +20,11 @@ import nl.uu.cs.ape.utils.APEUtils;
 public class SLTLxVariableOccurance {
 
 	/** Mapping variables to their usages under unary predicates.*/
-	private Map<SATVariable, Set<PredicateLabel>> unaryPredicates;
+	private Map<SLTLxVariable, Set<PredicateLabel>> unaryPredicates;
 	/** Mapping variables to their usages under binary predicates.*/
-	private Map<Pair<SATVariable>, Set<AtomVarType>> binaryPredicates;
+	private Map<Pair<SLTLxVariable>, Set<AtomVarType>> binaryPredicates;
 	/** Variable mapping to variables it is combined with under a pair. */
-	private Map<SATVariable, Set<SATVariable>> variablePairs;
+	private Map<SLTLxVariable, Set<SLTLxVariable>> variablePairs;
 			
 	/**
 	 * Create the variable usage class.
@@ -43,7 +43,7 @@ public class SLTLxVariableOccurance {
 	 * @param predicate - unary predicate
 	 * @return {@code true} if the predicated was associated with the variable, {@code false} otherwise.
 	 */
-	public boolean addUnaryPair(SATVariable argumentState, PredicateLabel predicate) {
+	public boolean addUnaryPair(SLTLxVariable argumentState, PredicateLabel predicate) {
 		if(this.unaryPredicates.get(argumentState) == null) {
 			Set<PredicateLabel> preds = new HashSet<>();
 			boolean tmp = preds.add(predicate);
@@ -61,7 +61,7 @@ public class SLTLxVariableOccurance {
 	 * @return {@code true} if the predicated was associated with the variable pair, {@code false} otherwise.
 	 */
 
-	public boolean addBinaryPair(Pair<SATVariable> varPair, AtomVarType relType) {
+	public boolean addBinaryPair(Pair<SLTLxVariable> varPair, AtomVarType relType) {
 		if(relType.equals(AtomVarType.VAR_REF)) {
 			return false;
 		}
@@ -73,7 +73,7 @@ public class SLTLxVariableOccurance {
 			
 			return tmp;
 		} else {
-			Set<SATVariable> vars = new HashSet<>();
+			Set<SLTLxVariable> vars = new HashSet<>();
 			vars.add(varPair.getSecond());
 			this.variablePairs.put(varPair.getFirst(), vars);
 			
@@ -87,7 +87,7 @@ public class SLTLxVariableOccurance {
 	 * @param satVariable - the given variable
 	 * @return Set (possibly empty) of unary predicates that are mentioned in combination with the given variable. 
 	 */
-	public Set<PredicateLabel> getUnaryPredicates(SATVariable satVariable) {
+	public Set<PredicateLabel> getUnaryPredicates(SLTLxVariable satVariable) {
 		Set<PredicateLabel> unaryPreds = this.unaryPredicates.get(satVariable);
 		return ((unaryPreds == null) ? new HashSet<PredicateLabel>() : unaryPreds);
 	}
@@ -97,7 +97,7 @@ public class SLTLxVariableOccurance {
 	 * @param satVariable - the given variable pair
 	 * @return Set (possibly empty) of binary predicates that were used over the variable pair.
 	 */
-	public Set<AtomVarType> getBinaryPredicates(Pair<SATVariable> varPair) {
+	public Set<AtomVarType> getBinaryPredicates(Pair<SLTLxVariable> varPair) {
 		Set<AtomVarType> binPreds = this.binaryPredicates.get(varPair);
 		return ((binPreds == null) ? new HashSet<AtomVarType>() : binPreds);
 	}
@@ -108,10 +108,10 @@ public class SLTLxVariableOccurance {
 	 * @param firstVar - variable that is first in the pairs
 	 * @return Set of Pair objects that are used in the formulas, where the given variable is the first one.
 	 */
-	public Set<Pair<SATVariable>> getPairsContainingVarAsFirstArg(SATVariable firstVar) {
-		Set<Pair<SATVariable>> pairs = new HashSet<>();
-		for(SATVariable secondVar : APEUtils.safe(this.variablePairs.get(firstVar))){
-			pairs.add(new Pair<SATVariable>(firstVar, secondVar));
+	public Set<Pair<SLTLxVariable>> getPairsContainingVarAsFirstArg(SLTLxVariable firstVar) {
+		Set<Pair<SLTLxVariable>> pairs = new HashSet<>();
+		for(SLTLxVariable secondVar : APEUtils.safe(this.variablePairs.get(firstVar))){
+			pairs.add(new Pair<SLTLxVariable>(firstVar, secondVar));
 		}
 		return pairs;
 	}

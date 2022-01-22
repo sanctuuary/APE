@@ -22,12 +22,20 @@ private SLTLxFormula formula;
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
-		return formula.getCNFEncoding(stateNo + 1, variableMapping, synthesisEngine);
+		if(synthesisEngine.getSolutionSize() <= stateNo)  {
+			return SLTLxAtom.getFalse().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
+		} else {
+			return formula.getCNFEncoding(stateNo + 1, variableMapping, synthesisEngine);
+ 		}
 	}
 
 	@Override
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
-		return formula.getNegatedCNFEncoding(stateNo + 1, variableMapping, synthesisEngine);
+		if(synthesisEngine.getSolutionSize() <= stateNo)  {
+			return SLTLxAtom.getTrue().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
+		} else {
+			return formula.getCNFEncoding(stateNo + 1, variableMapping, synthesisEngine);
+ 		}
 	}
 
 }

@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import nl.uu.cs.ape.automaton.SATVariable;
+import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;
@@ -29,6 +29,7 @@ import nl.uu.cs.ape.models.satStruc.SLTLxNext;
 import nl.uu.cs.ape.models.satStruc.SLTLxNextOp;
 import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
 import nl.uu.cs.ape.models.satStruc.SLTLxOperation;
+import nl.uu.cs.ape.models.satStruc.SLTLxParsingException;
 import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
 import nl.uu.cs.ape.models.satStruc.SLTLxUntil;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxBaseVisitor;
@@ -150,7 +151,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 
 	@Override
 	public SLTLxFormula visitForall(ForallContext ctx) {
-		SATVariable variable = new SATVariable(ctx.getChild(2).getText());
+		SLTLxVariable variable = new SLTLxVariable(ctx.getChild(2).getText());
 		SLTLxFormula subFormula = visit(ctx.getChild(4));
 		return new SLTLxForall(variable, subFormula);
 	}
@@ -161,16 +162,25 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 	public SLTLxFormula visitFunction(FunctionContext ctx) {
 		String typePredicateID = ctx.getChild(0).getText().replace("'", "");
 		String variableID = ctx.getChild(2).getText();
+		
 		TaxonomyPredicate typePred = allTypes.get(typePredicateID);
 		
-		return new SLTLxAtomVar(AtomVarType.TYPE_VAR, typePred, new SATVariable(variableID));
+		if(typePred == null) {
+			String typePredIRI = APEUtils.createClassURI(typePredicateID, this.ontologyPrexifURI);
+			typePred = allTypes.get(typePredIRI);
+		}
+		if(typePred == null) {
+			throw SLTLxParsingException.typeDoesNoExists("Data type '" + typePredicateID + "' does not exist in the taxonomy.");
+		}
+		
+		return new SLTLxAtomVar(AtomVarType.TYPE_VAR, typePred, new SLTLxVariable(variableID));
 	}
 
 
 
 	@Override
 	public SLTLxFormula visitExists(ExistsContext ctx) {
-		SATVariable variable = new SATVariable(ctx.getChild(2).getText());
+		SLTLxVariable variable = new SLTLxVariable(ctx.getChild(2).getText());
 		SLTLxFormula subFormula = visit(ctx.getChild(4));
 		return new SLTLxExists(variable, subFormula);
 	}
@@ -196,7 +206,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		String variableID1 = ctx.getChild(2).getText();
 		String variableID2 = ctx.getChild(4).getText();
 		
-		return new SLTLxAtomVar(AtomVarType.TYPE_DEPENDENCY_VAR, new SATVariable(variableID1), new SATVariable(variableID2));
+		return new SLTLxAtomVar(AtomVarType.TYPE_DEPENDENCY_VAR, new SLTLxVariable(variableID1), new SLTLxVariable(variableID2));
 	}
 
 	@Override
@@ -204,7 +214,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		String variableID1 = ctx.getChild(0).getText();
 		String variableID2 = ctx.getChild(2).getText();
 		
-		return new SLTLxAtomVar(AtomVarType.VAR_EQUIVALENCE, new SATVariable(variableID1), new SATVariable(variableID2));
+		return new SLTLxAtomVar(AtomVarType.VAR_EQUIVALENCE, new SLTLxVariable(variableID1), new SLTLxVariable(variableID2));
 	}
 
 
@@ -218,22 +228,23 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 			currOperation = allModules.get(operationIRI);
 		}
 		if(currOperation == null) {
-			throw ConstraintFormatException.wrongSLTLxOperation("Operation '" + operationID + "' does not exist in the taxonomy/tool annotations.");
+			throw SLTLxParsingException.moduleDoesNoExists("Operation '" + operationID + "' does not exist in the taxonomy/tool annotations.");
 		}
-		List<SATVariable> inputs = new ArrayList<SATVariable>();
+		
+		List<SLTLxVariable> inputs = new ArrayList<SLTLxVariable>();
 	
 		ParseTree inputElems = ctx.getChild(2);
 		for(int i = 0; i < inputElems.getChildCount(); i=i+2) {
 			String variableID = inputElems.getChild(i).getText();
-			inputs.add(new SATVariable(variableID));
+			inputs.add(new SLTLxVariable(variableID));
 		}
 		
-		List<SATVariable> outputs = new ArrayList<SATVariable>();
+		List<SLTLxVariable> outputs = new ArrayList<SLTLxVariable>();
 		
 		ParseTree outputElems = ctx.getChild(4);
 		for(int i = 0; i < outputElems.getChildCount(); i=i+2) {
 			String variableID = outputElems.getChild(i).getText();
-			outputs.add(new SATVariable(variableID));
+			outputs.add(new SLTLxVariable(variableID));
 		}
 		
 		return new SLTLxOperation(currOperation, inputs, outputs);

@@ -2,7 +2,7 @@ package nl.uu.cs.ape.models.satStruc;
 
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.SATVariable;
+import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
@@ -24,7 +24,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
     /**
      * Second argument is a variable representing a typeState.
      */
-    private final SATVariable secondArg;
+    private final SLTLxVariable secondArg;
 
     /**
      * Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.)
@@ -46,7 +46,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
      * @param firstArg  - Predicate used or a variable that is the referenced.
      * @param secondArg - Variable representing state in the automaton it was used/created in.
      */
-    public SLTLxAtomVar(AtomVarType elementType, PredicateLabel firstArg, SATVariable secondArg) {
+    public SLTLxAtomVar(AtomVarType elementType, PredicateLabel firstArg, SLTLxVariable secondArg) {
     	super();
         this.firstArg = firstArg;
         this.secondArg = secondArg;
@@ -119,7 +119,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
      *
      * @return Field {@link #secondArg}.
      */
-    public SATVariable getSecondArg() {
+    public SLTLxVariable getSecondArg() {
         return secondArg;
     }
 
@@ -165,12 +165,12 @@ public class SLTLxAtomVar extends SLTLxFormula {
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.elementType.isUnaryProperty()) {
-			SATVariable var = variableMapping.getVarSabstitute(this.secondArg);
+			SLTLxVariable var = variableMapping.getVarSabstitute(this.secondArg);
 			synthesisEngine.getVariableUsage().addUnaryPair(var, this.firstArg);
 		} else if(!this.elementType.equals(AtomVarType.VAR_REF) && this.elementType.isBinaryRel()) {
-			SATVariable firstVaR = variableMapping.getVarSabstitute((SATVariable) this.firstArg);
-			SATVariable secondVar = variableMapping.getVarSabstitute(this.secondArg);
-			synthesisEngine.getVariableUsage().addBinaryPair(new Pair<SATVariable>(firstVaR, secondVar), this.elementType);
+			SLTLxVariable firstVaR = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
+			SLTLxVariable secondVar = variableMapping.getVarSabstitute(this.secondArg);
+			synthesisEngine.getVariableUsage().addBinaryPair(new Pair<SLTLxVariable>(firstVaR, secondVar), this.elementType);
 		}
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);

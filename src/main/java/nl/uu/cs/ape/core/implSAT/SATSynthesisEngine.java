@@ -212,10 +212,16 @@ public class SATSynthesisEngine implements SynthesisEngine {
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, domainSetup.getConstraintsForAuxiliaryPredicates(moduleAutomaton, typeAutomaton));
         
+        
+        /*
+         * Setup encoding of auxiliary 'true', 'false' and 'EQ' atoms, to ensure proper SLTLx parsing.
+         * TODO
+         */
+        
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, Hello.getFact(this, "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> <'ToolsTaxonomy'(?y;)> true)"));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, Hello.getFact(this, "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?u)> <'ToolsTaxonomy'(?y;)> true)"));
 
         /*
          * Counting the number of variables and clauses that will be given to the SAT solver

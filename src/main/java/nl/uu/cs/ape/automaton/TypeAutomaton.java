@@ -32,7 +32,7 @@ public class TypeAutomaton implements Automaton {
      * State is used in order to represent no state.
      */
     private State nullState;
-
+    
     /**
      * Generate the Type State automatons based on the defined length and branching factor.<br>
      * Labeling of the automaton is provided in
@@ -360,4 +360,16 @@ public class TypeAutomaton implements Automaton {
 		}
 		return null;
 	}
+	
+	/**
+	 * Return the size of the automaton, i.e., number of blocks in memoryType/usedType automatons.<br/><br/>
+	 * <b>Note:</b>
+	 * Size of the type automaton is (workflow length + 1) as it includes the workflow input and output as an additional block. 
+	 * @return Size of type automaton.
+	 */
+	public int getLength() {
+		return this.memoryTypesAutomaton.size();
+	}
+	
+	
 }

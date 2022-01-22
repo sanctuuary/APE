@@ -27,7 +27,7 @@ import nl.uu.cs.ape.models.satStruc.SLTLxVariableOccurance;
  *
  * @author Vedran Kasalica
  */
-public class SATVariable implements StateInterface, PredicateLabel {
+public class SLTLxVariable extends PredicateLabel implements StateInterface  {
 
 	/** Unique name of the type state variable */
     private final String variableID;
@@ -37,7 +37,7 @@ public class SATVariable implements StateInterface, PredicateLabel {
      * Create new type state variable.
      * @param variableName - Unique variable name
      */
-    public SATVariable(String variableName) {
+    public SLTLxVariable(String variableName) {
 		super();
 		this.variableID = variableName;
 	}
@@ -65,7 +65,7 @@ public class SATVariable implements StateInterface, PredicateLabel {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SATVariable other = (SATVariable) obj;
+		SLTLxVariable other = (SLTLxVariable) obj;
 		if (variableID == null) {
 			if (other.variableID != null)
 				return false;
@@ -198,9 +198,9 @@ public class SATVariable implements StateInterface, PredicateLabel {
 		}
 		
 		/** Introduce rules to enforce substitution over unary predicates when needed. */
-		for(Pair<SATVariable> pairs : varUsage.getPairsContainingVarAsFirstArg(this)) {
-			SATVariable var1 = this;
-			SATVariable var2 = pairs.getSecond();
+		for(Pair<SLTLxVariable> pairs : varUsage.getPairsContainingVarAsFirstArg(this)) {
+			SLTLxVariable var1 = this;
+			SLTLxVariable var2 = pairs.getSecond();
 			for(AtomVarType atomVarType : varUsage.getBinaryPredicates(pairs)) {
 				AtomType atomType;
 				if(atomVarType.equals(AtomVarType.VAR_EQUIVALENCE)) {

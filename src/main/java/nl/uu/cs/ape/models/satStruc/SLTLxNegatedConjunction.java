@@ -7,7 +7,7 @@ import java.util.Set;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 
 /**
- * Structure used to model NAND relation of terms in SLTLx.
+ * Structure used to model NAND (not (and x y)) operation in SLTLx.
  * 
  * @author Vedran Kasalica
  *
@@ -33,7 +33,7 @@ private Set<SLTLxFormula> nconjunctedFacts;
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
-		return new SLTLxDisjunction(nconjunctedFacts).getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine);
+		return new SLTLxConjunction(nconjunctedFacts).getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 
 	

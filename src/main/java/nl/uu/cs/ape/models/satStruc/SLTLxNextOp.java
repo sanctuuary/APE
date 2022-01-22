@@ -26,6 +26,10 @@ public class SLTLxNextOp extends SLTLxFormula {
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+		if(synthesisEngine.getSolutionSize() <= stateNo)  {
+			return SLTLxAtom.getFalse().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
+ 		}
+		
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
 		/* Conjunct the collection of clauses that encode the operation and the formula */
@@ -37,6 +41,9 @@ public class SLTLxNextOp extends SLTLxFormula {
 
 	@Override
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+		if(synthesisEngine.getSolutionSize() <= stateNo)  {
+			return SLTLxAtom.getTrue().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
+ 		}
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
 		/* Disjunction the collection of clauses that encode the negation of the operation and of the formula */

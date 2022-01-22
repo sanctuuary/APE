@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.SATVariable;
+import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;
@@ -20,12 +20,12 @@ import nl.uu.cs.ape.models.enums.AtomVarType;
 public class SLTLxOperation extends SLTLxFormula {
 
 	private AbstractModule module;
-	private List<SATVariable> inputs;
-	private List<SATVariable> outputs;
+	private List<SLTLxVariable> inputs;
+	private List<SLTLxVariable> outputs;
 	
 
 
-	public SLTLxOperation(AbstractModule module, List<SATVariable> inputs, List<SATVariable> outputs) {
+	public SLTLxOperation(AbstractModule module, List<SLTLxVariable> inputs, List<SLTLxVariable> outputs) {
 		super();
 		this.module = module;
 		this.inputs = inputs;
@@ -64,7 +64,7 @@ public class SLTLxOperation extends SLTLxFormula {
 		
 		
 		Set<SLTLxFormula> allInputs = new HashSet<>();
-		for(SATVariable inputVar : inputs) {
+		for(SLTLxVariable inputVar : inputs) {
 			Set<SLTLxAtomVar> inputAtoms = new HashSet<>();
 			for(State inState : synthesisEngine.getTypeAutomaton().getUsedTypesBlock(stateNo).getStates()) {
 				inputAtoms.add(new SLTLxAtomVar(AtomVarType.VAR_REF, inState, inputVar));
@@ -76,9 +76,10 @@ public class SLTLxOperation extends SLTLxFormula {
 		
 		
 		Set<SLTLxFormula> allOutputs = new HashSet<>();
-		for(SATVariable outputVar : outputs) {
+		for(SLTLxVariable outputVar : outputs) {
 			Set<SLTLxAtomVar> outputAtoms = new HashSet<>();
 			for(State outState : synthesisEngine.getTypeAutomaton().getMemoryTypesBlock(stateNo).getStates()) {
+				System.out.println(outState.toString());
 				outputAtoms.add(new SLTLxAtomVar(AtomVarType.VAR_REF, outState, outputVar));
 			}
 			SLTLxDisjunction outputPossibilities = new SLTLxDisjunction(outputAtoms);
