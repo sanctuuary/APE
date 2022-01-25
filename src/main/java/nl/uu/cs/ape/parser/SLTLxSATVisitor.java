@@ -5,10 +5,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import nl.uu.cs.ape.automaton.SLTLxVariable;
-import nl.uu.cs.ape.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
@@ -29,10 +31,13 @@ import nl.uu.cs.ape.models.satStruc.SLTLxNext;
 import nl.uu.cs.ape.models.satStruc.SLTLxNextOp;
 import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
 import nl.uu.cs.ape.models.satStruc.SLTLxOperation;
+import nl.uu.cs.ape.models.satStruc.SLTLxParsingBaseErrorListener;
 import nl.uu.cs.ape.models.satStruc.SLTLxParsingPredicatesException;
 import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
 import nl.uu.cs.ape.models.satStruc.SLTLxUntil;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxBaseVisitor;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxLexer;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BinaryBoolContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BinaryModalContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BooleanContext;
@@ -64,6 +69,25 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		this.ontologyPrexifURI = synthesisEngine.getDomainSetup().getOntologyPrefixURI();
 		this.allTypes = synthesisEngine.getDomainSetup().getAllTypes();
 		this.allModules = synthesisEngine.getDomainSetup().getAllModules();
+	}
+	
+	public static Set<SLTLxFormula> parseFormula(SATSynthesisEngine synthesisEngine, String formula) throws ParseCancellationException {
+		Set<SLTLxFormula> facts = new HashSet<>();
+
+		SLTLxLexer lexer = new SLTLxLexer(CharStreams.fromString(formula));
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(SLTLxParsingBaseErrorListener.INSTANCE);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		SLTLxParser parser = new SLTLxParser(tokens);
+		parser.removeErrorListeners();
+		parser.addErrorListener(SLTLxParsingBaseErrorListener.INSTANCE);
+
+		ParseTree tree = parser.formula();
+		SLTLxSATVisitor visitor = new SLTLxSATVisitor(synthesisEngine);
+		SLTLxFormula res = visitor.visit(tree);
+		facts.add(res);
+
+		return facts;
 	}
 
 
