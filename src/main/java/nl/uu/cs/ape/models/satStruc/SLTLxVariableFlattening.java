@@ -75,12 +75,12 @@ public class SLTLxVariableFlattening {
 	 * 
 	 * @param existingVar - variable used in the formula
 	 * @return Unique variable that corresponds to the current variable binding.
-	 * @throws SLTLxParsingPredicatesException - in case that the variable does not exist.
+	 * @throws SLTLxParsingAnnotationException - in case that the variable does not exist.
 	 */
-	public SLTLxVariable getVarSabstitute(SLTLxVariable existingVar) throws SLTLxParsingPredicatesException {
+	public SLTLxVariable getVarSabstitute(SLTLxVariable existingVar) throws SLTLxParsingAnnotationException {
 		SLTLxVariable var = mappedVariables.get(existingVar);
 		if (var == null) {
-			throw SLTLxParsingPredicatesException
+			throw SLTLxParsingAnnotationException
 					.variableNotBound("Variable " + existingVar.getPredicateID() + " must be bound.");
 		}
 		return var;

@@ -223,7 +223,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> <'ToolsTaxonomy'(?y;)> true)"));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> <'ToolsTaxonomy'(?y;)> true)"));
 
         System.out.println("END");
         /*
@@ -241,7 +241,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         cnfEncoding.delete();
         
         /* add the cnf encoding file to Desktop */
-//        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
+        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
         
         /* add human readable version of the cnf encoding file to Desktop */
 //        FileInputStream cnfStream = new FileInputStream(satInputFile);

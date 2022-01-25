@@ -17,7 +17,7 @@ public class SLTLxParsingBaseErrorListener extends BaseErrorListener {
 
 	   @Override
 	   public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
-	      throws SLTLxParsingStructureException {
-	         throw new SLTLxParsingStructureException(line, charPositionInLine, msg);
+	      throws SLTLxParsingGrammarException {
+	         throw new SLTLxParsingGrammarException(line, charPositionInLine, msg);
 	      }
 	}

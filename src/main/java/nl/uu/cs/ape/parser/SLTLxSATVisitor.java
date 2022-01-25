@@ -32,7 +32,8 @@ import nl.uu.cs.ape.models.satStruc.SLTLxNextOp;
 import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
 import nl.uu.cs.ape.models.satStruc.SLTLxOperation;
 import nl.uu.cs.ape.models.satStruc.SLTLxParsingBaseErrorListener;
-import nl.uu.cs.ape.models.satStruc.SLTLxParsingPredicatesException;
+import nl.uu.cs.ape.models.satStruc.SLTLxParsingAnnotationException;
+import nl.uu.cs.ape.models.satStruc.SLTLxParsingGrammarException;
 import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
 import nl.uu.cs.ape.models.satStruc.SLTLxUntil;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxBaseVisitor;
@@ -71,10 +72,19 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		this.allModules = synthesisEngine.getDomainSetup().getAllModules();
 	}
 	
-	public static Set<SLTLxFormula> parseFormula(SATSynthesisEngine synthesisEngine, String formula) throws ParseCancellationException {
+	/**
+	 * Parse the formulas, where each is separated by a new line, and return the set of {link SLTLxFormula}a that model it.
+	 * 
+	 * @param synthesisEngine - SAT synthesis engine
+	 * @param formulasInSLTLx - SLTLx formulas in textual format (separated by new lines)
+	 * @return Set of {link SLTLxFormula} objects, where each represents a row (formula) from the text.
+	 * @throws SLTLxParsingGrammarException - Exception is thrown when a formula does not follow the provided grammar rules.
+	 * @throws SLTLxParsingAnnotationException - Exception is thrown if the formula follows the given grammar, but cannot be interpreted under the current domain (e.g., used operation does not exist, variable is free, etc.).
+	 */
+	public static Set<SLTLxFormula> parseFormula(SATSynthesisEngine synthesisEngine, String formulasInSLTLx) throws SLTLxParsingGrammarException, SLTLxParsingAnnotationException {
 		Set<SLTLxFormula> facts = new HashSet<>();
 
-		SLTLxLexer lexer = new SLTLxLexer(CharStreams.fromString(formula));
+		SLTLxLexer lexer = new SLTLxLexer(CharStreams.fromString(formulasInSLTLx));
 		lexer.removeErrorListeners();
 		lexer.addErrorListener(SLTLxParsingBaseErrorListener.INSTANCE);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -194,7 +204,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 			typePred = allTypes.get(typePredIRI);
 		}
 		if(typePred == null) {
-			throw SLTLxParsingPredicatesException.typeDoesNoExists("Data type '" + typePredicateID + "' does not exist in the taxonomy.");
+			throw SLTLxParsingAnnotationException.typeDoesNoExists("Data type '" + typePredicateID + "' does not exist in the taxonomy.");
 		}
 		
 		return new SLTLxAtomVar(AtomVarType.TYPE_V, typePred, new SLTLxVariable(variableID));
@@ -252,7 +262,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 			currOperation = allModules.get(operationIRI);
 		}
 		if(currOperation == null) {
-			throw SLTLxParsingPredicatesException.moduleDoesNoExists("Operation '" + operationID + "' does not exist in the taxonomy/tool annotations.");
+			throw SLTLxParsingAnnotationException.moduleDoesNoExists("Operation '" + operationID + "' does not exist in the taxonomy/tool annotations.");
 		}
 		
 		List<SLTLxVariable> inputs = new ArrayList<SLTLxVariable>();

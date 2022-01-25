@@ -8,9 +8,9 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
  * @author Vedran Kasalica
  *
  */
-public class SLTLxParsingStructureException extends ParseCancellationException {
+public class SLTLxParsingGrammarException extends ParseCancellationException {
 	
-	public SLTLxParsingStructureException(int line, int charPositionInLine, String msg) {
+	public SLTLxParsingGrammarException(int line, int charPositionInLine, String msg) {
 		super("SLTLx formula parsing error:\nline " + line + ":" + charPositionInLine + " " + msg);
 	}
 
