@@ -29,7 +29,7 @@ import nl.uu.cs.ape.models.satStruc.SLTLxNext;
 import nl.uu.cs.ape.models.satStruc.SLTLxNextOp;
 import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
 import nl.uu.cs.ape.models.satStruc.SLTLxOperation;
-import nl.uu.cs.ape.models.satStruc.SLTLxParsingException;
+import nl.uu.cs.ape.models.satStruc.SLTLxParsingPredicatesException;
 import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
 import nl.uu.cs.ape.models.satStruc.SLTLxUntil;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxBaseVisitor;
@@ -170,10 +170,10 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 			typePred = allTypes.get(typePredIRI);
 		}
 		if(typePred == null) {
-			throw SLTLxParsingException.typeDoesNoExists("Data type '" + typePredicateID + "' does not exist in the taxonomy.");
+			throw SLTLxParsingPredicatesException.typeDoesNoExists("Data type '" + typePredicateID + "' does not exist in the taxonomy.");
 		}
 		
-		return new SLTLxAtomVar(AtomVarType.TYPE_VAR, typePred, new SLTLxVariable(variableID));
+		return new SLTLxAtomVar(AtomVarType.TYPE_V, typePred, new SLTLxVariable(variableID));
 	}
 
 
@@ -206,7 +206,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		String variableID1 = ctx.getChild(2).getText();
 		String variableID2 = ctx.getChild(4).getText();
 		
-		return new SLTLxAtomVar(AtomVarType.TYPE_DEPENDENCY_VAR, new SLTLxVariable(variableID1), new SLTLxVariable(variableID2));
+		return new SLTLxAtomVar(AtomVarType.R_RELATION_V, new SLTLxVariable(variableID1), new SLTLxVariable(variableID2));
 	}
 
 	@Override
@@ -228,7 +228,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 			currOperation = allModules.get(operationIRI);
 		}
 		if(currOperation == null) {
-			throw SLTLxParsingException.moduleDoesNoExists("Operation '" + operationID + "' does not exist in the taxonomy/tool annotations.");
+			throw SLTLxParsingPredicatesException.moduleDoesNoExists("Operation '" + operationID + "' does not exist in the taxonomy/tool annotations.");
 		}
 		
 		List<SLTLxVariable> inputs = new ArrayList<SLTLxVariable>();

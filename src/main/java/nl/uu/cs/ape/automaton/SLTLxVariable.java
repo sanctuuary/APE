@@ -27,7 +27,7 @@ import nl.uu.cs.ape.models.satStruc.SLTLxVariableOccurance;
  *
  * @author Vedran Kasalica
  */
-public class SLTLxVariable extends PredicateLabel implements StateInterface  {
+public class SLTLxVariable implements StateInterface, PredicateLabel {
 
 	/** Unique name of the type state variable */
     private final String variableID;
@@ -103,10 +103,9 @@ public class SLTLxVariable extends PredicateLabel implements StateInterface  {
 	 */
 	public Set<CNFClause> getExistentialCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
-		for(State state :synthesisEngine.getTypeAutomaton().getAllStatesUntilBlockNo(stateNo)) {
-			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_REF, state, this);
-			SLTLxAtom emptyState = new SLTLxAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
-			varRefs.add(new SLTLxDisjunction(currAtomVar, emptyState));
+		for(State state : synthesisEngine.getTypeAutomaton().getAllStatesUntilBlockNo(stateNo)) {
+			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_VALUE, state, this);
+			varRefs.add(currAtomVar);
 		}
 		SLTLxDisjunction allVars = new SLTLxDisjunction(varRefs);
 		
@@ -129,7 +128,7 @@ public class SLTLxVariable extends PredicateLabel implements StateInterface  {
 		/** Setting up the domain of the variable. */
 		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
 		for(State state : this.getVariableDomain(stateNo, synthesisEngine)) {
-			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_REF, state, this);
+			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_VALUE, state, this);
 			SLTLxAtom emptyState = new SLTLxAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
 			varRefs.add(new SLTLxDisjunction(currAtomVar, emptyState));
 		}
@@ -163,11 +162,11 @@ public class SLTLxVariable extends PredicateLabel implements StateInterface  {
 				allFacts.add(new SLTLxImplication(
 										new SLTLxConjunction(
 												new SLTLxAtomVar(
-														AtomVarType.VAR_REF,
+														AtomVarType.VAR_VALUE,
 														varState,
 														this),
 												new SLTLxAtomVar(
-														AtomVarType.TYPE_VAR,
+														AtomVarType.TYPE_V,
 														usedPred,
 														this)),
 										new SLTLxAtom(
@@ -179,12 +178,12 @@ public class SLTLxVariable extends PredicateLabel implements StateInterface  {
 				allFacts.add(new SLTLxImplication(
 						new SLTLxConjunction(
 								new SLTLxAtomVar(
-										AtomVarType.VAR_REF,
+										AtomVarType.VAR_VALUE,
 										varState,
 										this),
 								new SLTLxNegation(
 										new SLTLxAtomVar(
-												AtomVarType.TYPE_VAR,
+												AtomVarType.TYPE_V,
 												usedPred,
 												this))),
 						new SLTLxNegation(
@@ -205,8 +204,8 @@ public class SLTLxVariable extends PredicateLabel implements StateInterface  {
 				AtomType atomType;
 				if(atomVarType.equals(AtomVarType.VAR_EQUIVALENCE)) {
 					atomType = AtomType.TYPE_EQUIVALENCE;
-				} else if(atomVarType.equals(AtomVarType.TYPE_DEPENDENCY_VAR)) {
-					atomType = AtomType.TYPE_DEPENDENCY; 
+				} else if(atomVarType.equals(AtomVarType.R_RELATION_V)) {
+					atomType = AtomType.R_RELATON; 
 				} else {
 					continue;
 				}
@@ -214,15 +213,14 @@ public class SLTLxVariable extends PredicateLabel implements StateInterface  {
 					for(State var2State : variableMapping.getVariableDomain(var2)) {
 					allFacts.add(new SLTLxImplication(
 											new SLTLxConjunction(
-													new SLTLxConjunction(
-															new SLTLxAtomVar(
-																	AtomVarType.VAR_REF,
-																	var1State,
-																	var1),
-															new SLTLxAtomVar(
-																	AtomVarType.VAR_REF,
-																	var2State,
-																	var2)),
+													new SLTLxAtomVar(
+															AtomVarType.VAR_VALUE,
+															var1State,
+															var1),
+													new SLTLxAtomVar(
+															AtomVarType.VAR_VALUE,
+															var2State,
+															var2),
 													new SLTLxAtomVar(
 															atomVarType,
 															var1,
@@ -236,15 +234,14 @@ public class SLTLxVariable extends PredicateLabel implements StateInterface  {
 					/* Enforce negation of the predicate as well. */
 					allFacts.add(new SLTLxImplication(
 							new SLTLxConjunction(
-									new SLTLxConjunction(
-											new SLTLxAtomVar(
-													AtomVarType.VAR_REF,
-													var1State,
-													var1),
-											new SLTLxAtomVar(
-													AtomVarType.VAR_REF,
-													var2State,
-													var2)),
+									new SLTLxAtomVar(
+											AtomVarType.VAR_VALUE,
+											var1State,
+											var1),
+									new SLTLxAtomVar(
+											AtomVarType.VAR_VALUE,
+											var2State,
+											var2),
 									new SLTLxNegation(
 											new SLTLxAtomVar(
 													atomVarType,

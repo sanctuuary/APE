@@ -218,7 +218,7 @@ public class SolutionWorkflow {
                             APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
                         }
                         memoryTypeNode.addUsedByTool(usedTypeNode);
-                    } else if (currLiteral.isWorkflowElementType(AtomType.TYPE_DEPENDENCY)) {
+                    } else if (currLiteral.isWorkflowElementType(AtomType.R_RELATON)) {
                     	// skip
                     }
                 }
@@ -289,7 +289,7 @@ public class SolutionWorkflow {
                             APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
                         }
                         memoryTypeNode.addUsedByTool(usedTypeNode);
-                    } else if (currAtom.isWorkflowElementType(AtomType.TYPE_DEPENDENCY)) {
+                    } else if (currAtom.isWorkflowElementType(AtomType.R_RELATON)) {
                     	// skip
                     }
             }

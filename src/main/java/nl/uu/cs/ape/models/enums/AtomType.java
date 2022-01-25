@@ -31,9 +31,9 @@ public enum AtomType implements SMTFunctionName {
     MEM_TYPE_REFERENCE("memRef"),
     
     /**
-     * Depicts the dependency between two data instances (states). It depicts that a data instance is dependent (was derived from) on another data instance.
+     * Depicts the dependency between two data instances (states), i.e., 'R' relation in SLTLx. It depicts that a data instance is dependent (was derived from) on another data instance.
      */
-    TYPE_DEPENDENCY("typeDep"),
+    R_RELATON("r_rel"),
     
     /**
      * Depicts data instances that are equal.
@@ -70,7 +70,7 @@ public enum AtomType implements SMTFunctionName {
 	  * @return {@code true} if it is a unary property, {@code false} otherwise. 
 	  */
 	 public boolean isBinaryRel() {
-		 if(this.equals(TYPE_DEPENDENCY) | this.equals(MEM_TYPE_REFERENCE)) {
+		 if(this.equals(R_RELATON) | this.equals(MEM_TYPE_REFERENCE)) {
 			 return true;
 		 } else {
 			 return false;

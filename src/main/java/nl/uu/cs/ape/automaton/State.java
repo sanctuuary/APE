@@ -11,7 +11,7 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  *
  * @author Vedran Kasalica
  */
-public class State extends PredicateLabel implements StateInterface {
+public class State implements PredicateLabel, StateInterface {
 
 	/** Unique name of the state */
     private final String stateName;

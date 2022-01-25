@@ -331,7 +331,7 @@ public final class SATModuleUtils {
 				cnfEncoding.add(
 						new SLTLxNegation(
 								new SLTLxAtom(
-									AtomType.TYPE_DEPENDENCY, 
+									AtomType.R_RELATON, 
 									currInputState,
 									typeAutomaton.getNullState())));
 				/*
@@ -356,7 +356,7 @@ public final class SATModuleUtils {
 					cnfEncoding.add(
 							new SLTLxNegation(
 									new SLTLxAtom(
-										AtomType.TYPE_DEPENDENCY, 
+										AtomType.R_RELATON, 
 										nonExictingMemState,
 										currInputState)));
 				}
@@ -369,14 +369,14 @@ public final class SATModuleUtils {
 				/* Memory state depends on itself */
 				cnfEncoding.add(
 							new SLTLxAtom(
-								AtomType.TYPE_DEPENDENCY, 
+								AtomType.R_RELATON, 
 								currMemState,
 								currMemState));
 				/* ..and does not depend on the null state */ 
 			cnfEncoding.add(
 						new SLTLxNegation(
 								new SLTLxAtom(
-									AtomType.TYPE_DEPENDENCY, 
+									AtomType.R_RELATON, 
 									currMemState,
 									typeAutomaton.getNullState())));
 				/*
@@ -402,7 +402,7 @@ public final class SATModuleUtils {
 						cnfEncoding.add(
 								new SLTLxNegation(
 										new SLTLxAtom(
-											AtomType.TYPE_DEPENDENCY, 
+											AtomType.R_RELATON, 
 											nonExictingMemState,
 											currMemState)));
 					}
@@ -442,12 +442,12 @@ public final class SATModuleUtils {
 																currMemState, 
 																currInputState),
 														new SLTLxAtom(
-																AtomType.TYPE_DEPENDENCY, 
+																AtomType.R_RELATON, 
 																existingMemState,
 																currMemState)
 														),
 												new SLTLxAtom(
-														AtomType.TYPE_DEPENDENCY, 
+														AtomType.R_RELATON, 
 														existingMemState, 
 														currInputState)
 												));
@@ -463,12 +463,12 @@ public final class SATModuleUtils {
 															currMemState, 
 															currInputState),
 													new SLTLxAtom(
-															AtomType.TYPE_DEPENDENCY, 
+															AtomType.R_RELATON, 
 															existingMemState, 
 															currInputState)
 													),
 											new SLTLxAtom(
-													AtomType.TYPE_DEPENDENCY, 
+													AtomType.R_RELATON, 
 													existingMemState,
 													currMemState)
 											));
@@ -484,7 +484,7 @@ public final class SATModuleUtils {
 									typeAutomaton.getNullState(), 
 									currInputState),
 							new SLTLxAtom(
-									AtomType.TYPE_DEPENDENCY, 
+									AtomType.R_RELATON, 
 									existingMemState, 
 									currInputState)
 							));
@@ -510,14 +510,14 @@ public final class SATModuleUtils {
 					cnfDependency.add(
 							new SLTLxNegation(
 									new SLTLxAtom(
-											AtomType.TYPE_DEPENDENCY, 
+											AtomType.R_RELATON, 
 											existingMemState, 
 											currMemState)));
 					// one of the tool inputs does as well
 					for (State currInputState : currInputBlock.getStates()) {
 						cnfDependency.add(
 								new SLTLxAtom(
-										AtomType.TYPE_DEPENDENCY, 
+										AtomType.R_RELATON, 
 										existingMemState, 
 										currInputState));
 					}
@@ -529,11 +529,11 @@ public final class SATModuleUtils {
 						cnfEncoding.add(
 								new SLTLxImplication(
 										new SLTLxAtom(
-												AtomType.TYPE_DEPENDENCY, 
+												AtomType.R_RELATON, 
 												existingMemState, 
 												currInputState),
 										new SLTLxAtom(
-												AtomType.TYPE_DEPENDENCY, 
+												AtomType.R_RELATON, 
 												existingMemState, 
 												currMemState)));
 					}

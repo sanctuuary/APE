@@ -91,7 +91,7 @@ public class SMTSolution extends SolutionInterpreter {
                         relevantModules.add(currAtom);
                     } else if (currAtom.getWorkflowElementType() != AtomType.MODULE
                             && currAtom.getWorkflowElementType() != AtomType.MEM_TYPE_REFERENCE
-                            && currAtom.getWorkflowElementType() != AtomType.TYPE_DEPENDENCY
+                            && currAtom.getWorkflowElementType() != AtomType.R_RELATON
                             && (currAtom.getPredicate() instanceof Type)
                             && ((Type) currAtom.getPredicate()).isSimplePredicate()) {
                         /* add all positive literals that describe simple types */

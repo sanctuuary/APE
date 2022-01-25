@@ -6,7 +6,7 @@ import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
-public interface AuxiliaryPredicate {
+public interface AuxiliaryPredicate extends PredicateLabel {
 
 	public LogicOperation getLogicOp();
 	

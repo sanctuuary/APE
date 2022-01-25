@@ -6,19 +6,19 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.utils.APEDimensionsException;
 
 /**
- * The {@code SLTLxParsingException} exception will be thrown if the given SLTLx formula is not specified correctly. 
+ * The {@code SLTLxParsingPredicatesException} exception will be thrown if the  variables are free or domain predicates (e.g., operations, data types, etc.) specified in the SLTLx formula are not specified correctly. 
  * 
  * @author Vedran Kasalica
  *
  */
-public class SLTLxParsingException extends RuntimeException {
+public class SLTLxParsingPredicatesException extends RuntimeException {
 	
 	/**
      * Instantiates a new Ape exception.
      *
      * @param message The message that will be passed to the {@link Exception} super class.
      */
-    private SLTLxParsingException(String message) {
+    private SLTLxParsingPredicatesException(String message) {
         super(message);
     }
 	
@@ -27,8 +27,8 @@ public class SLTLxParsingException extends RuntimeException {
      * @param message - Application specific message that may help the user solve the problem.
      * @return SLTLx Parsing exception with information that may help the user solve the problem.
      */
-    public static SLTLxParsingException typeDoesNoExists(String message) {
-    	return new SLTLxParsingException(String.format("The SLTLx constraints error. One or more data types used in the formula cannot be recognised. %s", message));
+    public static SLTLxParsingPredicatesException typeDoesNoExists(String message) {
+    	return new SLTLxParsingPredicatesException(String.format("SLTLx formula syntax error. One or more data types used in a specified formula cannot be recognised. %s", message));
     }
 
     /**
@@ -36,17 +36,16 @@ public class SLTLxParsingException extends RuntimeException {
      * @param message - Application specific message that may help the user solve the problem.
      * @return SLTLx Parsing exception with information that may help the user solve the problem.
      */
-    public static SLTLxParsingException moduleDoesNoExists(String message) {
-    	return new SLTLxParsingException(String.format("The SLTLx constraints error. One or more operations used in the formula cannot be recognised. %s", message));
+    public static SLTLxParsingPredicatesException moduleDoesNoExists(String message) {
+    	return new SLTLxParsingPredicatesException(String.format("SLTLx formula syntax error. One or more operations used in a specified formula cannot be recognised. %s", message));
     }
-    
     
     /**
      * Exception is thrown when the specified SLTLx formula contains a free variable.
      * @param message - Application specific message that may help the user solve the problem.
      * @return SLTLx Parsing exception with information that may help the user solve the problem.
      */
-    public static SLTLxParsingException variableNotBound(String message) {
-    	return new SLTLxParsingException(String.format("The SLTLx formula contains a non-bound (free) variable. %s", message));
+    public static SLTLxParsingPredicatesException variableNotBound(String message) {
+    	return new SLTLxParsingPredicatesException(String.format("SLTLx formula syntax error. A specified formula contains a free variable, which is not supported. %s", message));
     }
 }

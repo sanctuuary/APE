@@ -19,12 +19,12 @@ public class SLTLxAtomVar extends SLTLxFormula {
     /**
      * First argument is usually predicate that is referred (tool or type), or a variable representing a type state.
      */
-    private final PredicateLabel firstArg;
+    private PredicateLabel firstArg;
 
     /**
      * Second argument is a variable representing a typeState.
      */
-    private final SLTLxVariable secondArg;
+    private SLTLxVariable secondArg;
 
     /**
      * Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.)
@@ -139,11 +139,11 @@ public class SLTLxAtomVar extends SLTLxFormula {
      * @return String representing the workflow element in a textual form. {@code null} if the atom type is not correct.
      */
     public String toString() {
-        if (this.elementType == AtomVarType.VAR_REF) {
+        if (this.elementType == AtomVarType.VAR_VALUE) {
             return "[" + firstArg.getPredicateID() + "] <- (" + secondArg.getPredicateID() + ")";
-        } else if (this.elementType == AtomVarType.TYPE_DEPENDENCY_VAR) {
+        } else if (this.elementType == AtomVarType.R_RELATION_V) {
             return "R(" + firstArg.getPredicateID() + "," + secondArg.getPredicateID() + ")";
-        } else if (this.elementType == AtomVarType.TYPE_VAR){
+        } else if (this.elementType == AtomVarType.TYPE_V){
             return firstArg.getPredicateID() + "(" + secondArg.getPredicateID() + ")";
         } else if (this.elementType == AtomVarType.VAR_EQUIVALENCE){
             return "[" + firstArg.getPredicateID() + "=" + secondArg.getPredicateID() + "]";
@@ -164,15 +164,9 @@ public class SLTLxAtomVar extends SLTLxFormula {
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
-		if(this.elementType.isUnaryProperty()) {
-			SLTLxVariable var = variableMapping.getVarSabstitute(this.secondArg);
-			synthesisEngine.getVariableUsage().addUnaryPair(var, this.firstArg);
-		} else if(!this.elementType.equals(AtomVarType.VAR_REF) && this.elementType.isBinaryRel()) {
-			SLTLxVariable firstVaR = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
-			SLTLxVariable secondVar = variableMapping.getVarSabstitute(this.secondArg);
-			synthesisEngine.getVariableUsage().addBinaryPair(new Pair<SLTLxVariable>(firstVaR, secondVar), this.elementType);
-		}
 		if(this.clause == null) {
+			this.substituteVariables(variableMapping, synthesisEngine);
+			
 			int encoding = synthesisEngine.getMappings().add(this);
 			this.clause = new CNFClause(encoding);
 		}
@@ -182,10 +176,32 @@ public class SLTLxAtomVar extends SLTLxFormula {
 	@Override
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
+			this.substituteVariables(variableMapping, synthesisEngine);
+			
 			int encoding = synthesisEngine.getMappings().add(this);
 			this.clause = new CNFClause(encoding);
 		}
 		return this.clause.createNegatedCNFEncoding(synthesisEngine);
+	}
+	
+	/**
+	 * Method is used to substitute the variable occurrences to the unique ones. 
+	 * It is used to ensure that nesting of quantifications over the same variable works as intended (e.g. "Exists (?x) Q(?x) Forall (?x) P(?x)")
+	 * @param variableMapping
+	 * @param synthesisEngine
+	 */
+	private void substituteVariables(SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+		if(this.elementType.isUnaryProperty()) {
+			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+			synthesisEngine.getVariableUsage().addUnaryPair(this.secondArg, this.firstArg);
+		} else if(!this.elementType.equals(AtomVarType.VAR_VALUE) && this.elementType.isBinaryRel()) {
+			this.firstArg = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
+			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+			synthesisEngine.getVariableUsage().addBinaryPair(new Pair<SLTLxVariable>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
+		} else if(this.elementType.equals(AtomVarType.VAR_VALUE)) {
+			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+		}
+		
 	}
 
 }

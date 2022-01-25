@@ -7,6 +7,8 @@ import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.*;
 
+import com.google.common.io.Files;
+
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
@@ -221,8 +223,9 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, Hello.getFact(this, "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?u)> <'ToolsTaxonomy'(?y;)> true)"));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, Hello.getFact(this, "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> <'ToolsTaxonomy'(?y;)> true)"));
 
+        System.out.println("END");
         /*
          * Counting the number of variables and clauses that will be given to the SAT solver
          * TODO Improve this approach, no need to read the whole String again to count lines.
@@ -238,7 +241,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         cnfEncoding.delete();
         
         /* add the cnf encoding file to Desktop */
-//        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
+        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
         
         /* add human readable version of the cnf encoding file to Desktop */
 //        FileInputStream cnfStream = new FileInputStream(satInputFile);

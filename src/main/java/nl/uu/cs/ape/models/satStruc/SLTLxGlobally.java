@@ -27,7 +27,7 @@ private SLTLxFormula formula;
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
 		/* Conjunct the collection of clauses that encode the formula at each of the workflow steps. */
-		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
+		for(int i = stateNo; i <= synthesisEngine.getSolutionSize(); i++) {
 			allClauses.add(formula.getCNFEncoding(i, variableMapping, synthesisEngine));
 		}
 		return CNFClause.conjunctClausesCollection(allClauses);
@@ -38,7 +38,7 @@ private SLTLxFormula formula;
 		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
 
 		/* Disjoint the collection of clauses that encode negation of the formula at each of the workflow steps. */
-		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
+		for(int i = stateNo; i <= synthesisEngine.getSolutionSize(); i++) {
 			allClauses.add(formula.getNegatedCNFEncoding(i, variableMapping, synthesisEngine));
 		}
 		return CNFClause.disjoinClausesCollection(allClauses);

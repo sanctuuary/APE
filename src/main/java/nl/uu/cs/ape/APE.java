@@ -401,7 +401,7 @@ public class APE {
 
 		for (int i = 0; i < allSolutions.size(); i++) {
 			solutions2write
-					.append(allSolutions.get(i).getNativeSolution().getCompleteSolution()).append("\n");
+					.append(allSolutions.get(i).getNativeSolution().getRelevantSolution()).append("\n");
 		}
 		APEUtils.write2file(solutions2write.toString(),
 				allSolutions.getRunConfiguration().getSolutionDirPath2("solutions.txt").toFile(), false);

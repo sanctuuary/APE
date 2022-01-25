@@ -1,5 +1,7 @@
 package nl.uu.cs.ape.models.enums;
 
+import com.google.errorprone.annotations.Var;
+
 import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
 
 /**
@@ -13,7 +15,7 @@ public enum AtomVarType implements SMTFunctionName {
     /**
      * Depicts the dependency between two variables that represent data instances (states). It depicts that a data instance is dependent (was derived from) on another data instance.
      */
-    TYPE_DEPENDENCY_VAR("typeDepVar"),
+    R_RELATION_V("rRelVar"),
     
     /**
      * Depicts the equivalence of two variables (which represent type instances/states).
@@ -23,12 +25,12 @@ public enum AtomVarType implements SMTFunctionName {
 	/**
 	 * Depicts that the data instance represented as a variable is of a specific data type.
      */
-    TYPE_VAR("typeVar"),
+    TYPE_V("typeVar"),
     
     /**
      * Depicts the instantiation of a variable to a specific type state. It references state that the variable represents.
      */
-    VAR_REF("varRef");
+    VAR_VALUE("varValue");
 
 	
 	 private final String text;
@@ -47,7 +49,7 @@ public enum AtomVarType implements SMTFunctionName {
 	  * @return {@code true} if it is a unary property, {@code false} otherwise. 
 	  */
 	 public boolean isUnaryProperty() {
-		 if(this.equals(TYPE_DEPENDENCY_VAR)) {
+		 if(this.equals(TYPE_V)) {
 			 return true;
 		 } else {
 			 return false;
@@ -59,7 +61,7 @@ public enum AtomVarType implements SMTFunctionName {
 	  * @return {@code true} if it is a unary property, {@code false} otherwise. 
 	  */
 	 public boolean isBinaryRel() {
-		 if(this.equals(TYPE_VAR) | this.equals(TYPE_DEPENDENCY_VAR)| this.equals(VAR_EQUIVALENCE)) {
+		 if(this.equals(VAR_VALUE) | this.equals(R_RELATION_V)| this.equals(VAR_EQUIVALENCE)) {
 			 return true;
 		 } else {
 			 return false;

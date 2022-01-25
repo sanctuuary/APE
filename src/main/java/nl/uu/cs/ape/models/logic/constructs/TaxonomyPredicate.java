@@ -15,7 +15,7 @@ import nl.uu.cs.ape.utils.APEUtils;
  *
  * @author Vedran Kasalica
  */
-public abstract class TaxonomyPredicate extends  PredicateLabel {
+public abstract class TaxonomyPredicate implements PredicateLabel {
 
     /**
      * Describes the node in from the taxonomy hierarchy. The type can represent a

@@ -21,7 +21,7 @@ public class SLTLxVariableOccurance {
 
 	/** Mapping variables to their usages under unary predicates.*/
 	private Map<SLTLxVariable, Set<PredicateLabel>> unaryPredicates;
-	/** Mapping variables to their usages under binary predicates.*/
+	/** Mapping pairs variables to their usages under binary predicates.*/
 	private Map<Pair<SLTLxVariable>, Set<AtomVarType>> binaryPredicates;
 	/** Variable mapping to variables it is combined with under a pair. */
 	private Map<SLTLxVariable, Set<SLTLxVariable>> variablePairs;
@@ -62,7 +62,7 @@ public class SLTLxVariableOccurance {
 	 */
 
 	public boolean addBinaryPair(Pair<SLTLxVariable> varPair, AtomVarType relType) {
-		if(relType.equals(AtomVarType.VAR_REF)) {
+		if(relType.equals(AtomVarType.VAR_VALUE)) {
 			return false;
 		}
 		if(this.binaryPredicates.get(varPair) == null) {

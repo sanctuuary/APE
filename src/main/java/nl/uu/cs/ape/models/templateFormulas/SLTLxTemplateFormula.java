@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.models.formulas;
+package nl.uu.cs.ape.models.templateFormulas;
 
 import java.util.List;
 
@@ -14,13 +14,13 @@ import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
- * The class is used to represent general SLTL constraints and to generate the
- * corresponding CNF representation. The form currently supports only trivial
- * formulas under the modal quantifier (atomic type and module formulas).
+ * The class is used to represent a predefined SLTLx constraints according to a template, and to generate the
+ * corresponding CNF representation. The form supports a limited set of commonly used formulas, and unlike arbitrary
+ * SLTLx formulas, encoding of templates is optimized.
  *
  * @author Vedran Kasalica
  */
-public abstract class SLTL_formula {
+public abstract class SLTLxTemplateFormula {
 
     private TaxonomyPredicate predicate;
 
@@ -34,7 +34,7 @@ public abstract class SLTL_formula {
      *
      * @param predicate the predicate
      */
-    public SLTL_formula(TaxonomyPredicate predicate) {
+    public SLTLxTemplateFormula(TaxonomyPredicate predicate) {
         this.predicate = predicate;
         sign = true;
     }
@@ -47,7 +47,7 @@ public abstract class SLTL_formula {
      * @param sign      Sign of the predicate, false if the predicate is negated, true otherwise.
      * @param predicate A {@link TaxonomyPredicate}.
      */
-    public SLTL_formula(boolean sign, TaxonomyPredicate predicate) {
+    public SLTLxTemplateFormula(boolean sign, TaxonomyPredicate predicate) {
         this.predicate = predicate;
         this.sign = sign;
     }
@@ -442,7 +442,7 @@ public abstract class SLTL_formula {
                          * .. one of the inputs should depend on the inputNo workflow input
                          */
                         constraints = constraints
-                                .append(mappings.add(typeAutomaton.getWorkflowInputBlock().getState(inputNo-1), currInputState, AtomType.TYPE_DEPENDENCY))
+                                .append(mappings.add(typeAutomaton.getWorkflowInputBlock().getState(inputNo-1), currInputState, AtomType.R_RELATON))
                                 .append(" ");
             }
             constraints.append("0\n");

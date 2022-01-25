@@ -177,7 +177,8 @@ public class TypeAutomaton implements Automaton {
     /**
      * Get from the automaton all the @i-th Type Block that contain types used by tools.
      *
-     * @param i Ordering number of the used type block to be returned.
+     * @param i - ordering number of the used type block to be returned.
+     * (inputs to the first tool are in the block 0, and n-th block contains the workflow output of the workflow of length n)
      * @return Block of Type states that are used by tools.
      */
     public Block getUsedTypesBlock(int i) {
@@ -187,7 +188,8 @@ public class TypeAutomaton implements Automaton {
     /**
      * Get from the automaton all the {@code i}-th Type Block that contain types added to the memory.
      *
-     * @param i Ordering number of the memory type block to be returned.
+     * @param i - ordering number of the memory type block to be returned 
+     * (original workflow inputs are in the block 0, and n-th block contains the outputs of the last tool in the workflow of length n)
      * @return lock of Type states that are added to the memory.
      */
     public Block getMemoryTypesBlock(int i) {
@@ -212,7 +214,7 @@ public class TypeAutomaton implements Automaton {
     }
     
     /**
-     * Return all the type states that are available until a certain block, i.e. all the slots of tool inputs and outputs that are created until the current block.
+     * Return all the type states that are available until (and including) a certain block, i.e. all the slots of tool inputs and outputs that are created until the current block.
      *
      * @param maxBlockNo Memory block until which we are looking into tool inputs/outputs (this block is included).
      * @return List of Type States.

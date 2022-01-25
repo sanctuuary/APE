@@ -5,37 +5,33 @@ package nl.uu.cs.ape.models.logic.constructs;
  *
  * @author Vedran Kasalica
  */
-public abstract class PredicateLabel implements Comparable<PredicateLabel>, APEPredicate {
+public interface PredicateLabel extends Comparable<PredicateLabel>, APEPredicate {
 
     /**
      * Get string that corresponds to the predicate ID.
      *
      * @return String identifying the predicate.
      */
-    public abstract String getPredicateID();
+    public String getPredicateID();
 
     /**
      * Get string that corresponds to the predicate label (e.g. OWL label). The label is not guaranteed to be unique.
      *
      * @return String representation of the predicate.
      */
-    public abstract String getPredicateLabel();
+    public String getPredicateLabel();
     
     /**
      * Get long string that corresponds to the full predicate label (e.g. OWL URI). The long label is not guaranteed to be unique.
      *
      * @return Detailed String representation of the predicate.
      */
-    public abstract String getPredicateLongLabel();
+    public String getPredicateLongLabel();
 
     @Override
-    public String toString() {
-    	return "ID:" + this.getPredicateID();
-    }
-    @Override
-    public abstract int hashCode();
+    public int hashCode();
 
     @Override
-    public abstract boolean equals(Object obj);
+    public boolean equals(Object obj);
 
 }

@@ -51,18 +51,6 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
         this.elementType = elementType;
     }
 
-    /** TODO: Not clear what is the point of this?
-     * Creates a state in the automaton that corresponds to a usage of a data type as input, by a tool.
-      
-     * @param atom SLTLxAtom that is being copied.
-     */
-    public SLTLxAtom(SLTLxAtom atom) {
-    	super();
-        this.predicate = atom.predicate;
-        this.argumentState = atom.argumentState;
-        this.elementType = atom.elementType;
-    }
-
     /**
      * Private constructor used to create auxiliary {@code true} and {@code false} atoms.
      * @param string
@@ -152,7 +140,7 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
     		return predicate.getPredicateID() + "(" + argumentState.getPredicateID() + ")";
     	} else if (this.elementType == AtomType.MEM_TYPE_REFERENCE) {
             return "[" + predicate.getPredicateID() + "] <- (" + argumentState.getPredicateID() + ")";
-        } else if (this.elementType == AtomType.TYPE_DEPENDENCY) {
+        } else if (this.elementType == AtomType.R_RELATON) {
             return "R(" + predicate.getPredicateID() + "," + argumentState.getPredicateID() + ")";
         } else {
         	return null;
