@@ -241,7 +241,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         cnfEncoding.delete();
         
         /* add the cnf encoding file to Desktop */
-        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
+//        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
         
         /* add human readable version of the cnf encoding file to Desktop */
 //        FileInputStream cnfStream = new FileInputStream(satInputFile);
