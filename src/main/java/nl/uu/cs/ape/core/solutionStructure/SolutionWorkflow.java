@@ -15,8 +15,6 @@ import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.core.SolutionInterpreter;
 import nl.uu.cs.ape.core.implSAT.SATSolution;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.core.implSMT.SMTSolution;
-import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
@@ -224,75 +222,6 @@ public class SolutionWorkflow {
                 }
             }
         }
-
-        /* Remove empty elements of the sets. */
-        this.workflowInputTypeStates.removeIf(node -> node.isEmpty());
-
-        this.workflowOutputTypeStates.removeIf(node -> node.isEmpty());
-
-    }
-
-    /**
-     * Create a solution workflow, based on the output of the SMT solver and the defined smt synthesis instance.
-     * 
-     * @param facts
-     * @param smtSynthesisEngine
-     */
-    public SolutionWorkflow(List<SLTLxAtom> facts, SMTSynthesisEngine smtSynthesisEngine) {
-        /* Call for the default constructor. */
-        this(smtSynthesisEngine.getModuleAutomaton(), smtSynthesisEngine.getTypeAutomaton());
-
-        this.nativeSolution = new SMTSolution(facts, smtSynthesisEngine);
-        
-        for (SLTLxAtom currAtom : facts) {
-//        	System.out.println(currAtom.toString());
-                    if (currAtom.getPredicate() instanceof AuxiliaryPredicate) {
-                        continue;
-                    } else if (currAtom.isWorkflowElementType(AtomType.MODULE)) {
-                        ModuleNode currNode = this.mappedModuleNodes.get(currAtom.getUsedInStateArgument());
-                        if (currAtom.getPredicate() instanceof Module) {
-                            currNode.setUsedModule((Module) currAtom.getPredicate());
-                        } else {
-                            currNode.addAbstractDescriptionOfUsedType((AbstractModule) currAtom.getPredicate());
-                        }
-                    } else if (currAtom.isWorkflowElementType(AtomType.MEMORY_TYPE) ) {
-                        TypeNode currNode = this.mappedMemoryTypeNodes.get(currAtom.getUsedInStateArgument());
-                        if(currNode == null) {
-                        	//skip null memory type
-                        	continue;
-                        }
-                        if (currAtom.getPredicate() instanceof Type
-                                && ((Type) currAtom.getPredicate()).isNodeType(NodeType.LEAF)) {
-                            currNode.addUsedType((Type) currAtom.getPredicate());
-                        } else if ((currAtom.getPredicate() instanceof Type) && !(((Type) currAtom.getPredicate()).isNodeType(NodeType.EMPTY_LABEL) || (currAtom.getPredicate() == smtSynthesisEngine.getDomainSetup().getAllTypes().getLabelRoot()) ))  {
-                            currNode.addAbstractDescriptionOfUsedType((Type) currAtom.getPredicate());
-                        } else {
-                            /* Memory type cannot be anything else except a Type. */
-                        }
-                    } else if (currAtom.isWorkflowElementType(AtomType.USED_TYPE)
-                            && ((Type) currAtom.getPredicate()).isSimplePredicate()) {
-                        continue;
-                    } else if (currAtom.isWorkflowElementType(AtomType.MEM_TYPE_REFERENCE)
-                            && ((State) (currAtom.getPredicate())).getAbsoluteStateNumber() != -1) {
-                        /*
-                         * Add all positive literals that describe memory type references that are not
-                         * pointing to null state (NULL state has AbsoluteStateNumber == -1), i.e. that
-                         * are valid.
-                         */
-                        ModuleNode usedTypeNode = this.usedType2ToolMap.get(currAtom.getUsedInStateArgument());
-                        TypeNode memoryTypeNode = this.mappedMemoryTypeNodes.get(currAtom.getPredicate());
-                        int inputIndex = currAtom.getUsedInStateArgument().getLocalStateNumber();
-                        /* = Keep the order of inputs as they were defined in the solution file. */
-                        if (usedTypeNode != null) {
-                            usedTypeNode.setInputType(inputIndex, memoryTypeNode);
-                        } else {
-                            APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
-                        }
-                        memoryTypeNode.addUsedByTool(usedTypeNode);
-                    } else if (currAtom.isWorkflowElementType(AtomType.R_RELATON)) {
-                    	// skip
-                    }
-            }
 
         /* Remove empty elements of the sets. */
         this.workflowInputTypeStates.removeIf(node -> node.isEmpty());

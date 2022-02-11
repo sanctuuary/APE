@@ -6,12 +6,9 @@ import java.util.stream.Stream;
 
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory;
-import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.models.Mappings;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
-import nl.uu.cs.ape.models.SMTPredicateMappings;
 import nl.uu.cs.ape.models.enums.SolverType;
 import nl.uu.cs.ape.models.enums.SynthesisFlag;
 
@@ -71,10 +68,8 @@ public class SolutionsList {
         /* Provides mapping from each atom/predicate to a number/string, and vice versa */
         if(runConfig.getSolverType() == SolverType.SAT) {
         	this. mappings = new SATAtomMappings();
-        } else if(runConfig.getSolverType() == SolverType.SMT) {
-        	this.mappings = new SMTPredicateMappings();
         } else {
-        	throw new APEConfigException("Solver type has to be either SAT or SMT.");
+        	throw new APEConfigException("Solver type has to be SAT.");
         }
         /* Variables defining the current and maximum lengths and solutions count.*/
         this.maxSolutions = runConfig.getMaxNoSolutions();

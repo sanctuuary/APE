@@ -12,7 +12,6 @@ import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.models.Range;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
-import nl.uu.cs.ape.models.enums.SMTLogicFragment;
 import nl.uu.cs.ape.models.enums.SolverType;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 
@@ -151,10 +150,7 @@ public class APERunConfig {
      */
     public APEDomainSetup apeDomainSetup;
     
-    /** Logic fragment used by the Z3 solver. */
-	private SMTLogicFragment logicFragment;
-	
-	/** Solver type that should be used (SMT or SAT). */
+	/** Solver type that should be used (SAT). */
 	private SolverType solverType = SolverType.SAT;
 
 	/**
@@ -624,16 +620,6 @@ public class APERunConfig {
 		this.solverType = solverType;
 	}
     
-    public void setZ3LogicFragment(SMTLogicFragment logicFragment) {
-		this.logicFragment = logicFragment;
-		
-	}
-	
-	public SMTLogicFragment getZ3LogicFragment() {
-		return this.logicFragment;
-		
-	}
-
     /**
      * Creates builder to build {@link APERunConfig}.
      */

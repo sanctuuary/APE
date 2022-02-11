@@ -2,14 +2,12 @@ package nl.uu.cs.ape.models.enums;
 
 import com.google.errorprone.annotations.Var;
 
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
-
 /**
  * Defines the values describing the predicates over variables, that will reflect in states in the workflow.
  * 
  *  @author Vedran Kasalica
  */
-public enum AtomVarType implements SMTFunctionName {
+public enum AtomVarType {
 
     
     /**

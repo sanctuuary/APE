@@ -1,14 +1,12 @@
 package nl.uu.cs.ape.models.enums;
 
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTFunctionName;
-
 /**
  * Defines the values describing the states in the workflow.
  * 
  * 
  *  @author Vedran Kasalica
  */
-public enum AtomType implements SMTFunctionName {
+public enum AtomType {
 
     /**
      * Depicts usage of a tool/module.

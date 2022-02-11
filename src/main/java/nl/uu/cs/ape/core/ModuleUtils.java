@@ -10,7 +10,6 @@ import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 
 /**
  * The {@code ModuleUtils} class is used to encode SAT constraints based on the

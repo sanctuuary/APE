@@ -7,7 +7,6 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.smtStruc.boolStatements.SMTDataType;
 
 /**
  * The {@code SLTLxAtomVar} class represents {@link SLTLxAtom}s in SLTLx that contain variables instead of states.

@@ -10,12 +10,10 @@ import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.core.implSMT.SMTSynthesisEngine;
 import nl.uu.cs.ape.core.solutionStructure.AbstractCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.ExecutableCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
-import nl.uu.cs.ape.models.enums.SolverType;
 import nl.uu.cs.ape.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.configuration.APECoreConfig;
@@ -322,14 +320,8 @@ public class APE {
 				&& solutionLength <= runConfig.getSolutionLength().getMax() && APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) > 0) {
 
 			
-			SynthesisEngine implSynthesis = null;
-			if(runConfig.getSolverType() == SolverType.SAT) {
-				implSynthesis = new SATSynthesisEngine(apeDomainSetup, allSolutions, runConfig,
+			SynthesisEngine implSynthesis = new SATSynthesisEngine(apeDomainSetup, allSolutions, runConfig,
 						solutionLength);
-			} else {
-				implSynthesis = new SMTSynthesisEngine(apeDomainSetup, allSolutions, runConfig,
-						solutionLength);
-			}
 			
 
 			APEUtils.printHeader(implSynthesis.getSolutionSize(), "Workflow discovery - length");
