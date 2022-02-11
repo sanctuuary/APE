@@ -43,11 +43,11 @@ BIN_MODAL
    ;
 
 module
-   : constant '(' vars? ';' vars? ')' 
+   : constant '(' vars ';' vars ')' 
    ;
 
 vars
-   : variable ( ',' variable )*
+   : (variable ( ',' variable )*)?
    ;
 
   

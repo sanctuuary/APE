@@ -233,6 +233,23 @@ public class TypeAutomaton implements Automaton {
         }
         return untilStates;
     }
+    
+    /**
+     * Return all the memory states that are available until (and including) a certain block, i.e. all the slots of tool outputs that are created until the current block.
+     *
+     * @param maxBlockNo Memory block until which we are looking into tool inputs/outputs (this block is included).
+     * @return List of Memory Type States.
+     */
+    public List<State> getAllMemoryStatesUntilBlockNo(int maxBlockNo) {
+        List<State> untilStates = new ArrayList<State>();
+        for (int i = 0; i <= maxBlockNo && i < this.usedTypesAutomaton.size(); i++) {
+            Block currBlock = this.memoryTypesAutomaton.get(i);
+            for (State currState : currBlock.getStates()) {
+                untilStates.add(currState);
+            }
+        }
+        return untilStates;
+    }
 
     /**
      * Return all the memory type states that are generated after a certain block, i.e. all the slots of memory are generated prior to a certain block/tool.

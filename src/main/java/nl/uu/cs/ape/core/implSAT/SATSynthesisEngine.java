@@ -219,20 +219,20 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * Setup encoding of auxiliary 'true', 'false' and 'EQ' atoms, to ensure proper SLTLx parsing.
          * TODO
          */
-        
+        int clausesBefore = APEUtils.countLines(cnfEncoding) + 2;
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> <'ToolsTaxonomy'(?y;)> true)"));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
+        		"F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> F <'psxy_l'(?y;)> true))"));
 
-        System.out.println("END");
         /*
          * Counting the number of variables and clauses that will be given to the SAT solver
          * TODO Improve this approach, no need to read the whole String again to count lines.
          */
         int variables = mappings.getSize();
         int clauses = APEUtils.countLines(cnfEncoding) + 2;
-        
+        System.out.println("Encoding is: " + (clauses - clausesBefore));
         String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
         sat_input_header = sat_input_header + "1 0\n -2 0\n";
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");

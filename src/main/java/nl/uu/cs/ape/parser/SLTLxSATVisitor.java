@@ -133,9 +133,10 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 			return new SLTLxGlobally(subFormula);
 		} else if(ctx.getChild(0).getText().equals("F")) {
 			return new SLTLxFinally(subFormula);
-		} else if(ctx.getChild(0).getText().equals("N")) {
+		} else if(ctx.getChild(0).getText().equals("X")) {
 			return new SLTLxNext(subFormula);
 		} else {
+			System.err.println("Modal operation '"+ ctx.getChild(1).getText() + "' id not recognised.");
 			/* In case modal operator is not recognized return null. */
 			return null;
 		}
@@ -164,17 +165,18 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 
 	@Override
 	public SLTLxFormula visitBinaryBool(BinaryBoolContext ctx) {
-		SLTLxFormula subFormula1 = visit(ctx.getChild(1));
+		SLTLxFormula subFormula1 = visit(ctx.getChild(0));
 		SLTLxFormula subFormula2 = visit(ctx.getChild(2));
-		if(ctx.getChild(0).getText().equals("|")) {
+		if(ctx.getChild(1).getText().equals("|")) {
 			return new SLTLxDisjunction(subFormula1, subFormula2);
-		} else if(ctx.getChild(0).getText().equals("&")) {
+		} else if(ctx.getChild(1).getText().equals("&")) {
 			return new SLTLxConjunction(subFormula1, subFormula2);
-		} else if(ctx.getChild(0).getText().equals("->")) {
+		} else if(ctx.getChild(1).getText().equals("->")) {
 			return new SLTLxImplication(subFormula1, subFormula2);
-		} else if(ctx.getChild(0).getText().equals("<->")) {
+		} else if(ctx.getChild(1).getText().equals("<->")) {
 			return new SLTLxEquivalence(subFormula1, subFormula2);
 		} else {
+			System.err.println("Binary operation '"+ ctx.getChild(1).getText() + "' is not recognised.");
 			/* In case binary operator is not recognised return null. */
 			return null;
 		}
@@ -268,7 +270,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		List<SLTLxVariable> inputs = new ArrayList<SLTLxVariable>();
 	
 		ParseTree inputElems = ctx.getChild(2);
-		for(int i = 0; i < inputElems.getChildCount(); i=i+2) {
+		for(int i = 0; i < inputElems.getChildCount(); i = i+2) {
 			String variableID = inputElems.getChild(i).getText();
 			inputs.add(new SLTLxVariable(variableID));
 		}
@@ -276,7 +278,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		List<SLTLxVariable> outputs = new ArrayList<SLTLxVariable>();
 		
 		ParseTree outputElems = ctx.getChild(4);
-		for(int i = 0; i < outputElems.getChildCount(); i=i+2) {
+		for(int i = 0; i < outputElems.getChildCount(); i = i+2) {
 			String variableID = outputElems.getChild(i).getText();
 			outputs.add(new SLTLxVariable(variableID));
 		}

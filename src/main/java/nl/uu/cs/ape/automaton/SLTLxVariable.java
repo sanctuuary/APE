@@ -270,7 +270,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 */
 	public Set<State> getVariableDomain(int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<State> variableDomain = new HashSet<State>();
-		for(State state :synthesisEngine.getTypeAutomaton().getAllStatesUntilBlockNo(stateNo)) {
+		for(State state :synthesisEngine.getTypeAutomaton().getAllMemoryStatesUntilBlockNo(stateNo)) {
 			variableDomain.add(state);
 		}
 		return variableDomain;
