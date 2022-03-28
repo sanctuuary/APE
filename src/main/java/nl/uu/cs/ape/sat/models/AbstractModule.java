@@ -2,6 +2,7 @@ package nl.uu.cs.ape.sat.models;
 
 import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.List;
 
@@ -54,13 +55,22 @@ public class AbstractModule extends TaxonomyPredicate {
     public String getPredicateLabel() {
         return moduleName;
     }
+    
+    @Override
+    public String getPredicateLongLabel() {
+    	if(moduleID.endsWith("[tool]")) {
+    		return APEUtils.removeNLastChar(moduleID, 6);
+    	} else {
+    		return moduleID;
+    	}
+    }
 
     /**
      * Returns null. Abstract classes do not have input types.
      *
      * @return null module input
      */
-    public List<DataInstance> getModuleInput() {
+    public List<Type> getModuleInput() {
         return null;
     }
 
@@ -69,7 +79,7 @@ public class AbstractModule extends TaxonomyPredicate {
      *
      * @return null module output
      */
-    public List<DataInstance> getModuleOutput() {
+    public List<Type> getModuleOutput() {
         return null;
     }
 

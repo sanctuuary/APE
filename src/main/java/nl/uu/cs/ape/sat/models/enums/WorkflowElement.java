@@ -25,7 +25,12 @@ public enum WorkflowElement {
     /**
      * Depicts the usage of an already created type instance, as an input for a tool. It references the created data type.
      */
-    MEM_TYPE_REFERENCE;
+    MEM_TYPE_REFERENCE,
+    
+	/**
+     * Depicts the dependency between two data instances (states). It depicts that a data instance is dependent (was derived from) on another data instance.
+     */
+    TYPE_DEPENDENCY;
 
     /**
      * Gets string shortcut.

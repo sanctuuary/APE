@@ -3,40 +3,36 @@
     {
       "constraintid": "itn_m",
       "parameters": [
-        ["Points_and_lines"],
-        ["Basemaps"]
+	{"ToolsTaxonomy" : ["Points_and_lines"]},
+	{"ToolsTaxonomy" : ["Basemaps"]}
       ]
     },
     {
       "constraintid": "next_m",
       "parameters": [
-        ["initGMT"],
-        ["Plot_creation"]
+        {"ToolsTaxonomy" : ["initGMT"]},
+        {"ToolsTaxonomy" : ["Plot_creation"]}
       ]
     },
     {
-      "constraintid": "use_m",
-      "parameters": [
-        ["Draw_water"]
-      ]
-    },
-    {
-      "constraintid": "use_m",
-      "parameters": [
-        ["Draw_land"]
-      ]
-    },
-    {
-      "constraintid": "use_m",
-      "parameters": [
-        ["Draw_political_borders"]
-      ]
-    },
-    {
-      "constraintid": "use_m",
-      "parameters": [
-        ["Points_and_lines"]
-      ]
-    }
+        "constraintid": "use_m",
+        "parameters": [{"ToolsTaxonomy" : ["Draw_water"]}]
+      },
+      {
+        "constraintid": "use_m",
+        "parameters": [{"ToolsTaxonomy" : ["Draw_land"]}]
+      },
+      {
+        "constraintid": "use_m",
+        "parameters": [
+	{"ToolsTaxonomy" : ["Draw_political_borders"]}
+     	]
+      },
+      {
+        "constraintid": "use_m",
+        "parameters": [
+	{"ToolsTaxonomy" : ["Points_and_lines"]}
+     	]
+      }
   ]
 }

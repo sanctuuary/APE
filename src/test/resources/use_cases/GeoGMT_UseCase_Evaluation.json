@@ -1,6 +1,6 @@
 {
   "name": "GeoGMT",
-  "base_configuration": "GeoGMT/E0/ape.configuration",
+  "base_configuration": "GeoGMT/E0/config.json",
   "mutations": [
     {
       "description": "[NEW] replace constraints",
@@ -9,7 +9,7 @@
       "replace_constraints": [
         {
           "constraintid": "use_t",
-          "parameters": [[ "Color_palette_table"]]
+          "parameters": [ {"TypesTaxonomy" : [ "Color_palette_table"]}]
         }
       ]
     },
@@ -20,7 +20,7 @@
       "add_constraints": [
         {
           "constraintid": "use_t",
-          "parameters": [[ "Color_palette_table"]]
+          "parameters": [{"TypesTaxonomy" : [ "Color_palette_table"]}]
         }
       ]
     },
@@ -35,12 +35,6 @@
       "expected_no_solutions": [3, 128, 1000],
       "config": { "outputs": [] },
       "replace_constraints": []
-    },
-    {
-      "description": "TODO",
-      "solution_length_start": 1,
-      "expected_no_solutions": [],
-      "config": { "shared_memory": "false" }
     },
     {
       "description": "TODO",
@@ -87,6 +81,12 @@
       "solution_length_start": 6,
       "expected_no_solutions": [32, 1000],
       "config": { "inputs": [] }
+    },
+    {
+      "description": "Are the correct number of CWL files generated?",
+      "solution_length_start": 5,
+      "expected_no_solutions": [32, 1000],
+      "number_of_cwl_files": 3
     }
   ]
 }

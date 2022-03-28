@@ -6,10 +6,11 @@ import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Range;
+import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,35 +30,40 @@ public class APERunConfig {
     /**
      * Path to the file with all workflow constraints.
      */
-    public final APEConfigTag<Path> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
-    /**
-     * true if the shared memory structure should be used, false in case of a
-     * restrictive message passing structure.
-     */
-    public final APEConfigTag<Boolean> SHARED_MEMORY = new APEConfigTagFactory.TAGS.SHARED_MEMORY();
+    private final APEConfigTag<JSONObject> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
     /**
      * Path to the directory that will contain all the solutions to the problem.
      */
-    public final APEConfigTag<Path> SOLUTION_DIR_PATH = new APEConfigTagFactory.TAGS.SOLUTION_DIR_PATH();
+   private final APEConfigTag<Path> SOLUTION_DIR_PATH = new APEConfigTagFactory.TAGS.SOLUTION_DIR_PATH();
     /**
      * Min and Max possible length of the solutions (length of the automaton). For
      * no upper limit, max length should be set to 0.
      */
-    public final APEConfigTag<Range> SOLUTION_LENGTH_RANGE = new APEConfigTagFactory.TAGS.SOLUTION_LENGTH_RANGE();
+   private final APEConfigTag<Range> SOLUTION_LENGTH_RANGE = new APEConfigTagFactory.TAGS.SOLUTION_LENGTH_RANGE();
     /**
      * Max number of solution that the solver will return.
      */
-    public final APEConfigTag<Integer> MAX_NO_SOLUTIONS = new APEConfigTagFactory.TAGS.MAX_NO_SOLUTIONS();
+   private final APEConfigTag<Integer> MAX_NO_SOLUTIONS = new APEConfigTagFactory.TAGS.MAX_NO_SOLUTIONS();
     /**
      * Number of the workflow scripts that should be generated from candidate
      * workflows. Default is 0.
      */
-    public final APEConfigTag<Integer> NO_EXECUTIONS = new APEConfigTagFactory.TAGS.NO_EXECUTIONS();
+   private final APEConfigTag<Integer> NO_EXECUTIONS = new APEConfigTagFactory.TAGS.NO_EXECUTIONS();
     /**
      * Number of the solution graphs that should be generated from candidate
      * workflows. Default is 0.
      */
-    public final APEConfigTag<Integer> NO_GRAPHS = new APEConfigTagFactory.TAGS.NO_GRAPHS();
+   private final APEConfigTag<Integer> NO_GRAPHS = new APEConfigTagFactory.TAGS.NO_GRAPHS();
+    /**
+     * Number of CWL files that should be generated from candidate workflows.
+     * Default is 0.
+     */
+   private final APEConfigTag<Integer> NO_CWL = new APEConfigTagFactory.TAGS.NO_CWL();
+    /**
+     * Number of executable CWL files that should be generated from candidate workflows.
+     * Default is 0.
+     */
+    private final APEConfigTag<Integer> NO_EXECUTABLE_CWL = new APEConfigTagFactory.TAGS.NO_EXECUTABLE_CWL();
     /**
      * Determines the required usage for the data instances that are given as
      * workflow input:<br>
@@ -65,7 +71,7 @@ public class APERunConfig {
      * {@link ConfigEnum#ONE} if one of the workflow inputs should be used or <br>
      * {@link ConfigEnum#NONE} if none of the workflow inputs has to be used
      */
-    public final APEConfigTag<ConfigEnum> USE_WORKFLOW_INPUT = new APEConfigTagFactory.TAGS.USE_WORKFLOW_INPUT();
+   private final APEConfigTag<ConfigEnum> USE_WORKFLOW_INPUT = new APEConfigTagFactory.TAGS.USE_WORKFLOW_INPUT();
     /**
      * Determines the required usage for the generated data instances:<br>
      * {@link ConfigEnum#ALL} if all the generated data has to be used,<br>
@@ -73,39 +79,45 @@ public class APERunConfig {
      * output, per tool, has to be used or <br>
      * {@link ConfigEnum#NONE} if none of the data instances is obligatory to use.
      */
-    public final APEConfigTag<ConfigEnum> USE_ALL_GENERATED_DATA = new APEConfigTagFactory.TAGS.USE_ALL_GENERATED_DATA();
+   private final APEConfigTag<ConfigEnum> USE_ALL_GENERATED_DATA = new APEConfigTagFactory.TAGS.USE_ALL_GENERATED_DATA();
     /**
      * Mode is true if debug mode is turned on.
      */
-    public final APEConfigTag<Boolean> DEBUG_MODE = new APEConfigTagFactory.TAGS.DEBUG_MODE();
+   private final APEConfigTag<Boolean> DEBUG_MODE = new APEConfigTagFactory.TAGS.DEBUG_MODE();
+    /**
+     * Synthesis timeout in seconds.
+     */
+    public final APEConfigTag<Integer> TIMEOUT_SEC = new APEConfigTagFactory.TAGS.TIMEOUT_SEC();
     /**
      * false iff the provided solutions should be distinguished based on the tool
      * sequences alone, i.e. tool sequences cannot repeat, ignoring the types in the
      * solutions.
      */
-    public final APEConfigTag<Boolean> TOOL_SEQ_REPEAT = new APEConfigTagFactory.TAGS.TOOL_SEQ_REPEAT();
+   private final APEConfigTag<Boolean> TOOL_SEQ_REPEAT = new APEConfigTagFactory.TAGS.TOOL_SEQ_REPEAT();
     /**
      * Input types of the workflow.
      */
-    public final APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
+   private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
     /**
      * Output types of the workflow.
      */
-    public final APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
+   private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
     /**
      * All the Tags specified in this class. Should be in correct order of dependencies.
      */
     private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
             this.CONSTRAINTS,
-            this.SHARED_MEMORY,
             this.SOLUTION_DIR_PATH,
             this.SOLUTION_LENGTH_RANGE,
             this.MAX_NO_SOLUTIONS,
             this.NO_EXECUTIONS,
             this.NO_GRAPHS,
+            this.NO_CWL,
+            this.NO_EXECUTABLE_CWL,
             this.USE_WORKFLOW_INPUT,
             this.USE_ALL_GENERATED_DATA,
             this.DEBUG_MODE,
+            this.TIMEOUT_SEC,
             this.TOOL_SEQ_REPEAT,
             this.PROGRAM_OUTPUTS,
             this.PROGRAM_INPUTS
@@ -116,15 +128,17 @@ public class APERunConfig {
      */
     public static final APEConfigTags TAGS = new APEConfigTags(
             new CONSTRAINTS(),
-            new SHARED_MEMORY(),
             new SOLUTION_DIR_PATH(),
             new SOLUTION_LENGTH_RANGE(),
             new MAX_NO_SOLUTIONS(),
             new NO_EXECUTIONS(),
             new NO_GRAPHS(),
+            new NO_CWL(),
+            new NO_EXECUTABLE_CWL(),
             new USE_WORKFLOW_INPUT(),
             new USE_ALL_GENERATED_DATA(),
             new DEBUG_MODE(),
+            new TIMEOUT_SEC(),
             new TOOL_SEQ_REPEAT(),
             new PROGRAM_OUTPUTS(null),
             new PROGRAM_INPUTS(null)
@@ -148,17 +162,19 @@ public class APERunConfig {
 
         this.apeDomainSetup = builder.apeDomainSetup;
 
-        setConstraintsPath(builder.constraintsPath);
+        setConstraintsJSON(builder.constraintsJSON);
         setSolutionLength(builder.solutionMinLength, builder.solutionMaxLength);
         setMaxNoSolutions(builder.maxNoSolutions);
-        setSharedMemory(builder.sharedMemory);
         setToolSeqRepeat(builder.toolSeqRepeat);
         setSolutionPath(builder.solutionDirPath);
         setNoExecutions(builder.noExecutions);
         setNoGraphs(builder.noGraphs);
+        setNoCWL(builder.noCWL);
+        setNoExecutableCWL(builder.noExecutableCWL);
         setUseWorkflowInput(builder.useWorkflowInput);
         setUseAllGeneratedData(builder.useAllGeneratedData);
         setDebugMode(builder.debugMode);
+        setTimeoutSec(builder.timeoutSec);
         setProgramInputs(builder.programInputs);
         setProgramOutputs(builder.programOutputs);
     }
@@ -185,12 +201,12 @@ public class APERunConfig {
         APERunConfig dummy = new APERunConfig(setup);
         ValidationResults results = new ValidationResults();
         for(APEConfigTag<?> tag : dummy.all_tags){
-            results.add(tag.validate(json));
+            results.add(tag.validateConfig(json));
             if(results.hasFails()){
                 return results;
             }
             else{
-                tag.setValue(json); // for dependencies
+                tag.setValueFromConfig(json); // for dependencies
             }
         }
         return results;
@@ -221,7 +237,7 @@ public class APERunConfig {
 
         // set the apeDomain BEFORE setting the tags
         for (APEConfigTag<?> tag : all_tags) {
-            tag.setValue(runConfiguration);
+            tag.setValueFromConfig(runConfiguration);
         }
     }
 
@@ -271,35 +287,17 @@ public class APERunConfig {
      *
      * @return the value of {@link #CONSTRAINTS}
      */
-    public Path getConstraintsPath() {
+    public JSONObject getConstraintsJSON() {
         return CONSTRAINTS.getValue();
     }
 
     /**
-     * @param constraintsPath the constraintsPath to set
+     * Set the constrains.
+     * 
+     * @param constraintsJSON JSON object that contains the constraints
      */
-    public void setConstraintsPath(String constraintsPath) {
-        CONSTRAINTS.setValue(Paths.get(constraintsPath));
-    }
-
-    /**
-     * Returns true if the shared memory structure should be used, i.e. if the
-     * generated data is available in memory to all the tools used subsequently, or
-     * false in case of a restrictive message passing structure, i.e. if the
-     * generated data is available only to the tool next in sequence.
-     *
-     * @return true if the shared memory structure should be used, false in case of
-     * a restrictive message passing structure.
-     */
-    public boolean getSharedMemory() {
-        return SHARED_MEMORY.getValue();
-    }
-
-    /**
-     * @param sharedMemory the sharedMemory to set
-     */
-    public void setSharedMemory(boolean sharedMemory) {
-        SHARED_MEMORY.setValue(sharedMemory);
+    public void setConstraintsJSON(JSONObject constraintsJSON) {
+        CONSTRAINTS.setValue(constraintsJSON);
     }
 
     /**
@@ -364,6 +362,26 @@ public class APERunConfig {
      */
     public Path getSolutionDirPath2Figures() {
         return getSolutionDirPath2(FIGURES_FOLDER_NAME);
+    }
+
+    public static final String CWL_FOLDER_NAME = "CWL";
+    /**
+     * Get the path to the directory where the CWL scripts corresponding the given solutions should be stored.
+     *
+     * @return the path to the directory where the CWL scripts corresponding to the given solutions should be stored
+     */
+    public Path getSolutionDirPath2CWL() {
+        return getSolutionDirPath2(CWL_FOLDER_NAME);
+    }
+
+    public static final String EXECUTABLE_CWL_FOLDER_NAME = "CWL_executables";
+    /**
+     * Get the path to the directory where the executable CWL scripts corresponding the given solutions should be stored.
+     *
+     * @return the path to the directory where the executable CWL scripts corresponding to the given solutions should be stored
+     */
+    public Path getSolutionDirPath2ExecutableCWL() {
+        return getSolutionDirPath2(EXECUTABLE_CWL_FOLDER_NAME);
     }
 
     /**
@@ -431,18 +449,50 @@ public class APERunConfig {
     }
 
     /**
+     * Gets number of CWL files.
+     * @return The value of {@link #NO_CWL}
+     */
+    public int getNoCWL() {
+        return NO_CWL.getValue();
+    }
+
+    /**
+     * Set the number of CWL files.
+     * @param noCWL The number to set.
+     */
+    public void setNoCWL(int noCWL) {
+        NO_CWL.setValue(noCWL);
+    }
+
+    /**
+     * Gets number of executable CWL files.
+     * @return The value of {@link #NO_EXECUTABLE_CWL}
+     */
+    public int getNoExecutableCWL() {
+        return NO_EXECUTABLE_CWL.getValue();
+    }
+
+    /**
+     * Set the number of executable CWL files.
+     * @param noExecutableCWL The number to set.
+     */
+    public void setNoExecutableCWL(int noExecutableCWL) {
+        NO_EXECUTABLE_CWL.setValue(noExecutableCWL);
+    }
+
+    /**
      * Gets program inputs.
      *
      * @return the value of {@link #PROGRAM_INPUTS}
      */
-    public List<DataInstance> getProgramInputs() {
+    public List<Type> getProgramInputs() {
         return PROGRAM_INPUTS.getValue();
     }
 
     /**
      * @param programInputs the programInputs to set
      */
-    public void setProgramInputs(List<DataInstance> programInputs) {
+    public void setProgramInputs(List<Type> programInputs) {
         PROGRAM_INPUTS.setValue(programInputs);
     }
 
@@ -451,14 +501,14 @@ public class APERunConfig {
      *
      * @return the value of {@link #PROGRAM_OUTPUTS}
      */
-    public List<DataInstance> getProgramOutputs() {
+    public List<Type> getProgramOutputs() {
         return PROGRAM_OUTPUTS.getValue();
     }
 
     /**
      * @param programOutputs the programOutputs to set
      */
-    public void setProgramOutputs(List<DataInstance> programOutputs) {
+    public void setProgramOutputs(List<Type> programOutputs) {
         PROGRAM_OUTPUTS.setValue(programOutputs);
     }
 
@@ -492,6 +542,30 @@ public class APERunConfig {
      */
     public void setUseAllGeneratedData(ConfigEnum useAllGeneratedData) {
         USE_ALL_GENERATED_DATA.setValue(useAllGeneratedData);
+    }
+    
+    /**
+     * Get timeout (in seconds) how long the execution should last.
+     * @return Timeout in seconds.
+     */
+    public int getTimeoutSec() {
+    	return TIMEOUT_SEC.getValue();
+    }
+    
+    /**
+     * Get timeout (in ms) how long the execution should last.
+     * @return Timeout in seconds.
+     */
+    public int getTimeoutMs() {
+    	return TIMEOUT_SEC.getValue() * 1000;
+    }
+    
+    /**
+     * Set the timeout in sec.
+     * @param timeoutSec
+     */
+    public void setTimeoutSec(int timeoutSec) {
+    	TIMEOUT_SEC.setValue(timeoutSec);
     }
 
     /**
@@ -548,11 +622,9 @@ public class APERunConfig {
     }
 
     public interface IBuildStage {
-        IBuildStage withConstraintsPath(String constraintsPath);
+        IBuildStage withConstraintsJSON(JSONObject constraintsJSON);
 
-        IBuildStage withSharedMemory(boolean sharedMemory);
-
-        IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
+		IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
 
         IBuildStage withSolutionDirPath(String solutionPath);
 
@@ -560,15 +632,21 @@ public class APERunConfig {
 
         IBuildStage withNoGraphs(int noGraphs);
 
-        IBuildStage withProgramInputs(List<DataInstance> programInputs);
+        IBuildStage withNoCWL(int noCWL);
 
-        IBuildStage withProgramOutputs(List<DataInstance> programOutputs);
+        IBuildStage withNoExecutableCWL(int noExecutableCWLCWL);
+
+        IBuildStage withProgramInputs(List<Type> programInputs);
+
+        IBuildStage withProgramOutputs(List<Type> programOutputs);
 
         IBuildStage withUseWorkflowInput(ConfigEnum useWorkflowInput);
 
         IBuildStage withUseAllGeneratedData(ConfigEnum useAllGeneratedData);
 
         IBuildStage withDebugMode(boolean debugMode);
+        
+        IBuildStage withTimeoutSec(int timeoutSec);
 
         APERunConfig build();
     }
@@ -582,17 +660,19 @@ public class APERunConfig {
         private int solutionMaxLength;
         private int maxNoSolutions;
         private APEDomainSetup apeDomainSetup;
-        private String constraintsPath;
-        private boolean sharedMemory;
+        private JSONObject constraintsJSON;
         private boolean toolSeqRepeat;
         private String solutionDirPath;
         private int noExecutions;
         private int noGraphs;
-        private List<DataInstance> programInputs = Collections.emptyList();
-        private List<DataInstance> programOutputs = Collections.emptyList();
+        private int noCWL;
+        private int noExecutableCWL;
+        private List<Type> programInputs = Collections.emptyList();
+        private List<Type> programOutputs = Collections.emptyList();
         private ConfigEnum useWorkflowInput;
         private ConfigEnum useAllGeneratedData;
         private boolean debugMode;
+        private int timeoutSec;
 
         private Builder() {
         }
@@ -622,14 +702,8 @@ public class APERunConfig {
         }
 
         @Override
-        public IBuildStage withConstraintsPath(String constraintsPath) {
-            this.constraintsPath = constraintsPath;
-            return this;
-        }
-
-        @Override
-        public IBuildStage withSharedMemory(boolean sharedMemory) {
-            this.sharedMemory = sharedMemory;
+        public IBuildStage withConstraintsJSON(JSONObject constraintsJSON) {
+            this.constraintsJSON = constraintsJSON;
             return this;
         }
 
@@ -659,13 +733,25 @@ public class APERunConfig {
         }
 
         @Override
-        public IBuildStage withProgramInputs(List<DataInstance> programInputs) {
+        public IBuildStage withNoCWL(int noCWL) {
+            this.noCWL = noCWL;
+            return this;
+        }
+
+        @Override
+        public IBuildStage withNoExecutableCWL(int noExecutableCWLCWL) {
+            this.noExecutableCWL = noExecutableCWLCWL;
+            return this;
+        }
+
+        @Override
+        public IBuildStage withProgramInputs(List<Type> programInputs) {
             this.programInputs = programInputs;
             return this;
         }
 
         @Override
-        public IBuildStage withProgramOutputs(List<DataInstance> programOutputs) {
+        public IBuildStage withProgramOutputs(List<Type> programOutputs) {
             this.programOutputs = programOutputs;
             return this;
         }
@@ -685,6 +771,12 @@ public class APERunConfig {
         @Override
         public IBuildStage withDebugMode(boolean debugMode) {
             this.debugMode = debugMode;
+            return this;
+        }
+        
+        @Override
+        public IBuildStage withTimeoutSec(int timeout) {
+            this.timeoutSec = timeout;
             return this;
         }
 

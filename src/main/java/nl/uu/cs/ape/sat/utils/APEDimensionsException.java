@@ -28,4 +28,22 @@ public class APEDimensionsException extends RuntimeException {
     public static APEDimensionsException dimensionsOverlap(String message) {
     	return new APEDimensionsException(String.format("The data dimensions cannot overlap. %s", message));
     }
+    
+    /**
+     * Exception is thrown when a dimension expected does not exist.
+     * @param message - Application specific message that may help the user solve the problem.
+     * @return Dimensions exception with information that may help the user solve the problem.
+     */
+    public static APEDimensionsException notExistingDimension(String message) {
+    	return new APEDimensionsException(String.format("The dimension does not exist. %s", message));
+    }
+    
+    /**
+     * Exception is thrown when a dimension does not contain the specified subclass.
+     * @param message - Application specific message that may help the user solve the problem.
+     * @return Dimensions exception with information that may help the user solve the problem.
+     */
+    public static APEDimensionsException dimensionDoesNotContainClass(String message) {
+    	return new APEDimensionsException(String.format("The data dimension does not contain the specified subclass. %s", message));
+    }
 }

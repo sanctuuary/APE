@@ -12,16 +12,18 @@ import nl.uu.cs.ape.sat.automaton.Block;
 import nl.uu.cs.ape.sat.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.sat.automaton.State;
 import nl.uu.cs.ape.sat.automaton.TypeAutomaton;
-import nl.uu.cs.ape.sat.core.implSAT.SAT_SynthesisEngine;
-import nl.uu.cs.ape.sat.core.implSAT.SAT_solution;
+import nl.uu.cs.ape.sat.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.sat.core.implSAT.SATSolution;
 import nl.uu.cs.ape.sat.models.AbstractModule;
-import nl.uu.cs.ape.sat.models.AuxTaxonomyPredicate;
+import nl.uu.cs.ape.sat.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.sat.models.Module;
 import nl.uu.cs.ape.sat.models.Type;
+import nl.uu.cs.ape.sat.models.enums.NodeType;
 import nl.uu.cs.ape.sat.models.enums.WorkflowElement;
 import nl.uu.cs.ape.sat.models.logic.constructs.Literal;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,13 +47,13 @@ public class SolutionWorkflow {
 
     /**
      * List of memory type nodes provided as the initial workflow input, ordered
-     * according the initial description (ape.config file).
+     * according the initial description (config.json file).
      */
     private List<TypeNode> workflowInputTypeStates;
 
     /**
      * List of used type nodes provided as the final workflow output, ordered
-     * according the initial description (ape.config file).
+     * according the initial description (config.jsong file).
      */
     private List<TypeNode> workflowOutputTypeStates;
 
@@ -79,7 +81,7 @@ public class SolutionWorkflow {
     /**
      * Non-structured solution obtained directly from the SAT output.
      */
-    private SAT_solution nativeSolution;
+    private SATSolution nativeSolution;
 
     /**
      * Graph representation of the data-flow workflow solution.
@@ -163,17 +165,17 @@ public class SolutionWorkflow {
      * @param satSolution       SAT solution, presented as array of integers.
      * @param synthesisInstance Current synthesis instance
      */
-    public SolutionWorkflow(int[] satSolution, SAT_SynthesisEngine synthesisInstance) {
+    public SolutionWorkflow(int[] satSolution, SATSynthesisEngine synthesisInstance) {
         /* Call for the default constructor. */
         this(synthesisInstance.getModuleAutomaton(), synthesisInstance.getTypeAutomaton());
 
-        this.nativeSolution = new SAT_solution(satSolution, synthesisInstance);
+        this.nativeSolution = new SATSolution(satSolution, synthesisInstance);
 
         for (int mappedLiteral : satSolution) {
             if (mappedLiteral > synthesisInstance.getMappings().getMaxNumOfMappedAuxVar()) {
                 Literal currLiteral = new Literal(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
                 if (!currLiteral.isNegated()) {
-                    if (currLiteral.getPredicate() instanceof AuxTaxonomyPredicate) {
+                    if (currLiteral.getPredicate() instanceof AuxiliaryPredicate) {
                         continue;
                     } else if (currLiteral.isWorkflowElementType(WorkflowElement.MODULE)) {
                         ModuleNode currNode = this.mappedModuleNodes.get(currLiteral.getUsedInStateArgument());
@@ -185,9 +187,9 @@ public class SolutionWorkflow {
                     } else if (currLiteral.isWorkflowElementType(WorkflowElement.MEMORY_TYPE)) {
                         TypeNode currNode = this.mappedMemoryTypeNodes.get(currLiteral.getUsedInStateArgument());
                         if (currLiteral.getPredicate() instanceof Type
-                                && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
+                                && ((Type) currLiteral.getPredicate()).isNodeType(NodeType.LEAF)) {
                             currNode.addUsedType((Type) currLiteral.getPredicate());
-                        } else if (currLiteral.getPredicate() instanceof Type) {
+                        } else if ((currLiteral.getPredicate() instanceof Type) && !((Type) currLiteral.getPredicate()).isNodeType(NodeType.EMPTY_LABEL))  {
                             currNode.addAbstractDescriptionOfUsedType((Type) currLiteral.getPredicate());
                         } else {
                             /* Memory type cannot be anything else except a Type. */
@@ -212,6 +214,8 @@ public class SolutionWorkflow {
                             APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
                         }
                         memoryTypeNode.addUsedByTool(usedTypeNode);
+                    } else if (currLiteral.isWorkflowElementType(WorkflowElement.TYPE_DEPENDENCY)) {
+                    	// skip
                     }
                 }
             }
@@ -255,9 +259,9 @@ public class SolutionWorkflow {
     /**
      * Get non-structured solution obtained directly from the SAT output.
      *
-     * @return A {@link SAT_solution} object, that contains information about the native SAT encoding, and how it translates into human readable text.
+     * @return A {@link SATSolution} object, that contains information about the native SAT encoding, and how it translates into human readable text.
      */
-    public SAT_solution getNativeSATsolution() {
+    public SATSolution getNativeSATsolution() {
         return this.nativeSolution;
     }
 
@@ -290,6 +294,21 @@ public class SolutionWorkflow {
             return generateFieldDataflowGraph(title, orientation);
         }
     }
+    
+    /**
+     * Get the graphical representation of the data-flow diagram with the
+     * required title and in the defined orientation.
+     *
+     * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
+     * @return The solution graph in PNG format.
+     */
+    public BufferedImage getDataflowGraphPNG(RankDir orientation) {
+        if (this.dataflowGraph != null) {
+            return this.dataflowGraph.getPNGImage(false);
+        } else {
+            return generateFieldDataflowGraph("", orientation).getPNGImage(false);
+        }
+    }
 
     /**
      * Get the graphical representation of the control-flow diagram in default
@@ -306,7 +325,7 @@ public class SolutionWorkflow {
     }
 
     /**
-     * /** Get the graphical representation of the control-flow diagram with the
+     * Get the graphical representation of the control-flow diagram with the
      * required title and in the defined orientation.
      *
      * @param title       The title of the SolutionGraph.
@@ -318,6 +337,21 @@ public class SolutionWorkflow {
             return this.controlflowGraph;
         } else {
             return generateFieldControlflowGraph(title, orientation);
+        }
+    }
+    
+    /**
+     * Get the graphical representation of the control-flow diagram with the
+     * required title and in the defined orientation.
+     *
+     * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
+     * @return The solution graph in PNG format.
+     */
+    public BufferedImage getControlflowGraphPNG(RankDir orientation) {
+        if (this.controlflowGraph != null) {
+            return this.controlflowGraph.getPNGImage(false);
+        } else {
+            return generateFieldControlflowGraph("", orientation).getPNGImage(false);
         }
     }
 
@@ -340,49 +374,49 @@ public class SolutionWorkflow {
     public String getReadableSolution() {
         StringBuilder solution = new StringBuilder();
 
-        solution = solution.append("WORKFLOW_IN:{");
+        solution.append("WORKFLOW_IN:{");
         int i = 0;
         for (TypeNode workflowInput : this.workflowInputTypeStates) {
-            solution = solution.append(workflowInput.toString());
+            solution.append(workflowInput.toString());
             if (++i < this.workflowInputTypeStates.size()) {
-                solution = solution.append(", ");
+                solution.append(", ");
             }
         }
-        solution = solution.append("} |");
+        solution.append("} |");
 
         for (ModuleNode currTool : this.moduleNodes) {
-            solution = solution.append(" IN:{");
+            solution.append(" IN:{");
             i = 0;
             for (TypeNode toolInput : currTool.getInputTypes()) {
                 if (!toolInput.isEmpty()) {
                     if (i++ > 1) {
-                        solution = solution.append(", ");
+                        solution.append(", ");
                     }
-                    solution = solution.append(toolInput.toString());
+                    solution.append(toolInput.toString());
                 }
             }
-            solution = solution.append("} ").append(currTool.toString());
-            solution = solution.append(" OUT:{");
+            solution.append("} ").append(currTool.toString());
+            solution.append(" OUT:{");
             i = 0;
             for (TypeNode toolOutput : currTool.getOutputTypes()) {
                 if (!toolOutput.isEmpty()) {
                     if (i++ > 1) {
-                        solution = solution.append(", ");
+                        solution.append(", ");
                     }
-                    solution = solution.append(toolOutput.toString());
+                    solution.append(toolOutput.toString());
                 }
             }
-            solution = solution.append("} |");
+            solution.append("} |");
         }
         i = 0;
-        solution = solution.append("WORKFLOW_OUT:{");
+        solution.append("WORKFLOW_OUT:{");
         for (TypeNode workflowOutput : this.workflowOutputTypeStates) {
-            solution = solution.append(workflowOutput.toString());
+            solution.append(workflowOutput.toString());
             if (++i < this.workflowOutputTypeStates.size()) {
-                solution = solution.append(", ");
+                solution.append(", ");
             }
         }
-        solution = solution.append("}");
+        solution.append("}");
 
         return solution.toString();
     }
@@ -404,33 +438,33 @@ public class SolutionWorkflow {
                 System.out.println(input + " [shape=box, color = red];\n");
                 inputDefined = true;
             }
-            solution = solution.append(input + "->" + workflowInput.getNodeID() + ";\n");
-            solution = solution.append(workflowInput.getDotDefinition());
+            solution.append(input + "->" + workflowInput.getNodeID() + ";\n");
+            solution.append(workflowInput.getDotDefinition());
         }
 
         for (ModuleNode currTool : this.moduleNodes) {
-            solution = solution.append(currTool.getDotDefinition());
+            solution.append(currTool.getDotDefinition());
             for (TypeNode toolInput : currTool.getInputTypes()) {
                 if (!toolInput.isEmpty()) {
-                    solution = solution.append(
+                    solution.append(
                             toolInput.getNodeID() + "->" + currTool.getNodeID() + "[label = in, fontsize = 10];\n");
                 }
             }
             for (TypeNode toolOutput : currTool.getOutputTypes()) {
                 if (!toolOutput.isEmpty()) {
-                    solution = solution.append(toolOutput.getDotDefinition());
-                    solution = solution.append(
+                    solution.append(toolOutput.getDotDefinition());
+                    solution.append(
                             currTool.getNodeID() + "->" + toolOutput.getNodeID() + " [label = out, fontsize = 10];\n");
                 }
             }
         }
         for (TypeNode workflowOutput : this.workflowOutputTypeStates) {
             if (!outputDefined) {
-                solution = solution.append(output + " [shape=box, color = red];\n");
+                solution.append(output + " [shape=box, color = red];\n");
                 outputDefined = true;
             }
-            solution = solution.append(workflowOutput.getDotDefinition());
-            solution = solution.append(workflowOutput.getNodeID() + "->" + output + ";\n");
+            solution.append(workflowOutput.getDotDefinition());
+            solution.append(workflowOutput.getNodeID() + "->" + output + ";\n");
         }
 
         return solution.toString();
@@ -558,18 +592,18 @@ public class SolutionWorkflow {
      */
     public String getScriptExecution() {
         StringBuffer script = new StringBuffer("#!/bin/bash\n");
-        script = script.append("if [ $# -ne " + workflowInputTypeStates.size() + " ]\n\tthen\n");
-        script = script
+        script.append("if [ $# -ne " + workflowInputTypeStates.size() + " ]\n\tthen\n");
+        script
                 .append("\t\techo \"" + workflowInputTypeStates.size() + " argument(s) expected.\"\n\t\texit\nfi\n");
         int in = 1;
         for (TypeNode input : workflowInputTypeStates) {
-            script = script.append(input.getShortNodeID() + "=$" + (in++) + "\n");
+            script.append(input.getShortNodeID() + "=$" + (in++) + "\n");
         }
-        script = script.append("\n");
+        script.append("\n");
         for (ModuleNode operation : moduleNodes) {
             String code = operation.getUsedModule().getExecutionCode();
             if (code == null || code.equals("")) {
-                script = script.append("\"Error. Tool '" + operation.getNodeLabel() + "' is missing the execution code.\"")
+                script.append("\"Error. Tool '" + operation.getNodeLabel() + "' is missing the execution code.\"")
                         .append("\n");
             } else {
                 for (int i = 0; i < operation.getInputTypes().size(); i++) {
@@ -578,12 +612,12 @@ public class SolutionWorkflow {
                 for (int i = 0; i < operation.getOutputTypes().size(); i++) {
                     code = code.replace("@output[" + i + "]", operation.getOutputTypes().get(i).getShortNodeID());
                 }
-                script = script.append(code).append("\n");
+                script.append(code).append("\n");
             }
         }
         int out = 1;
         for (TypeNode output : workflowOutputTypeStates) {
-            script = script.append("echo \"" + (out++) + ". output is: $" + output.getShortNodeID() + "\"");
+            script.append("echo \"" + (out++) + ". output is: $" + output.getShortNodeID() + "\"");
         }
 
         return script.toString();

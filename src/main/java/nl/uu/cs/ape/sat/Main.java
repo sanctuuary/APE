@@ -1,8 +1,8 @@
 package nl.uu.cs.ape.sat;
 
 import guru.nidi.graphviz.attribute.Rank.RankDir;
-import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
+import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -19,14 +19,14 @@ public class Main {
     /**
      * The entry point of application when the library is used in a Command Line Interface (CLI).
      *
-     * @param args APE expects only one (1) argument: The absolute or relative path to the configuration file.
+     * @param args APE expects at most one (1) argument: The absolute or relative path to the configuration file.
      */
     public static void main(String[] args) {
         String path;
         if (args.length == 1) {
             path = args[0];
         } else {
-            path = "./ape.configuration";
+            path = "./config.json";
         }
         if (!APEUtils.isValidReadFile(path)) {
             System.err.println("Bad path.");
@@ -45,17 +45,25 @@ public class Main {
             return;
         }
 
-        SATsolutionsList solutions;
+        SolutionsList solutions;
         try {
 
             // run the synthesis and retrieve the solutions
             solutions = apeFramework.runSynthesis(path);
 
-        } catch (APEConfigException | JSONException | IOException e) {
-            System.err.println("Error in synthesis execution:");
+        } catch (APEConfigException e) {
+            System.err.println("Error in synthesis execution. APE configuration error:");
             System.err.println(e.getMessage());
             return;
-        }
+        } catch (JSONException e) {
+        	System.err.println("Error in synthesis execution. Bad JSON formatting (APE configuration or constriants JSON). ");
+            System.err.println(e.getMessage());
+            return;
+		} catch (IOException e) {
+        	System.err.println("Error in synthesis execution.");
+            System.err.println(e.getMessage());
+            return;
+		}
 
         /*
          * Writing solutions to the specified file in human readable format
@@ -68,6 +76,8 @@ public class Main {
                 APE.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
 //				APE.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
                 APE.writeExecutableWorkflows(solutions);
+                APE.writeCWLWorkflows(solutions);
+                APE.writeExecutableCWLWorkflows(solutions, apeFramework.getConfig());
             } catch (IOException e) {
                 System.err.println("Error in writing the solutions. to the file system.");
                 e.printStackTrace();

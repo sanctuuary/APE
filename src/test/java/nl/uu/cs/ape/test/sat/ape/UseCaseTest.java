@@ -1,8 +1,11 @@
-package nl.uu.cs.ape.sat.ape;
+package nl.uu.cs.ape.test.sat.ape;
 
 import nl.uu.cs.ape.sat.APE;
-import nl.uu.cs.ape.sat.core.implSAT.SATsolutionsList;
-import util.GitHubRepo;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
+import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.sat.test.utils.GitHubRepo;
+import nl.uu.cs.ape.sat.test.utils.TestResources;
+import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -10,13 +13,17 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
-import static nl.uu.cs.ape.sat.utils.APEUtils.printWarning;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static util.Evaluation.success;
-import static util.TestResources.getJSONResource;
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * The {@code UseCaseTest} test is an initial version for functional testing that makes use of the API.
@@ -36,9 +43,9 @@ class UseCaseTest {
         final String message = "There needs to be an active internet connection to run the use case tests.\nSKIP: " + UseCaseTest.class.getName();
 
         if (!canConnect)
-            printWarning(message);
+            APEUtils.printWarning(message);
 
-        // ignore use case tests if there is no active internet connection
+        // ignore use case tests if there is no active Internet connection
         Assumptions.assumeTrue(canConnect, message);
     }
 
@@ -48,21 +55,21 @@ class UseCaseTest {
     }
 
     @Test
-    void GeoGMT() throws Exception {
+    void GeoGMT() throws APEConfigException, OWLOntologyCreationException, IOException {
         testUseCase("GeoGMT", "use_cases/GeoGMT_UseCase_Evaluation.json");
     }
 
     @Test
-    void ImageMagick() throws Exception {
+    void ImageMagick() throws APEConfigException, OWLOntologyCreationException, IOException {
         testUseCase("ImageMagick", "use_cases/ImageMagick_UseCase_Evaluation.json");
     }
 
     @Test
-    void MassSpectometry() throws Exception {
+    void MassSpectometry() throws APEConfigException, OWLOntologyCreationException, IOException {
         testUseCase("MassSpectometry", "use_cases/MassSpectometry_UseCase_Evaluation.json");
     }
 
-    void testUseCase(String name, String evaluationPath) throws Exception {
+    void testUseCase(String name, String evaluationPath) throws APEConfigException, OWLOntologyCreationException, IOException {
 
         System.out.println("-------------------------------------------------------------");
         System.out.println("       TEST " + name);
@@ -83,7 +90,7 @@ class UseCaseTest {
              * For each N[i] in N: (S[N[i] - 1] == v + i) AND (S[N[i]] == v + i + 1)
              */
 
-            final SATsolutionsList solutions = new APE(config).runSynthesis(config);
+            final SolutionsList solutions = new APE(config).runSynthesis(config);
 
             // Generate workflow images
             // APE.writeDataFlowGraphs(solutions, Rank.RankDir.TOP_TO_BOTTOM);
@@ -91,7 +98,9 @@ class UseCaseTest {
             final int max_no_solutions = config.getInt("max_solutions");
             int current_solution_length = mutation.solution_length_start;
             for (int no_solutions : mutation.expected_no_solutions) {
-
+            	if(solutions.size() < max_no_solutions) {
+            		fail("The number of expected workflow solutions is be %d, but the number of generated workflows was %d.", max_no_solutions, solutions.size());
+            	}
                 assertEquals(current_solution_length, solutions.get(no_solutions - 1).getSolutionlength(),
                         String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions - 1, current_solution_length, solutions.get(no_solutions - 1).getSolutionlength()));
                 success("Workflow solution at index %s has expected length of %s", no_solutions - 1, current_solution_length);
@@ -112,6 +121,24 @@ class UseCaseTest {
                 assertEquals(0, no_solutions, String.format("APE found '%s' solutions, while for this use case APE should have found 0.", no_solutions));
                 success("APE did not find any solutions as expected.");
             }
+
+            // Test the generation of CWL files if they should be generated
+            if (mutation.number_of_cwl_files != 0) {
+                boolean writingSuccess = APE.writeCWLWorkflows(solutions);
+                assertTrue(writingSuccess);
+
+                String cwl_path = config.get("solutions_dir_path").toString();
+                Path cwlFolder = Paths.get(cwl_path).resolve("CWL");
+                assertTrue(cwlFolder.toFile().exists());
+
+                File[] files = cwlFolder.toFile().listFiles();
+                assertNotNull(files);
+                assertEquals(mutation.number_of_cwl_files, files.length);
+                for (File f : files) {
+                    assertTrue(f.getName().startsWith("workflowSolution_"));
+                }
+                success("All %s expected CWL files were generated", mutation.number_of_cwl_files);
+            }
         }
 
         success("Use case '%s' ran successfully!", useCase.name);
@@ -126,7 +153,7 @@ class UseCaseTest {
 
         public UseCase(String useCasePath, GitHubRepo repo) {
 
-            JSONObject useCase = getJSONResource(useCasePath);
+            JSONObject useCase = TestResources.getJSONResource(useCasePath);
 
             // read name
             this.name = useCase.getString("name");
@@ -161,6 +188,7 @@ class UseCaseTest {
             private final static String CONSTRAINTS = "constraints";
             private final static String CONSTRAINTS_PATH = "constraints_path";
             private final static String DESCRIPTION = "description";
+            private final static String NO_CWL = "number_of_cwl_files";
 
             public final int solution_length_start;
             public final int[] expected_no_solutions;
@@ -169,12 +197,14 @@ class UseCaseTest {
             public JSONArray add_constraints;
             public String constraints_path;
             public String description;
+            public int number_of_cwl_files;
 
             public Mutation(JSONObject mutation, String const_path, GitHubRepo folder) {
 
                 this.config_mutations = mutation.has(CONFIG) ? mutation.getJSONObject(CONFIG) : null;
                 this.solution_length_start = mutation.getInt(START_LENGTH);
                 this.description = mutation.has(DESCRIPTION) ? mutation.getString(DESCRIPTION) : null;
+                this.number_of_cwl_files = mutation.has(NO_CWL) ? mutation.getInt(NO_CWL) : 0;
 
                 JSONArray jsonArray = mutation.getJSONArray(NO_SOLUTIONS);
                 this.expected_no_solutions = new int[jsonArray.length()];
@@ -210,6 +240,11 @@ class UseCaseTest {
                     config.put(CONSTRAINTS_PATH, this.constraints_path);
                 }
 
+                // Add the "number_of_cwl_files" configuration option
+                if (this.number_of_cwl_files != 0) {
+                    config.put(NO_CWL, this.number_of_cwl_files);
+                }
+
                 return config;
             }
 
@@ -231,6 +266,10 @@ class UseCaseTest {
 
                 if (replace_constraints != null) {
                     System.out.println("    REPLACE CONSTRAINTS: " + replace_constraints.getJSONArray(CONSTRAINTS).toString());
+                }
+
+                if (number_of_cwl_files != 0) {
+                    System.out.println("    NUMBER OF CWL FILES: " + number_of_cwl_files);
                 }
 
                 System.out.println("    MINIMAL SOLUTION LENGTH: " + solution_length_start);

@@ -1,4 +1,4 @@
-package util;
+package nl.uu.cs.ape.sat.test.utils;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
@@ -14,10 +14,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static util.Evaluation.fail;
-import static util.Evaluation.success;
-import static util.TestResources.getAbsoluteRoot;
 
 public class GitHubRepo {
 
@@ -27,7 +26,7 @@ public class GitHubRepo {
     private HashMap<Integer, TempFile> files;
 
     public GitHubRepo(String repository, String commitOrBranch) {
-        this.absoluteLocalRoot = Paths.get(getAbsoluteRoot(), "temp").toString();
+        this.absoluteLocalRoot = Paths.get(TestResources.getAbsoluteRoot(), "temp").toString();
         this.repository = repository;
         this.commit = commitOrBranch;
         this.files = new HashMap<>();
@@ -207,9 +206,8 @@ public class GitHubRepo {
                 fos = new FileOutputStream(targetFile);
                 fos.write(fileData); // write out the file we want to save.
                 fos.close(); // close the output stream writer
-
                 success("Downloading file '%s' from '%s'", url.getPath(), this.repository);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 fail("Could not download file " + toString());
             }
         }

@@ -1,21 +1,27 @@
-package nl.uu.cs.ape.sat.configuration;
+package nl.uu.cs.ape.sat.test.configuration;
 
 import nl.uu.cs.ape.sat.APE;
+import nl.uu.cs.ape.sat.configuration.APEConfigException;
+import nl.uu.cs.ape.sat.configuration.APECoreConfig;
+import nl.uu.cs.ape.sat.configuration.APERunConfig;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
+import nl.uu.cs.ape.sat.test.utils.Evaluation;
+import nl.uu.cs.ape.sat.test.utils.TestResources;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import util.Evaluation;
-import util.TestResources;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static util.Evaluation.fail;
-import static util.Evaluation.success;
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
+import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests whether human mistakes in the configuration are detected and
@@ -34,7 +40,6 @@ class APEConfigTest {
             .put("tool_annotations_path", TestResources.getAbsoluteResourcePath("template/tool_annotations.json"))
             .put("constraints_path", TestResources.getAbsoluteResourcePath("template/constraints.json"))
             .put("solutions_dir_path", TestResources.getAbsoluteResourcePath("template"))
-            .put("shared_memory", true)
             .put("tool_seq_repeat", false)
             .put("solution_length", new JSONObject().put(Range.MIN_TAG, 1).put(Range.MAX_TAG, 5))
             .put("max_solutions", 5)
@@ -60,7 +65,7 @@ class APEConfigTest {
                     "Boolean",
                     true,
                     new Object[]{"wrong", 1},
-                    new String[]{"shared_memory", "debug_mode", "tool_seq_repeat"}),
+                    new String[]{"debug_mode", "tool_seq_repeat"}),
             new TagInfo(
                     "Enum",
                     ConfigEnum.ONE.toString(),
@@ -80,7 +85,12 @@ class APEConfigTest {
                     "TaxonomyEntity",
                     "ToolsTaxonomy",
                     new Object[]{false, "wrong"},
-                    new String[]{"toolsTaxonomyRoot", "dataDimensionsTaxonomyRoots"}),
+                    new String[]{"toolsTaxonomyRoot"}),
+            new TagInfo(
+                    "TaxonomyEntity",
+                    "TypesTaxonomy",
+                    new Object[]{false, "wrong"},
+                    new String[]{"dataDimensionsTaxonomyRoots"}),
     };
 
     /**

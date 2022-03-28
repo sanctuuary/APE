@@ -13,7 +13,7 @@
         "label": "add_XYZ_table",
         "id": "add_XYZ_table",
         "taxonomyOperations": ["add_XYZ_table"],
-        "outputs": [{ "TypesTaxonomy$OR$": ["XYZ_table_file"] }],
+        "outputs": [{ "TypesTaxonomy": ["XYZ_table_file"] }],
         "implementation": { "code": "echo \"Enter path to the XYZ table file:\" EOL read XYZ_table_file" }
       },
       {

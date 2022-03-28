@@ -19,8 +19,11 @@ import java.util.Map;
  */
 public class AtomMappings {
 
+	/** Mapping of the atoms to integers. */
     private Map<Atom, Integer> mappings;
+    /** Inverse mapping from integers to atoms. */
     private Map<Integer, Atom> reverseMapping;
+    /** Map of all the IDs that were mapped to atoms. */
     private Map<String, Atom> mapped;
 
     /**
@@ -59,13 +62,14 @@ public class AtomMappings {
      * @param elementType Element that defines what type of a predicate is described (such as {@link WorkflowElement#MODULE}.
      * @return Mapping number of the atom (number is always &gt; 0).
      */
-    public Integer add(PredicateLabel predicate, State usedInState, WorkflowElement elementType) {
+    public Integer add(PredicateLabel predicate, State usedInState, WorkflowElement elementType) throws AtomMappingsException {
         Atom atom = new Atom(predicate, usedInState, elementType);
 
         Integer id;
         if ((id = mappings.get(atom)) == null) {
             if (mapped.get(atom.toString()) != null) {
-                throw new Error("Encoding error. Two or more mappings map the same string: '" + atom.toString() + "'.");
+            	Atom tmp = mapped.get(atom.toString());
+                throw AtomMappingsException.mappedAtomsSignaturesOverlap("Encoding error. Two or more mappings map share same string: '" + atom.toString() + "' as ID.");
             }
             size++;
             mappings.put(atom, size);
@@ -109,7 +113,7 @@ public class AtomMappings {
     }
 
     /**
-     * Get the next auxiliary number and increase the counter by 1.
+     * Get the next auxiliary number and increase the counterErrors by 1.
      *
      * @return Mapping number that can be used for auxiliary variables.
      */

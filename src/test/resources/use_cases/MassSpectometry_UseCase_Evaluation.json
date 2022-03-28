@@ -1,11 +1,11 @@
 {
   "name": "MassSpectometry",
-  "base_configuration": "MassSpectometry/No1/ape.configuration",
+  "base_configuration": "MassSpectometry/No1/config_original.json",
   "mutations": [
     {
       "description": "The base configuration without any changes.",
       "solution_length_start": 4,
-      "expected_no_solutions": [48, 1000]
+      "expected_no_solutions": [1, 8, 39, 154, 545, 1000]
     }
   ]
 }

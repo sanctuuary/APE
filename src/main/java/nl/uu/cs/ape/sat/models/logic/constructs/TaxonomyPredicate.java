@@ -6,6 +6,8 @@ import nl.uu.cs.ape.sat.utils.APEUtils;
 
 import java.util.*;
 
+import org.json.JSONObject;
+
 /**
  * The {@code PredicateLabel} class (interface) represents a single
  * predicate/label used to depict an operation or a data type/format.<br>
@@ -392,6 +394,17 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         return superPredicates;
     }
 
+    
+    /**
+     * Returns true if the type is a simple/leaf type, otherwise returns false - the
+     * type is an abstract (non-leaf) type.
+     *
+     * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type).
+     */
+    public boolean isNodeType(NodeType nodeType) {
+        return this.nodeType.equals(nodeType);
+    }
+    
     /**
      * Returns true if the type is a simple/leaf type, otherwise returns false - the
      * type is an abstract (non-leaf) type.
@@ -399,17 +412,17 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type).
      */
     public boolean isSimplePredicate() {
-        return (this.nodeType == NodeType.LEAF);
+        return (this.nodeType == NodeType.LEAF || this.nodeType == NodeType.EMPTY_LABEL);
     }
 
     /**
-     * Returns true if the type is an instance, otherwise returns false - the type
-     * is an abstract (non-leaf) type or a regular leaf type.
+     * Returns true if the type is an artificial predicate, otherwise returns false - it
+     * is a predicate that exists in the taxonomy.
      *
-     * @return true (instance) or false (leaf type or abstract/non-leaf type).
+     * @return true (artificial leaf) or false (taxonomy term).
      */
-    public boolean isInstancePredicate() {
-        return this.nodeType == NodeType.INSTANCE;
+    public boolean isArtificialLeaf() {
+        return this.nodeType == NodeType.ARTIFICIAL_LEAF;
     }
 
     /**
@@ -433,13 +446,6 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
-     * Set the type to be a simple type (LEAF type in the Taxonomy).
-     */
-    public void setToSimplePredicate() {
-        this.nodeType = NodeType.LEAF;
-    }
-
-    /**
      * Returns the type of the data node, based on the taxonomy.
      *
      * @return The node type object.
@@ -451,9 +457,10 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Sets node predicate.
      *
-     * @param nodeType \Sets the type of the data node, based on the taxonomy.
+     * @param nodeType sets the type of the data node, based on the taxonomy.
      */
     public void setNodePredicate(NodeType nodeType) {
         this.nodeType = nodeType;
     }
+
 }

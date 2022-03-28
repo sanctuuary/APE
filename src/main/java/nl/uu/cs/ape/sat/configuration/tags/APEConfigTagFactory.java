@@ -3,16 +3,18 @@ package nl.uu.cs.ape.sat.configuration.tags;
 import nl.uu.cs.ape.sat.configuration.APEConfigException;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.sat.io.APEFiles;
-import nl.uu.cs.ape.sat.models.DataInstance;
 import nl.uu.cs.ape.sat.models.Range;
 import nl.uu.cs.ape.sat.models.Type;
 import nl.uu.cs.ape.sat.models.enums.ConfigEnum;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
 import nl.uu.cs.ape.sat.utils.APEUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.inject.Provider;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -90,7 +92,7 @@ public class APEConfigTagFactory {
 
         }
 
-        public static abstract class DataInstances extends APEConfigDependentTag.One<List<DataInstance>, APEDomainSetup> {
+        public static abstract class DataInstances extends APEConfigDependentTag.One<List<Type>, APEDomainSetup> {
 
             public DataInstances(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -102,74 +104,16 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected ValidationResults validate(List<DataInstance> value, APEDomainSetup apeDomainSetup, ValidationResults results) {
+            protected ValidationResults validate(List<Type> value, APEDomainSetup apeDomainSetup, ValidationResults results) {
                 // TODO: check data instances
                 return results;
             }
 
             @Override
-            public APEConfigDefaultValue<List<DataInstance>> getDefault() {
+            public APEConfigDefaultValue<List<Type>> getDefault() {
                 return APEConfigDefaultValue.withDefault(new ArrayList<>());
             }
 
-            @Override
-            protected List<DataInstance> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
-                final ArrayList<DataInstance> instances = new ArrayList<>();
-
-                if (apeDomainSetup == null) {
-                    throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
-                }
-
-                try {
-                    for (JSONObject jsonModuleOutput : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
-                        DataInstance output;
-                        if ((output = getDataInstance(jsonModuleOutput, apeDomainSetup)) != null) {
-                            instances.add(output);
-                        }
-                    }
-                } catch (ClassCastException e) {
-                    instances.clear();
-                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
-                            "please provide the correct format.");
-                }
-
-                return instances;
-            }
-
-            /**
-             * Used to read an input or output data instance for the program.
-             */
-            private DataInstance getDataInstance(JSONObject jsonModuleInput, APEDomainSetup apeDomainSetup) {
-
-                DataInstance dataInstances = new DataInstance();
-
-                for (String typeSuperClassLabel : jsonModuleInput.keySet()) {
-
-                    String typeSuperClassURI = APEUtils.createClassURI(typeSuperClassLabel,
-                            apeDomainSetup.getOntologyPrefixURI());
-
-                    for (String currTypeLabel : APEUtils.getListFromJson(jsonModuleInput, typeSuperClassLabel, String.class)) {
-
-                        String currTypeURI = APEUtils.createClassURI(currTypeLabel, apeDomainSetup.getOntologyPrefixURI());
-
-                        Type currType = apeDomainSetup.getAllTypes().get(currTypeURI, typeSuperClassURI);
-
-                        if (currType == null) {
-                            System.err.println("Error in the configuration file. The data type '" + currTypeURI
-                                    + "' was not defined or does not belong to the dimension '" + typeSuperClassLabel + "'.");
-                            return null;
-                        }
-
-                        dataInstances.addType(currType);
-                    }
-                }
-
-                if (!dataInstances.getTypes().isEmpty()) {
-                    return dataInstances;
-                }
-
-                return null;
-            }
         }
 
         public static abstract class Bool extends APEConfigTag<Boolean> {
@@ -333,6 +277,36 @@ public class APEConfigTagFactory {
                 return results;
             }
         }
+        
+        public static abstract class JSON extends APEConfigTag<JSONObject> {
+
+            @Override
+            public TagType getType() {
+                return JSON;
+            }
+
+            @Override
+            protected JSONObject constructFromJSON(JSONObject obj) {
+            	String constrintsPath = obj.getString(getTagName());
+            	JSONObject constraints = null;
+            	try {
+            	constraints = APEUtils.readFileToJSONObject(new File(constrintsPath));
+            	} catch (IOException e) {
+            		throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
+				} catch (JSONException e) {
+					throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
+				}
+            	
+            
+                return constraints;
+            }
+
+            @Override
+            protected ValidationResults validate(JSONObject jsonObject, ValidationResults results) {
+                results.add(getTagName(), "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).", APEFiles.isJSON(jsonObject));
+                return results;
+            }
+        }
     }
 
     public static class TAGS {
@@ -439,6 +413,30 @@ public class APEConfigTagFactory {
                 //TODO
                 return "";
             }
+            
+            @Override
+            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
+                final ArrayList<Type> instances = new ArrayList<>();
+
+                if (apeDomainSetup == null) {
+                    throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
+                }
+
+                try {
+                    for (JSONObject jsonType : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
+                        Type input;
+                        if ((input = Type.taxonomyInstanceFromJson(jsonType, apeDomainSetup, true)) != null) {
+                            instances.add(input);
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    instances.clear();
+                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
+                            "please provide the correct format.");
+                }
+
+                return instances;
+            }
         }
 
         public static class PROGRAM_OUTPUTS extends TYPES.DataInstances {
@@ -461,6 +459,30 @@ public class APEConfigTagFactory {
             public String getDescription() {
                 //TODO
                 return "";
+            }
+            
+            @Override
+            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
+                final ArrayList<Type> instances = new ArrayList<>();
+
+                if (apeDomainSetup == null) {
+                    throw APEConfigException.requiredValidationTag(getTagName(), "core configuration", "");
+                }
+
+                try {
+                    for (JSONObject jsonType : APEUtils.getListFromJson(obj, getTagName(), JSONObject.class)) {
+                        Type output;
+                        if ((output = Type.taxonomyInstanceFromJson(jsonType, apeDomainSetup, false)) != null) {
+                            instances.add(output);
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    instances.clear();
+                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
+                            "please provide the correct format.");
+                }
+
+                return instances;
             }
         }
 
@@ -535,12 +557,35 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class CONSTRAINTS extends TYPES.ExistingFile {
+        public static class CWL_ANNOTATIONS extends TYPES.ExistingFile {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
                 return new APEFiles.Permission[]{APEFiles.Permission.READ};
             }
+
+            @Override
+            public String getTagName() {
+                return "cwl_annotations_path";
+            }
+
+            @Override
+            public String getLabel() {
+                return "CWL annotations";
+            }
+
+            @Override
+            public String getDescription() {
+                return "This tag should be a path to an existing .yaml file.";
+            }
+
+            @Override
+            public APEConfigDefaultValue<Path> getDefault() {
+                return APEConfigDefaultValue.withDefault(null);
+            }
+        }
+
+        public static class CONSTRAINTS extends TYPES.JSON {
 
             @Override
             public String getTagName() {
@@ -559,21 +604,21 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigDefaultValue<Path> getDefault() {
+            public APEConfigDefaultValue<JSONObject> getDefault() {
                 return APEConfigDefaultValue.withDefault(null);
             }
         }
 
-        public static class SHARED_MEMORY extends TYPES.Bool {
+        public static class STRICT_TOOL_ANNOTATIONS extends TYPES.Bool {
 
             @Override
             public String getTagName() {
-                return "shared_memory";
+                return "strict_tool_annotations";
             }
 
             @Override
             public String getLabel() {
-                return "Use shared memory";
+                return "Implement strict tool annotations";
             }
 
             @Override
@@ -726,6 +771,101 @@ public class APEConfigTagFactory {
             @Override
             protected ValidationResults validate(Integer value, ValidationResults results) {
                 return results;
+            }
+        }
+
+        public static class NO_CWL extends TYPES.Int {
+            public NO_CWL() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
+
+            @Override
+            public APEConfigDefaultValue<Integer> getDefault() {
+                return APEConfigDefaultValue.withDefault(0);
+            }
+
+            @Override
+            public String getTagName() {
+                return "number_of_cwl_files";
+            }
+
+            @Override
+            public String getLabel() {
+                return "Number of CWL files";
+            }
+
+            @Override
+            public String getDescription() {
+                return "The number of CWL representations of solutions should be generated.";
+            }
+
+            @Override
+            protected  ValidationResults validate(Integer value, ValidationResults results) {
+                return results;
+            }
+        }
+
+        public static class NO_EXECUTABLE_CWL extends TYPES.Int {
+            public NO_EXECUTABLE_CWL() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
+
+            @Override
+            public APEConfigDefaultValue<Integer> getDefault() {
+                return APEConfigDefaultValue.withDefault(0);
+            }
+
+            @Override
+            public String getTagName() {
+                return "number_of_executable_cwl_files";
+            }
+
+            @Override
+            public String getLabel() {
+                return "Number of executable CWL files";
+            }
+
+            @Override
+            public String getDescription() {
+                return "The number of CWL representations of executable solutions should be generated.";
+            }
+
+            @Override
+            protected  ValidationResults validate(Integer value, ValidationResults results) {
+                return results;
+            }
+        }
+        
+        public static class TIMEOUT_SEC extends TYPES.Int {
+
+            public TIMEOUT_SEC() {
+                super(Range.of(0, Integer.MAX_VALUE));
+            }
+
+            @Override
+            public String getTagName() {
+                return "timeout_sec";
+            }
+
+            @Override
+            public String getLabel() {
+                return "Timeout (in sec)";
+            }
+
+            @Override
+            public String getDescription() {
+                //TODO
+                return "";
+            }
+
+            @Override
+            protected ValidationResults validate(Integer value, ValidationResults results) {
+                return results;
+            }
+            
+            @Override
+            public APEConfigDefaultValue<Integer> getDefault() {
+                return APEConfigDefaultValue.withDefault(300);
             }
         }
 

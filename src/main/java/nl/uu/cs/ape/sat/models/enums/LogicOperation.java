@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.sat.models.enums;
 
 /**
- * The {@code LogicOperation} class is used to TODO ..
+ * The {@code LogicOperation} class is used to depict logical OR and AND operators.
  *
  * @author Vedran Kasalica
  */

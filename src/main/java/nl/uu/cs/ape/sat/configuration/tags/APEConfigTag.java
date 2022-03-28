@@ -128,16 +128,16 @@ public abstract class APEConfigTag<T> {
 
     /**
      * Sets the actual value of the Tag.
-     * It uses {@link APEConfigTag#validate(JSONObject obj)}
+     * It uses {@link APEConfigTag#validateConfig(JSONObject obj)}
      * to check if the value is valid.
      * If the tag has a default value AND configuration does
      * not contain the tag, the default will be set.
      *
      * @param obj the obj
      */
-    public void setValue(JSONObject obj) {
+    public void setValueFromConfig(JSONObject obj) {
 
-        final ValidationResults results = validate(obj);
+        final ValidationResults results = validateConfig(obj);
 
         if (results.hasFails()) {
             throw APEConfigException.ruleViolations(results);
@@ -197,7 +197,7 @@ public abstract class APEConfigTag<T> {
      * @param json the configuration object
      * @return the validation results
      */
-    public ValidationResults validate(JSONObject json) {
+    public ValidationResults validateConfig(JSONObject json) {
 
         final ValidationResults results = new ValidationResults();
 
@@ -276,6 +276,7 @@ public abstract class APEConfigTag<T> {
         FILE_PATH,
         FOLDER_PATH,
         URI,
+        JSON,
         INTEGER,
         INTEGER_RANGE,
         BOOLEAN,

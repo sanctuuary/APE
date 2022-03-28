@@ -30,25 +30,20 @@ public abstract class ConstraintTemplate {
     /**
      * List of all the parameters of the constraint.
      */
-    List<ConstraintParameter> parameters;
+    List<ConstraintTemplateParameter> parameters;
 
-    /**
-     * Implementation function of the constraint.
-     */
-    Runnable function;
 
     /**
      * Instantiates a new Constraint template.
      *
      * @param id          Constraint ID.
-     * @param parameters  Set of {@link ConstraintParameter} the constraint requires.
+     * @param parameters  Set of {@link ConstraintTemplateParameter} the constraint requires.
      * @param description Description of the constraint.
      */
-    public ConstraintTemplate(String id, List<ConstraintParameter> parameters, String description) {
+    public ConstraintTemplate(String id, List<ConstraintTemplateParameter> parameters, String description) {
         this.constraintID = id;
         this.parameters = parameters;
         this.description = description;
-        // this.function = function;
     }
 
     /**
@@ -88,11 +83,11 @@ public abstract class ConstraintTemplate {
     }
 
     /**
-     * Gets parameters.
+     * Gets parameter templates that are expected to be provided. The template is 
      *
      * @return The field {@link #parameters}.
      */
-    public List<ConstraintParameter> getParameters() {
+    public List<ConstraintTemplateParameter> getParameters() {
         return parameters;
     }
 
@@ -102,7 +97,7 @@ public abstract class ConstraintTemplate {
      * @param index Index of the element to return.
      * @return The Constraint parameter at the specified position in this list.
      */
-    public ConstraintParameter getParameter(int index) {
+    public ConstraintTemplateParameter getParameter(int index) {
         return parameters.get(index);
     }
 
@@ -111,14 +106,14 @@ public abstract class ConstraintTemplate {
      * It will use predefined mapping function and all the atoms will be mapped to
      * numbers accordingly.
      *
-     * @param parameters      Array of input parameters.
+     * @param list      Array of input parameters.
      * @param domainSetup     Domain with all the modules.
      * @param moduleAutomaton Module automaton.
      * @param typeAutomaton   Type automaton.
      * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the constraint. null in case of incorrect number of constraint parameters.
      */
-    public abstract String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+    public abstract String getConstraint(List<TaxonomyPredicate> list, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
                                          TypeAutomaton typeAutomaton, AtomMappings mappings);
 
     /**
@@ -132,21 +127,17 @@ public abstract class ConstraintTemplate {
     }
 
     /**
-     * To json json object.
+     * Convert the constraint template to a JSONObject.
      *
-     * @return the json object
+     * @return the JSONObject representing the constraint template.
      */
     public JSONObject toJSON() {
         JSONObject currJson = new JSONObject();
         currJson.put("constraintID", constraintID);
         currJson.put("description", description);
         JSONArray params = new JSONArray();
-        for (ConstraintParameter param : parameters) {
-            JSONArray oneParamDimensions = new JSONArray();
-            for (TaxonomyPredicate pred : param.getParameterTypes()) {
-                oneParamDimensions.put(pred.getPredicateID());
-            }
-            params.put(oneParamDimensions);
+        for (ConstraintTemplateParameter param : parameters) {
+            params.put(param.toJSON());
         }
         currJson.put("parameters", params);
         return currJson;

@@ -5,15 +5,21 @@ import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.sat.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.sat.configuration.tags.validation.ValidationResults;
+import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEUtils;
+import nl.uu.cs.ape.sat.utils.OWLReader;
+
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +49,15 @@ public class APECoreConfig {
      * The JSON file with all tool annotations.
      */
     public final APEConfigTag<Path> TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.TOOL_ANNOTATIONS();
+    /**
+     * {@code true} if the domain expects strict tool annotations, where, {@code false} in case of a
+     * restrictive message passing structure.
+     */
+    public final APEConfigTag<Boolean> STRICT_TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.STRICT_TOOL_ANNOTATIONS();
+    /**
+     * The CWL file with all CWL annotations.
+     */
+    public final APEConfigTag<Path> CWL_ANNOTATIONS = new APEConfigTagFactory.TAGS.CWL_ANNOTATIONS();
 
     /**
      * All the Tags specified in this class. Should be in correct order of dependencies.
@@ -52,7 +67,9 @@ public class APECoreConfig {
             this.ONTOLOGY,
             this.TOOL_ONTOLOGY_ROOT,
             this.DIMENSIONS_ONTOLOGY,
-            this.TOOL_ANNOTATIONS
+            this.TOOL_ANNOTATIONS,
+            this.STRICT_TOOL_ANNOTATIONS,
+            this.CWL_ANNOTATIONS
     };
 
     /**
@@ -64,7 +81,9 @@ public class APECoreConfig {
             new ONTOLOGY(),
             new TOOL_ONTOLOGY_ROOT(null),
             new DIMENSIONS_ONTOLOGY(null),
-            new TOOL_ANNOTATIONS()
+            new TOOL_ANNOTATIONS(),
+            new STRICT_TOOL_ANNOTATIONS(),
+            new CWL_ANNOTATIONS()
     );
 
     /**
@@ -75,8 +94,9 @@ public class APECoreConfig {
      * @param toolTaxonomyRoot   Node in the ontology that corresponds to the root of the module taxonomy.
      * @param dataDimensionRoots List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
      * @param toolAnnotations    The JSON file with all tool annotations.
+     * @param strictToolAnnotations {@code true} if the domain expects strict tool annotations
      */
-    public APECoreConfig(File ontology, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations) {
+    public APECoreConfig(File ontology, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations, boolean strictToolAnnotations) {
 
         /* Path to the OWL file. */
         this.ONTOLOGY.setValue(ontology.toPath());
@@ -95,6 +115,8 @@ public class APECoreConfig {
 
         /* Path to the tool annotations JSON file. */
         this.TOOL_ANNOTATIONS.setValue(toolAnnotations.toPath());
+        /* Set the tool annotation model for the domain. */
+        this.STRICT_TOOL_ANNOTATIONS.setValue(strictToolAnnotations);
     }
 
     /**
@@ -112,6 +134,19 @@ public class APECoreConfig {
         }
 
         coreConfigSetup(new JSONObject(FileUtils.readFileToString(new File(configPath), "utf-8")));
+    }
+    
+    /**
+     * Initialize the configuration of the project.
+     *
+     * @param config 			  APE configuration file.
+     * @throws IOException        Error in reading the configuration file.
+     * @throws JSONException      Error in parsing the configuration file.
+     * @throws APEConfigException Error in setting up the the configuration.
+     */
+    public APECoreConfig(File config) throws IOException, JSONException, APEConfigException {
+
+        coreConfigSetup(new JSONObject(FileUtils.readFileToString(config, "utf-8")));
     }
 
     /**
@@ -171,7 +206,7 @@ public class APECoreConfig {
 
         // set the value for each tag
         for (APEConfigTag<?> tag : all_tags) {
-            tag.setValue(coreConfiguration);
+            tag.setValueFromConfig(coreConfiguration);
         }
     }
 
@@ -194,24 +229,48 @@ public class APECoreConfig {
         APECoreConfig dummy = new APECoreConfig();
         ValidationResults results = new ValidationResults();
         for(APEConfigTag<?> tag : dummy.all_tags){
-            results.add(tag.validate(json));
+            results.add(tag.validateConfig(json));
             if(results.hasFails()){
                 return results;
             }
             else{
-                tag.setValue(json); // for dependencies
+                tag.setValueFromConfig(json); // for dependencies
             }
         }
         return results;
     }
+    
+    /**
+     * Run the initial validation of the ontology file and the corresponding tool and data terms. Validation will simply check the format of the ontology and the existance of the mentioned classes.
+     * @param ontologyFile - ontology file
+     * @param ontologyPrefixURI  Prefix used to define OWL class IDs
+     * @param toolTaxonomyRoot   Node in the ontology that corresponds to the root of the module taxonomy.
+     * @param dataDimensionRoots List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
+     * @return
+     * @throws APEDimensionsException Error when one of the terms does not exist in the ontology
+     * @throws OWLOntologyCreationException Error in file format.
+     * @throws FileExistsException File error.
+     */
+    public static boolean validateOntology(File ontologyFile, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
+    	return OWLReader.verifyOntology(ontologyFile, ontologyPrefixURI, toolTaxonomyRoot, dataDimensionRoots);
+    	
+    }
 
     /**
-     * Gets ontology path.
+     * Gets ontology.
      *
      * @return the value of tag {@link #ONTOLOGY}
      */
     public File getOntologyFile() {
         return ONTOLOGY.getValue().toFile();
+    }
+    
+    /**
+     * Set ontology annotation.
+     *
+     */
+    public void setOntologyFile(File ontology) {
+    	ONTOLOGY.setValue(ontology.toPath());
     }
 
     /**
@@ -231,7 +290,7 @@ public class APECoreConfig {
     public String getToolTaxonomyRoot() {
         return TOOL_ONTOLOGY_ROOT.getValue();
     }
-
+    
     /**
      * Gets data dimension roots.
      *
@@ -249,6 +308,27 @@ public class APECoreConfig {
     public File getToolAnnotationsFile() {
         return TOOL_ANNOTATIONS.getValue().toFile();
     }
+    
+    /**
+     * Set tool annotations.
+     *
+     */
+    public void setToolAnnotationsFile(File toolAnnotations) {
+        TOOL_ANNOTATIONS.setValue(toolAnnotations.toPath());
+    }
+
+    /**
+     * Gets CWL annotations path.
+     *
+     * @return the value of tag {@link #TOOL_ANNOTATIONS}
+     */
+    public Optional<File> getCwlAnnotationsFile() {
+        if (CWL_ANNOTATIONS.getValue() == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(CWL_ANNOTATIONS.getValue().toFile());
+        }
+    }
 
     /**
      * Gets cwl format root.
@@ -259,4 +339,13 @@ public class APECoreConfig {
     public String getCWLFormatRoot() {
         return "format_1915";
     }
+    
+    /**
+     * Get information whether the domain was annotated under the strict rules of the output dependency.
+     * @return {@code true} if the strict rules apply, {@code false} otherwise.
+     */
+    public boolean getUseStrictToolAnnotations() {
+        return STRICT_TOOL_ANNOTATIONS.getValue();
+    }
+    
 }
