@@ -4,14 +4,16 @@ import java.util.*;
 
 import org.json.JSONObject;
 
+import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.AllPredicates;
 import nl.uu.cs.ape.models.enums.NodeType;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
- * The {@code StateInterface} class (interface) represents a single
- * predicate/label used to depict an operation or a data type/format.<br>
- * <b>Note:</b> In order to be an atom, a relation needs to be added.
+ * The {@code TaxonomyPredicate} class represents a single
+ * class in the taxonomy as a predicate. The predicate might have parent classes (super-predicate) and child classes (sub-predicate).<br>
+ * <b>Note:</b> Taxonomy predicates in combination with {@link State}s create {@link SLTLxAtom}s.
  *
  * @author Vedran Kasalica
  */

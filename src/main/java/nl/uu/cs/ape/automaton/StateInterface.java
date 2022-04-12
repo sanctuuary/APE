@@ -2,7 +2,7 @@ package nl.uu.cs.ape.automaton;
 
 
 /**
- * The {@code StateInterface} class is used to represent a label that describes predicates, such as data types, operations or states in the system.
+ * The {@code PredicateLabel} class is used to represent a label that describes predicates, such as data types, operations or states in the system.
  *
  * @author Vedran Kasalica
  */

@@ -39,6 +39,7 @@ import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
 public class APEDomainSetup {
 
 	static int counterErrors = 1, x =1;
+	/* Helper objects used to keep track of the domain quality. */
 	public Set<String> emptyTools = new HashSet<String>();
 	public Set<String> wrongToolIO = new HashSet<String>();
 	public Set<String> wrongToolTax = new HashSet<String>();
