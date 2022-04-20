@@ -129,6 +129,13 @@ SATsolutionsList solutions2 = ape.runSynthesis(runConfig);
 For more information see [APE javadoc.io](https://javadoc.io/doc/io.github.sanctuuary/APE/latest/nl/uu/cs/ape/sat/APE.html) page.
 
 
+## APE v2 architecture
+
+The architecture of the APE v2 library is presented in the following figure. Components coloured light blue extend existing components in the APE v1 framework; dark blue components are new modules.
+
+<img src="https://user-images.githubusercontent.com/11068408/164122545-8fda998d-ca5a-4b4d-a662-5f37a9129314.png" alt="APE 2.0 Architecture" width=50%>
+
+
 ## APE Web
 
 <div align="left">
