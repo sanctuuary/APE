@@ -34,7 +34,7 @@ class APEConfigTest {
      */
     private static final String jsonTemplate = new JSONObject()
             .put("ontology_path", TestResources.getAbsoluteResourcePath("template/ontology.owl"))
-            .put("ontologyPrexifIRI", "http://www.co-ode.org/ontologies/ont.owl#")
+            .put("ontologyPrefixIRI", "http://www.co-ode.org/ontologies/ont.owl#")
             .put("toolsTaxonomyRoot", "ToolsTaxonomy")
             .put("dataDimensionsTaxonomyRoots", new String[]{"TypesTaxonomy"})
             .put("tool_annotations_path", TestResources.getAbsoluteResourcePath("template/tool_annotations.json"))

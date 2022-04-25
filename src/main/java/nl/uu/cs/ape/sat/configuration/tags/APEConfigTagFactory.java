@@ -344,7 +344,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getTagName() {
-                return "ontologyPrexifIRI";
+                return "ontologyPrefixIRI";
             }
 
             @Override
