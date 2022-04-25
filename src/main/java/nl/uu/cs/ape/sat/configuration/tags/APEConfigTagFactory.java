@@ -344,7 +344,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getTagName() {
-                return "ontologyPrexifIRI";
+                return "ontologyPrefixIRI";
             }
 
             @Override
@@ -665,20 +665,20 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class MAX_NO_SOLUTIONS extends TYPES.Int {
+        public static class NO_SOLUTIONS extends TYPES.Int {
 
-            public MAX_NO_SOLUTIONS() {
+            public NO_SOLUTIONS() {
                 super(Range.of(0, Integer.MAX_VALUE));
             }
 
             @Override
             public String getTagName() {
-                return "max_solutions";
+                return "solutions";
             }
 
             @Override
             public String getLabel() {
-                return "Maximum number of solutions";
+                return "Number of solutions";
             }
 
             @Override
@@ -689,7 +689,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(Integer i, ValidationResults results) {
-                results.add(getTagName(), "The maximum number of generated solutions should be greater or equal to 0.", i >= 0);
+                results.add(getTagName(), "The number of generated solutions should be greater or equal to 0.", i >= 0);
                 return results;
             }
         }

@@ -41,9 +41,9 @@ public class APERunConfig {
      */
    private final APEConfigTag<Range> SOLUTION_LENGTH_RANGE = new APEConfigTagFactory.TAGS.SOLUTION_LENGTH_RANGE();
     /**
-     * Max number of solution that the solver will return.
+     * Number of solution that the solver should return.
      */
-   private final APEConfigTag<Integer> MAX_NO_SOLUTIONS = new APEConfigTagFactory.TAGS.MAX_NO_SOLUTIONS();
+   private final APEConfigTag<Integer> NO_SOLUTIONS = new NO_SOLUTIONS();
     /**
      * Number of the workflow scripts that should be generated from candidate
      * workflows. Default is 0.
@@ -109,7 +109,7 @@ public class APERunConfig {
             this.CONSTRAINTS,
             this.SOLUTION_DIR_PATH,
             this.SOLUTION_LENGTH_RANGE,
-            this.MAX_NO_SOLUTIONS,
+            this.NO_SOLUTIONS,
             this.NO_EXECUTIONS,
             this.NO_GRAPHS,
             this.NO_CWL,
@@ -130,7 +130,7 @@ public class APERunConfig {
             new CONSTRAINTS(),
             new SOLUTION_DIR_PATH(),
             new SOLUTION_LENGTH_RANGE(),
-            new MAX_NO_SOLUTIONS(),
+            new NO_SOLUTIONS(),
             new NO_EXECUTIONS(),
             new NO_GRAPHS(),
             new NO_CWL(),
@@ -403,17 +403,17 @@ public class APERunConfig {
     /**
      * Gets max no solutions.
      *
-     * @return the value of {@link #MAX_NO_SOLUTIONS}
+     * @return the value of {@link #NO_SOLUTIONS}
      */
     public int getMaxNoSolutions() {
-        return MAX_NO_SOLUTIONS.getValue();
+        return NO_SOLUTIONS.getValue();
     }
 
     /**
      * @param maxNoSolutions the maxNoSolutions to set
      */
     public void setMaxNoSolutions(int maxNoSolutions) {
-        MAX_NO_SOLUTIONS.setValue(maxNoSolutions);
+        NO_SOLUTIONS.setValue(maxNoSolutions);
     }
 
     /**
