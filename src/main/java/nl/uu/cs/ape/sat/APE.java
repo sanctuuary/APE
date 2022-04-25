@@ -204,7 +204,7 @@ public class APE {
 			}
 		}
 		if(root == null) {
-			return getTaxonomySubclasses(APEUtils.createClassURI(taxonomyElementID, apeDomainSetup.getOntologyPrefixURI()));
+			return getTaxonomySubclasses(APEUtils.createClassURI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
 		} else {
 			return elements;
 		}
@@ -222,7 +222,7 @@ public class APE {
 			element = apeDomainSetup.getAllModules().get(taxonomyElementID);
 		}
 		if(element == null) {
-			return getTaxonomyElement(APEUtils.createClassURI(taxonomyElementID, apeDomainSetup.getOntologyPrefixURI()));
+			return getTaxonomyElement(APEUtils.createClassURI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
 		} else {
 			return element;
 		}

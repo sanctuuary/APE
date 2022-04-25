@@ -191,17 +191,17 @@ public final class APEUtils {
 	 * Create the full class URI (ID) based on the label and the OWL prefix.
 	 *
 	 * @param label             Label of the current term.
-	 * @param ontologyPrefixURI OWL prefix information.
+	 * @param ontologyPrefixIRI OWL prefix information.
 	 * @return String representing full OWL class URI.
 	 * @throws IllegalArgumentException Error if the given label is an empty String.
 	 */
-	public static String createClassURI(String label, String ontologyPrefixURI) throws IllegalArgumentException {
+	public static String createClassURI(String label, String ontologyPrefixIRI) throws IllegalArgumentException {
 		if (label == null || label.equals("")) {
 			throw new IllegalArgumentException("The OWL object label cannot be an empty String.");
 		} else if (label.startsWith("http")) {
 			return label;
 		} else {
-			return ontologyPrefixURI + label;
+			return ontologyPrefixIRI + label;
 		}
 	}
 
@@ -210,13 +210,13 @@ public final class APEUtils {
 	 * prefix.
 	 *
 	 * @param taxonomyTerms     Tool labels.
-	 * @param ontologyPrefixURI OWL prefix information.
+	 * @param ontologyPrefixIRI OWL prefix information.
 	 * @return Set of strings representing full OWL class URI.
 	 */
-	public static Set<String> createURIsFromLabels(Set<String> taxonomyTerms, String ontologyPrefixURI) {
+	public static Set<String> createURIsFromLabels(Set<String> taxonomyTerms, String ontologyPrefixIRI) {
 		Set<String> taxonomyTermURIs = new HashSet<>();
 		for (String taxonomyTermLabel : taxonomyTerms) {
-			taxonomyTermURIs.add(createClassURI(taxonomyTermLabel, ontologyPrefixURI));
+			taxonomyTermURIs.add(createClassURI(taxonomyTermLabel, ontologyPrefixIRI));
 		}
 		return taxonomyTermURIs;
 	}
