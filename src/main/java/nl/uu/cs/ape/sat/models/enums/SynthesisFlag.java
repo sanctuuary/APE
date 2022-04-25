@@ -21,12 +21,12 @@ public enum SynthesisFlag {
     UNSAT,
     
     /**
-     * Synthesis search was interrupted because it reached the maximum workflow length.
+     * Synthesis search was interrupted because it reached the maximum workflow length without finding the specified number of solutions.
      */
     MAX_LENGTH,
     
     /**
-     * Synthesis was interrupted because it reached the TIMEOUT.
+     * Synthesis was interrupted because it reached the maximum run duration.
      */
     TIMEOUT,
     
@@ -45,13 +45,13 @@ public enum SynthesisFlag {
         if (this == SynthesisFlag.NONE) {
             return "";
         } else if(this == SynthesisFlag.UNSAT){
-        	return "No solutions can be found for the given specification.";
+            return "No solutions can be found for the given specification.";
         } else if(this == SynthesisFlag.MAX_LENGTH) {
-            return "Synthesis was interrupted because it reached the maximum workflow length.";
+            return "Synthesis was interrupted because it reached the maximum workflow length without finding the specified number of solutions.";
         } else if(this == SynthesisFlag.TIMEOUT){
-        	return "Synthesis was interrupted because it reached the TIMEOUT.";
+            return "Synthesis was interrupted because it reached the maximum run duration.";
         } else {
-        	return "Synthesis was interrupted for an unknown reason.";
+            return "Synthesis was interrupted for an unknown reason.";
         }
     }
 
