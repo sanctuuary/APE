@@ -4,7 +4,7 @@
   "dataDimensionsTaxonomyRoots": [ "TypesTaxonomy" ],
   "solution_min_length": "1",
   "solution_max_length": "8",
-  "max_solutions": "100",
+  "solutions": "100",
   "number_of_execution_scripts": "3",
   "number_of_generated_graphs": "10",
   "inputs": [

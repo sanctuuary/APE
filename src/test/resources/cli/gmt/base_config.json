@@ -3,7 +3,7 @@
   "toolsTaxonomyRoot": "ToolsTaxonomy",
   "dataDimensionsTaxonomyRoots": ["TypesTaxonomy"],
   "solution_length": { "min": 1, "max": 8 },
-  "max_solutions": "100",
+  "solutions": "100",
   "number_of_execution_scripts": "3",
   "number_of_generated_graphs": "3",
   "tool_seq_repeat": "true",

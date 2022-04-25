@@ -42,7 +42,7 @@ class APEConfigTest {
             .put("solutions_dir_path", TestResources.getAbsoluteResourcePath("template"))
             .put("tool_seq_repeat", false)
             .put("solution_length", new JSONObject().put(Range.MIN_TAG, 1).put(Range.MAX_TAG, 5))
-            .put("max_solutions", 5)
+            .put("solutions", 5)
             .put("number_of_execution_scripts", 1)
             .put("number_of_generated_graphs", 1)
             .put("inputs", new JSONObject[]{new JSONObject().put("TypesTaxonomy", new String[]{"XYZ_table_file"})})
@@ -75,7 +75,7 @@ class APEConfigTest {
                     "Integer",
                     1,
                     new Object[]{false, "wrong"},
-                    new String[]{"max_solutions", "number_of_execution_scripts", "number_of_generated_graphs"}),
+                    new String[]{"solutions", "number_of_execution_scripts", "number_of_generated_graphs"}),
             new TagInfo(
                     "Range",
                     new JSONObject().put(Range.MIN_TAG, 2).put(Range.MAX_TAG, 5),
