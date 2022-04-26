@@ -46,7 +46,7 @@ public abstract class SLTLxFormula implements SLTLxElem {
 	 */
 	public static Set<CNFClause> createCNFEncoding(Collection<SLTLxFormula> facts, int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> clauses = new HashSet<>();
-		facts.forEach(fact -> clauses.addAll(fact.getCNFEncoding(stateNo, new SLTLxVariableFlattening(), synthesisEngine)));
+		facts.forEach(fact -> clauses.addAll(fact.getCNFEncoding(stateNo, new SLTLxVariableSubstitutionCollection(), synthesisEngine)));
 		
 		return clauses;
 	}

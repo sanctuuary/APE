@@ -17,7 +17,7 @@ import nl.uu.cs.ape.utils.APEUtils;
  * @author Vedran Kasalica
  *
  */
-public class SLTLxVariableOccurance {
+public class SLTLxVariableOccuranceCollection {
 
 	/** Mapping variables to their usages under unary predicates.*/
 	private Map<SLTLxVariable, Set<PredicateLabel>> unaryPredicates;
@@ -29,7 +29,7 @@ public class SLTLxVariableOccurance {
 	/**
 	 * Create the variable usage class.
 	 */
-	public SLTLxVariableOccurance() {
+	public SLTLxVariableOccuranceCollection() {
 		super();
 		this.unaryPredicates = new HashMap<>();
 		this.binaryPredicates = new HashMap<>();
@@ -55,7 +55,8 @@ public class SLTLxVariableOccurance {
 		
 	}
 	/**
-	 * Associate the the binary predicate ({@link AtomVarType.VAR_EQUIVALENCE} or {@link AtomVarType.TYPE_DEPENDENCY_VAR}) to the corresponding pair of variables (the order of the variables matter). 
+	 * Associate the the binary predicate ({@link AtomVarType.VAR_EQUIVALENCE} or {@link AtomVarType.TYPE_DEPENDENCY_VAR}) 
+	 * to the corresponding pair of variables (the order of the variables matter). 
 	 * @param varPair - pair of the variables used
 	 * @param relType - binary predicate type (<b>NOTE: The relation cannot be {@link AtomVarType.VAR_REF}</b>)
 	 * @return {@code true} if the predicated was associated with the variable pair, {@code false} otherwise.
@@ -65,20 +66,39 @@ public class SLTLxVariableOccurance {
 		if(relType.equals(AtomVarType.VAR_VALUE)) {
 			return false;
 		}
-		if(this.binaryPredicates.get(varPair) == null) {
-			Set<AtomVarType> preds = new HashSet<>();
-			boolean tmp = preds.add(relType);
-			this.binaryPredicates.put(varPair, preds);
-			this.variablePairs.get(varPair.getFirst()).add(varPair.getSecond());
-			
-			return tmp;
-		} else {
+		// check if the first element of the pair occurred earlier
+		if(this.variablePairs.get(varPair.getFirst()) == null) {
+			// create the first element mapping as it did not occur earlier (and add the second element)
 			Set<SLTLxVariable> vars = new HashSet<>();
 			vars.add(varPair.getSecond());
 			this.variablePairs.put(varPair.getFirst(), vars);
 			
-			return this.binaryPredicates.get(varPair).add(relType);
+			// create the pair as it did not occur earlier
+			Set<AtomVarType> preds = new HashSet<>();
+			boolean tmp = preds.add(relType);
+			this.binaryPredicates.put(varPair, preds);
+
+			return tmp;
+		
+		} else {
+			// ..if it did check whether the pair occurred earlier as well
+			if(this.binaryPredicates.get(varPair) == null) {
+				// create the pair as it did not occur earlier
+				Set<AtomVarType> preds = new HashSet<>();
+				boolean tmp = preds.add(relType);
+				this.binaryPredicates.put(varPair, preds);
+				
+				// add the second element to the mapping of the first 
+				this.variablePairs.get(varPair.getFirst()).add(varPair.getSecond());
+				
+				return tmp;
+			} else {
+				boolean tmp = this.variablePairs.get(varPair.getFirst()).add(varPair.getSecond());
+				
+				return this.binaryPredicates.get(varPair).add(relType) & tmp;
+			}
 		}
+		
 		
 	}
 
@@ -111,6 +131,19 @@ public class SLTLxVariableOccurance {
 	public Set<Pair<SLTLxVariable>> getPairsContainingVarAsFirstArg(SLTLxVariable firstVar) {
 		Set<Pair<SLTLxVariable>> pairs = new HashSet<>();
 		for(SLTLxVariable secondVar : APEUtils.safe(this.variablePairs.get(firstVar))){
+			pairs.add(new Pair<SLTLxVariable>(firstVar, secondVar));
+		}
+		return pairs;
+	}
+	
+	/**
+	 * Return the set of pairs that are used in the formulas, where the given variable is the second one.
+	 * @param secondVar - variable that is second in the pairs
+	 * @return Set of Pair objects that are used in the formulas, where the given variable is the second one.
+	 */
+	public Set<Pair<SLTLxVariable>> getPairsContainingVarAsSecondArg(SLTLxVariable secondVar) {
+		Set<Pair<SLTLxVariable>> pairs = new HashSet<>();
+		for(SLTLxVariable firstVar : APEUtils.safe(this.variablePairs.get(secondVar))){
 			pairs.add(new Pair<SLTLxVariable>(firstVar, secondVar));
 		}
 		return pairs;

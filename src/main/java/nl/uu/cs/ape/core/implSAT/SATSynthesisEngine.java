@@ -19,7 +19,7 @@ import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
-import nl.uu.cs.ape.models.satStruc.SLTLxVariableOccurance;
+import nl.uu.cs.ape.models.satStruc.SLTLxVariableOccuranceCollection;
 import nl.uu.cs.ape.parser.SLTLxSATVisitor;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -87,7 +87,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
     /**
      * Mapping of all the variables that are utilised in the encoding to the predicates use them.
      */
-    private SLTLxVariableOccurance varUsage;
+    private SLTLxVariableOccuranceCollection varUsage;
     
     /**
      * Setup of an instance of the SAT synthesis engine.
@@ -105,7 +105,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         this.runConfig = runConfig;
         this.mappings = (SATAtomMappings) allSolutions.getMappings();
         this.mappings.resetAuxVariables();
-        this.varUsage = new SLTLxVariableOccurance();
+        this.varUsage = new SLTLxVariableOccuranceCollection();
         
         this.satInputFile = null;
         this.cnfEncoding = File.createTempFile("satCNF" + workflowLength, null);
@@ -137,7 +137,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
 
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
-        /* Create const raints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
+        /* Create constraints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeModuleAnnotations(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
@@ -186,9 +186,13 @@ public class SATSynthesisEngine implements SynthesisEngine {
         }
         
         /*
-         * Encode data instance dependency constraints.
+         * Encode data ancestor relation (R) constraints.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeDataInstanceDependencyCons(typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeAncestorRelationDependencyCons(typeAutomaton));
+        
+        /*
+         * Encode data equivalence relation (IS) constraints. TODO
+         */
 
         /*
          * Encode the workflow input. Workflow I/O are encoded the last in order to
@@ -216,25 +220,27 @@ public class SATSynthesisEngine implements SynthesisEngine {
         
         
         /*
-         * Setup encoding of auxiliary 'true', 'false' and 'EQ' atoms, to ensure proper SLTLx parsing.
+         * Setup encoding of auxiliary 'EQ' atoms, to ensure proper SLTLx parsing.
          * TODO
          */
-        int clausesBefore = APEUtils.countLines(cnfEncoding) + 2;
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, domainSetup.getConstraintsForSLTLx());
+        
         /*
-         * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
+         * Additional SLTLx constraints. TODO - provide a proper interface
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
-        		"F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> F <'psxy_l'(?y;)> true))"));
+//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
+//        		" (Exists (?x) G Forall (?y) true)"));
+//    			" (Exists (?x) Forall (?y) !R(?x,?y))"));
+//        		" (G Exists (?x) <'ZonalStatisticsMeanCount'(?x;)> G Forall (?y) <'ZonalStatisticsMeanCount'(?y;)> ! R(?x,?y))"));
+//    "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> F <'psxy_l'(?y;)> true))"));
 
         /*
          * Counting the number of variables and clauses that will be given to the SAT solver
          * TODO Improve this approach, no need to read the whole String again to count lines.
          */
         int variables = mappings.getSize();
-        int clauses = APEUtils.countLines(cnfEncoding) + 2;
-        System.out.println("Encoding is: " + (clauses - clausesBefore));
+        int clauses = APEUtils.countLines(cnfEncoding);
         String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
-        sat_input_header = sat_input_header + "1 0\n -2 0\n";
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
         
         satInputFile = APEUtils.concatIntoFile(sat_input_header, cnfEncoding);
@@ -421,9 +427,9 @@ public class SATSynthesisEngine implements SynthesisEngine {
     
     /**
      * Get mapping of all the variables that are utilised in the encoding to the predicates use them.
-     * @return Variable usage class {@link SLTLxVariableOccurance}.
+     * @return Variable usage class {@link SLTLxVariableOccuranceCollection}.
      */
-    public SLTLxVariableOccurance getVariableUsage() {
+    public SLTLxVariableOccuranceCollection getVariableUsage() {
     	return varUsage;
     }
 

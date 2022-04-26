@@ -162,7 +162,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
     }
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			this.substituteVariables(variableMapping, synthesisEngine);
 			
@@ -173,7 +173,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			this.substituteVariables(variableMapping, synthesisEngine);
 			
@@ -185,11 +185,12 @@ public class SLTLxAtomVar extends SLTLxFormula {
 	
 	/**
 	 * Method is used to substitute the variable occurrences to the unique ones. 
-	 * It is used to ensure that nesting of quantifications over the same variable works as intended (e.g. "Exists (?x) Q(?x) Forall (?x) P(?x)")
+	 * It is used to ensure that nesting of quantifications over the same variable works as intended 
+	 * (e.g. "Exists (?x) Q(?x) Forall (?x) P(?x)")
 	 * @param variableMapping
 	 * @param synthesisEngine
 	 */
-	private void substituteVariables(SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	private void substituteVariables(SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.elementType.isUnaryProperty()) {
 			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
 			synthesisEngine.getVariableUsage().addUnaryPair(this.secondArg, this.firstArg);

@@ -581,4 +581,24 @@ public class APEDomainSetup {
     public boolean getUseStrictToolAnnotations() {
         return useStrictToolAnnotations;
     }
+
+    /**
+     * Ensure the truth value of:
+     * <ul>
+     * 		<li>{@code true} - SLTLx term</li>
+     * 		<li>{@code false} - SLTLx term</li>
+     * 		<li>Equivalence relation (EQ) among the constants</li>	
+	 * </ul> 
+     * 
+     * @return A set of formulas that ensure the encoding.
+     */
+	public Collection<SLTLxFormula> getConstraintsForSLTLx() {
+		 Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		 
+		 /* Encode {@code true} and {@code false} SLTLx terms. */
+		 cnfEncoding.add(SLTLxAtom.getTrue());
+		 cnfEncoding.add(new SLTLxNegation(SLTLxAtom.getFalse()));
+		 
+		return cnfEncoding;
+	}
 }

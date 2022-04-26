@@ -32,13 +32,13 @@ private Set<SLTLxFormula> nconjunctedFacts;
 
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		return new SLTLxConjunction(nconjunctedFacts).getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 
 	
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		return new SLTLxConjunction(nconjunctedFacts).getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 

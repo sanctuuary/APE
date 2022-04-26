@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
@@ -51,7 +52,7 @@ public final class SATModuleUtils {
 	 *
 	 * @param synthesisInstance A specific synthesis run that contains all the
 	 *                          information specific for it.
-	 * @return String representation of CNF constraints regarding the required INPUT
+	 * @return Set of SLTLx formulas that represent the CNF constraints regarding the required INPUT
 	 *         and OUTPUT types of the modules.
 	 */
 	public static Set<SLTLxFormula> encodeModuleAnnotations(SATSynthesisEngine synthesisInstance) {
@@ -70,7 +71,7 @@ public final class SATModuleUtils {
 	 *
 	 * @param synthesisInstance A specific synthesis run that contains all the
 	 *                          information specific for it.
-	 * @return String representation of CNF constraints regarding the required
+	 * @return Set of SLTLx formulas that represent the CNF constraints regarding the required
 	 *         memory structure implementation.
 	 */
 	public static Set<SLTLxFormula> encodeMemoryStructure(SATSynthesisEngine synthesisInstance) {
@@ -85,19 +86,27 @@ public final class SATModuleUtils {
 
 	
 	/**
-	 * Return a CNF formula that preserves the dependency between data instances. Instance A depends on Instance B if it was 
-	 * computed by using Instance B, directly or indirectly.
+	 * Function returns the encoding that ensures that ancestor relation (R) 
+	 * among data objects is preserved.
 	 * 
-	 * @param typeAutomaton
-	 * @param mappings
-	 * @return
+	 * @param typeAutomaton - collection of states representing the data objects in the workflow
+	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	public static Set<SLTLxFormula> encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton) {
+	public static Set<SLTLxFormula> encodeAncestorRelationDependencyCons(TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		
-		cnfEncoding.addAll(allowDataDependencyCons(typeAutomaton));
+		cnfEncoding.addAll(restrictAncestorRelAndEnforceReflexivity(typeAutomaton));
 		cnfEncoding.addAll(enforceDataDependencyOverModules(typeAutomaton));
-		cnfEncoding.addAll(enforceDataDependencyOverDataReferencing(typeAutomaton));
+		cnfEncoding.addAll(enforceDataDependencyTransitivity(typeAutomaton));
+		
+		return cnfEncoding;
+	}
+	
+	
+	public static Set<SLTLxFormula> encodeDataInstanceEquivalenceCons(TypeAutomaton typeAutomaton) {
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		
+		cnfEncoding.addAll(enforceDataEquivalenceOverDataReferencing(typeAutomaton));
 		
 		return cnfEncoding;
 	}
@@ -108,7 +117,7 @@ public final class SATModuleUtils {
 	 * Returns the CNF representation of the input type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.
 	 *
-	 * @return String representation of constraints.
+	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	private static Set<SLTLxFormula> inputCons(SATSynthesisEngine synthesisInstance) {
 
@@ -255,7 +264,7 @@ public final class SATModuleUtils {
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
 	 * the Shared Memory Approach.
 	 *
-	 * @return String representation of constraints.
+	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	private static Set<SLTLxFormula> allowDataReferencingCons(TypeAutomaton typeAutomaton) {
 
@@ -313,44 +322,44 @@ public final class SATModuleUtils {
 	}
 
 	/**
-	 * Generate constraints that ensure that the data instances can depend on
-	 * instances that are available in memory, and that each data instance depends
-	 * on itself.
+	 * Generate constraints that ensure that R is reflexive and that the data instances cannot depend on
+	 * instances that are not available in memory.
 	 * 
-	 * @return String representation of constraints.
+	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> allowDataDependencyCons(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> restrictAncestorRelAndEnforceReflexivity(TypeAutomaton typeAutomaton) {
 
-		// setting up dependency constraints
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
-		/** For each input state... */
-		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
-			int blockNumber = currBlock.getBlockNumber();
-			for (State currInputState : currBlock.getStates()) {
-				/* Input state does not depend on the null state */
+		
+		/**
+		 * For each state:
+		 */
+		for (Block currBlock : typeAutomaton.getAllBlocks()) {
+			for (State currState : currBlock.getStates()) {
+				/* State depends on itself */
 				cnfEncoding.add(
+							new SLTLxAtom(
+								AtomType.R_RELATON, 
+								currState,
+								currState));
+				/* ..and does not depend on the null state */ 
+			cnfEncoding.add(
 						new SLTLxNegation(
 								new SLTLxAtom(
 									AtomType.R_RELATON, 
-									currInputState,
+									currState,
 									typeAutomaton.getNullState())));
-				/*
-				 * Tool input state can depend on states that are currently in the shared
-				 * memory, i.e. already created.
-				 */
-//				List<State> possibleMemStates = typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber);
-//				for (State exictingMemState : possibleMemStates) {
-//					constraints = constraints
-//							.append(mappings.add(exictingMemState, currInputState, SMTDataType.TYPE_DEPENDENCY))
-//							.append(" ");
-//				}
-//				if(possibleMemStates.size() > 0) {
-//					constraints.append(" 0\n");
-//				}
+			}
+		}
+		
+		/** For each used state... */
+		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
+			int blockNumber = currBlock.getBlockNumber();
+			for (State currInputState : currBlock.getStates()) {
 
 				/*
 				 * Used state cannot depend on states that are yet to be created, i.e. not yet
-				 * in the shared memory.
+				 * in the shared memory.`
 				 */
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
 					cnfEncoding.add(
@@ -360,38 +369,30 @@ public final class SATModuleUtils {
 										nonExictingMemState,
 										currInputState)));
 				}
+				
+				// Empty inputs have no data dependencies
+				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
+					/* !(input -> empty) ||  !R(mem,input) */
+					cnfEncoding.add(
+							new SLTLxNegatedConjunction(
+								new SLTLxAtom(
+										AtomType.MEM_TYPE_REFERENCE, 
+										typeAutomaton.getNullState(), 
+										currInputState),
+								new SLTLxAtom(
+										AtomType.R_RELATON, 
+										existingMemState, 
+										currInputState)
+							));
+				}
 			}
 		}
+		
+		
 		/** For each memory state... */
 		for (Block currBlock : typeAutomaton.getMemoryTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
 			for (State currMemState : currBlock.getStates()) {
-				/* Memory state depends on itself */
-				cnfEncoding.add(
-							new SLTLxAtom(
-								AtomType.R_RELATON, 
-								currMemState,
-								currMemState));
-				/* ..and does not depend on the null state */ 
-			cnfEncoding.add(
-						new SLTLxNegation(
-								new SLTLxAtom(
-									AtomType.R_RELATON, 
-									currMemState,
-									typeAutomaton.getNullState())));
-				/*
-				 * and the memory state can depend on states that are currently in the shared
-				 * memory, i.e. already created.
-				 */
-//				List<State> possibleMemStates = typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber - 1);
-//				for (State exictingMemState : possibleMemStates) {
-//					constraints = constraints
-//							.append(mappings.add(exictingMemState, currMemState, SMTDataType.TYPE_DEPENDENCY))
-//							.append(" ");
-//				}
-//				if(possibleMemStates.size() > 0) {
-//					constraints.append(" 0\n");
-//				}
 
 				/*
 				 * Memory state cannot depend on states that are yet to be created or that were
@@ -414,11 +415,11 @@ public final class SATModuleUtils {
 
 	/**
 	 * Generate constraints that ensure that tool inputs that reference data in
-	 * memory depend on the same data as the referenced data instance.
+	 * memory are the same data objects/instances (equivalent) as the referenced data.
 	 * 
-	 * @return String representation of constraints.
+	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> enforceDataEquivalenceOverDataReferencing(TypeAutomaton typeAutomaton) {
 
 		// setting up dependency constraints
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
@@ -429,71 +430,33 @@ public final class SATModuleUtils {
 				/*
 				 * and for each available memory state..
 				 */
-				for (int i = 0; i <= blockNumber; i++) {
-					Block currMemBlock = typeAutomaton.getMemoryTypesBlock(i);
-					for (State currMemState : currMemBlock.getStates()) {
-						/* ..if the input state references the memory state.. */
-						for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
-							cnfEncoding.add(
-										new SLTLxImplication(
-												new SLTLxConjunction(
-														new SLTLxAtom(
-																AtomType.MEM_TYPE_REFERENCE, 
-																currMemState, 
-																currInputState),
-														new SLTLxAtom(
-																AtomType.R_RELATON, 
-																existingMemState,
-																currMemState)
-														),
-												new SLTLxAtom(
-														AtomType.R_RELATON, 
-														existingMemState, 
-														currInputState)
-												));
-
-							// and vice versa (if it does not depend on it, neither will the tool input
-							// state)
-
-							cnfEncoding.add(
-									new SLTLxImplication(
-											new SLTLxConjunction(
-													new SLTLxAtom(
-															AtomType.MEM_TYPE_REFERENCE, 
-															currMemState, 
-															currInputState),
-													new SLTLxAtom(
-															AtomType.R_RELATON, 
-															existingMemState, 
-															currInputState)
-													),
-											new SLTLxAtom(
-													AtomType.R_RELATON, 
-													existingMemState,
-													currMemState)
-											));
-						}
-					}
-				}
-
-				// Empty inputs have no data dependencies
-				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
-					cnfEncoding.add(new SLTLxNegatedConjunction(
-							new SLTLxAtom(
-									AtomType.MEM_TYPE_REFERENCE, 
-									typeAutomaton.getNullState(), 
-									currInputState),
-							new SLTLxAtom(
-									AtomType.R_RELATON, 
-									existingMemState, 
-									currInputState)
-							));
+					for (State availableMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
+						/* If input references a memory, they are in ancestor relation
+						 *  (used -> mem) => IS(mem, used) */
+						cnfEncoding.add(
+								new SLTLxImplication(
+										new SLTLxAtom(
+												AtomType.MEM_TYPE_REFERENCE, 
+												availableMemState, 
+												currInputState),
+										new SLTLxAtom(
+												AtomType.TYPE_EQUIVALENCE, 
+												availableMemState,
+												currInputState)
+										));
 				}
 			}
 		}
 		return cnfEncoding;
 	}
 
+	/**
+	 * Function returns the encoding that ensures that tool inputs and outputs are
+	 * preserving the ancestor relation (R). Outputs have to depend on inputs.
+	 *
+	 * @param typeAutomaton - system that represents states in the workflow
+	 * @return Set of SLTLx formulas that represent the constraints.
+	 */
 	private static Set<SLTLxFormula> enforceDataDependencyOverModules(TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/** For tool inputs and outputs */
@@ -501,45 +464,59 @@ public final class SATModuleUtils {
 			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
 			Block currMemBlock = typeAutomaton.getMemoryTypesBlock(i + 1);
 
-			// For each output state
+			// For each output state..
 			for (State currMemState : currMemBlock.getStates()) {
-				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(i)) {
-					// if the type depends on a data from the memory
-					Set<SLTLxFormula> cnfDependency = new HashSet<SLTLxFormula>();
-					
-					cnfDependency.add(
-							new SLTLxNegation(
-									new SLTLxAtom(
-											AtomType.R_RELATON, 
-											existingMemState, 
-											currMemState)));
-					// one of the tool inputs does as well
-					for (State currInputState : currInputBlock.getStates()) {
-						cnfDependency.add(
-								new SLTLxAtom(
-										AtomType.R_RELATON, 
-										existingMemState, 
-										currInputState));
-					}
-					cnfEncoding.add(new SLTLxDisjunction(cnfDependency));
-
-					// ..and vice versa, dependence of the input types is inherited to the outputs
-
-					for (State currInputState : currInputBlock.getStates()) {
-						cnfEncoding.add(
-								new SLTLxImplication(
-										new SLTLxAtom(
-												AtomType.R_RELATON, 
-												existingMemState, 
-												currInputState),
-										new SLTLxAtom(
-												AtomType.R_RELATON, 
-												existingMemState, 
-												currMemState)));
-					}
+				
+				// .. the memory (output) state has all tool inputs as ancestors.
+				for (State currInputState : currInputBlock.getStates()) {
+					cnfEncoding.add(
+							new SLTLxAtom(
+									AtomType.R_RELATON, 
+									currInputState, 
+									currMemState));
 				}
 			}
 		}
+		return cnfEncoding;
+	}
+	
+	/**
+	 * Function returns the encoding that ensures that the ancestor relation (R)
+	 * is transitive.f	
+	 *
+	 * @param typeAutomaton - system that represents states in the workflow
+	 * @return Set of SLTLx formulas that represent the constraints.
+	 */
+	private static Set<SLTLxFormula> enforceDataDependencyTransitivity(TypeAutomaton typeAutomaton) {
+		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		
+		/* Ancestor relation (R) is transitive for any 3 states in the system. */
+		typeAutomaton.getAllMemoryTypesStates()
+					.forEach(state1 -> {
+			typeAutomaton.getAllMemoryTypesStates()
+						.forEach(state2 -> {
+				typeAutomaton.getAllMemoryTypesStates()
+							.forEach(state3 -> {
+						/* R(s1,s2) & R(s2,s3) => R(s1,s3) */
+						cnfEncoding.add(
+								new SLTLxImplication(
+										new SLTLxConjunction(
+											new SLTLxAtom(
+													AtomType.R_RELATON, 
+													state1, 
+													state2),
+											new SLTLxAtom(
+													AtomType.R_RELATON, 
+													state2, 
+													state3)),
+										new SLTLxAtom(
+												AtomType.R_RELATON, 
+												state1, 
+												state3))
+								);
+					});
+				});
+			});
 		return cnfEncoding;
 	}
 
@@ -549,7 +526,7 @@ public final class SATModuleUtils {
 	 * workflow inputs have to be used, then each of them has to be referenced at
 	 * least once.
 	 *
-	 * @return String representation of constraints.
+	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	private static Set<SLTLxFormula> enforcingUsageOfGeneratedTypesCons(SATSynthesisEngine synthesisInstance) {
 
@@ -664,7 +641,7 @@ public final class SATModuleUtils {
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.<br>
 	 * Generate constraints that preserve tool outputs.
 	 *
-	 * @return String representation of constraints.
+	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	private static Set<SLTLxFormula> outputCons(SATSynthesisEngine synthesisInstance) {
 
@@ -729,7 +706,7 @@ public final class SATModuleUtils {
 	 * @param allModules      All the modules.
 	 * @param moduleAutomaton Module automaton.
 	 * @param mappings        Mapping function.
-	 * @return The String representation of constraints.
+	 * @return The Set of SLTLx formulas that represent the constraints.
 	 */
 	
 	public static Set<SLTLxFormula> moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton) {
@@ -761,7 +738,7 @@ public final class SATModuleUtils {
 	 * @param allModules      All the modules.
 	 * @param moduleAutomaton Module automaton.
 	 * @param mappings        Mapping function.
-	 * @return String representation of constraints.
+	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	public static Set<SLTLxFormula> moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
@@ -798,7 +775,7 @@ public final class SATModuleUtils {
 	 * @param currModule      Module that should be used.
 	 * @param moduleAutomaton Module automaton.
 	 * @param mappings        Mapping function.
-	 * @return String representation of constraints enforcing taxonomy
+	 * @return Set of SLTLx formulas that represent the constraints enforcing taxonomy
 	 *         classifications.
 	 */
 	public static Set<SLTLxFormula> moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,

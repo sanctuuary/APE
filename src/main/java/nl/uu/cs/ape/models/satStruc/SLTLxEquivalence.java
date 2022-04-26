@@ -25,7 +25,7 @@ private SLTLxFormula secondArg;
 }
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> allClauses = new HashSet<CNFClause>();
 
 		/* Add the elements that represent the 2 way implication. */
@@ -36,7 +36,7 @@ private SLTLxFormula secondArg;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> allClauses = new HashSet<CNFClause>();
 
 		/* Ensure that the 2 arguments are not the same. */

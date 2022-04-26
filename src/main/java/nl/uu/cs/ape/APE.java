@@ -41,7 +41,7 @@ import java.util.*;
  *
  * @author Vedran Kasalica
  */
-public class APE {
+public class APE implements APEInterface{
 
 	/** Core configuration object defined from the configuration file. */
 	private final APECoreConfig config;

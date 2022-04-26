@@ -8,13 +8,13 @@ import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.automaton.State;
 
 /**
- * Class is used to represent substitutions of the existing variables with a new
+ * Class is used to collect substitutions of the existing variables with a new
  * one that will uniquely identify the variable bindings.
  * 
  * @author Vedran Kasalica
  *
  */
-public class SLTLxVariableFlattening {
+public class SLTLxVariableSubstitutionCollection {
 
 	/** Variable mapping to unique IDs. */
 	private Map<SLTLxVariable, SLTLxVariable> mappedVariables;
@@ -24,9 +24,9 @@ public class SLTLxVariableFlattening {
 	private int variableNo;
 
 	/**
-	 * Create a new variable mappping class.
+	 * Create a new variable mapping class.
 	 */
-	public SLTLxVariableFlattening() {
+	public SLTLxVariableSubstitutionCollection() {
 		super();
 		this.mappedVariables = new HashMap<>();
 		this.variableDomain = new HashMap<>();
@@ -38,7 +38,7 @@ public class SLTLxVariableFlattening {
 	 * 
 	 * @param existing - existing variable mapping.
 	 */
-	public SLTLxVariableFlattening(SLTLxVariableFlattening existing) {
+	public SLTLxVariableSubstitutionCollection(SLTLxVariableSubstitutionCollection existing) {
 		super();
 		this.mappedVariables = new HashMap<>();
 		for (SLTLxVariable key : existing.mappedVariables.keySet()) {

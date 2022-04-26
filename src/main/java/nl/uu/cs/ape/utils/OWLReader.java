@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public class OWLReader {
 
-	/** File cinstianing the ontology */
+	/** File containing the ontology */
 	private final File ontologyFile;
 	/** List of all modules in the domain */
 	private final AllModules allModules;

@@ -7,8 +7,9 @@ import java.util.List;
 import nl.uu.cs.ape.models.enums.AtomType;
 
 /**
- * Class is used to represent the type automaton. Type Automaton represents the structure that data instances in the provided solutions will follow.
- * It comprises blocks of data types that are added to the memory and those that are being used by tools, as input.
+ * The {@code TypeAutomaton} class  is used to represent the collection of data object states that exist in the workflow.
+ * It comprises blocks of data objects, where each block groups inputs or outputs of a specific operation.<br/><br/>
+ * Each state (within a block) represents a data object (a specific input or output data object) in the workflow.
  * <p>
  * Labeling of the automaton is provided in
  * <a href="https://github.com/sanctuuary/APE/blob/master/res/WorkflowAutomaton_Implementation.png">/APE/res/WorkflowAutomaton_Implementation.png</a>.

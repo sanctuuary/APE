@@ -11,7 +11,7 @@ import java.util.Set;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 
 /**
- * A fact used for the SAT encoding. Represents a clause in cnf.
+ * The class represents a clause/fact used in the SAT encoding (CNF). 
  * 
  * @author Vedran Kasalica
  *

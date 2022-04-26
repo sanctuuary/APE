@@ -28,7 +28,7 @@ private SLTLxFormula thenFact;
 	}
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		
 		List<CNFClause> allClauses = new ArrayList<CNFClause>();
 
@@ -54,7 +54,7 @@ private SLTLxFormula thenFact;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> constraints = new HashSet<CNFClause>();
 		constraints.addAll(ifFact.getCNFEncoding(stateNo, variableMapping, synthesisEngine));
 		constraints.addAll(thenFact.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine));

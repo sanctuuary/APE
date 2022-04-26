@@ -16,8 +16,8 @@ import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
 import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
 import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
 import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
-import nl.uu.cs.ape.models.satStruc.SLTLxVariableFlattening;
-import nl.uu.cs.ape.models.satStruc.SLTLxVariableOccurance;
+import nl.uu.cs.ape.models.satStruc.SLTLxVariableSubstitutionCollection;
+import nl.uu.cs.ape.models.satStruc.SLTLxVariableOccuranceCollection;
 
 /***
  * The {@code State} class is used to represent a variable for type states. The variable only represents states from the type automatons, excluding the module automaton states. 
@@ -101,7 +101,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<CNFClause> getExistentialCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getExistentialCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
 		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
 		for(State state : synthesisEngine.getTypeAutomaton().getAllStatesUntilBlockNo(stateNo)) {
 			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_VALUE, state, this);
@@ -109,7 +109,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		}
 		SLTLxDisjunction allVars = new SLTLxDisjunction(varRefs);
 		
-		return allVars.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
+		return allVars.getCNFEncoding(stateNo, variableSubtitutions, synthesisEngine);
 	}
 	
 	/**
@@ -124,7 +124,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<CNFClause> getUniversalCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getUniversalCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
 		/** Setting up the domain of the variable. */
 		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
 		for(State state : this.getVariableDomain(stateNo, synthesisEngine)) {
@@ -134,7 +134,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		}
 		SLTLxConjunction allVars = new SLTLxConjunction(varRefs);
 		
-		return allVars.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
+		return allVars.getCNFEncoding(stateNo, variableSubtitutions, synthesisEngine);
 	}
 	
 	
@@ -149,43 +149,75 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<CNFClause> getVariableSubstitutionEnforcingCNFEncoding(int stateNo, SLTLxVariableFlattening variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> getVariableSubstitutionEnforcingCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
 		Set<SLTLxFormula> allFacts = new HashSet<>();
-		SLTLxVariableOccurance varUsage = synthesisEngine.getVariableUsage(); 
+		SLTLxVariableOccuranceCollection varOccurances = synthesisEngine.getVariableUsage(); 
+		
+		/** Introduce rules to enforce substitution over unary predicates when needed. */
+		allFacts.addAll(generateUnarySubstitutionRules(this, variableSubtitutions, varOccurances));
+		
+		/** Introduce rules to enforce substitution over binary predicates
+		 * (where the current variable is the first argument). */
+		varOccurances.getPairsContainingVarAsFirstArg(this).forEach(
+				pair -> 
+				allFacts.addAll(generateBinarySubstitutionRules(pair, variableSubtitutions, varOccurances)));
+
+		/** Introduce rules to enforce substitution over binary predicates 
+		 * (where the current variable is the second argument). */
+		varOccurances.getPairsContainingVarAsSecondArg(this).forEach(
+				pair -> 
+				allFacts.addAll(generateBinarySubstitutionRules(pair, variableSubtitutions, varOccurances)));
+		
+		SLTLxConjunction andFacts = new SLTLxConjunction(allFacts);
+		
+		return andFacts.getCNFEncoding(stateNo, variableSubtitutions, synthesisEngine);
+	}
+
+	/**
+	 * Generate the rules that enforce substitution over binary predicates. 
+	 * @param pair - a pair of variables that will be substituted
+	 * @param variableSubtitutions - collection of substitutions for each variable
+	 * @param varOccurances - collection that tracks occurrences of variables
+	 * @return Set of formulas that represent the encoding of the rules 
+	 */
+	private static Set<SLTLxFormula> generateUnarySubstitutionRules(SLTLxVariable variable, SLTLxVariableSubstitutionCollection variableSubtitutions, SLTLxVariableOccuranceCollection varOccurances) {
+		Set<SLTLxFormula> allFacts = new HashSet<>();
 		
 		/** Introduce rules to enforce substitution over unary predicates when needed. 
 		 * e.g., x = T1 &  P(x) ->  P(T1)
 		 * 		 x = T1 & !P(x) -> !P(T1)	
 		 * */
-		for(PredicateLabel usedPred : varUsage.getUnaryPredicates(this)) {
-			for(State varState : variableMapping.getVariableDomain(this)) {
+		for(PredicateLabel usedPred : varOccurances.getUnaryPredicates(variable)) {
+			for(State varState : variableSubtitutions.getVariableDomain(variable)) {
+				/* (is(?x,a) & P(x)) -> P(a) */
 				allFacts.add(new SLTLxImplication(
 										new SLTLxConjunction(
 												new SLTLxAtomVar(
 														AtomVarType.VAR_VALUE,
 														varState,
-														this),
+														variable),
 												new SLTLxAtomVar(
 														AtomVarType.TYPE_V,
 														usedPred,
-														this)),
+														variable)),
 										new SLTLxAtom(
 												varState.getWorkflowStateType(),
 												usedPred,
 												varState)));
 				
-				/* Enforce negation of the predicate as well. */
+				/* Enforce negation of the predicate as well.
+				 * (is(?x,a) & !P(x)) -> !P(a)  */
 				allFacts.add(new SLTLxImplication(
 						new SLTLxConjunction(
 								new SLTLxAtomVar(
 										AtomVarType.VAR_VALUE,
 										varState,
-										this),
+										variable),
 								new SLTLxNegation(
 										new SLTLxAtomVar(
 												AtomVarType.TYPE_V,
 												usedPred,
-												this))),
+												variable))),
 						new SLTLxNegation(
 								new SLTLxAtom(
 										varState.getWorkflowStateType(),
@@ -196,70 +228,101 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 			}
 		}
 		
-		/** Introduce rules to enforce substitution over unary predicates when needed. */
-		for(Pair<SLTLxVariable> pairs : varUsage.getPairsContainingVarAsFirstArg(this)) {
-			SLTLxVariable var1 = this;
-			SLTLxVariable var2 = pairs.getSecond();
-			for(AtomVarType atomVarType : varUsage.getBinaryPredicates(pairs)) {
-				AtomType atomType;
-				if(atomVarType.equals(AtomVarType.VAR_EQUIVALENCE)) {
-					atomType = AtomType.TYPE_EQUIVALENCE;
-				} else if(atomVarType.equals(AtomVarType.R_RELATION_V)) {
-					atomType = AtomType.R_RELATON; 
-				} else {
-					continue;
-				}
-				for(State var1State : variableMapping.getVariableDomain(var1)) {
-					for(State var2State : variableMapping.getVariableDomain(var2)) {
-					allFacts.add(new SLTLxImplication(
-											new SLTLxConjunction(
-													new SLTLxAtomVar(
-															AtomVarType.VAR_VALUE,
-															var1State,
-															var1),
-													new SLTLxAtomVar(
-															AtomVarType.VAR_VALUE,
-															var2State,
-															var2),
-													new SLTLxAtomVar(
-															atomVarType,
-															var1,
-															var2)),
-											new SLTLxAtom(
-													atomType,
-													var1State,
-													var2State)
-											));
-					
-					/* Enforce negation of the predicate as well. */
-					allFacts.add(new SLTLxImplication(
-							new SLTLxConjunction(
-									new SLTLxAtomVar(
-											AtomVarType.VAR_VALUE,
-											var1State,
-											var1),
-									new SLTLxAtomVar(
-											AtomVarType.VAR_VALUE,
-											var2State,
-											var2),
-									new SLTLxNegation(
-											new SLTLxAtomVar(
-													atomVarType,
-													var1,
-													var2))),
-							new SLTLxNegation(
-									new SLTLxAtom(
-											atomType,
-											var1State,
-											var2State))
-							));
-					}
+		
+		
+		return allFacts;
+	}
+		
+		
+	
+	/**
+	 * Generate the rules that enforce substitution over binary predicates. 
+	 * @param pair - a pair of variables that will be substituted
+	 * @param variableSubtitutions - collection of substitutions for each variable
+	 * @param varOccurances - collection that tracks occurrences of variables
+	 * @return Set of formulas that represent the encoding of the rules 
+	 */
+	private static Set<SLTLxFormula> generateBinarySubstitutionRules(Pair<SLTLxVariable> pair, SLTLxVariableSubstitutionCollection variableSubtitutions, SLTLxVariableOccuranceCollection varOccurances) {
+		Set<SLTLxFormula> allFacts = new HashSet<>();
+		
+		SLTLxVariable var1 = pair.getFirst();
+		SLTLxVariable var2 = pair.getSecond();
+		
+		/*	Skip the pair if one of the variables is not in the scope (the rules were implemented already). */
+		if(variableSubtitutions.getVariableDomain(var1)==null || variableSubtitutions.getVariableDomain(var2)==null) {
+			return allFacts;
+		}
+		
+		for(AtomVarType atomVarType : varOccurances.getBinaryPredicates(pair)) {
+			AtomType atomType = inferAtomType(atomVarType);
+			if(atomType == null) continue;
+			
+			for(State var1State : variableSubtitutions.getVariableDomain(var1)) {
+				for(State var2State : variableSubtitutions.getVariableDomain(var2)) {
+					/* (is(?x,a) & is(?y,b) & P(x,y)) -> P(a,b) */ 
+				allFacts.add(new SLTLxImplication(
+										new SLTLxConjunction(
+												new SLTLxAtomVar(
+														AtomVarType.VAR_VALUE,
+														var1State,
+														var1),
+												new SLTLxAtomVar(
+														AtomVarType.VAR_VALUE,
+														var2State,
+														var2),
+												new SLTLxAtomVar(
+														atomVarType,
+														var1,
+														var2)),
+										new SLTLxAtom(
+												atomType,
+												var1State,
+												var2State)
+										));
+				
+				/* Enforce negation of the predicate as well.
+				 * (is(?x,a) & is(?y,b) & !P(x,y)) -> !P(a,b) */
+				allFacts.add(new SLTLxImplication(
+						new SLTLxConjunction(
+								new SLTLxAtomVar(
+										AtomVarType.VAR_VALUE,
+										var1State,
+										var1),
+								new SLTLxAtomVar(
+										AtomVarType.VAR_VALUE,
+										var2State,
+										var2),
+								new SLTLxNegation(
+										new SLTLxAtomVar(
+												atomVarType,
+												var1,
+												var2))),
+						new SLTLxNegation(
+								new SLTLxAtom(
+										atomType,
+										var1State,
+										var2State))
+						));
 				}
 			}
 		}
-		SLTLxConjunction andFacts = new SLTLxConjunction(allFacts);
-		
-		return andFacts.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
+		return allFacts;
+	}
+
+	/**
+	 * When a constant is substituting a variable, infer type of the new atom based on the type of the one 
+	 * containing the variable.
+	 * @param atomVarType - type of the atom containing a variable
+	 * @return Type of the new atom as long as the substitution is applicable, {@code null} otherwise.
+	 */
+	private static AtomType inferAtomType(AtomVarType atomVarType) {
+		if(atomVarType.equals(AtomVarType.VAR_EQUIVALENCE)) {
+			return AtomType.TYPE_EQUIVALENCE;
+		} else if(atomVarType.equals(AtomVarType.R_RELATION_V)) {
+		 return AtomType.R_RELATON; 
+		} else {
+			return null;
+		}
 	}
 
 	/**

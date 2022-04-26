@@ -6,8 +6,8 @@ import java.util.List;
 import nl.uu.cs.ape.models.enums.AtomType;
 
 /**
- * The {@code ModuleAutomaton} class is used to represent the module automaton. Module Automaton represents the structure that tools in the provided solutions will follow.
- * Module automaton is represented as an array of {@link State}.
+ * The {@code ModuleAutomaton} class is used to represent the collection of operation states in the workflow.
+ * Module automaton is represented as an array of {@link State}s where each state is an operation performed within the workflow.
  * <p>
  * Labeling of the automaton is provided in
  * <a href="https://github.com/sanctuuary/APE/blob/master/res/WorkflowAutomaton_Implementation.png">/APE/res/WorkflowAutomaton_Implementation.png</a>.
