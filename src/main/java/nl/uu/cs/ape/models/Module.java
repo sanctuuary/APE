@@ -215,7 +215,7 @@ public class Module extends AbstractModule {
 		for (String currRootLabel : jsonParam.keySet()) {
 			String curRootURI = currRootLabel;
 			if(!allModules.existsRoot(curRootURI)) {
-				curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixURI());
+				curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixIRI());
 			}
 			if(!allModules.existsRoot(curRootURI)) {
 				throw APEDimensionsException.notExistingDimension("Data type was defined over a non existing data dimension: '" + curRootURI + "', in JSON: '" + jsonParam + "'");
@@ -224,7 +224,7 @@ public class Module extends AbstractModule {
 			SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
 			/* for each dimensions a disjoint array of types/tools is given */
 			for (String currModuleLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
-				String currModuleURI = APEUtils.createClassURI(currModuleLabel, domainSetup.getOntologyPrefixURI());
+				String currModuleURI = APEUtils.createClassURI(currModuleLabel, domainSetup.getOntologyPrefixIRI());
 				
 				AbstractModule currModule = allModules.get(currModuleURI);
 				if (currModule == null) {

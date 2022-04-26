@@ -56,7 +56,7 @@ public class APEDomainSetup {
     /**
      * Prefix used to define OWL class IDs
      */
-    private String ontologyPrexifURI;
+    private String ontologyPrefixIRI;
 
     /**
      * Object used to create temporal constraints.
@@ -98,7 +98,7 @@ public class APEDomainSetup {
         this.allTypes = new AllTypes(config);
         this.constraintFactory = new ConstraintFactory();
         this.helperPredicates = new ArrayList<AuxiliaryPredicate>();
-        this.ontologyPrexifURI = config.getOntologyPrefixURI();
+        this.ontologyPrefixIRI = config.getOntologyPrefixIRI();
         this.useStrictToolAnnotations = config.getUseStrictToolAnnotations();
     }
 
@@ -387,19 +387,19 @@ public class APEDomainSetup {
      */
     private boolean updateModuleFromJson(JSONObject jsonModule)
             throws JSONException, APEDimensionsException {
-        String ontologyPrefixURI = getOntologyPrefixURI();
+        String ontologyPrefixIRI = getOntologyPrefixIRI();
         AllModules allModules = getAllModules();
-        String moduleURI = APEUtils.createClassURI(jsonModule.getString(APECoreConfig.getJsonTags("id")), ontologyPrefixURI);
+        String moduleURI = APEUtils.createClassURI(jsonModule.getString(APECoreConfig.getJsonTags("id")), ontologyPrefixIRI);
         if (allModules.get(moduleURI) != null) {
             moduleURI = moduleURI + "[tool]";
         }
         String moduleLabel = jsonModule.getString(APECoreConfig.getJsonTags("label"));
         Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("taxonomyOperations"), String.class));
-        taxonomyModules = APEUtils.createURIsFromLabels(taxonomyModules, ontologyPrefixURI);
+        taxonomyModules = APEUtils.createURIsFromLabels(taxonomyModules, ontologyPrefixIRI);
         /* Check if the referenced module taxonomy classes exist. */
         List<String> toRemove = new ArrayList<String>();
         for (String taxonomyModule : taxonomyModules) {
-            String taxonomyModuleURI = APEUtils.createClassURI(taxonomyModule, ontologyPrefixURI);
+            String taxonomyModuleURI = APEUtils.createClassURI(taxonomyModule, ontologyPrefixIRI);
             if (allModules.get(taxonomyModuleURI) == null) {
                 System.err.println("Tool '" + moduleURI + "' annotation issue. "
                         + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy." + (x++) + "\n" + wrongToolTax.size());
@@ -522,8 +522,8 @@ public class APEDomainSetup {
      *
      * @return the ontology prefix URI
      */
-    public String getOntologyPrefixURI() {
-        return ontologyPrexifURI;
+    public String getOntologyPrefixIRI() {
+        return ontologyPrefixIRI;
     }
 
 	/** 

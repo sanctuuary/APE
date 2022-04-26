@@ -67,7 +67,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 	
 	public SLTLxSATVisitor(SATSynthesisEngine synthesisEngine) {
 		super();
-		this.ontologyPrexifURI = synthesisEngine.getDomainSetup().getOntologyPrefixURI();
+		this.ontologyPrexifURI = synthesisEngine.getDomainSetup().getOntologyPrefixIRI();
 		this.allTypes = synthesisEngine.getDomainSetup().getAllTypes();
 		this.allModules = synthesisEngine.getDomainSetup().getAllModules();
 	}
