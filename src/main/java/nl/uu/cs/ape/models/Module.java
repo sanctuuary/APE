@@ -245,7 +245,7 @@ public class Module extends AbstractModule {
 
 			/*
 			 * Create a new type, that represents a disjunction of the types, that can be
-			 * used to abstract over each of the types individually and represents specificaion over one dimension.
+			 * used to abstract over each of the types individually and represents specification over one dimension.
 			 */
 			AbstractModule abstractDimensionType = AuxModulePredicate.generateAuxiliaryPredicate(logConnectedPredicates, logConn,domainSetup);
 			if (abstractDimensionType != null) {

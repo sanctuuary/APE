@@ -5,15 +5,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import nl.uu.cs.ape.automaton.Automaton;
 import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.models.AllModules;
+import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
+import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
@@ -105,6 +108,7 @@ public final class EnforceModuleRelatedRules {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		
 		cnfEncoding.addAll(dataEquivalenceOverDataReferencing(typeAutomaton));
+//		TODO make sure each atom is equivalent to itself
 		
 		return cnfEncoding;
 	}
@@ -838,6 +842,7 @@ public final class EnforceModuleRelatedRules {
 		
 		return fullCNFEncoding;
 	}
+	
 
 	/**
 	 * Gets predicate pairs.

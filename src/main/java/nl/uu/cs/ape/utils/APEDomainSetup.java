@@ -38,7 +38,6 @@ import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
  */
 public class APEDomainSetup {
 
-	static int counterErrors = 1, x =1;
 	/* Helper objects used to keep track of the domain quality. */
 	public Set<String> emptyTools = new HashSet<String>();
 	public Set<String> wrongToolIO = new HashSet<String>();
@@ -184,113 +183,6 @@ public class APEDomainSetup {
     public ConstraintTemplate getConstraintTamplate(String constraintID) {
         return constraintFactory.getConstraintTemplate(constraintID);
     }
-
-    /**
-     * Encoding all the required constraints for the given program length, in order to ensure that helper predicates are used properly.
-     *TODO Remove from this class
-     * @param mappings        Current atom mappings.
-     * @param moduleAutomaton Graph representing all the tool states in the current workflow (one synthesis run might iterate though workflows of different lengths).
-     * @param typeAutomaton   Graph representing all the type states in the current workflow (one synthesis run might iterate though workflows of different lengths).
-     * @return CNF encoding of that ensures the correctness of the helper predicates.
-     */
-    public Set<SLTLxFormula> getConstraintsForAuxiliaryPredicates(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
-    	Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
-    	
-        Automaton automaton = null;
-        AtomType workflowElem = null;
-        for (AuxiliaryPredicate helperPredicate : helperPredicates) {
-            if (helperPredicate.getGeneralizedPredicates().first() instanceof Type) {
-                automaton = typeAutomaton;
-            } else {
-                automaton = moduleAutomaton;
-                workflowElem = AtomType.MODULE;
-            }
-            for (State currState : automaton.getAllStates()) {
-                workflowElem = currState.getWorkflowStateType();
-                if (helperPredicate.getLogicOp() == LogicOperation.OR) {
-                    /*
-                     * Ensures that if the abstract predicate is used, at least one of the
-                     * disjointLabels has to be used.
-                     */
-                	Set<SLTLxFormula> allORPossibilities = new HashSet<SLTLxFormula>();
-                	allORPossibilities.add(
-                			new SLTLxNegation(
-								new SLTLxAtom(
-									workflowElem, 
-									helperPredicate, 
-									currState)));
-
-                    for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	allORPossibilities.add(
-								new SLTLxAtom(
-									workflowElem, 
-									subLabel, 
-									currState));
-                    }
-                    cnfEncoding.add(new SLTLxDisjunction(allORPossibilities));
-
-                    /*
-                     * Ensures that if at least one of the disjointLabels was used, the abstract
-                     * predicate has to be used as well.
-                     */
-                    for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	cnfEncoding.add(
-                    			new SLTLxImplication(
-    								new SLTLxAtom(
-    									workflowElem, 
-    									subLabel, 
-    									currState),
-    								new SLTLxAtom(
-    									workflowElem, 
-    									helperPredicate, 
-    									currState)));
-                    }
-                } else if (helperPredicate.getLogicOp() == LogicOperation.AND) {
-
-                    /*
-                     * Ensures that if the abstract predicate is used, all of the disjointLabels
-                     * have to be used.
-                     */
-                    for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	cnfEncoding.add(
-                    			new SLTLxImplication(
-    								new SLTLxAtom(
-    									workflowElem, 
-    									helperPredicate, 
-    									currState),
-    								new SLTLxAtom(
-    									workflowElem, 
-    									subLabel, 
-    									currState)));
-                    }
-
-                    /*
-                     * Ensures that if all of the disjointLabels were used, the abstract predicate
-                     * has to be used as well.
-                     */
-                    Set<SLTLxFormula> allANDPossibilities = new HashSet<SLTLxFormula>();
-                	
-                    for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	allANDPossibilities.add(
-                    			new SLTLxNegation(
-    								new SLTLxAtom(
-    									workflowElem, 
-    									subLabel, 
-    									currState)));
-                    }
-                    allANDPossibilities.add(
-							new SLTLxAtom(
-								workflowElem, 
-								helperPredicate, 
-								currState));
-                    
-                    cnfEncoding.add(new SLTLxDisjunction(allANDPossibilities));
-                }
-            }
-
-        }
-        return cnfEncoding;
-    }
     
     /**
 	 * Method read the constraints from a JSON object and updates the
@@ -402,7 +294,7 @@ public class APEDomainSetup {
             String taxonomyModuleURI = APEUtils.createClassURI(taxonomyModule, ontologyPrefixIRI);
             if (allModules.get(taxonomyModuleURI) == null) {
                 System.err.println("Tool '" + moduleURI + "' annotation issue. "
-                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy." + (x++) + "\n" + wrongToolTax.size());
+                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy.");
                 wrongToolTax.add(moduleLabel);
                 toRemove.add(taxonomyModuleURI);
             }
@@ -581,24 +473,13 @@ public class APEDomainSetup {
     public boolean getUseStrictToolAnnotations() {
         return useStrictToolAnnotations;
     }
-
+    
     /**
-     * Ensure the truth value of:
-     * <ul>
-     * 		<li>{@code true} - SLTLx term</li>
-     * 		<li>{@code false} - SLTLx term</li>
-     * 		<li>Equivalence relation (EQ) among the constants</li>	
-	 * </ul> 
-     * 
-     * @return A set of formulas that ensure the encoding.
+     * Get the list of helper predicates used in the domain.
+     * @return List of the auxiliary helper predicates.
      */
-	public Collection<SLTLxFormula> getConstraintsForSLTLx() {
-		 Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
-		 
-		 /* Encode {@code true} and {@code false} SLTLx terms. */
-		 cnfEncoding.add(SLTLxAtom.getTrue());
-		 cnfEncoding.add(new SLTLxNegation(SLTLxAtom.getFalse()));
-		 
-		return cnfEncoding;
+    public List<AuxiliaryPredicate> getHelperPredicates() {
+		return helperPredicates;
 	}
+
 }

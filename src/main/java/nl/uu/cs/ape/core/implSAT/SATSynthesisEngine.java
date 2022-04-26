@@ -192,9 +192,15 @@ public class SATSynthesisEngine implements SynthesisEngine {
         
         /*
          * Encode data equivalence relation (IS) constraints.
+         * TODO
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.dataEquivalence(typeAutomaton));
 
+        /*
+         * Setup encoding of 'true' and 'false' atoms to ensure proper SLTLx interpretation.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.setTrueFalse());
+        
         /*
          *  Workflow I/O are encoded the last in order to
          * reuse the mappings for states, instead of introducing new ones, using the I/O
@@ -211,14 +217,9 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, domainSetup.getConstraintsForAuxiliaryPredicates(moduleAutomaton, typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.preserveAuxiliaryPredicateRules(moduleAutomaton, typeAutomaton, domainSetup.getHelperPredicates()));
         
         
-        /*
-         * Setup encoding of auxiliary 'EQ' atoms, to ensure proper SLTLx parsing.
-         * TODO
-         */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, domainSetup.getConstraintsForSLTLx());
         
         /*
          * Additional SLTLx constraints. TODO - provide a proper interface
