@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
@@ -13,7 +12,6 @@ import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Pair;
-import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.AtomType;
@@ -31,17 +29,17 @@ import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
- * The {@code ModuleUtils} class is used to encode SAT constraints based on the
- * module annotations.
+ * The {@code ModuleUtils} class is used to encode SLTLx constraints based on the
+ * module annotations that would encode the workflow structure.
  *
  * @author Vedran Kasalica
  */
-public final class SATModuleUtils {
+public final class EnforceModuleRelatedRules {
 
 	/**
 	 * Private constructor is used to to prevent instantiation.
 	 */
-	private SATModuleUtils() {
+	private EnforceModuleRelatedRules() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -55,11 +53,11 @@ public final class SATModuleUtils {
 	 * @return Set of SLTLx formulas that represent the CNF constraints regarding the required INPUT
 	 *         and OUTPUT types of the modules.
 	 */
-	public static Set<SLTLxFormula> encodeModuleAnnotations(SATSynthesisEngine synthesisInstance) {
+	public static Set<SLTLxFormula> moduleAnnotations(SATSynthesisEngine synthesisInstance) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
-		cnfEncoding.addAll(enforseToolInputTypes(synthesisInstance));
+		cnfEncoding.addAll(toolInputTypes(synthesisInstance));
 
-		cnfEncoding.addAll(enforseToolOutputTypes(synthesisInstance));
+		cnfEncoding.addAll(toolOutputTypes(synthesisInstance));
 		return cnfEncoding;
 	}
 
@@ -74,12 +72,12 @@ public final class SATModuleUtils {
 	 * @return Set of SLTLx formulas that represent the CNF constraints regarding the required
 	 *         memory structure implementation.
 	 */
-	public static Set<SLTLxFormula> encodeMemoryStructure(SATSynthesisEngine synthesisInstance) {
+	public static Set<SLTLxFormula> memoryStructure(SATSynthesisEngine synthesisInstance) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
 		cnfEncoding.addAll(allowDataReferencing(synthesisInstance.getTypeAutomaton()));
-		cnfEncoding.addAll(enforceUsageOfGeneratedTypes(synthesisInstance));
-		cnfEncoding.addAll(enforceDataReference(synthesisInstance.getDomainSetup(),
+		cnfEncoding.addAll(usageOfGeneratedTypes(synthesisInstance));
+		cnfEncoding.addAll(dataReference(synthesisInstance.getDomainSetup(),
 				synthesisInstance.getTypeAutomaton()));
 		return cnfEncoding;
 	}
@@ -92,21 +90,21 @@ public final class SATModuleUtils {
 	 * @param typeAutomaton - collection of states representing the data objects in the workflow
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	public static Set<SLTLxFormula> encodeAncestorRelationDependency(TypeAutomaton typeAutomaton) {
+	public static Set<SLTLxFormula> ancestorRelationDependency(TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		
 		cnfEncoding.addAll(restrictAncestorRelAndEnforceReflexivity(typeAutomaton));
-		cnfEncoding.addAll(enforceDataDependencyOverModules(typeAutomaton));
-		cnfEncoding.addAll(enforceDataDependencyTransitivity(typeAutomaton));
+		cnfEncoding.addAll(dataDependencyOverModules(typeAutomaton));
+		cnfEncoding.addAll(dataDependencyTransitivity(typeAutomaton));
 		
 		return cnfEncoding;
 	}
 	
 	
-	public static Set<SLTLxFormula> encodeDataEquivalence(TypeAutomaton typeAutomaton) {
+	public static Set<SLTLxFormula> dataEquivalence(TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		
-		cnfEncoding.addAll(enforceDataEquivalenceOverDataReferencing(typeAutomaton));
+		cnfEncoding.addAll(dataEquivalenceOverDataReferencing(typeAutomaton));
 		
 		return cnfEncoding;
 	}
@@ -119,7 +117,7 @@ public final class SATModuleUtils {
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> enforseToolInputTypes(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> toolInputTypes(SATSynthesisEngine synthesisInstance) {
 
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/* For each module.. */
@@ -185,7 +183,7 @@ public final class SATModuleUtils {
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static Set<SLTLxFormula> enforceDataReference(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> dataReference(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
 		/* For each type instance */
@@ -419,7 +417,7 @@ public final class SATModuleUtils {
 	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> enforceDataEquivalenceOverDataReferencing(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> dataEquivalenceOverDataReferencing(TypeAutomaton typeAutomaton) {
 
 		// setting up dependency constraints
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
@@ -455,9 +453,10 @@ public final class SATModuleUtils {
 	 * preserving the ancestor relation (R). Outputs have to depend on inputs.
 	 *
 	 * @param typeAutomaton - system that represents states in the workflow
+	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> enforceDataDependencyOverModules(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> dataDependencyOverModules(TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/** For tool inputs and outputs */
 		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
@@ -487,7 +486,7 @@ public final class SATModuleUtils {
 	 * @param typeAutomaton - system that represents states in the workflow
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> enforceDataDependencyTransitivity(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> dataDependencyTransitivity(TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		
 		/* Ancestor relation (R) is transitive for any 3 states in the system. */
@@ -525,10 +524,12 @@ public final class SATModuleUtils {
 	 * according to the configuration, e.g. if the config specifies that all
 	 * workflow inputs have to be used, then each of them has to be referenced at
 	 * least once.
+	 * 
+	 * @param synthesisInstance - instance of the synthesis engine
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> enforceUsageOfGeneratedTypes(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> usageOfGeneratedTypes(SATSynthesisEngine synthesisInstance) {
 
 		Type emptyType = synthesisInstance.getEmptyType();
 		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
@@ -640,10 +641,12 @@ public final class SATModuleUtils {
 	 * Return the CNF representation of the output type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.<br>
 	 * Generate constraints that preserve tool outputs.
+	 * 
+	 * @param synthesisInstance - instance of the synthesis engine
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> enforseToolOutputTypes(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> toolOutputTypes(SATSynthesisEngine synthesisInstance) {
 
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
@@ -778,12 +781,12 @@ public final class SATModuleUtils {
 	 * @return Set of SLTLx formulas that represent the constraints enforcing taxonomy
 	 *         classifications.
 	 */
-	public static Set<SLTLxFormula> moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
+	public static Set<SLTLxFormula> moduleTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
 			ModuleAutomaton moduleAutomaton) {
 
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		for (State moduleState : moduleAutomaton.getAllStates()) {
-			cnfEncoding.addAll(moduleEnforceTaxonomyStructureForState(allModules, currModule, moduleState));
+			cnfEncoding.addAll(moduleTaxonomyStructureForState(allModules, currModule, moduleState));
 		}
 		return cnfEncoding;
 	}
@@ -797,7 +800,7 @@ public final class SATModuleUtils {
 	 * @param moduleState State in which the module should be used.
 	 * @param mappings    Mapping function.
 	 */
-	private static Set<SLTLxFormula> moduleEnforceTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule, State moduleState) {
+	private static Set<SLTLxFormula> moduleTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule, State moduleState) {
 		SLTLxAtom superModuleState = new SLTLxAtom(AtomType.MODULE, currModule, moduleState);
 
 		Set<SLTLxFormula> fullCNFEncoding = new HashSet<SLTLxFormula>();
@@ -819,7 +822,7 @@ public final class SATModuleUtils {
 				currCNFEncoding.add(subModuleState);
 				subModulesStates.add(subModuleState);
 				
-				fullCNFEncoding.addAll(moduleEnforceTaxonomyStructureForState(allModules, subModule, moduleState));
+				fullCNFEncoding.addAll(moduleTaxonomyStructureForState(allModules, subModule, moduleState));
 			}
 			fullCNFEncoding.add(new SLTLxDisjunction(currCNFEncoding));
 			/*

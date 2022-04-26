@@ -8,10 +8,10 @@ import java.util.Set;
 import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
+import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.AuxTypePredicate;
 import nl.uu.cs.ape.models.Pair;
-import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.AtomType;
@@ -26,16 +26,17 @@ import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 
 /**
- * The {@code SMTTypeUtils} class is used to encode SAT constraints  based on the type annotations.
+ * The {@code SMTTypeUtils} class is used to encode SLTLx constraints based on the
+ * existing types that would encode the workflow structure.
  *
  * @author Vedran Kasalica
  */
-public class SATTypeUtils {
+public class EnforceTypeRelatedRules {
 
     /**
      * Private constructor is used to to prevent instantiation.
      */
-    private SATTypeUtils() {
+    private EnforceTypeRelatedRules() {
         throw new UnsupportedOperationException();
     }
 
@@ -43,9 +44,9 @@ public class SATTypeUtils {
      * Generating the mutual exclusion for each pair of tools from @modules
      * (excluding abstract modules from the taxonomy) in each state
      * of @moduleAutomaton.
-     *
-     * @param allTypes      TODO
-     * @param typeAutomaton TODO
+     * 
+     * @param allTypes      - Collection of all the types in the domain.
+     * @param typeAutomaton - System that represents states in the workflow
      * @return String representation of constraints.
      */
    public static Set<SLTLxFormula> typeMutualExclusion(AllTypes allTypes, TypeAutomaton typeAutomaton) {
@@ -94,8 +95,8 @@ public class SATTypeUtils {
      * state of @moduleAutomaton. It enforces that each type instance is either
      * defined on all the dimensions or is empty.
      *
-     * @param domainSetup   TODO
-     * @param typeAutomaton TODO
+     * @param domainSetup   - Domain model
+     * @param typeAutomaton - System that represents states in the workflow
      * @return String representation of constraints.
      */
    public static Set<SLTLxFormula> typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
@@ -142,8 +143,8 @@ public class SATTypeUtils {
      * and it's valid in each state of @typeAutomaton. @emptyType denotes the type
      * that is being used if the state has no type.
      *
-     * @param allTypes      TODO
-     * @param typeAutomaton TODO
+     * @param allTypes      - Collection of all the types in the domain.
+     * @param typeAutomaton - System that represents states in the workflow
      * @return The String representation of constraints enforcing taxonomy classifications.
      */
    public static Set<SLTLxFormula> typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton) {
@@ -168,10 +169,10 @@ public class SATTypeUtils {
     /**
      * Supporting recursive method for typeEnforceTaxonomyStructure.
      * 
-     * @param currType
-     * @param typeState
-     * @param typeElement
-     * @return
+     * @param currType - Current type
+     * @param typeState - Current type state
+     * @param typeElement - Current type element
+     * @return Set of the corresponding SLTLx formulas
      */
     private static Set<SLTLxFormula> typeEnforceTaxonomyStructureForState(TaxonomyPredicate currType,
                                                                 State typeState, AtomType typeElement) {
@@ -212,15 +213,16 @@ public class SATTypeUtils {
     }
 
     /**
-     * Encoding the initial workflow input.
+     * Encodes rules that ensure the initial workflow input.
      *
      * @param allTypes       Set of all the types in the domain
      * @param program_inputs Input types for the program.
      * @param typeAutomaton  Automaton representing the type states in the model
      * @param mappings       All the atom mappings
      * @return The String representation of the initial input encoding.
+     * @throws APEConfigException Exception thrown when one of the output types is not defined in the taxonomy.
      */
-   public static Set<SLTLxFormula> encodeInputData(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton) {
+   public static Set<SLTLxFormula> workflowInputs(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton) throws APEConfigException {
         Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
         List<State> workflowInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
@@ -229,9 +231,7 @@ public class SATTypeUtils {
             if (i < program_inputs.size()) {
                 Type currType = program_inputs.get(i);
                     if (allTypes.get(currType.getPredicateID()) == null) {
-                        System.err.println(
-                                "Program input '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
-                        return null;
+                        throw APEConfigException.workflowIODataTypeNotInDomain(currType.getPredicateID());
                     }
                     cnfEncoding.add(
                     		new SLTLxAtom(
@@ -251,16 +251,16 @@ public class SATTypeUtils {
     }
 
     /**
-     * Encoding the workflow output. The provided output files have to occur
-     * as the final list of "used" data types. In the predefined order.
+     * Encodes the rules that ensure generation of the workflow output.
      *
      * @param allTypes        Set of all the types in the domain
      * @param program_outputs Output types for the program.
      * @param typeAutomaton   Automaton representing the type states in the model
      * @param mappings       All the atom mappings
      * @return String representation of the workflow output encoding.
+     * @throws APEConfigException Exception thrown when one of the output types is not defined in the taxonomy.
      */
-   public static Set<SLTLxFormula> encodeOutputData(AllTypes allTypes, List<Type> program_outputs, TypeAutomaton typeAutomaton) {
+   public static Set<SLTLxFormula> workdlowOutputs(AllTypes allTypes, List<Type> program_outputs, TypeAutomaton typeAutomaton) throws APEConfigException{
         Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
         List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
@@ -268,10 +268,8 @@ public class SATTypeUtils {
             if (i < program_outputs.size()) {
             	TaxonomyPredicate currType = program_outputs.get(i);
                     if (allTypes.get(currType.getPredicateID()) == null) {
-                        System.err.println(
-                                "Program output '" + currType.getPredicateID() + "' was not defined in the taxonomy.");
-                        return null;
-                    }
+                        throw APEConfigException.workflowIODataTypeNotInDomain(currType.getPredicateID());
+                        }
                     cnfEncoding.add(
                     		new SLTLxAtom(
 									AtomType.USED_TYPE, 

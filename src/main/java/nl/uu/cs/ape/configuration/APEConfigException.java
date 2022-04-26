@@ -145,4 +145,14 @@ public class APEConfigException extends RuntimeException {
         );
         return new APEConfigException(sb.toString());
     }
+    
+    /**
+     * The annotated type (workflow input or output) is not defined within the domain taxonomy.
+     *
+     * @param typeID  - ID of the data type not defined
+     * @return Run configuration exception with information that may help the user solve the problem.
+     */
+    public static APEConfigException workflowIODataTypeNotInDomain(String typeID) {
+        return new APEConfigException(String.format("Data type '%s'used to annotate workdlow input/output is not defined in the taxonomy.", typeID));
+    }
 }

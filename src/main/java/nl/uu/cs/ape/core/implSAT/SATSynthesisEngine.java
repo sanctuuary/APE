@@ -138,14 +138,14 @@ public class SATSynthesisEngine implements SynthesisEngine {
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
         /* Create constraints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeModuleAnnotations(this));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleAnnotations(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
         /*
          * The constraints preserve the memory structure, i.e. preserve the data available in memory and the
          * logic of referencing data from memory in case of tool inputs.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeMemoryStructure(this));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.memoryStructure(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Memory structure encoding");
 
         /*
@@ -154,12 +154,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the tools - from taxonomy.
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
         
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
         
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.moduleEnforceTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
         
         /*
@@ -169,12 +169,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
         
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
         
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeMandatoryUsage(domainSetup, typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMandatoryUsage(domainSetup, typeAutomaton));
         
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATTypeUtils.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
         
         /*
@@ -188,31 +188,25 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Encode data ancestor relation (R) constraints.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeAncestorRelationDependency(typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.ancestorRelationDependency(typeAutomaton));
         
         /*
-         * Encode data equivalence relation (IS) constraints. TODO
+         * Encode data equivalence relation (IS) constraints.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeDataEquivalence(typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.dataEquivalence(typeAutomaton));
 
         /*
-         * Encode the workflow input. Workflow I/O are encoded the last in order to
+         *  Workflow I/O are encoded the last in order to
          * reuse the mappings for states, instead of introducing new ones, using the I/O
          * types of NodeType.UNKNOWN.
+         * 
+         * Encode the workflow input.
          */
-        Set<SLTLxFormula> inputDataEncoding = SATTypeUtils.encodeInputData(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton);
-        if (inputDataEncoding == null) {
-            return false;
-        }
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, inputDataEncoding);
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.workflowInputs(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton));
         /*
          * Encode the workflow output
          */
-        Set<SLTLxFormula> outputDataEncoding = SATTypeUtils.encodeOutputData(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton);
-        if (outputDataEncoding == null) {
-            return false;
-        }
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, outputDataEncoding);
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.workdlowOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
 
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
