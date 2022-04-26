@@ -188,11 +188,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Encode data ancestor relation (R) constraints.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeAncestorRelationDependencyCons(typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeAncestorRelationDependency(typeAutomaton));
         
         /*
          * Encode data equivalence relation (IS) constraints. TODO
          */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SATModuleUtils.encodeDataEquivalence(typeAutomaton));
 
         /*
          * Encode the workflow input. Workflow I/O are encoded the last in order to

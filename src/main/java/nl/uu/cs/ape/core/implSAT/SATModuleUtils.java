@@ -57,9 +57,9 @@ public final class SATModuleUtils {
 	 */
 	public static Set<SLTLxFormula> encodeModuleAnnotations(SATSynthesisEngine synthesisInstance) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
-		cnfEncoding.addAll(inputCons(synthesisInstance));
+		cnfEncoding.addAll(enforseToolInputTypes(synthesisInstance));
 
-		cnfEncoding.addAll(outputCons(synthesisInstance));
+		cnfEncoding.addAll(enforseToolOutputTypes(synthesisInstance));
 		return cnfEncoding;
 	}
 
@@ -77,9 +77,9 @@ public final class SATModuleUtils {
 	public static Set<SLTLxFormula> encodeMemoryStructure(SATSynthesisEngine synthesisInstance) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
-		cnfEncoding.addAll(allowDataReferencingCons(synthesisInstance.getTypeAutomaton()));
-		cnfEncoding.addAll(enforcingUsageOfGeneratedTypesCons(synthesisInstance));
-		cnfEncoding.addAll(enforceDataReferenceRules(synthesisInstance.getDomainSetup(),
+		cnfEncoding.addAll(allowDataReferencing(synthesisInstance.getTypeAutomaton()));
+		cnfEncoding.addAll(enforceUsageOfGeneratedTypes(synthesisInstance));
+		cnfEncoding.addAll(enforceDataReference(synthesisInstance.getDomainSetup(),
 				synthesisInstance.getTypeAutomaton()));
 		return cnfEncoding;
 	}
@@ -92,7 +92,7 @@ public final class SATModuleUtils {
 	 * @param typeAutomaton - collection of states representing the data objects in the workflow
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	public static Set<SLTLxFormula> encodeAncestorRelationDependencyCons(TypeAutomaton typeAutomaton) {
+	public static Set<SLTLxFormula> encodeAncestorRelationDependency(TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		
 		cnfEncoding.addAll(restrictAncestorRelAndEnforceReflexivity(typeAutomaton));
@@ -103,7 +103,7 @@ public final class SATModuleUtils {
 	}
 	
 	
-	public static Set<SLTLxFormula> encodeDataInstanceEquivalenceCons(TypeAutomaton typeAutomaton) {
+	public static Set<SLTLxFormula> encodeDataEquivalence(TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		
 		cnfEncoding.addAll(enforceDataEquivalenceOverDataReferencing(typeAutomaton));
@@ -119,7 +119,7 @@ public final class SATModuleUtils {
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> inputCons(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> enforseToolInputTypes(SATSynthesisEngine synthesisInstance) {
 
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 		/* For each module.. */
@@ -185,7 +185,7 @@ public final class SATModuleUtils {
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static Set<SLTLxFormula> enforceDataReferenceRules(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> enforceDataReference(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 
 		/* For each type instance */
@@ -266,7 +266,7 @@ public final class SATModuleUtils {
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> allowDataReferencingCons(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> allowDataReferencing(TypeAutomaton typeAutomaton) {
 
 		// setting up input constraints (Shared Memory Approach)
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
@@ -528,7 +528,7 @@ public final class SATModuleUtils {
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> enforcingUsageOfGeneratedTypesCons(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> enforceUsageOfGeneratedTypes(SATSynthesisEngine synthesisInstance) {
 
 		Type emptyType = synthesisInstance.getEmptyType();
 		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
@@ -643,7 +643,7 @@ public final class SATModuleUtils {
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> outputCons(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> enforseToolOutputTypes(SATSynthesisEngine synthesisInstance) {
 
 		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
 

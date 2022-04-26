@@ -46,7 +46,6 @@ public class SATTypeUtils {
      *
      * @param allTypes      TODO
      * @param typeAutomaton TODO
-     * @param mappings      TODO
      * @return String representation of constraints.
      */
    public static Set<SLTLxFormula> typeMutualExclusion(AllTypes allTypes, TypeAutomaton typeAutomaton) {
@@ -97,7 +96,6 @@ public class SATTypeUtils {
      *
      * @param domainSetup   TODO
      * @param typeAutomaton TODO
-     * @param mappings      TODO
      * @return String representation of constraints.
      */
    public static Set<SLTLxFormula> typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
@@ -146,7 +144,6 @@ public class SATTypeUtils {
      *
      * @param allTypes      TODO
      * @param typeAutomaton TODO
-     * @param mappings      TODO
      * @return The String representation of constraints enforcing taxonomy classifications.
      */
    public static Set<SLTLxFormula> typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton) {
@@ -170,6 +167,11 @@ public class SATTypeUtils {
 
     /**
      * Supporting recursive method for typeEnforceTaxonomyStructure.
+     * 
+     * @param currType
+     * @param typeState
+     * @param typeElement
+     * @return
      */
     private static Set<SLTLxFormula> typeEnforceTaxonomyStructureForState(TaxonomyPredicate currType,
                                                                 State typeState, AtomType typeElement) {
