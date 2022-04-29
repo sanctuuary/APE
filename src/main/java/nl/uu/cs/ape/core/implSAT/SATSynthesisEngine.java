@@ -188,14 +188,14 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Encode data ancestor relation (R) constraints.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.ancestorRelationDependency(typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.ancestorRelationsDependency(typeAutomaton));
         
         /*
-         * Encode data equivalence relation (IS) constraints.
-         * TODO
+         * Encode data equivalence/identity relation (IS) constraints.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.dataEquivalence(typeAutomaton));
-
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.identityRelationsDependency(typeAutomaton));
+        
+        
         /*
          * Setup encoding of 'true' and 'false' atoms to ensure proper SLTLx interpretation.
          */

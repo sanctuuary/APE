@@ -22,7 +22,7 @@ private SLTLxFormula formula;
 		this.bindedVariable = boundBariable; 
 		this.formula = formula;
 	}
-
+	
 
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection curVarMapping, SATSynthesisEngine synthesisEngine) {
@@ -30,10 +30,13 @@ private SLTLxFormula formula;
 		SLTLxVariableSubstitutionCollection newVarMappping = new SLTLxVariableSubstitutionCollection(curVarMapping); 
 		SLTLxVariable flatBindedVariable = newVarMappping.addNewVariable(bindedVariable, bindedVariable.getVariableDomain(stateNo, synthesisEngine));
 		
+		/** Encode the possible substitutions for the given variable. */
 		clauses.addAll(flatBindedVariable.getUniversalCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		/** Encode the underlying formula. */
 		clauses.addAll(formula.getCNFEncoding(stateNo, newVarMappping, synthesisEngine));
-		/** The rules have to be applied after visiting the bound formula (as done in the previous step). */
-		clauses.addAll(flatBindedVariable.getVariableSubstitutionEnforcingCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		/** Ensure that the variables and states they substitute satisfy the same properties. 
+		 * The rules have to be applied after visiting the bound formula (as done in the previous step). */
+		clauses.addAll(flatBindedVariable.getVariableSubstitutionToPresereProperties(stateNo, newVarMappping, synthesisEngine));
 		
 		return clauses;
 	}
@@ -44,10 +47,13 @@ private SLTLxFormula formula;
 		SLTLxVariableSubstitutionCollection newVarMappping = new SLTLxVariableSubstitutionCollection(curVarMapping); 
 		SLTLxVariable flatBindedVariable = newVarMappping.addNewVariable(bindedVariable, bindedVariable.getVariableDomain(stateNo, synthesisEngine));
 		
+		/** Encode the possible substitutions for the given variable. */
 		clauses.addAll(flatBindedVariable.getExistentialCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		/** Encode the underlying formula. */
 		clauses.addAll(formula.getNegatedCNFEncoding(stateNo, newVarMappping, synthesisEngine));
-		/** The rules have to be applied after visiting the bound formula (as done in the previous step). */
-		clauses.addAll(flatBindedVariable.getVariableSubstitutionEnforcingCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		/** Ensure that the variables and states they substitute satisfy the same properties. 
+		 * The rules have to be applied after visiting the bound formula (as done in the previous step). */
+		clauses.addAll(flatBindedVariable.getVariableSubstitutionToPresereProperties(stateNo, newVarMappping, synthesisEngine));
 		
 		return clauses;
 	}

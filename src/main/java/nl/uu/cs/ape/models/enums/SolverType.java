@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.models.enums;
 
 /**
- * Defines the values describing the quantity of covered cases.
+ * Defines the types of solvers supported by the framework.
  * <p>
  * 
  *  @author Vedran Kasalica

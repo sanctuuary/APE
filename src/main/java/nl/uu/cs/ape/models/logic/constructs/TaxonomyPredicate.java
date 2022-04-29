@@ -436,6 +436,16 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     public boolean isEmptyPredicate() {
         return this.nodeType == NodeType.EMPTY;
     }
+    
+    /**
+     * Returns true if the type is <b>not an empty type</b> , i.e., is a (abstract or non-abstract) type.), otherwise returns false - the type
+     * is empty.
+     *
+     * @return true (empty type) or false (implemented type).
+     */
+    public boolean notEmptyPredicate() {
+        return this.nodeType != NodeType.EMPTY;
+    }
 
     /**
      * Returns true if the type the root type, otherwise returns false - the type is

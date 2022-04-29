@@ -1,6 +1,8 @@
 package nl.uu.cs.ape.core.implSAT;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,10 +20,12 @@ import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.AtomType;
+import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.satStruc.SLTLxConjunction;
 import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.satStruc.SLTLxAtomVar;
 import nl.uu.cs.ape.models.satStruc.SLTLxEquivalence;
 import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
 import nl.uu.cs.ape.models.satStruc.SLTLxNegatedConjunction;
@@ -57,11 +61,11 @@ public final class EnforceModuleRelatedRules {
 	 *         and OUTPUT types of the modules.
 	 */
 	public static Set<SLTLxFormula> moduleAnnotations(SATSynthesisEngine synthesisInstance) {
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
-		cnfEncoding.addAll(toolInputTypes(synthesisInstance));
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+		fullEncoding.addAll(toolInputTypes(synthesisInstance));
 
-		cnfEncoding.addAll(toolOutputTypes(synthesisInstance));
-		return cnfEncoding;
+		fullEncoding.addAll(toolOutputTypes(synthesisInstance));
+		return fullEncoding;
 	}
 
 	/**
@@ -76,43 +80,68 @@ public final class EnforceModuleRelatedRules {
 	 *         memory structure implementation.
 	 */
 	public static Set<SLTLxFormula> memoryStructure(SATSynthesisEngine synthesisInstance) {
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
-		cnfEncoding.addAll(allowDataReferencing(synthesisInstance.getTypeAutomaton()));
-		cnfEncoding.addAll(usageOfGeneratedTypes(synthesisInstance));
-		cnfEncoding.addAll(dataReference(synthesisInstance.getDomainSetup(),
+		fullEncoding.addAll(allowDataReferencing(synthesisInstance.getTypeAutomaton()));
+		fullEncoding.addAll(usageOfGeneratedTypes(synthesisInstance));
+		fullEncoding.addAll(dataReference(synthesisInstance.getDomainSetup(),
 				synthesisInstance.getTypeAutomaton()));
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	
 	/**
-	 * Function returns the encoding that ensures that ancestor relation (R) 
+	 * Function returns the encoding that ensures that ancestor relation (R)
 	 * among data objects is preserved.
 	 * 
 	 * @param typeAutomaton - collection of states representing the data objects in the workflow
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	public static Set<SLTLxFormula> ancestorRelationDependency(TypeAutomaton typeAutomaton) {
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+	public static Set<SLTLxFormula> ancestorRelationsDependency(TypeAutomaton typeAutomaton) {
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		
-		cnfEncoding.addAll(restrictAncestorRelAndEnforceReflexivity(typeAutomaton));
-		cnfEncoding.addAll(dataDependencyOverModules(typeAutomaton));
-		cnfEncoding.addAll(dataDependencyTransitivity(typeAutomaton));
+		/**
+		 * Encode reflexivity and transitivity of the relation.
+		 */
+		fullEncoding.addAll(relationalReflexivity(AtomType.R_RELATON,typeAutomaton));
+		fullEncoding.addAll(relationalTransitivity(AtomType.R_RELATON,typeAutomaton));
 		
-		return cnfEncoding;
+		
+		/**
+		 * Ancestor relation: 
+		 * - encode restrictions  
+		 * - preserve ancestor relation among tool I/O 
+		 * - preserve ancestor relation when data referencing 
+		 */
+		fullEncoding.addAll(restrictAncestorRelationDomain(typeAutomaton));
+		fullEncoding.addAll(dataDependencyOverModules(typeAutomaton));
+		fullEncoding.addAll(ancestorRelOverDataReferencing(typeAutomaton));
+		
+		return fullEncoding;
 	}
 	
-	
-	public static Set<SLTLxFormula> dataEquivalence(TypeAutomaton typeAutomaton) {
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+	/**
+	 * Function returns the encoding that ensures that identity relation (IS)
+	 * among data objects is preserved.
+	 * 
+	 * @param typeAutomaton - collection of states representing the data objects in the workflow
+	 * @return Set of SLTLx formulas that represent the constraints.
+	 */
+	public static Set<SLTLxFormula> identityRelationsDependency(TypeAutomaton typeAutomaton) {
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		
-		cnfEncoding.addAll(dataEquivalenceOverDataReferencing(typeAutomaton));
-//		TODO make sure each atom is equivalent to itself
+		/**
+		 * Encode that the relation in an identity.
+		 */
 		
-		return cnfEncoding;
+		fullEncoding.addAll(relationalIdentity(AtomType.IDENTITI_RELATION, typeAutomaton));
+		
+		return fullEncoding;
 	}
+	
 
+	
+	
 	/**
 	 * Generate constraints that ensure that the set of inputs correspond to the
 	 * tool specifications.<br>
@@ -123,7 +152,7 @@ public final class EnforceModuleRelatedRules {
 	 */
 	private static Set<SLTLxFormula> toolInputTypes(SATSynthesisEngine synthesisInstance) {
 
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		/* For each module.. */
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
 			/* ..which is a Tool.. */
@@ -148,7 +177,7 @@ public final class EnforceModuleRelatedRules {
 							/* Encode: if module was used in the module state
 							 * the corresponding data and format types need to be provided in input
 							 * states */
-							cnfEncoding.add(
+							fullEncoding.add(
 									new SLTLxImplication(
 												new SLTLxAtom(
 														AtomType.MODULE, 
@@ -159,7 +188,7 @@ public final class EnforceModuleRelatedRules {
 														currInputType, 
 														currInputState)));
 						} else {
-							cnfEncoding.add(
+							fullEncoding.add(
 									new SLTLxImplication(
 												new SLTLxAtom(
 														AtomType.MODULE, 
@@ -175,7 +204,7 @@ public final class EnforceModuleRelatedRules {
 			}
 		}
 
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	/**
@@ -188,7 +217,7 @@ public final class EnforceModuleRelatedRules {
 	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
 	private static Set<SLTLxFormula> dataReference(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
 		/* For each type instance */
 		for (TaxonomyPredicate currType : domainSetup.getAllTypes().getTypes()) {
@@ -197,8 +226,9 @@ public final class EnforceModuleRelatedRules {
 				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
 					for (State currUsedTypeState : currUsedBlock.getStates()) {
 						if (!currType.isEmptyPredicate()) {
-							/* ..the referenced memory state cannot be null.. */
-							cnfEncoding.add(
+							/* If the predicate is not empty
+							 * the referenced memory state cannot be null.. */
+							fullEncoding.add(
 									new SLTLxNegatedConjunction(
 												new SLTLxAtom(
 														AtomType.USED_TYPE, 
@@ -216,7 +246,7 @@ public final class EnforceModuleRelatedRules {
 									 * Pairs of referenced states have to be of the same types.
 									 */
 									
-									cnfEncoding.add(
+									fullEncoding.add(
 											new SLTLxImplication(
 													new SLTLxAtom(
 															AtomType.MEM_TYPE_REFERENCE, 
@@ -237,7 +267,7 @@ public final class EnforceModuleRelatedRules {
 							/* If the type is empty the referenced state has to be null. */
 						} else {
 							
-							cnfEncoding.add(
+							fullEncoding.add(
 									new SLTLxImplication(
 												new SLTLxAtom(
 														AtomType.USED_TYPE, 
@@ -254,7 +284,7 @@ public final class EnforceModuleRelatedRules {
 			}
 		}
 
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	/**
@@ -271,7 +301,7 @@ public final class EnforceModuleRelatedRules {
 	private static Set<SLTLxFormula> allowDataReferencing(TypeAutomaton typeAutomaton) {
 
 		// setting up input constraints (Shared Memory Approach)
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		/** For each input state... */
 		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
 			int blockNumber = currBlock.getBlockNumber();
@@ -286,12 +316,12 @@ public final class EnforceModuleRelatedRules {
 				for (State exictingMemState : possibleMemStates) {
 					allPossibilities.add(new SLTLxAtom(AtomType.MEM_TYPE_REFERENCE, exictingMemState, currInputState));
 				}
-				cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
+				fullEncoding.add(new SLTLxDisjunction(allPossibilities));
 				
 
 				/* Defining that each input can reference only one state in the shared memory */
 				for (Pair<PredicateLabel> pair : getPredicatePairs(possibleMemStates)) {
-					cnfEncoding.add(
+					fullEncoding.add(
 							new SLTLxNegatedConjunction(
 										new SLTLxAtom(
 												AtomType.MEM_TYPE_REFERENCE, 
@@ -310,7 +340,7 @@ public final class EnforceModuleRelatedRules {
 				 */
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
 					
-					cnfEncoding.add(
+					fullEncoding.add(
 							new SLTLxNegation(
 									new SLTLxAtom(
 										AtomType.MEM_TYPE_REFERENCE, 
@@ -320,39 +350,19 @@ public final class EnforceModuleRelatedRules {
 			}
 		}
 
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	/**
-	 * Generate constraints that ensure that R is reflexive and that the data instances cannot depend on
-	 * instances that are not available in memory.
+	 * Generate constraints that ensure the data objects cannot depend (have ancestors) on
+	 * data objects that are not available in memory. 
 	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> restrictAncestorRelAndEnforceReflexivity(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> restrictAncestorRelationDomain(TypeAutomaton typeAutomaton) {
 
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		
-		/**
-		 * For each state:
-		 */
-		for (Block currBlock : typeAutomaton.getAllBlocks()) {
-			for (State currState : currBlock.getStates()) {
-				/* State depends on itself */
-				cnfEncoding.add(
-							new SLTLxAtom(
-								AtomType.R_RELATON, 
-								currState,
-								currState));
-				/* ..and does not depend on the null state */ 
-			cnfEncoding.add(
-						new SLTLxNegation(
-								new SLTLxAtom(
-									AtomType.R_RELATON, 
-									currState,
-									typeAutomaton.getNullState())));
-			}
-		}
 		
 		/** For each used state... */
 		for (Block currBlock : typeAutomaton.getUsedTypesBlocks()) {
@@ -361,10 +371,10 @@ public final class EnforceModuleRelatedRules {
 
 				/*
 				 * Used state cannot depend on states that are yet to be created, i.e. not yet
-				 * in the shared memory.`
+				 * in the shared memory.
 				 */
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber)) {
-					cnfEncoding.add(
+					fullEncoding.add(
 							new SLTLxNegation(
 									new SLTLxAtom(
 										AtomType.R_RELATON, 
@@ -375,7 +385,7 @@ public final class EnforceModuleRelatedRules {
 				// Empty inputs have no data dependencies
 				for (State existingMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
 					/* !(input -> empty) ||  !R(mem,input) */
-					cnfEncoding.add(
+					fullEncoding.add(
 							new SLTLxNegatedConjunction(
 								new SLTLxAtom(
 										AtomType.MEM_TYPE_REFERENCE, 
@@ -402,7 +412,7 @@ public final class EnforceModuleRelatedRules {
 				 */
 				for (State nonExictingMemState : typeAutomaton.getMemoryStatesAfterBlockNo(blockNumber - 1)) {
 					if (!nonExictingMemState.equals(currMemState)) {
-						cnfEncoding.add(
+						fullEncoding.add(
 								new SLTLxNegation(
 										new SLTLxAtom(
 											AtomType.R_RELATON, 
@@ -412,19 +422,19 @@ public final class EnforceModuleRelatedRules {
 				}
 			}
 		}
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	/**
 	 * Generate constraints that ensure that tool inputs that reference data in
-	 * memory are the same data objects/instances (equivalent) as the referenced data.
+	 * memory are in ancestor relation (R) with the referenced data.
 	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> dataEquivalenceOverDataReferencing(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> ancestorRelOverDataReferencing(TypeAutomaton typeAutomaton) {
 
 		// setting up dependency constraints
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		/** For each input state... */
 		for (Block currInputBlock : typeAutomaton.getUsedTypesBlocks()) {
 			int blockNumber = currInputBlock.getBlockNumber();
@@ -434,24 +444,25 @@ public final class EnforceModuleRelatedRules {
 				 */
 					for (State availableMemState : typeAutomaton.getMemoryStatesUntilBlockNo(blockNumber)) {
 						/* If input references a memory, they are in ancestor relation
-						 *  (used -> mem) => IS(mem, used) */
-						cnfEncoding.add(
+						 *  (used -> mem) => R(mem, used) */
+						fullEncoding.add(
 								new SLTLxImplication(
 										new SLTLxAtom(
 												AtomType.MEM_TYPE_REFERENCE, 
 												availableMemState, 
 												currInputState),
 										new SLTLxAtom(
-												AtomType.TYPE_EQUIVALENCE, 
+												AtomType.R_RELATON, 
 												availableMemState,
 												currInputState)
 										));
 				}
 			}
 		}
-		return cnfEncoding;
+		return fullEncoding;
 	}
-
+	
+	
 	/**
 	 * Function returns the encoding that ensures that tool inputs and outputs are
 	 * preserving the ancestor relation (R). Outputs have to depend on inputs.
@@ -461,7 +472,7 @@ public final class EnforceModuleRelatedRules {
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	private static Set<SLTLxFormula> dataDependencyOverModules(TypeAutomaton typeAutomaton) {
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		/** For tool inputs and outputs */
 		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
 			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
@@ -472,7 +483,7 @@ public final class EnforceModuleRelatedRules {
 				
 				// .. the memory (output) state has all tool inputs as ancestors.
 				for (State currInputState : currInputBlock.getStates()) {
-					cnfEncoding.add(
+					fullEncoding.add(
 							new SLTLxAtom(
 									AtomType.R_RELATON, 
 									currInputState, 
@@ -480,47 +491,171 @@ public final class EnforceModuleRelatedRules {
 				}
 			}
 		}
-		return cnfEncoding;
+		return fullEncoding;
 	}
 	
 	/**
-	 * Function returns the encoding that ensures that the ancestor relation (R)
-	 * is transitive.f	
-	 *
+	 * Generate constraints that ensure that the relations (e.g., identity relation (IS)) are reflexive.
+	 * 
+	 * @param binRel - binary relation that is reflexive 
+	 * 
+	 * @return Set of SLTLx formulas that represent the constraints.
+	 */
+	private static Set<SLTLxFormula> relationalReflexivity(AtomType binRel, TypeAutomaton typeAutomaton) {
+
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+
+		/* Relation is reflexive for any state in the system. */
+		typeAutomaton.getAllStates()
+					.forEach(state -> {
+								/* Rel(state,state) */
+								fullEncoding.add(
+										new SLTLxAtom(
+												binRel, 
+												state, 
+												state)
+										);
+								/* ..no state is related to null state*/ 
+								fullEncoding.add(
+									new SLTLxNegation(
+											new SLTLxAtom(
+													binRel,
+												state,
+												typeAutomaton.getNullState())));
+			});
+		
+		return fullEncoding;
+	}
+	
+	/**
+	 * Generate constraints that ensure that the relations (e.g., identity relation (IS)) are an identity.
+	 * Forall X,Y IS(X,Y) IFF
+	 * 
+	 * @param binRel - binary relation that is reflexive 
+	 * 
+	 * @return Set of SLTLx formulas that represent the constraints.
+	 */
+	private static Set<SLTLxFormula> relationalIdentity(AtomType binRel, TypeAutomaton typeAutomaton) {
+
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+
+		/* Relation is reflexive for any state in the system. */
+		typeAutomaton.getAllStates()
+					.forEach(state1 -> {
+						/* ..no state is identical to null state*/ 
+						fullEncoding.add(
+							new SLTLxNegation(
+									new SLTLxAtom(
+											binRel,
+											state1,
+											typeAutomaton.getNullState())));
+						fullEncoding.add(
+								new SLTLxNegation(
+										new SLTLxAtom(
+												binRel,
+												typeAutomaton.getNullState(),
+												state1)));
+			typeAutomaton.getAllStates()
+						.forEach(state2 -> {
+							if(state1.equals(state2)) {
+								/* state=state -> IS(state,state) */
+								fullEncoding.add(
+										new SLTLxAtom(
+												binRel, 
+												state1, 
+												state2)
+										);
+							} else {
+								/* state1<>state2 then !IS(state1,state2) */
+								fullEncoding.add(
+										new SLTLxNegation(
+												new SLTLxAtom(
+														binRel, 
+														state1, 
+														state2)
+										));
+							}
+						});
+			});
+		
+		return fullEncoding;
+	}
+	
+	
+	/**
+	 * Function returns the encoding that ensures that the relation (e.g., ancestor relation (R)) is transitive.
+	 * 
+	 * @param binRel - relation that is transitive
 	 * @param typeAutomaton - system that represents states in the workflow
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> dataDependencyTransitivity(TypeAutomaton typeAutomaton) {
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+	private static Set<SLTLxFormula> relationalTransitivity(AtomType binRel, TypeAutomaton typeAutomaton) {
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		
-		/* Ancestor relation (R) is transitive for any 3 states in the system. */
+		/* Relation is transitive for any 3 states in the system. */
 		typeAutomaton.getAllMemoryTypesStates()
 					.forEach(state1 -> {
 			typeAutomaton.getAllMemoryTypesStates()
 						.forEach(state2 -> {
 				typeAutomaton.getAllMemoryTypesStates()
 							.forEach(state3 -> {
-						/* R(s1,s2) & R(s2,s3) => R(s1,s3) */
-						cnfEncoding.add(
-								new SLTLxImplication(
-										new SLTLxConjunction(
-											new SLTLxAtom(
-													AtomType.R_RELATON, 
-													state1, 
-													state2),
-											new SLTLxAtom(
-													AtomType.R_RELATON, 
-													state2, 
-													state3)),
-										new SLTLxAtom(
-												AtomType.R_RELATON, 
-												state1, 
-												state3))
-								);
+						/* Encode the transitivity.
+						 * E.g., R(s1,s2) & R(s2,s3) => R(s1,s3) */
+								fullEncoding.add(
+										new SLTLxImplication(
+												new SLTLxConjunction(
+													new SLTLxAtom(
+															binRel, 
+															state1, 
+															state2),
+													new SLTLxAtom(
+															binRel, 
+															state2, 
+															state3)),
+												new SLTLxAtom(
+														binRel, 
+														state1, 
+														state3))
+										);
 					});
 				});
 			});
-		return cnfEncoding;
+		return fullEncoding;
+	}
+	
+	/**
+	 * Function returns the encoding that ensures that 
+	 * the relation (e.g., identity relations (IS)) is symmetrical.
+	 * 
+	 * @param binRel - binary relation that is symmetrical
+	 * @param typeAutomaton - system that represents states in the workflow
+	 * @return Set of SLTLx formulas that represent the constraints.
+	 */
+	private static Set<SLTLxFormula> relationalSymmetry(AtomType binRel, TypeAutomaton typeAutomaton) {
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+		
+		/* Relation is symmetric for any 2 states in the system. */
+		typeAutomaton.getAllMemoryTypesStates()
+					.forEach(state1 -> {
+			typeAutomaton.getAllMemoryTypesStates()
+						.forEach(state2 -> {
+						/* Encode the symmetry.
+						 * E.g., IS(s1,s2) => IS(s2,s1) 
+						 */
+								fullEncoding.add(
+									new SLTLxImplication(
+												new SLTLxAtom(
+														binRel, 
+														state1, 
+														state2),
+											new SLTLxAtom(
+													binRel, 
+													state2, 
+													state1))
+									);
+						});
+			});
+		return fullEncoding;
 	}
 
 	/**
@@ -537,7 +672,7 @@ public final class EnforceModuleRelatedRules {
 
 		Type emptyType = synthesisInstance.getEmptyType();
 		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		/*
 		 * Setting up the constraints that ensure usage of the generated types in the
 		 * memory, (e.g. all workflow inputs and at least one of each of the tool
@@ -566,7 +701,7 @@ public final class EnforceModuleRelatedRules {
 										currMemoryState, 
 										inputState));
 						}
-						cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
+						fullEncoding.add(new SLTLxDisjunction(allPossibilities));
 					}
 					/* In case that at least one workflow input need to be used */
 				} else if (synthesisInstance.getConfig().getUseWorkflowInput() == ConfigEnum.ONE) {
@@ -587,7 +722,7 @@ public final class EnforceModuleRelatedRules {
 										inputState));
 						}
 					}
-					cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
+					fullEncoding.add(new SLTLxDisjunction(allPossibilities));
 				}
 				/* In case that none of the workflow input has to be used, do nothing. */
 			} else {
@@ -607,7 +742,7 @@ public final class EnforceModuleRelatedRules {
 										currMemoryState, 
 										inputState));
 						}
-						cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
+						fullEncoding.add(new SLTLxDisjunction(allPossibilities));
 					}
 					/*
 					 * In case that at least one of the generated data instances per tool need to be
@@ -631,14 +766,14 @@ public final class EnforceModuleRelatedRules {
 										inputState));
 						}
 					}
-					cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
+					fullEncoding.add(new SLTLxDisjunction(allPossibilities));
 				}
 				/* In case that none generated data has to be used do nothing. */
 
 			}
 		}
 
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	/**
@@ -652,7 +787,7 @@ public final class EnforceModuleRelatedRules {
 	 */
 	private static Set<SLTLxFormula> toolOutputTypes(SATSynthesisEngine synthesisInstance) {
 
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
 		// for each module
 		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
@@ -674,7 +809,7 @@ public final class EnforceModuleRelatedRules {
 							// require type and/or format to be used in one of the directly
 							// proceeding output states if it exists, otherwise use empty type
 							
-							cnfEncoding.add(
+							fullEncoding.add(
 									new SLTLxImplication(
 												new SLTLxAtom(
 														AtomType.MODULE, 
@@ -686,7 +821,7 @@ public final class EnforceModuleRelatedRules {
 														currOutputStates.get(i))));
 
 						} else {
-							cnfEncoding.add(
+							fullEncoding.add(
 									new SLTLxImplication(
 												new SLTLxAtom(
 														AtomType.MODULE, 
@@ -702,7 +837,7 @@ public final class EnforceModuleRelatedRules {
 			}
 		}
 
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	/**
@@ -718,11 +853,11 @@ public final class EnforceModuleRelatedRules {
 	
 	public static Set<SLTLxFormula> moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton) {
 
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
 		for (Pair<PredicateLabel> pair : allModules.getSimplePairs()) {
 			for (State moduleState : moduleAutomaton.getAllStates()) {
-				cnfEncoding.add(
+				fullEncoding.add(
 						new SLTLxNegatedConjunction(
 									new SLTLxAtom(
 											AtomType.MODULE, 
@@ -735,7 +870,7 @@ public final class EnforceModuleRelatedRules {
 			}
 		}
 
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	/**
@@ -748,11 +883,11 @@ public final class EnforceModuleRelatedRules {
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	public static Set<SLTLxFormula> moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton) {
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		
 		if (allModules.getModules().isEmpty()) {
 			System.err.println("No tools were I/O annotated.");
-			return cnfEncoding;
+			return fullEncoding;
 		}
 
 		for (State moduleState : moduleAutomaton.getAllStates()) {
@@ -767,10 +902,10 @@ public final class EnforceModuleRelatedRules {
 								moduleState));
 				}
 			}
-			cnfEncoding.add(new SLTLxDisjunction(allPossibilities));
+			fullEncoding.add(new SLTLxDisjunction(allPossibilities));
 		}
 
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	/**
@@ -788,11 +923,11 @@ public final class EnforceModuleRelatedRules {
 	public static Set<SLTLxFormula> moduleTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
 			ModuleAutomaton moduleAutomaton) {
 
-		Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		for (State moduleState : moduleAutomaton.getAllStates()) {
-			cnfEncoding.addAll(moduleTaxonomyStructureForState(allModules, currModule, moduleState));
+			fullEncoding.addAll(moduleTaxonomyStructureForState(allModules, currModule, moduleState));
 		}
-		return cnfEncoding;
+		return fullEncoding;
 	}
 
 	/**
@@ -807,10 +942,7 @@ public final class EnforceModuleRelatedRules {
 	private static Set<SLTLxFormula> moduleTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule, State moduleState) {
 		SLTLxAtom superModuleState = new SLTLxAtom(AtomType.MODULE, currModule, moduleState);
 
-		Set<SLTLxFormula> fullCNFEncoding = new HashSet<SLTLxFormula>();
-		Set<SLTLxFormula> currCNFEncoding = new HashSet<SLTLxFormula>();
-		currCNFEncoding.add(
-				new SLTLxNegation(superModuleState));
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
 		List<SLTLxAtom> subModulesStates = new ArrayList<SLTLxAtom>();
 		if (!(currModule.getSubPredicates() == null || currModule.getSubPredicates().isEmpty())) {
@@ -823,24 +955,30 @@ public final class EnforceModuleRelatedRules {
 							+ currModule.getSubPredicates().toString());
 				}
 				SLTLxAtom subModuleState = new SLTLxAtom(AtomType.MODULE,subModule, moduleState);
-				currCNFEncoding.add(subModuleState);
 				subModulesStates.add(subModuleState);
 				
-				fullCNFEncoding.addAll(moduleTaxonomyStructureForState(allModules, subModule, moduleState));
+				fullEncoding.addAll(moduleTaxonomyStructureForState(allModules, subModule, moduleState));
 			}
-			fullCNFEncoding.add(new SLTLxDisjunction(currCNFEncoding));
+			/*
+			 * Ensuring the TOP-DOWN taxonomy tree dependency
+			 */
+			fullEncoding.add(
+					new SLTLxImplication(
+							superModuleState, 
+							new SLTLxDisjunction(subModulesStates)
+					));
 			/*
 			 * Ensuring the BOTTOM-UP taxonomy tree dependency
 			 */
 			for (SLTLxAtom subModuleState : subModulesStates) {
-				fullCNFEncoding.add(
+				fullEncoding.add(
 						new SLTLxImplication(
 								subModuleState,
 								superModuleState));
 			}
 		}
 		
-		return fullCNFEncoding;
+		return fullEncoding;
 	}
 	
 

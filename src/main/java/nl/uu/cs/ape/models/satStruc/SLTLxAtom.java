@@ -138,10 +138,8 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
     public String toString() {
     	if(this.elementType.isUnaryProperty()) {
     		return predicate.getPredicateID() + "(" + argumentState.getPredicateID() + ")";
-    	} else if (this.elementType == AtomType.MEM_TYPE_REFERENCE) {
-            return "[" + predicate.getPredicateID() + "] <- (" + argumentState.getPredicateID() + ")";
-        } else if (this.elementType == AtomType.R_RELATON) {
-            return "R(" + predicate.getPredicateID() + "," + argumentState.getPredicateID() + ")";
+    	} else if(this.elementType.isBinaryRel()) {
+            return elementType.toString() + "(" + predicate.getPredicateID() + "," + argumentState.getPredicateID() + ")";
         } else {
         	return null;
         }

@@ -34,9 +34,9 @@ public enum AtomType {
     R_RELATON("r_rel"),
     
     /**
-     * Depicts data instances that are equal.
+     * This is a reflexive function, where X and Y are in relation IFF they are the same data object
      */
-    TYPE_EQUIVALENCE("typeEq");
+    IDENTITI_RELATION("is_rel");
     
 
 	
@@ -68,7 +68,7 @@ public enum AtomType {
 	  * @return {@code true} if it is a unary property, {@code false} otherwise. 
 	  */
 	 public boolean isBinaryRel() {
-		 if(this.equals(R_RELATON) | this.equals(MEM_TYPE_REFERENCE)) {
+		 if(this.equals(R_RELATON) | this.equals(MEM_TYPE_REFERENCE) | this.equals(IDENTITI_RELATION)) {
 			 return true;
 		 } else {
 			 return false;
@@ -96,7 +96,7 @@ public enum AtomType {
         	return "nullMem";
         }
         /** In case it is a element that should not have short string representation. */
-        return "NaN";
+        return "AtomType error.";
     }
 
 }

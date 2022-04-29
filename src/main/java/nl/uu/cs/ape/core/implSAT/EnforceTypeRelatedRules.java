@@ -51,7 +51,7 @@ public class EnforceTypeRelatedRules {
      */
    public static Set<SLTLxFormula> typeMutualExclusion(AllTypes allTypes, TypeAutomaton typeAutomaton) {
 
-        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+        Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
         PredicateLabel firstPair, secondPair;
         for (Pair<PredicateLabel> pair : allTypes.getTypePairsForEachSubTaxonomy()) {
             firstPair = pair.getFirst();
@@ -59,7 +59,7 @@ public class EnforceTypeRelatedRules {
             // mutual exclusion of types in all the states (those that represent general memory)
             for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
                 for (State memTypeState : typeBlock.getStates()) {
-                	cnfEncoding.add(
+                	fullEncoding.add(
     						new SLTLxNegatedConjunction(
     									new SLTLxAtom(
     											AtomType.MEMORY_TYPE, 
@@ -74,7 +74,7 @@ public class EnforceTypeRelatedRules {
             // mutual exclusion of types in all the states (those that represent used instances)
             for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
                 for (State usedTypeState : typeBlock.getStates()) {
-                	cnfEncoding.add(
+                	fullEncoding.add(
     						new SLTLxNegatedConjunction(
     									new SLTLxAtom(
     											AtomType.USED_TYPE, 
@@ -87,7 +87,7 @@ public class EnforceTypeRelatedRules {
                 }
             }
         }
-        return cnfEncoding;
+        return fullEncoding;
     }
 
     /**
@@ -100,14 +100,14 @@ public class EnforceTypeRelatedRules {
      * @return String representation of constraints.
      */
    public static Set<SLTLxFormula> typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
-        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+        Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
         Type empty = domainSetup.getAllTypes().getEmptyType();
         Type dataType = AuxTypePredicate.generateAuxiliaryPredicate(domainSetup.getAllTypes().getDataTaxonomyDimensionsAsSortedSet(), LogicOperation.AND, domainSetup);
         // enforcement of types in in all the states (those that represent general
         // memory and used data instances)
         for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
             for (State memTypeState : typeBlock.getStates()) {
-            	cnfEncoding.add(
+            	fullEncoding.add(
 						new SLTLxDisjunction(
 									new SLTLxAtom(
 											AtomType.MEMORY_TYPE, 
@@ -121,7 +121,7 @@ public class EnforceTypeRelatedRules {
         }
         for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
             for (State usedTypeState : typeBlock.getStates()) {
-            	cnfEncoding.add(
+            	fullEncoding.add(
 						new SLTLxDisjunction(
 									new SLTLxAtom(
 											AtomType.USED_TYPE, 
@@ -134,7 +134,7 @@ public class EnforceTypeRelatedRules {
             }
         }
 
-        return cnfEncoding;
+        return fullEncoding;
     }
 
     /**
@@ -148,22 +148,22 @@ public class EnforceTypeRelatedRules {
      * @return The String representation of constraints enforcing taxonomy classifications.
      */
    public static Set<SLTLxFormula> typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton) {
-        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+        Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
         // taxonomy enforcement of types in in all the states (those that represent
         // general memory and used data instances)
         for (TaxonomyPredicate dimension : allTypes.getRootPredicates()) {
             for (Block memTypeBlock : typeAutomaton.getMemoryTypesBlocks()) {
                 for (State memTypeState : memTypeBlock.getStates()) {
-                	cnfEncoding.addAll(typeEnforceTaxonomyStructureForState(dimension, memTypeState, AtomType.MEMORY_TYPE));
+                	fullEncoding.addAll(typeEnforceTaxonomyStructureForState(dimension, memTypeState, AtomType.MEMORY_TYPE));
                 }
             }
             for (Block usedTypeBlock : typeAutomaton.getUsedTypesBlocks()) {
                 for (State usedTypeState : usedTypeBlock.getStates()) {
-                	cnfEncoding.addAll(typeEnforceTaxonomyStructureForState(dimension, usedTypeState, AtomType.USED_TYPE));
+                	fullEncoding.addAll(typeEnforceTaxonomyStructureForState(dimension, usedTypeState, AtomType.USED_TYPE));
                 }
             }
         }
-        return cnfEncoding;
+        return fullEncoding;
     }
 
     /**
@@ -174,16 +174,12 @@ public class EnforceTypeRelatedRules {
      * @param typeElement - Current type element
      * @return Set of the corresponding SLTLx formulas
      */
-    private static Set<SLTLxFormula> typeEnforceTaxonomyStructureForState(TaxonomyPredicate currType,
+    private static Set<SLTLxFormula> typeEnforceTaxonomyStructureForState (TaxonomyPredicate currType,
                                                                 State typeState, AtomType typeElement) {
 
         SLTLxAtom superTypeState = new SLTLxAtom(typeElement, currType, typeState);
 
-        Set<SLTLxFormula> fullCNFEncoding = new HashSet<SLTLxFormula>();
-		Set<SLTLxFormula> currCNFEncoding = new HashSet<SLTLxFormula>();
-		
-		currCNFEncoding.add(
-				new SLTLxNegation(superTypeState));
+        Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
         List<SLTLxAtom> subTypesStates = new ArrayList<SLTLxAtom>();
         if (!(currType.getSubPredicates() == null || currType.getSubPredicates().isEmpty())) {
@@ -193,23 +189,29 @@ public class EnforceTypeRelatedRules {
             for (TaxonomyPredicate subType : currType.getSubPredicates()) {
 
             	SLTLxAtom subTypeState = new SLTLxAtom(typeElement, subType, typeState);
-            	currCNFEncoding.add(subTypeState);
             	subTypesStates.add(subTypeState);
 
-                fullCNFEncoding.addAll(typeEnforceTaxonomyStructureForState(subType, typeState, typeElement));
+                fullEncoding.addAll(typeEnforceTaxonomyStructureForState(subType, typeState, typeElement));
             }
-            fullCNFEncoding.add(new SLTLxDisjunction(currCNFEncoding));
+            /*
+			 * Ensuring the TOP-DOWN taxonomy tree dependency
+			 */
+			fullEncoding.add(
+					new SLTLxImplication(
+							superTypeState, 
+							new SLTLxDisjunction(subTypesStates)
+					));
             /*
              * Ensuring the BOTTOM-UP taxonomy tree dependency
              */
             for (SLTLxAtom subTypeState : subTypesStates) {
-            	fullCNFEncoding.add(
+            	fullEncoding.add(
 						new SLTLxImplication(
 								subTypeState,
 								superTypeState));
             }
         }
-        return fullCNFEncoding;
+        return fullEncoding;
     }
 
     /**
@@ -223,7 +225,7 @@ public class EnforceTypeRelatedRules {
      * @throws APEConfigException Exception thrown when one of the output types is not defined in the taxonomy.
      */
    public static Set<SLTLxFormula> workflowInputs(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton) throws APEConfigException {
-        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+        Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
         List<State> workflowInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
         for (int i = 0; i < workflowInputStates.size(); i++) {
@@ -233,21 +235,21 @@ public class EnforceTypeRelatedRules {
                     if (allTypes.get(currType.getPredicateID()) == null) {
                         throw APEConfigException.workflowIODataTypeNotInDomain(currType.getPredicateID());
                     }
-                    cnfEncoding.add(
+                    fullEncoding.add(
                     		new SLTLxAtom(
 									AtomType.MEMORY_TYPE, 
 									currType, 
 									currState));
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
-            	cnfEncoding.add(
+            	fullEncoding.add(
                 		new SLTLxAtom(
 								AtomType.MEMORY_TYPE, 
 								allTypes.getEmptyType(), 
 								currState));
             }
         }
-        return cnfEncoding;
+        return fullEncoding;
     }
 
     /**
@@ -261,7 +263,7 @@ public class EnforceTypeRelatedRules {
      * @throws APEConfigException Exception thrown when one of the output types is not defined in the taxonomy.
      */
    public static Set<SLTLxFormula> workdlowOutputs(AllTypes allTypes, List<Type> program_outputs, TypeAutomaton typeAutomaton) throws APEConfigException{
-        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+        Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
         List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
         for (int i = 0; i < workflowOutputStates.size(); i++) {
@@ -270,7 +272,7 @@ public class EnforceTypeRelatedRules {
                     if (allTypes.get(currType.getPredicateID()) == null) {
                         throw APEConfigException.workflowIODataTypeNotInDomain(currType.getPredicateID());
                         }
-                    cnfEncoding.add(
+                    fullEncoding.add(
                     		new SLTLxAtom(
 									AtomType.USED_TYPE, 
 									currType, 
@@ -278,7 +280,7 @@ public class EnforceTypeRelatedRules {
                     
             } else {
                 /* Forcing in the rest of the input states to be empty types. */
-            	cnfEncoding.add(
+            	fullEncoding.add(
                 		new SLTLxAtom(
 								AtomType.USED_TYPE, 
 								allTypes.getEmptyType(), 
@@ -287,6 +289,6 @@ public class EnforceTypeRelatedRules {
 
         }
 
-        return cnfEncoding;
+        return fullEncoding;
     }
 }
