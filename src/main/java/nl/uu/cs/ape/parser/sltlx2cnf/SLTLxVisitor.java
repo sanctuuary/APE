@@ -31,13 +31,6 @@ public interface SLTLxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUnaryModal(SLTLxParser.UnaryModalContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code boolean}
-	 * labeled alternative in {@link SLTLxParser#formula}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBoolean(SLTLxParser.BooleanContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code negUnary}
 	 * labeled alternative in {@link SLTLxParser#formula}.
 	 * @param ctx the parse tree
@@ -72,6 +65,13 @@ public interface SLTLxVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFunction(SLTLxParser.FunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code true}
+	 * labeled alternative in {@link SLTLxParser#formula}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTrue(SLTLxParser.TrueContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code exists}
 	 * labeled alternative in {@link SLTLxParser#formula}.

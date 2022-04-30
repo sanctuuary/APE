@@ -52,18 +52,6 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBoolean(SLTLxParser.BooleanContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBoolean(SLTLxParser.BooleanContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterNegUnary(SLTLxParser.NegUnaryContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -119,6 +107,18 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFunction(SLTLxParser.FunctionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTrue(SLTLxParser.TrueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTrue(SLTLxParser.TrueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

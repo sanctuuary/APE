@@ -226,7 +226,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
 //        		" (Exists (?x) G Forall (?y) true)"));
-    			"(G <'ArealInterpolationRate'(;)> G !<'ArealInterpolationRate'(;)> true)"));
+    			"G (<'Tool'(;)>  true | ! <'Tool'(;)> true)"));
 //    " (Exists (?x) Forall (?y) !R(?x,?y))"));
 //        		" (G Exists (?x) <'ZonalStatisticsMeanCount'(?x;)> G Forall (?y) <'ZonalStatisticsMeanCount'(?y;)> ! R(?x,?y))"));
 //    "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> F <'psxy_l'(?y;)> true))"));

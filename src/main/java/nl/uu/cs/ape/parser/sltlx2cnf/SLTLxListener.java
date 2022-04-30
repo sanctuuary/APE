@@ -42,18 +42,6 @@ public interface SLTLxListener extends ParseTreeListener {
 	 */
 	void exitUnaryModal(SLTLxParser.UnaryModalContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code boolean}
-	 * labeled alternative in {@link SLTLxParser#formula}.
-	 * @param ctx the parse tree
-	 */
-	void enterBoolean(SLTLxParser.BooleanContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code boolean}
-	 * labeled alternative in {@link SLTLxParser#formula}.
-	 * @param ctx the parse tree
-	 */
-	void exitBoolean(SLTLxParser.BooleanContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code negUnary}
 	 * labeled alternative in {@link SLTLxParser#formula}.
 	 * @param ctx the parse tree
@@ -113,6 +101,18 @@ public interface SLTLxListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunction(SLTLxParser.FunctionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code true}
+	 * labeled alternative in {@link SLTLxParser#formula}.
+	 * @param ctx the parse tree
+	 */
+	void enterTrue(SLTLxParser.TrueContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code true}
+	 * labeled alternative in {@link SLTLxParser#formula}.
+	 * @param ctx the parse tree
+	 */
+	void exitTrue(SLTLxParser.TrueContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code exists}
 	 * labeled alternative in {@link SLTLxParser#formula}.

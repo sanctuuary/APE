@@ -11,7 +11,7 @@ condition
    ;
    
 formula
-   : BOOL										# boolean
+   : TRUE										# true
    | LPAREN formula RPAREN						# brackets
    | formula BIN_CONNECTIVE formula 			# binaryBool	
    | NOT formula 								# negUnary
@@ -51,9 +51,8 @@ vars
    ;
 
   
-BOOL
+TRUE
    : 'true'
-   | 'false'
    ;
 
 LPAREN

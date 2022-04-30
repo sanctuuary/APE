@@ -7,7 +7,7 @@ null
 null
 null
 null
-null
+'true'
 '('
 ')'
 null
@@ -37,7 +37,7 @@ null
 BIN_CONNECTIVE
 UN_MODAL
 BIN_MODAL
-BOOL
+TRUE
 LPAREN
 RPAREN
 VARIABLE

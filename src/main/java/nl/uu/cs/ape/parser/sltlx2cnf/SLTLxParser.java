@@ -18,7 +18,7 @@ public class SLTLxParser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, BIN_CONNECTIVE=5, UN_MODAL=6, BIN_MODAL=7, 
-		BOOL=8, LPAREN=9, RPAREN=10, VARIABLE=11, CONSTANT=12, R_REL=13, SLTL_UNTIL=14, 
+		TRUE=8, LPAREN=9, RPAREN=10, VARIABLE=11, CONSTANT=12, R_REL=13, SLTL_UNTIL=14, 
 		SLTL_GLOBALLY=15, SLTL_FINALLY=16, SLTL_NEXT=17, OR=18, AND=19, IMPL=20, 
 		EQUIVALENT=21, EQUAL=22, NOT=23, EXISTS=24, FORALL=25, ENDLINE=26, WHITESPACE=27;
 	public static final int
@@ -32,8 +32,8 @@ public class SLTLxParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'<'", "'>'", "','", "';'", null, null, null, null, "'('", "')'", 
-			null, null, "'R'", "'U'", "'G'", "'F'", "'X'", "'|'", "'&'", "'->'", 
+			null, "'<'", "'>'", "','", "';'", null, null, null, "'true'", "'('", 
+			"')'", null, null, "'R'", "'U'", "'G'", "'F'", "'X'", "'|'", "'&'", "'->'", 
 			"'<->'", "'='", "'!'", "'Exists'", "'Forall'"
 		};
 	}
@@ -41,7 +41,7 @@ public class SLTLxParser extends Parser {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, null, null, "BIN_CONNECTIVE", "UN_MODAL", "BIN_MODAL", 
-			"BOOL", "LPAREN", "RPAREN", "VARIABLE", "CONSTANT", "R_REL", "SLTL_UNTIL", 
+			"TRUE", "LPAREN", "RPAREN", "VARIABLE", "CONSTANT", "R_REL", "SLTL_UNTIL", 
 			"SLTL_GLOBALLY", "SLTL_FINALLY", "SLTL_NEXT", "OR", "AND", "IMPL", "EQUIVALENT", 
 			"EQUAL", "NOT", "EXISTS", "FORALL", "ENDLINE", "WHITESPACE"
 		};
@@ -238,23 +238,6 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class BooleanContext extends FormulaContext {
-		public TerminalNode BOOL() { return getToken(SLTLxParser.BOOL, 0); }
-		public BooleanContext(FormulaContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterBoolean(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitBoolean(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitBoolean(this);
-			else return visitor.visitChildren(this);
-		}
-	}
 	public static class NegUnaryContext extends FormulaContext {
 		public TerminalNode NOT() { return getToken(SLTLxParser.NOT, 0); }
 		public FormulaContext formula() {
@@ -361,6 +344,23 @@ public class SLTLxParser extends Parser {
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitFunction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	public static class TrueContext extends FormulaContext {
+		public TerminalNode TRUE() { return getToken(SLTLxParser.TRUE, 0); }
+		public TrueContext(FormulaContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterTrue(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitTrue(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitTrue(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -471,14 +471,14 @@ public class SLTLxParser extends Parser {
 			setState(62);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case BOOL:
+			case TRUE:
 				{
-				_localctx = new BooleanContext(_localctx);
+				_localctx = new TrueContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
 				setState(25);
-				match(BOOL);
+				match(TRUE);
 				}
 				break;
 			case LPAREN:

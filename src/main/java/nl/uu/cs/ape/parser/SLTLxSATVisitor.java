@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import nl.uu.cs.ape.automaton.SLTLxVariable;
@@ -41,7 +40,6 @@ import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxLexer;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BinaryBoolContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BinaryModalContext;
-import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BooleanContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.BracketsContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.ConditionContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.ExistsContext;
@@ -51,6 +49,7 @@ import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.ModuleContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.NegUnaryContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.R_relationContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.ToolRefContext;
+import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.TrueContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.UnaryModalContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.VarEqContext;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -145,7 +144,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 
 
 	@Override
-	public SLTLxFormula visitBoolean(BooleanContext ctx) {
+	public SLTLxFormula visitTrue(TrueContext ctx) {
 		if(ctx.getChild(0).getText().equals("true")) {
 			return SLTLxAtom.getTrue();
 		} else {
