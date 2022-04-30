@@ -15,14 +15,14 @@ formula
    | LPAREN formula RPAREN						# brackets
    | formula BIN_CONNECTIVE formula 			# binaryBool	
    | NOT formula 								# negUnary
-   | FORALL LPAREN variable RPAREN formula 		# forall
-   | EXISTS LPAREN variable RPAREN formula		# exists
+   | FORALL LPAREN VARIABLE RPAREN formula 		# forall
+   | EXISTS LPAREN VARIABLE RPAREN formula		# exists
    | UN_MODAL formula							# unaryModal
    | '<' module '>' formula						# toolRef
    | formula BIN_MODAL formula					# binaryModal
-   | R_REL LPAREN variable ',' variable RPAREN	# r_relation
-   | constant '(' variable ')'					# function
-   | variable EQUAL variable					# varEq
+   | R_REL LPAREN VARIABLE ',' VARIABLE RPAREN	# r_relation
+   | CONSTANT '(' VARIABLE ')'					# function
+   | VARIABLE EQUAL VARIABLE					# varEq
    ;
    
 BIN_CONNECTIVE
@@ -43,11 +43,11 @@ BIN_MODAL
    ;
 
 module
-   : constant '(' vars ';' vars ')' 
+   : CONSTANT '(' vars ';' vars ')' 
    ;
 
 vars
-   : (variable ( ',' variable )*)?
+   : (VARIABLE ( ',' VARIABLE )*)?
    ;
 
   
@@ -63,14 +63,14 @@ RPAREN
    :')'
    ;
    
-variable
-   : '?' CHARACTER+
+VARIABLE
+   : '?'  ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '_')+
    ;
 
-constant
-   : '\'' CHARACTER+ '\''
+CONSTANT
+   : '\''  ('0' .. '9' | 'a' .. 'z' | 'A' .. 'Z' | '_')+ '\''
    ;
-
+   
 R_REL
    : 'R'
    ;
@@ -118,9 +118,6 @@ FORALL
    :'Forall'
    ;
    
-CHARACTER
-   : [0-9] | [a-z] | [A-Z] | '_'
-   ;
 
 ENDLINE
    :('\r'|'\n')+

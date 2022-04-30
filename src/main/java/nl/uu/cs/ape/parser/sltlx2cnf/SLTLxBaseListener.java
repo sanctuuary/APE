@@ -191,30 +191,6 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitVars(SLTLxParser.VarsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterVariable(SLTLxParser.VariableContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVariable(SLTLxParser.VariableContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterConstant(SLTLxParser.ConstantContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitConstant(SLTLxParser.ConstantContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

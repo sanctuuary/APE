@@ -218,6 +218,6 @@ public class SATAtomMappings implements Mappings {
      */
     public int getInitialNumOfMappedAtoms() {
         return auxMax + atomVarMaxNo + 1;
-    }
-	
+	}
+
 }

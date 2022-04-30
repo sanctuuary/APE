@@ -181,24 +181,4 @@ public interface SLTLxListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitVars(SLTLxParser.VarsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SLTLxParser#variable}.
-	 * @param ctx the parse tree
-	 */
-	void enterVariable(SLTLxParser.VariableContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SLTLxParser#variable}.
-	 * @param ctx the parse tree
-	 */
-	void exitVariable(SLTLxParser.VariableContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link SLTLxParser#constant}.
-	 * @param ctx the parse tree
-	 */
-	void enterConstant(SLTLxParser.ConstantContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link SLTLxParser#constant}.
-	 * @param ctx the parse tree
-	 */
-	void exitConstant(SLTLxParser.ConstantContext ctx);
 }
