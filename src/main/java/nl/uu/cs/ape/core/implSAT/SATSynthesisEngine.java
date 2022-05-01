@@ -188,7 +188,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Encode data ancestor relation (R) constraints.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.ancestorRelationsDependency(typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.ancestorRelationsDependency(this));
         
         /*
          * Encode data equivalence/identity relation (IS) constraints.
@@ -225,7 +225,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * Additional SLTLx constraints. TODO - provide a proper interface
          */
 //        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
-//        		" Exists (?x) Forall (?y) ?x=?y"));
+//        		" Exists (?x) 'LatticeRatioAVectorAIRA'(?x)"));
 //    			"X !<'Tool'(;)> true"));
 //    " (Exists (?x) Forall (?y) !R(?x,?y))"));
 //        		" (G Exists (?x) <'ZonalStatisticsMeanCount'(?x;)> G Forall (?y) <'ZonalStatisticsMeanCount'(?y;)> ! R(?x,?y))"));

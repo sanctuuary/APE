@@ -1,37 +1,31 @@
 package nl.uu.cs.ape.core.implSAT;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.Automaton;
 import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.models.AllModules;
-import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.enums.ConfigEnum;
-import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.enums.AtomVarType;
+import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SLTLxConjunction;
 import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
-import nl.uu.cs.ape.models.satStruc.SLTLxAtomVar;
+import nl.uu.cs.ape.models.satStruc.SLTLxConjunction;
+import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
 import nl.uu.cs.ape.models.satStruc.SLTLxEquivalence;
 import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
 import nl.uu.cs.ape.models.satStruc.SLTLxNegatedConjunction;
 import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
-import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
-import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
+import nl.uu.cs.ape.models.satStruc.SLTLxXOR;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -94,11 +88,13 @@ public final class EnforceModuleRelatedRules {
 	 * Function returns the encoding that ensures that ancestor relation (R)
 	 * among data objects is preserved.
 	 * 
-	 * @param typeAutomaton - collection of states representing the data objects in the workflow
+	 * @param synthesisInstance A specific synthesis run that contains all the
+	 *                          information specific for it.
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	public static Set<SLTLxFormula> ancestorRelationsDependency(TypeAutomaton typeAutomaton) {
+	public static Set<SLTLxFormula> ancestorRelationsDependency(SATSynthesisEngine synthesisInstance) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
 		
 		/**
 		 * Encode reflexivity and transitivity of the relation.
@@ -114,7 +110,7 @@ public final class EnforceModuleRelatedRules {
 		 * - preserve ancestor relation when data referencing 
 		 */
 		fullEncoding.addAll(restrictAncestorRelationDomain(typeAutomaton));
-		fullEncoding.addAll(dataDependencyOverModules(typeAutomaton));
+		fullEncoding.addAll(dataDependencyOverModules(synthesisInstance));
 		fullEncoding.addAll(ancestorRelOverDataReferencing(typeAutomaton));
 		
 		return fullEncoding;
@@ -467,27 +463,42 @@ public final class EnforceModuleRelatedRules {
 	 * Function returns the encoding that ensures that tool inputs and outputs are
 	 * preserving the ancestor relation (R). Outputs have to depend on inputs.
 	 *
-	 * @param typeAutomaton - system that represents states in the workflow
+	 * @param synthesisInstance A specific synthesis run that contains all the
+	 *                          information specific for it.
 	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> dataDependencyOverModules(TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> dataDependencyOverModules(SATSynthesisEngine synthesisInstance) {
+		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
 		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		/** For tool inputs and outputs */
 		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
 			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
 			Block currMemBlock = typeAutomaton.getMemoryTypesBlock(i + 1);
 
+			Type emptyType = synthesisInstance.getEmptyType();
 			// For each output state..
 			for (State currMemState : currMemBlock.getStates()) {
 				
-				// .. the memory (output) state has all tool inputs as ancestors.
+				// .. the memory (output) state has all tool inputs as ancestors, as long as none of them is empty
 				for (State currInputState : currInputBlock.getStates()) {
 					fullEncoding.add(
-							new SLTLxAtom(
-									AtomType.R_RELATON, 
-									currInputState, 
-									currMemState));
+							new SLTLxXOR(
+								new SLTLxAtom(
+										AtomType.R_RELATON, 
+										currInputState, 
+										currMemState),
+								new SLTLxDisjunction(
+										new SLTLxAtom(
+												AtomType.MEMORY_TYPE, 
+												emptyType, 
+												currMemState),
+										new SLTLxAtom(
+												AtomType.USED_TYPE, 
+												emptyType, 
+												currInputState)
+										)
+							));
 				}
 			}
 		}
