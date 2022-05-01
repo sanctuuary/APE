@@ -74,20 +74,10 @@ public class AuxTypePredicate extends Type implements AuxiliaryPredicate {
         return newAbsType;
     }
 
-    /**
-     * Gets logic operator used to group the abstracted predicates.
-     *
-     * @return the field {@link #logicOp}.
-     */
     public LogicOperation getLogicOp() {
         return logicOp;
     }
 
-    /**
-     * Return the list of {@link TaxonomyPredicate}s that are generalized over using the helper predicate.
-     *
-     * @return all {@link TaxonomyPredicate}s generalized over.
-     */
     public SortedSet<TaxonomyPredicate> getGeneralizedPredicates() {
         return this.containingPredicates;
     }

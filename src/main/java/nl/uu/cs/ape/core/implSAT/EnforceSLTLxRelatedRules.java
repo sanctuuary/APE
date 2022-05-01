@@ -73,13 +73,6 @@ public class EnforceSLTLxRelatedRules {
                      * disjointLabels has to be used.
                      */
                 	Set<SLTLxFormula> allORPossibilities = new HashSet<SLTLxFormula>();
-                	allORPossibilities.add(
-                			new SLTLxNegation(
-								new SLTLxAtom(
-									workflowElem, 
-									helperPredicate, 
-									currState)));
-
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                     	allORPossibilities.add(
 								new SLTLxAtom(
@@ -87,7 +80,12 @@ public class EnforceSLTLxRelatedRules {
 									subLabel, 
 									currState));
                     }
-                    cnfEncoding.add(new SLTLxDisjunction(allORPossibilities));
+                    cnfEncoding.add(new SLTLxImplication(
+							new SLTLxAtom(
+								workflowElem, 
+								helperPredicate, 
+								currState),
+                    		new SLTLxDisjunction(allORPossibilities)));
 
                     /*
                      * Ensures that if at least one of the disjointLabels was used, the abstract
@@ -108,7 +106,7 @@ public class EnforceSLTLxRelatedRules {
                 } else if (helperPredicate.getLogicOp() == LogicOperation.AND) {
 
                     /*
-                     * Ensures that if the abstract predicate is used, all of the disjointLabels
+                     * Ensures that if the abstract predicate is used, all of the conjointLabels
                      * have to be used.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
@@ -125,7 +123,7 @@ public class EnforceSLTLxRelatedRules {
                     }
 
                     /*
-                     * Ensures that if all of the disjointLabels were used, the abstract predicate
+                     * Ensures that if all of the conjointLabels were used, the abstract predicate
                      * has to be used as well.
                      */
                     Set<SLTLxFormula> allANDPossibilities = new HashSet<SLTLxFormula>();
@@ -143,6 +141,7 @@ public class EnforceSLTLxRelatedRules {
 								workflowElem, 
 								helperPredicate, 
 								currState));
+                    
                     
                     cnfEncoding.add(new SLTLxDisjunction(allANDPossibilities));
                 }

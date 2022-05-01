@@ -27,6 +27,7 @@ public class SLTLxNextOp extends SLTLxFormula {
 	@Override
 	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(synthesisEngine.getSolutionSize() <= stateNo)  {
+			
 			return SLTLxAtom.getFalse().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
  		}
 		

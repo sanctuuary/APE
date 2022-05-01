@@ -62,30 +62,39 @@ public class SLTLxOperation extends SLTLxFormula {
 		}
 		SLTLxAtom moduleRule = new SLTLxAtom(AtomType.MODULE, this.module, modulState);
 		
-		
-		Set<SLTLxFormula> allInputs = new HashSet<>();
-		for(SLTLxVariable inputVar : inputs) {
-			Set<SLTLxAtomVar> inputAtoms = new HashSet<>();
-			for(State inState : synthesisEngine.getTypeAutomaton().getUsedTypesBlock(stateNo).getStates()) {
-				inputAtoms.add(new SLTLxAtomVar(AtomVarType.VAR_VALUE, inState, inputVar));
+		SLTLxFormula inputsRule;
+		/* In case no inputs were specified, the input rule is true by default. */
+		if(inputs.isEmpty()) {
+			inputsRule = SLTLxAtom.getTrue();
+		} else {
+			Set<SLTLxFormula> allInputs = new HashSet<>();
+			for(SLTLxVariable inputVar : inputs) {
+				Set<SLTLxAtomVar> inputAtoms = new HashSet<>();
+				for(State inState : synthesisEngine.getTypeAutomaton().getUsedTypesBlock(stateNo).getStates()) {
+					inputAtoms.add(new SLTLxAtomVar(AtomVarType.VAR_VALUE, inState, inputVar));
+				}
+				SLTLxDisjunction currInputStates = new SLTLxDisjunction(inputAtoms);
+				allInputs.add(currInputStates);
 			}
-			SLTLxDisjunction currInputStates = new SLTLxDisjunction(inputAtoms);
-			allInputs.add(currInputStates);
+			inputsRule = new SLTLxConjunction(allInputs);
 		}
-		SLTLxConjunction inputsRule = new SLTLxConjunction(allInputs);
 		
-		
-		Set<SLTLxFormula> allOutputs = new HashSet<>();
-		for(SLTLxVariable outputVar : outputs) {
-			Set<SLTLxAtomVar> outputAtoms = new HashSet<>();
-			for(State outState : synthesisEngine.getTypeAutomaton().getMemoryTypesBlock(stateNo + 1).getStates()) {
-				outputAtoms.add(new SLTLxAtomVar(AtomVarType.VAR_VALUE, outState, outputVar));
+		SLTLxFormula outputsRule;
+		/* In case no outputs were specified, the output rule is true by default. */
+		if(outputs.isEmpty()) {
+			outputsRule = SLTLxAtom.getTrue();
+		} else {
+			Set<SLTLxFormula> allOutputs = new HashSet<>();
+			for(SLTLxVariable outputVar : outputs) {
+				Set<SLTLxAtomVar> outputAtoms = new HashSet<>();
+				for(State outState : synthesisEngine.getTypeAutomaton().getMemoryTypesBlock(stateNo + 1).getStates()) {
+					outputAtoms.add(new SLTLxAtomVar(AtomVarType.VAR_VALUE, outState, outputVar));
+				}
+				SLTLxDisjunction outputPossibilities = new SLTLxDisjunction(outputAtoms);
+				allOutputs.add(outputPossibilities);
 			}
-			SLTLxDisjunction outputPossibilities = new SLTLxDisjunction(outputAtoms);
-			allOutputs.add(outputPossibilities);
+			outputsRule = new SLTLxConjunction(allOutputs);
 		}
-		SLTLxConjunction outputsRule = new SLTLxConjunction(allOutputs);
-		
 		
 		return new SLTLxConjunction(moduleRule, inputsRule, outputsRule);
 	}

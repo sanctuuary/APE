@@ -130,8 +130,8 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
 		for(State state : getVariableDomain(stateNo, synthesisEngine)) {
 			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_VALUE, state, this);
-			SLTLxAtom emptyState = new SLTLxAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
-			varRefs.add(new SLTLxDisjunction(currAtomVar, emptyState));
+			SLTLxAtom currIsEmptyState = new SLTLxAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
+			varRefs.add(new SLTLxDisjunction(currAtomVar, currIsEmptyState));
 		}
 		SLTLxConjunction allVars = new SLTLxConjunction(varRefs);
 		
