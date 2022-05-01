@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.models.satStruc;
+package nl.uu.cs.ape.models.sltlxStruc;
 
 import java.util.HashMap;
 import java.util.Map;

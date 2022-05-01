@@ -18,8 +18,8 @@ import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
-import nl.uu.cs.ape.models.satStruc.SLTLxVariableOccuranceCollection;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccuranceCollection;
 import nl.uu.cs.ape.parser.SLTLxSATVisitor;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -224,8 +224,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Additional SLTLx constraints. TODO - provide a proper interface
          */
-//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
-//        		" Exists (?x) 'LatticeRatioAVectorAIRA'(?x)"));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
+        		" Exists (?x) Forall (?y) !R(?x,?y)"));
 //    			"X !<'Tool'(;)> true"));
 //    " (Exists (?x) Forall (?y) !R(?x,?y))"));
 //        		" (G Exists (?x) <'ZonalStatisticsMeanCount'(?x;)> G Forall (?y) <'ZonalStatisticsMeanCount'(?y;)> ! R(?x,?y))"));

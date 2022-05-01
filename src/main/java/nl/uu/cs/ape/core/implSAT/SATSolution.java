@@ -10,7 +10,7 @@ import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.satStruc.SLTLxLiteral;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxLiteral;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**

@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.models.satStruc;
+package nl.uu.cs.ape.models.sltlxStruc;
 
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;

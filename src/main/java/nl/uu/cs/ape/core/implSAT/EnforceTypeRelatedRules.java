@@ -17,12 +17,12 @@ import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
-import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
-import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
-import nl.uu.cs.ape.models.satStruc.SLTLxNegatedConjunction;
-import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
-import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxDisjunction;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxImplication;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegatedConjunction;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 
 /**

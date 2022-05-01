@@ -20,9 +20,9 @@ import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.NodeType;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxLiteral;
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
-import nl.uu.cs.ape.models.satStruc.SLTLxLiteral;
 import nl.uu.cs.ape.utils.APEUtils;
 
 import java.awt.image.BufferedImage;

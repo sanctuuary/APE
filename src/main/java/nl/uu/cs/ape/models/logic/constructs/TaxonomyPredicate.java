@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.AllPredicates;
 import nl.uu.cs.ape.models.enums.NodeType;
-import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**

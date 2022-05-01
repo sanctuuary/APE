@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.models.satStruc;
+package nl.uu.cs.ape.models.sltlxStruc;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 

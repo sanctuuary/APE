@@ -17,15 +17,15 @@ import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
-import nl.uu.cs.ape.models.satStruc.SLTLxConjunction;
-import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
-import nl.uu.cs.ape.models.satStruc.SLTLxEquivalence;
-import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
-import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
-import nl.uu.cs.ape.models.satStruc.SLTLxNegatedConjunction;
-import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
-import nl.uu.cs.ape.models.satStruc.SLTLxXOR;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxConjunction;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxDisjunction;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxEquivalence;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxImplication;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegatedConjunction;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxXOR;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -110,7 +110,7 @@ public final class EnforceModuleRelatedRules {
 		 * - preserve ancestor relation when data referencing 
 		 */
 		fullEncoding.addAll(restrictAncestorRelationDomain(typeAutomaton));
-		fullEncoding.addAll(dataDependencyOverModules(synthesisInstance));
+		fullEncoding.addAll(ancestorRelDependencyOverModules(synthesisInstance));
 		fullEncoding.addAll(ancestorRelOverDataReferencing(typeAutomaton));
 		
 		return fullEncoding;
@@ -468,7 +468,7 @@ public final class EnforceModuleRelatedRules {
 	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> dataDependencyOverModules(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> ancestorRelDependencyOverModules(SATSynthesisEngine synthesisInstance) {
 		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
 		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		/** For tool inputs and outputs */
@@ -604,11 +604,11 @@ public final class EnforceModuleRelatedRules {
 		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 		
 		/* Relation is transitive for any 3 states in the system. */
-		typeAutomaton.getAllMemoryTypesStates()
+		typeAutomaton.getAllStates()
 					.forEach(state1 -> {
-			typeAutomaton.getAllMemoryTypesStates()
+			typeAutomaton.getAllStates()
 						.forEach(state2 -> {
-				typeAutomaton.getAllMemoryTypesStates()
+				typeAutomaton.getAllStates()
 							.forEach(state3 -> {
 						/* Encode the transitivity.
 						 * E.g., R(s1,s2) & R(s2,s3) => R(s1,s3) */

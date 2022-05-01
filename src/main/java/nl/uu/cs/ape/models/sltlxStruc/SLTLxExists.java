@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.models.satStruc;
+package nl.uu.cs.ape.models.sltlxStruc;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,7 +28,7 @@ private SLTLxFormula formula;
 	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection curVarMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> clauses = new HashSet<CNFClause>();
 		SLTLxVariableSubstitutionCollection newVarMappping = new SLTLxVariableSubstitutionCollection(curVarMapping); 
-		SLTLxVariable flatBindedVariable = newVarMappping.addNewVariable(bindedVariable, bindedVariable.getVariableDomain(stateNo, synthesisEngine));
+		SLTLxVariable flatBindedVariable = newVarMappping.addNewVariable(bindedVariable, SLTLxVariable.getVariableDomain(stateNo, synthesisEngine));
 		
 		/** Encode the possible substitutions for the given variable. */
 		clauses.addAll(flatBindedVariable.getExistentialCNFEncoding(stateNo, newVarMappping, synthesisEngine));
@@ -45,7 +45,7 @@ private SLTLxFormula formula;
 	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection curVarMapping, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> clauses = new HashSet<CNFClause>();
 		SLTLxVariableSubstitutionCollection newVarMappping = new SLTLxVariableSubstitutionCollection(curVarMapping); 
-		SLTLxVariable flatBindedVariable = newVarMappping.addNewVariable(bindedVariable, bindedVariable.getVariableDomain(stateNo, synthesisEngine));
+		SLTLxVariable flatBindedVariable = newVarMappping.addNewVariable(bindedVariable, SLTLxVariable.getVariableDomain(stateNo, synthesisEngine));
 		
 		/** Encode the possible substitutions for the given variable. */
 		clauses.addAll(flatBindedVariable.getUniversalCNFEncoding(stateNo, newVarMappping, synthesisEngine));

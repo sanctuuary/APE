@@ -25,11 +25,11 @@ import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.satStruc.SLTLxAtom;
-import nl.uu.cs.ape.models.satStruc.SLTLxFormula;
-import nl.uu.cs.ape.models.satStruc.SLTLxImplication;
-import nl.uu.cs.ape.models.satStruc.SLTLxNegation;
-import nl.uu.cs.ape.models.satStruc.SLTLxDisjunction;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxDisjunction;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxImplication;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
 
 /**
  * The {@code APEDomainSetup} class is used to store the domain information and initial constraints that have to be encoded.
