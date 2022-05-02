@@ -161,20 +161,31 @@ public class SATAtomMappings implements Mappings {
      * @return Mapping of the atom.
      */
     public Integer findMapping(SLTLxAtom atom) {
-        return mappings.get(atom);
+        return this.mappings.get(atom);
     }
 
 
     /**
-     * Return the mapping value (Integer) for the<b>atom</b>.
-     * If the <b>atom</b> was not mapped it returns null.
+     * Return the <b>atom</b> for the mapping value (Integer).
+     * If the <b>integer</b> was not mapped it returns null.
      *
-     * @param mapping Integer mapping of the atom.
+     * @param mappedValue Integer mapping of the atom.
      * @return The original atom.
      */
-    public SLTLxAtom findOriginal(Integer mapping) {
-        return reverseMapping.get(mapping);
+    public SLTLxAtom findOriginal(Integer mappedValue) {
+        return this.reverseMapping.get(mappedValue);
     }
+    
+    /**
+     * Return the <b>atom with variables</b> for the mapping value (Integer).
+     * If the <b>integer</b> was not mapped it returns null.
+     *
+     * @param mappedValue Integer mapping of the atom.
+     * @return The original atom (which contains variables).
+     */
+    public SLTLxAtomVar findOriginalVar(Integer mappedValue) {
+    	 return this.vReverseMapping.get(mappedValue);
+	}
 
     /**
      * Gets atomNo.

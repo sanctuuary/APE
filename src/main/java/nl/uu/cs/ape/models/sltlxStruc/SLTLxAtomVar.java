@@ -191,14 +191,18 @@ public class SLTLxAtomVar extends SLTLxFormula {
 	 * @param synthesisEngine
 	 */
 	private void substituteVariables(SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		if(this.elementType.isUnaryProperty()) {
+		if (this.elementType.isUnaryProperty()) {
 			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
 			synthesisEngine.getVariableUsage().addUnaryPair(this.secondArg, this.firstArg);
-		} else if(!this.elementType.equals(AtomVarType.VAR_VALUE) && this.elementType.isBinaryRel()) {
+		} 
+		
+		else if (!this.elementType.equals(AtomVarType.VAR_VALUE) && this.elementType.isBinaryRel()) {
 			this.firstArg = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
 			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
 			synthesisEngine.getVariableUsage().addBinaryPair(new Pair<SLTLxVariable>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
-		} else if(this.elementType.equals(AtomVarType.VAR_VALUE)) {
+		} 
+		
+		else if (this.elementType.equals(AtomVarType.VAR_VALUE)) {
 			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
 		}
 		

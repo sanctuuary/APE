@@ -106,6 +106,9 @@ public class SATSolution extends SolutionInterpreter {
                         relevantElements.add(currLiteral);
                     }
                 }
+            } else if (mappedLiteral >= 100000) {
+                SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
+                literals.add(currLiteral);
             }
         }
         Collections.sort(relevantModules);
@@ -156,7 +159,7 @@ public class SATSolution extends SolutionInterpreter {
             solution = new StringBuilder("UNSAT");
         } else {
             for (SLTLxLiteral literal : literals) {
-                solution.append(literal.toString()).append(" ");
+                solution.append(literal.toString()).append("\n ");
             }
         }
         return solution.toString();

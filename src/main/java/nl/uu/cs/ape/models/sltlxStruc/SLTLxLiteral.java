@@ -1,5 +1,7 @@
 package nl.uu.cs.ape.models.sltlxStruc;
 
+import javax.annotation.processing.SupportedSourceVersion;
+
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.SATAtomMappings;
@@ -32,6 +34,9 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
      * The {@link SLTLxAtom} class represents elements of the workflow, that can be true or not (depending of the truth value of the literal).
      */
     private SLTLxAtom atom;
+    
+    /**  The {@link SLTLxAtomVar} class represents abstractions over elements of the workflow which contain variables, that can be true or not (depending of the truth value of the literal). */
+    private SLTLxAtomVar atomVar;
 
     /**
      * Generating an object from a mapped representation of the SLTLxLiteral.
@@ -50,6 +55,8 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
         }
 
         this.atom = atomMapping.findOriginal(mappedAtom);
+        this.atomVar = atomMapping.findOriginalVar(mappedAtom);
+        
     }
 
     /**
@@ -59,7 +66,7 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
      */
     public String toMappedString() {
         if (negated) {
-            return "-" + mappedAtom;
+            return "-" + mappedAtom.toString();
         } else {
             return mappedAtom.toString();
         }
@@ -74,7 +81,7 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
         if (negated) {
             return mappedAtom.toString();
         } else {
-            return "-" + mappedAtom;
+            return "-" + mappedAtom.toString();
         }
     }
 
@@ -207,11 +214,19 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
      * @return The value of the original literal
      */
     public String toString() {
-        if (negated) {
-            return "-" + atom.toString();
-        } else {
-            return atom.toString();
-        }
+    	if(atom != null) {
+	        if (negated) {
+	            return "-" + atom.toString();
+	        } else {
+	            return atom.toString();
+	        }
+    	} else {
+	        if (negated) {
+	            return "-" + atomVar.toString();
+	        } else {
+	            return atomVar.toString();
+	        }
+    	}
     }
 
 }

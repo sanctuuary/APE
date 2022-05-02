@@ -224,10 +224,11 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Additional SLTLx constraints. TODO - provide a proper interface
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
-        		" Exists (?x) Forall (?y) !R(?x,?y)"));
+//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
+//        		" Forall (?x) Exists (?y) R(?x,?y)"));
+//			    " Forall (?x) Exists (?y) R(?x,?y)"));
+//			    "Forall (?x) Exists (?y) R(?y,?x)"));
 //    			"X !<'Tool'(;)> true"));
-//    " (Exists (?x) Forall (?y) !R(?x,?y))"));
 //        		" (G Exists (?x) <'ZonalStatisticsMeanCount'(?x;)> G Forall (?y) <'ZonalStatisticsMeanCount'(?y;)> ! R(?x,?y))"));
 //    "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> F <'psxy_l'(?y;)> true))"));
 

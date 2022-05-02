@@ -108,8 +108,12 @@ public final class EnforceModuleRelatedRules {
 		 * - encode restrictions  
 		 * - preserve ancestor relation among tool I/O 
 		 * - preserve ancestor relation when data referencing 
+		 * - restrict that outputs can ONLY depend on inputs of the tool
+		 * ONLY
+		 * - restrict that empty types don't depend on anything
 		 */
 		fullEncoding.addAll(restrictAncestorRelationDomain(typeAutomaton));
+		fullEncoding.addAll(ancestorRelRestrictOverModules(synthesisInstance));
 		fullEncoding.addAll(ancestorRelDependencyOverModules(synthesisInstance));
 		fullEncoding.addAll(ancestorRelOverDataReferencing(typeAutomaton));
 		
@@ -499,6 +503,63 @@ public final class EnforceModuleRelatedRules {
 												currInputState)
 										)
 							));
+				}
+			}
+		}
+		return fullEncoding;
+	}
+	
+	/**
+	 * Function returns the encoding that ensures that tool outputs are only in the ancestor relation (R)
+	 * with the tool inputs (and their ancestors), and not any other data objects. Outputs can depend only on inputs.
+	 *
+	 * @param synthesisInstance A specific synthesis run that contains all the
+	 *                          information specific for it.
+	 * 
+	 * @return Set of SLTLx formulas that represent the constraints.
+	 */
+	private static Set<SLTLxFormula> ancestorRelRestrictOverModules(SATSynthesisEngine synthesisInstance) {
+		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
+		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+		Type emptyType = synthesisInstance.getEmptyType();
+		
+		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
+			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
+			Block currMemBlock = typeAutomaton.getMemoryTypesBlock(i + 1);
+			/** For each tool output.. */
+			for (State currMemState : currMemBlock.getStates()) {
+				/* ..(unless it is empty)..*/
+				SLTLxAtom outputEmpty = new SLTLxAtom(
+												AtomType.MEMORY_TYPE, 
+												emptyType, 
+												currMemState);
+				/* ..and an arbitrary element in the memory.. */
+				for(State existingType : typeAutomaton.getAllMemoryStatesUntilBlockNo(i)) {
+				
+				/* ..if the element from the memory is not ancestor of any of the inputs.. */
+					Set<SLTLxFormula> notInputAncestors = new HashSet<SLTLxFormula>();
+					for (State currInputState : currInputBlock.getStates()) {
+						notInputAncestors.add(
+								new SLTLxNegation(
+									new SLTLxAtom(
+											AtomType.R_RELATON, 
+											existingType, 
+											currInputState)));
+					}
+					/* .., it cannot be an ancestor of the output either (unless it is empty). */
+					fullEncoding.add(
+							new SLTLxDisjunction(
+									outputEmpty,
+									new SLTLxImplication(
+											new SLTLxConjunction(notInputAncestors),
+											new SLTLxNegation(
+												new SLTLxAtom(
+														AtomType.R_RELATON, 
+														existingType, 
+														currMemState)
+												)
+											)
+									));
 				}
 			}
 		}
