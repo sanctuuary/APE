@@ -24,12 +24,12 @@ private SLTLxFormula secondArg;
 }
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		return new SLTLxEquivalence(firstArg, secondArg).getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		return new SLTLxEquivalence(firstArg, secondArg).getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 

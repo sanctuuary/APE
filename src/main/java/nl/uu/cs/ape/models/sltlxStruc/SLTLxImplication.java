@@ -28,34 +28,34 @@ private SLTLxFormula thenFact;
 	}
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		
-		List<CNFClause> allClauses = new ArrayList<CNFClause>();
+		List<String> allClauses = new ArrayList<String>();
 
 		/* Add the elements of the if element of the implication.. */
 		allClauses.addAll(ifFact.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine));
-		Set<CNFClause> newClauses = thenFact.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
+		Set<String> newClauses = thenFact.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		/* .. and combine it with all the other elements of the then term. */
-		ListIterator<CNFClause> allClausesIt = allClauses.listIterator();
+		ListIterator<String> allClausesIt = allClauses.listIterator();
 		while (allClausesIt.hasNext()) {
 			  /* Remove the existing element .. */
-			  CNFClause existingClause = allClausesIt.next();
+			String existingClause = allClausesIt.next();
 			  allClausesIt.remove();
 			  
 			  /* ... and add all the combinations of that elements and the new elements. */
-			  for(CNFClause newClause : newClauses) {
+			  for(String newClause : newClauses) {
 				  allClausesIt.add(CNFClause.disjoin2Clauses(existingClause, newClause));
 			  }
 		  }
 		
-		Set<CNFClause> fullClauses = new HashSet<>();
+		Set<String> fullClauses = new HashSet<>();
 		fullClauses.addAll(allClauses);
 		return fullClauses;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> constraints = new HashSet<CNFClause>();
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+		Set<String> constraints = new HashSet<String>();
 		constraints.addAll(ifFact.getCNFEncoding(stateNo, variableMapping, synthesisEngine));
 		constraints.addAll(thenFact.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine));
 		return constraints;

@@ -26,11 +26,11 @@ private SLTLxFormula formulaUntil;
 }
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+		Set<Set<String>> allClauses = new HashSet<Set<String>>();
 		
 		
-		Set<CNFClause> clauses = new HashSet<>();
+		Set<String> clauses = new HashSet<>();
 //		for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {
 //			clauses.addAll(formula.getCNFEncoding(i, variableMapping, synthesisEngine));
 //		}
@@ -38,8 +38,8 @@ private SLTLxFormula formulaUntil;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> clauses = new HashSet<>();
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+		Set<String> clauses = new HashSet<>();
 		return clauses;
 	}
 

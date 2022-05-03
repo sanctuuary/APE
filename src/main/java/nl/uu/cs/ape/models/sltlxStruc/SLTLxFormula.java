@@ -33,25 +33,35 @@ public abstract class SLTLxFormula implements SLTLxElem {
 		APEUtils.printMemoryStatus(synthesisEngine.getConfig().getDebugMode());
 		StringBuilder cnf = new StringBuilder();
 		createCNFEncoding(formulas, 0, synthesisEngine)
-							.forEach(clause -> cnf.append(clause.toCNF()));
-		
+							.forEach(clause -> cnf.append(clause));
+		APEUtils.printMemoryStatus(synthesisEngine.getConfig().getDebugMode());
 		APEUtils.appendToFile(file, cnf.toString());
 	}
 	
+	
+	
 	/**
-	 * Create the CNF encoding of the facts and return the set of corresponding {@link CNFClause}s.
+	 * Create the CNF encoding of the facts and return the set of corresponding clauses in String format.
 	 * 
 	 * @param facts				- all facts that should be encoded
 	 * @param synthesisEngine	- synthesis engine used for encoding
-	 * @return Set of {@link CNFClause}s that encode the given collector of formulas.
+	 * @return Set of clauses in String format that encode the given collector of formulas.
 	 */
-	public static Set<CNFClause> createCNFEncoding(Collection<SLTLxFormula> facts, int stateNo, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> clauses = new HashSet<>();
-		facts.forEach(fact -> {
-			clauses.addAll(fact.getCNFEncoding(stateNo, new SLTLxVariableSubstitutionCollection(), synthesisEngine));
-			APEUtils.printMemoryStatus(synthesisEngine.getConfig().getDebugMode());
-		});
+	private static Set<String> createCNFEncoding(Collection<SLTLxFormula> facts, int stateNo, SATSynthesisEngine synthesisEngine) {
+		Set<String> clauses = new HashSet<String>();
+		facts.forEach(fact ->
+			clauses.addAll(fact.getCNFEncoding(stateNo, new SLTLxVariableSubstitutionCollection(), synthesisEngine))
+		);
 		return clauses;
+	}
+	
+	/**
+	 * Get string that represents the CNF encoding of the constraint. As the
+	 * @param synthesisEngine
+	 * @return
+	 */
+	public Set<String> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+		return this.getCNFEncoding(0, new SLTLxVariableSubstitutionCollection(), synthesisEngine);
 	}
 	
 }

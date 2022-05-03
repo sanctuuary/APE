@@ -25,8 +25,8 @@ private SLTLxFormula secondArg;
 }
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> allClauses = new HashSet<CNFClause>();
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+		Set<String> allClauses = new HashSet<String>();
 
 		/* Add the elements that represent the 2 way implication. */
 		allClauses.addAll(new SLTLxImplication(firstArg, secondArg).getCNFEncoding(stateNo, variableMapping, synthesisEngine));
@@ -36,8 +36,8 @@ private SLTLxFormula secondArg;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<CNFClause> allClauses = new HashSet<CNFClause>();
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+		Set<String> allClauses = new HashSet<String>();
 
 		/* Ensure that the 2 arguments are not the same. */
 		allClauses.addAll(new SLTLxDisjunction(firstArg, secondArg).getCNFEncoding(stateNo, variableMapping, synthesisEngine));

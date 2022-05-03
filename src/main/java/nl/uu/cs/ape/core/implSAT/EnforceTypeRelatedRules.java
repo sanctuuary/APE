@@ -44,14 +44,15 @@ public class EnforceTypeRelatedRules {
      * Generating the mutual exclusion for each pair of tools from @modules
      * (excluding abstract modules from the taxonomy) in each state
      * of @moduleAutomaton.
+     * @param satSynthesisEngine 
      * 
      * @param allTypes      - Collection of all the types in the domain.
      * @param typeAutomaton - System that represents states in the workflow
      * @return String representation of constraints.
      */
-   public static Set<SLTLxFormula> typeMutualExclusion(AllTypes allTypes, TypeAutomaton typeAutomaton) {
-
-        Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+   public static Set<String> typeMutualExclusion(SATSynthesisEngine satSynthesisEngine, AllTypes allTypes, TypeAutomaton typeAutomaton) {
+//	    Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+        Set<String> fullEncoding = new HashSet<String>();
         PredicateLabel firstPair, secondPair;
         for (Pair<PredicateLabel> pair : allTypes.getTypePairsForEachSubTaxonomy()) {	
             firstPair = pair.getFirst();
@@ -59,7 +60,7 @@ public class EnforceTypeRelatedRules {
             // mutual exclusion of types in all the states (those that represent general memory)
             for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
                 for (State memTypeState : typeBlock.getStates()) {
-                	fullEncoding.add(
+                	fullEncoding.addAll(
     						new SLTLxNegatedConjunction(
     									new SLTLxAtom(
     											AtomType.MEMORY_TYPE, 
@@ -68,13 +69,13 @@ public class EnforceTypeRelatedRules {
     									new SLTLxAtom(
     											AtomType.MEMORY_TYPE, 
     											secondPair, 
-    											memTypeState)));
+    											memTypeState)).getCNFEncoding(satSynthesisEngine));
                 }
             }
             // mutual exclusion of types in all the states (those that represent used instances)
             for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
                 for (State usedTypeState : typeBlock.getStates()) {
-                	fullEncoding.add(
+                	fullEncoding.addAll(
     						new SLTLxNegatedConjunction(
     									new SLTLxAtom(
     											AtomType.USED_TYPE, 
@@ -83,7 +84,7 @@ public class EnforceTypeRelatedRules {
     									new SLTLxAtom(
     											AtomType.USED_TYPE, 
     											secondPair, 
-    											usedTypeState)));
+    											usedTypeState)).getCNFEncoding(satSynthesisEngine));
                 }
             }
         }

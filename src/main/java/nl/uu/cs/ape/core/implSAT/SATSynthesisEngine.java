@@ -167,7 +167,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the types in the transition nodes (note: "empty type" is considered a type)
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
+//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
+        APEUtils.appendSetToFile(cnfEncoding, EnforceTypeRelatedRules.typeMutualExclusion(this, domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
         
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMandatoryUsage(domainSetup, typeAutomaton));

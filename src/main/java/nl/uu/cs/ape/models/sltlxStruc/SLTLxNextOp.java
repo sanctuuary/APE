@@ -25,13 +25,13 @@ public class SLTLxNextOp extends SLTLxFormula {
 
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(synthesisEngine.getSolutionSize() <= stateNo)  {
 			
 			return SLTLxAtom.getFalse().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
  		}
 		
-		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+		Set<Set<String>> allClauses = new HashSet<Set<String>>();
 
 		/* Conjunct the collection of clauses that encode the operation and the formula */
 		allClauses.add(operation.getCNFEncoding(stateNo, variableMapping, synthesisEngine));
@@ -41,11 +41,11 @@ public class SLTLxNextOp extends SLTLxFormula {
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(synthesisEngine.getSolutionSize() <= stateNo)  {
 			return SLTLxAtom.getTrue().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
  		}
-		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+		Set<Set<String>> allClauses = new HashSet<Set<String>>();
 
 		/* Disjunction the collection of clauses that encode the negation of the operation and of the formula */
 		allClauses.add(operation.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine));

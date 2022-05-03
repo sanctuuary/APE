@@ -33,7 +33,7 @@ public class SLTLxOperation extends SLTLxFormula {
 	}
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		
 		SLTLxFormula operationUsage = enforceOperation(stateNo, synthesisEngine);
 		
@@ -41,7 +41,7 @@ public class SLTLxOperation extends SLTLxFormula {
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		
 		SLTLxFormula operationModel = enforceOperation(stateNo, synthesisEngine);
 		

@@ -39,13 +39,13 @@ private Set<SLTLxFormula> conjunctedFacts;
 	}
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		/* Implement conjunction over an empty set rule. */
 		if(conjunctedFacts.isEmpty()) {
 			return SLTLxAtom.getTrue().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		}
 		
-		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+		Set<Set<String>> allClauses = new HashSet<Set<String>>();
 
 		/* Conjunct the collection of clauses that encode each of the conjuncted elements. */
 		for(SLTLxFormula formula : conjunctedFacts) {
@@ -55,13 +55,13 @@ private Set<SLTLxFormula> conjunctedFacts;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		/* Implement conjunction over an empty set rule. */
 		if(conjunctedFacts.isEmpty()) {
 			return SLTLxAtom.getFalse().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		}
 		
-		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+		Set<Set<String>> allClauses = new HashSet<Set<String>>();
 
 		/* Disjoint the collection of clauses that encode negatioNs of each of the disjoint elements. */
 		for(SLTLxFormula formula : conjunctedFacts) {

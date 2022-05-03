@@ -23,8 +23,8 @@ private SLTLxFormula formula;
 
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+		Set<Set<String>> allClauses = new HashSet<Set<String>>();
 
 		/* Conjunct the collection of clauses that encode the formula at each of the workflow steps. */
 		for(int i = stateNo; i <= synthesisEngine.getSolutionSize(); i++) {
@@ -34,8 +34,8 @@ private SLTLxFormula formula;
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		Set<Collection<CNFClause>> allClauses = new HashSet<Collection<CNFClause>>();
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+		Set<Set<String>> allClauses = new HashSet<Set<String>>();
 
 		/* Disjoint the collection of clauses that encode negation of the formula at each of the workflow steps. */
 		for(int i = stateNo; i <= synthesisEngine.getSolutionSize(); i++) {

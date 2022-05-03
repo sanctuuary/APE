@@ -196,21 +196,21 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
 	
 
 	@Override
-	public Set<CNFClause> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);
 			this.clause = new CNFClause(encoding);
 		}
-		return this.clause.createCNFEncoding(synthesisEngine);
+		return this.clause.toCNF();
 	}
 
 	@Override
-	public Set<CNFClause> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		if(this.clause == null) {
 			int encoding = synthesisEngine.getMappings().add(this);
 			this.clause = new CNFClause(encoding);
 		}
-		return this.clause.createNegatedCNFEncoding(synthesisEngine);
+		return this.clause.toNegatedCNF();
 	}
 
 }

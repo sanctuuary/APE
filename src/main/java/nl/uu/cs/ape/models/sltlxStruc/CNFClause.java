@@ -9,6 +9,7 @@ import java.util.ListIterator;
 import java.util.Set;
 
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The class represents a clause/fact used in the SAT encoding (CNF). 
@@ -46,8 +47,8 @@ public class CNFClause {
 	 * @param facts - collections of 'collections of clauses' that are conjunct
 	 * @return Set of {@link CNFClause}s that represent conjunction of the given collections of clauses.
 	 */
-	public static Set<CNFClause> conjunctClausesCollection(Collection<Collection<CNFClause>> facts) {
-		Set<CNFClause> allClauses = new HashSet<CNFClause>();
+	public static Set<String> conjunctClausesCollection(Set<Set<String>> facts) {
+		Set<String> allClauses = new HashSet<String>();
 		facts.forEach(col -> allClauses.addAll(col));
 		
 		return allClauses;
@@ -58,29 +59,29 @@ public class CNFClause {
 	 * @param facts - collections of 'collections of clauses' that are disjoint.
 	 * @return Set of {@link CNFClause}s that represent disjunction of the given collections of clauses.
 	 */
-	public static Set<CNFClause> disjoinClausesCollection(Collection<Collection<CNFClause>> facts) {
-		List<CNFClause> clausesList = new ArrayList<CNFClause>();
-		Iterator<Collection<CNFClause>> currDisjFact = facts.iterator();
+	public static Set<String> disjoinClausesCollection(Set<Set<String>> facts) {
+		List<String> clausesList = new ArrayList<String>();
+		Iterator<Set<String>> currDisjFact = facts.iterator();
 		
 		if (currDisjFact.hasNext()) {
 			clausesList.addAll(currDisjFact.next());
 		  while (currDisjFact.hasNext()) {
-			  Collection<CNFClause> newClauses = currDisjFact.next();
+			  Collection<String> newClauses = currDisjFact.next();
 			  /* .. and combine it with all the other elements. */
-			  ListIterator<CNFClause> allClausesIt = clausesList.listIterator();
+			  ListIterator<String> allClausesIt = clausesList.listIterator();
 			  while (allClausesIt.hasNext()) {
 				  /* Remove the existing element .. */
-				  CNFClause existingClause = allClausesIt.next();
+				  String existingClause = allClausesIt.next();
 				  allClausesIt.remove();
 				  
 				  /* ... and add all the combinations of that elements and the new elements. */
-				  for(CNFClause newClause : newClauses) {
+				  for(String newClause : newClauses) {
 					  allClausesIt.add(CNFClause.disjoin2Clauses(existingClause, newClause));
 				  }
 			  }
 		  }
 		}
-		Set<CNFClause> allClauses = new HashSet<CNFClause>();
+		Set<String> allClauses = new HashSet<String>();
 		allClauses.addAll(clausesList);
 		return allClauses;
 	}
@@ -92,11 +93,9 @@ public class CNFClause {
 	 * @param clause2 - 2nd clause that should be combined
 	 * @return
 	 */
-	public static CNFClause disjoin2Clauses(CNFClause clause1, CNFClause clause2) {
-		List<Integer> combinedAtoms = new ArrayList<Integer>();
-		clause1.atoms.forEach(existingAtom -> combinedAtoms.add(existingAtom));
-		clause2.atoms.forEach(newAtom -> combinedAtoms.add(newAtom));
-		return new CNFClause(combinedAtoms);
+	public static String disjoin2Clauses(String clause1, String clause2) {
+		String clause1Cleaned = clause1.substring(0, clause1.indexOf("0\n"));
+		return clause1Cleaned + clause2;
 	}
 	
 
@@ -116,12 +115,21 @@ public class CNFClause {
 	}
 	
 	
-	public String toCNF() {
+	public Set<String> toCNF() {
 		StringBuilder cnf = new StringBuilder();
 		atoms.forEach(elem -> cnf.append(elem + " "));
 		cnf.append("0\n");
 		
-		return cnf.toString();
+		Set<String> clauses = new HashSet<String>();
+		clauses.add(cnf.toString());
+		return clauses;
 	}
 	
+	public Set<String> toNegatedCNF() {
+		Set<String> clauses = new HashSet<String>();
+		atoms.forEach(elem -> clauses.add((-elem) + " 0\n"));
+		
+		return clauses;
+	}
+
 }

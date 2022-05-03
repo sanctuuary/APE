@@ -844,6 +844,22 @@ public final class APEUtils {
 		writer.close();
 	}
 	
+	/**
+	 * Append text to the existing file. It adds the text at the end of the content of the file.
+	 * @param file 		- 	existing file
+	 * @param content 	- content that should be appended
+	 * @throws IOException in case of an I/O error
+	 * @throws NullPointerException if the file is null
+	 */
+	public static void appendSetToFile(File file, Set<String> content) throws IOException, NullPointerException {
+		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
+		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
+		for(String str : content) {
+			writer.write(str);	
+		}
+		writer.close();
+	}
+	
 	
 	/**
 	 * Append text to the existing file. It adds the text at the end of the content of the file.
@@ -914,10 +930,9 @@ public final class APEUtils {
 		}
 		double currMemMB = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024/1024;
 		double totalMemMB = (Runtime.getRuntime().totalMemory())/1024/1024;
-		double oneCharValue = totalMemMB / 30;
-		
-		int currMemChars = (int) (currMemMB / oneCharValue);
-		int totalMemChars = (int) (totalMemMB / oneCharValue);
+		double oneCharValueMB = 100 ;
+		int currMemChars = (int) Math.ceil(currMemMB / oneCharValueMB);
+		int totalMemChars = (int) Math.ceil(totalMemMB / oneCharValueMB);
 		
 		StringBuilder memoryStatus = new StringBuilder();
 		IntStream.range(0, currMemChars).forEach(step -> memoryStatus.append("#"));

@@ -103,7 +103,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<CNFClause> getExistentialCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getExistentialCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
 		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
 		for(State state : getVariableDomain(stateNo, synthesisEngine)) {
 			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_VALUE, state, this);
@@ -127,7 +127,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<CNFClause> getUniversalCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getUniversalCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
 		/** Setting up the domain of the variable. */
 		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
 		for(State state : getVariableDomain(stateNo, synthesisEngine)) {
@@ -153,7 +153,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<CNFClause> getVariableSubstitutionToPresereProperties(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getVariableSubstitutionToPresereProperties(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
 		Set<SLTLxFormula> allFacts = new HashSet<>();
 		SLTLxVariableOccuranceCollection varOccurances = synthesisEngine.getVariableUsage(); 
 		
