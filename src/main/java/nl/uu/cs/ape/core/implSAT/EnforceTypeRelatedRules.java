@@ -53,7 +53,7 @@ public class EnforceTypeRelatedRules {
 
         Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
         PredicateLabel firstPair, secondPair;
-        for (Pair<PredicateLabel> pair : allTypes.getTypePairsForEachSubTaxonomy()) {
+        for (Pair<PredicateLabel> pair : allTypes.getTypePairsForEachSubTaxonomy()) {	
             firstPair = pair.getFirst();
             secondPair = pair.getSecond();
             // mutual exclusion of types in all the states (those that represent general memory)

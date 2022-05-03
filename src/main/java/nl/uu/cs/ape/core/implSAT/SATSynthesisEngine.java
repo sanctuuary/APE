@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * The {@code SATSynthesisEngine} class represents a <b>synthesis instance</b>,
@@ -168,7 +167,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the types in the transition nodes (note: "empty type" is considered a type)
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
         
@@ -225,9 +223,10 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * Additional SLTLx constraints. TODO - provide a proper interface
          */
 //        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
-//        		" Forall (?x) Exists (?y) R(?x,?y)"));
+//        		" G !<'ArealInterpolationRate'(;)> true | !  X F <'ArealInterpolationRate'(;)> true"));
+//        		"G ((<'ArealInterpolationRate'(;)> true) -> !  X F <'ArealInterpolationRate'(;)> true)"));
+//    			"G Forall (?x1) (<'Transform'(?x1;)> true) -> X G Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2)))"));
 //			    " Forall (?x) Exists (?y) R(?x,?y)"));
-//			    "Forall (?x) Exists (?y) R(?y,?x)"));
 //    			"X !<'Tool'(;)> true"));
 //        		" (G Exists (?x) <'ZonalStatisticsMeanCount'(?x;)> G Forall (?y) <'ZonalStatisticsMeanCount'(?y;)> ! R(?x,?y))"));
 //    "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> F <'psxy_l'(?y;)> true))"));

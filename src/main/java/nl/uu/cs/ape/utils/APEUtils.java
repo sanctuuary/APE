@@ -17,6 +17,7 @@ import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.sltlxStruc.CNFClause;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 
 import java.io.*;
@@ -24,6 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * The {@link APEUtils} class is used for storing {@code Static} methods.
@@ -842,6 +844,25 @@ public final class APEUtils {
 		writer.close();
 	}
 	
+	
+	/**
+	 * Append text to the existing file. It adds the text at the end of the content of the file.
+	 * @param file 		- 	existing file
+	 * @param cnfEncoding 	- cnf clauses that should be appended 
+	 * @throws IOException in case of an I/O error
+	 * @throws NullPointerException if the file is null
+	 */
+	public static void appendToFile(File file, Set<CNFClause> cnfEncoding) throws IOException, NullPointerException {
+		StringBuilder string = new StringBuilder();
+		cnfEncoding.forEach(clause -> {
+				string.append(clause.toCNF());
+		});
+		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
+		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
+		writer.write(string.toString());
+		writer.close();
+	}
+	
 	/**
 	 * Prepend text to the existing file content and create a new file out of it.
 	 * It adds the text at the beginning, before the existing content of the file.
@@ -881,5 +902,28 @@ public final class APEUtils {
 			e.printStackTrace();
 		}
 		return lines;
+	}
+
+	/**
+	 *  Visualises in the command line the memory status of the VM at the given step, if debug mode is on.
+	 * @param debugMode - true if debug mode is on
+	 */
+	public static void printMemoryStatus(boolean debugMode) {
+		if (!debugMode) {
+			return;
+		}
+		double currMemMB = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024/1024;
+		double totalMemMB = (Runtime.getRuntime().totalMemory())/1024/1024;
+		double oneCharValue = totalMemMB / 30;
+		
+		int currMemChars = (int) (currMemMB / oneCharValue);
+		int totalMemChars = (int) (totalMemMB / oneCharValue);
+		
+		StringBuilder memoryStatus = new StringBuilder();
+		IntStream.range(0, currMemChars).forEach(step -> memoryStatus.append("#"));
+		IntStream.range(currMemChars, totalMemChars).forEach(step -> memoryStatus.append(" "));
+		 System.out.print("Memory:\n"
+		 		+ "[" + memoryStatus.toString()+ "]\t" + totalMemMB + "\tMB\n");
+		
 	}
 }

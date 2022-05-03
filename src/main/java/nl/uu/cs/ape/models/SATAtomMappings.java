@@ -86,7 +86,7 @@ public class SATAtomMappings implements Mappings {
      * @param elementType Element that defines what type of a predicate is described (such as {@link SMTDataType#MODULE}.
      * @return Mapping number of the atom (number is always &gt; 0).
      */
-    public Integer add(PredicateLabel predicate, State usedInState, AtomType elementType) throws MappingsException {
+    public synchronized Integer add(PredicateLabel predicate, State usedInState, AtomType elementType) throws MappingsException {
         SLTLxAtom atom = new SLTLxAtom(elementType, predicate, usedInState);
 
         Integer id;
@@ -110,7 +110,7 @@ public class SATAtomMappings implements Mappings {
      * @param atom   atom that is added
      * @return Mapping number of the atom (number is always &gt; 0).
      */
-    public Integer add(SLTLxAtom atom) throws MappingsException {
+    public synchronized Integer add(SLTLxAtom atom) throws MappingsException {
 
         Integer id;
         if ((id = mappings.get(atom)) == null) {
@@ -135,7 +135,7 @@ public class SATAtomMappings implements Mappings {
      * @param atomVar   atom containing variable(s) that is added
      * @return Mapping number of the atom (number is always &gt; 0).
      */
-    public Integer add(SLTLxAtomVar atomVar) throws MappingsException {
+    public synchronized Integer add(SLTLxAtomVar atomVar) throws MappingsException {
 
         Integer id;
         if ((id = vMappings.get(atomVar)) == null) {

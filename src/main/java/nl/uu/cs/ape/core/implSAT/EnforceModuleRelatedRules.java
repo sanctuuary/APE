@@ -930,15 +930,17 @@ public final class EnforceModuleRelatedRules {
 		for (Pair<PredicateLabel> pair : allModules.getSimplePairs()) {
 			for (State moduleState : moduleAutomaton.getAllStates()) {
 				fullEncoding.add(
-						new SLTLxNegatedConjunction(
+						new SLTLxDisjunction(
+								new SLTLxNegation(
 									new SLTLxAtom(
 											AtomType.MODULE, 
 											pair.getFirst(), 
-											moduleState),
+											moduleState)),
+								new SLTLxNegation(
 									new SLTLxAtom(
 											AtomType.MODULE, 
 											pair.getSecond(), 
-											moduleState)));
+											moduleState))));
 			}
 		}
 

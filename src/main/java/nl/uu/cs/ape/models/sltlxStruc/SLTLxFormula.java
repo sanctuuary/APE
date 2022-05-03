@@ -27,9 +27,10 @@ public abstract class SLTLxFormula implements SLTLxElem {
 	 * @param file - existing cnf file
 	 * @param synthesisEngine synthesis engine used for encoding
 	 * @param formulas - collection of formulas that should be encoded
-	 * @throws IOException  in case of an I/O error
+	 * @throws IOException Thrown in case of an I/O error.
 	 */
 	public static void appendCNFToFile(File file, SATSynthesisEngine synthesisEngine,  Collection<SLTLxFormula> formulas) throws IOException {
+		APEUtils.printMemoryStatus(synthesisEngine.getConfig().getDebugMode());
 		StringBuilder cnf = new StringBuilder();
 		createCNFEncoding(formulas, 0, synthesisEngine)
 							.forEach(clause -> cnf.append(clause.toCNF()));
@@ -46,8 +47,10 @@ public abstract class SLTLxFormula implements SLTLxElem {
 	 */
 	public static Set<CNFClause> createCNFEncoding(Collection<SLTLxFormula> facts, int stateNo, SATSynthesisEngine synthesisEngine) {
 		Set<CNFClause> clauses = new HashSet<>();
-		facts.forEach(fact -> clauses.addAll(fact.getCNFEncoding(stateNo, new SLTLxVariableSubstitutionCollection(), synthesisEngine)));
-		
+		facts.forEach(fact -> {
+			clauses.addAll(fact.getCNFEncoding(stateNo, new SLTLxVariableSubstitutionCollection(), synthesisEngine));
+			APEUtils.printMemoryStatus(synthesisEngine.getConfig().getDebugMode());
+		});
 		return clauses;
 	}
 	
