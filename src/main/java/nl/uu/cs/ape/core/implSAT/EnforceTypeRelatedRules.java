@@ -41,55 +41,88 @@ public class EnforceTypeRelatedRules {
     }
 
     /**
-     * Generating the mutual exclusion for each pair of tools from @modules
+     * Generating the mutual exclusion for the pair of tools from @modules
      * (excluding abstract modules from the taxonomy) in each state
      * of @moduleAutomaton.
      * @param satSynthesisEngine 
      * 
-     * @param allTypes      - Collection of all the types in the domain.
+     * @param pair      - pair of types from a dimension.
      * @param typeAutomaton - System that represents states in the workflow
      * @return String representation of constraints.
      */
-   public static Set<String> typeMutualExclusion(SATSynthesisEngine satSynthesisEngine, AllTypes allTypes, TypeAutomaton typeAutomaton) {
-//	    Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
-        Set<String> fullEncoding = new HashSet<String>();
-        PredicateLabel firstPair, secondPair;
-        for (Pair<PredicateLabel> pair : allTypes.getTypePairsForEachSubTaxonomy()) {	
-            firstPair = pair.getFirst();
-            secondPair = pair.getSecond();
-            // mutual exclusion of types in all the states (those that represent general memory)
-            for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
-                for (State memTypeState : typeBlock.getStates()) {
-                	fullEncoding.addAll(
-    						new SLTLxNegatedConjunction(
-    									new SLTLxAtom(
-    											AtomType.MEMORY_TYPE, 
-    											firstPair, 
-    											memTypeState),
-    									new SLTLxAtom(
-    											AtomType.MEMORY_TYPE, 
-    											secondPair, 
-    											memTypeState)).getCNFEncoding(satSynthesisEngine));
-                }
-            }
-            // mutual exclusion of types in all the states (those that represent used instances)
-            for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
-                for (State usedTypeState : typeBlock.getStates()) {
-                	fullEncoding.addAll(
-    						new SLTLxNegatedConjunction(
-    									new SLTLxAtom(
-    											AtomType.USED_TYPE, 
-    											firstPair, 
-    											usedTypeState),
-    									new SLTLxAtom(
-    											AtomType.USED_TYPE, 
-    											secondPair, 
-    											usedTypeState)).getCNFEncoding(satSynthesisEngine));
-                }
+   public static Set<SLTLxFormula> typeMutualExclusion(Pair<PredicateLabel> pair, TypeAutomaton typeAutomaton) {
+	    Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+//        Set<String> fullEncoding = new HashSet<String>();
+    	PredicateLabel firstPair = pair.getFirst();
+    	PredicateLabel secondPair = pair.getSecond();
+        // mutual exclusion of types in all the states (those that represent general memory)
+        for (Block typeBlock : typeAutomaton.getMemoryTypesBlocks()) {
+            for (State memTypeState : typeBlock.getStates()) {
+            	fullEncoding.add(
+						new SLTLxNegatedConjunction(
+									new SLTLxAtom(
+											AtomType.MEMORY_TYPE, 
+											firstPair, 
+											memTypeState),
+									new SLTLxAtom(
+											AtomType.MEMORY_TYPE, 
+											secondPair, 
+											memTypeState)));
             }
         }
+        // mutual exclusion of types in all the states (those that represent used instances)
+//        for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
+//            for (State usedTypeState : typeBlock.getStates()) {
+//            	fullEncoding.add(
+//						new SLTLxNegatedConjunction(
+//									new SLTLxAtom(
+//											AtomType.USED_TYPE, 
+//											firstPair, 
+//											usedTypeState),
+//									new SLTLxAtom(
+//											AtomType.USED_TYPE, 
+//											secondPair, 
+//											usedTypeState)));
+//            }
+//        }
         return fullEncoding;
     }
+   
+   
+   /**
+    * Generating the mutual exclusion for the pair of tools from @modules
+    * (excluding abstract modules from the taxonomy) in each state
+    * of @moduleAutomaton.
+    * @param satSynthesisEngine 
+    * 
+    * @param pair      - pair of types from a dimension.
+    * @param typeAutomaton - System that represents states in the workflow
+    * @return String representation of constraints.
+    */
+  public static Set<SLTLxFormula> typeMutualExclusion2(Pair<PredicateLabel> pair, TypeAutomaton typeAutomaton) {
+	    Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+//       Set<String> fullEncoding = new HashSet<String>();
+   	PredicateLabel firstPair = pair.getFirst();
+   	PredicateLabel secondPair = pair.getSecond();
+       // mutual exclusion of types in all the states (those that represent general memory)
+       // mutual exclusion of types in all the states (those that represent used instances)
+       for (Block typeBlock : typeAutomaton.getUsedTypesBlocks()) {
+           for (State usedTypeState : typeBlock.getStates()) {
+           	fullEncoding.add(
+						new SLTLxNegatedConjunction(
+									new SLTLxAtom(
+											AtomType.USED_TYPE, 
+											firstPair, 
+											usedTypeState),
+									new SLTLxAtom(
+											AtomType.USED_TYPE, 
+											secondPair, 
+											usedTypeState)));
+           }
+       }
+       return fullEncoding;
+   }
+   
 
     /**
      * Generating the mandatory usage constraints of root type @rootType in each

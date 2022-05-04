@@ -20,14 +20,16 @@ private Set<SLTLxFormula> disjointFacts;
 	public SLTLxDisjunction(SLTLxFormula arg1, SLTLxFormula arg2) {
 		super();
 		this.disjointFacts = new HashSet<SLTLxFormula>();
-		this.disjointFacts.add(arg1);
-		this.disjointFacts.add(arg2);
+		if(arg1 != null) this.disjointFacts.add(arg1);
+		if(arg2 != null) this.disjointFacts.add(arg2);
 	}
 
 	public SLTLxDisjunction(Collection<? extends SLTLxFormula> conjunctedFacts) {
 		super();
 		this.disjointFacts = new HashSet<SLTLxFormula>();
-		conjunctedFacts.forEach(fact -> this.disjointFacts.add(fact));
+		conjunctedFacts.forEach(fact -> {
+			if(fact != null) this.disjointFacts.add(fact);
+		});
 	}
 
 	@Override

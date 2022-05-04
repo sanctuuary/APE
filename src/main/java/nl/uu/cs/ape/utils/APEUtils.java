@@ -576,6 +576,8 @@ public final class APEUtils {
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
 		System.out.println(printString + " setup time: " + (printTime / 1000F) + " sec.");
 		timers.put(timerID, System.currentTimeMillis());
+		
+//		APEUtils.printMemoryStatus(true);
 	}
 
 	/**
@@ -937,8 +939,7 @@ public final class APEUtils {
 		StringBuilder memoryStatus = new StringBuilder();
 		IntStream.range(0, currMemChars).forEach(step -> memoryStatus.append("#"));
 		IntStream.range(currMemChars, totalMemChars).forEach(step -> memoryStatus.append(" "));
-		 System.out.print("Memory:\n"
-		 		+ "[" + memoryStatus.toString()+ "]\t" + totalMemMB + "\tMB\n");
+		 System.out.print("\n[" + memoryStatus.toString()+ "]\t" + totalMemMB + "\tMB \r");
 		
 	}
 }

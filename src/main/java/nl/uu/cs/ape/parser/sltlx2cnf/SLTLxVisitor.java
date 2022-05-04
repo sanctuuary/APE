@@ -52,19 +52,19 @@ public interface SLTLxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBinaryBool(SLTLxParser.BinaryBoolContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code forall}
-	 * labeled alternative in {@link SLTLxParser#formula}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitForall(SLTLxParser.ForallContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code function}
 	 * labeled alternative in {@link SLTLxParser#formula}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitFunction(SLTLxParser.FunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code forall}
+	 * labeled alternative in {@link SLTLxParser#formula}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForall(SLTLxParser.ForallContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code true}
 	 * labeled alternative in {@link SLTLxParser#formula}.

@@ -78,18 +78,6 @@ public interface SLTLxListener extends ParseTreeListener {
 	 */
 	void exitBinaryBool(SLTLxParser.BinaryBoolContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code forall}
-	 * labeled alternative in {@link SLTLxParser#formula}.
-	 * @param ctx the parse tree
-	 */
-	void enterForall(SLTLxParser.ForallContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code forall}
-	 * labeled alternative in {@link SLTLxParser#formula}.
-	 * @param ctx the parse tree
-	 */
-	void exitForall(SLTLxParser.ForallContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code function}
 	 * labeled alternative in {@link SLTLxParser#formula}.
 	 * @param ctx the parse tree
@@ -101,6 +89,18 @@ public interface SLTLxListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunction(SLTLxParser.FunctionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code forall}
+	 * labeled alternative in {@link SLTLxParser#formula}.
+	 * @param ctx the parse tree
+	 */
+	void enterForall(SLTLxParser.ForallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code forall}
+	 * labeled alternative in {@link SLTLxParser#formula}.
+	 * @param ctx the parse tree
+	 */
+	void exitForall(SLTLxParser.ForallContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code true}
 	 * labeled alternative in {@link SLTLxParser#formula}.

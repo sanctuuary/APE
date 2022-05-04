@@ -87,11 +87,11 @@ public class CNFClause {
 	}
 	
 	/** 
-	 * Return a new clause that combines the two clauses. The method combines the 2 sets of disjoint elements.
+	 * Return a new clause that combines the two clauses. The method combines the 2 strings, each comprising disjoint Atoms.
 	 * 
 	 * @param clause1 - 1st clause that should be combined
 	 * @param clause2 - 2nd clause that should be combined
-	 * @return
+	 * @return String that represents the disjunction of the two clauses.
 	 */
 	public static String disjoin2Clauses(String clause1, String clause2) {
 		String clause1Cleaned = clause1.substring(0, clause1.indexOf("0\n"));

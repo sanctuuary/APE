@@ -88,18 +88,6 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterForall(SLTLxParser.ForallContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitForall(SLTLxParser.ForallContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterFunction(SLTLxParser.FunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -107,6 +95,18 @@ public class SLTLxBaseListener implements SLTLxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFunction(SLTLxParser.FunctionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterForall(SLTLxParser.ForallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitForall(SLTLxParser.ForallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

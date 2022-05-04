@@ -913,35 +913,33 @@ public final class EnforceModuleRelatedRules {
 	}
 
 	/**
-	 * Generating the mutual exclusion constraints for each pair of tools from
+	 * Generating the mutual exclusion constraints for the pair of tools from
 	 * modules (excluding abstract modules from the taxonomy) in each state of
 	 * moduleAutomaton.
 	 *
-	 * @param allModules      All the modules.
+	 * @param pair      pair of modules.
 	 * @param moduleAutomaton Module automaton.
 	 * @param mappings        Mapping function.
 	 * @return The Set of SLTLx formulas that represent the constraints.
 	 */
 	
-	public static Set<SLTLxFormula> moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton) {
+	public static Set<SLTLxFormula> moduleMutualExclusion(Pair<PredicateLabel> pair, ModuleAutomaton moduleAutomaton) {
 
 		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
-		for (Pair<PredicateLabel> pair : allModules.getSimplePairs()) {
-			for (State moduleState : moduleAutomaton.getAllStates()) {
-				fullEncoding.add(
-						new SLTLxDisjunction(
-								new SLTLxNegation(
-									new SLTLxAtom(
-											AtomType.MODULE, 
-											pair.getFirst(), 
-											moduleState)),
-								new SLTLxNegation(
-									new SLTLxAtom(
-											AtomType.MODULE, 
-											pair.getSecond(), 
-											moduleState))));
-			}
+		for (State moduleState : moduleAutomaton.getAllStates()) {
+			fullEncoding.add(
+					new SLTLxDisjunction(
+							new SLTLxNegation(
+								new SLTLxAtom(
+										AtomType.MODULE, 
+										pair.getFirst(), 
+										moduleState)),
+							new SLTLxNegation(
+								new SLTLxAtom(
+										AtomType.MODULE, 
+										pair.getSecond(), 
+										moduleState))));
 		}
 
 		return fullEncoding;

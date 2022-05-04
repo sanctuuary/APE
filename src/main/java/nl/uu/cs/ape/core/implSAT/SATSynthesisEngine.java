@@ -15,8 +15,10 @@ import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
+import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccuranceCollection;
@@ -42,7 +44,6 @@ import java.util.List;
  * @author Vedran Kasalica
  */
 public class SATSynthesisEngine implements SynthesisEngine {
-
     /**
      * Object that contains all the domain information.
      */
@@ -122,7 +123,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
      * @throws IOException Error if taxonomies have not been setup properly.
      */
     public boolean synthesisEncoding() throws IOException {
-
         long problemSetupStartTime = System.currentTimeMillis();
         TaxonomyPredicate rootModule = domainSetup.getAllModules().getRootModule();
 
@@ -153,22 +153,26 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the tools - from taxonomy.
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleMutualExclusion(domainSetup.getAllModules(), moduleAutomaton));
+        for(Pair<PredicateLabel> pair : domainSetup.getAllModules().getSimplePairs()) {
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleMutualExclusion(pair, moduleAutomaton));
+        }
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
         
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
         
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
-        
         /*
          * Create the constraints enforcing:
          * 1. Mutual exclusion of the types/formats (according to the search model)
          * 2. Mandatory usage of the types in the transition nodes (note: "empty type" is considered a type)
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMutualExclusion(domainSetup.getAllTypes(), typeAutomaton));
-        APEUtils.appendSetToFile(cnfEncoding, EnforceTypeRelatedRules.typeMutualExclusion(this, domainSetup.getAllTypes(), typeAutomaton));
+        for(Pair<PredicateLabel> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
+            SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMutualExclusion(pair, typeAutomaton));
+            SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMutualExclusion2(pair, typeAutomaton));
+        }
+//        APEUtils.appendSetToFile(cnfEncoding, EnforceTypeRelatedRules.typeMutualExclusion(this, domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
         
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMandatoryUsage(domainSetup, typeAutomaton));
@@ -218,15 +222,16 @@ public class SATSynthesisEngine implements SynthesisEngine {
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.preserveAuxiliaryPredicateRules(moduleAutomaton, typeAutomaton, domainSetup.getHelperPredicates()));
         
-        
-        
         /*
          * Additional SLTLx constraints. TODO - provide a proper interface
          */
 //        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, 
-//        		" G !<'ArealInterpolationRate'(;)> true | !  X F <'ArealInterpolationRate'(;)> true"));
+//    "Forall (?x1) <'Transform'(;?x1)> true"));
+//	"G (Forall (?x1) (<'Transform'(?x1;)> true) -> (X G (Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2))))"));
+//        		"true");
+//        		"  !X(<'ArealInterpolationRate'(;)> true)"));
+//    			" G <'Transform'(;)> true -> !  X F <'Transform'(;)> true"));
 //        		"G ((<'ArealInterpolationRate'(;)> true) -> !  X F <'ArealInterpolationRate'(;)> true)"));
-//    			"G Forall (?x1) (<'Transform'(?x1;)> true) -> X G Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2)))"));
 //			    " Forall (?x) Exists (?y) R(?x,?y)"));
 //    			"X !<'Tool'(;)> true"));
 //        		" (G Exists (?x) <'ZonalStatisticsMeanCount'(?x;)> G Forall (?y) <'ZonalStatisticsMeanCount'(?y;)> ! R(?x,?y))"));

@@ -22,7 +22,6 @@ private SLTLxFormula formula;
 
 	@Override
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		
 		if(synthesisEngine.getSolutionSize() <= stateNo)  {
 			return SLTLxAtom.getFalse().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		} else {
@@ -35,7 +34,7 @@ private SLTLxFormula formula;
 		if(synthesisEngine.getSolutionSize() <= stateNo)  {
 			return SLTLxAtom.getTrue().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		} else {
-			return formula.getCNFEncoding(stateNo + 1, variableMapping, synthesisEngine);
+			return formula.getNegatedCNFEncoding(stateNo + 1, variableMapping, synthesisEngine);
  		}
 	}
 

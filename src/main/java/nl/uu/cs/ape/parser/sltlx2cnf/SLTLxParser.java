@@ -304,6 +304,26 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
+	public static class FunctionContext extends FormulaContext {
+		public TerminalNode CONSTANT() { return getToken(SLTLxParser.CONSTANT, 0); }
+		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
+		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
+		public TerminalNode RPAREN() { return getToken(SLTLxParser.RPAREN, 0); }
+		public FunctionContext(FormulaContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterFunction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitFunction(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitFunction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
 	public static class ForallContext extends FormulaContext {
 		public TerminalNode FORALL() { return getToken(SLTLxParser.FORALL, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
@@ -324,26 +344,6 @@ public class SLTLxParser extends Parser {
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitForall(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	public static class FunctionContext extends FormulaContext {
-		public TerminalNode CONSTANT() { return getToken(SLTLxParser.CONSTANT, 0); }
-		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
-		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
-		public TerminalNode RPAREN() { return getToken(SLTLxParser.RPAREN, 0); }
-		public FunctionContext(FormulaContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).enterFunction(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SLTLxListener ) ((SLTLxListener)listener).exitFunction(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SLTLxVisitor ) return ((SLTLxVisitor<? extends T>)visitor).visitFunction(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -494,94 +494,19 @@ public class SLTLxParser extends Parser {
 				match(RPAREN);
 				}
 				break;
-			case NOT:
-				{
-				_localctx = new NegUnaryContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(30);
-				match(NOT);
-				setState(31);
-				formula(9);
-				}
-				break;
-			case FORALL:
-				{
-				_localctx = new ForallContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(32);
-				match(FORALL);
-				setState(33);
-				match(LPAREN);
-				setState(34);
-				match(VARIABLE);
-				setState(35);
-				match(RPAREN);
-				setState(36);
-				formula(8);
-				}
-				break;
-			case EXISTS:
-				{
-				_localctx = new ExistsContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(37);
-				match(EXISTS);
-				setState(38);
-				match(LPAREN);
-				setState(39);
-				match(VARIABLE);
-				setState(40);
-				match(RPAREN);
-				setState(41);
-				formula(7);
-				}
-				break;
-			case UN_MODAL:
-				{
-				_localctx = new UnaryModalContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(42);
-				match(UN_MODAL);
-				setState(43);
-				formula(6);
-				}
-				break;
 			case T__0:
 				{
 				_localctx = new ToolRefContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(44);
+				setState(30);
 				match(T__0);
-				setState(45);
+				setState(31);
 				module();
-				setState(46);
+				setState(32);
 				match(T__1);
-				setState(47);
-				formula(5);
-				}
-				break;
-			case R_REL:
-				{
-				_localctx = new R_relationContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(49);
-				match(R_REL);
-				setState(50);
-				match(LPAREN);
-				setState(51);
-				match(VARIABLE);
-				setState(52);
-				match(T__2);
-				setState(53);
-				match(VARIABLE);
-				setState(54);
-				match(RPAREN);
+				setState(33);
+				formula(10);
 				}
 				break;
 			case CONSTANT:
@@ -589,13 +514,13 @@ public class SLTLxParser extends Parser {
 				_localctx = new FunctionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(55);
+				setState(35);
 				match(CONSTANT);
-				setState(56);
+				setState(36);
 				match(LPAREN);
-				setState(57);
+				setState(37);
 				match(VARIABLE);
-				setState(58);
+				setState(38);
 				match(RPAREN);
 				}
 				break;
@@ -604,12 +529,87 @@ public class SLTLxParser extends Parser {
 				_localctx = new VarEqContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(59);
+				setState(39);
 				match(VARIABLE);
-				setState(60);
+				setState(40);
 				match(EQUAL);
-				setState(61);
+				setState(41);
 				match(VARIABLE);
+				}
+				break;
+			case NOT:
+				{
+				_localctx = new NegUnaryContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(42);
+				match(NOT);
+				setState(43);
+				formula(7);
+				}
+				break;
+			case FORALL:
+				{
+				_localctx = new ForallContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(44);
+				match(FORALL);
+				setState(45);
+				match(LPAREN);
+				setState(46);
+				match(VARIABLE);
+				setState(47);
+				match(RPAREN);
+				setState(48);
+				formula(5);
+				}
+				break;
+			case EXISTS:
+				{
+				_localctx = new ExistsContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(49);
+				match(EXISTS);
+				setState(50);
+				match(LPAREN);
+				setState(51);
+				match(VARIABLE);
+				setState(52);
+				match(RPAREN);
+				setState(53);
+				formula(4);
+				}
+				break;
+			case UN_MODAL:
+				{
+				_localctx = new UnaryModalContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(54);
+				match(UN_MODAL);
+				setState(55);
+				formula(3);
+				}
+				break;
+			case R_REL:
+				{
+				_localctx = new R_relationContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(56);
+				match(R_REL);
+				setState(57);
+				match(LPAREN);
+				setState(58);
+				match(VARIABLE);
+				setState(59);
+				match(T__2);
+				setState(60);
+				match(VARIABLE);
+				setState(61);
+				match(RPAREN);
 				}
 				break;
 			default:
@@ -632,11 +632,11 @@ public class SLTLxParser extends Parser {
 						_localctx = new BinaryBoolContext(new FormulaContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_formula);
 						setState(64);
-						if (!(precpred(_ctx, 10))) throw new FailedPredicateException(this, "precpred(_ctx, 10)");
+						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
 						setState(65);
 						match(BIN_CONNECTIVE);
 						setState(66);
-						formula(11);
+						formula(7);
 						}
 						break;
 					case 2:
@@ -644,11 +644,11 @@ public class SLTLxParser extends Parser {
 						_localctx = new BinaryModalContext(new FormulaContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_formula);
 						setState(67);
-						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
+						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
 						setState(68);
 						match(BIN_MODAL);
 						setState(69);
-						formula(5);
+						formula(3);
 						}
 						break;
 					}
@@ -811,9 +811,9 @@ public class SLTLxParser extends Parser {
 	private boolean formula_sempred(FormulaContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 10);
+			return precpred(_ctx, 6);
 		case 1:
-			return precpred(_ctx, 4);
+			return precpred(_ctx, 2);
 		}
 		return true;
 	}
@@ -831,19 +831,19 @@ public class SLTLxParser extends Parser {
 		"\2\2\21\17\3\2\2\2\22\24\7\34\2\2\23\22\3\2\2\2\24\27\3\2\2\2\25\23\3"+
 		"\2\2\2\25\26\3\2\2\2\26\30\3\2\2\2\27\25\3\2\2\2\30\31\7\2\2\3\31\3\3"+
 		"\2\2\2\32\33\b\3\1\2\33A\7\n\2\2\34\35\7\13\2\2\35\36\5\4\3\2\36\37\7"+
-		"\f\2\2\37A\3\2\2\2 !\7\31\2\2!A\5\4\3\13\"#\7\33\2\2#$\7\13\2\2$%\7\r"+
-		"\2\2%&\7\f\2\2&A\5\4\3\n\'(\7\32\2\2()\7\13\2\2)*\7\r\2\2*+\7\f\2\2+A"+
-		"\5\4\3\t,-\7\b\2\2-A\5\4\3\b./\7\3\2\2/\60\5\6\4\2\60\61\7\4\2\2\61\62"+
-		"\5\4\3\7\62A\3\2\2\2\63\64\7\17\2\2\64\65\7\13\2\2\65\66\7\r\2\2\66\67"+
-		"\7\5\2\2\678\7\r\2\28A\7\f\2\29:\7\16\2\2:;\7\13\2\2;<\7\r\2\2<A\7\f\2"+
-		"\2=>\7\r\2\2>?\7\30\2\2?A\7\r\2\2@\32\3\2\2\2@\34\3\2\2\2@ \3\2\2\2@\""+
-		"\3\2\2\2@\'\3\2\2\2@,\3\2\2\2@.\3\2\2\2@\63\3\2\2\2@9\3\2\2\2@=\3\2\2"+
-		"\2AJ\3\2\2\2BC\f\f\2\2CD\7\7\2\2DI\5\4\3\rEF\f\6\2\2FG\7\t\2\2GI\5\4\3"+
-		"\7HB\3\2\2\2HE\3\2\2\2IL\3\2\2\2JH\3\2\2\2JK\3\2\2\2K\5\3\2\2\2LJ\3\2"+
-		"\2\2MN\7\16\2\2NO\7\13\2\2OP\5\b\5\2PQ\7\6\2\2QR\5\b\5\2RS\7\f\2\2S\7"+
-		"\3\2\2\2TY\7\r\2\2UV\7\5\2\2VX\7\r\2\2WU\3\2\2\2X[\3\2\2\2YW\3\2\2\2Y"+
-		"Z\3\2\2\2Z]\3\2\2\2[Y\3\2\2\2\\T\3\2\2\2\\]\3\2\2\2]\t\3\2\2\2\t\17\25"+
-		"@HJY\\";
+		"\f\2\2\37A\3\2\2\2 !\7\3\2\2!\"\5\6\4\2\"#\7\4\2\2#$\5\4\3\f$A\3\2\2\2"+
+		"%&\7\16\2\2&\'\7\13\2\2\'(\7\r\2\2(A\7\f\2\2)*\7\r\2\2*+\7\30\2\2+A\7"+
+		"\r\2\2,-\7\31\2\2-A\5\4\3\t./\7\33\2\2/\60\7\13\2\2\60\61\7\r\2\2\61\62"+
+		"\7\f\2\2\62A\5\4\3\7\63\64\7\32\2\2\64\65\7\13\2\2\65\66\7\r\2\2\66\67"+
+		"\7\f\2\2\67A\5\4\3\689\7\b\2\29A\5\4\3\5:;\7\17\2\2;<\7\13\2\2<=\7\r\2"+
+		"\2=>\7\5\2\2>?\7\r\2\2?A\7\f\2\2@\32\3\2\2\2@\34\3\2\2\2@ \3\2\2\2@%\3"+
+		"\2\2\2@)\3\2\2\2@,\3\2\2\2@.\3\2\2\2@\63\3\2\2\2@8\3\2\2\2@:\3\2\2\2A"+
+		"J\3\2\2\2BC\f\b\2\2CD\7\7\2\2DI\5\4\3\tEF\f\4\2\2FG\7\t\2\2GI\5\4\3\5"+
+		"HB\3\2\2\2HE\3\2\2\2IL\3\2\2\2JH\3\2\2\2JK\3\2\2\2K\5\3\2\2\2LJ\3\2\2"+
+		"\2MN\7\16\2\2NO\7\13\2\2OP\5\b\5\2PQ\7\6\2\2QR\5\b\5\2RS\7\f\2\2S\7\3"+
+		"\2\2\2TY\7\r\2\2UV\7\5\2\2VX\7\r\2\2WU\3\2\2\2X[\3\2\2\2YW\3\2\2\2YZ\3"+
+		"\2\2\2Z]\3\2\2\2[Y\3\2\2\2\\T\3\2\2\2\\]\3\2\2\2]\t\3\2\2\2\t\17\25@H"+
+		"JY\\";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

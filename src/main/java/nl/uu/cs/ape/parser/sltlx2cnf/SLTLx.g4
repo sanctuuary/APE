@@ -13,16 +13,17 @@ condition
 formula
    : TRUE										# true
    | LPAREN formula RPAREN						# brackets
-   | formula BIN_CONNECTIVE formula 			# binaryBool	
+   | '<' module '>' formula						# toolRef
+   | CONSTANT '(' VARIABLE ')'					# function
+   | VARIABLE EQUAL VARIABLE					# varEq
    | NOT formula 								# negUnary
    | FORALL LPAREN VARIABLE RPAREN formula 		# forall
    | EXISTS LPAREN VARIABLE RPAREN formula		# exists
    | UN_MODAL formula							# unaryModal
-   | '<' module '>' formula						# toolRef
+   | formula BIN_CONNECTIVE formula 			# binaryBool
+   
    | formula BIN_MODAL formula					# binaryModal
    | R_REL LPAREN VARIABLE ',' VARIABLE RPAREN	# r_relation
-   | CONSTANT '(' VARIABLE ')'					# function
-   | VARIABLE EQUAL VARIABLE					# varEq
    ;
    
 BIN_CONNECTIVE

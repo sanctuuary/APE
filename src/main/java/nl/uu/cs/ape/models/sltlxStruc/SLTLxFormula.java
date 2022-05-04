@@ -30,11 +30,9 @@ public abstract class SLTLxFormula implements SLTLxElem {
 	 * @throws IOException Thrown in case of an I/O error.
 	 */
 	public static void appendCNFToFile(File file, SATSynthesisEngine synthesisEngine,  Collection<SLTLxFormula> formulas) throws IOException {
-		APEUtils.printMemoryStatus(synthesisEngine.getConfig().getDebugMode());
 		StringBuilder cnf = new StringBuilder();
 		createCNFEncoding(formulas, 0, synthesisEngine)
 							.forEach(clause -> cnf.append(clause));
-		APEUtils.printMemoryStatus(synthesisEngine.getConfig().getDebugMode());
 		APEUtils.appendToFile(file, cnf.toString());
 	}
 	
