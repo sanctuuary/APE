@@ -130,7 +130,7 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
     }
 
     /**
-     * Returns the string representation of the SMTDataType, used for the textual solution representation. In case of the atom depicting
+     * Returns the string representation of the {@link SLTLxAtom} used for the textual solution representation. In case of the atom depicting
      * a usage of a type in the workflow, the structure of the representation contains an additional attribute, state in which the type was initially added to the memory.
      *
      * @return String representing the workflow element in a textual form.

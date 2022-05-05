@@ -1,6 +1,5 @@
 package nl.uu.cs.ape.models.enums;
 
-import com.google.errorprone.annotations.Var;
 
 /**
  * Defines the values describing the predicates over variables, that will reflect in states in the workflow.

@@ -9,7 +9,6 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
@@ -35,6 +34,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxParsingAnnotationException;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxParsingBaseErrorListener;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxParsingGrammarException;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxUntil;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariable;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxBaseVisitor;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxLexer;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser;

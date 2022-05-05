@@ -159,7 +159,7 @@ public class SATSolution extends SolutionInterpreter {
             solution = new StringBuilder("UNSAT");
         } else {
             for (SLTLxLiteral literal : literals) {
-                solution.append(literal.toString()).append("\n ");
+                solution.append(literal.toString()).append("\n");
             }
         }
         return solution.toString();

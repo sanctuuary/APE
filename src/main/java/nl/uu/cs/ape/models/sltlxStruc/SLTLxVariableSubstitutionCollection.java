@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.automaton.State;
 
 /**

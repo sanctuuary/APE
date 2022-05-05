@@ -1,25 +1,15 @@
-package nl.uu.cs.ape.automaton;
+package nl.uu.cs.ape.models.sltlxStruc;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import nl.uu.cs.ape.automaton.State;
+import nl.uu.cs.ape.automaton.StateInterface;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.models.sltlxStruc.CNFClause;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxConjunction;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxDisjunction;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxEquivalence;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxImplication;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccuranceCollection;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableSubstitutionCollection;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxXOR;
 
 /***
  * The {@code State} class is used to represent a variable for type states. The variable only represents states from the type automatons, excluding the module automaton states. 
@@ -131,7 +121,6 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		/** Setting up the domain of the variable. */
 		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
 		for(State state : getVariableDomain(stateNo, synthesisEngine)) {
-			System.out.println(state.getPredicateID());
 			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_VALUE, state, this);
 			SLTLxAtom currIsEmptyState = new SLTLxAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(), state);
 			varRefs.add(new SLTLxXOR(currAtomVar, currIsEmptyState));

@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;

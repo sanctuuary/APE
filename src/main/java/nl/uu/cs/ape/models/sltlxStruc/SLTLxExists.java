@@ -3,7 +3,6 @@ package nl.uu.cs.ape.models.sltlxStruc;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 
 /**

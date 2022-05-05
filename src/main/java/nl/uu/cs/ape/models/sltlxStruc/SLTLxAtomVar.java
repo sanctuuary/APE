@@ -2,7 +2,6 @@ package nl.uu.cs.ape.models.sltlxStruc;
 
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
@@ -132,20 +131,16 @@ public class SLTLxAtomVar extends SLTLxFormula {
     }
 
     /**
-     * Returns the string representation of the SMTDataType, used for the textual solution representation. In case of the atom depicting
+     * Returns the string representation of the {@link SLTLxAtom} used for the textual solution representation. In case of the atom depicting
      * a usage of a type in the workflow, the structure of the representation contains an additional attribute, state in which the type was initially added to the memory.
      *
-     * @return String representing the workflow element in a textual form. {@code null} if the atom type is not correct.
+     * @return String representing the workflow element in a textual form.
      */
     public String toString() {
-        if (this.elementType == AtomVarType.VAR_VALUE) {
-            return "[" + firstArg.getPredicateID() + "] <- (" + secondArg.getPredicateID() + ")";
-        } else if (this.elementType == AtomVarType.R_RELATION_V) {
-            return "R(" + firstArg.getPredicateID() + "," + secondArg.getPredicateID() + ")";
-        } else if (this.elementType == AtomVarType.TYPE_V){
-            return firstArg.getPredicateID() + "(" + secondArg.getPredicateID() + ")";
-        } else if (this.elementType == AtomVarType.VAR_EQUIVALENCE){
-            return "[" + firstArg.getPredicateID() + "=" + secondArg.getPredicateID() + "]";
+    	if(this.elementType.isUnaryProperty()) {
+    		return firstArg.getPredicateID() + "(" + secondArg.getPredicateID() + ")";
+    	} else if(this.elementType.isBinaryRel()) {
+            return elementType.toString() + "(" + firstArg.getPredicateID() + "," + secondArg.getPredicateID() + ")";
         } else {
         	return null;
         }
@@ -194,19 +189,15 @@ public class SLTLxAtomVar extends SLTLxFormula {
 	private void substituteVariables(SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
 		if (this.elementType.isUnaryProperty()) {
 			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
-			synthesisEngine.getVariableUsage().addUnaryPair(this.secondArg, this.firstArg);
+			synthesisEngine.getVariableUsage().addUnaryPred(this.secondArg, this.firstArg);
 		} 
 		
-		else if (!this.elementType.equals(AtomVarType.VAR_VALUE) && this.elementType.isBinaryRel()) {
+		else if (this.elementType.isBinaryRel()) {
 			this.firstArg = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
 			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
-			synthesisEngine.getVariableUsage().addBinaryPair(new Pair<SLTLxVariable>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
+			synthesisEngine.getVariableUsage().addBinaryPred(new Pair<SLTLxVariable>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
 		} 
-		
-		else if (this.elementType.equals(AtomVarType.VAR_VALUE)) {
-			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
-		}
-		
+		System.out.println("eeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
 	}
 
 }

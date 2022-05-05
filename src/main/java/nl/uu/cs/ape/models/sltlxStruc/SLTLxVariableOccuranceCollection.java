@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import nl.uu.cs.ape.automaton.SLTLxVariable;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
@@ -43,7 +42,7 @@ public class SLTLxVariableOccuranceCollection {
 	 * @param predicate - unary predicate
 	 * @return {@code true} if the predicated was associated with the variable, {@code false} otherwise.
 	 */
-	public boolean addUnaryPair(SLTLxVariable argumentState, PredicateLabel predicate) {
+	public boolean addUnaryPred(SLTLxVariable argumentState, PredicateLabel predicate) {
 		if(this.unaryPredicates.get(argumentState) == null) {
 			Set<PredicateLabel> preds = new HashSet<>();
 			boolean tmp = preds.add(predicate);
@@ -62,7 +61,7 @@ public class SLTLxVariableOccuranceCollection {
 	 * @return {@code true} if the predicated was associated with the variable pair, {@code false} otherwise.
 	 */
 
-	public void addBinaryPair(Pair<SLTLxVariable> varPair, AtomVarType relType) {
+	public void addBinaryPred(Pair<SLTLxVariable> varPair, AtomVarType relType) {
 		if(relType.equals(AtomVarType.VAR_VALUE)) {
 			return;
 		}
