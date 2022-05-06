@@ -228,7 +228,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * Additional SLTLx constraints. TODO - provide a proper interface
          */
 //        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this,
-//        		"Exists (?x1) (<'Transform'(;?x1)> true)"));
+//        		"!F Exists (?x1) (<'operation_0004'(?x1,?x1;)> true)"));
 //        		"!Exists (?x1) (<'Transform'(;?x1)> true) & (<'Transform'(?x1;)> true)"));
 //        		"G(Forall (?x1) (<'Transform'(?x1;)> true) -> (X G (Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2))))"));
 //        		"true");
@@ -256,10 +256,10 @@ public class SATSynthesisEngine implements SynthesisEngine {
 //        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
         
         /* add human readable version of the cnf encoding file to Desktop */
-//        FileInputStream cnfStream = new FileInputStream(satInputFile);
-//		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
-//		cnfStream.close();
-//		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
+        FileInputStream cnfStream = new FileInputStream(satInputFile);
+		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
+		cnfStream.close();
+		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
 		
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;

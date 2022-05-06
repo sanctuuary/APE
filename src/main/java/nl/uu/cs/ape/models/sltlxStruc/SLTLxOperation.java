@@ -1,5 +1,6 @@
 package nl.uu.cs.ape.models.sltlxStruc;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -74,6 +75,40 @@ public class SLTLxOperation extends SLTLxFormula {
 				}
 				SLTLxDisjunction currInputStates = new SLTLxDisjunction(inputAtoms);
 				allInputs.add(currInputStates);
+			}
+			/* Ensure that inputs are different. */
+			if(inputs.size() > 1) {
+				for(SLTLxVariable inputVar : inputs) {
+					List<SLTLxVariable> restVars = new ArrayList<>();
+					inputs.forEach(in -> restVars.add(in));
+					restVars.remove(restVars.indexOf(inputVar));
+					
+					for(State inState : synthesisEngine.getTypeAutomaton().getUsedTypesBlock(stateNo).getStates()) {
+						List<State> restStates = new ArrayList<>();
+						synthesisEngine.getTypeAutomaton().getUsedTypesBlock(stateNo).getStates().forEach(in -> restStates.add(in));
+						restStates.remove(restStates.indexOf(inState));
+						
+						SLTLxFormula currSub = new SLTLxAtomVar(AtomVarType.MEM_TYPE_REF_V, inState, inputVar);
+						
+						for(SLTLxVariable otherVar : restVars) {
+							Set<SLTLxFormula> varPossibility = new HashSet<>();
+							
+							for(State otherState : restStates) {
+								varPossibility.add(new SLTLxAtomVar(AtomVarType.MEM_TYPE_REF_V, otherState, otherVar));
+							}
+							
+							allInputs.add(
+									new SLTLxImplication(
+											currSub, 
+											new SLTLxDisjunction(varPossibility)));
+						}
+						
+						
+					}
+					
+					
+					
+				}
 			}
 			inputsRule = new SLTLxConjunction(allInputs);
 		}
