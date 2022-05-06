@@ -213,12 +213,10 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Encode the constraints from the file based on the templates (manual templates)
          */
-//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, "G(Forall (?x1) (<'Transform'(?x1;)> true) -> (X G (Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2))))"));
         if (!domainSetup.getUnformattedConstr().isEmpty() || !domainSetup.getSLTLxConstraints().isEmpty() ) {
         	APEUtils.appendToFile(cnfEncoding, APEUtils.encodeAPEConstraints(this, domainSetup, mappings, moduleAutomaton, typeAutomaton));
             APEUtils.timerRestartAndPrint(currLengthTimer, "SLTLx constraints");
         }
-        APEUtils.timerRestartAndPrint(currLengthTimer, "SLTLx constraints");
         /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
@@ -256,10 +254,10 @@ public class SATSynthesisEngine implements SynthesisEngine {
 //        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
         
         /* add human readable version of the cnf encoding file to Desktop */
-        FileInputStream cnfStream = new FileInputStream(satInputFile);
-		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
-		cnfStream.close();
-		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
+//        FileInputStream cnfStream = new FileInputStream(satInputFile);
+//		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
+//		cnfStream.close();
+//		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
 
 		
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
