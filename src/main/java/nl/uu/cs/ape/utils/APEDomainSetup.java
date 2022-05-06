@@ -67,6 +67,7 @@ public class APEDomainSetup {
      */
     private List<ConstraintTemplateData> unformattedConstr;
     private List<AuxiliaryPredicate> helperPredicates;
+    private List<String> constraintsSLTLx;
     
     /**
      * Maximum number of inputs that a tool can have.
@@ -83,6 +84,7 @@ public class APEDomainSetup {
 
     private final static String CONSTR_JSON_TAG = "constraints";
 	private final static String CONSTR_ID_TAG = "constraintid";
+	private final static String CONSTR_SLTLx = "formula";
 	private final static String CONSTR_PARAM_JSON_TAG = "parameters";
 	private final static String TOOLS_JSOM_TAG = "functions";
     
@@ -97,6 +99,7 @@ public class APEDomainSetup {
         this.allTypes = new AllTypes(config);
         this.constraintFactory = new ConstraintFactory();
         this.helperPredicates = new ArrayList<AuxiliaryPredicate>();
+        this.constraintsSLTLx = new ArrayList<String>();
         this.ontologyPrefixIRI = config.getOntologyPrefixIRI();
         this.useStrictToolAnnotations = config.getUseStrictToolAnnotations();
     }
@@ -118,14 +121,30 @@ public class APEDomainSetup {
     public void addConstraintData(ConstraintTemplateData constr) {
         this.unformattedConstr.add(constr);
     }
+    
+    /**
+     * Add the String that corresponds to an SLTLx formula that should be parsed to the list of constraints.
+     * @param formulaSLTLx - String that corresponds to an SLTLx formula that should be parsed
+     */
+    public void addSLTLxConstraint(String formulaSLTLx) {
+    	this.constraintsSLTLx.add(formulaSLTLx);
+    }
 
     /**
-     * Gets unformatted constr.
+     * Gets unformatted constraints.
      *
      * @return the field {@link #unformattedConstr}.
      */
     public List<ConstraintTemplateData> getUnformattedConstr() {
         return unformattedConstr;
+    }
+    
+    /**
+     * Gets all SLTLx constraints specified by the user in SLTLx as text.
+     * @return Set of string representations of the constraints.
+     */
+    public List<String> getSLTLxConstraints(){
+    	return constraintsSLTLx;
     }
 
     /**
@@ -209,7 +228,16 @@ public class APEDomainSetup {
 				ConstraintTemplate currConstrTemplate = getConstraintFactory()
 						.getConstraintTemplate(constraintID);
 				if (currConstrTemplate == null) {
-					throw ConstraintFormatException.wrongConstraintID(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+					if(constraintID.equals("SLTLx")) {
+						String formulaSLTLx = jsonConstraint.getString(CONSTR_SLTLx);
+						if (formulaSLTLx == null) {
+							throw ConstraintFormatException.wrongNumberOfParameters(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+						}
+						this.addSLTLxConstraint(formulaSLTLx);
+						continue;
+					} else {
+						throw ConstraintFormatException.wrongConstraintID(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+					}
 				}
 
 				List<ConstraintTemplateParameter> currTemplateParameters = currConstrTemplate.getParameters();
@@ -234,7 +262,7 @@ public class APEDomainSetup {
 				if (constraintParametes.stream().anyMatch(Objects::isNull)) {
 					throw ConstraintFormatException.wrongParameter(String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
 				} else {
-					addConstraintData(currConstr);
+					this.addConstraintData(currConstr);
 				}
 
 			} catch (JSONException e) {

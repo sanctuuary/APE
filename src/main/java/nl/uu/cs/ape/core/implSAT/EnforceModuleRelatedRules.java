@@ -223,62 +223,58 @@ public final class EnforceModuleRelatedRules {
 		for (TaxonomyPredicate currType : domainSetup.getAllTypes().getTypes()) {
 			if (currType.isSimplePredicate() || currType.isEmptyPredicate()) {
 				/* ..for each state in which type can be used .. */
-				for (Block currUsedBlock : typeAutomaton.getUsedTypesBlocks()) {
-					for (State currUsedTypeState : currUsedBlock.getStates()) {
-						if (!currType.isEmptyPredicate()) {
-							/* If the predicate is not empty
-							 * the referenced memory state cannot be null.. */
-							fullEncoding.add(
-									new SLTLxNegatedConjunction(
-												new SLTLxAtom(
-														AtomType.USED_TYPE, 
-														currType, 
-														currUsedTypeState),
-												new SLTLxAtom(
-														AtomType.MEM_TYPE_REFERENCE, 
-														typeAutomaton.getNullState(), 
-														currUsedTypeState)));
+				for (State currUsedTypeState : typeAutomaton.getAllUsedTypesStates()) {
+					if (!currType.isEmptyPredicate()) {
+						/* If the predicate is not empty
+						 * the referenced memory state cannot be null.. */
+						fullEncoding.add(
+								new SLTLxNegatedConjunction(
+											new SLTLxAtom(
+													AtomType.USED_TYPE, 
+													currType, 
+													currUsedTypeState),
+											new SLTLxAtom(
+													AtomType.MEM_TYPE_REFERENCE, 
+													typeAutomaton.getNullState(), 
+													currUsedTypeState)));
 
-							/* ..and for each state in which type can be created in memory .. */
-							for (Block memoryBlock : typeAutomaton.getMemoryTypesBlocks()) {
-								for (State refMemoryTypeState : memoryBlock.getStates()) {
-									/*
-									 * Pairs of referenced states have to be of the same types.
-									 */
-									
-									fullEncoding.add(
-											new SLTLxImplication(
-													new SLTLxAtom(
-															AtomType.MEM_TYPE_REFERENCE, 
-															refMemoryTypeState,
-															currUsedTypeState),
-													new SLTLxEquivalence(
-														new SLTLxAtom(
-																AtomType.USED_TYPE, 
-																currType, 
-																currUsedTypeState),
-														new SLTLxAtom(
-																AtomType.MEMORY_TYPE, 
-																currType, 
-																refMemoryTypeState)
-														)));
-								}
-							}
-							/* If the type is empty the referenced state has to be null. */
-						} else {
-							
-							fullEncoding.add(
-									new SLTLxImplication(
-												new SLTLxAtom(
-														AtomType.USED_TYPE, 
-														currType, 
-														currUsedTypeState),
+						/* ..and for each state in which type can be created in memory .. */
+						for (State refMemoryTypeState : typeAutomaton.getAllMemoryTypesStates()) {
+								/*
+								 * Pairs of referenced states have to be of the same types.
+								 */
+								
+								fullEncoding.add(
+										new SLTLxImplication(
 												new SLTLxAtom(
 														AtomType.MEM_TYPE_REFERENCE, 
-														typeAutomaton.getNullState(), 
-														currUsedTypeState)));
-							
+														refMemoryTypeState,
+														currUsedTypeState),
+												new SLTLxEquivalence(
+													new SLTLxAtom(
+															AtomType.USED_TYPE, 
+															currType, 
+															currUsedTypeState),
+													new SLTLxAtom(
+															AtomType.MEMORY_TYPE, 
+															currType, 
+															refMemoryTypeState)
+													)));
 						}
+						/* If the type is empty the referenced state has to be null. */
+					} else {
+						
+						fullEncoding.add(
+								new SLTLxImplication(
+											new SLTLxAtom(
+													AtomType.USED_TYPE, 
+													currType, 
+													currUsedTypeState),
+											new SLTLxAtom(
+													AtomType.MEM_TYPE_REFERENCE, 
+													typeAutomaton.getNullState(), 
+													currUsedTypeState)));
+						
 					}
 				}
 			}

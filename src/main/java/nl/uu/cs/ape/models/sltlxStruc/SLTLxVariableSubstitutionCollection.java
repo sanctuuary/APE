@@ -20,7 +20,7 @@ public class SLTLxVariableSubstitutionCollection {
 	/** Variable mapping to its domain. */
 	private Map<SLTLxVariable, Set<State>> variableDomain;
 	/** Number of variables. */
-	private int variableNo;
+	private static int variableNo = 1;
 
 	/**
 	 * Create a new variable mapping class.
@@ -29,7 +29,6 @@ public class SLTLxVariableSubstitutionCollection {
 		super();
 		this.mappedVariables = new HashMap<>();
 		this.variableDomain = new HashMap<>();
-		this.variableNo = 1;
 	}
 
 	/**
@@ -47,7 +46,6 @@ public class SLTLxVariableSubstitutionCollection {
 		for (SLTLxVariable key : existing.variableDomain.keySet()) {
 			this.variableDomain.put(key, existing.variableDomain.get(key));
 		}
-		this.variableNo = existing.variableNo;
 	}
 
 	/**
@@ -85,6 +83,11 @@ public class SLTLxVariableSubstitutionCollection {
 		return var;
 	}
 
+	/**
+	 * Get the domain for the given variable.
+	 * @param var - variable in question
+	 * @return Set of states that represent the domain of the variable.
+	 */
 	public Set<State> getVariableDomain(SLTLxVariable var) {
 		return this.variableDomain.get(var);
 	}

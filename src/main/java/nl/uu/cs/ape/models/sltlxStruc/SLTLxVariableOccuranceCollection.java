@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
@@ -18,8 +19,10 @@ import nl.uu.cs.ape.utils.APEUtils;
  */
 public class SLTLxVariableOccuranceCollection {
 
-	/** Mapping variables to their usages under unary predicates.*/
-	private Map<SLTLxVariable, Set<PredicateLabel>> unaryPredicates;
+	/** Mapping variables to their predicate properties.*/
+	private Map<SLTLxVariable, Set<PredicateLabel>> variableDataTypes;
+	/** Mapping variables (depicting memory states) to tool inputs that reference them.*/
+	private Map<SLTLxVariable, Set<State>> variableMemoryReferences;
 	/** Mapping pairs variables to their usages under binary predicates.*/
 	private Map<Pair<SLTLxVariable>, Set<AtomVarType>> binaryPredicates;
 	/** Variable mapping to variables it is combined with under a pair. */
@@ -30,29 +33,49 @@ public class SLTLxVariableOccuranceCollection {
 	 */
 	public SLTLxVariableOccuranceCollection() {
 		super();
-		this.unaryPredicates = new HashMap<>();
+		this.variableDataTypes = new HashMap<>();
+		this.variableMemoryReferences = new HashMap<>();
 		this.binaryPredicates = new HashMap<>();
 		this.variablePairs = new HashMap<>();
 	}
 
 
 	/**
-	 * Associate the the unary predicate to the corresponding variable. 
-	 * @param argumentState - variable used
-	 * @param predicate - unary predicate
-	 * @return {@code true} if the predicated was associated with the variable, {@code false} otherwise.
+	 * Associate the data type to the corresponding variable. 
+	 * @param dataType - state property
+	 * @param variableState - variable used
+	 * @return {@code true} if the property was associated with the variable, {@code false} otherwise.
 	 */
-	public boolean addUnaryPred(SLTLxVariable argumentState, PredicateLabel predicate) {
-		if(this.unaryPredicates.get(argumentState) == null) {
+	public boolean addDataType(PredicateLabel dataType, SLTLxVariable variableState) {
+		if(this.variableDataTypes.get(variableState) == null) {
 			Set<PredicateLabel> preds = new HashSet<>();
-			boolean tmp = preds.add(predicate);
-			this.unaryPredicates.put(argumentState, preds);
+			boolean tmp = preds.add(dataType);
+			this.variableDataTypes.put(variableState, preds);
 			return tmp;
 		} else {
-			return this.unaryPredicates.get(argumentState).add(predicate);
+			return this.variableDataTypes.get(variableState).add(dataType);
 		}
 		
 	}
+	
+	/**
+	 * Associate the tool input state to the corresponding variable. 
+	 * @param usedState - state that represents data input
+	 * @param variableState - variable used
+	 * @return {@code true} if the state was associated with the variable, {@code false} otherwise.
+	 */
+	public boolean addMemoryReference(State usedState, SLTLxVariable variableState) {
+		if(this.variableMemoryReferences.get(variableState) == null) {
+			Set<State> preds = new HashSet<>();
+			boolean tmp = preds.add(usedState);
+			this.variableMemoryReferences.put(variableState, preds);
+			return tmp;
+		} else {
+			return this.variableMemoryReferences.get(variableState).add(usedState);
+		}
+		
+	}
+	
 	/**
 	 * Associate the the binary predicate ({@link AtomVarType.VAR_EQUIVALENCE} or {@link AtomVarType.TYPE_DEPENDENCY_VAR}) 
 	 * to the corresponding pair of variables (the order of the variables matter). 
@@ -101,13 +124,23 @@ public class SLTLxVariableOccuranceCollection {
 	}
 
 	/**
-	 * Get all unary predicates that include the given variable.
+	 * Get all data types that include the given variable.
 	 * @param satVariable - the given variable
-	 * @return Set (possibly empty) of unary predicates that are mentioned in combination with the given variable. 
+	 * @return Set (possibly empty) of memory references that are mentioned in combination with the given variable. 
 	 */
-	public Set<PredicateLabel> getUnaryPredicates(SLTLxVariable satVariable) {
-		Set<PredicateLabel> unaryPreds = this.unaryPredicates.get(satVariable);
+	public Set<PredicateLabel> getDataTypes(SLTLxVariable satVariable) {
+		Set<PredicateLabel> unaryPreds = this.variableDataTypes.get(satVariable);
 		return ((unaryPreds == null) ? new HashSet<PredicateLabel>() : unaryPreds);
+	}
+	
+	/**
+	 * Get all memory references  that include the given variable.
+	 * @param satVariable - the given variable
+	 * @return Set (possibly empty) of memory references that are mentioned in combination with the given variable. 
+	 */
+	public Set<State> getMemoryReferences(SLTLxVariable satVariable) {
+		Set<State> unaryPreds = this.variableMemoryReferences.get(satVariable);
+		return ((unaryPreds == null) ? new HashSet<State>() : unaryPreds);
 	}
 	
 	/**

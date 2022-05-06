@@ -11,14 +11,20 @@ import org.json.JSONObject;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
+import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.Module;
+import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
+import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.CNFClause;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
+import nl.uu.cs.ape.parser.SLTLxSATVisitor;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -51,6 +57,7 @@ public final class APEUtils {
 
 	/**
 	 * Encode ape constraints string.
+	 * @param synthesisEngine 
 	 *
 	 * @param domainSetup     Domain information, including all the existing tools
 	 *                        and types.
@@ -59,7 +66,7 @@ public final class APEUtils {
 	 * @param typeAutomaton   Type automaton.
 	 * @return The CNF representation of the SLTL constraints in our project.
 	 */
-	public static String encodeAPEConstraints(APEDomainSetup domainSetup, SATAtomMappings mappings,
+	public static String encodeAPEConstraints(SATSynthesisEngine synthesisEngine, APEDomainSetup domainSetup, SATAtomMappings mappings,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
 
 		StringBuilder cnf_SLTL = new StringBuilder();
@@ -82,6 +89,18 @@ public final class APEUtils {
 				}
 			}
 		}
+		
+		/*
+		 * Parse the constraints specified in SLTLx.
+		 */
+		for(String constraint : domainSetup.getSLTLxConstraints()){
+			Set<SLTLxFormula> sltlxFormulas = SLTLxSATVisitor.parseFormula(synthesisEngine, constraint);
+			for(SLTLxFormula sltlxFormula : sltlxFormulas) {
+				sltlxFormula.getConstraintCNFEncoding(synthesisEngine)
+							.forEach(sltlxString -> cnf_SLTL.append(sltlxString));
+			}
+		}
+		
 		return cnf_SLTL.toString();
 	}
 
@@ -720,15 +739,35 @@ public final class APEUtils {
 		while (scanner.hasNextInt()) {
 			int intAtom = scanner.nextInt();
 
-			if (intAtom > 0) {
+			
+			if (intAtom == 0) {
+				humanReadable.append("\n");
+			} else if (intAtom > -3 & intAtom < 3) {
+				if(intAtom == 1 || intAtom == -2) {
+					humanReadable.append("true ");
+				} else {
+					humanReadable.append("false ");
+				}
+			} else if (intAtom > 0) {
 				SLTLxAtom atom = mappings.findOriginal(intAtom);
+				if(atom==null) {
+					SLTLxAtomVar varAtom = mappings.findOriginalVar(intAtom);
+					humanReadable.append(varAtom.toString()).append(" ");
+				} else {
+					humanReadable.append(atom.toString()).append(" ");
+				}
 				
-				humanReadable.append(atom.toString()).append(" ");
 			} else if (intAtom < 0) {
 				SLTLxAtom atom = mappings.findOriginal(-intAtom);
-				humanReadable.append("-").append(atom.toString()).append(" ");
-			} else {
-				humanReadable.append("\n");
+				if(atom==null) {
+					SLTLxAtomVar varAtom = mappings.findOriginalVar(-intAtom);
+					if(varAtom == null)
+						System.out.println(intAtom);
+					humanReadable.append("-").append(varAtom.toString()).append(" ");
+				} else {
+					humanReadable.append("-").append(atom.toString()).append(" ");
+				}
+				
 			}
 		}
 		scanner.close();
@@ -939,7 +978,22 @@ public final class APEUtils {
 		StringBuilder memoryStatus = new StringBuilder();
 		IntStream.range(0, currMemChars).forEach(step -> memoryStatus.append("#"));
 		IntStream.range(currMemChars, totalMemChars).forEach(step -> memoryStatus.append(" "));
-		 System.out.print("\n[" + memoryStatus.toString()+ "]\t" + totalMemMB + "\tMB \r");
+		System.out.print("\n[" + memoryStatus.toString()+ "]\t" + totalMemMB + "\tMB \r");
 		
+	}
+	/**
+	 * Get all unique pairs of PredicateLabels within the collection.
+	 * @param set - Set of PredicateLabel that should be used to create the pairs
+	 * @return Set of unique pairs.
+	 */
+	public static Set<Pair<PredicateLabel>> getUniquePairs(Collection<? extends PredicateLabel> set) {
+		Set<Pair<PredicateLabel>> pairs = new HashSet<Pair<PredicateLabel>>();
+		set.stream().forEach(ele1 -> {
+			set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
+						.forEach(ele2 -> {
+							pairs.add(new Pair<PredicateLabel>(ele1, ele2));
+			});
+		});
+        return pairs;
 	}
 }

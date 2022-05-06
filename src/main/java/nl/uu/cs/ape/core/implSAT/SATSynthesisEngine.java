@@ -169,8 +169,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
         for(Pair<PredicateLabel> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
-            SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMutualExclusion(pair, typeAutomaton));
-            SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMutualExclusion2(pair, typeAutomaton));
+            SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.memoryTypesMutualExclusion(pair, typeAutomaton));
+//            SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.usedTypeMutualExclusion(pair, typeAutomaton));
         }
 //        APEUtils.appendSetToFile(cnfEncoding, EnforceTypeRelatedRules.typeMutualExclusion(this, domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
@@ -180,13 +180,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
         
-        /*
-         * Encode the constraints from the file based on the templates (manual templates)
-         */
-        if (domainSetup.getUnformattedConstr() != null && !domainSetup.getUnformattedConstr().isEmpty()) {
-        	APEUtils.appendToFile(cnfEncoding, APEUtils.encodeAPEConstraints(domainSetup, mappings, moduleAutomaton, typeAutomaton));
-            APEUtils.timerRestartAndPrint(currLengthTimer, "SLTL constraints");
-        }
         
         /*
          * Encode data ancestor relation (R) constraints.
@@ -218,6 +211,15 @@ public class SATSynthesisEngine implements SynthesisEngine {
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.workdlowOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
 
         /*
+         * Encode the constraints from the file based on the templates (manual templates)
+         */
+//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this, "G(Forall (?x1) (<'Transform'(?x1;)> true) -> (X G (Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2))))"));
+        if (!domainSetup.getUnformattedConstr().isEmpty() || !domainSetup.getSLTLxConstraints().isEmpty() ) {
+        	APEUtils.appendToFile(cnfEncoding, APEUtils.encodeAPEConstraints(this, domainSetup, mappings, moduleAutomaton, typeAutomaton));
+            APEUtils.timerRestartAndPrint(currLengthTimer, "SLTLx constraints");
+        }
+        APEUtils.timerRestartAndPrint(currLengthTimer, "SLTLx constraints");
+        /*
          * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.preserveAuxiliaryPredicateRules(moduleAutomaton, typeAutomaton, domainSetup.getHelperPredicates()));
@@ -225,10 +227,10 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /*
          * Additional SLTLx constraints. TODO - provide a proper interface
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this,
-        		"Forall (?x1) <'Transform'(?x1;?x1)> true"));
-//    "Exists (?x1) (<'Transform'(;?x1)> true) & (<'Transform'(?x1;)> true)"));
-//	"G (Forall (?x1) (<'Transform'(?x1;)> true) -> (X G (Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2))))"));
+//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this,
+//        		"Exists (?x1) (<'Transform'(;?x1)> true)"));
+//        		"!Exists (?x1) (<'Transform'(;?x1)> true) & (<'Transform'(?x1;)> true)"));
+//        		"G(Forall (?x1) (<'Transform'(?x1;)> true) -> (X G (Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2))))"));
 //        		"true");
 //        		"  !X(<'ArealInterpolationRate'(;)> true)"));
 //    			" G <'Transform'(;)> true -> !  X F <'Transform'(;)> true"));

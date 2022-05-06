@@ -2,6 +2,7 @@ package nl.uu.cs.ape.models.sltlxStruc;
 
 import java.util.Set;
 
+import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
@@ -49,18 +50,6 @@ public class SLTLxAtomVar extends SLTLxFormula {
         this.firstArg = firstArg;
         this.secondArg = secondArg;
         this.elementType = elementType;
-    }
-
-    /**TODO: What is the point of this?
-     * Creates a state in the automaton that corresponds to a usage of a data type as input, by a tool.
-      
-     * @param atom SLTLxAtom that is being copied.
-     */
-    public SLTLxAtomVar(SLTLxAtomVar atom) {
-    	super();
-        this.firstArg = atom.firstArg;
-        this.secondArg = atom.secondArg;
-        this.elementType = atom.elementType;
     }
 
 	/**
@@ -137,8 +126,12 @@ public class SLTLxAtomVar extends SLTLxFormula {
      * @return String representing the workflow element in a textual form.
      */
     public String toString() {
-    	if(this.elementType.isUnaryProperty()) {
+    	if(this.elementType.isVarDataType()) {
     		return firstArg.getPredicateID() + "(" + secondArg.getPredicateID() + ")";
+    	
+    	} else if(this.elementType.isVarMemReference()) {
+    		return "[" + firstArg.getPredicateID() + "->" + secondArg.getPredicateID() + "]";
+    	
     	} else if(this.elementType.isBinaryRel()) {
             return elementType.toString() + "(" + firstArg.getPredicateID() + "," + secondArg.getPredicateID() + ")";
         } else {
@@ -158,7 +151,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
 
     @Override
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		if(this.clause == null) {
+    	if(this.clause == null) {
 			this.substituteVariables(variableMapping, synthesisEngine);
 			
 			int encoding = synthesisEngine.getMappings().add(this);
@@ -187,17 +180,25 @@ public class SLTLxAtomVar extends SLTLxFormula {
 	 * @param synthesisEngine
 	 */
 	private void substituteVariables(SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		if (this.elementType.isUnaryProperty()) {
+		if (this.elementType.isVarDataType()) {
 			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
-			synthesisEngine.getVariableUsage().addUnaryPred(this.secondArg, this.firstArg);
+			synthesisEngine.getVariableUsage().addDataType(firstArg, secondArg);
+		
+		} else if (this.elementType.isVarMemReference()) {
+			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+			synthesisEngine.getVariableUsage().addMemoryReference((State) firstArg, secondArg);
 		} 
 		
-		else if (this.elementType.isBinaryRel()) {
+		else if (this.elementType.isBinaryRel() & !(this.elementType.equals(AtomVarType.VAR_VALUE))) {
 			this.firstArg = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
 			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
 			synthesisEngine.getVariableUsage().addBinaryPred(new Pair<SLTLxVariable>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
 		} 
-		System.out.println("eeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+		
+		else if (this.elementType.equals(AtomVarType.VAR_VALUE)) {
+			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+			/* These predicates are not added to the set.*/
+		}
 	}
 
 }

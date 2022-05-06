@@ -3,11 +3,14 @@ package nl.uu.cs.ape.models;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code AllModules} class represent the set of all modules/tools that can be
@@ -113,22 +116,16 @@ public class AllModules extends AllPredicates {
      *
      * @return List of pairs of modules.
      */
-    public List<Pair<PredicateLabel>> getSimplePairs() {
-        List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();
+    public Set<Pair<PredicateLabel>> getSimplePairs() {
 
-        List<TaxonomyPredicate> iterator = new ArrayList<TaxonomyPredicate>();
+        Set<PredicateLabel> iterator = new HashSet<PredicateLabel>();
         for (TaxonomyPredicate module : getMappedPredicates().values()) {
             if (module.isSimplePredicate()) {
                 iterator.add(module);
             }
         }
 
-        for (int i = 0; i < iterator.size() - 1; i++) {
-            for (int j = i + 1; j < iterator.size(); j++) {
-                pairs.add(new Pair<PredicateLabel>(iterator.get(i), iterator.get(j)));
-            }
-        }
-        return pairs;
+        return APEUtils.getUniquePairs(iterator);
     }
     
     /**

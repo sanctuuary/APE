@@ -54,11 +54,11 @@ public abstract class SLTLxFormula implements SLTLxElem {
 	}
 	
 	/**
-	 * Get string that represents the CNF encoding of the constraint. As the
+	 * Get string that represents the CNF encoding of the constraint. The encoding assumes that the constraint should be valid for the whole workflow.
 	 * @param synthesisEngine
 	 * @return
 	 */
-	public Set<String> getCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<String> getConstraintCNFEncoding(SATSynthesisEngine synthesisEngine) {
 		return this.getCNFEncoding(0, new SLTLxVariableSubstitutionCollection(), synthesisEngine);
 	}
 	

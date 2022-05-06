@@ -70,7 +70,7 @@ public class SLTLxOperation extends SLTLxFormula {
 			for(SLTLxVariable inputVar : inputs) {
 				Set<SLTLxAtomVar> inputAtoms = new HashSet<>();
 				for(State inState : synthesisEngine.getTypeAutomaton().getUsedTypesBlock(stateNo).getStates()) {
-					inputAtoms.add(new SLTLxAtomVar(AtomVarType.VAR_VALUE, inState, inputVar));
+					inputAtoms.add(new SLTLxAtomVar(AtomVarType.MEM_TYPE_REF_V, inState, inputVar));
 				}
 				SLTLxDisjunction currInputStates = new SLTLxDisjunction(inputAtoms);
 				allInputs.add(currInputStates);
