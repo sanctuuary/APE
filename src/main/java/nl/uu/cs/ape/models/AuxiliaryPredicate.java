@@ -11,7 +11,7 @@ public interface AuxiliaryPredicate extends PredicateLabel {
 	 /**
      * Gets logic operator used to group the abstracted predicates.
      *
-     * @return the field {@link #logicOp}.
+     * @return the field {@link AuxModulePredicate#logicOp}.
      */
 	public LogicOperation getLogicOp();
 	

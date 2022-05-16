@@ -44,8 +44,6 @@ public class EnforceTypeRelatedRules {
      * Generating the mutual exclusion for the pair of tools from @modules
      * (excluding abstract modules from the taxonomy) in each memory state
      * of @moduleAutomaton.
-     * @param satSynthesisEngine 
-     * 
      * @param pair      - pair of types from a dimension.
      * @param typeAutomaton - System that represents states in the workflow
      * @return String representation of constraints.
@@ -76,8 +74,6 @@ public class EnforceTypeRelatedRules {
     * Generating the mutual exclusion for the pair of tools from @modules
     * (excluding abstract modules from the taxonomy) in each used state
     * of @moduleAutomaton.
-    * @param satSynthesisEngine 
-    * 
     * @param pair      - pair of types from a dimension.
     * @param typeAutomaton - System that represents states in the workflow
     * @return String representation of constraints.
@@ -235,7 +231,6 @@ public class EnforceTypeRelatedRules {
      * @param allTypes       Set of all the types in the domain
      * @param program_inputs Input types for the program.
      * @param typeAutomaton  Automaton representing the type states in the model
-     * @param mappings       All the atom mappings
      * @return The String representation of the initial input encoding.
      * @throws APEConfigException Exception thrown when one of the output types is not defined in the taxonomy.
      */
@@ -273,7 +268,6 @@ public class EnforceTypeRelatedRules {
      * @param allTypes        Set of all the types in the domain
      * @param program_outputs Output types for the program.
      * @param typeAutomaton   Automaton representing the type states in the model
-     * @param mappings       All the atom mappings
      * @return String representation of the workflow output encoding.
      * @throws APEConfigException Exception thrown when one of the output types is not defined in the taxonomy.
      */

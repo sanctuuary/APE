@@ -37,6 +37,7 @@ public class AuxModulePredicate extends AbstractModule implements AuxiliaryPredi
      * Create an auxiliary predicate.<br><br>
      * It is recommended to use the method {@link AuxModulePredicate#generateAuxiliaryPredicate} to generate an auxiliary object.
      *
+     * TODO vedran: complete parameter descriptions
      * @param predicate the predicate
      * @param logicOp   the logic operator
      */

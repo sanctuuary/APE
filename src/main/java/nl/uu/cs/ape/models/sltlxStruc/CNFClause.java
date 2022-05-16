@@ -34,7 +34,7 @@ public class CNFClause {
 	/**
 	 * Create a clause that has only one element.
 	 * 
-	 * @param atom
+	 * @param atom TODO vedran: fill in description
 	 */
 	public CNFClause(Integer atom) {
 		super();

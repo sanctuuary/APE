@@ -34,7 +34,7 @@ public class AuxTypePredicate extends Type implements AuxiliaryPredicate {
 
     /**
      * Create an auxiliary predicate.<br><br>
-     * It is recommended to use the method {@link AuxTaxonomyPredicate#generateAuxiliaryPredicate} to generate an auxiliary object.
+     * It is recommended to use the method {@link AuxTypePredicate#generateAuxiliaryPredicate} to generate an auxiliary object.
      *
      * @param predicate the predicate
      * @param logicOp   the logic operator

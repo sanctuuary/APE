@@ -5,7 +5,7 @@ import java.util.Set;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 
 /**
- * Structure used to model XOR relation ("a xor b" is the same as "not a <=> b") in SLTLx.
+ * Structure used to model XOR relation ("a xor b" is the same as "not a &lt;=&gt; b") in SLTLx.
  * 
  * @author Vedran Kasalica
  *

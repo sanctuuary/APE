@@ -12,7 +12,7 @@ import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 
 /**
- * Structure used to model the operation specification, used as a part of the next operation (<Op>) modal statement in SLTLx.
+ * Structure used to model the operation specification, used as a part of the next operation (&lt;Op&gt;) modal statement in SLTLx.
  * 
  * @author Vedran Kasalica
  *

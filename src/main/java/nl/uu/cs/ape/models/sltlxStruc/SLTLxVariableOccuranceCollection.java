@@ -77,13 +77,11 @@ public class SLTLxVariableOccuranceCollection {
 	}
 	
 	/**
-	 * Associate the the binary predicate ({@link AtomVarType.VAR_EQUIVALENCE} or {@link AtomVarType.TYPE_DEPENDENCY_VAR}) 
+	 * Associate the binary predicate ({@link AtomVarType#VAR_EQUIVALENCE} or {@link AtomVarType#TYPE_DEPENDENCY_VAR}) TODO vedran
 	 * to the corresponding pair of variables (the order of the variables matter). 
 	 * @param varPair - pair of the variables used
-	 * @param relType - binary predicate type (<b>NOTE: The relation cannot be {@link AtomVarType.VAR_REF}</b>)
-	 * @return {@code true} if the predicated was associated with the variable pair, {@code false} otherwise.
+	 * @param relType - binary predicate type (<b>NOTE: The relation cannot be {@link AtomVarType#VAR_REF}</b>) TODO vedran
 	 */
-
 	public void addBinaryPred(Pair<SLTLxVariable> varPair, AtomVarType relType) {
 		if(relType.equals(AtomVarType.VAR_VALUE)) {
 			return;
@@ -145,7 +143,7 @@ public class SLTLxVariableOccuranceCollection {
 	
 	/**
 	 * Get all binary relations that include the given variable pair as arguments (in the given order).
-	 * @param satVariable - the given variable pair
+	 * @param varPair - the given variable pair
 	 * @return Set (possibly empty) of binary predicates that were used over the variable pair.
 	 */
 	public Set<AtomVarType> getBinaryPredicates(Pair<SLTLxVariable> varPair) {
