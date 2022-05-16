@@ -111,7 +111,7 @@ public class OWLReader {
 		return true;
 	}
 	
-	public static boolean verifyOntology(File ontologyFile, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots ) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
+	public static boolean verifyOntology(File ontologyFile, String ontologyPrefixIRI, String toolTaxonomyRoot, List<String> dataDimensionRoots ) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
 
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		AllModules allModules = new AllModules(toolTaxonomyRoot);

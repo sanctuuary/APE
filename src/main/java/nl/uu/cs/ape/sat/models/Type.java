@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import nl.uu.cs.ape.sat.models.enums.LogicOperation;
 import nl.uu.cs.ape.sat.models.enums.NodeType;
-import nl.uu.cs.ape.sat.models.logic.constructs.CustomLabel;
 import nl.uu.cs.ape.sat.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.sat.utils.APEDimensionsException;
 import nl.uu.cs.ape.sat.utils.APEDomainSetup;
@@ -99,7 +98,7 @@ public class Type extends TaxonomyPredicate {
 		for (String currRootLabel : jsonParam.keySet()) {
 			String curRootURI = currRootLabel;
 			if(!allTypes.existsRoot(curRootURI)) {
-				curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixURI());
+				curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixIRI());
 			}
 			if (!allTypes.existsRoot(curRootURI)) {
 				throw APEDimensionsException
@@ -112,7 +111,7 @@ public class Type extends TaxonomyPredicate {
 			for (String currTypeLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
 				String currTypeURI = currTypeLabel;
 				if(allTypes.get(currTypeURI, curRootURI) == null) {
-					currTypeURI = APEUtils.createClassURI(currTypeLabel, domainSetup.getOntologyPrefixURI());
+					currTypeURI = APEUtils.createClassURI(currTypeLabel, domainSetup.getOntologyPrefixIRI());
 				}
 				
 				if (currRootLabel.equals(allTypes.getLabelRootID())) {

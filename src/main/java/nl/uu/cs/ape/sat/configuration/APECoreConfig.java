@@ -90,27 +90,27 @@ public class APECoreConfig {
      * Initialize the configuration of the project.
      *
      * @param ontology           A file containing the APE configuration.
-     * @param ontologyPrefixURI  Prefix used to define OWL class IDs
+     * @param ontologyPrefixIRI  Prefix used to define OWL class IDs
      * @param toolTaxonomyRoot   Node in the ontology that corresponds to the root of the module taxonomy.
      * @param dataDimensionRoots List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
      * @param toolAnnotations    The JSON file with all tool annotations.
      * @param strictToolAnnotations {@code true} if the domain expects strict tool annotations
      */
-    public APECoreConfig(File ontology, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations, boolean strictToolAnnotations) {
+    public APECoreConfig(File ontology, String ontologyPrefixIRI, String toolTaxonomyRoot, List<String> dataDimensionRoots, File toolAnnotations, boolean strictToolAnnotations) {
 
         /* Path to the OWL file. */
         this.ONTOLOGY.setValue(ontology.toPath());
 
         /* URI of the ontology classes. */
-        this.ONTOLOGY_PREFIX.setValue(ontologyPrefixURI);
+        this.ONTOLOGY_PREFIX.setValue(ontologyPrefixIRI);
 
         /* The root class of the tool taxonomy. */
-        this.TOOL_ONTOLOGY_ROOT.setValue(APEUtils.createClassURI(toolTaxonomyRoot, getOntologyPrefixURI()));
+        this.TOOL_ONTOLOGY_ROOT.setValue(APEUtils.createClassURI(toolTaxonomyRoot, getOntologyPrefixIRI()));
 
         /* Dimension classes of the data taxonomy. */
         this.DIMENSIONS_ONTOLOGY.setValue(
                 dataDimensionRoots.stream()
-                        .map(subTaxonomy -> APEUtils.createClassURI(subTaxonomy, getOntologyPrefixURI()))
+                        .map(subTaxonomy -> APEUtils.createClassURI(subTaxonomy, getOntologyPrefixIRI()))
                         .collect(Collectors.toList()));
 
         /* Path to the tool annotations JSON file. */
@@ -243,7 +243,7 @@ public class APECoreConfig {
     /**
      * Run the initial validation of the ontology file and the corresponding tool and data terms. Validation will simply check the format of the ontology and the existance of the mentioned classes.
      * @param ontologyFile - ontology file
-     * @param ontologyPrefixURI  Prefix used to define OWL class IDs
+     * @param ontologyPrefixIRI  Prefix used to define OWL class IDs
      * @param toolTaxonomyRoot   Node in the ontology that corresponds to the root of the module taxonomy.
      * @param dataDimensionRoots List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
      * @return
@@ -251,8 +251,8 @@ public class APECoreConfig {
      * @throws OWLOntologyCreationException Error in file format.
      * @throws FileExistsException File error.
      */
-    public static boolean validateOntology(File ontologyFile, String ontologyPrefixURI, String toolTaxonomyRoot, List<String> dataDimensionRoots) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
-    	return OWLReader.verifyOntology(ontologyFile, ontologyPrefixURI, toolTaxonomyRoot, dataDimensionRoots);
+    public static boolean validateOntology(File ontologyFile, String ontologyPrefixIRI, String toolTaxonomyRoot, List<String> dataDimensionRoots) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
+    	return OWLReader.verifyOntology(ontologyFile, ontologyPrefixIRI, toolTaxonomyRoot, dataDimensionRoots);
     	
     }
 
@@ -278,7 +278,7 @@ public class APECoreConfig {
      *
      * @return the value of tag {@link #ONTOLOGY_PREFIX}
      */
-    public String getOntologyPrefixURI() {
+    public String getOntologyPrefixIRI() {
         return ONTOLOGY_PREFIX.getValue();
     }
 
