@@ -9,7 +9,6 @@ import java.util.ListIterator;
 import java.util.Set;
 
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The class represents a clause/fact used in the SAT encoding (CNF). 
@@ -34,7 +33,7 @@ public class CNFClause {
 	/**
 	 * Create a clause that has only one element.
 	 * 
-	 * @param atom TODO vedran: fill in description
+	 * @param atom - integer that corresponds to the mapping of the atom
 	 */
 	public CNFClause(Integer atom) {
 		super();

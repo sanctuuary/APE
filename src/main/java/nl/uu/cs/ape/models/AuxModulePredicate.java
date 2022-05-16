@@ -37,12 +37,14 @@ public class AuxModulePredicate extends AbstractModule implements AuxiliaryPredi
      * Create an auxiliary predicate.<br><br>
      * It is recommended to use the method {@link AuxModulePredicate#generateAuxiliaryPredicate} to generate an auxiliary object.
      *
-     * TODO vedran: complete parameter descriptions
-     * @param predicate the predicate
-     * @param logicOp   the logic operator
+     * @param moduleName - name of the auxiliary module predicate
+     * @param moduleID - ID of the auxiliary module predicate
+     * @param rootNode - module root node
+     * @param containingPredicates - collection of module predicates that comprise the auxiliary predicate 
+     * @param logicOp - logical operation that binds the comprised predicates
      */
-    private AuxModulePredicate(String moduleName, String moduleID, String rootNode, NodeType nodeType, Collection<TaxonomyPredicate> containingPredicates, LogicOperation logicOp) {
-        super(moduleName, moduleID, rootNode, nodeType);
+    private AuxModulePredicate(String moduleName, String moduleID, String rootNode, Collection<TaxonomyPredicate> containingPredicates, LogicOperation logicOp) {
+        super(moduleName, moduleID, rootNode, NodeType.ABSTRACT);
         this.logicOp = logicOp;
         this.containingPredicates = new TreeSet<TaxonomyPredicate>();
         this.containingPredicates.addAll(containingPredicates);
@@ -68,7 +70,7 @@ public class AuxModulePredicate extends AbstractModule implements AuxiliaryPredi
         String abstractLabel = APEUtils.getLabelFromList(relatedPredicates, logicOp);
 
         
-        AuxModulePredicate newAbsType = (AuxModulePredicate) domainSetup.getAllModules().addPredicate(new AuxModulePredicate(abstractLabel, abstractLabel, relatedPredicates.first().getRootNodeID(), NodeType.ABSTRACT, relatedPredicates, logicOp));
+        AuxModulePredicate newAbsType = (AuxModulePredicate) domainSetup.getAllModules().addPredicate(new AuxModulePredicate(abstractLabel, abstractLabel, relatedPredicates.first().getRootNodeID(), relatedPredicates, logicOp));
 
         if (newAbsType != null) {
         	domainSetup.addHelperPredicate(newAbsType);

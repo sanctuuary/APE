@@ -53,7 +53,7 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
 
     /**
      * Private constructor used to create auxiliary {@code true} and {@code false} atoms.
-     * @param mapping TODO vedran: fill in description
+     * @param mapping integer that corresponds to the mapped Atom. 
      */
     private SLTLxAtom(int mapping) {
     	super();

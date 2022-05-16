@@ -34,7 +34,7 @@ public interface APEInterface {
 		/**
 		 * The method returns the configuration file of the APE instance.
 		 *
-		 * @return Field {@link #config}. TODO vedran
+		 * @return The {@link APECoreConfig} that contains all core configuration parameters.
 		 */
 		public APECoreConfig getConfig();
 
