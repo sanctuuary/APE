@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.test.sat.ape;
 
-import nl.uu.cs.ape.sat.Main;
-import nl.uu.cs.ape.sat.configuration.APERunConfig;
+import nl.uu.cs.ape.Main;
+import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.sat.test.utils.TestResources;
 
 import org.apache.commons.io.FileUtils;
