@@ -75,7 +75,7 @@ public class SolutionWorkflow {
      * Mapping used to allow us to determine the correlation between the usage of
      * data instances and the actual tools that take the instance as input.
      * A mapping is a pair of an Automaton {@link State} that depicts
-     * {@link SMTDataType#USED_TYPE} and a {@link ModuleNode}.<br>
+     * {@link AtomType#USED_TYPE} and a {@link ModuleNode}.<br>
      * If the second is NULL, the data is used as WORKFLOW OUTPUT.
      */
     private Map<State, ModuleNode> usedType2ToolMap;
@@ -358,7 +358,6 @@ public class SolutionWorkflow {
     }
 
     /**
-     * TODO Make it to work for both, SMT and SAT to work
      * Returns the negated solution in mapped format. Negating the original solution
      * created by the SAT solver. Usually used to add to the solver to find new solutions.
      *

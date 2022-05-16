@@ -101,17 +101,17 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
     /**
      * Return the type of the element in the workflow (tool, memory type, etc.)
      *
-     * @return The {@link SMTDataType} that corresponds to the SLTLxLiteral usage or not usage (in case of a negated literal).
+     * @return The {@link AtomType} that corresponds to the SLTLxLiteral usage or not usage (in case of a negated literal).
      */
     public AtomType getWorkflowElementType() {
         return atom.getWorkflowElementType();
     }
 
     /**
-     * Return true if the current workflow element is of the given {@link SMTDataType} type.
+     * Return true if the current workflow element is of the given {@link AtomType} type.
      *
      * @param workflowElemType Element type that is current literal is compared to.
-     * @return true if the current workflow element corresponds to the given {@link SMTDataType}, false otherwise.
+     * @return true if the current workflow element corresponds to the given {@link AtomType}, false otherwise.
      */
     public boolean isWorkflowElementType(AtomType workflowElemType) {
         return atom.getWorkflowElementType() == workflowElemType;

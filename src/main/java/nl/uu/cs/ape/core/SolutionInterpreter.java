@@ -6,7 +6,7 @@ import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.Module;
 
 /**
- * The {@code SolutionInterpreter} class defines objects used to interpret the solutions given in native formats (e.g. SAT, SMT output).
+ * The {@code SolutionInterpreter} class defines objects used to interpret the solutions given in native formats (e.g. SAT output).
  *
  * @author Vedran Kasalica
  */

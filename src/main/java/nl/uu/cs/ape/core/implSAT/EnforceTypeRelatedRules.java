@@ -26,7 +26,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 
 /**
- * The {@code SMTTypeUtils} class is used to encode SLTLx constraints based on the
+ * The {@code EnforceTypeRelatedRules} class is used to encode SLTLx constraints based on the
  * existing types that would encode the workflow structure.
  *
  * @author Vedran Kasalica

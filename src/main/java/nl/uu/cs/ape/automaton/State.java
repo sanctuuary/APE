@@ -154,7 +154,7 @@ public class State implements PredicateLabel, StateInterface {
     /**
      * Get the type of the state (e.g. tool, memory type, etc.).
      *
-     * @return The {@link SMTDataType} that describes the state.
+     * @return The {@link AtomType} that describes the state.
      */
     public AtomType getWorkflowStateType() {
         return this.workflowStateType;
@@ -163,9 +163,9 @@ public class State implements PredicateLabel, StateInterface {
     /**
      * Function used to calculate the absolute order number of a state based on the information regarding its block number, order number within the block and type of the state.
      * <p>
-     * {@link SMTDataType#MEMORY_TYPE} corresponds to the Memory Type State,<br>
-     * {@link SMTDataType#USED_TYPE} corresponds to the Used Type State,<br>
-     * {@link SMTDataType#MODULE} corresponds to the Module/Tool State.
+     * {@link AtomType#MEMORY_TYPE} corresponds to the Memory Type State,<br>
+     * {@link AtomType#USED_TYPE} corresponds to the Used Type State,<br>
+     * {@link AtomType#MODULE} corresponds to the Module/Tool State.
      *
      * @param blockNumber     Corresponds to the block number within the type automaton (not applicable for the module automaton).
      * @param localStateNumber     Corresponds to the state number within block.
@@ -192,9 +192,9 @@ public class State implements PredicateLabel, StateInterface {
      * Function used to calculate the order number of a state within the corresponding automaton (e.g., order number of a MemoryState in a MemoryState Automaton)
      * The information is calculated based on the  block number, order number within the block and type of the state.
      * <p>
-     * {@link SMTDataType#MEMORY_TYPE} corresponds to the Memory Type State,<br>
-     * {@link SMTDataType#USED_TYPE} corresponds to the Used Type State,<br>
-     * {@link SMTDataType#MODULE} corresponds to the Module/Tool State.
+     * {@link AtomType#MEMORY_TYPE} corresponds to the Memory Type State,<br>
+     * {@link AtomType#USED_TYPE} corresponds to the Used Type State,<br>
+     * {@link AtomType#MODULE} corresponds to the Module/Tool State.
      *
      * @param blockNumber     Corresponds to the block number within the type automaton (not applicable for the module automaton).
      * @param localStateNumber     Corresponds to the state number within block.

@@ -20,6 +20,12 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxImplication;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
 
+/**
+ * Class used to encode rules specific to SLTLx logic.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class EnforceSLTLxRelatedRules {
 
 	

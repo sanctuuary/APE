@@ -210,11 +210,11 @@ public final class EnforceModuleRelatedRules {
 	/**
 	 * Constraints that ensure that the referenced memory states contain the same
 	 * data type as the one that is used as the input for the tool. Constraints
-	 * ensure that the {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented
+	 * ensure that the {@link AtomType#MEM_TYPE_REFERENCE} are implemented
 	 * correctly.
 	 *
 	 * @return String representing the constraints required to ensure that the
-	 *         {@link SMTDataType#MEM_TYPE_REFERENCE} are implemented correctly.
+	 *         {@link AtomType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
 	private static Set<SLTLxFormula> dataReference(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();

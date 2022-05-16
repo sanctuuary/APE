@@ -21,8 +21,7 @@ import static guru.nidi.graphviz.model.Factory.node;
  * an output of a tool in the workflow execution.
  * <p>
  * When compared to the {@link TypeAutomaton} representation of the problem,
- * a Workflow {@code TypeNode} correspond to a {@link State}
- * of a {@link SMTDataType#MEMORY_TYPE} element.
+ * a Workflow {@code TypeNode} correspond to a {@link State} in memory.
  *
  * @author Vedran Kasalica
  */
@@ -54,7 +53,8 @@ public class TypeNode extends SolutionWorkflowNode {
      * Creating Workflow Node that corresponds to a type instance in memory.
      *
      * @param automatonState State in the {@link TypeAutomaton} that corresponds to the workflow node.
-     * @throws ExceptionInInitializerError Exception when the Type Workflow Node is instantiated using a State in                                     TypeAutomaton that does not correspond to a {@code SMTDataType#MEMORY_TYPE}.
+     * @throws ExceptionInInitializerError Exception when the Type Workflow Node is instantiated using a State in
+     * TypeAutomaton that does not correspond to a {@code AtomType#MEMORY_TYPE}.
      */
     public TypeNode(State automatonState) throws ExceptionInInitializerError {
         super(automatonState);
@@ -64,7 +64,7 @@ public class TypeNode extends SolutionWorkflowNode {
         usedByModules = new ArrayList<ModuleNode>();
         if (automatonState.getWorkflowStateType() != AtomType.MEMORY_TYPE) {
             throw new ExceptionInInitializerError(
-                    "Class MemTypeNode can only be instantiated using State that is of type SMTDataType.MEMORY_TYPE, as a parameter.");
+                    "Class MemTypeNode can only be instantiated using State that is of type AtomType.MEMORY_TYPE, as a parameter.");
         }
     }
 

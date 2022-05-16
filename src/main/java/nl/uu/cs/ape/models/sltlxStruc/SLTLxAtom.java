@@ -40,7 +40,7 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
      * Creates an atom that can represent usage of the tool, creation or usage of a type,
      * or a reference between an input type and the state in which it was generated..
      *
-     * @param elementType Element that defines what type of a predicate is described (such as {@link SMTDataType#MODULE}.
+     * @param elementType Element that defines what type of a predicate is described (such as {@link AtomType#MODULE}.
      * @param predicate   Predicate used.
      * @param usedInState State in the automaton it was used/created in.
      */
@@ -123,7 +123,7 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
     /**
      * Return the type of the element in the workflow (tool, memory type, etc.)
      *
-     * @return The {@link SMTDataType} that corresponds to the atom usage.
+     * @return The {@link AtomType} that corresponds to the atom usage.
      */
     public AtomType getWorkflowElementType() {
         return elementType;
@@ -146,10 +146,10 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
     }
 
     /**
-     * Return true if the current workflow element is of the given {@link SMTDataType} type.
+     * Return true if the current workflow element is of the given {@link AtomType} type.
      *
      * @param workflowElemType Element type that is current SLTLxAtom is compared to.
-     * @return true if the current workflow element corresponds to the given {@link SMTDataType}, false otherwise.
+     * @return true if the current workflow element corresponds to the given {@link AtomType}, false otherwise.
      */
     public boolean isWorkflowElementType(AtomType workflowElemType) {
         return getWorkflowElementType() == workflowElemType;

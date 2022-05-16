@@ -620,25 +620,39 @@ public class APERunConfig {
 		this.solverType = solverType;
 	}
     
-    /**
-     * Creates builder to build {@link APERunConfig}.
-     */
-    public interface ISolutionMinLengthStage {
+	/**
+	    * Creates interface for the min length of {@link APERunConfig}.
+	    */
+	    public interface ISolutionMinLengthStage {
         ISolutionMaxLengthStage withSolutionMinLength(int solutionMinLength);
     }
 
+    /**
+    * Creates interface for the max length of {@link APERunConfig}.
+    */
     public interface ISolutionMaxLengthStage {
         IMaxNoSolutionsStage withSolutionMaxLength(int solutionMaxLength);
     }
 
-    public interface IMaxNoSolutionsStage {
+    /**
+     * Creates interface for the max solution no of {@link APERunConfig}.
+     */
+     public interface IMaxNoSolutionsStage {
         IApeDomainSetupStage withMaxNoSolutions(int maxNoSolutions);
     }
 
-    public interface IApeDomainSetupStage {
+     /**
+      * Creates interface to setup the domain of {@link APERunConfig}.
+      */
+      public interface IApeDomainSetupStage {
         IBuildStage withApeDomainSetup(APEDomainSetup apeDomainSetup);
     }
 
+    /**
+     * Interface for the builder class.
+     * @author Vedran Kasalica
+     *
+     */
     public interface IBuildStage {
         IBuildStage withConstraintsJSON(JSONObject constraintsJSON);
 
@@ -803,13 +817,5 @@ public class APERunConfig {
             return new APERunConfig(this);
         }
     }
-
-    private String options;
-    public void setSMTOptions(String options) {
-    	this.options = options;
-    }
-	public String getSMTOptions() {
-		return this.options;
-	}
 
 }

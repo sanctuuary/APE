@@ -113,7 +113,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
     /**
      * Return the type of the element in the workflow (tool, memory type, etc.)
      *
-     * @return The {@link SMTDataType} that corresponds to the atom usage.
+     * @return The {@link AtomType} that corresponds to the atom usage.
      */
     public AtomVarType getWorkflowElementType() {
         return elementType;
@@ -140,10 +140,10 @@ public class SLTLxAtomVar extends SLTLxFormula {
     }
 
     /**
-     * Return true if the current workflow element is of the given {@link SMTDataType} type.
+     * Return true if the current workflow element is of the given {@link AtomType} type.
      *
      * @param workflowElemType Element type that is current SLTLxAtom is compared to.
-     * @return true if the current workflow element corresponds to the given {@link SMTDataType}, false otherwise.
+     * @return true if the current workflow element corresponds to the given {@link AtomType}, false otherwise.
      */
     public boolean isWorkflowElementType(AtomVarType workflowElemType) {
         return getWorkflowElementType() == workflowElemType;
