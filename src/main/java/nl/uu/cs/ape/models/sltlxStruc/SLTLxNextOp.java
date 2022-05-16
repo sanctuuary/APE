@@ -7,7 +7,7 @@ import java.util.Set;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 
 /**
- * Structure used to model Next operation (<Op>) modal statement in SLTLx.
+ * Structure used to model Next operation (&lt;Op&gt;) modal statement in SLTLx.
  * 
  * @author Vedran Kasalica
  *

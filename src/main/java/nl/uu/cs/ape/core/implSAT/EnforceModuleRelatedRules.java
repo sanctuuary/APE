@@ -915,7 +915,6 @@ public final class EnforceModuleRelatedRules {
 	 *
 	 * @param pair      pair of modules.
 	 * @param moduleAutomaton Module automaton.
-	 * @param mappings        Mapping function.
 	 * @return The Set of SLTLx formulas that represent the constraints.
 	 */
 	
@@ -947,7 +946,6 @@ public final class EnforceModuleRelatedRules {
 	 *
 	 * @param allModules      All the modules.
 	 * @param moduleAutomaton Module automaton.
-	 * @param mappings        Mapping function.
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	public static Set<SLTLxFormula> moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton) {
@@ -984,7 +982,6 @@ public final class EnforceModuleRelatedRules {
 	 * @param allModules      All the modules.
 	 * @param currModule      Module that should be used.
 	 * @param moduleAutomaton Module automaton.
-	 * @param mappings        Mapping function.
 	 * @return Set of SLTLx formulas that represent the constraints enforcing taxonomy
 	 *         classifications.
 	 */
@@ -1005,7 +1002,6 @@ public final class EnforceModuleRelatedRules {
 	 * @param allModules  All the modules.
 	 * @param currModule  Module that should be used.
 	 * @param moduleState State in which the module should be used.
-	 * @param mappings    Mapping function.
 	 */
 	private static Set<SLTLxFormula> moduleTaxonomyStructureForState(AllModules allModules, TaxonomyPredicate currModule, State moduleState) {
 		SLTLxAtom superModuleState = new SLTLxAtom(AtomType.MODULE, currModule, moduleState);
@@ -1054,7 +1050,7 @@ public final class EnforceModuleRelatedRules {
 	 * Gets predicate pairs.
 	 *
 	 * @param predicateList List of predicates.
-	 * @return A a list of pairs of tools from modules. Note that the abstract
+	 * @return A list of pairs of tools from modules. Note that the abstract
 	 *         modules are not returned, only the unique pairs of modules that are
 	 *         representing actual tools.
 	 */

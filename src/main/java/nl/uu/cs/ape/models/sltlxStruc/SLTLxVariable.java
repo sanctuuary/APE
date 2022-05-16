@@ -135,7 +135,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	/**
 	 * The encoding ensures that the variable substitution preserves the properties of the data objects,
 	 * i.e., if a variable X substitutes state S, the two have to satisfy the same properties.<br/> 
-	 * <i> e.g., (VAL(?x,a) => (P(?x) <=> P(a))</i>
+	 * <i> e.g., (VAL(?x,a) =&gt; (P(?x) &lt;=&gt; P(a))</i>
 	 * <br/><br/>
 	 * 
 	 * <b>IMPORTANT: This method should be call after the binded subformula was visited (the corresponding CNF was generated),
@@ -168,7 +168,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 
 	/**
 	 * Generate the rules that enforce substitution over the data properties.<br/> <i> e.g., (VAL(?x,a) => (P(?x) <=> P(a))</i>
-	 * @param pair - a pair of variables that will be substituted
+	 * @param variable - the variable that will be substituted
 	 * @param variableSubtitutions - collection of substitutions for each variable
 	 * @param varOccurances - collection that tracks occurrences of variables
 	 * @return Set of formulas that represent the encoding of the rules 

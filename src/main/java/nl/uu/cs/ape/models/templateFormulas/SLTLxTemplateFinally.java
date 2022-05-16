@@ -10,7 +10,7 @@ import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
- * Template for the formulas including the modal Finally operator in its simplest format "G A(x)" or "G <T(;)> true".
+ * Template for the formulas including the modal Finally operator in its simplest format "G A(x)" or "G &lt;T(;)&gt; true".
  * 
  * @author Vedran Kasalica
  *

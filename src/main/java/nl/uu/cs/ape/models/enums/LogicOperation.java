@@ -35,7 +35,7 @@ public enum LogicOperation {
     }
 
     /**
-     * Get sign as a 1 char string - '|' or '&'.
+     * Get sign as a 1 char string - '|' or '&amp;'.
      *
      * @return A simple sign corresponding to the logical operation.
      */

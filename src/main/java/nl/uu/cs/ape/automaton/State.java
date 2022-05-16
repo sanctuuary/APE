@@ -29,7 +29,7 @@ public class State implements PredicateLabel, StateInterface {
      *
      * @param workflowStateType Parameter determining the state type.
      * @param blockNumber       Corresponds to the block number within the type automaton (not applicable for the module automaton).
-     * @param localStateNumber       Corresponds to the state number within block.
+     * @param stateNumber       Corresponds to the state number within block.
      * @param inputBranching   Max number of inputs per module.
      * @param outputBranching   Max number of outputs per module.
      */
@@ -132,7 +132,7 @@ public class State implements PredicateLabel, StateInterface {
     }
 
     /**
-     * Returns the  order number of the state with respect to the State Type ({@link AtomType}). Unlike {@link #getStateNumber}, this function returns number that can be used to compare ordering of any 2 states of the same type in the system,
+     * Returns the  order number of the state with respect to the State Type ({@link AtomType}). Unlike {@link #getLocalStateNumber}, this function returns number that can be used to compare ordering of any 2 states of the same type in the system,
      * disregarding the block. null memory state has {@link #typeDependantStateNumber} = -1.
      *
      * @return Non-negative number that corresponds to the order number of the state within the same type or -1 for null memory state.
@@ -142,7 +142,7 @@ public class State implements PredicateLabel, StateInterface {
     }
     
     /**
-     * Returns the absolute order number of the state within the whole workflow. Unlike {@link #getStateNumber}, this function returns number that can be used to compare ordering of any 2 states in the system,
+     * Returns the absolute order number of the state within the whole workflow. Unlike {@link #getLocalStateNumber}, this function returns number that can be used to compare ordering of any 2 states in the system,
      * disregarding the block or their type (data type, tool, etc.). null state has AbsoluteStateNumber -1.
      *
      * @return Non-negative number that corresponds to the absolute order number of the state or -1 for null state.
@@ -168,7 +168,7 @@ public class State implements PredicateLabel, StateInterface {
      * {@link AtomType#MODULE} corresponds to the Module/Tool State.
      *
      * @param blockNumber     Corresponds to the block number within the type automaton (not applicable for the module automaton).
-     * @param localStateNumber     Corresponds to the state number within block.
+     * @param stateNumber     Corresponds to the state number within block.
      * @param inputBranching   Max number of inputs per module.
      * @param outputBranching   Max number of outputs per module.
      * @param typeOfTheState  Parameter determining the state type.
@@ -197,7 +197,7 @@ public class State implements PredicateLabel, StateInterface {
      * {@link AtomType#MODULE} corresponds to the Module/Tool State.
      *
      * @param blockNumber     Corresponds to the block number within the type automaton (not applicable for the module automaton).
-     * @param localStateNumber     Corresponds to the state number within block.
+     * @param stateNumber     Corresponds to the state number within block.
      * @param inputBranching   Max number of inputs per module.
      * @param outputBranching   Max number of outputs per module.
      * @param typeOfTheState  Parameter determining the state type.

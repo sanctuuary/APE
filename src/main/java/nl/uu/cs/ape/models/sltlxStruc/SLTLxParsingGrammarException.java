@@ -3,7 +3,7 @@ package nl.uu.cs.ape.models.sltlxStruc;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /**
- * The {@codeSLTLxParsingStructureException} exception will be thrown if the SLTLx formula is not well formatted, i.e., it does not follow the grammar rules. 
+ * The {@link SLTLxParsingGrammarException} exception will be thrown if the SLTLx formula is not well formatted, i.e., it does not follow the grammar rules.
  * 
  * @author Vedran Kasalica
  *

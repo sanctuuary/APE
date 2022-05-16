@@ -6,7 +6,7 @@ import java.util.Set;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 
 /**
- * Structure used to model equivalence (e.g., "a <=> b") in SLTLx.
+ * Structure used to model equivalence (e.g., "a &lt;=&gt; b") in SLTLx.
  * 
  * @author Vedran Kasalica
  *
