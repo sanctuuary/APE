@@ -15,7 +15,10 @@ public interface StateInterface {
      */
     public String getPredicateID();
     
-    /** By default variable states have no absolute state number. */
+    /** 
+     * By default variable states have no absolute state number.
+     * @return If absolute number is not defined, return {@code -1}.
+     */
     public default int getAbsoluteStateNumber() { return -1; }
 	
     @Override

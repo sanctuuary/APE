@@ -18,7 +18,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
  *
  * @author Vedran Kasalica
  */
-public class SATAtomMappings implements Mappings {
+public class SATAtomMappings {
 
 	/** 
 	 * First variable that can be used for auxiliary variables.

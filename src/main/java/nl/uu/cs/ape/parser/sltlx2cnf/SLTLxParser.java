@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 
+/**
+ * Parser for SLTLx language.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class SLTLxParser extends Parser {
 	static { RuntimeMetaData.checkVersion("4.9.2", RuntimeMetaData.VERSION); }
@@ -97,7 +103,13 @@ public class SLTLxParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
-	public static class ConditionContext extends ParserRuleContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  ConditionContext extends ParserRuleContext {
 		public List<FormulaContext> formula() {
 			return getRuleContexts(FormulaContext.class);
 		}
@@ -185,6 +197,12 @@ public class SLTLxParser extends Parser {
 		return _localctx;
 	}
 
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
 	public static class FormulaContext extends ParserRuleContext {
 		public FormulaContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -196,7 +214,13 @@ public class SLTLxParser extends Parser {
 			super.copyFrom(ctx);
 		}
 	}
-	public static class ToolRefContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  ToolRefContext extends FormulaContext {
 		public ModuleContext module() {
 			return getRuleContext(ModuleContext.class,0);
 		}
@@ -218,7 +242,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class UnaryModalContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  UnaryModalContext extends FormulaContext {
 		public TerminalNode UN_MODAL() { return getToken(SLTLxParser.UN_MODAL, 0); }
 		public FormulaContext formula() {
 			return getRuleContext(FormulaContext.class,0);
@@ -238,7 +268,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class NegUnaryContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  NegUnaryContext extends FormulaContext {
 		public TerminalNode NOT() { return getToken(SLTLxParser.NOT, 0); }
 		public FormulaContext formula() {
 			return getRuleContext(FormulaContext.class,0);
@@ -258,7 +294,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class R_relationContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  R_relationContext extends FormulaContext {
 		public TerminalNode R_REL() { return getToken(SLTLxParser.R_REL, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public List<TerminalNode> VARIABLE() { return getTokens(SLTLxParser.VARIABLE); }
@@ -281,7 +323,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class BinaryBoolContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  BinaryBoolContext extends FormulaContext {
 		public List<FormulaContext> formula() {
 			return getRuleContexts(FormulaContext.class);
 		}
@@ -304,7 +352,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class FunctionContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  FunctionContext extends FormulaContext {
 		public TerminalNode CONSTANT() { return getToken(SLTLxParser.CONSTANT, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
@@ -324,7 +378,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class ForallContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  ForallContext extends FormulaContext {
 		public TerminalNode FORALL() { return getToken(SLTLxParser.FORALL, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
@@ -347,7 +407,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class TrueContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  TrueContext extends FormulaContext {
 		public TerminalNode TRUE() { return getToken(SLTLxParser.TRUE, 0); }
 		public TrueContext(FormulaContext ctx) { copyFrom(ctx); }
 		@Override
@@ -364,7 +430,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class ExistsContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  ExistsContext extends FormulaContext {
 		public TerminalNode EXISTS() { return getToken(SLTLxParser.EXISTS, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
@@ -387,7 +459,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class BinaryModalContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  BinaryModalContext extends FormulaContext {
 		public List<FormulaContext> formula() {
 			return getRuleContexts(FormulaContext.class);
 		}
@@ -410,7 +488,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class BracketsContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  BracketsContext extends FormulaContext {
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public FormulaContext formula() {
 			return getRuleContext(FormulaContext.class,0);
@@ -431,7 +515,13 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class VarEqContext extends FormulaContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  VarEqContext extends FormulaContext {
 		public List<TerminalNode> VARIABLE() { return getTokens(SLTLxParser.VARIABLE); }
 		public TerminalNode VARIABLE(int i) {
 			return getToken(SLTLxParser.VARIABLE, i);
@@ -671,7 +761,13 @@ public class SLTLxParser extends Parser {
 		return _localctx;
 	}
 
-	public static class ModuleContext extends ParserRuleContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  ModuleContext extends ParserRuleContext {
 		public TerminalNode CONSTANT() { return getToken(SLTLxParser.CONSTANT, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public List<VarsContext> vars() {
@@ -731,7 +827,13 @@ public class SLTLxParser extends Parser {
 		return _localctx;
 	}
 
-	public static class VarsContext extends ParserRuleContext {
+	/**
+	 * SLTLx parser element.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
+	public static class  VarsContext extends ParserRuleContext {
 		public List<TerminalNode> VARIABLE() { return getTokens(SLTLxParser.VARIABLE); }
 		public TerminalNode VARIABLE(int i) {
 			return getToken(SLTLxParser.VARIABLE, i);

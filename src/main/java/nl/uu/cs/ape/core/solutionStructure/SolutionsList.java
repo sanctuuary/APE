@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.models.Mappings;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.enums.SolverType;
@@ -30,7 +29,7 @@ public class SolutionsList {
     /**
      * Mapping of predicates into integers (for SAT encoding).
      */
-    private final Mappings mappings;
+    private final SATAtomMappings mappings;
 
     /**
      * Current solution index.
@@ -101,7 +100,7 @@ public class SolutionsList {
      *
      * @return The {@link SATAtomMappings} object.
      */
-    public Mappings getMappings() {
+    public SATAtomMappings getMappings() {
         return mappings;
     }
 

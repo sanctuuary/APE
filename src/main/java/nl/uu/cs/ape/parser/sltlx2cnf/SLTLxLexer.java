@@ -9,6 +9,13 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
+
+/**
+ * Lexter for SLTLx language.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class SLTLxLexer extends Lexer {
 	static { RuntimeMetaData.checkVersion("4.9.2", RuntimeMetaData.VERSION); }

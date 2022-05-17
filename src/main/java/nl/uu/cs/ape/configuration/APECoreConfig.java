@@ -246,7 +246,7 @@ public class APECoreConfig {
      * @param ontologyPrefixIRI  Prefix used to define OWL class IDs
      * @param toolTaxonomyRoot   Node in the ontology that corresponds to the root of the module taxonomy.
      * @param dataDimensionRoots List of nodes in the ontology that correspond to the roots of disjoint sub-taxonomies, where each represents a data dimension (e.g. data type, data format, etc.).
-     * @return
+     * @return return {@code true} if validation was successful, {@code false} otherwise.
      * @throws APEDimensionsException Error when one of the terms does not exist in the ontology
      * @throws OWLOntologyCreationException Error in file format.
      * @throws FileExistsException File error.
@@ -267,7 +267,7 @@ public class APECoreConfig {
     
     /**
      * Set ontology annotation.
-     *
+     * @param ontology - ontology filej
      */
     public void setOntologyFile(File ontology) {
     	ONTOLOGY.setValue(ontology.toPath());
@@ -311,6 +311,7 @@ public class APECoreConfig {
     
     /**
      * Set tool annotations.
+     * @param toolAnnotations - tool annotations file
      *
      */
     public void setToolAnnotationsFile(File toolAnnotations) {

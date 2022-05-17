@@ -54,6 +54,13 @@ import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.UnaryModalContext;
 import nl.uu.cs.ape.parser.sltlx2cnf.SLTLxParser.VarEqContext;
 import nl.uu.cs.ape.utils.APEUtils;
 
+
+/**
+ * ANTLR Visitor class, used to parse an SLTLx formula and generate the corresponding {@link SLTLxFormula} structure.	
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 
 	static int usedState = 0;

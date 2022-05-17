@@ -103,7 +103,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         this.domainSetup = domainSetup;
         this.allSolutions = allSolutions;
         this.runConfig = runConfig;
-        this.mappings = (SATAtomMappings) allSolutions.getMappings();
+        this.mappings = allSolutions.getMappings();
         this.mappings.resetAuxVariables();
         this.varUsage = new SLTLxVariableOccuranceCollection();
         

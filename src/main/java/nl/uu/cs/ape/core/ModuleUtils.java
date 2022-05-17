@@ -60,6 +60,13 @@ public abstract class ModuleUtils {
 		return constraints.toString();
 	}
 	
+	/**
+	 * Encode data instance dependency constraints.
+	 * 
+	 * @param typeAutomaton type automaton
+	 * @param mappings all the atom mappings
+	 * @return String representation of constraints.
+	 */
 	public String encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
 		
@@ -76,6 +83,7 @@ public abstract class ModuleUtils {
 	 * tool specifications.<br>
 	 * Returns the representation of the input type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.
+	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representation of constraints.
 	 */
@@ -86,6 +94,7 @@ public abstract class ModuleUtils {
 	 * data type as the one that is used as the input for the tool. Constraints
 	 * ensure that the {@link AtomType#MEM_TYPE_REFERENCE} are implemented
 	 * correctly.
+	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link AtomType#MEM_TYPE_REFERENCE} are implemented correctly.
@@ -99,6 +108,7 @@ public abstract class ModuleUtils {
 	 * Return the representation of the input type constraints for all modules,
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
 	 * the Shared Memory Approach.
+	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representation of constraints.
 	 */
@@ -108,6 +118,9 @@ public abstract class ModuleUtils {
 	 * Generate constraints that ensure that the data instances can depend on
 	 * instances that are available in memory, and that each data instance depends
 	 * on itself.
+	 *
+	 * @param typeAutomaton type automaton
+	 * @param mappings all the atom mappings
 	 * 
 	 * @return String representation of constraints.
 	 */
@@ -116,11 +129,22 @@ public abstract class ModuleUtils {
 	/**
 	 * Generate constraints that ensure that tool inputs that reference data in
 	 * memory depend on the same data as the referenced data instance.
+	 *
+	 * @param typeAutomaton type automaton
+	 * @param mappings all the atom mappings
 	 * 
 	 * @return String representation of constraints.
 	 */
 	public abstract String enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton, SATAtomMappings mappings);
 
+	/**
+	 * Generate constraints that data dependency is preserved over modules.
+	 * 
+	 * @param typeAutomaton type automaton
+	 * @param mappings all the atom mappings
+	 * 
+	 * @return String representation of constraints.
+	 */
 	public abstract String enforceDataDependencyOverModules(TypeAutomaton typeAutomaton, SATAtomMappings mappings);
 
 	/**
@@ -128,6 +152,7 @@ public abstract class ModuleUtils {
 	 * according to the configuration, e.g. if the config specifies that all
 	 * workflow inputs have to be used, then each of them has to be referenced at
 	 * least once.
+	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representation of constraints.
 	 */
@@ -137,6 +162,7 @@ public abstract class ModuleUtils {
 	 * Return the representation of the output type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.<br>
 	 * Generate constraints that preserve tool outputs.
+	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representation of constraints.
 	 */

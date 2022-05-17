@@ -295,10 +295,19 @@ public abstract class APEConfigTag<T> {
      */
     public static class Info<T> {
 
-        public final String tag_name, label, description;
+    	/** Tag name. */
+        public final String tag_name;
+        /** Label. */
+        public final String label;
+        /** description. */
+        public final String description;
+        /** Is it ptional. */
         public final boolean optional;
+        /** Type. */
         public final TagType type;
+        /** Default value. */
         public final T _default;
+        /** Constraints. */
         public final JSONObject constraints;
 
         /**

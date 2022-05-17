@@ -4,10 +4,23 @@ package nl.uu.cs.ape.core.solutionStructure;
  * Base class with shared behaviour for CWL export classes.
  */
 public abstract class CWLCreatorBase {
+	/**
+	 * Cwl representation.
+	 */
     protected final StringBuilder cwlRepresentation;
+    /**
+     * Solution.
+     */
     protected SolutionWorkflow solution;
+    /**
+     * Indent style used.
+     */
     private IndentStyle indentStyle;
 
+    /**
+     * Generate the creator base from the workflow solution.
+     * @param solution - APE workflow solution
+     */
     protected CWLCreatorBase(SolutionWorkflow solution) {
         this.solution = solution;
         this.cwlRepresentation = new StringBuilder();

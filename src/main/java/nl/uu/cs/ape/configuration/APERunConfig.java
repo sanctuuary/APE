@@ -282,6 +282,10 @@ public class APERunConfig {
         return new Builder();
     }
 
+    /**
+     * Get domain setup.
+     * @return Object containing domain specific parameters/annotations.
+     */
     public APEDomainSetup getApeDomainSetup() {
         return this.apeDomainSetup;
     }
@@ -348,6 +352,7 @@ public class APERunConfig {
         return getSolutionDirPath().resolve(relativePath);
     }
 
+    /** Tag value. */
     public static final String EXECUTABLES_FOLDER_NAME = "Executables";
     /**
      * Get the path to the directory where the executable scripts corresponding to the given solutions should be stored.
@@ -358,6 +363,7 @@ public class APERunConfig {
         return getSolutionDirPath2(EXECUTABLES_FOLDER_NAME);
     }
 
+     /** Tag value. */
     public static final String FIGURES_FOLDER_NAME = "Figures";
     /**
      * Get the path to the directory where the graphs representation of the solutions should be stored.
@@ -368,6 +374,7 @@ public class APERunConfig {
         return getSolutionDirPath2(FIGURES_FOLDER_NAME);
     }
 
+     /** Tag value. */
     public static final String CWL_FOLDER_NAME = "CWL";
     /**
      * Get the path to the directory where the CWL scripts corresponding the given solutions should be stored.
@@ -378,6 +385,7 @@ public class APERunConfig {
         return getSolutionDirPath2(CWL_FOLDER_NAME);
     }
 
+     /** Tag value. */
     public static final String EXECUTABLE_CWL_FOLDER_NAME = "CWL_executables";
     /**
      * Get the path to the directory where the executable CWL scripts corresponding the given solutions should be stored.
@@ -631,6 +639,11 @@ public class APERunConfig {
     * Creates interface for the max length of {@link APERunConfig}.
     */
     public interface ISolutionMaxLengthStage {
+    	/**
+    	 * Set Max length.
+    	 * @param solutionMaxLength
+    	 * @return 
+    	 */
         IMaxNoSolutionsStage withSolutionMaxLength(int solutionMaxLength);
     }
 

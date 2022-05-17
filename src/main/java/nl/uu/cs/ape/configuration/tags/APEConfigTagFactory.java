@@ -26,8 +26,17 @@ import java.util.List;
 
 public class APEConfigTagFactory {
 
+	/**
+	 * Types of tag fields.
+	 * 
+	 * @author Vedran Kasalica
+	 *
+	 */
     public static class TYPES {
 
+       /**
+         * Abstract field type.
+         */
         public static abstract class ExistingFile extends APEConfigTag<Path> {
 
             @Override
@@ -54,6 +63,9 @@ public class APEConfigTagFactory {
             }
         }
 
+       /**
+         * Abstract field type.
+         */
         public static abstract class DataDimensions extends APEConfigDependentTag.One<List<String>, String> {
 
             public DataDimensions(Provider<String> provider) {
@@ -93,6 +105,9 @@ public class APEConfigTagFactory {
 
         }
 
+       /**
+         * Abstract field type.
+         */
         public static abstract class DataInstances extends APEConfigDependentTag.One<List<Type>, APEDomainSetup> {
 
             public DataInstances(Provider<APEDomainSetup> provider) {
@@ -117,6 +132,9 @@ public class APEConfigTagFactory {
 
         }
 
+        /**
+         * Abstract field type.
+         */
         public static abstract class Bool extends APEConfigTag<Boolean> {
 
             @Override
@@ -135,6 +153,9 @@ public class APEConfigTagFactory {
             }
         }
 
+       /**
+         * Abstract field type.
+         */
         public static abstract class Int extends APEConfigTag<Integer> {
 
             private final Range range;
@@ -164,6 +185,9 @@ public class APEConfigTagFactory {
             }
         }
 
+       /**
+         * Abstract field type.
+         */
         public static abstract class IntRange extends APEConfigTag<Range> {
 
             private final Range boundaries;
@@ -201,6 +225,9 @@ public class APEConfigTagFactory {
             }
         }
 
+       /**
+         * Abstract field type.
+         */
         public static abstract class Directory extends APEConfigTag<Path> {
 
             protected abstract APEFiles.Permission[] getRequiredPermissions();
@@ -231,6 +258,9 @@ public class APEConfigTagFactory {
             }
         }
 
+       /**
+         * Abstract field type.
+         */
         public static abstract class Option<E extends Enum<E>> extends APEConfigTag<E> {
 
             @Override
@@ -260,6 +290,9 @@ public class APEConfigTagFactory {
             }
         }
 
+       /**
+         * Abstract field type.
+         */
         public static abstract class URI extends APEConfigTag<String> {
 
             @Override
@@ -279,6 +312,9 @@ public class APEConfigTagFactory {
             }
         }
         
+       /**
+         * Abstract field type.
+         */
         public static abstract class JSON extends APEConfigTag<JSONObject> {
 
             @Override
@@ -310,9 +346,15 @@ public class APEConfigTagFactory {
         }
     }
 
+    /**
+     * Configuration tags.
+     */
     public static class TAGS {
 
-        public static class ONTOLOGY extends TYPES.ExistingFile {
+    	/**
+         * Configuration field.
+         */
+    	public static class ONTOLOGY extends TYPES.ExistingFile {
 
             @Override
             public String getTagName() {
@@ -341,7 +383,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class ONTOLOGY_PREFIX extends TYPES.URI {
+    	/**
+         * Configuration field.
+         */
+    	public static class ONTOLOGY_PREFIX extends TYPES.URI {
 
             @Override
             public String getTagName() {
@@ -365,7 +410,10 @@ public class APEConfigTagFactory {
 
         }
 
-        public static class DIMENSIONS_ONTOLOGY extends TYPES.DataDimensions {
+    	/**
+         * Configuration field.
+         */
+    	public static class DIMENSIONS_ONTOLOGY extends TYPES.DataDimensions {
 
             public DIMENSIONS_ONTOLOGY(Provider<String> provider) {
                 super(provider);
@@ -393,7 +441,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class PROGRAM_INPUTS extends TYPES.DataInstances {
+    	/**
+         * Configuration field.
+         */
+    	public static class PROGRAM_INPUTS extends TYPES.DataInstances {
 
             public PROGRAM_INPUTS(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -440,7 +491,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class PROGRAM_OUTPUTS extends TYPES.DataInstances {
+    	/**
+         * Configuration field.
+         */
+    	public static class PROGRAM_OUTPUTS extends TYPES.DataInstances {
 
             public PROGRAM_OUTPUTS(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -487,7 +541,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class TOOL_ONTOLOGY_ROOT extends APEConfigDependentTag.One<String, String> {
+    	/**
+         * Configuration field.
+         */
+    	public static class TOOL_ONTOLOGY_ROOT extends APEConfigDependentTag.One<String, String> {
 
             public TOOL_ONTOLOGY_ROOT(Provider<String> prefix_provider) {
                 super(prefix_provider);
@@ -530,7 +587,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class TOOL_ANNOTATIONS extends TYPES.ExistingFile {
+    	/**
+         * Configuration field.
+         */
+    	public static class TOOL_ANNOTATIONS extends TYPES.ExistingFile {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
@@ -558,7 +618,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class CWL_ANNOTATIONS extends TYPES.ExistingFile {
+    	/**
+         * Configuration field.
+         */
+    	public static class CWL_ANNOTATIONS extends TYPES.ExistingFile {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
@@ -586,7 +649,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class CONSTRAINTS extends TYPES.JSON {
+    	/**
+         * Configuration field.
+         */
+    	public static class CONSTRAINTS extends TYPES.JSON {
 
             @Override
             public String getTagName() {
@@ -610,7 +676,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class STRICT_TOOL_ANNOTATIONS extends TYPES.Bool {
+    	/**
+         * Configuration field.
+         */
+    	public static class STRICT_TOOL_ANNOTATIONS extends TYPES.Bool {
 
             @Override
             public String getTagName() {
@@ -634,7 +703,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class SOLUTION_LENGTH_RANGE extends TYPES.IntRange {
+    	/**
+         * Configuration field.
+         */
+    	public static class SOLUTION_LENGTH_RANGE extends TYPES.IntRange {
 
             public SOLUTION_LENGTH_RANGE() {
                 super(Range.of(1, 50));
@@ -666,7 +738,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class NO_SOLUTIONS extends TYPES.Int {
+    	/**
+         * Configuration field.
+         */
+    	public static class NO_SOLUTIONS extends TYPES.Int {
 
             public NO_SOLUTIONS() {
                 super(Range.of(0, Integer.MAX_VALUE));
@@ -695,7 +770,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class SOLUTION_DIR_PATH extends TYPES.Directory {
+    	/**
+         * Configuration field.
+         */
+    	public static class SOLUTION_DIR_PATH extends TYPES.Directory {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
@@ -719,7 +797,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class NO_EXECUTIONS extends TYPES.Int {
+    	/**
+         * Configuration field.
+         */
+    	public static class NO_EXECUTIONS extends TYPES.Int {
 
             public NO_EXECUTIONS() {
                 super(Range.of(0, Integer.MAX_VALUE));
@@ -747,7 +828,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class NO_GRAPHS extends TYPES.Int {
+    	/**
+         * Configuration field.
+         */
+    	public static class NO_GRAPHS extends TYPES.Int {
 
             public NO_GRAPHS() {
                 super(Range.of(0, Integer.MAX_VALUE));
@@ -775,7 +859,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class NO_CWL extends TYPES.Int {
+    	/**
+         * Configuration field.
+         */
+    	public static class NO_CWL extends TYPES.Int {
             public NO_CWL() {
                 super(Range.of(0, Integer.MAX_VALUE));
             }
@@ -806,7 +893,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class NO_EXECUTABLE_CWL extends TYPES.Int {
+    	/**
+         * Configuration field.
+         */
+    	public static class NO_EXECUTABLE_CWL extends TYPES.Int {
             public NO_EXECUTABLE_CWL() {
                 super(Range.of(0, Integer.MAX_VALUE));
             }
@@ -837,7 +927,10 @@ public class APEConfigTagFactory {
             }
         }
         
-        public static class TIMEOUT_SEC extends TYPES.Int {
+    	/**
+         * Configuration field.
+         */
+    	public static class TIMEOUT_SEC extends TYPES.Int {
 
             public TIMEOUT_SEC() {
                 super(Range.of(0, Integer.MAX_VALUE));
@@ -870,7 +963,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class USE_WORKFLOW_INPUT extends TYPES.Option<ConfigEnum> {
+    	/**
+         * Configuration field.
+         */
+    	public static class USE_WORKFLOW_INPUT extends TYPES.Option<ConfigEnum> {
 
             @Override
             public Class<ConfigEnum> getEnumClass() {
@@ -899,7 +995,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class USE_ALL_GENERATED_DATA extends TYPES.Option<ConfigEnum> {
+    	/**
+         * Configuration field.
+         */
+    	public static class USE_ALL_GENERATED_DATA extends TYPES.Option<ConfigEnum> {
 
             @Override
             public Class<ConfigEnum> getEnumClass() {
@@ -928,7 +1027,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class DEBUG_MODE extends TYPES.Bool {
+    	/**
+         * Configuration field.
+         */
+    	public static class DEBUG_MODE extends TYPES.Bool {
 
             @Override
             public String getTagName() {
@@ -952,7 +1054,10 @@ public class APEConfigTagFactory {
             }
         }
 
-        public static class TOOL_SEQ_REPEAT extends TYPES.Bool {
+    	/**
+         * Configuration field.
+         */
+    	public static class TOOL_SEQ_REPEAT extends TYPES.Bool {
 
             @Override
             public String getTagName() {

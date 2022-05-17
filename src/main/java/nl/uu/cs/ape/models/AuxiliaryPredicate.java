@@ -6,6 +6,12 @@ import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
+/**
+ * Class represents an auxiliary predicates (module or type) that represents a collection of disjoint or conjunct predicates.
+ * 
+ * @author Vedran Kasalica
+ *
+ */
 public interface AuxiliaryPredicate extends PredicateLabel {
 
 	 /**

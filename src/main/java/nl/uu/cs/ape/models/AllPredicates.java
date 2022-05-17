@@ -168,7 +168,7 @@ public abstract class AllPredicates {
     
     /**
      * Check whether the string occurs as one of the roots in the taxonomy.
-     * @param curRootURI
+     * @param curRootURI - curr root URI 
      * @return true if the root exists
      */
     public boolean existsRoot(String curRootURI) {

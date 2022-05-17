@@ -28,7 +28,7 @@ public abstract class SolutionInterpreter {
     
     /**
      * Returns only the most important part of the solution in human readable format, containing the list of tools in the order of execution.
-     * @return
+     * @return list of tools in a string
      */
     public abstract String getRelevantToolsInSolution();
 

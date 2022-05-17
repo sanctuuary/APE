@@ -96,8 +96,8 @@ public class ConstraintTemplateParameter {
 	 * Generate a taxonomy instance (tool or type) that is defined based on one or
 	 * more dimensions that describe it. Based on the constraint, it will either generate a Type or Module object.
 	 * 
-	 * @param jsonParam
-	 * @param domainSetup
+	 * @param jsonParam json object
+	 * @param domainSetup - domain model
 	 * @return A {@link Type} or {@link AbstractModule} object that represent the data instance given as the parameter.
 	 * @throws JSONException if the given JSON is not well formatted
 	 * @throws APEDimensionsException if the referenced types/modules are not well defined

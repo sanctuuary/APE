@@ -24,8 +24,18 @@ public class APEFiles {
     /**
      * READ and WRITE enums used to verify paths.
      */
-    public enum Permission { READ, WRITE }
+    public enum Permission { 
+    	/**Read permission.*/ 
+    	READ, 
+    	/**Write permission.*/
+    	WRITE }
 
+    /**
+     * Verify and get full path based based on the field.
+     * @param tag - tag
+     * @param path - path
+     * @return Return the path to the file
+     */
     private static Path getPath(String tag, String path){
 
         // check on empty values

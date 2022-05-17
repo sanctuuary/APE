@@ -400,6 +400,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Returns true if the type is a simple/leaf type, otherwise returns false - the
      * type is an abstract (non-leaf) type.
+     * @param nodeType - node type
      *
      * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type).
      */

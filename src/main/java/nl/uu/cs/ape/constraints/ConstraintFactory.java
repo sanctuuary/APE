@@ -199,20 +199,6 @@ public class ConstraintFactory {
 		addConstraintTemplate(currTemplate);
 		
 		/*
-		 * ID: m_in1_depen
-		 */
-		currTemplate = new Constraint_use_m_with_dependence("m_in1_depen", moduleParam1, 1,
-				"Use operation ${parameter_1} with data that depends on the first input.");
-		addConstraintTemplate(currTemplate);
-		
-		/*
-		 * ID: m_in2_depen
-		 */
-		currTemplate = new Constraint_use_m_with_dependence("m_in2_depen", moduleParam1, 2,
-				"Use operation ${parameter_1} with data that depends on the second input.");
-		addConstraintTemplate(currTemplate);
-
-		/*
 		 * ID: gen_t 
 		 
 		currTemplate = new Constraint_gen_type("gen_t", typeParam1, "Generate type ${parameter_1} in the solution.");
@@ -806,35 +792,4 @@ public class ConstraintFactory {
 		}
 	}
 	
-	/**
-	 * Implements constraints of the form:<br>
-	 *Use operation ${parameter_1} with data that depends on the n-th input.
-	 * {@link #getConstraint}.
-	 */
-	public class Constraint_use_m_with_dependence extends ConstraintTemplate {
-		/**
-		 * Instantiates a new Constraint use type.
-		 *
-		 * @param id           the id
-		 * @param parametersNo the parameters no
-		 * @param description  the description
-		 */
-		private int inputNo;
-		
-		protected Constraint_use_m_with_dependence(String id, List<ConstraintTemplateParameter> parametersNo, int i, String description) {
-			super(id, parametersNo, description);
-			inputNo = i;
-		}
-
-		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
-				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
-			if (parameters.size() != this.getNoOfParameters()) {
-				super.throwParametersError(parameters.size());
-				return null;
-			}
-
-			return SLTLxTemplateFormula.use_m_with_dependence(parameters.get(0), inputNo, moduleAutomaton, typeAutomaton, mappings);
-		}
-	}
 }
