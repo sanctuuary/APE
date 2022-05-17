@@ -63,6 +63,10 @@ public class Type extends TaxonomyPredicate {
         return "type";
     }
     
+    /**
+     * Set plain type type.
+     * @param plainType - plain type that should be used
+     */
     public void setPlainType(Type plainType) {
     	this.plainType = plainType;
     }

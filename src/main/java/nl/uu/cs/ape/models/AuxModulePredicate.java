@@ -58,6 +58,8 @@ public class AuxModulePredicate extends AbstractModule implements AuxiliaryPredi
      *
      * @param relatedPredicates Set of sorted type that are logically related to the new abstract type (label of the equivalent sets is always the same due to its ordering).
      * @param logicOp           Logical operation that describes the relation between the types.
+     * @param domainSetup - domain model
+     * 
      * @return An abstract predicate that provides abstraction over a disjunction/conjunction of the labels.
      */
     public static AbstractModule generateAuxiliaryPredicate(SortedSet<TaxonomyPredicate> relatedPredicates, LogicOperation logicOp, APEDomainSetup domainSetup) {
