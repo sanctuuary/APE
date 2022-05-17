@@ -101,16 +101,16 @@ public class APECoreConfig {
         /* Path to the OWL file. */
         this.ONTOLOGY.setValue(ontology.toPath());
 
-        /* URI of the ontology classes. */
+        /* IRI of the ontology classes. */
         this.ONTOLOGY_PREFIX.setValue(ontologyPrefixIRI);
 
         /* The root class of the tool taxonomy. */
-        this.TOOL_ONTOLOGY_ROOT.setValue(APEUtils.createClassURI(toolTaxonomyRoot, getOntologyPrefixIRI()));
+        this.TOOL_ONTOLOGY_ROOT.setValue(APEUtils.createClassIRI(toolTaxonomyRoot, getOntologyPrefixIRI()));
 
         /* Dimension classes of the data taxonomy. */
         this.DIMENSIONS_ONTOLOGY.setValue(
                 dataDimensionRoots.stream()
-                        .map(subTaxonomy -> APEUtils.createClassURI(subTaxonomy, getOntologyPrefixIRI()))
+                        .map(subTaxonomy -> APEUtils.createClassIRI(subTaxonomy, getOntologyPrefixIRI()))
                         .collect(Collectors.toList()));
 
         /* Path to the tool annotations JSON file. */

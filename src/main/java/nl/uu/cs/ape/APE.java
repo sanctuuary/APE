@@ -206,7 +206,7 @@ public class APE implements APEInterface{
 			}
 		}
 		if(root == null) {
-			return getTaxonomySubclasses(APEUtils.createClassURI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
+			return getTaxonomySubclasses(APEUtils.createClassIRI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
 		} else {
 			return elements;
 		}
@@ -224,7 +224,7 @@ public class APE implements APEInterface{
 			element = apeDomainSetup.getAllModules().get(taxonomyElementID);
 		}
 		if(element == null) {
-			return getTaxonomyElement(APEUtils.createClassURI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
+			return getTaxonomyElement(APEUtils.createClassIRI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
 		} else {
 			return element;
 		}

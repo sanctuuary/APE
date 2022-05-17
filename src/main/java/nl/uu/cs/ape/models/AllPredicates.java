@@ -168,11 +168,11 @@ public abstract class AllPredicates {
     
     /**
      * Check whether the string occurs as one of the roots in the taxonomy.
-     * @param curRootURI - curr root URI 
+     * @param curRootIRI - curr root IRI 
      * @return true if the root exists
      */
-    public boolean existsRoot(String curRootURI) {
-    	return dimensionRoots.contains(curRootURI);
+    public boolean existsRoot(String curRootIRI) {
+    	return dimensionRoots.contains(curRootIRI);
     }
     
     /**

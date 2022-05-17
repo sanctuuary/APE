@@ -276,7 +276,7 @@ public abstract class APEConfigTag<T> {
     public enum TagType {
         FILE_PATH,
         FOLDER_PATH,
-        URI,
+        IRI,
         JSON,
         INTEGER,
         INTEGER_RANGE,

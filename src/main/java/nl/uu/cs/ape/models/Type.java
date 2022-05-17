@@ -96,28 +96,28 @@ public class Type extends TaxonomyPredicate {
 		AllTypes allTypes = domainSetup.getAllTypes();
 		/* Iterate through each of the dimensions */
 		for (String currRootLabel : jsonParam.keySet()) {
-			String curRootURI = currRootLabel;
-			if(!allTypes.existsRoot(curRootURI)) {
-				curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixIRI());
+			String curRootIRI = currRootLabel;
+			if(!allTypes.existsRoot(curRootIRI)) {
+				curRootIRI = APEUtils.createClassIRI(currRootLabel, domainSetup.getOntologyPrefixIRI());
 			}
-			if (!allTypes.existsRoot(curRootURI)) {
+			if (!allTypes.existsRoot(curRootIRI)) {
 				throw APEDimensionsException
-						.notExistingDimension("Data type was defined over a non existing data dimension: '" + curRootURI
+						.notExistingDimension("Data type was defined over a non existing data dimension: '" + curRootIRI
 								+ "', in JSON: '" + jsonParam + "'");
 			}
 			LogicOperation logConn = LogicOperation.OR;
 			SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
 			/* for each dimensions a disjoint array of types/tools is given */
 			for (String currTypeLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
-				String currTypeURI = currTypeLabel;
-				if(allTypes.get(currTypeURI, curRootURI) == null) {
-					currTypeURI = APEUtils.createClassURI(currTypeLabel, domainSetup.getOntologyPrefixIRI());
+				String currTypeIRI = currTypeLabel;
+				if(allTypes.get(currTypeIRI, curRootIRI) == null) {
+					currTypeIRI = APEUtils.createClassIRI(currTypeLabel, domainSetup.getOntologyPrefixIRI());
 				}
 				
 				if (currRootLabel.equals(allTypes.getLabelRootID())) {
 					labelDefined = true;
 				}
-				Type currType = allTypes.get(currTypeURI, curRootURI);
+				Type currType = allTypes.get(currTypeIRI, curRootIRI);
 				if (currType != null) {
 					if (isOutputData) {
 						currType.setAsRelevantTaxonomyTerm(allTypes);
@@ -131,7 +131,7 @@ public class Type extends TaxonomyPredicate {
 					logConnectedPredicates.add(currType);
 				} else if (currRootLabel.equals(allTypes.getLabelRootID()) && isOutputData) {
 					/* add a new label to the taxonomy */
-					currType = allTypes.addPredicate(new Type(currTypeLabel, currTypeLabel, curRootURI, NodeType.LEAF));
+					currType = allTypes.addPredicate(new Type(currTypeLabel, currTypeLabel, curRootIRI, NodeType.LEAF));
 
 					allTypes.getLabelRoot().addSubPredicate(currType);
 					currType.addSuperPredicate(allTypes.getLabelRoot());
@@ -146,7 +146,7 @@ public class Type extends TaxonomyPredicate {
 				} else {
 					throw APEDimensionsException.dimensionDoesNotContainClass(String.format(
 							"Error in a JSON input. The data type '%s' was not defined or does not belong to the data dimension '%s'.",
-							currTypeURI, curRootURI));
+							currTypeIRI, curRootIRI));
 				}
 			}
 

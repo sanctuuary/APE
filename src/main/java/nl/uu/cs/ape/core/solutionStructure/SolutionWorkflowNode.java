@@ -80,7 +80,7 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
     public abstract String getNodeID();
 
     /**
-     * Gets node long (full) label (e.g. containing OWL URIs).
+     * Gets node long (full) label (e.g. containing OWL IRIs).
      *
      * @return A label that describes the node using full type and tool IDs (it is usually much longer than {@link #getNodeLabel()}.
      */

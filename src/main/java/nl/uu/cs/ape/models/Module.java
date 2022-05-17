@@ -213,20 +213,20 @@ public class Module extends AbstractModule {
 		AllModules allModules = domainSetup.getAllModules();
 		/* Iterate through each of the dimensions */
 		for (String currRootLabel : jsonParam.keySet()) {
-			String curRootURI = currRootLabel;
-			if(!allModules.existsRoot(curRootURI)) {
-				curRootURI = APEUtils.createClassURI(currRootLabel, domainSetup.getOntologyPrefixIRI());
+			String curRootIRI = currRootLabel;
+			if(!allModules.existsRoot(curRootIRI)) {
+				curRootIRI = APEUtils.createClassIRI(currRootLabel, domainSetup.getOntologyPrefixIRI());
 			}
-			if(!allModules.existsRoot(curRootURI)) {
-				throw APEDimensionsException.notExistingDimension("Data type was defined over a non existing data dimension: '" + curRootURI + "', in JSON: '" + jsonParam + "'");
+			if(!allModules.existsRoot(curRootIRI)) {
+				throw APEDimensionsException.notExistingDimension("Data type was defined over a non existing data dimension: '" + curRootIRI + "', in JSON: '" + jsonParam + "'");
 			}
 			LogicOperation logConn = LogicOperation.OR;
 			SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
 			/* for each dimensions a disjoint array of types/tools is given */
 			for (String currModuleLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
-				String currModuleURI = APEUtils.createClassURI(currModuleLabel, domainSetup.getOntologyPrefixIRI());
+				String currModuleIRI = APEUtils.createClassIRI(currModuleLabel, domainSetup.getOntologyPrefixIRI());
 				
-				AbstractModule currModule = allModules.get(currModuleURI);
+				AbstractModule currModule = allModules.get(currModuleIRI);
 				if (currModule == null) {
 					currModule = allModules.get(currModuleLabel);
 				}
@@ -239,7 +239,7 @@ public class Module extends AbstractModule {
 					currModule.setAsRelevantTaxonomyTerm(allModules);
 					logConnectedPredicates.add(currModule);
 				} else {
-					throw APEDimensionsException.dimensionDoesNotContainClass(String.format("Error in a JSON input. The tool '%s' was not defined or does not belong to the tool dimension '%s'.", currModuleURI, curRootURI));
+					throw APEDimensionsException.dimensionDoesNotContainClass(String.format("Error in a JSON input. The tool '%s' was not defined or does not belong to the tool dimension '%s'.", currModuleIRI, curRootIRI));
 				}
 			}
 

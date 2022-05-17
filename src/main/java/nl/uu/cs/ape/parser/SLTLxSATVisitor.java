@@ -67,13 +67,13 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 	int memIndexFactor;
 	private final AllTypes allTypes;
 	private final AllModules allModules;
-	private String ontologyPrexifURI;
+	private String ontologyPrexifIRI;
 	
 	
 	
 	public SLTLxSATVisitor(SATSynthesisEngine synthesisEngine) {
 		super();
-		this.ontologyPrexifURI = synthesisEngine.getDomainSetup().getOntologyPrefixIRI();
+		this.ontologyPrexifIRI = synthesisEngine.getDomainSetup().getOntologyPrefixIRI();
 		this.allTypes = synthesisEngine.getDomainSetup().getAllTypes();
 		this.allModules = synthesisEngine.getDomainSetup().getAllModules();
 	}
@@ -208,7 +208,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		TaxonomyPredicate typePred = allTypes.get(typePredicateID);
 		
 		if(typePred == null) {
-			String typePredIRI = APEUtils.createClassURI(typePredicateID, this.ontologyPrexifURI);
+			String typePredIRI = APEUtils.createClassIRI(typePredicateID, this.ontologyPrexifIRI);
 			typePred = allTypes.get(typePredIRI);
 		}
 		if(typePred == null) {
@@ -266,7 +266,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		String operationID = ctx.getChild(0).getText().replace("'", "");
 		AbstractModule currOperation = allModules.get(operationID);
 		if(currOperation == null) {
-			String operationIRI = APEUtils.createClassURI(operationID, this.ontologyPrexifURI);
+			String operationIRI = APEUtils.createClassIRI(operationID, this.ontologyPrexifIRI);
 			currOperation = allModules.get(operationIRI);
 		}
 		if(currOperation == null) {

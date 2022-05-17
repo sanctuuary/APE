@@ -309,29 +309,29 @@ public class APEDomainSetup {
             throws JSONException, APEDimensionsException {
         String ontologyPrefixIRI = getOntologyPrefixIRI();
         AllModules allModules = getAllModules();
-        String moduleURI = APEUtils.createClassURI(jsonModule.getString(APECoreConfig.getJsonTags("id")), ontologyPrefixIRI);
-        if (allModules.get(moduleURI) != null) {
-            moduleURI = moduleURI + "[tool]";
+        String moduleIRI = APEUtils.createClassIRI(jsonModule.getString(APECoreConfig.getJsonTags("id")), ontologyPrefixIRI);
+        if (allModules.get(moduleIRI) != null) {
+            moduleIRI = moduleIRI + "[tool]";
         }
         String moduleLabel = jsonModule.getString(APECoreConfig.getJsonTags("label"));
         Set<String> taxonomyModules = new HashSet<String>(APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("taxonomyOperations"), String.class));
-        taxonomyModules = APEUtils.createURIsFromLabels(taxonomyModules, ontologyPrefixIRI);
+        taxonomyModules = APEUtils.createIRIsFromLabels(taxonomyModules, ontologyPrefixIRI);
         /* Check if the referenced module taxonomy classes exist. */
         List<String> toRemove = new ArrayList<String>();
         for (String taxonomyModule : taxonomyModules) {
-            String taxonomyModuleURI = APEUtils.createClassURI(taxonomyModule, ontologyPrefixIRI);
-            if (allModules.get(taxonomyModuleURI) == null) {
-                System.err.println("Tool '" + moduleURI + "' annotation issue. "
-                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleURI + "' cannot be found in the Tool Taxonomy.");
+            String taxonomyModuleIRI = APEUtils.createClassIRI(taxonomyModule, ontologyPrefixIRI);
+            if (allModules.get(taxonomyModuleIRI) == null) {
+                System.err.println("Tool '" + moduleIRI + "' annotation issue. "
+                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleIRI + "' cannot be found in the Tool Taxonomy.");
                 wrongToolTax.add(moduleLabel);
-                toRemove.add(taxonomyModuleURI);
+                toRemove.add(taxonomyModuleIRI);
             }
         }
         taxonomyModules.removeAll(toRemove);
 
         /* If the taxonomy terms were not properly specified the tool taxonomy root is used as superclass of the tool. */
         if (taxonomyModules.isEmpty()) {
-            System.err.println("Tool '" + moduleURI + "' annotation issue. "
+            System.err.println("Tool '" + moduleIRI + "' annotation issue. "
                     + "None of the referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "' can be found in the Tool Taxonomy.");
             taxonomyModules.add(allModules.getRootModuleID());
         }
@@ -384,7 +384,7 @@ public class APEDomainSetup {
          * Add the module and make it sub module of the currSuperModule (if it was not
          * previously defined)
          */
-        Module currModule = (Module) allModules.addPredicate(new Module(moduleLabel, moduleURI, allModules.getRootModuleID(), moduleExecutionImpl));
+        Module currModule = (Module) allModules.addPredicate(new Module(moduleLabel, moduleIRI, allModules.getRootModuleID(), moduleExecutionImpl));
 
         /*	For each supermodule add the current module as a subset and vice versa. */
         for (String superModuleID : taxonomyModules) {
@@ -438,9 +438,9 @@ public class APEDomainSetup {
     }
 
     /**
-     * Gets ontology prefix URI.
+     * Gets ontology prefix IRI.
      *
-     * @return the ontology prefix URI
+     * @return the ontology prefix IRI
      */
     public String getOntologyPrefixIRI() {
         return ontologyPrefixIRI;

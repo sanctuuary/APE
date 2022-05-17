@@ -224,12 +224,12 @@ public class APEFiles {
     }
 
     /**
-     * String is a valid URI.
+     * String is a valid IRI.
      *
      * @param uri the uri
-     * @return String is a valid URI
+     * @return String is a valid IRI
      */
-    public static boolean isURI(String uri){
+    public static boolean isIRI(String uri){
         final URL url;
         try {
             url = new URL(uri);

@@ -82,7 +82,7 @@ public class APEConfigTagFactory {
                 List<String> dataDimensionRoots = new ArrayList<>();
                 try {
                     for (String subTaxonomy : APEUtils.getListFromJson(obj, getTagName(), String.class)) {
-                        dataDimensionRoots.add(APEUtils.createClassURI(subTaxonomy, ontology_prefix));
+                        dataDimensionRoots.add(APEUtils.createClassIRI(subTaxonomy, ontology_prefix));
                     }
                 } catch (ClassCastException e) {
                     throw APEConfigException.invalidValue(getTagName(), obj, "expected a list in correct format.");
@@ -293,11 +293,11 @@ public class APEConfigTagFactory {
        /**
          * Abstract field type.
          */
-        public static abstract class URI extends APEConfigTag<String> {
+        public static abstract class IRI extends APEConfigTag<String> {
 
             @Override
             public TagType getType() {
-                return URI;
+                return IRI;
             }
 
             @Override
@@ -307,7 +307,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(String uri, ValidationResults results) {
-                results.add(getTagName(), "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).", APEFiles.isURI(uri));
+                results.add(getTagName(), "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).", APEFiles.isIRI(uri));
                 return results;
             }
         }
@@ -386,7 +386,7 @@ public class APEConfigTagFactory {
     	/**
          * Configuration field.
          */
-    	public static class ONTOLOGY_PREFIX extends TYPES.URI {
+    	public static class ONTOLOGY_PREFIX extends TYPES.IRI {
 
             @Override
             public String getTagName() {
@@ -578,7 +578,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected String constructFromJSON(JSONObject obj, String prefix) {
-                return APEUtils.createClassURI(obj.getString(getTagName()), prefix);
+                return APEUtils.createClassIRI(obj.getString(getTagName()), prefix);
             }
 
             @Override

@@ -22,7 +22,7 @@ public interface PredicateLabel extends Comparable<PredicateLabel>, APEPredicate
     public String getPredicateLabel();
     
     /**
-     * Get long string that corresponds to the full predicate label (e.g. OWL URI). The long label is not guaranteed to be unique.
+     * Get long string that corresponds to the full predicate label (e.g. OWL IRI). The long label is not guaranteed to be unique.
      *
      * @return Detailed String representation of the predicate.
      */
