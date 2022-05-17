@@ -1,5 +1,6 @@
-/Benchmarking.java
-/BenchmarkingZ3.java
-/BenchmarkingZ3Options.java
 /LocalRun.java
 /Test.java
+/Benchmarking.java
+/BenchmarkingZ3.java
+/BenchmarkingZ3_test.java
+/BenchmarkingZ3Options.java

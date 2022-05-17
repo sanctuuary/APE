@@ -1,11 +1,11 @@
 package nl.uu.cs.ape.test.sat.ape;
 
-import nl.uu.cs.ape.sat.APE;
-import nl.uu.cs.ape.sat.configuration.APEConfigException;
-import nl.uu.cs.ape.sat.core.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.APE;
+import nl.uu.cs.ape.configuration.APEConfigException;
+import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.sat.test.utils.GitHubRepo;
 import nl.uu.cs.ape.sat.test.utils.TestResources;
-import nl.uu.cs.ape.sat.utils.APEUtils;
+import nl.uu.cs.ape.utils.APEUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -95,7 +95,7 @@ class UseCaseTest {
             // Generate workflow images
             // APE.writeDataFlowGraphs(solutions, Rank.RankDir.TOP_TO_BOTTOM);
 
-            final int max_no_solutions = config.getInt("max_solutions");
+            final int max_no_solutions = config.getInt("solutions");
             int current_solution_length = mutation.solution_length_start;
             for (int no_solutions : mutation.expected_no_solutions) {
             	if(solutions.size() < max_no_solutions) {

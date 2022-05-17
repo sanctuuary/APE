@@ -1,12 +1,12 @@
 package nl.uu.cs.ape.sat.test.configuration;
 
-import nl.uu.cs.ape.sat.configuration.APEConfigException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+
+import nl.uu.cs.ape.configuration.APEConfigException;
 
 
 /**
