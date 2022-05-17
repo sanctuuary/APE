@@ -5,7 +5,7 @@
 	<groupId>io.github.sanctuuary</groupId>
 	<artifactId>APE</artifactId>
 	<version>2.0.0</version>
-<packaging>jar</packaging>
+	<packaging>jar</packaging>
 	<name>io.github.sanctuuary:APE</name>
 	<description>APE is a command line tool and an API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools.</description>
 	<url>https://github.com/sanctuuary/APE</url>
@@ -53,7 +53,7 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
-										<Main-Class>nl.uu.cs.ape.sat.Main</Main-Class>
+										<Main-Class>nl.uu.cs.ape.Main</Main-Class>
 										<X-Compile-Source-JDK>1.8</X-Compile-Source-JDK>
 										<X-Compile-Target-JDK>1.8</X-Compile-Target-JDK>
 									</manifestEntries>
