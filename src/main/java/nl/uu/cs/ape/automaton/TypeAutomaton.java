@@ -8,7 +8,7 @@ import nl.uu.cs.ape.models.enums.AtomType;
 
 /**
  * The {@code TypeAutomaton} class  is used to represent the collection of data object states that exist in the workflow.
- * It comprises blocks of data objects, where each block groups inputs or outputs of a specific operation.<br/><br/>
+ * It comprises blocks of data objects, where each block groups inputs or outputs of a specific operation.<br><br>
  * Each state (within a block) represents a data object (a specific input or output data object) in the workflow.
  * <p>
  * Labeling of the automaton is provided in
@@ -352,7 +352,7 @@ public class TypeAutomaton implements Automaton {
     }
 
 	/**
-	 * Return the size of the automaton, i.e., number of blocks in memoryType/usedType automatons.<br/><br/>
+	 * Return the size of the automaton, i.e., number of blocks in memoryType/usedType automatons.<br><br>
 	 * <b>Note:</b>
 	 * Size of the type automaton is (workflow length + 1) as it includes the workflow input and output as an additional block. 
 	 * @return Size of type automaton.

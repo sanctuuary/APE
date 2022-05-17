@@ -79,7 +79,7 @@ public class SLTLxVariableOccuranceCollection {
 	/**
 	 * Associate the pair of variables (the order of the variables matter) with the type of atom they are used in.
 	 * @param varPair - pair of the variables used
-	 * @param relType - Atom type that has the pair of variables as arguments (<b>NOTE: The relation cannot be {@link AtomVarType#VAR_REF}</b>) 
+	 * @param relType - Atom type that has the pair of variables as arguments 
 	 */
 	public void addBinaryPred(Pair<SLTLxVariable> varPair, AtomVarType relType) {
 		if(relType.equals(AtomVarType.VAR_VALUE)) {

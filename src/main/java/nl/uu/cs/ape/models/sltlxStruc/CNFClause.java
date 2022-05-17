@@ -21,7 +21,7 @@ public class CNFClause {
 	List<Integer> atoms;
 	
 	/**
-	 * Create clause based on the list of elements (integers, > 0)
+	 * Create clause based on the list of elements (integers, bigger that 0)
 	 * @param atoms
 	 */
 	public CNFClause(List<Integer> atoms) {

@@ -49,9 +49,9 @@ public class SLTLxVariableSubstitutionCollection {
 	}
 
 	/**
-	 * Add the new variable to the mapping.<br/>
+	 * Add the new variable to the mapping.<br>
 	 * Create a new and unique variable to substitute the current binding of the
-	 * variable. <br/>
+	 * variable. <br>
 	 * In case that the substitution for a variable with the same name exists, it
 	 * will be overwritten.
 	 * 

@@ -110,7 +110,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	/**
 	 * Get the set of clauses that enforce substitution of the variable under the universal
 	 * quantification for the given set of states. In addition, the encoding ensures that the 
-	 * usage of variables in atoms will imply usage of the corresponding states as well (mimicking substitution).<br/><br/>
+	 * usage of variables in atoms will imply usage of the corresponding states as well (mimicking substitution).<br><br>
 	 * 
 	 * <b>IMPORTANT: This method should be call after the binded subformula was visited (the corresponding CNF was generated),
 	 * in order to ensure that all occurrences of the variable were taken into account.</b>
@@ -134,9 +134,9 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	
 	/**
 	 * The encoding ensures that the variable substitution preserves the properties of the data objects,
-	 * i.e., if a variable X substitutes state S, the two have to satisfy the same properties.<br/> 
+	 * i.e., if a variable X substitutes state S, the two have to satisfy the same properties.<br> 
 	 * <i> e.g., (VAL(?x,a) =&gt; (P(?x) &lt;=&gt; P(a))</i>
-	 * <br/><br/>
+	 * <br><br>
 	 * 
 	 * <b>IMPORTANT: This method should be call after the binded subformula was visited (the corresponding CNF was generated),
 	 * in order to ensure that all the occurrences of the variable were taken into account.</b>
@@ -167,7 +167,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	}
 
 	/**
-	 * Generate the rules that enforce substitution over the data properties.<br/> <i> e.g., (VAL(?x,a) => (P(?x) <=> P(a))</i>
+	 * Generate the rules that enforce substitution over the data properties.<br> <i> e.g., (VAL(?x,a) => (P(?x) <=> P(a))</i>
 	 * @param variable - the variable that will be substituted
 	 * @param variableSubtitutions - collection of substitutions for each variable
 	 * @param varOccurances - collection that tracks occurrences of variables
@@ -229,7 +229,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		
 	
 	/**
-	 * Generate the rules that enforce substitution over binary predicates. <br/> <i> e.g., VAL(?x,a) & VAL(?y,b) =>  (R_v(x,y) <=> R(a,b))  </i> 
+	 * Generate the rules that enforce substitution over binary predicates. <br> <i> e.g., VAL(?x,a) & VAL(?y,b) =>  (R_v(x,y) <=> R(a,b))  </i> 
 	 * @param pair - a pair of variables that will be substituted
 	 * @param variableSubtitutions - collection of substitutions for each variable
 	 * @param varOccurances - collection that tracks occurrences of variables
