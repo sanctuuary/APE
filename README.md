@@ -57,17 +57,17 @@ From the project root, simply launch
 ```shell
 $ mvn -DskipTests=true install
 ```
-to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-<version>-executable.jar`
+to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-[latest]-executable.jar`
 
 ## Using APE
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
 ### How to run APE from the command line
-[APE-2.0.0-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar) is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
+**APE-[latest]-executable.jar** is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
-When running APE-&lt;version>-executable.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly:
+When running APE-[latest]-executable.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly:
 ```shell
-java -jar APE-<version>-executable.jar [path-to-ape-configuration]
+java -jar APE-[latest]-executable.jar [path-to-ape-configuration]
 ```
 
 The configuration file (see [APE cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/config.json) and [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)) provides references to all therefor required information:
@@ -84,10 +84,10 @@ or
 ```shell
 git clone https://github.com/sanctuuary/APE_UseCases.git
 ```
-Download the latest version of [`APE-<version>-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
+Download the latest version of [`APE-[latest]-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
 ```shell
 cd ~/git/APE_UseCases
-java -jar APE-2.0.0-executable.jar ImageMagick/Example1/config.json
+java -jar APE-[latest]-executable.jar ImageMagick/Example1/config.json
 ```
 See [ImageMagick: Example 1](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick/Example1) for more information about the results and on how to execute the composed workflow.
 
