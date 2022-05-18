@@ -84,7 +84,7 @@ or
 ```shell
 git clone https://github.com/sanctuuary/APE_UseCases.git
 ```
-Download the latest version of [`APE-<version>-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.9/APE-1.1.9-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
+Download the latest version of [`APE-<version>-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
 ```shell
 cd ~/git/APE_UseCases
 java -jar APE-2.0.0-executable.jar ImageMagick/Example1/config.json
@@ -197,4 +197,3 @@ Workflow discovery through semantic constraints: A geovisualization case study.
 In Computational science and its applications – ICCSA 2019
 (pp. 473–488), Springer International Publishing,
 https://doi.org/10.1007/978-3-030-24302-9_53
-| 17-05-2021 | 2.0.0   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-sources.jar)|
