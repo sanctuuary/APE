@@ -38,6 +38,7 @@ Building APE from source is not required to run it, as the latest stable version
 | 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
 | 02-05-2021 | 1.1.7   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-sources.jar)|
 | 20-12-2021 | 1.1.12   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-sources.jar)|
+| 17-05-2021 | 2.0.0   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-sources.jar)|
 
 ### Add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
@@ -46,7 +47,7 @@ To add a dependency on APE using Maven, use the following:
 <dependency>
     <groupId>io.github.sanctuuary</groupId>
     <artifactId>APE</artifactId>
-    <version>1.1.12</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 For information regarding Gradle, Ivy, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
@@ -62,7 +63,7 @@ to build the APE modules from the source tree and the built files will be genera
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
 ### How to run APE from the command line
-[APE-1.1.12-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-executable.jar) is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
+[APE-2.0.0-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar) is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
 When running APE-&lt;version>-executable.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly:
 ```shell
@@ -86,7 +87,7 @@ git clone https://github.com/sanctuuary/APE_UseCases.git
 Download the latest version of [`APE-<version>-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.9/APE-1.1.9-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
 ```shell
 cd ~/git/APE_UseCases
-java -jar APE-1.1.12-executable.jar ImageMagick/Example1/config.json
+java -jar APE-2.0.0-executable.jar ImageMagick/Example1/config.json
 ```
 See [ImageMagick: Example 1](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick/Example1) for more information about the results and on how to execute the composed workflow.
 
@@ -196,3 +197,4 @@ Workflow discovery through semantic constraints: A geovisualization case study.
 In Computational science and its applications – ICCSA 2019
 (pp. 473–488), Springer International Publishing,
 https://doi.org/10.1007/978-3-030-24302-9_53
+| 17-05-2021 | 2.0.0   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-sources.jar)|
