@@ -50,7 +50,7 @@ To add a dependency on APE using Maven, use the following:
     <version>2.0.0</version>
 </dependency>
 ```
-For information regarding Gradle, Ivy, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
+For information regarding **Gradle**, **Ivy**, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
 ### Build APE from source (using Maven)
 From the project root, simply launch
