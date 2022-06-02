@@ -366,8 +366,9 @@ public class APEDomainSetup {
                 outputs.add(Type.taxonomyInstanceFromJson(jsonOutput, this, true));
             }
         }
-        } catch (APEDimensionsException x) {
+        } catch (APEDimensionsException badDimension) {
         	wrongToolIO.add(moduleLabel);
+        	System.err.println("Operation '" + "' was not included." + badDimension.getMessage());
 //        	System.out.println("Skipped " + (counterErrors ++) + " tool annotations.");
         	return false;
         }
@@ -378,6 +379,7 @@ public class APEDomainSetup {
         }
         if(inputs.isEmpty() && outputs.isEmpty()) {
         	emptyTools.add(moduleLabel);
+        	System.out.println("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
         	return false;
         }
         /*

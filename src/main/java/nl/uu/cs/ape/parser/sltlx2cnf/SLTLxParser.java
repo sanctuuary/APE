@@ -1,4 +1,4 @@
-// Generated from SLTLx.g4 by ANTLR 4.9.2
+// Generated from SLTLx.g4 by ANTLR 4.10.1
 package nl.uu.cs.ape.parser.sltlx2cnf;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -9,15 +9,9 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 
-/**
- * Parser for SLTLx language.
- * 
- * @author Vedran Kasalica
- *
- */
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class SLTLxParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.9.2", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.10.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -103,13 +97,7 @@ public class SLTLxParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  ConditionContext extends ParserRuleContext {
+	public static class ConditionContext extends ParserRuleContext {
 		public List<FormulaContext> formula() {
 			return getRuleContexts(FormulaContext.class);
 		}
@@ -197,12 +185,6 @@ public class SLTLxParser extends Parser {
 		return _localctx;
 	}
 
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
 	public static class FormulaContext extends ParserRuleContext {
 		public FormulaContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -214,13 +196,7 @@ public class SLTLxParser extends Parser {
 			super.copyFrom(ctx);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  ToolRefContext extends FormulaContext {
+	public static class ToolRefContext extends FormulaContext {
 		public ModuleContext module() {
 			return getRuleContext(ModuleContext.class,0);
 		}
@@ -242,13 +218,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  UnaryModalContext extends FormulaContext {
+	public static class UnaryModalContext extends FormulaContext {
 		public TerminalNode UN_MODAL() { return getToken(SLTLxParser.UN_MODAL, 0); }
 		public FormulaContext formula() {
 			return getRuleContext(FormulaContext.class,0);
@@ -268,13 +238,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  NegUnaryContext extends FormulaContext {
+	public static class NegUnaryContext extends FormulaContext {
 		public TerminalNode NOT() { return getToken(SLTLxParser.NOT, 0); }
 		public FormulaContext formula() {
 			return getRuleContext(FormulaContext.class,0);
@@ -294,13 +258,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  R_relationContext extends FormulaContext {
+	public static class R_relationContext extends FormulaContext {
 		public TerminalNode R_REL() { return getToken(SLTLxParser.R_REL, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public List<TerminalNode> VARIABLE() { return getTokens(SLTLxParser.VARIABLE); }
@@ -323,13 +281,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  BinaryBoolContext extends FormulaContext {
+	public static class BinaryBoolContext extends FormulaContext {
 		public List<FormulaContext> formula() {
 			return getRuleContexts(FormulaContext.class);
 		}
@@ -352,13 +304,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  FunctionContext extends FormulaContext {
+	public static class FunctionContext extends FormulaContext {
 		public TerminalNode CONSTANT() { return getToken(SLTLxParser.CONSTANT, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
@@ -378,13 +324,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  ForallContext extends FormulaContext {
+	public static class ForallContext extends FormulaContext {
 		public TerminalNode FORALL() { return getToken(SLTLxParser.FORALL, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
@@ -407,13 +347,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  TrueContext extends FormulaContext {
+	public static class TrueContext extends FormulaContext {
 		public TerminalNode TRUE() { return getToken(SLTLxParser.TRUE, 0); }
 		public TrueContext(FormulaContext ctx) { copyFrom(ctx); }
 		@Override
@@ -430,13 +364,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  ExistsContext extends FormulaContext {
+	public static class ExistsContext extends FormulaContext {
 		public TerminalNode EXISTS() { return getToken(SLTLxParser.EXISTS, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public TerminalNode VARIABLE() { return getToken(SLTLxParser.VARIABLE, 0); }
@@ -459,13 +387,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  BinaryModalContext extends FormulaContext {
+	public static class BinaryModalContext extends FormulaContext {
 		public List<FormulaContext> formula() {
 			return getRuleContexts(FormulaContext.class);
 		}
@@ -488,13 +410,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  BracketsContext extends FormulaContext {
+	public static class BracketsContext extends FormulaContext {
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public FormulaContext formula() {
 			return getRuleContext(FormulaContext.class,0);
@@ -515,13 +431,7 @@ public class SLTLxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  VarEqContext extends FormulaContext {
+	public static class VarEqContext extends FormulaContext {
 		public List<TerminalNode> VARIABLE() { return getTokens(SLTLxParser.VARIABLE); }
 		public TerminalNode VARIABLE(int i) {
 			return getToken(SLTLxParser.VARIABLE, i);
@@ -652,7 +562,7 @@ public class SLTLxParser extends Parser {
 				setState(47);
 				match(RPAREN);
 				setState(48);
-				formula(5);
+				formula(6);
 				}
 				break;
 			case EXISTS:
@@ -669,7 +579,7 @@ public class SLTLxParser extends Parser {
 				setState(52);
 				match(RPAREN);
 				setState(53);
-				formula(4);
+				formula(5);
 				}
 				break;
 			case UN_MODAL:
@@ -680,7 +590,7 @@ public class SLTLxParser extends Parser {
 				setState(54);
 				match(UN_MODAL);
 				setState(55);
-				formula(3);
+				formula(4);
 				}
 				break;
 			case R_REL:
@@ -722,11 +632,11 @@ public class SLTLxParser extends Parser {
 						_localctx = new BinaryBoolContext(new FormulaContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_formula);
 						setState(64);
-						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
 						setState(65);
 						match(BIN_CONNECTIVE);
 						setState(66);
-						formula(7);
+						formula(4);
 						}
 						break;
 					case 2:
@@ -761,13 +671,7 @@ public class SLTLxParser extends Parser {
 		return _localctx;
 	}
 
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  ModuleContext extends ParserRuleContext {
+	public static class ModuleContext extends ParserRuleContext {
 		public TerminalNode CONSTANT() { return getToken(SLTLxParser.CONSTANT, 0); }
 		public TerminalNode LPAREN() { return getToken(SLTLxParser.LPAREN, 0); }
 		public List<VarsContext> vars() {
@@ -827,13 +731,7 @@ public class SLTLxParser extends Parser {
 		return _localctx;
 	}
 
-	/**
-	 * SLTLx parser element.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
-	public static class  VarsContext extends ParserRuleContext {
+	public static class VarsContext extends ParserRuleContext {
 		public List<TerminalNode> VARIABLE() { return getTokens(SLTLxParser.VARIABLE); }
 		public TerminalNode VARIABLE(int i) {
 			return getToken(SLTLxParser.VARIABLE, i);
@@ -913,7 +811,7 @@ public class SLTLxParser extends Parser {
 	private boolean formula_sempred(FormulaContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 6);
+			return precpred(_ctx, 3);
 		case 1:
 			return precpred(_ctx, 2);
 		}
@@ -921,31 +819,63 @@ public class SLTLxParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\35_\4\2\t\2\4\3\t"+
-		"\3\4\4\t\4\4\5\t\5\3\2\3\2\3\2\7\2\16\n\2\f\2\16\2\21\13\2\3\2\7\2\24"+
-		"\n\2\f\2\16\2\27\13\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3A\n\3\3\3\3\3\3\3\3\3\3"+
-		"\3\3\3\7\3I\n\3\f\3\16\3L\13\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\5\3\5\3\5"+
-		"\7\5X\n\5\f\5\16\5[\13\5\5\5]\n\5\3\5\2\3\4\6\2\4\6\b\2\2\2i\2\n\3\2\2"+
-		"\2\4@\3\2\2\2\6M\3\2\2\2\b\\\3\2\2\2\n\17\5\4\3\2\13\f\7\34\2\2\f\16\5"+
-		"\4\3\2\r\13\3\2\2\2\16\21\3\2\2\2\17\r\3\2\2\2\17\20\3\2\2\2\20\25\3\2"+
-		"\2\2\21\17\3\2\2\2\22\24\7\34\2\2\23\22\3\2\2\2\24\27\3\2\2\2\25\23\3"+
-		"\2\2\2\25\26\3\2\2\2\26\30\3\2\2\2\27\25\3\2\2\2\30\31\7\2\2\3\31\3\3"+
-		"\2\2\2\32\33\b\3\1\2\33A\7\n\2\2\34\35\7\13\2\2\35\36\5\4\3\2\36\37\7"+
-		"\f\2\2\37A\3\2\2\2 !\7\3\2\2!\"\5\6\4\2\"#\7\4\2\2#$\5\4\3\f$A\3\2\2\2"+
-		"%&\7\16\2\2&\'\7\13\2\2\'(\7\r\2\2(A\7\f\2\2)*\7\r\2\2*+\7\30\2\2+A\7"+
-		"\r\2\2,-\7\31\2\2-A\5\4\3\t./\7\33\2\2/\60\7\13\2\2\60\61\7\r\2\2\61\62"+
-		"\7\f\2\2\62A\5\4\3\7\63\64\7\32\2\2\64\65\7\13\2\2\65\66\7\r\2\2\66\67"+
-		"\7\f\2\2\67A\5\4\3\689\7\b\2\29A\5\4\3\5:;\7\17\2\2;<\7\13\2\2<=\7\r\2"+
-		"\2=>\7\5\2\2>?\7\r\2\2?A\7\f\2\2@\32\3\2\2\2@\34\3\2\2\2@ \3\2\2\2@%\3"+
-		"\2\2\2@)\3\2\2\2@,\3\2\2\2@.\3\2\2\2@\63\3\2\2\2@8\3\2\2\2@:\3\2\2\2A"+
-		"J\3\2\2\2BC\f\b\2\2CD\7\7\2\2DI\5\4\3\tEF\f\4\2\2FG\7\t\2\2GI\5\4\3\5"+
-		"HB\3\2\2\2HE\3\2\2\2IL\3\2\2\2JH\3\2\2\2JK\3\2\2\2K\5\3\2\2\2LJ\3\2\2"+
-		"\2MN\7\16\2\2NO\7\13\2\2OP\5\b\5\2PQ\7\6\2\2QR\5\b\5\2RS\7\f\2\2S\7\3"+
-		"\2\2\2TY\7\r\2\2UV\7\5\2\2VX\7\r\2\2WU\3\2\2\2X[\3\2\2\2YW\3\2\2\2YZ\3"+
-		"\2\2\2Z]\3\2\2\2[Y\3\2\2\2\\T\3\2\2\2\\]\3\2\2\2]\t\3\2\2\2\t\17\25@H"+
-		"JY\\";
+		"\u0004\u0001\u001b]\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0001\u0000\u0001\u0000\u0001"+
+		"\u0000\u0005\u0000\f\b\u0000\n\u0000\f\u0000\u000f\t\u0000\u0001\u0000"+
+		"\u0005\u0000\u0012\b\u0000\n\u0000\f\u0000\u0015\t\u0000\u0001\u0000\u0001"+
+		"\u0000\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0003\u0001?\b\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0005\u0001G\b"+
+		"\u0001\n\u0001\f\u0001J\t\u0001\u0001\u0002\u0001\u0002\u0001\u0002\u0001"+
+		"\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0003\u0001\u0003\u0001"+
+		"\u0003\u0005\u0003V\b\u0003\n\u0003\f\u0003Y\t\u0003\u0003\u0003[\b\u0003"+
+		"\u0001\u0003\u0000\u0001\u0002\u0004\u0000\u0002\u0004\u0006\u0000\u0000"+
+		"g\u0000\b\u0001\u0000\u0000\u0000\u0002>\u0001\u0000\u0000\u0000\u0004"+
+		"K\u0001\u0000\u0000\u0000\u0006Z\u0001\u0000\u0000\u0000\b\r\u0003\u0002"+
+		"\u0001\u0000\t\n\u0005\u001a\u0000\u0000\n\f\u0003\u0002\u0001\u0000\u000b"+
+		"\t\u0001\u0000\u0000\u0000\f\u000f\u0001\u0000\u0000\u0000\r\u000b\u0001"+
+		"\u0000\u0000\u0000\r\u000e\u0001\u0000\u0000\u0000\u000e\u0013\u0001\u0000"+
+		"\u0000\u0000\u000f\r\u0001\u0000\u0000\u0000\u0010\u0012\u0005\u001a\u0000"+
+		"\u0000\u0011\u0010\u0001\u0000\u0000\u0000\u0012\u0015\u0001\u0000\u0000"+
+		"\u0000\u0013\u0011\u0001\u0000\u0000\u0000\u0013\u0014\u0001\u0000\u0000"+
+		"\u0000\u0014\u0016\u0001\u0000\u0000\u0000\u0015\u0013\u0001\u0000\u0000"+
+		"\u0000\u0016\u0017\u0005\u0000\u0000\u0001\u0017\u0001\u0001\u0000\u0000"+
+		"\u0000\u0018\u0019\u0006\u0001\uffff\uffff\u0000\u0019?\u0005\b\u0000"+
+		"\u0000\u001a\u001b\u0005\t\u0000\u0000\u001b\u001c\u0003\u0002\u0001\u0000"+
+		"\u001c\u001d\u0005\n\u0000\u0000\u001d?\u0001\u0000\u0000\u0000\u001e"+
+		"\u001f\u0005\u0001\u0000\u0000\u001f \u0003\u0004\u0002\u0000 !\u0005"+
+		"\u0002\u0000\u0000!\"\u0003\u0002\u0001\n\"?\u0001\u0000\u0000\u0000#"+
+		"$\u0005\f\u0000\u0000$%\u0005\t\u0000\u0000%&\u0005\u000b\u0000\u0000"+
+		"&?\u0005\n\u0000\u0000\'(\u0005\u000b\u0000\u0000()\u0005\u0016\u0000"+
+		"\u0000)?\u0005\u000b\u0000\u0000*+\u0005\u0017\u0000\u0000+?\u0003\u0002"+
+		"\u0001\u0007,-\u0005\u0019\u0000\u0000-.\u0005\t\u0000\u0000./\u0005\u000b"+
+		"\u0000\u0000/0\u0005\n\u0000\u00000?\u0003\u0002\u0001\u000612\u0005\u0018"+
+		"\u0000\u000023\u0005\t\u0000\u000034\u0005\u000b\u0000\u000045\u0005\n"+
+		"\u0000\u00005?\u0003\u0002\u0001\u000567\u0005\u0006\u0000\u00007?\u0003"+
+		"\u0002\u0001\u000489\u0005\r\u0000\u00009:\u0005\t\u0000\u0000:;\u0005"+
+		"\u000b\u0000\u0000;<\u0005\u0003\u0000\u0000<=\u0005\u000b\u0000\u0000"+
+		"=?\u0005\n\u0000\u0000>\u0018\u0001\u0000\u0000\u0000>\u001a\u0001\u0000"+
+		"\u0000\u0000>\u001e\u0001\u0000\u0000\u0000>#\u0001\u0000\u0000\u0000"+
+		">\'\u0001\u0000\u0000\u0000>*\u0001\u0000\u0000\u0000>,\u0001\u0000\u0000"+
+		"\u0000>1\u0001\u0000\u0000\u0000>6\u0001\u0000\u0000\u0000>8\u0001\u0000"+
+		"\u0000\u0000?H\u0001\u0000\u0000\u0000@A\n\u0003\u0000\u0000AB\u0005\u0005"+
+		"\u0000\u0000BG\u0003\u0002\u0001\u0004CD\n\u0002\u0000\u0000DE\u0005\u0007"+
+		"\u0000\u0000EG\u0003\u0002\u0001\u0003F@\u0001\u0000\u0000\u0000FC\u0001"+
+		"\u0000\u0000\u0000GJ\u0001\u0000\u0000\u0000HF\u0001\u0000\u0000\u0000"+
+		"HI\u0001\u0000\u0000\u0000I\u0003\u0001\u0000\u0000\u0000JH\u0001\u0000"+
+		"\u0000\u0000KL\u0005\f\u0000\u0000LM\u0005\t\u0000\u0000MN\u0003\u0006"+
+		"\u0003\u0000NO\u0005\u0004\u0000\u0000OP\u0003\u0006\u0003\u0000PQ\u0005"+
+		"\n\u0000\u0000Q\u0005\u0001\u0000\u0000\u0000RW\u0005\u000b\u0000\u0000"+
+		"ST\u0005\u0003\u0000\u0000TV\u0005\u000b\u0000\u0000US\u0001\u0000\u0000"+
+		"\u0000VY\u0001\u0000\u0000\u0000WU\u0001\u0000\u0000\u0000WX\u0001\u0000"+
+		"\u0000\u0000X[\u0001\u0000\u0000\u0000YW\u0001\u0000\u0000\u0000ZR\u0001"+
+		"\u0000\u0000\u0000Z[\u0001\u0000\u0000\u0000[\u0007\u0001\u0000\u0000"+
+		"\u0000\u0007\r\u0013>FHWZ";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
