@@ -145,7 +145,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<String> getVariableSubstitutionToPresereProperties(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getVariableSubstitutionToPreserveProperties(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
 		Set<SLTLxFormula> allFacts = new HashSet<>();
 		SLTLxVariableOccuranceCollection varOccurances = synthesisEngine.getVariableUsage(); 
 		

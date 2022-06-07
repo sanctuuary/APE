@@ -192,10 +192,26 @@ public class ConstraintFactory {
 		
 		
 		/*
-		 * ID: m_in_label
+		 * ID: operation_input
 		 */
-		currTemplate = new Constraint_use_m_in_label("m_in_label", moduleNlabel,
-				"Use operation ${parameter_1} with data labeled ${parameter_2} as one of the inputs.");
+		currTemplate = new Constraint_use_module_with_input("operation_input", moduleNlabel,
+				"Use the operation with an input of the given type.");
+		addConstraintTemplate(currTemplate);
+		
+		/*
+		 * ID: operation_output
+		 */
+		currTemplate = new Constraint_use_module_with_output("operation_output", moduleNlabel,
+				"Use the operation to generate an output of the given type.");
+		addConstraintTemplate(currTemplate);
+		
+		
+		
+		/*
+		 * ID: connected_op 
+		 */
+		currTemplate = new Constraint_connected_modules("connected_op", moduleParam2,
+				"1st operation should generate an output used by the 2nd operation.");
 		addConstraintTemplate(currTemplate);
 		
 		/*
@@ -765,10 +781,10 @@ public class ConstraintFactory {
 	
 	/**
 	 * Implements constraints of the form:<br>
-	 * Use operation ${parameter_1} with data labeled ${parameter_2} as one of the inputs.
+	 * Use operation ${parameter_1} with input labeled ${parameter_2}.
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_use_m_in_label extends ConstraintTemplate {
+	public class Constraint_use_module_with_input extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint use type.
 		 *
@@ -776,7 +792,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_use_m_in_label(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+		protected Constraint_use_module_with_input(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
 			super(id, parametersNo, description);
 		}
 
@@ -788,8 +804,66 @@ public class ConstraintFactory {
 				return null;
 			}
 
-			return SLTLxTemplateFormula.use_m_in_label(parameters.get(0), parameters.get(1), moduleAutomaton, typeAutomaton, mappings);
+			return SLTLxTemplateFormula.use_module_input(parameters.get(0), parameters.get(1), moduleAutomaton, typeAutomaton, mappings);
 		}
 	}
 	
+	/**
+	 * Implements constraints of the form:<br>
+	 * Use operation ${parameter_1} to generate output labeled ${parameter_2}
+	 * {@link #getConstraint}.
+	 */
+	public class Constraint_use_module_with_output extends ConstraintTemplate {
+		/**
+		 * Instantiates a new Constraint use type.
+		 *
+		 * @param id           the id
+		 * @param parametersNo the parameters no
+		 * @param description  the description
+		 */
+		protected Constraint_use_module_with_output(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+			super(id, parametersNo, description);
+		}
+
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+
+			return SLTLxTemplateFormula.use_module_output(parameters.get(0), parameters.get(1), moduleAutomaton, typeAutomaton, mappings);
+		}
+	}
+
+	/**
+	 * Implements constraints of the form:<br>
+	 * 1st operation should generate an output used by the 2nd operation
+	 * subsequently using the function {@link #getConstraint}.
+	 */
+	public class Constraint_connected_modules extends ConstraintTemplate {
+		/**
+		 * Instantiates a new Constraint if then module.
+		 *
+		 * @param id             the id
+		 * @param parameterTypes the parameter types
+		 * @param description    the description
+		 */
+		protected Constraint_connected_modules(String id, List<ConstraintTemplateParameter> parameterTypes,
+				String description) {
+			super(id, parameterTypes, description);
+		}
+
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTLxTemplateFormula.connected_modules(parameters.get(0), parameters.get(1),domainSetup, moduleAutomaton, typeAutomaton, mappings);
+		}
+	}
+
 }
