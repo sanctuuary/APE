@@ -206,12 +206,26 @@ public class ConstraintFactory {
 		addConstraintTemplate(currTemplate);
 		
 		
-		
 		/*
 		 * ID: connected_op 
 		 */
 		currTemplate = new Constraint_connected_modules("connected_op", moduleParam2,
 				"1st operation should generate an output used by the 2nd operation.");
+		addConstraintTemplate(currTemplate);
+		
+		
+		/*
+		 * ID: not_connected_op 
+		 */
+		currTemplate = new Constraint_not_connected_modules("not_connected_op", moduleParam2,
+				"1st operation should never generate an output used by the 2nd operation.");
+		addConstraintTemplate(currTemplate);
+		
+		/*
+		 * ID: not_repeat_op 
+		 */
+		currTemplate = new Constraint_not_repeat_modules("not_repeat_op", moduleParam1,
+				"No operation that belongs to the subtree should be repeated over.");
 		addConstraintTemplate(currTemplate);
 		
 		/*
@@ -865,5 +879,62 @@ public class ConstraintFactory {
 			return SLTLxTemplateFormula.connected_modules(parameters.get(0), parameters.get(1),domainSetup, moduleAutomaton, typeAutomaton, mappings);
 		}
 	}
+	
+	/**
+	 * Implements constraints of the form:<br>
+	 * 1st operation should not generate an output used by the 2nd operation
+	 * subsequently using the function {@link #getConstraint}.
+	 */
+	public class Constraint_not_connected_modules extends ConstraintTemplate {
+		/**
+		 * Instantiates a new Constraint if then module.
+		 *
+		 * @param id             the id
+		 * @param parameterTypes the parameter types
+		 * @param description    the description
+		 */
+		protected Constraint_not_connected_modules(String id, List<ConstraintTemplateParameter> parameterTypes,
+				String description) {
+			super(id, parameterTypes, description);
+		}
 
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTLxTemplateFormula.not_connected_modules(parameters.get(0), parameters.get(1),domainSetup, moduleAutomaton, typeAutomaton, mappings);
+		}
+	}
+
+	/**
+	 * Implements constraints of the form:<br>
+	 * No operation that belongs to the subtree should be repeated over.
+	 * {@link #getConstraint}.
+	 */
+	public class Constraint_not_repeat_modules extends ConstraintTemplate {
+		/**
+		 * Instantiates a new Constraint last module.
+		 *
+		 * @param id           the id
+		 * @param parametersNo the parameters no
+		 * @param description  the description
+		 */
+		protected Constraint_not_repeat_modules(String id, List<ConstraintTemplateParameter> parametersNo,
+				String description) {
+			super(id, parametersNo, description);
+		}
+
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+			return SLTLxTemplateFormula.notRepeatModules(parameters.get(0), domainSetup, moduleAutomaton, typeAutomaton, mappings);
+		}
+	}
 }
