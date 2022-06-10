@@ -421,7 +421,7 @@ public class APE implements APEInterface{
 		final File executeDir = executionsFolder.toFile();
 		if (executeDir.isDirectory()) {
 			Arrays.stream(executionsFolder.toFile()
-					.listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_")))
+					.listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_".toLowerCase())))
 					.forEach(File::delete);
 		} else {
 			executeDir.mkdir();
@@ -481,7 +481,7 @@ public class APE implements APEInterface{
 		/* Removing the existing files from the file system. */
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
-			Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
+			Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo".toLowerCase())))
 					.forEach(File::delete);
 		} else {
 			graphDir.mkdir();
