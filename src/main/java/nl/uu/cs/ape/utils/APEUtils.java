@@ -611,8 +611,11 @@ public final class APEUtils {
 			return -1;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
-		System.out.println(
-				"\nAPE found " + solutionsFound + " solutions. Total solving time: " + (printTime / 1000F) + " sec.");
+		System.out.println("\n"
+						+ "APE found " + solutionsFound + " solutions.\n"
+						+ "Total APE runtime: " + (printTime / 1000F) + " sec.\n"
+						+ "Total encoding time: \t" + (SATSynthesisEngine.encodingTime / 1000F) + " sec.");
+		System.out.println();
 		return printTime;
 	}
 
@@ -981,6 +984,7 @@ public final class APEUtils {
 		System.out.print("\n[" + memoryStatus.toString()+ "]\t" + totalMemMB + "\tMB \r");
 		
 	}
+
 	/**
 	 * Get all unique pairs of PredicateLabels within the collection.
 	 * @param set - Set of PredicateLabel that should be used to create the pairs
@@ -996,4 +1000,21 @@ public final class APEUtils {
 		});
         return pairs;
 	}
+	
+	/**
+	 * Get unique pairs of elements within 2 collections.
+	 * @param set1 - Set of elements that should be used to create the first elements of the pairs
+	 * @param set2 - Set of elements that should be used to create the second elements of the pairs
+	 * @return Set of unique pairs.
+	 */
+	public static <T> Set<Pair<T>> getUniquePairs(Collection<T> set1, Collection<T> set2) {
+		Set<Pair<T>> pairs = new HashSet<Pair<T>>();
+		set1.stream().forEach(ele1 -> {
+			set2.stream().forEach(ele2 -> {
+							pairs.add(new Pair<T>(ele1, ele2));
+			});
+		});
+        return pairs;
+	}
+	
 }

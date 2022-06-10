@@ -1,6 +1,11 @@
 package nl.uu.cs.ape.models.templateFormulas;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
@@ -8,10 +13,13 @@ import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.Module;
+import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.utils.APEDomainSetup;
+import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The class is used to represent a predefined SLTLx constraints according to a template, and to generate the
@@ -30,7 +38,7 @@ public abstract class SLTLxTemplateFormula {
     private boolean sign;
 
     /**
-     * Instantiates a new SLTL formula.
+     * Instantiates a new SLTLx formula.
      *
      * @param predicate the predicate
      */
@@ -72,7 +80,7 @@ public abstract class SLTLxTemplateFormula {
     }
 
     /**
-     * Function returns the formula that was specified under the SLTL operator.<br>
+     * Function returns the formula that was specified under the SLTLx operator.<br>
      * Currently only predicates.
      *
      * @return StateInterface ({@link AbstractModule}, {@link Module} or {@link Type}).
@@ -82,9 +90,9 @@ public abstract class SLTLxTemplateFormula {
     }
 
     /**
-     * Returns the type of the SLTL formula [<b>F</b>, <b>G</b> or <b>X</b>].
+     * Returns the type of the SLTLx formula [<b>F</b>, <b>G</b> or <b>X</b>].
      *
-     * @return String [<b>F</b>, <b>G</b> or <b>X</b>], depending on the type of SLTL formula.
+     * @return String [<b>F</b>, <b>G</b> or <b>X</b>], depending on the type of SLTLx formula.
      */
     public abstract String getType();
 
@@ -96,7 +104,7 @@ public abstract class SLTLxTemplateFormula {
      * @param typeStateBlocks Automaton of all the type states.
      * @param workflowElement type of the workflow element ({@link AtomType#MODULE}, {@link AtomType#MEM_TYPE_REFERENCE} etc.)
      * @param mappings        Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public abstract String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, AtomType workflowElement, SATAtomMappings mappings);
 
@@ -108,7 +116,7 @@ public abstract class SLTLxTemplateFormula {
      * @param then_predicate  Predicate that is enforced by <b>if_predicate</b>.
      * @param moduleAutomaton Module automaton.
      * @param mappings        Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public static String ite_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate, ModuleAutomaton moduleAutomaton,
                                     SATAtomMappings mappings) {
@@ -137,7 +145,7 @@ public abstract class SLTLxTemplateFormula {
      * @param moduleAutomaton Module automaton.
      * @param typeBlocks      Type blocks (corresponding to the memory or used type states).
      * @param mappings        Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public static String ite_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate, AtomType typeElement, ModuleAutomaton moduleAutomaton,
                                   List<Block> typeBlocks, SATAtomMappings mappings) {
@@ -173,7 +181,7 @@ public abstract class SLTLxTemplateFormula {
      * @param then_not_predicate Module that is forbidden by <b>if_predicate</b>.
      * @param moduleAutomaton    Module automaton.
      * @param mappings           Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public static String itn_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate,
                                     ModuleAutomaton moduleAutomaton, SATAtomMappings mappings) {
@@ -203,7 +211,7 @@ public abstract class SLTLxTemplateFormula {
      * @param moduleAutomaton    Module automaton.
      * @param typeBlocks         Type blocks (corresponding to the memory or used type states).
      * @param mappings           Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public static String itn_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate, AtomType typeElement, ModuleAutomaton moduleAutomaton,
                                   List<Block> typeBlocks, SATAtomMappings mappings) {
@@ -241,7 +249,7 @@ public abstract class SLTLxTemplateFormula {
      * @param first_module_in_sequence  Predicate that is enforced by <b>second_predicate</b>.
      * @param moduleAutomaton           Module automaton.
      * @param mappings                  Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public static String depend_module(TaxonomyPredicate second_module_in_sequence, TaxonomyPredicate first_module_in_sequence,
                                        ModuleAutomaton moduleAutomaton, SATAtomMappings mappings) {
@@ -324,7 +332,7 @@ public abstract class SLTLxTemplateFormula {
      * @param last_module     The module.
      * @param moduleAutomaton Automaton of all the module states.
      * @param mappings        Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public static String useAsLastModule(TaxonomyPredicate last_module, ModuleAutomaton moduleAutomaton,
                                          SATAtomMappings mappings) {
@@ -345,7 +353,7 @@ public abstract class SLTLxTemplateFormula {
      * @param n               The absolute position in the solution.
      * @param moduleAutomaton Automaton of all the module states.
      * @param mappings        Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public static String useAsNthModule(TaxonomyPredicate module, int n, ModuleAutomaton moduleAutomaton,
                                         SATAtomMappings mappings) {
@@ -366,7 +374,7 @@ public abstract class SLTLxTemplateFormula {
      * @param n               Number of repetitions.
      * @param moduleAutomaton Automaton of all the module states.
      * @param mappings        Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTL formula.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public static String useModuleNtimes(TaxonomyPredicate module, int n, ModuleAutomaton moduleAutomaton,
                                          SATAtomMappings mappings) {
@@ -391,62 +399,259 @@ public abstract class SLTLxTemplateFormula {
      * @param mappings			Set of the mappings for the literals.
      * @return
      */
-	public static String use_m_in_label(TaxonomyPredicate module, TaxonomyPredicate inputType,
+	public static String use_module_input(TaxonomyPredicate module, TaxonomyPredicate inputType,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
-		StringBuilder constraints = new StringBuilder();
-		/* For each module state in the workflow */
-		for (State moduleState : moduleAutomaton.getAllStates()) {
-			int moduleNo = moduleState.getLocalStateNumber();
-            /* ..and for each input state of that module state.. */
-            List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
-            /* Encode: if module was used in the module state */
-            constraints.append("-")
-                    .append(mappings.add(module, moduleState, AtomType.MODULE)).append(" ");
-            for (State currInputState : currInputStates) {
-                        /*
-                         * .. the corresponding data type needs to be provided in one of the input
-                         * states
-                         */
-                        constraints = constraints
-                                .append(mappings.add(inputType, currInputState, AtomType.USED_TYPE))
-                                .append(" ");
-            }
-            constraints.append("0\n");
-		}
+
+        StringBuilder constraints = new StringBuilder();
+        Set<Integer> allCombinations = new HashSet<>();
+        Map<Integer, State> opOrderStates = new HashMap<>();
+        Map<Integer, List<State> > opInputs = new HashMap<>();
+        
+        int automatonSize = moduleAutomaton.getAllStates().size();
+        for (int opNo = 0; opNo < automatonSize; opNo++) {
+        		
+        		int currOp = mappings.getNextAuxNum();
+        		allCombinations.add(currOp);
+        	
+        		opOrderStates.put(currOp, moduleAutomaton.getAllStates().get(opNo));
+        		
+        		opInputs.put(currOp, typeAutomaton.getUsedTypesBlock(opNo).getStates());
+	           	
+        }
+        // at least one of the states must be valid
+        for(Integer currComb : allCombinations) {
+        	constraints.append(currComb + " ");
+        }
+        constraints.append("0\n");
+        
+        // each state enforces usage of the corresponding tools and input
+        for(Integer currComb : allCombinations) {
+        	// enforce tools
+        	constraints.append("-" + currComb + " ")
+        				.append(mappings.add(module, opOrderStates.get(currComb), AtomType.MODULE))
+        				.append(" 0\n");
+        	//enforce output/input dependencies
+        	constraints.append("-" + currComb + " ");
+        	for(State currState : opInputs.get(currComb)) {
+        		constraints.append(mappings.add(inputType, currState, AtomType.USED_TYPE))
+        					.append(" ");
+        	}
+        	 constraints.append("0\n");
+        				
+        }
+        
         return constraints.toString();
 	}
-	/**
+	
+	 /**
      * Creates a CNF representation of the Constraint:<br>
-     * Use <b>module</b> with data <b>inputType</b> as one of the inputs.
+     * Use <b>module</b> with data <b>outputType</b> as one of the outputs.
      * 
      * @param module			Module to be used.
-     * @param inputNo			Type of one of the input types.
+     * @param outputType			Type of one of the input types.
      * @param moduleAutomaton	The module automaton
      * @param typeAutomaton		The type automaton.
      * @param mappings			Set of the mappings for the literals.
      * @return
      */
-	public static String use_m_with_dependence(TaxonomyPredicate module, int inputNo,
+	public static String use_module_output(TaxonomyPredicate module, TaxonomyPredicate outputType,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
-		StringBuilder constraints = new StringBuilder();
-		/* For each module state in the workflow */
-		for (State moduleState : moduleAutomaton.getAllStates()) {
-			int moduleNo = moduleState.getLocalStateNumber();
-            /* ..and for each input state of that module state.. */
-            List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1).getStates();
-            /* Encode: if module was used in the module state */
-            constraints.append("-")
-                    .append(mappings.add(module, moduleState, AtomType.MODULE)).append(" ");
-            for (State currInputState : currInputStates) {
-                        /*
-                         * .. one of the inputs should depend on the inputNo workflow input
-                         */
-                        constraints = constraints
-                                .append(mappings.add(typeAutomaton.getWorkflowInputBlock().getState(inputNo-1), currInputState, AtomType.R_RELATON))
-                                .append(" ");
-            }
-            constraints.append("0\n");
-		}
+
+        StringBuilder constraints = new StringBuilder();
+        Set<Integer> allCombinations = new HashSet<>();
+        Map<Integer, State> opOrderStates = new HashMap<>();
+        Map<Integer, List<State> > onOutputs = new HashMap<>();
+        
+        int automatonSize = moduleAutomaton.getAllStates().size();
+        for (int opNo = 0; opNo < automatonSize; opNo++) {
+        		
+        		int currOp = mappings.getNextAuxNum();
+        		allCombinations.add(currOp);
+        	
+        		opOrderStates.put(currOp, moduleAutomaton.getAllStates().get(opNo));
+        		
+        		onOutputs.put(currOp, typeAutomaton.getMemoryTypesBlock(opNo + 1).getStates());
+	           	
+        }
+        // at least one of the states must be valid
+        for(Integer currComb : allCombinations) {
+        	constraints.append(currComb + " ");
+        }
+        constraints.append("0\n");
+        
+        // each state enforces usage of the corresponding tools and input
+        for(Integer currComb : allCombinations) {
+        	// enforce tools
+        	constraints.append("-" + currComb + " ")
+        				.append(mappings.add(module, opOrderStates.get(currComb), AtomType.MODULE))
+        				.append(" 0\n");
+        	//enforce output/input dependencies
+        	constraints.append("-" + currComb + " ");
+        	for(State currState : onOutputs.get(currComb)) {
+        		constraints.append(mappings.add(outputType, currState, AtomType.MEM_TYPE_REFERENCE))
+        					.append(" ");
+        	}
+        	 constraints.append("0\n");
+        				
+        }
+        
         return constraints.toString();
 	}
+	
+	
+	/**
+     * Creates a CNF representation of the Constraint:<br>
+     * 1st operation should generate an output used by the 2nd operation.
+     *
+     * @param first_predicate   - Module type that generates the data as output
+     * @param second_predicate - Module type that uses the generated data as input
+	 * @param domainSetup  - setup of the domain
+     * @param moduleAutomaton - module automaton.
+	 * @param typeAutomaton - type automaton
+     * @param mappings       - Set of the mappings for the literals.
+     * @return The String CNF representation of the SLTLx formula.
+     */
+    public static String connected_modules(TaxonomyPredicate first_predicate, TaxonomyPredicate second_predicate, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+                                    TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+        StringBuilder constraints = new StringBuilder();
+        Set<Integer> allCombinations = new HashSet<>();
+        Map<Integer, Pair<State>> opOrderStates = new HashMap<>();
+        Map<Integer, Set<Pair<State>> > opOutInPairs= new HashMap<>();
+        
+        int automatonSize = moduleAutomaton.getAllStates().size();
+        for (int op1 = 0; op1 < automatonSize-1; op1++) {
+        	for (int op2 = op1 + 1; op2 < automatonSize; op2++) {
+        		
+        		int currComb = mappings.getNextAuxNum();
+        		allCombinations.add(currComb);
+        		
+        		opOrderStates.put(currComb, new Pair<State>(moduleAutomaton.getAllStates().get(op1), moduleAutomaton.getAllStates().get(op2)));
+        		
+        		List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();
+        		List<State> op2inputs = typeAutomaton.getUsedTypesBlock(op2).getStates();
+        		
+        		Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
+        		opOutInPairs.put(currComb, statePairs);
+	           	
+        	}
+        }
+        // at least one of the combinations must be valid
+        for(Integer currComb : allCombinations) {
+        	constraints.append(currComb + " ");
+        }
+        constraints.append("0\n");
+        
+        // each combination enforces usage of the corresponding tools and output/inputs
+        for(Integer currComb : allCombinations) {
+        	// enforce tools
+        	constraints.append("-" + currComb + " ")
+        				.append(mappings.add(first_predicate, opOrderStates.get(currComb).getFirst(), AtomType.MODULE))
+        				.append(" 0\n");
+        	constraints.append("-" + currComb + " ")
+						.append(mappings.add(second_predicate, opOrderStates.get(currComb).getSecond(), AtomType.MODULE))
+						.append(" 0\n");
+        	//enforce output/input dependencies
+        	constraints.append("-" + currComb + " ");
+        	for(Pair<State> currPair : opOutInPairs.get(currComb)) {
+        		constraints.append(mappings.add(currPair.getFirst(), currPair.getSecond(), AtomType.MEM_TYPE_REFERENCE))
+        					.append(" ");
+        	}
+        	 constraints.append("0\n");
+        				
+        }
+        
+        return constraints.toString();
+    }
+    
+    /**
+     * Creates a CNF representation of the Constraint:<br>
+     * 1st operation should not generate an output used by the 2nd operation.
+     *
+     * @param first_predicate   - Module type that generates the data as output
+     * @param second_predicate - Module type that uses the generated data as input
+	 * @param domainSetup  - setup of the domain
+     * @param moduleAutomaton - module automaton.
+	 * @param typeAutomaton - type automaton
+     * @param mappings       - Set of the mappings for the literals.
+     * @return The String CNF representation of the SLTLx formula.
+     */
+    public static String not_connected_modules(TaxonomyPredicate first_predicate, TaxonomyPredicate second_predicate, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+                                    TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+        StringBuilder constraints = new StringBuilder();
+        
+        int automatonSize = moduleAutomaton.getAllStates().size();
+        for (int op1 = 0; op1 < automatonSize-1; op1++) {
+        	for (int op2 = op1 + 1; op2 < automatonSize; op2++) {
+        		
+        		State firstModuleState = moduleAutomaton.get(op1);
+        		State secondModuleState = moduleAutomaton.get(op2);
+        		
+        		List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();
+        		List<State> op2inputs = typeAutomaton.getUsedTypesBlock(op2).getStates();
+        		
+        		// Ensure that either the 2 operations are not used consequently, or that they are not connected
+        		Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
+        		for(Pair<State> currIOpair : statePairs) {
+        			constraints.append("-").append(mappings.add(first_predicate, firstModuleState, AtomType.MODULE)).append(" ");
+        			constraints.append("-"
+                            + mappings.add(currIOpair.getFirst(), currIOpair.getSecond(), AtomType.MEM_TYPE_REFERENCE) + " ");
+                    constraints.append("-"
+                            + mappings.add(second_predicate, secondModuleState, AtomType.MODULE)
+                            + " 0\n");
+        		}
+	           	
+        	}
+        }
+        
+        return constraints.toString();
+    }
+
+    
+    public static String notRepeatModules(TaxonomyPredicate predicate, APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+            TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+        StringBuilder constraints = new StringBuilder();
+        
+        int automatonSize = moduleAutomaton.getAllStates().size();
+        for (int op1 = 0; op1 < automatonSize-1; op1++) {
+        	for (int op2 = op1 + 1; op2 < automatonSize; op2++) {
+        		
+        		State firstModuleState = moduleAutomaton.get(op1);
+        		State secondModuleState = moduleAutomaton.get(op2);
+        		
+        		List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();
+        		List<State> op2inputs = typeAutomaton.getUsedTypesBlock(op2).getStates();
+        		
+        		// Ensure that either each operation is not used consequently, or that they are not connected
+        		Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
+        		for(Pair<State> currIOpair : statePairs) {
+        			// filter all operations
+        			domainSetup.getAllModules().getElementsFromSubTaxonomy(predicate).stream()
+        								.filter(x -> x.isSimplePredicate()).forEach(operation ->{
+
+        									constraints.append("-").append(mappings.add(operation, firstModuleState, AtomType.MODULE)).append(" ");
+		        			constraints.append("-"
+		                            + mappings.add(currIOpair.getFirst(), currIOpair.getSecond(), AtomType.MEM_TYPE_REFERENCE) + " ");
+		                    constraints.append("-"
+		                            + mappings.add(operation, secondModuleState, AtomType.MODULE)
+		                            + " 0\n");
+        			});
+        		}
+	           	
+        	}
+        }
+        
+        return constraints.toString();
+    }
+    
+
+    /**
+     * Simple method that combines a pair of integers into a unique String.
+     * @param int1 - first integer
+     * @param int2 - second integer
+     * @return Unique combination of the pair, as String.
+     */
+	private static String combine(int int1, int int2) {
+		return int1 + "_" + int2;
+	}
+	
 }

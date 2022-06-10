@@ -354,6 +354,7 @@ public class APE implements APEInterface{
 		
 		System.out.println(allSolutions.getFlag().getMessage());
 		long runTimeMS = APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
+
 		allSolutions.setSolvingTime(runTimeMS);
 		return allSolutions;
 	}

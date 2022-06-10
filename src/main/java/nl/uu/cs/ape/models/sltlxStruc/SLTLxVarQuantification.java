@@ -31,7 +31,7 @@ protected SLTLxFormula formula;
 		clauses.addAll(formula.getCNFEncoding(stateNo, newVarMappping, synthesisEngine));
 		/** Ensure that the variables and states they substitute satisfy the same properties. 
 		 * The rules have to be applied after visiting the bound formula (as done in the previous step). */
-		clauses.addAll(flatBindedVariable.getVariableSubstitutionToPresereProperties(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(flatBindedVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMappping, synthesisEngine));
 		clauses.addAll(flatBindedVariable.getVariableMutualExclusion(stateNo, newVarMappping, synthesisEngine));
 		return clauses;
 	}
@@ -44,7 +44,7 @@ protected SLTLxFormula formula;
 		clauses.addAll(formula.getNegatedCNFEncoding(stateNo, newVarMappping, synthesisEngine));
 		/** Ensure that the variables and states they substitute satisfy the same properties. 
 		 * The rules have to be applied after visiting the bound formula (as done in the previous step). */
-		clauses.addAll(flatBindedVariable.getVariableSubstitutionToPresereProperties(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(flatBindedVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMappping, synthesisEngine));
 		clauses.addAll(flatBindedVariable.getVariableMutualExclusion(stateNo, newVarMappping, synthesisEngine));
 		return clauses;
 	}
