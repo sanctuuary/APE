@@ -89,6 +89,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
      */
     private SLTLxVariableOccuranceCollection varUsage;
     
+    public static double encodingTime = 0;
+    
     /**
      * Setup of an instance of the SAT synthesis engine.
      *
@@ -262,7 +264,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
 		
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
         System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");
-
+        encodingTime += problemSetupTimeElapsedMillis;
         return true;
     }
 
