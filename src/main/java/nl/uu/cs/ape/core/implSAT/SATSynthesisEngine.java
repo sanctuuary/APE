@@ -89,7 +89,15 @@ public class SATSynthesisEngine implements SynthesisEngine {
      */
     private SLTLxVariableOccuranceCollection varUsage;
     
+    /**
+     * Static variable used to count the encoding time of the APE instance run, strictly used to display the APE CLI run stats.
+     */
     public static double encodingTime = 0;
+    
+    /**
+     * Static variable used to count the SAT solving time of the APE instance run, strictly used to display the APE CLI run stats.
+     */
+    public static double satSolvingTime = 0;
     
     /**
      * Setup of an instance of the SAT synthesis engine.
@@ -213,6 +221,11 @@ public class SATSynthesisEngine implements SynthesisEngine {
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.workdlowOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
 
         /*
+         * Encode rule that the given inputs should not be used as workflow outputs
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.inputsAreNotOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
+        
+        /*
          * Encode the constraints from the file based on the templates (manual templates)
          */
         if (!domainSetup.getUnformattedConstr().isEmpty() || !domainSetup.getSLTLxConstraints().isEmpty() ) {
@@ -248,7 +261,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
         int clauses = APEUtils.countLines(cnfEncoding);
         String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
-        
         satInputFile = APEUtils.concatIntoFile(sat_input_header, cnfEncoding);
         cnfEncoding.delete();
         
@@ -263,7 +275,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
 
 		
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
-        System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");
+        System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec (" + clauses + " clauses).");
         encodingTime += problemSetupTimeElapsedMillis;
         return true;
     }
@@ -339,20 +351,24 @@ public class SATSynthesisEngine implements SynthesisEngine {
         } catch (ParseFormatException e) {
             System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
             System.err.println(e.getMessage());
+            return solutions;
         } catch (ContradictionException e) {
             if (solutionsFound == 0) {
                 System.err.println("Unsatisfiable");
+                return solutions;
             }
         } catch (TimeoutException e) {
             System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
         } catch (IOException e) {
             System.err.println("Internal error while parsing the encoding.");
+            return solutions;
         }
 
         if (solutionsFound == 0 || solutionsFound % 500 != 0) {
             realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
             System.out.println("Found " + solutionsFound + " solutions. Solving time: "
                     + (realTimeElapsedMillis / 1000F) + " sec.");
+            satSolvingTime += realTimeElapsedMillis;
         }
 
         return solutions;
