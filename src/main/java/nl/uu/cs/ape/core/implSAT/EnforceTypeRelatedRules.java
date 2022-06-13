@@ -24,6 +24,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxImplication;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegatedConjunction;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
 import nl.uu.cs.ape.utils.APEDomainSetup;
+import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code EnforceTypeRelatedRules} class is used to encode SLTLx constraints based on the
@@ -237,7 +238,7 @@ public class EnforceTypeRelatedRules {
    public static Set<SLTLxFormula> workflowInputs(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton) throws APEConfigException {
         Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
 
-        List<State> workflowInputStates = typeAutomaton.getMemoryTypesBlock(0).getStates();
+        List<State> workflowInputStates = typeAutomaton.getWorkflowInputBlock().getStates();
         for (int i = 0; i < workflowInputStates.size(); i++) {
         	State currState = workflowInputStates.get(i);
             if (i < program_inputs.size()) {
@@ -300,4 +301,31 @@ public class EnforceTypeRelatedRules {
 
         return fullEncoding;
     }
+   
+   /**
+    * Encodes rules that ensure that the initial workflow inputs are not used as workflow outputs.
+    *
+    * @param allTypes       Set of all the types in the domain
+    * @param program_inputs Input types for the program.
+    * @param typeAutomaton  Automaton representing the type states in the model
+    * @return The String representation of the initial input encoding.
+    * @throws APEConfigException Exception thrown when one of the output types is not defined in the taxonomy.
+    */
+  public static Set<SLTLxFormula> inputsAreNotOutputs(AllTypes allTypes, List<Type> program_inputs, TypeAutomaton typeAutomaton) throws APEConfigException {
+       Set<SLTLxFormula> fullEncoding = new HashSet<SLTLxFormula>();
+
+       List<State> workflowInputStates = typeAutomaton.getWorkflowInputBlock().getStates();
+       List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
+       for(Pair<State> pairIO : APEUtils.getUniquePairs(workflowInputStates, workflowOutputStates) ) {
+    	   fullEncoding.add(
+    			   new SLTLxNegation(
+    					   new SLTLxAtom(
+								AtomType.MEM_TYPE_REFERENCE, 
+								pairIO.getFirst(), 
+								pairIO.getSecond())));
+       }
+       return fullEncoding;
+   }
+
+
 }

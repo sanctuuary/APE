@@ -613,8 +613,9 @@ public final class APEUtils {
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
 		System.out.println("\n"
 						+ "APE found " + solutionsFound + " solutions.\n"
-						+ "Total APE runtime: " + (printTime / 1000F) + " sec.\n"
-						+ "Total encoding time: \t" + (SATSynthesisEngine.encodingTime / 1000F) + " sec.");
+						+ "Total APE runtime: \t\t" + (printTime / 1000F) + " sec.\n"
+						+ "Total encoding time: \t\t" + (SATSynthesisEngine.encodingTime / 1000F) + " sec.\n"
+						+ "Total SAT solving time: \t" + (SATSynthesisEngine.satSolvingTime / 1000F) + " sec.");
 		System.out.println();
 		return printTime;
 	}
