@@ -152,6 +152,7 @@ public class APEDomainSetup {
      */
     public void clearConstraints() {
         this.unformattedConstr.clear();
+        this.constraintsSLTLx.clear();
     }
 
     /**
