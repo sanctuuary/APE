@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/wiki/sanctuuary/APE/logo.png" alt="logo" width=20% align="left" />
+<img src="https://user-images.githubusercontent.com/11068408/198268857-83b02297-0b03-4dc3-852b-52d889faaf3a.svg" alt="logo" width=20% align="left" />
 
 # APE (Automated Pipeline Explorer)
 
