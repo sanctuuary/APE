@@ -151,10 +151,10 @@ Our use cases are motivated by practical problems in various domains (e.g. bioin
 
 
 ## The APE team
-* Vedran Kasalica (v.kasalica[at]uu.nl), lead developer
+* Vedran Kasalica (v.kasalica[at]esciencecenter.nl), lead developer
 * Maurin Voshol, student developer
 * Koen Haverkort, student developer
-* Anna-Lena Lamprecht (a.l.lamprecht[at]uu.nl), project initiator and principal investigator
+* Anna-Lena Lamprecht (anna-lena.lamprecht[at]uni-potsdam.de), project initiator and principal investigator
 
 ## Contact
 For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica[at]uu.nl).
