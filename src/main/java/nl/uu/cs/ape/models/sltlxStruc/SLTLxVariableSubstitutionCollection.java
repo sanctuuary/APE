@@ -68,28 +68,29 @@ public class SLTLxVariableSubstitutionCollection {
 
 	/**
 	 * Get the unique variable used to substitute the current binding of the
-	 * variable.	
+	 * variable.
 	 * 
 	 * @param existingVar - variable used in the formula
 	 * @return Unique variable that corresponds to the current variable binding.
-	 * @throws SLTLxParsingAnnotationException - in case that the variable does not exist.
+	 * @throws SLTLxParsingAnnotationException - in case that the variable does not
+	 *                                         exist.
 	 */
 	public SLTLxVariable getVarSabstitute(SLTLxVariable existingVar) throws SLTLxParsingAnnotationException {
-		SLTLxVariable var = mappedVariables.get(existingVar);
-		if (var == null) {
+		SLTLxVariable variable = mappedVariables.get(existingVar);
+		if (variable == null) {
 			throw SLTLxParsingAnnotationException
 					.variableNotBound("Variable " + existingVar.getPredicateID() + " must be bound.");
 		}
-		return var;
+		return variable;
 	}
 
 	/**
 	 * Get the domain for the given variable.
-	 * @param var - variable in question
+	 * 
+	 * @param variable - variable in question
 	 * @return Set of states that represent the domain of the variable.
 	 */
-	public Set<State> getVariableDomain(SLTLxVariable var) {
-		return this.variableDomain.get(var);
+	public Set<State> getVariableDomain(SLTLxVariable variable) {
+		return this.variableDomain.get(variable);
 	}
-
 }

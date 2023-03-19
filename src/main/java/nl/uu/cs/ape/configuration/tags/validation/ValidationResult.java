@@ -4,7 +4,8 @@ import org.json.JSONObject;
 
 /**
  * This class contains information about the outcome of a validation.
- * More specifically: the tag name that was being tested, the description of the rule
+ * More specifically: the tag name that was being tested, the description of the
+ * rule
  * and a boolean that represents a success or fail.
  */
 public class ValidationResult {
@@ -65,7 +66,8 @@ public class ValidationResult {
     /**
      * To JSONObject.
      *
-     * @return the json object containing the tags: "tag", "description" and "success"
+     * @return the json object containing the tags: "tag", "description" and
+     *         "success"
      */
     public JSONObject toJSON() {
         return new JSONObject()

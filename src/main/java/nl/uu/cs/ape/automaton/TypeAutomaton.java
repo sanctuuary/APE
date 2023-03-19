@@ -7,24 +7,31 @@ import java.util.List;
 import nl.uu.cs.ape.models.enums.AtomType;
 
 /**
- * The {@code TypeAutomaton} class  is used to represent the collection of data object states that exist in the workflow.
- * It comprises blocks of data objects, where each block groups inputs or outputs of a specific operation.<br><br>
- * Each state (within a block) represents a data object (a specific input or output data object) in the workflow.
+ * The {@code TypeAutomaton} class is used to represent the collection of data
+ * object states that exist in the workflow.
+ * It comprises blocks of data objects, where each block groups inputs or
+ * outputs of a specific operation.<br>
+ * <br>
+ * Each state (within a block) represents a data object (a specific input or
+ * output data object) in the workflow.
  * <p>
  * Labeling of the automaton is provided in
- * <a href="https://github.com/sanctuuary/APE/blob/master/res/WorkflowAutomaton_Implementation.png">/APE/res/WorkflowAutomaton_Implementation.png</a>.
+ * <a href=
+ * "https://github.com/sanctuuary/APE/blob/master/res/WorkflowAutomaton_Implementation.png">/APE/res/WorkflowAutomaton_Implementation.png</a>.
  *
  * @author Vedran Kasalica
  */
 public class TypeAutomaton implements Automaton {
 
     /**
-     * Blocks of data types that are being added to the memory (usually outputs from the tools, apart from the initial workflow input).
+     * Blocks of data types that are being added to the memory (usually outputs from
+     * the tools, apart from the initial workflow input).
      */
     private List<Block> memoryTypesAutomaton;
 
     /**
-     * Blocks of data types that are being used by tools from the memory (inputs to the tools).
+     * Blocks of data types that are being used by tools from the memory (inputs to
+     * the tools).
      */
     private List<Block> usedTypesAutomaton;
 
@@ -32,15 +39,19 @@ public class TypeAutomaton implements Automaton {
      * State is used in order to represent no state.
      */
     private State nullState;
-    
+
     /**
-     * Generate the Type State automatons based on the defined length and branching factor.<br>
+     * Generate the Type State automatons based on the defined length and branching
+     * factor.<br>
      * Labeling of the automaton is provided in
-     * <a href="https://github.com/sanctuuary/APE/blob/master/res/WorkflowAutomaton_Implementation.png">/APE/res/WorkflowAutomaton_Implementation.png</a>
+     * <a href=
+     * "https://github.com/sanctuuary/APE/blob/master/res/WorkflowAutomaton_Implementation.png">/APE/res/WorkflowAutomaton_Implementation.png</a>
      *
      * @param automataBound   Length of the automaton
-     * @param inputBranching  Input branching factor (max number of inputs for modules)
-     * @param outputBranching Output branching factor (max number of outputs for modules)
+     * @param inputBranching  Input branching factor (max number of inputs for
+     *                        modules)
+     * @param outputBranching Output branching factor (max number of outputs for
+     *                        modules)
      */
     public TypeAutomaton(int automataBound, int inputBranching, int outputBranching) {
         memoryTypesAutomaton = new ArrayList<Block>();
@@ -54,7 +65,7 @@ public class TypeAutomaton implements Automaton {
             Block tmpMemoryTypeBlock = new Block(i);
 
             for (int j = 0; j < outputBranching; j++) {
-                State tmpMemoryState = new State(AtomType.MEMORY_TYPE, i, j,inputBranching, outputBranching);
+                State tmpMemoryState = new State(AtomType.MEMORY_TYPE, i, j, inputBranching, outputBranching);
                 tmpMemoryTypeBlock.addState(tmpMemoryState);
             }
             memoryTypesAutomaton.add(tmpMemoryTypeBlock);
@@ -69,7 +80,8 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
-     * Return from the automaton all the Type Blocks that contain types used by tools.
+     * Return from the automaton all the Type Blocks that contain types used by
+     * tools.
      *
      * @return Blocks of data types used by tools.
      */
@@ -78,7 +90,8 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
-     * Return from the automaton all the Type Blocks that contain types added to the memory.
+     * Return from the automaton all the Type Blocks that contain types added to the
+     * memory.
      *
      * @return Blocks of data types added to the memory.
      */
@@ -109,7 +122,8 @@ public class TypeAutomaton implements Automaton {
     /**
      * Adds a block to the {@link #usedTypesAutomaton} list.
      *
-     * @param block Add to the automaton the Type Block that contains types used by tools.
+     * @param block Add to the automaton the Type Block that contains types used by
+     *              tools.
      * @return true (as specified by {@link Collection#add}
      */
     public boolean addUsedTypesBlock(Block block) {
@@ -119,7 +133,8 @@ public class TypeAutomaton implements Automaton {
     /**
      * Adds a block to the {@link #memoryTypesAutomaton} list.
      *
-     * @param block Add to the automaton the Type Block that contains types added to the memory.
+     * @param block Add to the automaton the Type Block that contains types added to
+     *              the memory.
      * @return true (as specified by {@link Collection#add}
      */
     public boolean addMemoryTypesBlock(Block block) {
@@ -175,10 +190,12 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
-     * Get from the automaton all the @i-th Type Block that contain types used by tools.
+     * Get from the automaton all the @i-th Type Block that contain types used by
+     * tools.
      *
      * @param i - ordering number of the used type block to be returned.
-     * (inputs to the first tool are in the block 0, and n-th block contains the workflow output of the workflow of length n)
+     *          (inputs to the first tool are in the block 0, and n-th block
+     *          contains the workflow output of the workflow of length n)
      * @return Block of Type states that are used by tools.
      */
     public Block getUsedTypesBlock(int i) {
@@ -186,10 +203,12 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
-     * Get from the automaton all the {@code i}-th Type Block that contain types added to the memory.
+     * Get from the automaton all the {@code i}-th Type Block that contain types
+     * added to the memory.
      *
-     * @param i - ordering number of the memory type block to be returned 
-     * (original workflow inputs are in the block 0, and n-th block contains the outputs of the last tool in the workflow of length n)
+     * @param i - ordering number of the memory type block to be returned
+     *          (original workflow inputs are in the block 0, and n-th block
+     *          contains the outputs of the last tool in the workflow of length n)
      * @return lock of Type states that are added to the memory.
      */
     public Block getMemoryTypesBlock(int i) {
@@ -197,9 +216,11 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
-     * Return all the memory type states that are generated until a certain block, i.e. all the slots of memory are generated until a certain block/tool.
+     * Return all the memory type states that are generated until a certain block,
+     * i.e. all the slots of memory are generated until a certain block/tool.
      *
-     * @param maxBlockNo Memory block prior to which we are looking into memory (this block is included).
+     * @param maxBlockNo Memory block prior to which we are looking into memory
+     *                   (this block is included).
      * @return List of memory States.
      */
     public List<State> getMemoryStatesUntilBlockNo(int maxBlockNo) {
@@ -212,11 +233,14 @@ public class TypeAutomaton implements Automaton {
         }
         return untilStates;
     }
-    
+
     /**
-     * Return all the type states that are available until (and including) a certain block, i.e. all the slots of tool inputs and outputs that are created until the current block.
+     * Return all the type states that are available until (and including) a certain
+     * block, i.e. all the slots of tool inputs and outputs that are created until
+     * the current block.
      *
-     * @param maxBlockNo Memory block until which we are looking into tool inputs/outputs (this block is included).
+     * @param maxBlockNo Memory block until which we are looking into tool
+     *                   inputs/outputs (this block is included).
      * @return List of Type States.
      */
     public List<State> getAllStatesUntilBlockNo(int maxBlockNo) {
@@ -233,11 +257,14 @@ public class TypeAutomaton implements Automaton {
         }
         return untilStates;
     }
-    
+
     /**
-     * Return all the memory states that are available until (and including) a certain block, i.e. all the slots of tool outputs that are created until the current block.
+     * Return all the memory states that are available until (and including) a
+     * certain block, i.e. all the slots of tool outputs that are created until the
+     * current block.
      *
-     * @param maxBlockNo Memory block until which we are looking into tool inputs/outputs (this block is included).
+     * @param maxBlockNo Memory block until which we are looking into tool
+     *                   inputs/outputs (this block is included).
      * @return List of Memory Type States.
      */
     public List<State> getAllMemoryStatesUntilBlockNo(int maxBlockNo) {
@@ -252,9 +279,11 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
-     * Return all the memory type states that are generated after a certain block, i.e. all the slots of memory are generated prior to a certain block/tool.
+     * Return all the memory type states that are generated after a certain block,
+     * i.e. all the slots of memory are generated prior to a certain block/tool.
      *
-     * @param minBlockNo Memory block after which we are looking into memory (this block is not included).
+     * @param minBlockNo Memory block after which we are looking into memory (this
+     *                   block is not included).
      * @return List of memory States.
      */
     public List<State> getMemoryStatesAfterBlockNo(int minBlockNo) {
@@ -269,9 +298,12 @@ public class TypeAutomaton implements Automaton {
     }
 
     /**
-     * Return all the type states that are used after a certain block, i.e. all the slots of tool inputs that are used after current types were added to the memory.
+     * Return all the type states that are used after a certain block, i.e. all the
+     * slots of tool inputs that are used after current types were added to the
+     * memory.
      *
-     * @param minBlockNo Memory block after which we are looking into tool inputs (this block is not included).
+     * @param minBlockNo Memory block after which we are looking into tool inputs
+     *                   (this block is not included).
      * @return List of Used States.
      */
     public List<State> getUsedStatesAfterBlockNo(int minBlockNo) {
@@ -284,7 +316,6 @@ public class TypeAutomaton implements Automaton {
         }
         return afterStates;
     }
-    
 
     /**
      * Prints the used types and memory types to the console.
@@ -295,13 +326,15 @@ public class TypeAutomaton implements Automaton {
         System.out.println("-------------------------------------------------------------");
         for (Block memBlock : memoryTypesAutomaton) {
             for (State memState : memBlock.getStates()) {
-                System.out.println("\tType state: " + memState.getPredicateID() + ", order number: " + memState.getAbsoluteStateNumber());
+                System.out.println("\tType state: " + memState.getPredicateID() + ", order number: "
+                        + memState.getAbsoluteStateNumber());
             }
         }
         System.out.println("-------------------------------------------------------------");
         for (Block usedBlock : usedTypesAutomaton) {
             for (State usedState : usedBlock.getStates()) {
-                System.out.println("\tType state: " + usedState.getPredicateID() + ", order number: " + usedState.getAbsoluteStateNumber());
+                System.out.println("\tType state: " + usedState.getPredicateID() + ", order number: "
+                        + usedState.getAbsoluteStateNumber());
             }
         }
 
@@ -309,7 +342,9 @@ public class TypeAutomaton implements Automaton {
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see nl.uu.cs.ape.automaton.Automaton#getAllStates()
      */
     @Override
@@ -322,9 +357,10 @@ public class TypeAutomaton implements Automaton {
         }
         return allStates;
     }
-    
+
     /**
      * Get all memory type states in the automaton.
+     * 
      * @return List of memory type states.
      */
     public List<State> getAllMemoryTypesStates() {
@@ -336,30 +372,34 @@ public class TypeAutomaton implements Automaton {
         }
         return allMemoryStates;
     }
-    
+
     /**
      * Get all used type states in the automaton.
+     * 
      * @return List of used type states.
      */
     public List<State> getAllUsedTypesStates() {
         List<State> allUsedStates = new ArrayList<State>();
         for (Block currBlock : getUsedTypesBlocks()) {
             for (State currState : currBlock.getStates()) {
-            	allUsedStates.add(currState);
+                allUsedStates.add(currState);
             }
         }
         return allUsedStates;
     }
 
-	/**
-	 * Return the size of the automaton, i.e., number of blocks in memoryType/usedType automatons.<br><br>
-	 * <b>Note:</b>
-	 * Size of the type automaton is (workflow length + 1) as it includes the workflow input and output as an additional block. 
-	 * @return Size of type automaton.
-	 */
-	public int getLength() {
-		return this.memoryTypesAutomaton.size();
-	}
-	
-	
+    /**
+     * Return the size of the automaton, i.e., number of blocks in
+     * memoryType/usedType automatons.<br>
+     * <br>
+     * <b>Note:</b>
+     * Size of the type automaton is (workflow length + 1) as it includes the
+     * workflow input and output as an additional block.
+     * 
+     * @return Size of type automaton.
+     */
+    public int getLength() {
+        return this.memoryTypesAutomaton.size();
+    }
+
 }

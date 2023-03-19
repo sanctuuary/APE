@@ -7,8 +7,6 @@ import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.*;
 
-import com.google.common.io.Files;
-
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
@@ -22,7 +20,6 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccuranceCollection;
-import nl.uu.cs.ape.parser.SLTLxSATVisitor;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -237,21 +234,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.preserveAuxiliaryPredicateRules(moduleAutomaton, typeAutomaton, domainSetup.getHelperPredicates()));
         
-        /*
-         * Additional SLTLx constraints. TODO - provide a proper interface
-         */
-//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this,
-//        		"Exists (?x) 'birds'(?x) & F (<'psxyz_P'(?x;)> true)"));
-//        		"!Exists (?x1) (<'Transform'(;?x1)> true) & (<'Transform'(?x1;)> true)"));
-//        		"G(Forall (?x1) (<'Transform'(?x1;)> true) -> (X G (Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2))))"));
-//        		"true");
-//        		"  !X(<'ArealInterpolationRate'(;)> true)"));
-//    			" G <'Transform'(;)> true -> !  X F <'Transform'(;)> true"));
-//        		"G ((<'ArealInterpolationRate'(;)> true) -> !  X F <'ArealInterpolationRate'(;)> true)"));
-//			    " Forall (?x) Exists (?y) R(?x,?y)"));
-//    			"X !<'Tool'(;)> true"));
-//        		" (G Exists (?x) <'ZonalStatisticsMeanCount'(?x;)> G Forall (?y) <'ZonalStatisticsMeanCount'(?y;)> ! R(?x,?y))"));
-//    "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> F <'psxy_l'(?y;)> true))"));
 
         /*
          * Counting the number of variables and clauses that will be given to the SAT solver
@@ -265,13 +247,13 @@ public class SATSynthesisEngine implements SynthesisEngine {
         cnfEncoding.delete();
         
         /* add the cnf encoding file to Desktop */
-//        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
+//        Files.copy(satInputFile, new File("~/Desktop/tmp"+ problemSetupStartTime));
         
         /* add human readable version of the cnf encoding file to Desktop */
 //        FileInputStream cnfStream = new FileInputStream(satInputFile);
 //		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
 //		cnfStream.close();
-//		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
+//		APEUtils.write2file(encoding, new File("~/Desktop/tmp.txt"), false);
 
 		
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;

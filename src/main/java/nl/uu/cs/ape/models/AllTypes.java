@@ -12,17 +12,19 @@ import nl.uu.cs.ape.utils.APEDimensionsException;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
- * The {@code AllTypes} class represent the set of all the data dimensions that can be used in our program. The data 
- * can be grouped in multiple data dimensions (e.g. types,formats, etc.) and each {@link Type} will belong to one of those dimensions.
+ * The {@code AllTypes} class represent the set of all the data dimensions that
+ * can be used in our program. The data
+ * can be grouped in multiple data dimensions (e.g. types,formats, etc.) and
+ * each {@link Type} will belong to one of those dimensions.
  *
  * @author Vedran Kasalica
  */
 public class AllTypes extends AllPredicates {
 
-	 private static String empty = "empty";
-	 private static String apeLabel = "APE_label";
-	 private static String emptyLabel = "emptyLabel";
-	
+    private static String empty = "empty";
+    private static String apeLabel = "APE_label";
+    private static String emptyLabel = "emptyLabel";
+
     /**
      * {@link Type} object representing the "empty type".
      */
@@ -32,12 +34,12 @@ public class AllTypes extends AllPredicates {
      * {@link Type} object representing the "empty label root".
      */
     private Type apeLabelRoot;
-    
+
     /**
      * {@link Type} object representing the "empty label type".
      */
     private Type emptyLabelType;
-   
+
     /**
      * Instantiates a new AllTypes object.
      *
@@ -45,7 +47,7 @@ public class AllTypes extends AllPredicates {
      */
     public AllTypes(APECoreConfig config) {
         super(Stream.concat(config.getDataDimensionRoots().stream(), Stream.of(apeLabel))
-                             .collect(Collectors.toList()));
+                .collect(Collectors.toList()));
         emptyType = new Type(empty, empty, empty, NodeType.EMPTY);
         apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
         emptyLabelType = new Type(emptyLabel, emptyLabel, apeLabel, NodeType.EMPTY_LABEL);
@@ -55,34 +57,35 @@ public class AllTypes extends AllPredicates {
         apeLabelRoot.addSubPredicate(emptyLabelType);
         emptyLabelType.addSuperPredicate(apeLabelRoot);
     }
-    
+
     /**
      * Instantiates a new AllTypes object.
      *
      * @param typeTaxonomyRoots the list of data dimension roots
      */
     public AllTypes(List<String> typeTaxonomyRoots) {
-    	super(Stream.concat(typeTaxonomyRoots.stream(), Stream.of(apeLabel))
+        super(Stream.concat(typeTaxonomyRoots.stream(), Stream.of(apeLabel))
                 .collect(Collectors.toList()));
-    	 emptyType = new Type(empty, empty, empty, NodeType.EMPTY);
-         Type apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
-         emptyLabelType = new Type(emptyLabel, emptyLabel, apeLabel, NodeType.EMPTY_LABEL);
-         setRelevant(emptyType);
-         setRelevant(apeLabelRoot);
-         setRelevant(emptyLabelType);
-         apeLabelRoot.addSubPredicate(emptyLabelType);
-         emptyLabelType.addSuperPredicate(apeLabelRoot);
+        emptyType = new Type(empty, empty, empty, NodeType.EMPTY);
+        Type apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
+        emptyLabelType = new Type(emptyLabel, emptyLabel, apeLabel, NodeType.EMPTY_LABEL);
+        setRelevant(emptyType);
+        setRelevant(apeLabelRoot);
+        setRelevant(emptyLabelType);
+        apeLabelRoot.addSubPredicate(emptyLabelType);
+        emptyLabelType.addSuperPredicate(apeLabelRoot);
     }
-    
+
     /**
      * Helper method that sets the type to be relevant in the current domain
+     * 
      * @param type - Type that should be relevant
      */
     private void setRelevant(Type type) {
-    	type.setAsRelevantTaxonomyTerm(this);
+        type.setAsRelevantTaxonomyTerm(this);
         getMappedPredicates().put(type.getPredicateID(), type);
-		
-	}
+
+    }
 
     /**
      * Returns the set of {@link Type}s that are currently defined.
@@ -104,7 +107,8 @@ public class AllTypes extends AllPredicates {
      * elements.
      *
      * @param type The element that needs to be added.
-     * @return The same element if it's a new one or the existing element if this set contains the specified element..
+     * @return The same element if it's a new one or the existing element if this
+     *         set contains the specified element..
      */
     private Type put(Type type) {
         Type tmpType;
@@ -118,7 +122,8 @@ public class AllTypes extends AllPredicates {
 
     /**
      * The method is used to check weather the type with typeID was already
-     * introduced earlier on in {@code allTypes}. In case it was, it returns the item,
+     * introduced earlier on in {@code allTypes}. In case it was, it returns the
+     * item,
      * otherwise the new element is generated and returned.
      * <p>
      * In case of generating a new Type, the object is added to the set of all the
@@ -135,7 +140,9 @@ public class AllTypes extends AllPredicates {
                 this.put((Type) newType);
                 tmpType = (Type) newType;
             } else {
-                throw new ExceptionInInitializerError(String.format("Type error. Only 'Type' StateInterface can be added to the set of all types. '%s' is not a type", newType.getPredicateID()));
+                throw new ExceptionInInitializerError(String.format(
+                        "Type error. Only 'Type' StateInterface can be added to the set of all types. '%s' is not a type",
+                        newType.getPredicateID()));
             }
         }
         return tmpType;
@@ -147,28 +154,32 @@ public class AllTypes extends AllPredicates {
      * the typeID has no mappings.
      *
      * @param typeID - the key whose associated value is to be returned
+     * 
      * @return The {@link Type} to which the specified key is mapped to, or null
-     *         if the typeID has no mappings
-
-    public Type get(String typeID) {
-    return (Type) getPredicates().get(typeID);
-    }*/
+     * if the typeID has no mappings
+     * 
+     * public Type get(String typeID) {
+     * return (Type) getPredicates().get(typeID);
+     * }
+     */
 
     /**
-     * Returns the type to which the specified key is mapped to under the given dimension, or null if
+     * Returns the type to which the specified key is mapped to under the given
+     * dimension, or null if
      * the typeID has no mappings or does not belong to the given dimension.
      *
-     * @param predicateID      The key whose associated value is to be returned.
+     * @param predicateID The key whose associated value is to be returned.
      * @param dimensionID The ID of the dimension to which the type belongs to.
-     * @return {@link Type} to which the specified key is mapped to, or null if the typeID has no mappings or does not belong to the given dimension.
+     * @return {@link Type} to which the specified key is mapped to, or null if the
+     *         typeID has no mappings or does not belong to the given dimension.
      */
     public Type get(String predicateID, String dimensionID) throws APEDimensionsException {
-    	Type predicate = (Type) get(predicateID);
-    	if(predicate != null && predicate.getRootNodeID().equals(dimensionID)) {
-    		return predicate;
-    	} else {
-    		return null;
-    	}
+        Type predicate = (Type) get(predicateID);
+        if (predicate != null && predicate.getRootNodeID().equals(dimensionID)) {
+            return predicate;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -182,7 +193,8 @@ public class AllTypes extends AllPredicates {
 
     /**
      * Returns true if this set contains the specified type element. More formally,
-     * returns true if and only if this set contains an element e such that {@code (o==null ? e==null : o.equals(e))}.
+     * returns true if and only if this set contains an element e such that
+     * {@code (o==null ? e==null : o.equals(e))}.
      *
      * @param type Type that is searched for.
      * @return true if the type exists in the set.
@@ -200,7 +212,7 @@ public class AllTypes extends AllPredicates {
     public boolean existsType(String typeID) {
         return getMappedPredicates().containsKey(typeID);
     }
-    
+
     /**
      * Returns true if this dimension exists in the current domain.
      *
@@ -208,7 +220,7 @@ public class AllTypes extends AllPredicates {
      * @return true if the dimensionID exists in the domain.
      */
     public boolean existsRoot(String dimensionID) {
-    	return getAllRootIDs().contains(dimensionID);
+        return getAllRootIDs().contains(dimensionID);
     }
 
     /**
@@ -264,8 +276,8 @@ public class AllTypes extends AllPredicates {
                 /*
                  * Add empty type to each mutual exclusive dimension (excluding labels)
                  */
-            	 this.getDataTaxonomyDimensionIDs().stream().forEach(
- 						dimensionID -> subTreesMap.get(dimensionID).add(type));
+                this.getDataTaxonomyDimensionIDs().stream().forEach(
+                        dimensionID -> subTreesMap.get(dimensionID).add(type));
             }
         }
 
@@ -279,26 +291,30 @@ public class AllTypes extends AllPredicates {
 
         return pairs;
     }
-    
+
     /**
-     * Return the list of dimensions that represent the data. Each dimension represents
-     * a node in the data taxonomy and the root for the corresponding dimension (this excludes the "APE label" dimension).
+     * Return the list of dimensions that represent the data. Each dimension
+     * represents
+     * a node in the data taxonomy and the root for the corresponding dimension
+     * (this excludes the "APE label" dimension).
      *
      * @return List of abstract types that represent dimensions.
      */
     public List<String> getDataTaxonomyDimensionIDs() {
-    	List<String> taxonomyRoot = new ArrayList<String>();
-    	for(String dimension : getAllRootIDs()) {
-    		if(!dimension.equals(getLabelRootID())) {
-    			taxonomyRoot.add(dimension);
-    		}
-    	}
+        List<String> taxonomyRoot = new ArrayList<String>();
+        for (String dimension : getAllRootIDs()) {
+            if (!dimension.equals(getLabelRootID())) {
+                taxonomyRoot.add(dimension);
+            }
+        }
         return taxonomyRoot;
     }
 
     /**
-     * Return the list of dimensions that represent the data. Each dimension represents
-     * a node in the data taxonomy and the root for the corresponding dimension (this excludes the "APE label" dimension).
+     * Return the list of dimensions that represent the data. Each dimension
+     * represents
+     * a node in the data taxonomy and the root for the corresponding dimension
+     * (this excludes the "APE label" dimension).
      *
      * @return List of abstract types that represent dimensions.
      */
@@ -308,10 +324,12 @@ public class AllTypes extends AllPredicates {
                 .forEach(dimensionID -> dimensionTypes.add(get(dimensionID)));
         return dimensionTypes;
     }
-    
+
     /**
-     * Return the list of dimensions that represent the data and the data labels. Each dimension represents
-     * a node in the data taxonomy and the root for the corresponding dimension (this includes the "APE label" dimension).
+     * Return the list of dimensions that represent the data and the data labels.
+     * Each dimension represents
+     * a node in the data taxonomy and the root for the corresponding dimension
+     * (this includes the "APE label" dimension).
      *
      * @return List of abstract types that represent dimensions.
      */
@@ -324,8 +342,10 @@ public class AllTypes extends AllPredicates {
     }
 
     /**
-     * Return the SortedSet of dimensions that represent the data. Each dimension represents
-     * a node in the data taxonomy and the root for the corresponding dimension (this excludes the "APE label" dimension).
+     * Return the SortedSet of dimensions that represent the data. Each dimension
+     * represents
+     * a node in the data taxonomy and the root for the corresponding dimension
+     * (this excludes the "APE label" dimension).
      *
      * @return SortedSet of abstract types that represent dimensions.
      */
@@ -336,28 +356,32 @@ public class AllTypes extends AllPredicates {
         return dimensionTypes;
     }
 
-	/**
-	 * Return ID of the taxonomy root containing APE type labels (variables).
-	 * @return String representing the root ID
-	 */
-    public String getLabelRootID() {
-		return apeLabel;
-	}
-    
-	/**
-	 * Return the taxonomy root containing APE type labels (variables).
-	 * @return Type representing the root 
-	 */
-    public Type getLabelRoot() {
-		return apeLabelRoot;
-	}
-    
     /**
-	 * Return the empty APE type label. It corresponds to the type not being labeled.
-	 * @return Type that represents empty label
-	 */
+     * Return ID of the taxonomy root containing APE type labels (variables).
+     * 
+     * @return String representing the root ID
+     */
+    public String getLabelRootID() {
+        return apeLabel;
+    }
+
+    /**
+     * Return the taxonomy root containing APE type labels (variables).
+     * 
+     * @return Type representing the root
+     */
+    public Type getLabelRoot() {
+        return apeLabelRoot;
+    }
+
+    /**
+     * Return the empty APE type label. It corresponds to the type not being
+     * labeled.
+     * 
+     * @return Type that represents empty label
+     */
     public Type getEmptyAPELabel() {
-		return emptyLabelType;
-	}
-    
+        return emptyLabelType;
+    }
+
 }

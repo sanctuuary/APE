@@ -12,21 +12,22 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
  */
 public class SLTLxNegation extends SLTLxFormula {
 
-private SLTLxFormula negatedFact;
-	
+	private SLTLxFormula negatedFact;
+
 	public SLTLxNegation(SLTLxFormula arg1) {
 		super();
-		this.negatedFact = arg1; 
+		this.negatedFact = arg1;
 	}
 
-
 	@Override
-	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+			SATSynthesisEngine synthesisEngine) {
 		return negatedFact.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 
 	@Override
-	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+			SATSynthesisEngine synthesisEngine) {
 		return negatedFact.getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 

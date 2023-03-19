@@ -26,6 +26,8 @@ import java.util.List;
 
 public class APEConfigTagFactory {
 
+private static final String ONTOLOGY_IRI_MSG = "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).";
+
 	/**
 	 * Types of tag fields.
 	 * 
@@ -68,7 +70,7 @@ public class APEConfigTagFactory {
          */
         public static abstract class DataDimensions extends APEConfigDependentTag.One<List<String>, String> {
 
-            public DataDimensions(Provider<String> provider) {
+            protected DataDimensions(Provider<String> provider) {
                 super(provider);
             }
 
@@ -110,7 +112,7 @@ public class APEConfigTagFactory {
          */
         public static abstract class DataInstances extends APEConfigDependentTag.One<List<Type>, APEDomainSetup> {
 
-            public DataInstances(Provider<APEDomainSetup> provider) {
+            protected DataInstances(Provider<APEDomainSetup> provider) {
                 super(provider);
             }
 
@@ -160,7 +162,7 @@ public class APEConfigTagFactory {
 
             private final Range range;
 
-            public Int(Range range) {
+            protected Int(Range range) {
                 this.range = range;
             }
 
@@ -192,7 +194,7 @@ public class APEConfigTagFactory {
 
             private final Range boundaries;
 
-            public IntRange(Range boundaries) {
+            protected IntRange(Range boundaries) {
                 this.boundaries = boundaries;
             }
 
@@ -307,7 +309,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(String uri, ValidationResults results) {
-                results.add(getTagName(), "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).", APEFiles.isIRI(uri));
+                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isIRI(uri));
                 return results;
             }
         }
@@ -340,7 +342,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(JSONObject jsonObject, ValidationResults results) {
-                results.add(getTagName(), "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).", APEFiles.isJSON(jsonObject));
+                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isJSON(jsonObject));
                 return results;
             }
         }
@@ -400,7 +402,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                return "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).";
+                return ONTOLOGY_IRI_MSG;
             }
 
             @Override

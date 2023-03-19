@@ -9,36 +9,36 @@ package nl.uu.cs.ape.models;
  */
 public class Pair<T> {
 
-    private T first, second;
+	private T first, second;
 
-    /**
-     * Instantiates a new Pair.
-     *
-     * @param first  the first
-     * @param second the second
-     */
-    public Pair(T first, T second) {
-        this.first = first;
-        this.second = second;
-    }
+	/**
+	 * Instantiates a new Pair.
+	 *
+	 * @param first  the first
+	 * @param second the second
+	 */
+	public Pair(T first, T second) {
+		this.first = first;
+		this.second = second;
+	}
 
-    /**
-     * Gets first.
-     *
-     * @return the first
-     */
-    public T getFirst() {
-        return first;
-    }
+	/**
+	 * Gets first.
+	 *
+	 * @return the first
+	 */
+	public T getFirst() {
+		return first;
+	}
 
-    /**
-     * Gets second.
-     *
-     * @return the second
-     */
-    public T getSecond() {
-        return second;
-    }
+	/**
+	 * Gets second.
+	 *
+	 * @return the second
+	 */
+	public T getSecond() {
+		return second;
+	}
 
 	@Override
 	public int hashCode() {
@@ -57,7 +57,7 @@ public class Pair<T> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Pair other = (Pair) obj;
+		Pair<T> other = (Pair<T>) obj;
 		if (first == null) {
 			if (other.first != null)
 				return false;
@@ -70,6 +70,5 @@ public class Pair<T> {
 			return false;
 		return true;
 	}
-    
-    
+
 }

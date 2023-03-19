@@ -107,30 +107,30 @@ public class ConstraintFactory {
 		List<ConstraintTemplateParameter> typeParam2 = Arrays.asList(typeParameter, typeParameter);
 
 		List<ConstraintTemplateParameter> moduleNlabel = Arrays.asList(moduleParameter, typeParameter);
-		
+
 		/*
-		 * ID: ite_m 
+		 * ID: ite_m
 		 */
 		ConstraintTemplate currTemplate = new Constraint_if_then_module("ite_m", moduleParam2,
 				"If 1st operation is used, then 2nd operation must be used subsequently.");
 		addConstraintTemplate(currTemplate);
 
 		/*
-		 * ID: itn_m 
+		 * ID: itn_m
 		 */
 		currTemplate = new Constraint_if_then_not_module("itn_m", moduleParam2,
 				"If 1st operation is used, then 2nd operation cannot be used subsequently.");
 		addConstraintTemplate(currTemplate);
 
 		/*
-		 * ID: depend_m 
+		 * ID: depend_m
 		 */
 		currTemplate = new Constraint_depend_module("depend_m", moduleParam2,
 				"If 1st operation is used, then we must have used 2nd operation prior to it.");
 		addConstraintTemplate(currTemplate);
 
 		/*
-		 * ID: next_m 
+		 * ID: next_m
 		 */
 		currTemplate = new Constraint_next_module("next_m", moduleParam2,
 				"If 1st operation is used, then 2nd operation must be used as the next operation in the sequence.");
@@ -144,7 +144,7 @@ public class ConstraintFactory {
 		addConstraintTemplate(currTemplate);
 
 		/*
-		 * ID: use_m 
+		 * ID: use_m
 		 */
 		currTemplate = new Constraint_use_module("use_m", moduleParam1, "Use operation in the solution.");
 		addConstraintTemplate(currTemplate);
@@ -164,7 +164,7 @@ public class ConstraintFactory {
 		addConstraintTemplate(currTemplate);
 
 		/*
-		 * ID: use_t 
+		 * ID: use_t
 		 */
 		currTemplate = new Constraint_use_type("use_t", typeParam1, "Use type in the solution.");
 		addConstraintTemplate(currTemplate);
@@ -182,85 +182,84 @@ public class ConstraintFactory {
 		currTemplate = new Constraint_if_use_then_type("use_ite_t", typeParam2,
 				"If 1st data is used, then 2nd data must be used subsequently.");
 		addConstraintTemplate(currTemplate);
-		
+
 		/*
 		 * ID: use_itn_t
 		 */
 		currTemplate = new Constraint_if_use_then_not_type("use_itn_t", typeParam2,
 				"If 1st data is used, then 2nd data cannot be used subsequently.");
 		addConstraintTemplate(currTemplate);
-		
-		
+
 		/*
 		 * ID: operation_input
 		 */
 		currTemplate = new Constraint_use_module_with_input("operation_input", moduleNlabel,
 				"Use the operation with an input of the given type.");
 		addConstraintTemplate(currTemplate);
-		
+
 		/*
 		 * ID: operation_output
 		 */
 		currTemplate = new Constraint_use_module_with_output("operation_output", moduleNlabel,
 				"Use the operation to generate an output of the given type.");
 		addConstraintTemplate(currTemplate);
-		
-		
+
 		/*
-		 * ID: connected_op 
+		 * ID: connected_op
 		 */
 		currTemplate = new Constraint_connected_modules("connected_op", moduleParam2,
 				"1st operation should generate an output used by the 2nd operation.");
 		addConstraintTemplate(currTemplate);
-		
-		
+
 		/*
-		 * ID: not_connected_op 
+		 * ID: not_connected_op
 		 */
 		currTemplate = new Constraint_not_connected_modules("not_connected_op", moduleParam2,
 				"1st operation should never generate an output used by the 2nd operation.");
 		addConstraintTemplate(currTemplate);
-		
+
 		/*
-		 * ID: not_repeat_op 
+		 * ID: not_repeat_op
 		 */
 		currTemplate = new Constraint_not_repeat_modules("not_repeat_op", moduleParam1,
 				"No operation that belongs to the subtree should be repeated over.");
 		addConstraintTemplate(currTemplate);
-		
+
 		/*
-		 * ID: gen_t 
-		 
-		currTemplate = new Constraint_gen_type("gen_t", typeParam1, "Generate type ${parameter_1} in the solution.");
-		addConstraintTemplate(currTemplate);
-		*/
-		
+		 * ID: gen_t
+		 * 
+		 * currTemplate = new Constraint_gen_type("gen_t", typeParam1,
+		 * "Generate type ${parameter_1} in the solution.");
+		 * addConstraintTemplate(currTemplate);
+		 */
+
 		/*
 		 * ID: ngen_t Do not generate type ${parameter_1} in the solution.
-		
-		currTemplate = new Constraint_not_gen_type("ngen_t", typeParam1,
-				"Do not generate type ${parameter_1} in the solution.");
-		addConstraintTemplate(currTemplate);
-	 	 */
-		
+		 * 
+		 * currTemplate = new Constraint_not_gen_type("ngen_t", typeParam1,
+		 * "Do not generate type ${parameter_1} in the solution.");
+		 * addConstraintTemplate(currTemplate);
+		 */
+
 		/*
 		 * ID: gen_ite_t If we have data type ${parameter_1}, then generate type
 		 * ${parameter_2} subsequently.
-		
-		currTemplate = new Constraint_if_gen_then_type("gen_ite_t", typeParam2,
-				"If we have generated data type ${parameter_1}, then generate type ${parameter_2} subsequently.");
-		addConstraintTemplate(currTemplate);
+		 * 
+		 * currTemplate = new Constraint_if_gen_then_type("gen_ite_t", typeParam2,
+		 * "If we have generated data type ${parameter_1}, then generate type ${parameter_2} subsequently."
+		 * );
+		 * addConstraintTemplate(currTemplate);
 		 */
-		
-		
+
 		/*
 		 * ID: gen_itn_t If we have generated data type ${parameter_1}, then do not
 		 * generate type ${parameter_2} subsequently.
-		currTemplate = new Constraint_if_gen_then_not_type("gen_itn_t", typeParam2,
-				"If we have generated data type ${parameter_1}, then do not generate type ${parameter_2} subsequently.");
-		addConstraintTemplate(currTemplate);
-		*/
-		
+		 * currTemplate = new Constraint_if_gen_then_not_type("gen_itn_t", typeParam2,
+		 * "If we have generated data type ${parameter_1}, then do not generate type ${parameter_2} subsequently."
+		 * );
+		 * addConstraintTemplate(currTemplate);
+		 */
+
 		return true;
 
 	}
@@ -791,8 +790,7 @@ public class ConstraintFactory {
 			return formula.getCNF(null, typeAutomaton.getUsedTypesBlocks(), AtomType.USED_TYPE, mappings);
 		}
 	}
-	
-	
+
 	/**
 	 * Implements constraints of the form:<br>
 	 * Use operation ${parameter_1} with input labeled ${parameter_2}.
@@ -806,7 +804,8 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_use_module_with_input(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+		protected Constraint_use_module_with_input(String id, List<ConstraintTemplateParameter> parametersNo,
+				String description) {
 			super(id, parametersNo, description);
 		}
 
@@ -818,10 +817,11 @@ public class ConstraintFactory {
 				return null;
 			}
 
-			return SLTLxTemplateFormula.use_module_input(parameters.get(0), parameters.get(1), moduleAutomaton, typeAutomaton, mappings);
+			return SLTLxTemplateFormula.use_module_input(parameters.get(0), parameters.get(1), moduleAutomaton,
+					typeAutomaton, mappings);
 		}
 	}
-	
+
 	/**
 	 * Implements constraints of the form:<br>
 	 * Use operation ${parameter_1} to generate output labeled ${parameter_2}
@@ -835,7 +835,8 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_use_module_with_output(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+		protected Constraint_use_module_with_output(String id, List<ConstraintTemplateParameter> parametersNo,
+				String description) {
 			super(id, parametersNo, description);
 		}
 
@@ -847,7 +848,8 @@ public class ConstraintFactory {
 				return null;
 			}
 
-			return SLTLxTemplateFormula.use_module_output(parameters.get(0), parameters.get(1), moduleAutomaton, typeAutomaton, mappings);
+			return SLTLxTemplateFormula.use_module_output(parameters.get(0), parameters.get(1), moduleAutomaton,
+					typeAutomaton, mappings);
 		}
 	}
 
@@ -876,10 +878,11 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.connected_modules(parameters.get(0), parameters.get(1),domainSetup, moduleAutomaton, typeAutomaton, mappings);
+			return SLTLxTemplateFormula.connected_modules(parameters.get(0), parameters.get(1), domainSetup,
+					moduleAutomaton, typeAutomaton, mappings);
 		}
 	}
-	
+
 	/**
 	 * Implements constraints of the form:<br>
 	 * 1st operation should not generate an output used by the 2nd operation
@@ -905,7 +908,8 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.not_connected_modules(parameters.get(0), parameters.get(1),domainSetup, moduleAutomaton, typeAutomaton, mappings);
+			return SLTLxTemplateFormula.not_connected_modules(parameters.get(0), parameters.get(1), domainSetup,
+					moduleAutomaton, typeAutomaton, mappings);
 		}
 	}
 
@@ -934,7 +938,8 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.notRepeatModules(parameters.get(0), domainSetup, moduleAutomaton, typeAutomaton, mappings);
+			return SLTLxTemplateFormula.notRepeatModules(parameters.get(0), domainSetup, moduleAutomaton, typeAutomaton,
+					mappings);
 		}
 	}
 }

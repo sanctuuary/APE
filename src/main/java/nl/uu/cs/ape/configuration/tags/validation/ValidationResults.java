@@ -105,7 +105,8 @@ public class ValidationResults {
      * Indicates whether this class passed all validation criteria.
      * This method is the counterpart of {@link ValidationResults#hasFails()}
      *
-     * @return a boolean indicating whether this class passed all validation criteria
+     * @return a boolean indicating whether this class passed all validation
+     *         criteria
      */
     public boolean success() {
         return !hasFails();
@@ -122,6 +123,7 @@ public class ValidationResults {
 
     /**
      * Override toString as a JSON
+     * 
      * @return String representation
      */
     @Override

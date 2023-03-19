@@ -41,7 +41,7 @@ import java.util.*;
  *
  * @author Vedran Kasalica
  */
-public class APE implements APEInterface{
+public class APE implements APEInterface {
 
 	/** Core configuration object defined from the configuration file. */
 	private final APECoreConfig config;
@@ -108,7 +108,7 @@ public class APE implements APEInterface{
 	 * corresponding annotation and constraints files.
 	 *
 	 * @return true if the setup was successfully performed, false otherwise.
-	 * @throws MappingsException        Exception while reading the provided
+	 * @throws MappingsException            Exception while reading the provided
 	 *                                      ontology.
 	 * @throws IOException                  Error in handling a JSON file containing
 	 *                                      tool annotations.
@@ -134,7 +134,7 @@ public class APE implements APEInterface{
 
 		// Update allModules and allTypes sets based on the tool annotations
 		succRun &= apeDomainSetup
-			.updateToolAnnotationsFromJson(APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()));
+				.updateToolAnnotationsFromJson(APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()));
 
 		// Update allModules with CWL annotations, if CWL annotations file is given
 		if (config.getCwlAnnotationsFile().isPresent()) {
@@ -143,7 +143,7 @@ public class APE implements APEInterface{
 				File file = config.getCwlAnnotationsFile().get();
 				Map<String, Object> cwlAnnotations = yaml.load(new FileInputStream(file));
 				succRun &= apeDomainSetup
-					.updateCWLAnnotationsFromYaml(cwlAnnotations);
+						.updateCWLAnnotationsFromYaml(cwlAnnotations);
 			} catch (FileNotFoundException e) {
 				System.err.println("Could not find CWL yaml configuration file!");
 				e.printStackTrace();
@@ -205,8 +205,9 @@ public class APE implements APEInterface{
 				elements = apeDomainSetup.getAllModules().getElementsFromSubTaxonomy(root);
 			}
 		}
-		if(root == null) {
-			return getTaxonomySubclasses(APEUtils.createClassIRI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
+		if (root == null) {
+			return getTaxonomySubclasses(
+					APEUtils.createClassIRI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
 		} else {
 			return elements;
 		}
@@ -223,8 +224,9 @@ public class APE implements APEInterface{
 		if (element == null) {
 			element = apeDomainSetup.getAllModules().get(taxonomyElementID);
 		}
-		if(element == null) {
-			return getTaxonomyElement(APEUtils.createClassIRI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
+		if (element == null) {
+			return getTaxonomyElement(
+					APEUtils.createClassIRI(taxonomyElementID, apeDomainSetup.getOntologyPrefixIRI()));
 		} else {
 			return element;
 		}
@@ -298,8 +300,10 @@ public class APE implements APEInterface{
 	 *                     file.
 	 */
 	private SolutionsList executeSynthesis(APERunConfig runConfig) throws IOException, JSONException {
-//    	APEUtils.write2file(apeDomainSetup.emptyTools.toString(), new File("~/Desktop/tools"), false);
-//		APEUtils.write2file(apeDomainSetup.wrongToolIO.toString(), new File("~/Desktop/wrongToolIO"), false);
+		// APEUtils.write2file(apeDomainSetup.emptyTools.toString(), new
+		// File("~/Desktop/tools"), false);
+		// APEUtils.write2file(apeDomainSetup.wrongToolIO.toString(), new
+		// File("~/Desktop/wrongToolIO"), false);
 
 		/* List of all the solutions */
 		SolutionsList allSolutions = new SolutionsList(runConfig);
@@ -317,12 +321,11 @@ public class APE implements APEInterface{
 		APEUtils.timerStart(globalTimerID, true);
 		int solutionLength = runConfig.getSolutionLength().getMin();
 		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
-				&& solutionLength <= runConfig.getSolutionLength().getMax() && APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) > 0) {
+				&& solutionLength <= runConfig.getSolutionLength().getMax()
+				&& APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) > 0) {
 
-			
 			SynthesisEngine implSynthesis = new SATSynthesisEngine(apeDomainSetup, allSolutions, runConfig,
-						solutionLength);
-			
+					solutionLength);
 
 			APEUtils.printHeader(implSynthesis.getSolutionSize(), "Workflow discovery - length");
 
@@ -342,7 +345,7 @@ public class APE implements APEInterface{
 
 		if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)) {
 			allSolutions.setFlag(SynthesisFlag.NONE);
-		} else if(APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) <= 0) {
+		} else if (APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) <= 0) {
 			allSolutions.setFlag(SynthesisFlag.TIMEOUT);
 		} else if (allSolutions.getNumberOfSolutions() == 0) {
 			allSolutions.setFlag(SynthesisFlag.UNSAT);
@@ -351,7 +354,7 @@ public class APE implements APEInterface{
 		} else {
 			allSolutions.setFlag(SynthesisFlag.UNKNOWN);
 		}
-		
+
 		System.out.println(allSolutions.getFlag().getMessage());
 		long runTimeMS = APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
 
@@ -481,7 +484,8 @@ public class APE implements APEInterface{
 		/* Removing the existing files from the file system. */
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
-			Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo".toLowerCase())))
+			Arrays.stream(graphsFolder.toFile()
+					.listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo".toLowerCase())))
 					.forEach(File::delete);
 		} else {
 			graphDir.mkdir();
@@ -568,8 +572,11 @@ public class APE implements APEInterface{
 	}
 
 	/**
-	 * Generate CWL scripts that represent executable versions of the workflows solutions.
-	 * @param allSolutions Set of {@link SolutionWorkflow} which should be represented in CWL.
+	 * Generate CWL scripts that represent executable versions of the workflows
+	 * solutions.
+	 * 
+	 * @param allSolutions Set of {@link SolutionWorkflow} which should be
+	 *                     represented in CWL.
 	 * @return true if the execution was successfully performed, false otherwise.
 	 */
 	public static boolean writeCWLWorkflows(SolutionsList allSolutions) {
@@ -590,7 +597,7 @@ public class APE implements APEInterface{
 			File[] oldFiles = cwlDir.listFiles((dir, name) -> name.toLowerCase().startsWith(filePrefix.toLowerCase()));
 			if (oldFiles != null) {
 				Arrays.stream(oldFiles).forEach((f) -> {
-					if(!f.delete()) {
+					if (!f.delete()) {
 						System.err.printf("Failed to delete file %s%n", f.getName());
 					}
 				});
@@ -623,9 +630,12 @@ public class APE implements APEInterface{
 	}
 
 	/**
-	 * Generate executable CWL scripts that represent executable versions of the workflows solutions.
-	 * @param allSolutions Set of {@link SolutionWorkflow} which should be represented in CWL.
-	 * @param coreConfig The core configuration of APE.
+	 * Generate executable CWL scripts that represent executable versions of the
+	 * workflows solutions.
+	 * 
+	 * @param allSolutions Set of {@link SolutionWorkflow} which should be
+	 *                     represented in CWL.
+	 * @param coreConfig   The core configuration of APE.
 	 * @return true if the execution was successfully performed, false otherwise.
 	 */
 	public static boolean writeExecutableCWLWorkflows(SolutionsList allSolutions, APECoreConfig coreConfig) {
@@ -652,7 +662,7 @@ public class APE implements APEInterface{
 			File[] oldFiles = cwlDir.listFiles((dir, name) -> name.toLowerCase().startsWith(filePrefix.toLowerCase()));
 			if (oldFiles != null) {
 				Arrays.stream(oldFiles).forEach((f) -> {
-					if(!f.delete()) {
+					if (!f.delete()) {
 						System.err.printf("Failed to delete file %s%n", f.getName());
 					}
 				});

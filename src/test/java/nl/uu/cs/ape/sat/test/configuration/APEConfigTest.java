@@ -112,7 +112,7 @@ class APEConfigTest {
             JSONObject template = getCorrectTemplate();
             APECoreConfig config = new APECoreConfig(template);
             APE ape = new APE(config);
-            APERunConfig runConfig = new APERunConfig(template, ape.getDomainSetup());
+            new APERunConfig(template, ape.getDomainSetup());
         });
     }
 
@@ -239,8 +239,8 @@ class APEConfigTest {
      */
     private void setupRun(JSONObject obj) throws IOException, OWLOntologyCreationException {
         APE ape = new APE(obj);
-        APECoreConfig config = new APECoreConfig(obj);
-        APERunConfig runConfig = new APERunConfig(obj, ape.getDomainSetup());
+        new APECoreConfig(obj);
+        new APERunConfig(obj, ape.getDomainSetup());
     }
 
     static class TagInfo {

@@ -24,19 +24,21 @@ public class APEFiles {
     /**
      * READ and WRITE enums used to verify paths.
      */
-    public enum Permission { 
-    	/**Read permission.*/ 
-    	READ, 
-    	/**Write permission.*/
-    	WRITE }
+    public enum Permission {
+        /** Read permission. */
+        READ,
+        /** Write permission. */
+        WRITE
+    }
 
     /**
      * Verify and get full path based based on the field.
-     * @param tag - tag
+     * 
+     * @param tag  - tag
      * @param path - path
      * @return Return the path to the file
      */
-    private static Path getPath(String tag, String path){
+    private static Path getPath(String tag, String path) {
 
         // check on empty values
         if (path == null) {
@@ -49,9 +51,9 @@ public class APEFiles {
         // check format
         try {
             return Paths.get(path);
-        }
-        catch (InvalidPathException | NullPointerException e){
-            throw APEConfigException.invalidValue(tag, path, String.format("The path for tag '%s' is invalid. %s", tag, e.getMessage()));
+        } catch (InvalidPathException | NullPointerException e) {
+            throw APEConfigException.invalidValue(tag, path,
+                    String.format("The path for tag '%s' is invalid. %s", tag, e.getMessage()));
         }
     }
 
@@ -63,23 +65,24 @@ public class APEFiles {
      * @param path the path
      * @return a boolean indicating whether the path has a valid format
      */
-    public static boolean validPathFormat(String path){
+    public static boolean validPathFormat(String path) {
         try {
             Paths.get(path);
             return true;
-        }
-        catch (InvalidPathException | NullPointerException e){
+        } catch (InvalidPathException | NullPointerException e) {
             return false;
         }
     }
 
     /**
-     * Method checks whether the provided value represent a correct path to a file, and returns the corresponding file if it does.
+     * Method checks whether the provided value represent a correct path to a file,
+     * and returns the corresponding file if it does.
      *
      * @param tag                  Corresponding tag from the config file.
      * @param inputPath            Provided path for the file.
      * @param requestedPermissions the requested permissions
-     * @return File represented by the path in the JSON object, or the default value if the tag is not present.
+     * @return File represented by the path in the JSON object, or the default value
+     *         if the tag is not present.
      * @throws IOException        Error if path is cannot be found.
      * @throws JSONException      Error in parsing the value for specified tag.
      * @throws APEConfigException Error in setting up the the configuration.
@@ -110,7 +113,8 @@ public class APEFiles {
      * @param tag                  Corresponding tag from the config file.
      * @param inputPath            Path to the directory.
      * @param requestedPermissions the requested permissions
-     * @return Path represented in the JSON object, or the default value if the tag         is not present.
+     * @return Path represented in the JSON object, or the default value if the tag
+     *         is not present.
      * @throws IOException        Error if path is cannot be found.
      * @throws JSONException      Error in parsing the value for specified tag.
      * @throws APEConfigException Error in setting up the the configuration.
@@ -122,7 +126,7 @@ public class APEFiles {
         final String absolutePath = path.toAbsolutePath().toString();
 
         // first check if the format of the string resembles a path to a folder
-        if(!isFolderFormat(path)){
+        if (!isFolderFormat(path)) {
             throw APEConfigException.notADirectory(tag, absolutePath);
         }
 
@@ -142,13 +146,13 @@ public class APEFiles {
         return path.toAbsolutePath();
     }
 
-    private static void createDirectory(String tag, Path path){
+    private static void createDirectory(String tag, Path path) {
 
         if (Files.notExists(path)) {
 
             final String absolutePath = path.toAbsolutePath().toString();
 
-            if (!isFolderFormat(path)){
+            if (!isFolderFormat(path)) {
                 throw new APEConfigException("Path '" + absolutePath + "' for tag '" + tag + "' is not a directory!");
             }
 
@@ -156,8 +160,7 @@ public class APEFiles {
 
             if (new File(absolutePath).mkdirs()) {
                 System.out.println("Successfully created directory '" + absolutePath + "'");
-            }
-            else{
+            } else {
                 throw new APEConfigException("Could not create directory '" + absolutePath + "' for tag '" + tag + "'");
             }
         }
@@ -199,7 +202,7 @@ public class APEFiles {
      * @param path the path
      * @return the boolean
      */
-    public static boolean isFileFormat(Path path){
+    public static boolean isFileFormat(Path path) {
         return !isFolderFormat(path);
     }
 
@@ -209,10 +212,10 @@ public class APEFiles {
      * @param path the path
      * @return the boolean
      */
-    public static boolean directoryExists(Path path){
+    public static boolean directoryExists(Path path) {
         return Files.isDirectory(path);
     }
-    
+
     /**
      * Directory exists boolean.
      *
@@ -229,7 +232,7 @@ public class APEFiles {
      * @param uri the uri
      * @return String is a valid IRI
      */
-    public static boolean isIRI(String uri){
+    public static boolean isIRI(String uri) {
         final URL url;
         try {
             url = new URL(uri);

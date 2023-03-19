@@ -12,8 +12,10 @@ import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code TaxonomyPredicate} class represents a single
- * class in the taxonomy as a predicate. The predicate might have parent classes (super-predicate) and child classes (sub-predicate).<br>
- * <b>Note:</b> Taxonomy predicates in combination with {@link State}s create {@link SLTLxAtom}s.
+ * class in the taxonomy as a predicate. The predicate might have parent classes
+ * (super-predicate) and child classes (sub-predicate).<br>
+ * <b>Note:</b> Taxonomy predicates in combination with {@link State}s create
+ * {@link SLTLxAtom}s.
  *
  * @author Vedran Kasalica
  */
@@ -46,7 +48,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     private Set<TaxonomyPredicate> subPredicates;
 
     /**
-     * Set of all the predicates that contain the current predicate (null if the predicate is a root).
+     * Set of all the predicates that contain the current predicate (null if the
+     * predicate is a root).
      */
     private Set<TaxonomyPredicate> superPredicates;
 
@@ -86,7 +89,9 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -98,7 +103,9 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -159,7 +166,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Returns the type of the node, based on the taxonomy hierarchy.
      *
-     * @return the {@link NodeType} object that represent the type of the node (e.g. {@link NodeType#LEAF}, {@link NodeType#ROOT}).
+     * @return the {@link NodeType} object that represent the type of the node (e.g.
+     *         {@link NodeType#LEAF}, {@link NodeType#ROOT}).
      */
     public NodeType getNodeType() {
         return this.nodeType;
@@ -176,7 +184,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Returns whether the node is relevant for the scenario (if it can be used in
      * practice).
      *
-     * @return true if the node can occur in our solution (as a type or module), false otherwise.
+     * @return true if the node can occur in our solution (as a type or module),
+     *         false otherwise.
      */
     public boolean getIsRelevant() {
         return isRelevant;
@@ -267,7 +276,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Function is used to return the unique predicate identifier defined as String.
      *
-     * @return String representation of the predicate, used to uniquely identify the predicate.
+     * @return String representation of the predicate, used to uniquely identify the
+     *         predicate.
      */
     public abstract String getPredicateID();
 
@@ -275,7 +285,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Function is used to return the label that describes the predicate.
      *
      * @return String representation of the predicate label, used for presentation
-     * in case when the predicate id is too complex/long.
+     *         in case when the predicate id is too complex/long.
      */
     public abstract String getPredicateLabel();
 
@@ -309,7 +319,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Print the tree shaped representation of the corresponding taxonomy.
      *
-     * @param str           String that is helping the recursive function to distinguish between the tree levels.
+     * @param str           String that is helping the recursive function to
+     *                      distinguish between the tree levels.
      * @param allPredicates Set of all the predicates.
      */
     public void printTree(String str, AllPredicates allPredicates) {
@@ -336,7 +347,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
-     * Returns the list of the predicates that are directly subsumed by the current predicate.
+     * Returns the list of the predicates that are directly subsumed by the current
+     * predicate.
      *
      * @return List of the sub-predicates or null in case of a leaf predicate.
      */
@@ -369,7 +381,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
-     * Adds a super-predicate to the current one, if it was not added present already.
+     * Adds a super-predicate to the current one, if it was not added present
+     * already.
      *
      * @param predicate Predicate that will be added as a superclass.
      * @return true if super-predicate was added, false otherwise.
@@ -396,10 +409,10 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         return superPredicates;
     }
 
-    
     /**
      * Returns true if the type is a simple/leaf type, otherwise returns false - the
      * type is an abstract (non-leaf) type.
+     * 
      * @param nodeType - node type
      *
      * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type).
@@ -407,7 +420,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     public boolean isNodeType(NodeType nodeType) {
         return this.nodeType.equals(nodeType);
     }
-    
+
     /**
      * Returns true if the type is a simple/leaf type, otherwise returns false - the
      * type is an abstract (non-leaf) type.
@@ -419,7 +432,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
-     * Returns true if the type is an artificial predicate, otherwise returns false - it
+     * Returns true if the type is an artificial predicate, otherwise returns false
+     * - it
      * is a predicate that exists in the taxonomy.
      *
      * @return true (artificial leaf) or false (taxonomy term).
@@ -437,9 +451,10 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     public boolean isEmptyPredicate() {
         return this.nodeType == NodeType.EMPTY;
     }
-    
+
     /**
-     * Returns true if the type is <b>not an empty type</b> , i.e., is a (abstract or non-abstract) type.), otherwise returns false - the type
+     * Returns true if the type is <b>not an empty type</b> , i.e., is a (abstract
+     * or non-abstract) type.), otherwise returns false - the type
      * is empty.
      *
      * @return true (empty type) or false (implemented type).

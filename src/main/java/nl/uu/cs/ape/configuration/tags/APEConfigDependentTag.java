@@ -12,21 +12,28 @@ import javax.inject.Provider;
  * data from other tags when they need it (dependency).
  * <p>
  * Instead of overriding the method constructFromJSON(JSONObject json);
- * dependent tags need you to override constructFromJSON(JSONObject json, D1 dependency1, .., DN dependencyN);
- *     <ul>
- *         <li>Create instance of {@literal APEConfigDependentTag.One<T, D1>} for one dependency.</li>
- *         <li>Create instance of {@literal APEConfigDependentTag.Two<T, D1, D2>} for two dependencies..</li>
- *         <li>Create instance of {@literal APEConfigDependentTag.Three<T, D1, D2, D3>} for three dependencies.</li>
- *     </ul>
+ * dependent tags need you to override constructFromJSON(JSONObject json, D1
+ * dependency1, .., DN dependencyN);
+ * <ul>
+ * <li>Create instance of {@literal APEConfigDependentTag.One<T, D1>} for one
+ * dependency.</li>
+ * <li>Create instance of {@literal APEConfigDependentTag.Two<T, D1, D2>} for
+ * two dependencies..</li>
+ * <li>Create instance of {@literal APEConfigDependentTag.Three<T, D1, D2, D3>}
+ * for three dependencies.</li>
+ * </ul>
  * <p>
  * Example, tag2(string type) is dependent on tag1(int type):
  * {@literal APEConfigTag<Integer> tag1 = ... ;}
- * {@literal APEConfigTag<String> tag2 = new APEConfigDependentTag.One<String, Integer>(() -> tag1.getValue()) { ... };}
+ * {@literal APEConfigTag<String> tag2 = new APEConfigDependentTag.One<String,
+ * Integer>(() -> tag1.getValue()) { ... };}
  * <p>
- * Providers (callback functions) can be instantiated like this: {@literal () -> tag1.getValue()}
+ * Providers (callback functions) can be instantiated like this:
+ * {@literal () -> tag1.getValue()}
  * or like this: tag1::getValue
  * <p>
- * Using providers instead of tag references makes sure tags can be dependent on other data as well (e.g. APEDomainSetup)
+ * Using providers instead of tag references makes sure tags can be dependent on
+ * other data as well (e.g. APEDomainSetup)
  */
 public class APEConfigDependentTag {
 
@@ -130,7 +137,8 @@ public class APEConfigDependentTag {
          * @param results     the validation results
          * @return the validation results
          */
-        protected abstract ValidationResults validate(T value, D1 dependency1, D2 dependency2, ValidationResults results);
+        protected abstract ValidationResults validate(T value, D1 dependency1, D2 dependency2,
+                ValidationResults results);
     }
 
     /**
@@ -188,6 +196,7 @@ public class APEConfigDependentTag {
          * @param results     the validation results
          * @return the validation results
          */
-        protected abstract ValidationResults validate(T value, D1 dependency1, D2 dependency2, D3 dependency3, ValidationResults results);
+        protected abstract ValidationResults validate(T value, D1 dependency1, D2 dependency2, D3 dependency3,
+                ValidationResults results);
     }
 }

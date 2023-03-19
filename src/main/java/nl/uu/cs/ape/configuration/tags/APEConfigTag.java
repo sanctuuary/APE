@@ -14,17 +14,19 @@ import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
  *
  * To implement a new Tag, the following methods should be implemented:
  * <ul>
- *   <li>String {@link APEConfigTag#getTagName()}</li>
- *   <li>String {@link APEConfigTag#getLabel()}</li>
- *   <li>TagType {@link APEConfigTag#getType()}</li>
- *   <li>String {@link APEConfigTag#getDescription()}</li>
- *   <li>JSONObject {@link APEConfigTag#constructFromJSON(JSONObject config)}</li>
- *   <li>APEConfigDefaultValue {@link APEConfigTag#getDefault()}</li>
- *   <li>ValidationResults {@link APEConfigTag#validate(Object obj, ValidationResults results)}</li>
- *   <li>JSONObject {@link APEConfigTag#getTagConstraints()} (OPTIONAL)</li>
+ * <li>String {@link APEConfigTag#getTagName()}</li>
+ * <li>String {@link APEConfigTag#getLabel()}</li>
+ * <li>TagType {@link APEConfigTag#getType()}</li>
+ * <li>String {@link APEConfigTag#getDescription()}</li>
+ * <li>JSONObject {@link APEConfigTag#constructFromJSON(JSONObject config)}</li>
+ * <li>APEConfigDefaultValue {@link APEConfigTag#getDefault()}</li>
+ * <li>ValidationResults
+ * {@link APEConfigTag#validate(Object obj, ValidationResults results)}</li>
+ * <li>JSONObject {@link APEConfigTag#getTagConstraints()} (OPTIONAL)</li>
  * </ul>
  *
- * Returning an anonymous value directly (e.g. {@link APEConfigTag#getTagName()})
+ * Returning an anonymous value directly (e.g.
+ * {@link APEConfigTag#getTagName()})
  * creates static-like variable for one Tag implementation.
  *
  * @param <T> the data type that the tag should contain
@@ -144,8 +146,9 @@ public abstract class APEConfigTag<T> {
             throw APEConfigException.ruleViolations(results);
         }
 
-        // check if tag is present (optional tags still return a positive validationResult when they are missing)
-        if(obj.has(getTagName())){
+        // check if tag is present (optional tags still return a positive
+        // validationResult when they are missing)
+        if (obj.has(getTagName())) {
             this.value = constructFromJSON(obj);
         }
     }
@@ -204,8 +207,10 @@ public abstract class APEConfigTag<T> {
 
         // JSON contains tag
         if (!json.has(getTagName())) {
-            // If obligatory, configuration should have contained the tag. Add failure and return results.
-            // If optional, the default value is always correct, return empty results (success).
+            // If obligatory, configuration should have contained the tag. Add failure and
+            // return results.
+            // If optional, the default value is always correct, return empty results
+            // (success).
             if (isObligatory()) {
                 results.add(getTagName(), String.format("Value for tag '%s' is missing.", getTagName()), false);
             }
@@ -243,11 +248,13 @@ public abstract class APEConfigTag<T> {
      * Returns {@link ValidationResults} that contains
      * successes/failures for all validation criteria.
      *
-     * Use {@link ValidationResults#add(String tag_name, String rule_description, boolean success)}
+     * Use
+     * {@link ValidationResults#add(String tag_name, String rule_description, boolean success)}
      * to add successes/failures to the results parameter that the user can use.
      * After that, return the results.
      *
-     * E.g.: {@literal results.add(getTagName(), "The maximum number of generated solutions should be greater or equal to 0.", value >= 0);}
+     * E.g.:
+     * {@literal results.add(getTagName(), "The maximum number of generated solutions should be greater or equal to 0.", value >= 0);}
      *
      * @param value   the value
      * @param results the results
@@ -295,7 +302,7 @@ public abstract class APEConfigTag<T> {
      */
     public static class Info<T> {
 
-    	/** Tag name. */
+        /** Tag name. */
         public final String tag_name;
         /** Label. */
         public final String label;
@@ -351,5 +358,3 @@ public abstract class APEConfigTag<T> {
         }
     }
 }
-
-

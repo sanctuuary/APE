@@ -1,20 +1,20 @@
 package nl.uu.cs.ape.models.sltlxStruc;
 
-import javax.annotation.processing.SupportedSourceVersion;
-
 import nl.uu.cs.ape.automaton.State;
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
- * The {@code SLTLxLiteral} class represents literals (atoms that can be negated) corresponding to the usage of the modules
+ * The {@code SLTLxLiteral} class represents literals (atoms that can be
+ * negated) corresponding to the usage of the modules
  * and types in the solution.
  * <p>
  * {@code Literals} can start with a negation.<br>
- * {@code Literals} are compared according to the state in which they are used ({@linkplain #getUsedInStateArgument}),
- * i.e. a literal that represents the n-th state in the workflow, comes before the literal that represents the (n+1)th state.
+ * {@code Literals} are compared according to the state in which they are used
+ * ({@linkplain #getUsedInStateArgument}),
+ * i.e. a literal that represents the n-th state in the workflow, comes before
+ * the literal that represents the (n+1)th state.
  *
  * @author Vedran Kasalica
  */
@@ -31,11 +31,16 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
     private Boolean negated;
 
     /**
-     * The {@link SLTLxAtom} class represents elements of the workflow, that can be true or not (depending of the truth value of the literal).
+     * The {@link SLTLxAtom} class represents elements of the workflow, that can be
+     * true or not (depending of the truth value of the literal).
      */
     private SLTLxAtom atom;
-    
-    /**  The {@link SLTLxAtomVar} class represents abstractions over elements of the workflow which contain variables, that can be true or not (depending of the truth value of the literal). */
+
+    /**
+     * The {@link SLTLxAtomVar} class represents abstractions over elements of the
+     * workflow which contain variables, that can be true or not (depending of the
+     * truth value of the literal).
+     */
     private SLTLxAtomVar atomVar;
 
     /**
@@ -56,7 +61,7 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
 
         this.atom = atomMapping.findOriginal(mappedAtom);
         this.atomVar = atomMapping.findOriginalVar(mappedAtom);
-        
+
     }
 
     /**
@@ -101,17 +106,20 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
     /**
      * Return the type of the element in the workflow (tool, memory type, etc.)
      *
-     * @return The {@link AtomType} that corresponds to the SLTLxLiteral usage or not usage (in case of a negated literal).
+     * @return The {@link AtomType} that corresponds to the SLTLxLiteral usage or
+     *         not usage (in case of a negated literal).
      */
     public AtomType getWorkflowElementType() {
         return atom.getWorkflowElementType();
     }
 
     /**
-     * Return true if the current workflow element is of the given {@link AtomType} type.
+     * Return true if the current workflow element is of the given {@link AtomType}
+     * type.
      *
      * @param workflowElemType Element type that is current literal is compared to.
-     * @return true if the current workflow element corresponds to the given {@link AtomType}, false otherwise.
+     * @return true if the current workflow element corresponds to the given
+     *         {@link AtomType}, false otherwise.
      */
     public boolean isWorkflowElementType(AtomType workflowElemType) {
         return atom.getWorkflowElementType() == workflowElemType;
@@ -137,15 +145,18 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
 
     /**
      * Return the atom that is part of the literal.
+     * 
      * @return SLTLxAtom object that is the base for the literal.
      */
     public SLTLxAtom getAtom() {
-    	return atom;
+        return atom;
     }
-    
+
     /**
-     * Returns the predicate/label used to depict {@code AbstractModule, Module, Type} or {@code State}.
-     * Each of those refers to the element that is described by the SLTLxLiteral (e.g. StateInterface(State)).
+     * Returns the predicate/label used to depict
+     * {@code AbstractModule, Module, Type} or {@code State}.
+     * Each of those refers to the element that is described by the SLTLxLiteral
+     * (e.g. StateInterface(State)).
      *
      * @return StateInterface object that is referred by the literal.
      */
@@ -153,7 +164,9 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
         return atom.getPredicate();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -164,7 +177,9 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -191,9 +206,12 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
      * than the @otherLiteral's state.
      *
      * @param otherLiteral The SLTLxLiteral to be compared
-     * @return The value 0 if the argument SLTLxLiteral's state is equal to this SLTLxLiteral's state;
-     * a value less than 0 if this SLTLxLiteral's state comes before the @otherLiteral's state;
-     * and a value greater than 0 if this SLTLxLiteral's state comes after the @otherLiteral's state.
+     * @return The value 0 if the argument SLTLxLiteral's state is equal to this
+     *         SLTLxLiteral's state;
+     *         a value less than 0 if this SLTLxLiteral's state comes before
+     *         the @otherLiteral's state;
+     *         and a value greater than 0 if this SLTLxLiteral's state comes after
+     *         the @otherLiteral's state.
      */
     public int compareTo(SLTLxLiteral otherLiteral) {
 
@@ -214,19 +232,19 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
      * @return The value of the original literal
      */
     public String toString() {
-    	if(atom != null) {
-	        if (negated) {
-	            return "-" + atom.toString();
-	        } else {
-	            return atom.toString();
-	        }
-    	} else {
-	        if (negated) {
-	            return "-" + atomVar.toString();
-	        } else {
-	            return atomVar.toString();
-	        }
-    	}
+        if (atom != null) {
+            if (negated) {
+                return "-" + atom.toString();
+            } else {
+                return atom.toString();
+            }
+        } else {
+            if (negated) {
+                return "-" + atomVar.toString();
+            } else {
+                return atomVar.toString();
+            }
+        }
     }
 
 }

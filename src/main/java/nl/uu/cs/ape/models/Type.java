@@ -23,61 +23,66 @@ import nl.uu.cs.ape.utils.APEUtils;
  */
 public class Type extends TaxonomyPredicate {
 
-    private final String typeName;
-    private final String typeID;
-    private Type plainType;
+	private final String typeName;
+	private final String typeID;
+	private Type plainType;
 
-    /**
-     * Constructor used to create a Type object.
-     *
-     * @param typeName Type name.
-     * @param typeID   Type ID.
-     * @param rootNode ID of the Taxonomy (Sub)Root node corresponding to the Type.
-     * @param nodeType {@link NodeType} object describing the type w.r.t. the TypeTaxonomy.
-     */
-    public Type(String typeName, String typeID, String rootNode, NodeType nodeType) {
-        super(rootNode, nodeType);
-        this.typeName = typeName;
-        this.typeID = typeID;
-        this.plainType = this;
-    }
+	/**
+	 * Constructor used to create a Type object.
+	 *
+	 * @param typeName Type name.
+	 * @param typeID   Type ID.
+	 * @param rootNode ID of the Taxonomy (Sub)Root node corresponding to the Type.
+	 * @param nodeType {@link NodeType} object describing the type w.r.t. the
+	 *                 TypeTaxonomy.
+	 */
+	public Type(String typeName, String typeID, String rootNode, NodeType nodeType) {
+		super(rootNode, nodeType);
+		this.typeName = typeName;
+		this.typeID = typeID;
+		this.plainType = this;
+	}
 
-    public String getPredicateLabel() {
-        return typeName;
-    }
-    
-    public String getPredicateLongLabel() {
-    	if(typeID.endsWith("_plain")) {
-    		return APEUtils.removeNLastChar(typeID, 6);
-    	} else {
-    		return typeID;
-    	}
-    }
+	public String getPredicateLabel() {
+		return typeName;
+	}
 
-    public String getPredicateID() {
-        return typeID;
-    }
+	public String getPredicateLongLabel() {
+		if (typeID.endsWith("_plain")) {
+			return APEUtils.removeNLastChar(typeID, 6);
+		} else {
+			return typeID;
+		}
+	}
 
-    @Override
-    public String getType() {
-        return "type";
-    }
-    
-    /**
-     * Set plain type type.
-     * @param plainType - plain type that should be used
-     */
-    public void setPlainType(Type plainType) {
-    	this.plainType = plainType;
-    }
-    
-    /** 
-     * Method returns an artificially created plain version of the abstract class in case of a strict tool annotations, or the type itself otherwise.
-     * @return The type itself or an artificially created plain version of the type when needed.
-     */
-    public Type getPlainType() {
-    	return plainType;
-    }
+	public String getPredicateID() {
+		return typeID;
+	}
+
+	@Override
+	public String getType() {
+		return "type";
+	}
+
+	/**
+	 * Set plain type type.
+	 * 
+	 * @param plainType - plain type that should be used
+	 */
+	public void setPlainType(Type plainType) {
+		this.plainType = plainType;
+	}
+
+	/**
+	 * Method returns an artificially created plain version of the abstract class in
+	 * case of a strict tool annotations, or the type itself otherwise.
+	 * 
+	 * @return The type itself or an artificially created plain version of the type
+	 *         when needed.
+	 */
+	public Type getPlainType() {
+		return plainType;
+	}
 
 	/**
 	 * Generate a taxonomy data instance that is defined based on one or more
@@ -101,7 +106,7 @@ public class Type extends TaxonomyPredicate {
 		/* Iterate through each of the dimensions */
 		for (String currRootLabel : jsonParam.keySet()) {
 			String curRootIRI = currRootLabel;
-			if(!allTypes.existsRoot(curRootIRI)) {
+			if (!allTypes.existsRoot(curRootIRI)) {
 				curRootIRI = APEUtils.createClassIRI(currRootLabel, domainSetup.getOntologyPrefixIRI());
 			}
 			if (!allTypes.existsRoot(curRootIRI)) {
@@ -114,10 +119,10 @@ public class Type extends TaxonomyPredicate {
 			/* for each dimensions a disjoint array of types/tools is given */
 			for (String currTypeLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
 				String currTypeIRI = currTypeLabel;
-				if(allTypes.get(currTypeIRI, curRootIRI) == null) {
+				if (allTypes.get(currTypeIRI, curRootIRI) == null) {
 					currTypeIRI = APEUtils.createClassIRI(currTypeLabel, domainSetup.getOntologyPrefixIRI());
 				}
-				
+
 				if (currRootLabel.equals(allTypes.getLabelRootID())) {
 					labelDefined = true;
 				}
