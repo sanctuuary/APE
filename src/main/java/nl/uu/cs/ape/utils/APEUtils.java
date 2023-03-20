@@ -27,6 +27,9 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.parser.SLTLxSATVisitor;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -1031,6 +1034,42 @@ public final class APEUtils {
 			});
 		});
 		return pairs;
+	}
+
+	/**
+	 * Read file content from the given path (local path or a public URL) and return
+	 * the content as a File object.
+	 * 
+	 * @param path - Local path or a public URL with the content.
+	 * @return File containing info provided at the path.
+	 * @throws IOException Exception in case of a badly formatted path or file.
+	 */
+	public static File readFileFromPath(String path) throws IOException {
+
+		try {
+			new URL(path).toURI();
+			return readFileFromURL(path);
+		} catch (MalformedURLException | URISyntaxException e1) {
+			return new File(path);
+		}
+
+	}
+
+	/**
+	 * Read content from a URL and return it as a file.
+	 * 
+	 * @param file_url - URL of the content
+	 * @return File containing info provided at the URL.
+	 * @throws IOException Exception in case of a badly formatted URL or file.
+	 */
+	private static File readFileFromURL(String file_url) throws IOException {
+		File loadedFile = new File(file_url);
+		FileUtils.copyURLToFile(
+				new URL(file_url),
+				loadedFile,
+				1000,
+				1000);
+		return loadedFile;
 	}
 
 }

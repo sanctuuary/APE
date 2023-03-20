@@ -358,16 +358,6 @@ public class APECoreConfig {
     }
 
     /**
-     * Gets cwl format root.
-     * TODO: Set real values.
-     *
-     * @return the cwl format root
-     */
-    public String getCWLFormatRoot() {
-        return "format_1915";
-    }
-
-    /**
      * Get information whether the domain was annotated under the strict rules of
      * the output dependency.
      * 
