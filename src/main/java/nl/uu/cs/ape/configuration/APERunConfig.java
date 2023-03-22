@@ -35,33 +35,34 @@ public class APERunConfig {
     /**
      * Path to the directory that will contain all the solutions to the problem.
      */
-   private final APEConfigTag<Path> SOLUTION_DIR_PATH = new APEConfigTagFactory.TAGS.SOLUTION_DIR_PATH();
+    private final APEConfigTag<Path> SOLUTION_DIR_PATH = new APEConfigTagFactory.TAGS.SOLUTION_DIR_PATH();
     /**
      * Min and Max possible length of the solutions (length of the automaton). For
      * no upper limit, max length should be set to 0.
      */
-   private final APEConfigTag<Range> SOLUTION_LENGTH_RANGE = new APEConfigTagFactory.TAGS.SOLUTION_LENGTH_RANGE();
+    private final APEConfigTag<Range> SOLUTION_LENGTH_RANGE = new APEConfigTagFactory.TAGS.SOLUTION_LENGTH_RANGE();
     /**
      * Number of solution that the solver should return.
      */
-   private final APEConfigTag<Integer> NO_SOLUTIONS = new NO_SOLUTIONS();
+    private final APEConfigTag<Integer> NO_SOLUTIONS = new NO_SOLUTIONS();
     /**
      * Number of the workflow scripts that should be generated from candidate
      * workflows. Default is 0.
      */
-   private final APEConfigTag<Integer> NO_EXECUTIONS = new APEConfigTagFactory.TAGS.NO_EXECUTIONS();
+    private final APEConfigTag<Integer> NO_EXECUTIONS = new APEConfigTagFactory.TAGS.NO_EXECUTIONS();
     /**
      * Number of the solution graphs that should be generated from candidate
      * workflows. Default is 0.
      */
-   private final APEConfigTag<Integer> NO_GRAPHS = new APEConfigTagFactory.TAGS.NO_GRAPHS();
+    private final APEConfigTag<Integer> NO_GRAPHS = new APEConfigTagFactory.TAGS.NO_GRAPHS();
     /**
      * Number of CWL files that should be generated from candidate workflows.
      * Default is 0.
      */
-   private final APEConfigTag<Integer> NO_CWL = new APEConfigTagFactory.TAGS.NO_CWL();
+    private final APEConfigTag<Integer> NO_CWL = new APEConfigTagFactory.TAGS.NO_CWL();
     /**
-     * Number of executable CWL files that should be generated from candidate workflows.
+     * Number of executable CWL files that should be generated from candidate
+     * workflows.
      * Default is 0.
      */
     private final APEConfigTag<Integer> NO_EXECUTABLE_CWL = new APEConfigTagFactory.TAGS.NO_EXECUTABLE_CWL();
@@ -72,7 +73,7 @@ public class APERunConfig {
      * {@link ConfigEnum#ONE} if one of the workflow inputs should be used or <br>
      * {@link ConfigEnum#NONE} if none of the workflow inputs has to be used
      */
-   private final APEConfigTag<ConfigEnum> USE_WORKFLOW_INPUT = new APEConfigTagFactory.TAGS.USE_WORKFLOW_INPUT();
+    private final APEConfigTag<ConfigEnum> USE_WORKFLOW_INPUT = new APEConfigTagFactory.TAGS.USE_WORKFLOW_INPUT();
     /**
      * Determines the required usage for the generated data instances:<br>
      * {@link ConfigEnum#ALL} if all the generated data has to be used,<br>
@@ -80,11 +81,11 @@ public class APERunConfig {
      * output, per tool, has to be used or <br>
      * {@link ConfigEnum#NONE} if none of the data instances is obligatory to use.
      */
-   private final APEConfigTag<ConfigEnum> USE_ALL_GENERATED_DATA = new APEConfigTagFactory.TAGS.USE_ALL_GENERATED_DATA();
+    private final APEConfigTag<ConfigEnum> USE_ALL_GENERATED_DATA = new APEConfigTagFactory.TAGS.USE_ALL_GENERATED_DATA();
     /**
      * Mode is true if debug mode is turned on.
      */
-   private final APEConfigTag<Boolean> DEBUG_MODE = new APEConfigTagFactory.TAGS.DEBUG_MODE();
+    private final APEConfigTag<Boolean> DEBUG_MODE = new APEConfigTagFactory.TAGS.DEBUG_MODE();
     /**
      * Synthesis timeout in seconds.
      */
@@ -94,19 +95,22 @@ public class APERunConfig {
      * sequences alone, i.e. tool sequences cannot repeat, ignoring the types in the
      * solutions.
      */
-   private final APEConfigTag<Boolean> TOOL_SEQ_REPEAT = new APEConfigTagFactory.TAGS.TOOL_SEQ_REPEAT();
+    private final APEConfigTag<Boolean> TOOL_SEQ_REPEAT = new APEConfigTagFactory.TAGS.TOOL_SEQ_REPEAT();
     /**
      * Input types of the workflow.
      */
-   private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(this::getApeDomainSetup);
+    private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(
+            this::getApeDomainSetup);
     /**
      * Output types of the workflow.
      */
-   private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(this::getApeDomainSetup);
+    private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(
+            this::getApeDomainSetup);
     /**
-     * All the Tags specified in this class. Should be in correct order of dependencies.
+     * All the Tags specified in this class. Should be in correct order of
+     * dependencies.
      */
-    private final APEConfigTag<?>[] all_tags = new APEConfigTag[]{
+    private final APEConfigTag<?>[] all_tags = new APEConfigTag[] {
             this.CONSTRAINTS,
             this.SOLUTION_DIR_PATH,
             this.SOLUTION_LENGTH_RANGE,
@@ -125,7 +129,8 @@ public class APERunConfig {
     };
 
     /**
-     * Static versions of the Tags specified in this class. Should be in correct order for the Web API.
+     * Static versions of the Tags specified in this class. Should be in correct
+     * order for the Web API.
      */
     public static final APEConfigTags TAGS = new APEConfigTags(
             new CONSTRAINTS(),
@@ -142,18 +147,17 @@ public class APERunConfig {
             new TIMEOUT_SEC(),
             new TOOL_SEQ_REPEAT(),
             new PROGRAM_OUTPUTS(null),
-            new PROGRAM_INPUTS(null)
-    );
+            new PROGRAM_INPUTS(null));
 
     /**
      * Object containing domain information needed for the execution.
      */
     public APEDomainSetup apeDomainSetup;
-    
-	/** Solver type that should be used (SAT). */
-	private SolverType solverType = SolverType.SAT;
 
-	/**
+    /** Solver type that should be used (SAT). */
+    private SolverType solverType = SolverType.SAT;
+
+    /**
      * Constructor used to implement the Builder Pattern.
      *
      * @param builder Builder object
@@ -184,10 +188,11 @@ public class APERunConfig {
     }
 
     /**
-     * Private constructor used by {@link APERunConfig#validate(JSONObject config, APEDomainSetup setup)}
+     * Private constructor used by
+     * {@link APERunConfig#validate(JSONObject config, APEDomainSetup setup)}
      * to create an empty instance.
      */
-    private APERunConfig(APEDomainSetup setup){
+    private APERunConfig(APEDomainSetup setup) {
         this.apeDomainSetup = setup;
     }
 
@@ -197,19 +202,18 @@ public class APERunConfig {
      * the configuration object can be safely used to create
      * an APERunConfig object.
      *
-     * @param json the configuration file
+     * @param json  the configuration file
      * @param setup the domain setup
      * @return the validation results
      */
-    public static ValidationResults validate(JSONObject json, APEDomainSetup setup){
+    public static ValidationResults validate(JSONObject json, APEDomainSetup setup) {
         APERunConfig dummy = new APERunConfig(setup);
         ValidationResults results = new ValidationResults();
-        for(APEConfigTag<?> tag : dummy.all_tags){
+        for (APEConfigTag<?> tag : dummy.all_tags) {
             results.add(tag.validateConfig(json));
-            if(results.hasFails()){
+            if (results.hasFails()) {
                 return results;
-            }
-            else{
+            } else {
                 tag.setValueFromConfig(json); // for dependencies
             }
         }
@@ -284,6 +288,7 @@ public class APERunConfig {
 
     /**
      * Get domain setup.
+     * 
      * @return Object containing domain specific parameters/annotations.
      */
     public APEDomainSetup getApeDomainSetup() {
@@ -313,9 +318,11 @@ public class APERunConfig {
      * tool sequences alone, i.e. tool sequences cannot repeat, ignoring the types
      * in the solutions.
      *
-     * @return {@code false} if tool sequences cannot repeat, ignoring the types in the
-     * solutions, or {@code true} in case that the tool sequences can repeat as
-     * long as the corresponding types differ.
+     * @return {@code false} if tool sequences cannot repeat, ignoring the types in
+     *         the
+     *         solutions, or {@code true} in case that the tool sequences can repeat
+     *         as
+     *         long as the corresponding types differ.
      */
     public boolean getAllowToolSeqRepeat() {
         return TOOL_SEQ_REPEAT.getValue();
@@ -354,43 +361,55 @@ public class APERunConfig {
 
     /** Tag value. */
     public static final String EXECUTABLES_FOLDER_NAME = "Executables";
+
     /**
-     * Get the path to the directory where the executable scripts corresponding to the given solutions should be stored.
+     * Get the path to the directory where the executable scripts corresponding to
+     * the given solutions should be stored.
      *
-     * @return the path to the directory where the executable scripts corresponding to the given solutions should be stored
+     * @return the path to the directory where the executable scripts corresponding
+     *         to the given solutions should be stored
      */
     public Path getSolutionDirPath2Executables() {
         return getSolutionDirPath2(EXECUTABLES_FOLDER_NAME);
     }
 
-     /** Tag value. */
+    /** Tag value. */
     public static final String FIGURES_FOLDER_NAME = "Figures";
+
     /**
-     * Get the path to the directory where the graphs representation of the solutions should be stored.
+     * Get the path to the directory where the graphs representation of the
+     * solutions should be stored.
      *
-     * @return the path to the directory where the graphs representation of the solutions should be stored
+     * @return the path to the directory where the graphs representation of the
+     *         solutions should be stored
      */
     public Path getSolutionDirPath2Figures() {
         return getSolutionDirPath2(FIGURES_FOLDER_NAME);
     }
 
-     /** Tag value. */
+    /** Tag value. */
     public static final String CWL_FOLDER_NAME = "CWL";
+
     /**
-     * Get the path to the directory where the CWL scripts corresponding the given solutions should be stored.
+     * Get the path to the directory where the CWL scripts corresponding the given
+     * solutions should be stored.
      *
-     * @return the path to the directory where the CWL scripts corresponding to the given solutions should be stored
+     * @return the path to the directory where the CWL scripts corresponding to the
+     *         given solutions should be stored
      */
     public Path getSolutionDirPath2CWL() {
         return getSolutionDirPath2(CWL_FOLDER_NAME);
     }
 
-     /** Tag value. */
+    /** Tag value. */
     public static final String EXECUTABLE_CWL_FOLDER_NAME = "CWL_executables";
+
     /**
-     * Get the path to the directory where the executable CWL scripts corresponding the given solutions should be stored.
+     * Get the path to the directory where the executable CWL scripts corresponding
+     * the given solutions should be stored.
      *
-     * @return the path to the directory where the executable CWL scripts corresponding to the given solutions should be stored
+     * @return the path to the directory where the executable CWL scripts
+     *         corresponding to the given solutions should be stored
      */
     public Path getSolutionDirPath2ExecutableCWL() {
         return getSolutionDirPath2(EXECUTABLE_CWL_FOLDER_NAME);
@@ -462,6 +481,7 @@ public class APERunConfig {
 
     /**
      * Gets number of CWL files.
+     * 
      * @return The value of {@link #NO_CWL}
      */
     public int getNoCWL() {
@@ -470,6 +490,7 @@ public class APERunConfig {
 
     /**
      * Set the number of CWL files.
+     * 
      * @param noCWL The number to set.
      */
     public void setNoCWL(int noCWL) {
@@ -478,6 +499,7 @@ public class APERunConfig {
 
     /**
      * Gets number of executable CWL files.
+     * 
      * @return The value of {@link #NO_EXECUTABLE_CWL}
      */
     public int getNoExecutableCWL() {
@@ -486,6 +508,7 @@ public class APERunConfig {
 
     /**
      * Set the number of executable CWL files.
+     * 
      * @param noExecutableCWL The number to set.
      */
     public void setNoExecutableCWL(int noExecutableCWL) {
@@ -555,29 +578,32 @@ public class APERunConfig {
     public void setUseAllGeneratedData(ConfigEnum useAllGeneratedData) {
         USE_ALL_GENERATED_DATA.setValue(useAllGeneratedData);
     }
-    
+
     /**
      * Get timeout (in seconds) how long the execution should last.
+     * 
      * @return Timeout in seconds.
      */
     public int getTimeoutSec() {
-    	return TIMEOUT_SEC.getValue();
+        return TIMEOUT_SEC.getValue();
     }
-    
+
     /**
      * Get timeout (in ms) how long the execution should last.
+     * 
      * @return Timeout in seconds.
      */
     public int getTimeoutMs() {
-    	return TIMEOUT_SEC.getValue() * 1000;
+        return TIMEOUT_SEC.getValue() * 1000;
     }
-    
+
     /**
      * Set the timeout in sec.
+     * 
      * @param timeoutSec
      */
     public void setTimeoutSec(int timeoutSec) {
-    	TIMEOUT_SEC.setValue(timeoutSec);
+        TIMEOUT_SEC.setValue(timeoutSec);
     }
 
     /**
@@ -615,61 +641,64 @@ public class APERunConfig {
 
     /**
      * Gets the Solver type that should be used for solving.
+     * 
      * @return {@link SolverType} that corresponds to the solver type
      */
     public SolverType getSolverType() {
-		return this.solverType;
-	}
-    
+        return this.solverType;
+    }
+
     /**
-	 * @param solverType the solverType to set
-	 */
-	public void setSolverType(SolverType solverType) {
-		this.solverType = solverType;
-	}
-    
-	/**
-	    * Creates interface for the min length of {@link APERunConfig}.
-	    */
-	    public interface ISolutionMinLengthStage {
+     * @param solverType the solverType to set
+     */
+    public void setSolverType(SolverType solverType) {
+        this.solverType = solverType;
+    }
+
+    /**
+     * Creates interface for the min length of {@link APERunConfig}.
+     */
+    public interface ISolutionMinLengthStage {
         ISolutionMaxLengthStage withSolutionMinLength(int solutionMinLength);
     }
 
     /**
-    * Creates interface for the max length of {@link APERunConfig}.
-    */
+     * Creates interface for the max length of {@link APERunConfig}.
+     */
     public interface ISolutionMaxLengthStage {
-    	/**
-    	 * Set Max length.
-    	 * @param solutionMaxLength
-    	 * @return 
-    	 */
+        /**
+         * Set Max length.
+         * 
+         * @param solutionMaxLength
+         * @return
+         */
         IMaxNoSolutionsStage withSolutionMaxLength(int solutionMaxLength);
     }
 
     /**
      * Creates interface for the max solution no of {@link APERunConfig}.
      */
-     public interface IMaxNoSolutionsStage {
+    public interface IMaxNoSolutionsStage {
         IApeDomainSetupStage withMaxNoSolutions(int maxNoSolutions);
     }
 
-     /**
-      * Creates interface to setup the domain of {@link APERunConfig}.
-      */
-      public interface IApeDomainSetupStage {
+    /**
+     * Creates interface to setup the domain of {@link APERunConfig}.
+     */
+    public interface IApeDomainSetupStage {
         IBuildStage withApeDomainSetup(APEDomainSetup apeDomainSetup);
     }
 
     /**
      * Interface for the builder class.
+     * 
      * @author Vedran Kasalica
      *
      */
     public interface IBuildStage {
         IBuildStage withConstraintsJSON(JSONObject constraintsJSON);
 
-		IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
+        IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
 
         IBuildStage withSolutionDirPath(String solutionPath);
 
@@ -690,7 +719,7 @@ public class APERunConfig {
         IBuildStage withUseAllGeneratedData(ConfigEnum useAllGeneratedData);
 
         IBuildStage withDebugMode(boolean debugMode);
-        
+
         IBuildStage withTimeoutSec(int timeoutSec);
 
         APERunConfig build();
@@ -764,7 +793,6 @@ public class APERunConfig {
             return this;
         }
 
-
         @Override
         public IBuildStage withNoExecutions(int noExecutions) {
             this.noExecutions = noExecutions;
@@ -818,7 +846,7 @@ public class APERunConfig {
             this.debugMode = debugMode;
             return this;
         }
-        
+
         @Override
         public IBuildStage withTimeoutSec(int timeout) {
             this.timeoutSec = timeout;

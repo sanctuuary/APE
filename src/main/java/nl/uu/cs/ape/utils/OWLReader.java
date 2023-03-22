@@ -40,14 +40,18 @@ public class OWLReader {
 	private OWLDataFactory factory;
 	/** OWL logger */
 	private Logger logger = Logger.getLogger("OWLReader.class");
-	/** Holds information whether the domain was annotated under the strict rules of the output dependency. */
+	/**
+	 * Holds information whether the domain was annotated under the strict rules of
+	 * the output dependency.
+	 */
 	private boolean useStrictToolAnnotations;
 
 	/**
 	 * Setting up the reader that will populate the provided module and type sets
 	 * with objects from the ontology.
 	 *
-	 * @param domain       Domain information, including all the existing tools and types.
+	 * @param domain       Domain information, including all the existing tools and
+	 *                     types.
 	 * @param ontologyFile Path to the OWL file.
 	 */
 	public OWLReader(APEDomainSetup domain, File ontologyFile) {
@@ -63,8 +67,8 @@ public class OWLReader {
 	 * <b>TypesTaxonomy</b> part of the ontology.
 	 *
 	 * @return true is the ontology was read correctly, false otherwise.
-	 * @throws APEDimensionsException Exception if Type dimensions have common
-	 *                                     classes.
+	 * @throws APEDimensionsException       Exception if Type dimensions have common
+	 *                                      classes.
 	 * @throws OWLOntologyCreationException Error in reading the OWL file.
 	 */
 	public boolean readOntology() throws APEDimensionsException, OWLOntologyCreationException {
@@ -84,7 +88,8 @@ public class OWLReader {
 		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
 		if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
 			/* Handle scenario when the tool taxonomy root was not defined properly. */
-			throw APEDimensionsException.notExistingDimension(String.format("Operation root %s does not exist in the ontology.", moduleRootIRI));
+			throw APEDimensionsException.notExistingDimension(
+					String.format("Operation root %s does not exist in the ontology.", moduleRootIRI));
 		}
 
 		/* Get roots for each of the data dimensions. */
@@ -92,7 +97,8 @@ public class OWLReader {
 		for (String dimensionIRI : allTypes.getDataTaxonomyDimensionIDs()) {
 			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionIRI));
 			if (!ontology.containsClassInSignature(IRI.create(dimensionIRI))) {
-				throw APEDimensionsException.notExistingDimension(String.format("Data dimension %s does not exist in the ontology.", dimensionIRI));
+				throw APEDimensionsException.notExistingDimension(
+						String.format("Data dimension %s does not exist in the ontology.", dimensionIRI));
 			} else {
 				dimensionRootClasses.add(dimensionClass);
 			}
@@ -110,8 +116,10 @@ public class OWLReader {
 
 		return true;
 	}
-	
-	public static boolean verifyOntology(File ontologyFile, String ontologyPrefixIRI, String toolTaxonomyRoot, List<String> dataDimensionRoots ) throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
+
+	public static boolean verifyOntology(File ontologyFile, String ontologyPrefixIRI, String toolTaxonomyRoot,
+			List<String> dataDimensionRoots)
+			throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
 
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		AllModules allModules = new AllModules(toolTaxonomyRoot);
@@ -125,13 +133,14 @@ public class OWLReader {
 		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 		OWLReasoner reasoner = reasonerFactory.createNonBufferingReasoner(ontology);
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		
+
 		/* Get a root of the operations taxonomy. */
 		String moduleRootIRI = allModules.getRootModuleID();
 		OWLClass moduleRootClass = manager.getOWLDataFactory().getOWLClass(IRI.create(moduleRootIRI));
 		if (!ontology.containsClassInSignature(IRI.create(moduleRootIRI))) {
 			/* Handle scenario when the tool taxonomy root was not defined properly. */
-			throw APEDimensionsException.notExistingDimension(String.format("Operation root %s does not exist in the ontology.", moduleRootIRI));
+			throw APEDimensionsException.notExistingDimension(
+					String.format("Operation root %s does not exist in the ontology.", moduleRootIRI));
 		}
 
 		/* Get roots for each of the data dimensions. */
@@ -140,7 +149,8 @@ public class OWLReader {
 			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionIRI));
 			if (!ontology.containsClassInSignature(IRI.create(dimensionIRI))) {
 				/* Handle scenario when the type taxonomy root was not defined properly. */
-				throw APEDimensionsException.notExistingDimension(String.format("Data dimension %s does not exist in the ontology.", dimensionIRI));
+				throw APEDimensionsException.notExistingDimension(
+						String.format("Data dimension %s does not exist in the ontology.", dimensionIRI));
 			} else {
 				dimensionRootClasses.add(dimensionClass);
 			}
@@ -228,7 +238,7 @@ public class OWLReader {
 		final OWLClass currRoot;
 		Type superType = null;
 		Type currType = null;
-			
+
 		superType = allTypes.get(getIRI(superClass), getIRI(rootClass));
 		/*
 		 * Check whether the current node is a root or subRoot node.
@@ -243,7 +253,6 @@ public class OWLReader {
 
 		currType = addNewTypeToAllTypes(getLabel(currClass), getIRI(currClass), getIRI(currRoot), currNodeType);
 
-		
 		/* Add the current type as a sub-type of the super type. */
 		if (superType != null && currType != null) {
 			superType.addSubPredicate(currType);
@@ -266,7 +275,7 @@ public class OWLReader {
 			if (artificialSubType != null) {
 				currType.addSubPredicate(artificialSubType);
 				currType.setPlainType(artificialSubType);
-				
+
 				artificialSubType.addSuperPredicate(currType);
 				artificialSubType.setNodePredicate(NodeType.LEAF);
 			} else {
@@ -274,7 +283,7 @@ public class OWLReader {
 			}
 		}
 	}
-	
+
 	private Type addNewTypeToAllTypes(String classLabel, String classID, String rootID, NodeType currNodeType) {
 		Type currType = null;
 		/* Generate the Type that corresponds to the taxonomy class. */
@@ -307,7 +316,7 @@ public class OWLReader {
 				return ((OWLLiteral) val).getLiteral();
 		} else if (classID.contains("#")) {
 			label = classID.substring(classID.indexOf('#') + 1);
-//			label = label.replace(" ", "_");
+			// label = label.replace(" ", "_");
 			return label;
 		}
 		logger.fine("Class '" + classID + "' has no label.");

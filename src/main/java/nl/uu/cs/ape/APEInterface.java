@@ -15,83 +15,84 @@ import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 
-
 /**
- * The {@code APEInterface} is the interface of the main class of the library and is supposed to be
+ * The {@code APEInterface} is the interface of the main class of the library
+ * and is supposed to be
  * the main interface for working with the library.
  *
  * @author Vedran Kasalica
  */
 public interface APEInterface {
 
-		/**
-		 * Method that return all the supported constraint templates.
-		 *
-		 * @return List of {@link ConstraintTemplate} objects.
-		 */
-		public Collection<ConstraintTemplate> getConstraintTemplates();
+	/**
+	 * Method that return all the supported constraint templates.
+	 *
+	 * @return List of {@link ConstraintTemplate} objects.
+	 */
+	public Collection<ConstraintTemplate> getConstraintTemplates();
 
-		/**
-		 * The method returns the configuration file of the APE instance.
-		 *
-		 * @return The {@link APECoreConfig} that contains all core configuration parameters.
-		 */
-		public APECoreConfig getConfig();
+	/**
+	 * The method returns the configuration file of the APE instance.
+	 *
+	 * @return The {@link APECoreConfig} that contains all core configuration
+	 *         parameters.
+	 */
+	public APECoreConfig getConfig();
 
-		/**
-		 * Gets domain setup.
-		 *
-		 * @return The object that contains all crucial information about the domain
-		 *         (e.g. list of tools, data types, constraint factory, etc.)
-		 */
-		public APEDomainSetup getDomainSetup();
+	/**
+	 * Gets domain setup.
+	 *
+	 * @return The object that contains all crucial information about the domain
+	 *         (e.g. list of tools, data types, constraint factory, etc.)
+	 */
+	public APEDomainSetup getDomainSetup();
 
-		/**
-		 * Returns all the taxonomy elements that are subclasses of the given element.
-		 * Can be used to retrieve all data types, formats or all taxonomy operations.
-		 *
-		 * @param taxonomyElementID ID of the taxonomy element that is parent of all the
-		 *                          returned elements.
-		 * @return Sorted set of elements that belong to the given taxonomy subtree.
-		 */
-		public SortedSet<TaxonomyPredicate> getTaxonomySubclasses(String taxonomyElementID);
+	/**
+	 * Returns all the taxonomy elements that are subclasses of the given element.
+	 * Can be used to retrieve all data types, formats or all taxonomy operations.
+	 *
+	 * @param taxonomyElementID ID of the taxonomy element that is parent of all the
+	 *                          returned elements.
+	 * @return Sorted set of elements that belong to the given taxonomy subtree.
+	 */
+	public SortedSet<TaxonomyPredicate> getTaxonomySubclasses(String taxonomyElementID);
 
-		/**
-		 * Returns the {@link TaxonomyPredicate} that corresponds to the given ID.
-		 *
-		 * @param taxonomyElementID ID of the taxonomy element
-		 * @return The corresponding {@link TaxonomyPredicate}
-		 */
-		public TaxonomyPredicate getTaxonomyElement(String taxonomyElementID);
+	/**
+	 * Returns the {@link TaxonomyPredicate} that corresponds to the given ID.
+	 *
+	 * @param taxonomyElementID ID of the taxonomy element
+	 * @return The corresponding {@link TaxonomyPredicate}
+	 */
+	public TaxonomyPredicate getTaxonomyElement(String taxonomyElementID);
 
-		/**
-		 * Setup a new run instance of the APE solver and run the synthesis algorithm.
-		 *
-		 * @param configObject Object that contains run configurations.
-		 * @return The list of all the solutions.
-		 * @throws IOException Error in case of not providing a proper configuration
-		 *                     file.
-		 */
-		public SolutionsList runSynthesis(JSONObject configObject) throws IOException, APEConfigException;
+	/**
+	 * Setup a new run instance of the APE solver and run the synthesis algorithm.
+	 *
+	 * @param configObject Object that contains run configurations.
+	 * @return The list of all the solutions.
+	 * @throws IOException Error in case of not providing a proper configuration
+	 *                     file.
+	 */
+	public SolutionsList runSynthesis(JSONObject configObject) throws IOException, APEConfigException;
 
-		/**
-		 * Setup a new run instance of the APE solver and run the synthesis algorithm.
-		 *
-		 * @param runConfigPath Path to the JSON that contains run configurations.
-		 * @return The list of all the solutions.
-		 * @throws IOException Error in case of not providing a proper configuration
-		 *                     file.
-		 */
-		public SolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException;
+	/**
+	 * Setup a new run instance of the APE solver and run the synthesis algorithm.
+	 *
+	 * @param runConfigPath Path to the JSON that contains run configurations.
+	 * @return The list of all the solutions.
+	 * @throws IOException Error in case of not providing a proper configuration
+	 *                     file.
+	 */
+	public SolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException;
 
-		/**
-		 * Setup a new run instance of the APE solver and run the synthesis algorithm.
-		 *
-		 * @param runConfig Configuration object that contains run configurations.
-		 * @return The list of all the solutions.
-		 * @throws IOException Error in case of not providing a proper configuration
-		 *                     file.
-		 */
-		public SolutionsList runSynthesis(APERunConfig runConfig) throws IOException;
+	/**
+	 * Setup a new run instance of the APE solver and run the synthesis algorithm.
+	 *
+	 * @param runConfig Configuration object that contains run configurations.
+	 * @return The list of all the solutions.
+	 * @throws IOException Error in case of not providing a proper configuration
+	 *                     file.
+	 */
+	public SolutionsList runSynthesis(APERunConfig runConfig) throws IOException;
 
 }

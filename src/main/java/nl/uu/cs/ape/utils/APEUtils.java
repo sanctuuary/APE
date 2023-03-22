@@ -27,6 +27,9 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.parser.SLTLxSATVisitor;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -57,7 +60,8 @@ public final class APEUtils {
 
 	/**
 	 * Encode ape constraints string.
-	 * @param synthesisEngine 
+	 * 
+	 * @param synthesisEngine
 	 *
 	 * @param domainSetup     Domain information, including all the existing tools
 	 *                        and types.
@@ -66,7 +70,8 @@ public final class APEUtils {
 	 * @param typeAutomaton   Type automaton.
 	 * @return The CNF representation of the SLTL constraints in our project.
 	 */
-	public static String encodeAPEConstraints(SATSynthesisEngine synthesisEngine, APEDomainSetup domainSetup, SATAtomMappings mappings,
+	public static String encodeAPEConstraints(SATSynthesisEngine synthesisEngine, APEDomainSetup domainSetup,
+			SATAtomMappings mappings,
 			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
 
 		StringBuilder cnf_SLTL = new StringBuilder();
@@ -89,18 +94,18 @@ public final class APEUtils {
 				}
 			}
 		}
-		
+
 		/*
 		 * Parse the constraints specified in SLTLx.
 		 */
-		for(String constraint : domainSetup.getSLTLxConstraints()){
+		for (String constraint : domainSetup.getSLTLxConstraints()) {
 			Set<SLTLxFormula> sltlxFormulas = SLTLxSATVisitor.parseFormula(synthesisEngine, constraint);
-			for(SLTLxFormula sltlxFormula : sltlxFormulas) {
+			for (SLTLxFormula sltlxFormula : sltlxFormulas) {
 				sltlxFormula.getConstraintCNFEncoding(synthesisEngine)
-							.forEach(sltlxString -> cnf_SLTL.append(sltlxString));
+						.forEach(sltlxString -> cnf_SLTL.append(sltlxString));
 			}
 		}
-		
+
 		return cnf_SLTL.toString();
 	}
 
@@ -147,6 +152,20 @@ public final class APEUtils {
 	}
 
 	/**
+	 * Reads the path and provides the JSONObject that represents its content.
+	 *
+	 * @param path the path (local or URL) to the file
+	 * @return JSONObject representing the content of the file.
+	 * @throws IOException   Error if the file is corrupted
+	 * @throws JSONException Error if the file is not in expected JSON format
+	 */
+	public static JSONObject readPathToJSONObject(String path) throws IOException, JSONException {
+		File file = APEUtils.getFileFromPath(path);
+		String content = FileUtils.readFileToString(file, "utf-8");
+		return new JSONObject(content);
+	}
+
+	/**
 	 * Reads the file and provides the JSONObject that represents its content.
 	 *
 	 * @param file the JSON file
@@ -158,7 +177,7 @@ public final class APEUtils {
 		String content = FileUtils.readFileToString(file, "utf-8");
 		return new JSONObject(content);
 	}
-	
+
 	/**
 	 * Reads the file and provides the JSONArray that represents its content.
 	 *
@@ -179,35 +198,38 @@ public final class APEUtils {
 	 *
 	 * @return CNF representation of the formula
 	 */
-//	public static String convert2CNF(String propositionalFormula, SATAtomMappings mappings) {
-//		final FormulaFactory f = new FormulaFactory();
-//		final PropositionalParser p = new PropositionalParser(f);
-//
-//		Formula formula;
-//		try {
-//			formula = p.parse(propositionalFormula.replace('-', '~'));
-//			final Formula cnf = formula.cnf();
-//			String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", " 0\n").replace(" | ", " ")
-//					.replace("(", "").replace(")", "") + " 0\n";
-//			boolean exists = true;
-//			int counterErrors = 0;
-//			String auxVariable = "";
-//			while (exists) {
-//				auxVariable = "@RESERVED_CNF_" + counterErrors + " ";
-//				if (transformedCNF.contains("@RESERVED_CNF_")) {
-//					transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum() + " ");
-//				} else {
-//					exists = false;
-//				}
-//				counterErrors++;
-//			}
-//			return transformedCNF;
-//		} catch (ParserException e) {
-//			e.printStackTrace();
-//			return null;
-//		}
-//
-//	}
+	// public static String convert2CNF(String propositionalFormula, SATAtomMappings
+	// mappings) {
+	// final FormulaFactory f = new FormulaFactory();
+	// final PropositionalParser p = new PropositionalParser(f);
+	//
+	// Formula formula;
+	// try {
+	// formula = p.parse(propositionalFormula.replace('-', '~'));
+	// final Formula cnf = formula.cnf();
+	// String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", "
+	// 0\n").replace(" | ", " ")
+	// .replace("(", "").replace(")", "") + " 0\n";
+	// boolean exists = true;
+	// int counterErrors = 0;
+	// String auxVariable = "";
+	// while (exists) {
+	// auxVariable = "@RESERVED_CNF_" + counterErrors + " ";
+	// if (transformedCNF.contains("@RESERVED_CNF_")) {
+	// transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum()
+	// + " ");
+	// } else {
+	// exists = false;
+	// }
+	// counterErrors++;
+	// }
+	// return transformedCNF;
+	// } catch (ParserException e) {
+	// e.printStackTrace();
+	// return null;
+	// }
+	//
+	// }
 
 	/**
 	 * Create the full class IRI (ID) based on the label and the OWL prefix.
@@ -269,7 +291,7 @@ public final class APEUtils {
 	 * all the elements are put in a {@link List}, otherwise if the key corresponds
 	 * to a {@code <T>} list will contain only that object.
 	 *
-	 * @param            <T> Class to which the elements should belong to.
+	 * @param <T>        Class to which the elements should belong to.
 	 * @param jsonObject {@link JSONObject} that is being explored.
 	 * @param key        Key label that corresponds to the elements.
 	 * @param clazz      Class to which the elements should belong to.
@@ -295,6 +317,7 @@ public final class APEUtils {
 			}
 			return jsonList;
 		} catch (JSONException e) {
+			// Return empty list in case the key doesn't exist.
 			return jsonList;
 		}
 	}
@@ -303,7 +326,7 @@ public final class APEUtils {
 	 * The method converts the {@link JSONArray} object to {@link List} of objects
 	 * of the given structure.
 	 *
-	 * @param           <T> Class to which the elements should belong to.
+	 * @param <T>       Class to which the elements should belong to.
 	 * @param jsonArray JSON array object.
 	 * @param clazz     Class type that the elements of the array are.
 	 * @return List of objects of type {@link T}.
@@ -380,7 +403,6 @@ public final class APEUtils {
 			System.out.println("\tLabels Taxonomy:");
 			System.out.println("-------------------------------------------------------------");
 			domainSetup.getAllTypes().getLabelRoot().printTree(" ", domainSetup.getAllTypes());
-			
 
 			/*
 			 * Printing the tool annotations
@@ -412,7 +434,7 @@ public final class APEUtils {
 				System.out.println("\tNo constraints.");
 			}
 			System.out.println("-------------------------------------------------------------");
-			
+
 			int i = 1;
 			for (Type input : runConfig.getProgramInputs()) {
 				System.out.println((i++) + ". program input is " + input.toShortString());
@@ -446,7 +468,7 @@ public final class APEUtils {
 	/**
 	 * Provide a safe interface for iteration trough a list/set.
 	 *
-	 * @param          <E> Any type.
+	 * @param <E>      Any type.
 	 * @param currList List/set that is being evaluated.
 	 * @return An empty list in case of {@code currList == null}, or
 	 *         {@code currList} otherwise.
@@ -459,7 +481,7 @@ public final class APEUtils {
 	 * Provide a safe interface for getting an element from a list. In order to
 	 * bypass "index out of bounds" error.
 	 *
-	 * @param          <E> Any type.
+	 * @param <E>      Any type.
 	 * @param currList List of elements.
 	 * @param index    Index of the element that is to be returned.
 	 * @return Element of the list, or null if the index is out of bounds.
@@ -478,7 +500,7 @@ public final class APEUtils {
 	 * null elements to fit the given size of the array and then adds the new
 	 * element. If the index is negative number it does not change the array.
 	 *
-	 * @param         <E> Any type.
+	 * @param <E>     Any type.
 	 * @param list    List that is manipulated.
 	 * @param index   Absolute position of the new element.
 	 * @param element New element to be added to the list.
@@ -570,16 +592,16 @@ public final class APEUtils {
 			timers.put(timerID, (long) -1);
 		}
 	}
-	
+
 	public static long timerTimeLeft(String timerID, long timeout) {
-		if(timers.get(timerID) == -1) {
+		if (timers.get(timerID) == -1) {
 			return 0;
 		}
-		
+
 		long elapsedTimeMs = System.currentTimeMillis() - timers.get(timerID);
 		long timeLeftMs = timeout - elapsedTimeMs;
 		return timeLeftMs;
-				
+
 	}
 
 	/**
@@ -595,8 +617,8 @@ public final class APEUtils {
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
 		System.out.println(printString + " setup time: " + (printTime / 1000F) + " sec.");
 		timers.put(timerID, System.currentTimeMillis());
-		
-//		APEUtils.printMemoryStatus(true);
+
+		// APEUtils.printMemoryStatus(true);
 	}
 
 	/**
@@ -611,8 +633,12 @@ public final class APEUtils {
 			return -1;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
-		System.out.println(
-				"\nAPE found " + solutionsFound + " solutions. Total solving time: " + (printTime / 1000F) + " sec.");
+		System.out.println("\n"
+				+ "APE found " + solutionsFound + " solutions.\n"
+				+ "Total APE runtime: \t\t" + (printTime / 1000F) + " sec.\n"
+				+ "Total encoding time: \t\t" + (SATSynthesisEngine.encodingTime / 1000F) + " sec.\n"
+				+ "Total SAT solving time: \t" + (SATSynthesisEngine.satSolvingTime / 1000F) + " sec.");
+		System.out.println();
 		return printTime;
 	}
 
@@ -669,21 +695,21 @@ public final class APEUtils {
 					apeTaxonomyTerms.put(bioOperation.get("uri"));
 				}
 				apeJsonTool.put("taxonomyOperations", apeTaxonomyTerms);
-//			reading inputs
+				// reading inputs
 				JSONArray apeInputs = new JSONArray();
 				JSONArray bioInputs = function.getJSONArray("input");
-//			for each input
+				// for each input
 				for (int j = 0; j < bioInputs.length(); j++) {
 					JSONObject bioInput = bioInputs.getJSONObject(j);
 					JSONObject apeInput = new JSONObject();
 					JSONArray apeInputTypes = new JSONArray();
 					JSONArray apeInputFormats = new JSONArray();
-//				add all data types
+					// add all data types
 					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "data", JSONObject.class)) {
 						apeInputTypes.put(bioType.getString("uri"));
 					}
 					apeInput.put("data_0006", apeInputTypes);
-//				add all data formats (or just the first one)
+					// add all data formats (or just the first one)
 					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
 						apeInputFormats.put(bioType.getString("uri"));
 					}
@@ -693,22 +719,22 @@ public final class APEUtils {
 				}
 				apeJsonTool.put("inputs", apeInputs);
 
-//			reading outputs
+				// reading outputs
 				JSONArray apeOutputs = new JSONArray();
 				JSONArray bioOutputs = function.getJSONArray("output");
-//			for each output
+				// for each output
 				for (int j = 0; j < bioOutputs.length(); j++) {
 
 					JSONObject bioOutput = bioOutputs.getJSONObject(j);
 					JSONObject apeOutput = new JSONObject();
 					JSONArray apeOutputTypes = new JSONArray();
 					JSONArray apeOutputFormats = new JSONArray();
-//				add all data types
+					// add all data types
 					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "data", JSONObject.class)) {
 						apeOutputTypes.put(bioType.getString("uri"));
 					}
 					apeOutput.put("data_0006", apeOutputTypes);
-//				add all data formats
+					// add all data formats
 					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
 						apeOutputFormats.put(bioType.getString("uri"));
 					}
@@ -739,46 +765,45 @@ public final class APEUtils {
 		while (scanner.hasNextInt()) {
 			int intAtom = scanner.nextInt();
 
-			
 			if (intAtom == 0) {
 				humanReadable.append("\n");
 			} else if (intAtom > -3 & intAtom < 3) {
-				if(intAtom == 1 || intAtom == -2) {
+				if (intAtom == 1 || intAtom == -2) {
 					humanReadable.append("true ");
 				} else {
 					humanReadable.append("false ");
 				}
 			} else if (intAtom > 0) {
 				SLTLxAtom atom = mappings.findOriginal(intAtom);
-				if(atom==null) {
+				if (atom == null) {
 					SLTLxAtomVar varAtom = mappings.findOriginalVar(intAtom);
 					humanReadable.append(varAtom.toString()).append(" ");
 				} else {
 					humanReadable.append(atom.toString()).append(" ");
 				}
-				
+
 			} else if (intAtom < 0) {
 				SLTLxAtom atom = mappings.findOriginal(-intAtom);
-				if(atom==null) {
+				if (atom == null) {
 					SLTLxAtomVar varAtom = mappings.findOriginalVar(-intAtom);
-					if(varAtom == null)
+					if (varAtom == null)
 						System.out.println(intAtom);
 					humanReadable.append("-").append(varAtom.toString()).append(" ");
 				} else {
 					humanReadable.append("-").append(atom.toString()).append(" ");
 				}
-				
+
 			}
 		}
 		scanner.close();
 
 		return humanReadable.toString();
 	}
-	
+
 	public static void write2file(InputStream temp_sat_input, File file, Boolean append) throws IOException {
 		StringBuilder humanReadable = new StringBuilder();
 		Scanner scanner = new Scanner(temp_sat_input);
-		
+
 		while (scanner.hasNextLine()) {
 			String str = scanner.nextLine();
 
@@ -872,10 +897,12 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Append text to the existing file. It adds the text at the end of the content of the file.
-	 * @param file 		- 	existing file
-	 * @param content 	- content that should be appended
-	 * @throws IOException in case of an I/O error
+	 * Append text to the existing file. It adds the text at the end of the content
+	 * of the file.
+	 * 
+	 * @param file    - existing file
+	 * @param content - content that should be appended
+	 * @throws IOException          in case of an I/O error
 	 * @throws NullPointerException if the file is null
 	 */
 	public static void appendToFile(File file, String content) throws IOException, NullPointerException {
@@ -884,66 +911,70 @@ public final class APEUtils {
 		writer.write(content);
 		writer.close();
 	}
-	
+
 	/**
-	 * Append text to the existing file. It adds the text at the end of the content of the file.
-	 * @param file 		- 	existing file
-	 * @param content 	- content that should be appended
-	 * @throws IOException in case of an I/O error
+	 * Append text to the existing file. It adds the text at the end of the content
+	 * of the file.
+	 * 
+	 * @param file    - existing file
+	 * @param content - content that should be appended
+	 * @throws IOException          in case of an I/O error
 	 * @throws NullPointerException if the file is null
 	 */
 	public static void appendSetToFile(File file, Set<String> content) throws IOException, NullPointerException {
 		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
 		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
-		for(String str : content) {
-			writer.write(str);	
+		for (String str : content) {
+			writer.write(str);
 		}
 		writer.close();
 	}
-	
-	
+
 	/**
-	 * Append text to the existing file. It adds the text at the end of the content of the file.
-	 * @param file 		- 	existing file
-	 * @param cnfEncoding 	- cnf clauses that should be appended 
-	 * @throws IOException in case of an I/O error
+	 * Append text to the existing file. It adds the text at the end of the content
+	 * of the file.
+	 * 
+	 * @param file        - existing file
+	 * @param cnfEncoding - cnf clauses that should be appended
+	 * @throws IOException          in case of an I/O error
 	 * @throws NullPointerException if the file is null
 	 */
 	public static void appendToFile(File file, Set<CNFClause> cnfEncoding) throws IOException, NullPointerException {
 		StringBuilder string = new StringBuilder();
 		cnfEncoding.forEach(clause -> {
-				string.append(clause.toCNF());
+			string.append(clause.toCNF());
 		});
 		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
 		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
 		writer.write(string.toString());
 		writer.close();
 	}
-	
+
 	/**
 	 * Prepend text to the existing file content and create a new file out of it.
 	 * It adds the text at the beginning, before the existing content of the file.
+	 * 
 	 * @param file
 	 * @param prefix
 	 * @throws IOException
 	 */
-	public static File concatIntoFile(String prefix, File file) throws IOException {
-	    LineIterator li = FileUtils.lineIterator(file);
-	    File tempFile = File.createTempFile("prependPrefix", ".tmp");
-	    tempFile.deleteOnExit();
-	    Writer fileWriter = new FileWriterWithEncoding(tempFile, "ASCII", true);
+	public static File prependToFile(String prefix, File file) throws IOException {
+		LineIterator li = FileUtils.lineIterator(file);
+		File tempFile = File.createTempFile("prependPrefix", ".tmp");
+		tempFile.deleteOnExit();
+		Writer fileWriter = new FileWriterWithEncoding(tempFile, "ASCII", true);
 		BufferedWriter writer = new BufferedWriter(fileWriter);
-	    try {
-	    	writer.write(prefix);
-	        while (li.hasNext()) {
-	        	writer.write(li.next());
-	        	writer.write("\n");
-	        }
-	    } finally {
-	    	writer.close();
-	    	li.close();
-	    }
-	    return tempFile;
+		try {
+			writer.write(prefix);
+			while (li.hasNext()) {
+				writer.write(li.next());
+				writer.write("\n");
+			}
+		} finally {
+			writer.close();
+			li.close();
+		}
+		return tempFile;
 	}
 
 	public static int countLines(File cnfEncoding) {
@@ -951,7 +982,7 @@ public final class APEUtils {
 		try (BufferedReader b = new BufferedReader(new FileReader(cnfEncoding))) {
 			while (b.readLine() != null) {
 				lines++;
-				
+
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -962,27 +993,31 @@ public final class APEUtils {
 	}
 
 	/**
-	 *  Visualises in the command line the memory status of the VM at the given step, if debug mode is on.
+	 * Visualises in the command line the memory status of the VM at the given step,
+	 * if debug mode is on.
+	 * 
 	 * @param debugMode - true if debug mode is on
 	 */
 	public static void printMemoryStatus(boolean debugMode) {
 		if (!debugMode) {
 			return;
 		}
-		double currMemMB = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024/1024;
-		double totalMemMB = (Runtime.getRuntime().totalMemory())/1024/1024;
-		double oneCharValueMB = 100 ;
+		double currMemMB = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024;
+		double totalMemMB = (Runtime.getRuntime().totalMemory()) / 1024 / 1024;
+		double oneCharValueMB = 100;
 		int currMemChars = (int) Math.ceil(currMemMB / oneCharValueMB);
 		int totalMemChars = (int) Math.ceil(totalMemMB / oneCharValueMB);
-		
+
 		StringBuilder memoryStatus = new StringBuilder();
 		IntStream.range(0, currMemChars).forEach(step -> memoryStatus.append("#"));
 		IntStream.range(currMemChars, totalMemChars).forEach(step -> memoryStatus.append(" "));
-		System.out.print("\n[" + memoryStatus.toString()+ "]\t" + totalMemMB + "\tMB \r");
-		
+		System.out.print("\n[" + memoryStatus.toString() + "]\t" + totalMemMB + "\tMB \r");
+
 	}
+
 	/**
 	 * Get all unique pairs of PredicateLabels within the collection.
+	 * 
 	 * @param set - Set of PredicateLabel that should be used to create the pairs
 	 * @return Set of unique pairs.
 	 */
@@ -990,10 +1025,66 @@ public final class APEUtils {
 		Set<Pair<PredicateLabel>> pairs = new HashSet<Pair<PredicateLabel>>();
 		set.stream().forEach(ele1 -> {
 			set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
-						.forEach(ele2 -> {
-							pairs.add(new Pair<PredicateLabel>(ele1, ele2));
+					.forEach(ele2 -> {
+						pairs.add(new Pair<PredicateLabel>(ele1, ele2));
+					});
+		});
+		return pairs;
+	}
+
+	/**
+	 * Get unique pairs of elements within 2 collections.
+	 * 
+	 * @param set1 - Set of elements that should be used to create the first
+	 *             elements of the pairs
+	 * @param set2 - Set of elements that should be used to create the second
+	 *             elements of the pairs
+	 * @return Set of unique pairs.
+	 */
+	public static <T> Set<Pair<T>> getUniquePairs(Collection<T> set1, Collection<T> set2) {
+		Set<Pair<T>> pairs = new HashSet<Pair<T>>();
+		set1.stream().forEach(ele1 -> {
+			set2.stream().forEach(ele2 -> {
+				pairs.add(new Pair<T>(ele1, ele2));
 			});
 		});
-        return pairs;
+		return pairs;
 	}
+
+	/**
+	 * Read file content from the given path (local path or a public URL) and return
+	 * the content as a File object.
+	 * 
+	 * @param filePath - Local path or a public URL with the content.
+	 * @return File containing info provided at the path.
+	 * @throws IOException Exception in case of a badly formatted path or file.
+	 */
+	public static File getFileFromPath(String filePath) throws IOException {
+
+		try {
+			new URL(filePath).toURI();
+			return getFileFromURL(filePath);
+		} catch (MalformedURLException | URISyntaxException e1) {
+			return new File(filePath);
+		}
+
+	}
+
+	/**
+	 * Read content from a URL and return it as a file.
+	 * 
+	 * @param fileUrl - URL of the content
+	 * @return File containing info provided at the URL.
+	 * @throws IOException Exception in case of a badly formatted URL or file.
+	 */
+	private static File getFileFromURL(String fileUrl) throws IOException {
+		File loadedFile = new File(fileUrl);
+		FileUtils.copyURLToFile(
+				new URL(fileUrl),
+				loadedFile,
+				1000,
+				1000);
+		return loadedFile;
+	}
+
 }

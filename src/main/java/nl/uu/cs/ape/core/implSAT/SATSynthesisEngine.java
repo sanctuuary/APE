@@ -7,8 +7,6 @@ import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.*;
 
-import com.google.common.io.Files;
-
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
@@ -22,7 +20,6 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccuranceCollection;
-import nl.uu.cs.ape.parser.SLTLxSATVisitor;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -39,7 +36,8 @@ import java.util.List;
  * workflow length that is being explored).
  * <p>
  * It is used to execute synthesis algorithm over the given input, implemented
- * using MiniSAT solver. The class implements general synthesis interface {@link SynthesisEngine}.
+ * using MiniSAT solver. The class implements general synthesis interface
+ * {@link SynthesisEngine}.
  *
  * @author Vedran Kasalica
  */
@@ -75,38 +73,54 @@ public class SATSynthesisEngine implements SynthesisEngine {
     private File satInputFile;
 
     /**
-     * Representation of the tool part of the automaton used to encode the structure of the solution.
+     * Representation of the tool part of the automaton used to encode the structure
+     * of the solution.
      */
     private ModuleAutomaton moduleAutomaton;
 
     /**
-     * Representation of the type part of the automaton used to encode the structure of the solution.
+     * Representation of the type part of the automaton used to encode the structure
+     * of the solution.
      */
     private TypeAutomaton typeAutomaton;
-    
+
     /**
-     * Mapping of all the variables that are utilised in the encoding to the predicates use them.
+     * Mapping of all the variables that are utilised in the encoding to the
+     * predicates use them.
      */
     private SLTLxVariableOccuranceCollection varUsage;
-    
+
+    /**
+     * Static variable used to count the encoding time of the APE instance run,
+     * strictly used to display the APE CLI run stats.
+     */
+    public static double encodingTime = 0;
+
+    /**
+     * Static variable used to count the SAT solving time of the APE instance run,
+     * strictly used to display the APE CLI run stats.
+     */
+    public static double satSolvingTime = 0;
+
     /**
      * Setup of an instance of the SAT synthesis engine.
      *
-     * @param domainSetup  Domain information, including all the existing tools and types.
-     * @param allSolutions Set of {@link SolutionWorkflow}.
-     * @param runConfig    Setup configuration for the synthesis.
-     * @param workflowLength         Workflow length
+     * @param domainSetup    Domain information, including all the existing tools
+     *                       and types.
+     * @param allSolutions   Set of {@link SolutionWorkflow}.
+     * @param runConfig      Setup configuration for the synthesis.
+     * @param workflowLength Workflow length
      * @throws IOException - Error if the temp file cannot be created
      */
     public SATSynthesisEngine(APEDomainSetup domainSetup, SolutionsList allSolutions,
-                               APERunConfig runConfig, int workflowLength) throws IOException {
+            APERunConfig runConfig, int workflowLength) throws IOException {
         this.domainSetup = domainSetup;
         this.allSolutions = allSolutions;
         this.runConfig = runConfig;
         this.mappings = allSolutions.getMappings();
         this.mappings.resetAuxVariables();
         this.varUsage = new SLTLxVariableOccuranceCollection();
-        
+
         this.satInputFile = null;
         this.cnfEncoding = File.createTempFile("satCNF" + workflowLength, null);
 
@@ -117,7 +131,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
     }
 
     /**
-     * Generate the SAT encoding of the workflow synthesis and return it as a string.
+     * Generate the SAT encoding of the workflow synthesis and return it as a
+     * string.
      *
      * @return true if the encoding was performed successfully, false otherwise.
      * @throws IOException Error if taxonomies have not been setup properly.
@@ -136,12 +151,16 @@ public class SATSynthesisEngine implements SynthesisEngine {
 
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
-        /* Create constraints from the tool_annotations.json file regarding the Inputs/Outputs, preserving the structure of input and output fields. */
+        /*
+         * Create constraints from the tool_annotations.json file regarding the
+         * Inputs/Outputs, preserving the structure of input and output fields.
+         */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleAnnotations(this));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
         /*
-         * The constraints preserve the memory structure, i.e. preserve the data available in memory and the
+         * The constraints preserve the memory structure, i.e. preserve the data
+         * available in memory and the
          * logic of referencing data from memory in case of tool inputs.
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.memoryStructure(this));
@@ -153,129 +172,136 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the tools - from taxonomy.
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        for(Pair<PredicateLabel> pair : domainSetup.getAllModules().getSimplePairs()) {
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleMutualExclusion(pair, moduleAutomaton));
+        for (Pair<PredicateLabel> pair : domainSetup.getAllModules().getSimplePairs()) {
+            SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                    EnforceModuleRelatedRules.moduleMutualExclusion(pair, moduleAutomaton));
         }
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
-        
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
-        
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules
+                .moduleTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
         /*
          * Create the constraints enforcing:
          * 1. Mutual exclusion of the types/formats (according to the search model)
-         * 2. Mandatory usage of the types in the transition nodes (note: "empty type" is considered a type)
+         * 2. Mandatory usage of the types in the transition nodes (note: "empty type"
+         * is considered a type)
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        for(Pair<PredicateLabel> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
-            SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.memoryTypesMutualExclusion(pair, typeAutomaton));
-//            SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.usedTypeMutualExclusion(pair, typeAutomaton));
+        for (Pair<PredicateLabel> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
+            SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                    EnforceTypeRelatedRules.memoryTypesMutualExclusion(pair, typeAutomaton));
+            // SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+            // EnforceTypeRelatedRules.usedTypeMutualExclusion(pair, typeAutomaton));
         }
-//        APEUtils.appendSetToFile(cnfEncoding, EnforceTypeRelatedRules.typeMutualExclusion(this, domainSetup.getAllTypes(), typeAutomaton));
+        // APEUtils.appendSetToFile(cnfEncoding,
+        // EnforceTypeRelatedRules.typeMutualExclusion(this, domainSetup.getAllTypes(),
+        // typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
-        
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeMandatoryUsage(domainSetup, typeAutomaton));
-        
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceTypeRelatedRules.typeMandatoryUsage(domainSetup, typeAutomaton));
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceTypeRelatedRules.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
-        
-        
+
         /*
          * Encode data ancestor relation (R) constraints.
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.ancestorRelationsDependency(this));
-        
+
         /*
          * Encode data equivalence/identity relation (IS) constraints.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.identityRelationsDependency(typeAutomaton));
-        
-        
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.identityRelationsDependency(typeAutomaton));
+
         /*
-         * Setup encoding of 'true' and 'false' atoms to ensure proper SLTLx interpretation.
+         * Setup encoding of 'true' and 'false' atoms to ensure proper SLTLx
+         * interpretation.
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.setTrueFalse());
-        
+
         /*
-         *  Workflow I/O are encoded the last in order to
+         * Workflow I/O are encoded the last in order to
          * reuse the mappings for states, instead of introducing new ones, using the I/O
          * types of NodeType.UNKNOWN.
          * 
          * Encode the workflow input.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.workflowInputs(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
+                .workflowInputs(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton));
         /*
          * Encode the workflow output
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules.workdlowOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
+                .workdlowOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
 
         /*
-         * Encode the constraints from the file based on the templates (manual templates)
+         * Encode rule that the given inputs should not be used as workflow outputs
          */
-        if (!domainSetup.getUnformattedConstr().isEmpty() || !domainSetup.getSLTLxConstraints().isEmpty() ) {
-        	APEUtils.appendToFile(cnfEncoding, APEUtils.encodeAPEConstraints(this, domainSetup, mappings, moduleAutomaton, typeAutomaton));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
+                .inputsAreNotOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
+
+        /*
+         * Encode the constraints from the file based on the templates (manual
+         * templates)
+         */
+        if (!domainSetup.getUnformattedConstr().isEmpty() || !domainSetup.getSLTLxConstraints().isEmpty()) {
+            APEUtils.appendToFile(cnfEncoding,
+                    APEUtils.encodeAPEConstraints(this, domainSetup, mappings, moduleAutomaton, typeAutomaton));
             APEUtils.timerRestartAndPrint(currLengthTimer, "SLTLx constraints");
         }
         /*
-         * Setup the constraints ensuring that the auxiliary predicates are properly used and linked to the underlying taxonomy predicates.
+         * Setup the constraints ensuring that the auxiliary predicates are properly
+         * used and linked to the underlying taxonomy predicates.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.preserveAuxiliaryPredicateRules(moduleAutomaton, typeAutomaton, domainSetup.getHelperPredicates()));
-        
-        /*
-         * Additional SLTLx constraints. TODO - provide a proper interface
-         */
-//        SLTLxFormula.appendCNFToFile(cnfEncoding, this, SLTLxSATVisitor.parseFormula(this,
-//        		"!F Exists (?x1) (<'operation_0004'(?x1,?x1;)> true)"));
-//        		"!Exists (?x1) (<'Transform'(;?x1)> true) & (<'Transform'(?x1;)> true)"));
-//        		"G(Forall (?x1) (<'Transform'(?x1;)> true) -> (X G (Forall (?x2) (<'Transform'(?x2;)> true) -> ! R(?x1,?x2))))"));
-//        		"true");
-//        		"  !X(<'ArealInterpolationRate'(;)> true)"));
-//    			" G <'Transform'(;)> true -> !  X F <'Transform'(;)> true"));
-//        		"G ((<'ArealInterpolationRate'(;)> true) -> !  X F <'ArealInterpolationRate'(;)> true)"));
-//			    " Forall (?x) Exists (?y) R(?x,?y)"));
-//    			"X !<'Tool'(;)> true"));
-//        		" (G Exists (?x) <'ZonalStatisticsMeanCount'(?x;)> G Forall (?y) <'ZonalStatisticsMeanCount'(?y;)> ! R(?x,?y))"));
-//    "F (Exists (?x) Exists (?y) <'psxy_l'(?x;?y)> F <'psxy_l'(?y;)> true))"));
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules
+                .preserveAuxiliaryPredicateRules(moduleAutomaton, typeAutomaton, domainSetup.getHelperPredicates()));
 
         /*
-         * Counting the number of variables and clauses that will be given to the SAT solver
-         * TODO Improve this approach, no need to read the whole String again to count lines.
+         * Counting the number of variables and clauses that will be given to the SAT
+         * solver
+         * TODO Improve this approach, no need to read the whole String again to count
+         * lines.
          */
         int variables = mappings.getSize();
         int clauses = APEUtils.countLines(cnfEncoding);
         String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
-        
-        satInputFile = APEUtils.concatIntoFile(sat_input_header, cnfEncoding);
+        satInputFile = APEUtils.prependToFile(sat_input_header, cnfEncoding);
         cnfEncoding.delete();
-        
+
         /* add the cnf encoding file to Desktop */
-//        Files.copy(satInputFile, new File("/home/vedran/Desktop/tmp"+ problemSetupStartTime));
-        
+        // Files.copy(satInputFile, new File("~/Desktop/tmp"+ problemSetupStartTime));
+
         /* add human readable version of the cnf encoding file to Desktop */
-//        FileInputStream cnfStream = new FileInputStream(satInputFile);
-//		String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
-//		cnfStream.close();
-//		APEUtils.write2file(encoding, new File("/home/vedran/Desktop/tmp.txt"), false);
+        // FileInputStream cnfStream = new FileInputStream(satInputFile);
+        // String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
+        // cnfStream.close();
+        // APEUtils.write2file(encoding, new File("~/Desktop/tmp.txt"), false);
 
-		
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
-        System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec.");
-
+        System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec (" + clauses
+                + " clauses).");
+        encodingTime += problemSetupTimeElapsedMillis;
         return true;
     }
 
-
     /**
-     * Using the SAT input generated from SAT encoding and running MiniSAT solver to find the solutions.
+     * Using the SAT input generated from SAT encoding and running MiniSAT solver to
+     * find the solutions.
      *
      * @return The list of new solutions.
-     * @throws IOException  Error if the sat encoding file does not exist.
+     * @throws IOException Error if the sat encoding file does not exist.
      */
     public List<SolutionWorkflow> synthesisExecution() throws IOException {
 
-    	InputStream tmpSatInput = new FileInputStream(satInputFile);
+        InputStream tmpSatInput = new FileInputStream(satInputFile);
         List<SolutionWorkflow> currSolutions = runMiniSAT(tmpSatInput,
                 allSolutions.getNumberOfSolutions(), allSolutions.getMaxNumberOfSolutions());
         tmpSatInput.close();
@@ -303,11 +329,11 @@ public class SATSynthesisEngine implements SynthesisEngine {
         List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
         ISolver solver = SolverFactory.newDefault();
         long globalTimeoutMs = runConfig.getTimeoutMs();
-		long currTimeout = APEUtils.timerTimeLeft("globalTimer", globalTimeoutMs);
-		if (currTimeout <= 0) {
-			System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
-			return solutions;
-		}
+        long currTimeout = APEUtils.timerTimeLeft("globalTimer", globalTimeoutMs);
+        if (currTimeout <= 0) {
+            System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
+            return solutions;
+        }
         // set timeout (in ms)
         solver.setTimeoutMs(currTimeout);
         long realStartTime = 0;
@@ -330,32 +356,36 @@ public class SATSynthesisEngine implements SynthesisEngine {
                  * Adding the negation of the positive part of the solution as a constraint
                  * (default negation does not work)
                  */
-                IVecInt negSol = new VecInt(((SATSolution)sat_solution.getNativeSolution()).getNegatedMappedSolutionArray(runConfig.getAllowToolSeqRepeat()));
+                IVecInt negSol = new VecInt(((SATSolution) sat_solution.getNativeSolution())
+                        .getNegatedMappedSolutionArray(runConfig.getAllowToolSeqRepeat()));
                 solver.addClause(negSol);
             }
             sat_input.close();
         } catch (ParseFormatException e) {
             System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
             System.err.println(e.getMessage());
+            return solutions;
         } catch (ContradictionException e) {
             if (solutionsFound == 0) {
                 System.err.println("Unsatisfiable");
+                return solutions;
             }
         } catch (TimeoutException e) {
             System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
         } catch (IOException e) {
             System.err.println("Internal error while parsing the encoding.");
+            return solutions;
         }
 
         if (solutionsFound == 0 || solutionsFound % 500 != 0) {
             realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
             System.out.println("Found " + solutionsFound + " solutions. Solving time: "
                     + (realTimeElapsedMillis / 1000F) + " sec.");
+            satSolvingTime += realTimeElapsedMillis;
         }
 
         return solutions;
     }
-
 
     /**
      * Gets run configuration.
@@ -414,7 +444,8 @@ public class SATSynthesisEngine implements SynthesisEngine {
     /**
      * Gets empty type.
      *
-     * @return The {@link Type} object that represents the empty type, i.e. absence of types.
+     * @return The {@link Type} object that represents the empty type, i.e. absence
+     *         of types.
      */
     public Type getEmptyType() {
         return domainSetup.getAllTypes().getEmptyType();
@@ -428,22 +459,24 @@ public class SATSynthesisEngine implements SynthesisEngine {
     public int getSolutionSize() {
         return moduleAutomaton.size();
     }
-    
+
     /**
-     * Get mapping of all the variables that are utilised in the encoding to the predicates use them.
+     * Get mapping of all the variables that are utilised in the encoding to the
+     * predicates use them.
+     * 
      * @return Variable usage class {@link SLTLxVariableOccuranceCollection}.
      */
     public SLTLxVariableOccuranceCollection getVariableUsage() {
-    	return varUsage;
+        return varUsage;
     }
 
     /**
      * Delete all temporary files created.
      */
-	public void deleteTempFiles() {
-		cnfEncoding.delete();
-		satInputFile.delete();
-		
-	}
+    public void deleteTempFiles() {
+        cnfEncoding.delete();
+        satInputFile.delete();
+
+    }
 
 }

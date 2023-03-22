@@ -10,14 +10,16 @@ import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 
 /**
- * The {@code SLTLxAtomVar} class represents {@link SLTLxAtom}s in SLTLx that contain variables instead of states.
+ * The {@code SLTLxAtomVar} class represents {@link SLTLxAtom}s in SLTLx that
+ * contain variables instead of states.
  *
  * @author Vedran Kasalica
  */
 public class SLTLxAtomVar extends SLTLxFormula {
 
     /**
-     * First argument is usually predicate that is referred (tool or type), or a variable representing a type state.
+     * First argument is usually predicate that is referred (tool or type), or a
+     * variable representing a type state.
      */
     private PredicateLabel firstArg;
 
@@ -27,33 +29,35 @@ public class SLTLxAtomVar extends SLTLxFormula {
     private SLTLxVariable secondArg;
 
     /**
-     * Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.)
+     * Defines the type of the element in the workflow that the atom describes
+     * (tool, memory type, etc.)
      */
     private AtomVarType elementType;
-    
-    
+
     /**
      * Clause that represents the SLTLxAtom.
      */
     private CNFClause clause = null;
-    
 
     /**
-     * Creates an atom that can represent usage of the tool, creation or usage of a type,
-     * or a reference between an input type and the state in which it was generated..
+     * Creates an atom that can represent usage of the tool, creation or usage of a
+     * type,
+     * or a reference between an input type and the state in which it was
+     * generated..
      *
      * @param elementType - Element that defines what the atom depicts.
-     * @param firstArg  - Predicate used or a variable that is the referenced.
-     * @param secondArg - Variable representing state in the automaton it was used/created in.
+     * @param firstArg    - Predicate used or a variable that is the referenced.
+     * @param secondArg   - Variable representing state in the automaton it was
+     *                    used/created in.
      */
     public SLTLxAtomVar(AtomVarType elementType, PredicateLabel firstArg, SLTLxVariable secondArg) {
-    	super();
+        super();
         this.firstArg = firstArg;
         this.secondArg = secondArg;
         this.elementType = elementType;
     }
 
-	/**
+    /**
      * Gets firstArg.
      *
      * @return Field {@link #firstArg}.
@@ -62,7 +66,9 @@ public class SLTLxAtomVar extends SLTLxFormula {
         return firstArg;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -75,7 +81,9 @@ public class SLTLxAtomVar extends SLTLxFormula {
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -121,85 +129,96 @@ public class SLTLxAtomVar extends SLTLxFormula {
     }
 
     /**
-     * Returns the string representation of the {@link SLTLxAtom} used for the textual solution representation. In case of the atom depicting
-     * a usage of a type in the workflow, the structure of the representation contains an additional attribute, state in which the type was initially added to the memory.
+     * Returns the string representation of the {@link SLTLxAtom} used for the
+     * textual solution representation. In case of the atom depicting
+     * a usage of a type in the workflow, the structure of the representation
+     * contains an additional attribute, state in which the type was initially added
+     * to the memory.
      *
      * @return String representing the workflow element in a textual form.
      */
     public String toString() {
-    	if(this.elementType.isVarDataType()) {
-    		return firstArg.getPredicateID() + "(" + secondArg.getPredicateID() + ")";
-    	
-    	} else if(this.elementType.isVarMemReference()) {
-    		return "[" + firstArg.getPredicateID() + "->" + secondArg.getPredicateID() + "]";
-    	
-    	} else if(this.elementType.isBinaryRel()) {
+        if (this.elementType.isVarDataType()) {
+            return firstArg.getPredicateID() + "(" + secondArg.getPredicateID() + ")";
+
+        } else if (this.elementType.isVarMemReference()) {
+            return "[" + firstArg.getPredicateID() + "->" + secondArg.getPredicateID() + "]";
+
+        } else if (this.elementType.isBinaryRel()) {
             return elementType.toString() + "(" + firstArg.getPredicateID() + "," + secondArg.getPredicateID() + ")";
         } else {
-        	return null;
+            return null;
         }
     }
 
     /**
-     * Return true if the current workflow element is of the given {@link AtomType} type.
+     * Return true if the current workflow element is of the given {@link AtomType}
+     * type.
      *
-     * @param workflowElemType Element type that is current SLTLxAtom is compared to.
-     * @return true if the current workflow element corresponds to the given {@link AtomType}, false otherwise.
+     * @param workflowElemType Element type that is current SLTLxAtom is compared
+     *                         to.
+     * @return true if the current workflow element corresponds to the given
+     *         {@link AtomType}, false otherwise.
      */
     public boolean isWorkflowElementType(AtomVarType workflowElemType) {
         return getWorkflowElementType() == workflowElemType;
     }
 
     @Override
-	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-    	if(this.clause == null) {
-			this.substituteVariables(variableMapping, synthesisEngine);
-			
-			int encoding = synthesisEngine.getMappings().add(this);
-			this.clause = new CNFClause(encoding);
-		}
-		return this.clause.toCNF();
-	}
+    public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+            SATSynthesisEngine synthesisEngine) {
+        if (this.clause == null) {
+            this.substituteVariables(variableMapping, synthesisEngine);
 
-	@Override
-	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		if(this.clause == null) {
-			this.substituteVariables(variableMapping, synthesisEngine);
-			
-			int encoding = synthesisEngine.getMappings().add(this);
-			this.clause = new CNFClause(encoding);
-		}
-		return this.clause.toNegatedCNF();
-	}
-	
-	
-	/**
-	 * Method is used to substitute the variable occurrences to the unique ones. 
-	 * It is used to ensure that nesting of quantifications over the same variable works as intended 
-	 * (e.g. "Exists (?x) Q(?x) Forall (?x) P(?x)")
-	 * @param variableMapping
-	 * @param synthesisEngine
-	 */
-	private void substituteVariables(SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		if (this.elementType.isVarDataType()) {
-			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
-			synthesisEngine.getVariableUsage().addDataType(firstArg, secondArg);
-		
-		} else if (this.elementType.isVarMemReference()) {
-			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
-			synthesisEngine.getVariableUsage().addMemoryReference((State) firstArg, secondArg);
-		} 
-		
-		else if (this.elementType.isBinaryRel() & !(this.elementType.equals(AtomVarType.VAR_VALUE))) {
-			this.firstArg = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
-			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
-			synthesisEngine.getVariableUsage().addBinaryPred(new Pair<SLTLxVariable>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
-		} 
-		
-		else if (this.elementType.equals(AtomVarType.VAR_VALUE)) {
-			this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
-			/* These predicates are not added to the set.*/
-		}
-	}
+            int encoding = synthesisEngine.getMappings().add(this);
+            this.clause = new CNFClause(encoding);
+        }
+        return this.clause.toCNF();
+    }
+
+    @Override
+    public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+            SATSynthesisEngine synthesisEngine) {
+        if (this.clause == null) {
+            this.substituteVariables(variableMapping, synthesisEngine);
+
+            int encoding = synthesisEngine.getMappings().add(this);
+            this.clause = new CNFClause(encoding);
+        }
+        return this.clause.toNegatedCNF();
+    }
+
+    /**
+     * Method is used to substitute the variable occurrences to the unique ones.
+     * It is used to ensure that nesting of quantifications over the same variable
+     * works as intended
+     * (e.g. "Exists (?x) Q(?x) Forall (?x) P(?x)")
+     * 
+     * @param variableMapping
+     * @param synthesisEngine
+     */
+    private void substituteVariables(SLTLxVariableSubstitutionCollection variableMapping,
+            SATSynthesisEngine synthesisEngine) {
+        if (this.elementType.isVarDataType()) {
+            this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+            synthesisEngine.getVariableUsage().addDataType(firstArg, secondArg);
+
+        } else if (this.elementType.isVarMemReference()) {
+            this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+            synthesisEngine.getVariableUsage().addMemoryReference((State) firstArg, secondArg);
+        }
+
+        else if (this.elementType.isBinaryRel() & !(this.elementType.equals(AtomVarType.VAR_VALUE))) {
+            this.firstArg = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
+            this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+            synthesisEngine.getVariableUsage().addBinaryPred(
+                    new Pair<SLTLxVariable>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
+        }
+
+        else if (this.elementType.equals(AtomVarType.VAR_VALUE)) {
+            this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+            /* These predicates are not added to the set. */
+        }
+    }
 
 }

@@ -35,7 +35,8 @@ public class SATSolution extends SolutionInterpreter {
     private final List<SLTLxLiteral> positiveLiterals;
 
     /**
-     * List of only relevant (positive) literals that represent implemented modules/tools.
+     * List of only relevant (positive) literals that represent implemented
+     * modules/tools.
      */
     private final List<SLTLxLiteral> relevantModules;
 
@@ -50,7 +51,8 @@ public class SATSolution extends SolutionInterpreter {
     private final List<SLTLxLiteral> relevantElements;
 
     /**
-     * List of all the references for the types in the memory, when used as tool inputs.
+     * List of all the references for the types in the memory, when used as tool
+     * inputs.
      */
     private final List<SLTLxLiteral> references2MemTypes;
     private final Set<PredicateLabel> usedTypeStates;
@@ -63,7 +65,8 @@ public class SATSolution extends SolutionInterpreter {
     /**
      * Creating a list of Literals to represent the solution.
      *
-     * @param satSolution       list of mapped literals given as a list of integers (library SAT output)
+     * @param satSolution       list of mapped literals given as a list of integers
+     *                          (library SAT output)
      * @param synthesisInstance Mapping of the atoms.
      */
     public SATSolution(int[] satSolution, SATSynthesisEngine synthesisInstance) {
@@ -77,7 +80,8 @@ public class SATSolution extends SolutionInterpreter {
         usedTypeStates = new HashSet<PredicateLabel>();
         for (int mappedLiteral : satSolution) {
             if (mappedLiteral >= synthesisInstance.getMappings().getInitialNumOfMappedAtoms()) {
-                SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
+                SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral),
+                        synthesisInstance.getMappings());
                 literals.add(currLiteral);
                 if (!currLiteral.isNegated()) {
                     positiveLiterals.add(currLiteral);
@@ -107,7 +111,8 @@ public class SATSolution extends SolutionInterpreter {
                     }
                 }
             } else if (mappedLiteral >= 100000) {
-                SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
+                SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral),
+                        synthesisInstance.getMappings());
                 literals.add(currLiteral);
             }
         }
@@ -118,7 +123,8 @@ public class SATSolution extends SolutionInterpreter {
     }
 
     /**
-     * Creating an empty solution, for UNSAT problem. The list <b>literals</b> is null.
+     * Creating an empty solution, for UNSAT problem. The list <b>literals</b> is
+     * null.
      */
     public SATSolution() {
         unsat = true;
@@ -149,7 +155,8 @@ public class SATSolution extends SolutionInterpreter {
     }
 
     /**
-     * Returns the complete solution in human readable format, including the negative predicates.
+     * Returns the complete solution in human readable format, including the
+     * negative predicates.
      *
      * @return String representing the solution positive and negative literals).
      */
@@ -166,7 +173,8 @@ public class SATSolution extends SolutionInterpreter {
     }
 
     /**
-     * Returns only the most important part of the solution in human readable format,
+     * Returns only the most important part of the solution in human readable
+     * format,
      * filtering out the information that are not required to generate the workflow.
      * The solution literals are sorted according the state they are used in.
      *
@@ -185,7 +193,8 @@ public class SATSolution extends SolutionInterpreter {
     }
 
     /**
-     * Returns only the most important part of the solution in human readable format,
+     * Returns only the most important part of the solution in human readable
+     * format,
      * filtering out the information that are not required to generate the workflow.
      * The solution literals are sorted according the state they are used in.
      *
@@ -208,7 +217,7 @@ public class SATSolution extends SolutionInterpreter {
      *
      * @param allModules List of all the modules in the domain.
      * @return List of {@link Module}s in the order they appear in the solution
-     * workflow.
+     *         workflow.
      */
     public List<Module> getRelevantSolutionModules(AllModules allModules) {
         List<Module> solutionModules = new ArrayList<Module>();
@@ -223,7 +232,8 @@ public class SATSolution extends SolutionInterpreter {
     }
 
     /**
-     * Returns the solution in mapped format. The original solution created by the SAT solver.
+     * Returns the solution in mapped format. The original solution created by the
+     * SAT solver.
      *
      * @return String representing the mapped solution created by SAT solver.
      */
@@ -237,33 +247,34 @@ public class SATSolution extends SolutionInterpreter {
         return solution.toString();
     }
 
-	/**
-	 * Returns the negated solution in mapped format. Negating the original solution
-	 * created by the SAT solver. Usually used to add to the solver to find new
-	 * solutions.
-	 *
-     * @param toolSeqRepeat variable defining if the provided solutions should be distinguished based on the tool sequences alone
-	 * @return int[] representing the negated solution
-	 */
-	public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
-		List<Integer> negSol = new ArrayList<Integer>();
-		if (!unsat) {
-			if(!toolSeqRepeat) {
-				for (SLTLxLiteral literal : relevantModules) {
-					negSol.add(literal.toNegatedMappedInt());
-				}
-			} else {
-			for (SLTLxLiteral literal : relevantElements) {
-				if (literal.getWorkflowElementType() != AtomType.MEMORY_TYPE) {
-					negSol.add(literal.toNegatedMappedInt());
-				}
-			}
-			}
-		}
-		int[] negSolList = new int[negSol.size()];
-		for (int i = 0; i < negSol.size(); i++) {
-			negSolList[i] = negSol.get(i);
-		}
+    /**
+     * Returns the negated solution in mapped format. Negating the original solution
+     * created by the SAT solver. Usually used to add to the solver to find new
+     * solutions.
+     *
+     * @param toolSeqRepeat variable defining if the provided solutions should be
+     *                      distinguished based on the tool sequences alone
+     * @return int[] representing the negated solution
+     */
+    public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
+        List<Integer> negSol = new ArrayList<Integer>();
+        if (!unsat) {
+            if (!toolSeqRepeat) {
+                for (SLTLxLiteral literal : relevantModules) {
+                    negSol.add(literal.toNegatedMappedInt());
+                }
+            } else {
+                for (SLTLxLiteral literal : relevantElements) {
+                    if (literal.getWorkflowElementType() != AtomType.MEMORY_TYPE) {
+                        negSol.add(literal.toNegatedMappedInt());
+                    }
+                }
+            }
+        }
+        int[] negSolList = new int[negSol.size()];
+        for (int i = 0; i < negSol.size(); i++) {
+            negSolList[i] = negSol.get(i);
+        }
 
         return negSolList;
     }

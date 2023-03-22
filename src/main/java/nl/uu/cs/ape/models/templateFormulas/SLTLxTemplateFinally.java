@@ -10,7 +10,8 @@ import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
- * Template for the formulas including the modal Finally operator in its simplest format "G A(x)" or "G &lt;T(;)&gt; true".
+ * Template for the formulas including the modal Finally operator in its
+ * simplest format "G A(x)" or "G &lt;T(;)&gt; true".
  * 
  * @author Vedran Kasalica
  *
@@ -37,17 +38,21 @@ public class SLTLxTemplateFinally extends SLTLxTemplateFormula {
     }
 
     /**
-     * Generate String representation of the CNF formula for defined @moduleAutomaton and @typeAutomaton.
-     * However, the function only considers the memory states of type automaton (not the tool input/"used" states).
+     * Generate String representation of the CNF formula for
+     * defined @moduleAutomaton and @typeAutomaton.
+     * However, the function only considers the memory states of type automaton (not
+     * the tool input/"used" states).
      *
      * @param moduleAutomaton Automaton of all the module states.
      * @param typeStateBlocks Automaton of all the type states.
-     * @param workflowElement type of the workflow element ({@link AtomType#MODULE}, {@link AtomType#MEM_TYPE_REFERENCE} etc.)
+     * @param workflowElement type of the workflow element ({@link AtomType#MODULE},
+     *                        {@link AtomType#MEM_TYPE_REFERENCE} etc.)
      * @param mappings        Set of the mappings for the literals.
      * @return The CNF representation of the SLTL formula.
      */
     @Override
-    public String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, AtomType workflowElement, SATAtomMappings mappings) {
+    public String getCNF(ModuleAutomaton moduleAutomaton, List<Block> typeStateBlocks, AtomType workflowElement,
+            SATAtomMappings mappings) {
 
         String constraints = "";
 
@@ -59,8 +64,10 @@ public class SLTLxTemplateFinally extends SLTLxTemplateFormula {
             negSign = "-";
         }
 
-        /* Distinguishing whether the atom under the modal operator is type or module. */
-//		if (super.getSubFormula() instanceof Type) {
+        /*
+         * Distinguishing whether the atom under the modal operator is type or module.
+         */
+        // if (super.getSubFormula() instanceof Type) {
         if (super.getSubFormula().getType().matches("type")) {
             for (Block typeBlock : typeStateBlocks) {
                 for (State typeState : typeBlock.getStates()) {

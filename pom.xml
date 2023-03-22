@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.sanctuuary</groupId>
 	<artifactId>APE</artifactId>
-	<version>2.0.1</version>
+	<version>2.1.0</version>
 	<packaging>jar</packaging>
 	<name>io.github.sanctuuary:APE</name>
 	<description>APE is a command line tool and an API for the automated exploration of possible computational pipelines (workflows) from large collections of computational tools.</description>
@@ -141,7 +141,7 @@
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-distribution</artifactId>
-			<version>5.1.20</version>
+			<version>5.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -151,7 +151,7 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.17.2</version>
+			<version>2.20.0</version>
 		</dependency>
 		<dependency>
 			<groupId>guru.nidi</groupId>
@@ -162,7 +162,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20220320</version>
+			<version>20230227</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
 		<dependency>
@@ -174,18 +174,24 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.36</version>
+			<version>2.0.7</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.antlr/antlr4-runtime -->
 		<dependency>
 		    <groupId>org.antlr</groupId>
 		    <artifactId>antlr4-runtime</artifactId>
-		    <version>4.10.1</version>
+		    <version>4.12.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
-			<version>1.30</version>
+			<version>2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.11.0</version>
+		</dependency>
+
 	</dependencies>
 </project>

@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/wiki/sanctuuary/APE/logo.png" alt="logo" width=20% align="left" />
+<img src="https://user-images.githubusercontent.com/11068408/198268857-83b02297-0b03-4dc3-852b-52d889faaf3a.svg" alt="logo" width=20% align="left" />
 
 # APE (Automated Pipeline Explorer)
 
@@ -38,6 +38,7 @@ Building APE from source is not required to run it, as the latest stable version
 | 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
 | 02-05-2021 | 1.1.7   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-sources.jar)|
 | 20-12-2021 | 1.1.12   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-sources.jar)|
+| 17-05-2021 | 2.0.0   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-sources.jar)|
 
 ### Add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
@@ -46,27 +47,27 @@ To add a dependency on APE using Maven, use the following:
 <dependency>
     <groupId>io.github.sanctuuary</groupId>
     <artifactId>APE</artifactId>
-    <version>1.1.12</version>
+    <version>2.0.0</version>
 </dependency>
 ```
-For information regarding Gradle, Ivy, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
+For information regarding **Gradle**, **Ivy**, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
 ### Build APE from source (using Maven)
 From the project root, simply launch
 ```shell
 $ mvn -DskipTests=true install
 ```
-to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-<version>-executable.jar`
+to build the APE modules from the source tree and the built files will be generated under the `/target` directory. All the dependencies will be gathered by Maven and the following stand-alone module will be generated: `APE-[latest]-executable.jar`
 
 ## Using APE
 Automated workflow composition with APE can be performed through its command line interface (CLI) or its application programming interface (API). While the CLI provides a simple means to interact and experiment with the system, the API provides more flexibility and control over the synthesis process. It can be used to integrate APE’s functionality into other systems.
 
 ### How to run APE from the command line
-[APE-1.1.12-executable.jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-executable.jar) is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
+**APE-[latest]-executable.jar** is available in [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
-When running APE-&lt;version>-executable.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly:
+When running APE-[latest]-executable.jar from the command line, it requires a JSON configuration file given as a parameter and executes the automated workflow composition process accordingly:
 ```shell
-java -jar APE-<version>-executable.jar [path-to-ape-configuration]
+java -jar APE-[latest]-executable.jar [path-to-ape-configuration]
 ```
 
 The configuration file (see [APE cofiguration example](https://github.com/sanctuuary/APE_UseCases/blob/master/ImageMagick/Example1/config.json) and [APE configuration documentation](https://github.com/sanctuuary/APE_UseCases#configuration-file)) provides references to all therefor required information:
@@ -83,10 +84,10 @@ or
 ```shell
 git clone https://github.com/sanctuuary/APE_UseCases.git
 ```
-Download the latest version of [`APE-<version>-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.9/APE-1.1.9-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
+Download the latest version of [`APE-[latest]-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
 ```shell
 cd ~/git/APE_UseCases
-java -jar APE-1.1.12-executable.jar ImageMagick/Example1/config.json
+java -jar APE-[latest]-executable.jar ImageMagick/Example1/config.json
 ```
 See [ImageMagick: Example 1](https://github.com/sanctuuary/APE_UseCases/tree/master/ImageMagick/Example1) for more information about the results and on how to execute the composed workflow.
 
@@ -150,16 +151,18 @@ Our use cases are motivated by practical problems in various domains (e.g. bioin
 
 
 ## The APE team
-* Vedran Kasalica (v.kasalica[at]uu.nl), lead developer
+* Vedran Kasalica (v.kasalica[at]esciencecenter.nl), lead developer
 * Maurin Voshol, student developer
 * Koen Haverkort, student developer
-* Anna-Lena Lamprecht (a.l.lamprecht[at]uu.nl), project initiator and principal investigator
+* Anna-Lena Lamprecht (anna-lena.lamprecht[at]uni-potsdam.de), project initiator and principal investigator
 
 ## Contact
 For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica[at]uu.nl).
 
 ## Contributions
-We welcome contributions (bug reports, bug fixes, feature requests, extensions, use cases, ...) to APE. Please get in touch with Vedran Kasalica (v.kasalica@uu.nl) to coordinate your contribution. We expect all contributors to follow our [Code of Conduct](https://github.com/sanctuuary/APE/blob/master/CODE_OF_CONDUCT.md).
+We welcome all contributions (bug reports, bug fixes, feature requests, extensions, use cases, etc.) to APE. Please get in touch with Vedran Kasalica (v.kasalica@uu.nl) to coordinate your contribution. We expect all contributors to follow our [Code of Conduct](https://github.com/sanctuuary/APE/blob/master/CODE_OF_CONDUCT.md).
+
+In case you have a specific requiest, want to report a bug or a suggest a new constraint template please make an issue [here](https://github.com/sanctuuary/APE/issues/new).
 
 ## Credits
 APE has been inspired by the [Loose Programming framework PROPHETS](http://ls5-www.cs.tu-dortmund.de/projects/prophets/index.php). It uses similar mechanisms for semantic domain modeling, workflow specification and synthesis, but strives to provide the automated exploration and composition functionality independent from a concrete workflow system.

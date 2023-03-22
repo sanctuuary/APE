@@ -28,40 +28,44 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
  */
 public class EnforceSLTLxRelatedRules {
 
-	
-	
-	/**
-     * Define the base cases for the SLTLx relations. 
+    /**
+     * Define the base cases for the SLTLx relations.
      * Ensure the truth value of:
      * <ul>
-     * 		<li>{@code true} - SLTLx term</li>
-     * 		<li>{@code false} - SLTLx term</li>
-	 * </ul> 
+     * <li>{@code true} - SLTLx term</li>
+     * <li>{@code false} - SLTLx term</li>
+     * </ul>
      * 
      * @return A set of formulas that ensure the encoding.
      */
-	public static Collection<SLTLxFormula> setTrueFalse() {
-		 Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
-		 
-		 /* Encode {@code true} and {@code false} SLTLx terms. */
-		 cnfEncoding.add(SLTLxAtom.getTrue());
-		 cnfEncoding.add(new SLTLxNegation(SLTLxAtom.getFalse()));
-		 
-		return cnfEncoding;
-	}
-	
-	
-	/**
-     * Encoding all the required constraints for the given program length, in order to ensure that helper predicates are used properly.
+    public static Collection<SLTLxFormula> setTrueFalse() {
+        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+
+        /* Encode {@code true} and {@code false} SLTLx terms. */
+        cnfEncoding.add(SLTLxAtom.getTrue());
+        cnfEncoding.add(new SLTLxNegation(SLTLxAtom.getFalse()));
+
+        return cnfEncoding;
+    }
+
+    /**
+     * Encoding all the required constraints for the given program length, in order
+     * to ensure that helper predicates are used properly.
      *
-     * @param moduleAutomaton Graph representing all the tool states in the current workflow (one synthesis run might iterate though workflows of different lengths).
-     * @param typeAutomaton   Graph representing all the type states in the current workflow (one synthesis run might iterate though workflows of different lengths).
-     * @param helperPredicates List of helper predicates that should be encoded 
-     * @return CNF encoding of that ensures the correctness of the helper predicates.
+     * @param moduleAutomaton  Graph representing all the tool states in the current
+     *                         workflow (one synthesis run might iterate though
+     *                         workflows of different lengths).
+     * @param typeAutomaton    Graph representing all the type states in the current
+     *                         workflow (one synthesis run might iterate though
+     *                         workflows of different lengths).
+     * @param helperPredicates List of helper predicates that should be encoded
+     * @return CNF encoding of that ensures the correctness of the helper
+     *         predicates.
      */
-    public static Set<SLTLxFormula> preserveAuxiliaryPredicateRules(ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, List<AuxiliaryPredicate> helperPredicates) {
-    	Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
-    	
+    public static Set<SLTLxFormula> preserveAuxiliaryPredicateRules(ModuleAutomaton moduleAutomaton,
+            TypeAutomaton typeAutomaton, List<AuxiliaryPredicate> helperPredicates) {
+        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+
         Automaton automaton = null;
         AtomType workflowElem = null;
         for (AuxiliaryPredicate helperPredicate : helperPredicates) {
@@ -78,36 +82,36 @@ public class EnforceSLTLxRelatedRules {
                      * Ensures that if the abstract predicate is used, at least one of the
                      * disjointLabels has to be used.
                      */
-                	Set<SLTLxFormula> allORPossibilities = new HashSet<SLTLxFormula>();
+                    Set<SLTLxFormula> allORPossibilities = new HashSet<SLTLxFormula>();
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	allORPossibilities.add(
-								new SLTLxAtom(
-									workflowElem, 
-									subLabel, 
-									currState));
+                        allORPossibilities.add(
+                                new SLTLxAtom(
+                                        workflowElem,
+                                        subLabel,
+                                        currState));
                     }
                     cnfEncoding.add(new SLTLxImplication(
-							new SLTLxAtom(
-								workflowElem, 
-								helperPredicate, 
-								currState),
-                    		new SLTLxDisjunction(allORPossibilities)));
+                            new SLTLxAtom(
+                                    workflowElem,
+                                    helperPredicate,
+                                    currState),
+                            new SLTLxDisjunction(allORPossibilities)));
 
                     /*
                      * Ensures that if at least one of the disjointLabels was used, the abstract
                      * predicate has to be used as well.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	cnfEncoding.add(
-                    			new SLTLxImplication(
-    								new SLTLxAtom(
-    									workflowElem, 
-    									subLabel, 
-    									currState),
-    								new SLTLxAtom(
-    									workflowElem, 
-    									helperPredicate, 
-    									currState)));
+                        cnfEncoding.add(
+                                new SLTLxImplication(
+                                        new SLTLxAtom(
+                                                workflowElem,
+                                                subLabel,
+                                                currState),
+                                        new SLTLxAtom(
+                                                workflowElem,
+                                                helperPredicate,
+                                                currState)));
                     }
                 } else if (helperPredicate.getLogicOp() == LogicOperation.AND) {
 
@@ -116,16 +120,16 @@ public class EnforceSLTLxRelatedRules {
                      * have to be used.
                      */
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	cnfEncoding.add(
-                    			new SLTLxImplication(
-    								new SLTLxAtom(
-    									workflowElem, 
-    									helperPredicate, 
-    									currState),
-    								new SLTLxAtom(
-    									workflowElem, 
-    									subLabel, 
-    									currState)));
+                        cnfEncoding.add(
+                                new SLTLxImplication(
+                                        new SLTLxAtom(
+                                                workflowElem,
+                                                helperPredicate,
+                                                currState),
+                                        new SLTLxAtom(
+                                                workflowElem,
+                                                subLabel,
+                                                currState)));
                     }
 
                     /*
@@ -133,22 +137,21 @@ public class EnforceSLTLxRelatedRules {
                      * has to be used as well.
                      */
                     Set<SLTLxFormula> allANDPossibilities = new HashSet<SLTLxFormula>();
-                	
+
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
-                    	allANDPossibilities.add(
-                    			new SLTLxNegation(
-    								new SLTLxAtom(
-    									workflowElem, 
-    									subLabel, 
-    									currState)));
+                        allANDPossibilities.add(
+                                new SLTLxNegation(
+                                        new SLTLxAtom(
+                                                workflowElem,
+                                                subLabel,
+                                                currState)));
                     }
                     allANDPossibilities.add(
-							new SLTLxAtom(
-								workflowElem, 
-								helperPredicate, 
-								currState));
-                    
-                    
+                            new SLTLxAtom(
+                                    workflowElem,
+                                    helperPredicate,
+                                    currState));
+
                     cnfEncoding.add(new SLTLxDisjunction(allANDPossibilities));
                 }
             }

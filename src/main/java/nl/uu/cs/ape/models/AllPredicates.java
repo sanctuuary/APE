@@ -6,17 +6,17 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
- * The {@code AllPredicates} class is used to group all mappedPredicates of the same type (such as module, data) into one collection.
+ * The {@code AllPredicates} class is used to group all mappedPredicates of the
+ * same type (such as module, data) into one collection.
  *
  * @author Vedran Kasalica
  */
 public abstract class AllPredicates {
 
-	/** 
-	 * Map of all predicated mapped to their predicateID. 
-	 */
+    /**
+     * Map of all predicated mapped to their predicateID.
+     */
     private Map<String, TaxonomyPredicate> mappedPredicates;
-
 
     /**
      * Root of the taxonomy.
@@ -46,16 +46,16 @@ public abstract class AllPredicates {
         return rootpredicates;
     }
 
-
     /**
-     * Returns the ID of the root predicate of the taxonomy including the "APE label" dimension (in case of type taxonomy).
+     * Returns the ID of the root predicate of the taxonomy including the "APE
+     * label" dimension (in case of type taxonomy).
      *
      * @return The root predicate.
      */
     public List<String> getAllRootIDs() {
         return dimensionRoots;
     }
-    
+
     /**
      * Add predicate taxonomy predicate.
      *
@@ -71,7 +71,6 @@ public abstract class AllPredicates {
      * @return The runtime class of the mappedPredicates that belong to the Object.
      */
     public abstract Class<?> getPredicateClass();
-
 
     /**
      * Remove the parts of the taxonomy that are not in use for the given set of
@@ -127,7 +126,7 @@ public abstract class AllPredicates {
     /**
      * Gets mappedPredicates mapped to their IDs.
      *
-     * @return  The mapping to mappedPredicates from their IDs.
+     * @return The mapping to mappedPredicates from their IDs.
      */
     protected Map<String, TaxonomyPredicate> getMappedPredicates() {
         return this.mappedPredicates;
@@ -138,7 +137,8 @@ public abstract class AllPredicates {
      * map contains no mapping for the key.
      *
      * @param predicateID The key whose associated Predicate is to be returned.
-     * @return The predicate to which the specified key is mapped, or null if this map contains no mapping for the key.
+     * @return The predicate to which the specified key is mapped, or null if this
+     *         map contains no mapping for the key.
      */
     public TaxonomyPredicate get(String predicateID) {
         return this.mappedPredicates.get(predicateID);
@@ -165,32 +165,35 @@ public abstract class AllPredicates {
 
         return elements;
     }
-    
+
     /**
      * Check whether the string occurs as one of the roots in the taxonomy.
-     * @param curRootIRI - curr root IRI 
+     * 
+     * @param curRootIRI - curr root IRI
      * @return true if the root exists
      */
     public boolean existsRoot(String curRootIRI) {
-    	return dimensionRoots.contains(curRootIRI);
+        return dimensionRoots.contains(curRootIRI);
     }
-    
+
     /**
-     * Put a new TaxonomyPredicate to the mapping. 
-     * @param key - ID of the TaxonomyPredicate
-     * @param value -  TaxonomyPredicate to be added
+     * Put a new TaxonomyPredicate to the mapping.
+     * 
+     * @param key   - ID of the TaxonomyPredicate
+     * @param value - TaxonomyPredicate to be added
      */
-	public void put(String key, TaxonomyPredicate value) {
-		mappedPredicates.put(key, value);
+    public void put(String key, TaxonomyPredicate value) {
+        mappedPredicates.put(key, value);
 
-	}
+    }
 
-	/**
-	 * Remove the TaxonomyPredicate from the mapping.
-	 * @param predicateID - ID of the TaxonomyPredicate to be removed
-	 */
-	public void remove(String predicateID) {
-		mappedPredicates.remove(predicateID);
+    /**
+     * Remove the TaxonomyPredicate from the mapping.
+     * 
+     * @param predicateID - ID of the TaxonomyPredicate to be removed
+     */
+    public void remove(String predicateID) {
+        mappedPredicates.remove(predicateID);
 
-	}
+    }
 }

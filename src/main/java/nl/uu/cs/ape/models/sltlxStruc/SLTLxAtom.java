@@ -25,44 +25,48 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
     private final State argumentState;
 
     /**
-     * Defines the type of the element in the workflow that the atom describes (tool, memory type, etc.)
+     * Defines the type of the element in the workflow that the atom describes
+     * (tool, memory type, etc.)
      */
     private AtomType elementType;
-    
-    
+
     /**
      * Clause that represents the SLTLxAtom.
      */
     private CNFClause clause = null;
-    
 
     /**
-     * Creates an atom that can represent usage of the tool, creation or usage of a type,
-     * or a reference between an input type and the state in which it was generated..
+     * Creates an atom that can represent usage of the tool, creation or usage of a
+     * type,
+     * or a reference between an input type and the state in which it was
+     * generated..
      *
-     * @param elementType Element that defines what type of a predicate is described (such as {@link AtomType#MODULE}.
+     * @param elementType Element that defines what type of a predicate is described
+     *                    (such as {@link AtomType#MODULE}.
      * @param predicate   Predicate used.
      * @param usedInState State in the automaton it was used/created in.
      */
     public SLTLxAtom(AtomType elementType, PredicateLabel predicate, State usedInState) {
-    	super();
+        super();
         this.predicate = predicate;
         this.argumentState = usedInState;
         this.elementType = elementType;
     }
 
     /**
-     * Private constructor used to create auxiliary {@code true} and {@code false} atoms.
-     * @param mapping integer that corresponds to the mapped Atom. 
+     * Private constructor used to create auxiliary {@code true} and {@code false}
+     * atoms.
+     * 
+     * @param mapping integer that corresponds to the mapped Atom.
      */
     private SLTLxAtom(int mapping) {
-    	super();
-    	this.predicate = null;
-    	this.argumentState = null;
-    	this.clause = new CNFClause(mapping);
-	}
+        super();
+        this.predicate = null;
+        this.argumentState = null;
+        this.clause = new CNFClause(mapping);
+    }
 
-	/**
+    /**
      * Gets predicate.
      *
      * @return Field {@link #predicate}.
@@ -71,7 +75,9 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
         return predicate;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -84,7 +90,9 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -130,26 +138,33 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
     }
 
     /**
-     * Returns the string representation of the {@link SLTLxAtom} used for the textual solution representation. In case of the atom depicting
-     * a usage of a type in the workflow, the structure of the representation contains an additional attribute, state in which the type was initially added to the memory.
+     * Returns the string representation of the {@link SLTLxAtom} used for the
+     * textual solution representation. In case of the atom depicting
+     * a usage of a type in the workflow, the structure of the representation
+     * contains an additional attribute, state in which the type was initially added
+     * to the memory.
      *
      * @return String representing the workflow element in a textual form.
      */
     public String toString() {
-    	if(this.elementType.isUnaryProperty()) {
-    		return predicate.getPredicateID() + "(" + argumentState.getPredicateID() + ")";
-    	} else if(this.elementType.isBinaryRel()) {
-            return elementType.toString() + "(" + predicate.getPredicateID() + "," + argumentState.getPredicateID() + ")";
+        if (this.elementType.isUnaryProperty()) {
+            return predicate.getPredicateID() + "(" + argumentState.getPredicateID() + ")";
+        } else if (this.elementType.isBinaryRel()) {
+            return elementType.toString() + "(" + predicate.getPredicateID() + "," + argumentState.getPredicateID()
+                    + ")";
         } else {
-        	return null;
+            return null;
         }
     }
 
     /**
-     * Return true if the current workflow element is of the given {@link AtomType} type.
+     * Return true if the current workflow element is of the given {@link AtomType}
+     * type.
      *
-     * @param workflowElemType Element type that is current SLTLxAtom is compared to.
-     * @return true if the current workflow element corresponds to the given {@link AtomType}, false otherwise.
+     * @param workflowElemType Element type that is current SLTLxAtom is compared
+     *                         to.
+     * @return true if the current workflow element corresponds to the given
+     *         {@link AtomType}, false otherwise.
      */
     public boolean isWorkflowElementType(AtomType workflowElemType) {
         return getWorkflowElementType() == workflowElemType;
@@ -162,11 +177,14 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
      * than the @otherAtom's state.
      *
      * @param otherAtom The SLTLxAtom to be compared
-     * @return The value 0 if the argument SLTLxAtom's state is equal to this SLTLxAtom's state;
-     * a value less than 0 if this SLTLxAtom's state comes before the @otherAtom's state;
-     * and a value greater than 0 if this SLTLxAtom's state comes after the @otherAtom's state.
+     * @return The value 0 if the argument SLTLxAtom's state is equal to this
+     *         SLTLxAtom's state;
+     *         a value less than 0 if this SLTLxAtom's state comes before
+     *         the @otherAtom's state;
+     *         and a value greater than 0 if this SLTLxAtom's state comes after
+     *         the @otherAtom's state.
      */
-	public int compareTo(SLTLxAtom otherAtom) {
+    public int compareTo(SLTLxAtom otherAtom) {
 
         int thisAtomState = this.getUsedInStateArgument().getAbsoluteStateNumber();
         int otherAtomState = otherAtom.getUsedInStateArgument().getAbsoluteStateNumber();
@@ -177,40 +195,43 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
             return this.getPredicate().compareTo(otherAtom.getPredicate());
         }
     }
-	
-	/**
-	 * Method returns atom that corresponds to the {@code true} statement.
-	 * @return
-	 */
-	public static SLTLxAtom getTrue() {
-		return new SLTLxAtom(1);
-	}
-	
-	/**
-	 * Method returns atom that corresponds to the {@code false} statement.
-	 * @return
-	 */
-	public static SLTLxAtom getFalse() {
-		return new SLTLxAtom(2);
-	}
-	
 
-	@Override
-	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		if(this.clause == null) {
-			int encoding = synthesisEngine.getMappings().add(this);
-			this.clause = new CNFClause(encoding);
-		}
-		return this.clause.toCNF();
-	}
+    /**
+     * Method returns atom that corresponds to the {@code true} statement.
+     * 
+     * @return
+     */
+    public static SLTLxAtom getTrue() {
+        return new SLTLxAtom(1);
+    }
 
-	@Override
-	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
-		if(this.clause == null) {
-			int encoding = synthesisEngine.getMappings().add(this);
-			this.clause = new CNFClause(encoding);
-		}
-		return this.clause.toNegatedCNF();
-	}
+    /**
+     * Method returns atom that corresponds to the {@code false} statement.
+     * 
+     * @return
+     */
+    public static SLTLxAtom getFalse() {
+        return new SLTLxAtom(2);
+    }
+
+    @Override
+    public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+            SATSynthesisEngine synthesisEngine) {
+        if (this.clause == null) {
+            int encoding = synthesisEngine.getMappings().add(this);
+            this.clause = new CNFClause(encoding);
+        }
+        return this.clause.toCNF();
+    }
+
+    @Override
+    public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+            SATSynthesisEngine synthesisEngine) {
+        if (this.clause == null) {
+            int encoding = synthesisEngine.getMappings().add(this);
+            this.clause = new CNFClause(encoding);
+        }
+        return this.clause.toNegatedCNF();
+    }
 
 }

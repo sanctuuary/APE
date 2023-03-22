@@ -26,15 +26,17 @@ import java.util.List;
 
 public class APEConfigTagFactory {
 
-	/**
-	 * Types of tag fields.
-	 * 
-	 * @author Vedran Kasalica
-	 *
-	 */
+    private static final String ONTOLOGY_IRI_MSG = "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).";
+
+    /**
+     * Types of tag fields.
+     * 
+     * @author Vedran Kasalica
+     *
+     */
     public static class TYPES {
 
-       /**
+        /**
          * Abstract field type.
          */
         public static abstract class ExistingFile extends APEConfigTag<Path> {
@@ -63,12 +65,12 @@ public class APEConfigTagFactory {
             }
         }
 
-       /**
+        /**
          * Abstract field type.
          */
         public static abstract class DataDimensions extends APEConfigDependentTag.One<List<String>, String> {
 
-            public DataDimensions(Provider<String> provider) {
+            protected DataDimensions(Provider<String> provider) {
                 super(provider);
             }
 
@@ -76,7 +78,8 @@ public class APEConfigTagFactory {
             protected List<String> constructFromJSON(JSONObject obj, String ontology_prefix) {
 
                 if (ontology_prefix == null) {
-                    throw APEConfigException.requiredValidationTag(getTagName(), new TAGS.ONTOLOGY_PREFIX().getTagName(), "");
+                    throw APEConfigException.requiredValidationTag(getTagName(),
+                            new TAGS.ONTOLOGY_PREFIX().getTagName(), "");
                 }
 
                 List<String> dataDimensionRoots = new ArrayList<>();
@@ -93,7 +96,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected ValidationResults validate(List<String> value, String ontology_prefix, ValidationResults results) {
+            protected ValidationResults validate(List<String> value, String ontology_prefix,
+                    ValidationResults results) {
                 // TODO
                 return results;
             }
@@ -105,12 +109,12 @@ public class APEConfigTagFactory {
 
         }
 
-       /**
+        /**
          * Abstract field type.
          */
         public static abstract class DataInstances extends APEConfigDependentTag.One<List<Type>, APEDomainSetup> {
 
-            public DataInstances(Provider<APEDomainSetup> provider) {
+            protected DataInstances(Provider<APEDomainSetup> provider) {
                 super(provider);
             }
 
@@ -120,7 +124,8 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected ValidationResults validate(List<Type> value, APEDomainSetup apeDomainSetup, ValidationResults results) {
+            protected ValidationResults validate(List<Type> value, APEDomainSetup apeDomainSetup,
+                    ValidationResults results) {
                 // TODO: check data instances
                 return results;
             }
@@ -153,14 +158,14 @@ public class APEConfigTagFactory {
             }
         }
 
-       /**
+        /**
          * Abstract field type.
          */
         public static abstract class Int extends APEConfigTag<Integer> {
 
             private final Range range;
 
-            public Int(Range range) {
+            protected Int(Range range) {
                 this.range = range;
             }
 
@@ -185,14 +190,14 @@ public class APEConfigTagFactory {
             }
         }
 
-       /**
+        /**
          * Abstract field type.
          */
         public static abstract class IntRange extends APEConfigTag<Range> {
 
             private final Range boundaries;
 
-            public IntRange(Range boundaries) {
+            protected IntRange(Range boundaries) {
                 this.boundaries = boundaries;
             }
 
@@ -225,7 +230,7 @@ public class APEConfigTagFactory {
             }
         }
 
-       /**
+        /**
          * Abstract field type.
          */
         public static abstract class Directory extends APEConfigTag<Path> {
@@ -258,7 +263,7 @@ public class APEConfigTagFactory {
             }
         }
 
-       /**
+        /**
          * Abstract field type.
          */
         public static abstract class Option<E extends Enum<E>> extends APEConfigTag<E> {
@@ -290,7 +295,7 @@ public class APEConfigTagFactory {
             }
         }
 
-       /**
+        /**
          * Abstract field type.
          */
         public static abstract class IRI extends APEConfigTag<String> {
@@ -307,12 +312,12 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(String uri, ValidationResults results) {
-                results.add(getTagName(), "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).", APEFiles.isIRI(uri));
+                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isIRI(uri));
                 return results;
             }
         }
-        
-       /**
+
+        /**
          * Abstract field type.
          */
         public static abstract class JSON extends APEConfigTag<JSONObject> {
@@ -324,23 +329,22 @@ public class APEConfigTagFactory {
 
             @Override
             protected JSONObject constructFromJSON(JSONObject obj) {
-            	String constrintsPath = obj.getString(getTagName());
-            	JSONObject constraints = null;
-            	try {
-            	constraints = APEUtils.readFileToJSONObject(new File(constrintsPath));
-            	} catch (IOException e) {
-            		throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
-				} catch (JSONException e) {
-					throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
-				}
-            	
-            
+                String constrintsPath = obj.getString(getTagName());
+                JSONObject constraints = null;
+                try {
+                    constraints = APEUtils.readPathToJSONObject(constrintsPath);
+                } catch (IOException e) {
+                    throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
+                } catch (JSONException e) {
+                    throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
+                }
+
                 return constraints;
             }
 
             @Override
             protected ValidationResults validate(JSONObject jsonObject, ValidationResults results) {
-                results.add(getTagName(), "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).", APEFiles.isJSON(jsonObject));
+                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isJSON(jsonObject));
                 return results;
             }
         }
@@ -351,10 +355,10 @@ public class APEConfigTagFactory {
      */
     public static class TAGS {
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class ONTOLOGY extends TYPES.ExistingFile {
+        public static class ONTOLOGY extends TYPES.ExistingFile {
 
             @Override
             public String getTagName() {
@@ -365,7 +369,6 @@ public class APEConfigTagFactory {
             public String getLabel() {
                 return "Ontology";
             }
-
 
             @Override
             public String getDescription() {
@@ -379,14 +382,14 @@ public class APEConfigTagFactory {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[]{APEFiles.Permission.READ};
+                return new APEFiles.Permission[] { APEFiles.Permission.READ };
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class ONTOLOGY_PREFIX extends TYPES.IRI {
+        public static class ONTOLOGY_PREFIX extends TYPES.IRI {
 
             @Override
             public String getTagName() {
@@ -400,7 +403,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                return "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).";
+                return ONTOLOGY_IRI_MSG;
             }
 
             @Override
@@ -410,10 +413,10 @@ public class APEConfigTagFactory {
 
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class DIMENSIONS_ONTOLOGY extends TYPES.DataDimensions {
+        public static class DIMENSIONS_ONTOLOGY extends TYPES.DataDimensions {
 
             public DIMENSIONS_ONTOLOGY(Provider<String> provider) {
                 super(provider);
@@ -441,10 +444,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class PROGRAM_INPUTS extends TYPES.DataInstances {
+        public static class PROGRAM_INPUTS extends TYPES.DataInstances {
 
             public PROGRAM_INPUTS(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -462,10 +465,10 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                //TODO
+                // TODO
                 return "";
             }
-            
+
             @Override
             protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
                 final ArrayList<Type> instances = new ArrayList<>();
@@ -483,7 +486,8 @@ public class APEConfigTagFactory {
                     }
                 } catch (ClassCastException e) {
                     instances.clear();
-                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
+                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(),
+                            JSONObject[].class,
                             "please provide the correct format.");
                 }
 
@@ -491,10 +495,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class PROGRAM_OUTPUTS extends TYPES.DataInstances {
+        public static class PROGRAM_OUTPUTS extends TYPES.DataInstances {
 
             public PROGRAM_OUTPUTS(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -512,10 +516,10 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                //TODO
+                // TODO
                 return "";
             }
-            
+
             @Override
             protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
                 final ArrayList<Type> instances = new ArrayList<>();
@@ -533,7 +537,8 @@ public class APEConfigTagFactory {
                     }
                 } catch (ClassCastException e) {
                     instances.clear();
-                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(), JSONObject[].class,
+                    throw APEConfigException.cannotParse(getTagName(), obj.get(getTagName()).toString(),
+                            JSONObject[].class,
                             "please provide the correct format.");
                 }
 
@@ -541,10 +546,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class TOOL_ONTOLOGY_ROOT extends APEConfigDependentTag.One<String, String> {
+        public static class TOOL_ONTOLOGY_ROOT extends APEConfigDependentTag.One<String, String> {
 
             public TOOL_ONTOLOGY_ROOT(Provider<String> prefix_provider) {
                 super(prefix_provider);
@@ -567,7 +572,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                //TODO
+                // TODO
                 return "";
             }
 
@@ -587,14 +592,14 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class TOOL_ANNOTATIONS extends TYPES.ExistingFile {
+        public static class TOOL_ANNOTATIONS extends TYPES.ExistingFile {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[]{APEFiles.Permission.READ};
+                return new APEFiles.Permission[] { APEFiles.Permission.READ };
             }
 
             @Override
@@ -618,14 +623,14 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class CWL_ANNOTATIONS extends TYPES.ExistingFile {
+        public static class CWL_ANNOTATIONS extends TYPES.ExistingFile {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[]{APEFiles.Permission.READ};
+                return new APEFiles.Permission[] { APEFiles.Permission.READ };
             }
 
             @Override
@@ -649,10 +654,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class CONSTRAINTS extends TYPES.JSON {
+        public static class CONSTRAINTS extends TYPES.JSON {
 
             @Override
             public String getTagName() {
@@ -676,10 +681,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class STRICT_TOOL_ANNOTATIONS extends TYPES.Bool {
+        public static class STRICT_TOOL_ANNOTATIONS extends TYPES.Bool {
 
             @Override
             public String getTagName() {
@@ -703,10 +708,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class SOLUTION_LENGTH_RANGE extends TYPES.IntRange {
+        public static class SOLUTION_LENGTH_RANGE extends TYPES.IntRange {
 
             public SOLUTION_LENGTH_RANGE() {
                 super(Range.of(1, 50));
@@ -738,10 +743,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class NO_SOLUTIONS extends TYPES.Int {
+        public static class NO_SOLUTIONS extends TYPES.Int {
 
             public NO_SOLUTIONS() {
                 super(Range.of(0, Integer.MAX_VALUE));
@@ -770,14 +775,14 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class SOLUTION_DIR_PATH extends TYPES.Directory {
+        public static class SOLUTION_DIR_PATH extends TYPES.Directory {
 
             @Override
             protected APEFiles.Permission[] getRequiredPermissions() {
-                return new APEFiles.Permission[]{APEFiles.Permission.READ, APEFiles.Permission.WRITE};
+                return new APEFiles.Permission[] { APEFiles.Permission.READ, APEFiles.Permission.WRITE };
             }
 
             @Override
@@ -797,10 +802,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class NO_EXECUTIONS extends TYPES.Int {
+        public static class NO_EXECUTIONS extends TYPES.Int {
 
             public NO_EXECUTIONS() {
                 super(Range.of(0, Integer.MAX_VALUE));
@@ -818,7 +823,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                //TODO
+                // TODO
                 return "";
             }
 
@@ -828,10 +833,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class NO_GRAPHS extends TYPES.Int {
+        public static class NO_GRAPHS extends TYPES.Int {
 
             public NO_GRAPHS() {
                 super(Range.of(0, Integer.MAX_VALUE));
@@ -849,7 +854,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                //TODO
+                // TODO
                 return "";
             }
 
@@ -859,10 +864,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class NO_CWL extends TYPES.Int {
+        public static class NO_CWL extends TYPES.Int {
             public NO_CWL() {
                 super(Range.of(0, Integer.MAX_VALUE));
             }
@@ -888,15 +893,15 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected  ValidationResults validate(Integer value, ValidationResults results) {
+            protected ValidationResults validate(Integer value, ValidationResults results) {
                 return results;
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class NO_EXECUTABLE_CWL extends TYPES.Int {
+        public static class NO_EXECUTABLE_CWL extends TYPES.Int {
             public NO_EXECUTABLE_CWL() {
                 super(Range.of(0, Integer.MAX_VALUE));
             }
@@ -922,15 +927,15 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected  ValidationResults validate(Integer value, ValidationResults results) {
+            protected ValidationResults validate(Integer value, ValidationResults results) {
                 return results;
             }
         }
-        
-    	/**
+
+        /**
          * Configuration field.
          */
-    	public static class TIMEOUT_SEC extends TYPES.Int {
+        public static class TIMEOUT_SEC extends TYPES.Int {
 
             public TIMEOUT_SEC() {
                 super(Range.of(0, Integer.MAX_VALUE));
@@ -948,7 +953,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                //TODO
+                // TODO
                 return "";
             }
 
@@ -956,17 +961,17 @@ public class APEConfigTagFactory {
             protected ValidationResults validate(Integer value, ValidationResults results) {
                 return results;
             }
-            
+
             @Override
             public APEConfigDefaultValue<Integer> getDefault() {
                 return APEConfigDefaultValue.withDefault(300);
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class USE_WORKFLOW_INPUT extends TYPES.Option<ConfigEnum> {
+        public static class USE_WORKFLOW_INPUT extends TYPES.Option<ConfigEnum> {
 
             @Override
             public Class<ConfigEnum> getEnumClass() {
@@ -995,10 +1000,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class USE_ALL_GENERATED_DATA extends TYPES.Option<ConfigEnum> {
+        public static class USE_ALL_GENERATED_DATA extends TYPES.Option<ConfigEnum> {
 
             @Override
             public Class<ConfigEnum> getEnumClass() {
@@ -1027,10 +1032,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class DEBUG_MODE extends TYPES.Bool {
+        public static class DEBUG_MODE extends TYPES.Bool {
 
             @Override
             public String getTagName() {
@@ -1054,10 +1059,10 @@ public class APEConfigTagFactory {
             }
         }
 
-    	/**
+        /**
          * Configuration field.
          */
-    	public static class TOOL_SEQ_REPEAT extends TYPES.Bool {
+        public static class TOOL_SEQ_REPEAT extends TYPES.Bool {
 
             @Override
             public String getTagName() {

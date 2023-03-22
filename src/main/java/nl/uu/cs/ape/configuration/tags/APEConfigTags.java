@@ -62,13 +62,16 @@ public class APEConfigTags {
     }
 
     /**
-     * Create a JSONObject containing all the info on tags, e.g.: {"tags": [ .. tags ..]}
-     * This method uses {@link APEConfigTag.Info#toJSON()} to convert the tags to json.
+     * Create a JSONObject containing all the info on tags, e.g.: {"tags": [ .. tags
+     * ..]}
+     * This method uses {@link APEConfigTag.Info#toJSON()} to convert the tags to
+     * json.
      *
      * @return a JSONObject containing all the info on tags
      */
     public JSONObject toJSON() {
         return new JSONObject()
-                .put("tags", new JSONArray(getAll().stream().map(APEConfigTag.Info::toJSON).collect(Collectors.toSet())));
+                .put("tags",
+                        new JSONArray(getAll().stream().map(APEConfigTag.Info::toJSON).collect(Collectors.toSet())));
     }
 }

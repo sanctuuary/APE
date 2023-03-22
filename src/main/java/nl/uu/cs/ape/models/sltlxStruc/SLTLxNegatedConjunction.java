@@ -14,9 +14,8 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
  */
 public class SLTLxNegatedConjunction extends SLTLxFormula {
 
-private Set<SLTLxFormula> nconjunctedFacts;
-	
-		
+	private Set<SLTLxFormula> nconjunctedFacts;
+
 	public SLTLxNegatedConjunction(SLTLxFormula arg1, SLTLxFormula arg2) {
 		super();
 		this.nconjunctedFacts = new HashSet<SLTLxFormula>();
@@ -30,15 +29,15 @@ private Set<SLTLxFormula> nconjunctedFacts;
 		nconjunctedFacts.forEach(fact -> this.nconjunctedFacts.add(fact));
 	}
 
-
 	@Override
-	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+			SATSynthesisEngine synthesisEngine) {
 		return new SLTLxConjunction(nconjunctedFacts).getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 
-	
 	@Override
-	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping, SATSynthesisEngine synthesisEngine) {
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+			SATSynthesisEngine synthesisEngine) {
 		return new SLTLxConjunction(nconjunctedFacts).getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 	}
 

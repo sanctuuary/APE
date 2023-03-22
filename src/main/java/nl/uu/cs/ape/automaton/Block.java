@@ -11,7 +11,8 @@ import java.util.List;
 public class Block {
 
     /**
-     * States that comprise this block. Number of stater correspond to the max number of inputs or outputs.
+     * States that comprise this block. Number of stater correspond to the max
+     * number of inputs or outputs.
      */
     private List<State> typeStates;
 

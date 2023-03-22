@@ -50,9 +50,11 @@ public class APEConfigDefaultValue<T> {
     }
 
     /**
-     * Returns a boolean indicating whether the container has a default value set or not.
+     * Returns a boolean indicating whether the container has a default value set or
+     * not.
      *
-     * @return a boolean indicating whether the container has a default value set or not
+     * @return a boolean indicating whether the container has a default value set or
+     *         not
      */
     public boolean hasValue() {
         return this.hasValue;

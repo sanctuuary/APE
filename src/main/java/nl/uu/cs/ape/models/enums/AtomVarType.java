@@ -59,7 +59,7 @@ public enum AtomVarType {
 	public boolean isVarDataType() {
 		return this.equals(TYPE_V) ? true : false;
 	}
-	
+
 	/**
 	 * Check if the Atom represent a variable memory reference.
 	 * 

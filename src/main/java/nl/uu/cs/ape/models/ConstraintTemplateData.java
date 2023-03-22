@@ -5,7 +5,8 @@ import java.util.List;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
- * The {@link ConstraintTemplateData} class is used to store the data describing each constrain.
+ * The {@link ConstraintTemplateData} class is used to store the data describing
+ * each constrain.
  *
  * @author Vedran Kasalica
  */
