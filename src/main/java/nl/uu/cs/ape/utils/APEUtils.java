@@ -152,6 +152,20 @@ public final class APEUtils {
 	}
 
 	/**
+	 * Reads the path and provides the JSONObject that represents its content.
+	 *
+	 * @param path the path (local or URL) to the file
+	 * @return JSONObject representing the content of the file.
+	 * @throws IOException   Error if the file is corrupted
+	 * @throws JSONException Error if the file is not in expected JSON format
+	 */
+	public static JSONObject readPathToJSONObject(String path) throws IOException, JSONException {
+		File file = APEUtils.getFileFromPath(path);
+		String content = FileUtils.readFileToString(file, "utf-8");
+		return new JSONObject(content);
+	}
+
+	/**
 	 * Reads the file and provides the JSONObject that represents its content.
 	 *
 	 * @param file the JSON file
@@ -303,6 +317,7 @@ public final class APEUtils {
 			}
 			return jsonList;
 		} catch (JSONException e) {
+			// Return empty list in case the key doesn't exist.
 			return jsonList;
 		}
 	}
@@ -943,7 +958,7 @@ public final class APEUtils {
 	 * @param prefix
 	 * @throws IOException
 	 */
-	public static File concatIntoFile(String prefix, File file) throws IOException {
+	public static File prependToFile(String prefix, File file) throws IOException {
 		LineIterator li = FileUtils.lineIterator(file);
 		File tempFile = File.createTempFile("prependPrefix", ".tmp");
 		tempFile.deleteOnExit();
@@ -1040,17 +1055,17 @@ public final class APEUtils {
 	 * Read file content from the given path (local path or a public URL) and return
 	 * the content as a File object.
 	 * 
-	 * @param path - Local path or a public URL with the content.
+	 * @param filePath - Local path or a public URL with the content.
 	 * @return File containing info provided at the path.
 	 * @throws IOException Exception in case of a badly formatted path or file.
 	 */
-	public static File readFileFromPath(String path) throws IOException {
+	public static File getFileFromPath(String filePath) throws IOException {
 
 		try {
-			new URL(path).toURI();
-			return readFileFromURL(path);
+			new URL(filePath).toURI();
+			return getFileFromURL(filePath);
 		} catch (MalformedURLException | URISyntaxException e1) {
-			return new File(path);
+			return new File(filePath);
 		}
 
 	}
@@ -1058,14 +1073,14 @@ public final class APEUtils {
 	/**
 	 * Read content from a URL and return it as a file.
 	 * 
-	 * @param file_url - URL of the content
+	 * @param fileUrl - URL of the content
 	 * @return File containing info provided at the URL.
 	 * @throws IOException Exception in case of a badly formatted URL or file.
 	 */
-	private static File readFileFromURL(String file_url) throws IOException {
-		File loadedFile = new File(file_url);
+	private static File getFileFromURL(String fileUrl) throws IOException {
+		File loadedFile = new File(fileUrl);
 		FileUtils.copyURLToFile(
-				new URL(file_url),
+				new URL(fileUrl),
 				loadedFile,
 				1000,
 				1000);

@@ -144,7 +144,7 @@ public class APECoreConfig {
             throw new NullPointerException("The provided core configuration file path is null.");
         }
 
-        coreConfigSetup(new JSONObject(FileUtils.readFileToString(new File(configPath), "utf-8")));
+        coreConfigSetup(APEUtils.readPathToJSONObject(configPath));
     }
 
     /**
