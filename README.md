@@ -4,7 +4,7 @@
 
 [![Latest release](https://img.shields.io/github/release/sanctuuary/APE.svg)](https://github.com/sanctuuary/APE/releases/latest)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.sanctuuary/APE/badge.svg)](https://mvnrepository.com/artifact/io.github.sanctuuary/APE)
-[![Build Status](https://www.travis-ci.com/sanctuuary/APE.svg?branch=main)](https://app.travis-ci.com/github/sanctuuary/APE)
+![Build Status](https://github.com/sanctuuary/APE/actions/workflows/maven.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/ape-framework/badge/?version=latest)](https://ape-framework.readthedocs.io/en/latest/?badge=latest)
 [![GitHub license](https://img.shields.io/github/license/sanctuuary/APE)](https://github.com/sanctuuary/APE/blob/master/LICENSE)
 [![DOI](https://zenodo.org/badge/227861653.svg)](https://zenodo.org/badge/latestdoi/227861653)
