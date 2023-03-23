@@ -25,9 +25,9 @@ For our paper at [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) [[2]](#2) w
 #### For detailed information please visit [our page](https://ape-framework.readthedocs.io).
 
 ## Requirements
-To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE locally you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
+To [run](https://github.com/sanctuuary/APE#how-to-run-ape-from-the-command-line) APE locally you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
 
-To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
+To [build](https://github.com/sanctuuary/APE#build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
 
 #### Note
 Building APE from source is not required to run it, as the latest stable version is available at [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
