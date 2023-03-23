@@ -1,4 +1,4 @@
-<img src="https://user-images.githubusercontent.com/11068408/198268857-83b02297-0b03-4dc3-852b-52d889faaf3a.svg" alt="logo" width=20% align="left" />
+<img src="https://user-images.githubusercontent.com/11068408/227203515-210bd14e-19c6-48d8-9134-d3812cb2eb0c.png" alt="logo" width=20% align="left"/>
 
 # APE (Automated Pipeline Explorer)
 
