@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: Java CI
 
 on:
   push:
@@ -27,9 +27,9 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
-    - name: Build and test with Maven
-      run: mvn package
-    - name: Setup CWL
+    - name: Build, test and package with Maven
+      run: mvn -B package --file pom.xml
+    - name: Install CWL env
       run: |
         sudo apt-get -y install python3 python3-pip
         pip3 install cwlref-runner
