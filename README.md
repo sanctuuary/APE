@@ -1,10 +1,10 @@
-<img src="https://user-images.githubusercontent.com/11068408/198268857-83b02297-0b03-4dc3-852b-52d889faaf3a.svg" alt="logo" width=20% align="left" />
+<img src="https://user-images.githubusercontent.com/11068408/227203515-210bd14e-19c6-48d8-9134-d3812cb2eb0c.png" alt="logo" width=20% align="left"/>
 
 # APE (Automated Pipeline Explorer)
 
 [![Latest release](https://img.shields.io/github/release/sanctuuary/APE.svg)](https://github.com/sanctuuary/APE/releases/latest)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.sanctuuary/APE/badge.svg)](https://mvnrepository.com/artifact/io.github.sanctuuary/APE)
-[![Build Status](https://www.travis-ci.com/sanctuuary/APE.svg?branch=main)](https://app.travis-ci.com/github/sanctuuary/APE)
+![Build Status](https://github.com/sanctuuary/APE/actions/workflows/maven.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/ape-framework/badge/?version=latest)](https://ape-framework.readthedocs.io/en/latest/?badge=latest)
 [![GitHub license](https://img.shields.io/github/license/sanctuuary/APE)](https://github.com/sanctuuary/APE/blob/master/LICENSE)
 [![DOI](https://zenodo.org/badge/227861653.svg)](https://zenodo.org/badge/latestdoi/227861653)
@@ -25,9 +25,9 @@ For our paper at [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) [[2]](#2) w
 #### For detailed information please visit [our page](https://ape-framework.readthedocs.io).
 
 ## Requirements
-To [run](https://github.com/sanctuuary/APE#command-line-interface-cli) APE locally you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
+To [run](https://github.com/sanctuuary/APE#how-to-run-ape-from-the-command-line) APE locally you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
 
-To [build](https://github.com/sanctuuary/APE#how-to-build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
+To [build](https://github.com/sanctuuary/APE#build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
 
 #### Note
 Building APE from source is not required to run it, as the latest stable version is available at [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
