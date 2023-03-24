@@ -147,7 +147,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
         } else if (this.elementType.isBinaryRel()) {
             return elementType.toString() + "(" + firstArg.getPredicateID() + "," + secondArg.getPredicateID() + ")";
         } else {
-            return null;
+            return "SLTLxAtomVar_ERROR";
         }
     }
 
@@ -208,11 +208,11 @@ public class SLTLxAtomVar extends SLTLxFormula {
             synthesisEngine.getVariableUsage().addMemoryReference((State) firstArg, secondArg);
         }
 
-        else if (this.elementType.isBinaryRel() & !(this.elementType.equals(AtomVarType.VAR_VALUE))) {
+        else if (this.elementType.isBinaryRel() && !(this.elementType.equals(AtomVarType.VAR_VALUE))) {
             this.firstArg = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
             this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
             synthesisEngine.getVariableUsage().addBinaryPred(
-                    new Pair<SLTLxVariable>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
+                    new Pair<>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
         }
 
         else if (this.elementType.equals(AtomVarType.VAR_VALUE)) {

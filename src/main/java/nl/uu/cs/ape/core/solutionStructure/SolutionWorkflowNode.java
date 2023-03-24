@@ -3,7 +3,8 @@ package nl.uu.cs.ape.core.solutionStructure;
 import nl.uu.cs.ape.automaton.State;
 
 /**
- * The {@code SolutionWorkflowNode} class is used to represent a node in the actual solution workflow.
+ * The {@code SolutionWorkflowNode} class is used to represent a node in the
+ * actual solution workflow.
  *
  * @author Vedran Kasalica
  */
@@ -19,7 +20,7 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
      *
      * @param automatonState the automaton state
      */
-    public SolutionWorkflowNode(State automatonState) {
+    protected SolutionWorkflowNode(State automatonState) {
         this.automatonState = automatonState;
     }
 
@@ -41,7 +42,8 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
     }
 
     /**
-     * Two SolutionWorkflowNodes are equal if they represent the same state in the workflow.
+     * Two SolutionWorkflowNodes are equal if they represent the same state in the
+     * workflow.
      *
      * @return true if the state that the describe is the same.
      */
@@ -63,9 +65,13 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
     }
 
     /**
-     * Compares the two SolutionWorkflowNodes based on their order in the solution. {@link State} is used to evaluate the absolute position of the node in the workflow.
+     * Compares the two SolutionWorkflowNodes based on their order in the solution.
+     * {@link State} is used to evaluate the absolute position of the node in the
+     * workflow.
      *
-     * @return a negative integer, zero, or a positive integer as this object is before than, equal to, or after than the specified SolutionWorkflowNode.
+     * @return a negative integer, zero, or a positive integer as this object is
+     *         before than, equal to, or after than the specified
+     *         SolutionWorkflowNode.
      */
     @Override
     public int compareTo(SolutionWorkflowNode otherNode) {
@@ -75,17 +81,19 @@ public abstract class SolutionWorkflowNode implements Comparable<SolutionWorkflo
     /**
      * Gets unique node ID.
      *
-     * @return The unique ID that identifies the node and should not be used for presentation.
+     * @return The unique ID that identifies the node and should not be used for
+     *         presentation.
      */
     public abstract String getNodeID();
 
     /**
      * Gets node long (full) label (e.g. containing OWL IRIs).
      *
-     * @return A label that describes the node using full type and tool IDs (it is usually much longer than {@link #getNodeLabel()}.
+     * @return A label that describes the node using full type and tool IDs (it is
+     *         usually much longer than {@link #getNodeLabel()}.
      */
     public abstract String getNodeLongLabel();
-    
+
     /**
      * Gets node label (e.g. containing OWL labels).
      *

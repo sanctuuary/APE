@@ -17,6 +17,7 @@ import nl.uu.cs.ape.utils.OWLReader;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -157,7 +158,7 @@ public class APECoreConfig {
      */
     public APECoreConfig(File config) throws IOException, JSONException, APEConfigException {
 
-        coreConfigSetup(new JSONObject(FileUtils.readFileToString(config, "utf-8")));
+        coreConfigSetup(new JSONObject(FileUtils.readFileToString(config, StandardCharsets.UTF_8)));
     }
 
     /**
@@ -256,7 +257,7 @@ public class APECoreConfig {
     /**
      * Run the initial validation of the ontology file and the corresponding tool
      * and data terms. Validation will simply check the format of the ontology and
-     * the existance of the mentioned classes.
+     * the existence of the mentioned classes.
      * 
      * @param ontologyFile       - ontology file
      * @param ontologyPrefixIRI  Prefix used to define OWL class IDs
@@ -292,7 +293,7 @@ public class APECoreConfig {
     /**
      * Set ontology annotation.
      * 
-     * @param ontology - ontology filej
+     * @param ontology - ontology file
      */
     public void setOntologyFile(File ontology) {
         ONTOLOGY.setValue(ontology.toPath());

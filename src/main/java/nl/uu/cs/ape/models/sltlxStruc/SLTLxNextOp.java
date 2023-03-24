@@ -29,7 +29,7 @@ public class SLTLxNextOp extends SLTLxFormula {
 			return SLTLxAtom.getFalse().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		}
 
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/*
 		 * Conjunct the collection of clauses that encode the operation and the formula
@@ -46,7 +46,7 @@ public class SLTLxNextOp extends SLTLxFormula {
 		if (synthesisEngine.getSolutionSize() <= stateNo) {
 			return SLTLxAtom.getTrue().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		}
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/*
 		 * Disjunction the collection of clauses that encode the negation of the

@@ -58,11 +58,11 @@ public class SLTLxOperation extends SLTLxFormula {
 	 * @return Fact representing the existence of the operation.
 	 */
 	private SLTLxFormula enforceOperation(int stateNo, SATSynthesisEngine synthesisEngine) {
-		State modulState = synthesisEngine.getModuleAutomaton().getSafe(stateNo);
-		if (modulState == null) {
+		State moduleState = synthesisEngine.getModuleAutomaton().getSafe(stateNo);
+		if (moduleState == null) {
 			return SLTLxAtom.getFalse();
 		}
-		SLTLxAtom moduleRule = new SLTLxAtom(AtomType.MODULE, this.module, modulState);
+		SLTLxAtom moduleRule = new SLTLxAtom(AtomType.MODULE, this.module, moduleState);
 
 		SLTLxFormula inputsRule;
 		/* In case no inputs were specified, the input rule is true by default. */
@@ -82,13 +82,13 @@ public class SLTLxOperation extends SLTLxFormula {
 			if (inputs.size() > 1) {
 				for (SLTLxVariable inputVar : inputs) {
 					List<SLTLxVariable> restVars = new ArrayList<>();
-					inputs.forEach(in -> restVars.add(in));
+					inputs.forEach(restVars::add);
 					restVars.remove(restVars.indexOf(inputVar));
 
 					for (State inState : synthesisEngine.getTypeAutomaton().getUsedTypesBlock(stateNo).getStates()) {
 						List<State> restStates = new ArrayList<>();
 						synthesisEngine.getTypeAutomaton().getUsedTypesBlock(stateNo).getStates()
-								.forEach(in -> restStates.add(in));
+								.forEach(restStates::add);
 						restStates.remove(restStates.indexOf(inState));
 
 						SLTLxFormula currSub = new SLTLxAtomVar(AtomVarType.MEM_TYPE_REF_V, inState, inputVar);

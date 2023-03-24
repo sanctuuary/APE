@@ -116,7 +116,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 
 	@Override
 	public SLTLxFormula visitCondition(ConditionContext ctx) {
-		Set<SLTLxFormula> result = new HashSet<SLTLxFormula>();
+		Set<SLTLxFormula> result = new HashSet<>();
 		int n = ctx.getChildCount();
 		for (int i = 0; i < n; i++) {
 			ParseTree c = ctx.getChild(i);
@@ -262,7 +262,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 					"Operation '" + operationID + "' does not exist in the taxonomy/tool annotations.");
 		}
 
-		List<SLTLxVariable> inputs = new ArrayList<SLTLxVariable>();
+		List<SLTLxVariable> inputs = new ArrayList<>();
 
 		ParseTree inputElems = ctx.getChild(2);
 		for (int i = 0; i < inputElems.getChildCount(); i = i + 2) {
@@ -270,7 +270,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 			inputs.add(new SLTLxVariable(variableID));
 		}
 
-		List<SLTLxVariable> outputs = new ArrayList<SLTLxVariable>();
+		List<SLTLxVariable> outputs = new ArrayList<>();
 
 		ParseTree outputElems = ctx.getChild(4);
 		for (int i = 0; i < outputElems.getChildCount(); i = i + 2) {

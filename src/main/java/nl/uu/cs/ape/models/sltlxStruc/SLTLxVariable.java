@@ -98,10 +98,10 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<String> getExistentialCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions,
+	public Set<String> getExistentialCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubstitutions,
 			SATSynthesisEngine synthesisEngine) {
-		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
-		for (State state : variableSubtitutions.getVariableDomain(this)) {
+		Set<SLTLxFormula> varRefs = new HashSet<>();
+		for (State state : variableSubstitutions.getVariableDomain(this)) {
 			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_VALUE, state, this);
 			SLTLxAtom currIsEmptyState = new SLTLxAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(),
 					state);
@@ -109,7 +109,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		}
 		SLTLxDisjunction allVars = new SLTLxDisjunction(varRefs);
 
-		return allVars.getCNFEncoding(stateNo, variableSubtitutions, synthesisEngine);
+		return allVars.getCNFEncoding(stateNo, variableSubstitutions, synthesisEngine);
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * well (mimicking substitution).<br>
 	 * <br>
 	 * 
-	 * <b>IMPORTANT: This method should be call after the binded subformula was
+	 * <b>IMPORTANT: This method should be call after the bound sub-formula was
 	 * visited (the corresponding CNF was generated),
 	 * in order to ensure that all occurrences of the variable were taken into
 	 * account.</b>
@@ -130,18 +130,18 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @param synthesisEngine - synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
-	public Set<String> getUniversalCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubtitutions,
+	public Set<String> getUniversalCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubstitutions,
 			SATSynthesisEngine synthesisEngine) {
 		/** Setting up the domain of the variable. */
-		Set<SLTLxFormula> varRefs = new HashSet<SLTLxFormula>();
-		for (State state : variableSubtitutions.getVariableDomain(this)) {
+		Set<SLTLxFormula> varRefs = new HashSet<>();
+		for (State state : variableSubstitutions.getVariableDomain(this)) {
 			SLTLxAtomVar currAtomVar = new SLTLxAtomVar(AtomVarType.VAR_VALUE, state, this);
 			SLTLxAtom currIsEmptyState = new SLTLxAtom(state.getWorkflowStateType(), synthesisEngine.getEmptyType(),
 					state);
 			varRefs.add(new SLTLxXOR(currAtomVar, currIsEmptyState));
 		}
 		SLTLxConjunction allVars = new SLTLxConjunction(varRefs);
-		return allVars.getCNFEncoding(stateNo, variableSubtitutions, synthesisEngine);
+		return allVars.getCNFEncoding(stateNo, variableSubstitutions, synthesisEngine);
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * <br>
 	 * <br>
 	 * 
-	 * <b>IMPORTANT: This method should be call after the binded subformula was
+	 * <b>IMPORTANT: This method should be call after the bound sub-formula was
 	 * visited (the corresponding CNF was generated),
 	 * in order to ensure that all the occurrences of the variable were taken into
 	 * account.</b>
@@ -163,15 +163,15 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
 	public Set<String> getVariableSubstitutionToPreserveProperties(int stateNo,
-			SLTLxVariableSubstitutionCollection variableSubtitutions, SATSynthesisEngine synthesisEngine) {
+			SLTLxVariableSubstitutionCollection variableSubstitutions, SATSynthesisEngine synthesisEngine) {
 		Set<SLTLxFormula> allFacts = new HashSet<>();
-		SLTLxVariableOccuranceCollection varOccurances = synthesisEngine.getVariableUsage();
+		SLTLxVariableOccurrenceCollection varOccurrences = synthesisEngine.getVariableUsage();
 
 		/**
 		 * Introduce rules to enforce substitution over unary predicates.
 		 * E.g., Val(?x,s1) => (P(?x) <=> P(s1))
 		 */
-		allFacts.addAll(generateDataPropertySubstitutionRules(this, variableSubtitutions, varOccurances));
+		allFacts.addAll(generateDataPropertySubstitutionRules(this, variableSubstitutions, varOccurrences));
 
 		/**
 		 * Introduce rules to enforce substitution over binary predicates
@@ -179,33 +179,35 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		 * 
 		 * ..in all the variable pairs where the current variable occurs.
 		 */
-		varOccurances.getPairsContainingVarAsArg(this).forEach(
-				pair -> allFacts.addAll(generateBinarySubstitutionRules(pair, variableSubtitutions, varOccurances)));
+		varOccurrences.getPairsContainingVarAsArg(this).forEach(
+				pair -> allFacts.addAll(generateBinarySubstitutionRules(pair, variableSubstitutions, varOccurrences)));
 
 		SLTLxConjunction andFacts = new SLTLxConjunction(allFacts);
 
-		return andFacts.getCNFEncoding(stateNo, variableSubtitutions, synthesisEngine);
+		return andFacts.getCNFEncoding(stateNo, variableSubstitutions, synthesisEngine);
 	}
 
 	/**
 	 * Generate the rules that enforce substitution over the data properties.<br>
 	 * <i> e.g., (VAL(?x,a) => (P(?x) <=> P(a))</i>
 	 * 
-	 * @param variable             - the variable that will be substituted
-	 * @param variableSubtitutions - collection of substitutions for each variable
-	 * @param varOccurances        - collection that tracks occurrences of variables
+	 * @param variable              - the variable that will be substituted
+	 * @param variableSubstitutions - collection of substitutions for each variable
+	 * @param varOccurrences        - collection that tracks occurrences of
+	 *                              variables
 	 * @return Set of formulas that represent the encoding of the rules
 	 */
 	private static Set<SLTLxFormula> generateDataPropertySubstitutionRules(SLTLxVariable variable,
-			SLTLxVariableSubstitutionCollection variableSubtitutions, SLTLxVariableOccuranceCollection varOccurances) {
+			SLTLxVariableSubstitutionCollection variableSubstitutions,
+			SLTLxVariableOccurrenceCollection varOccurrences) {
 		Set<SLTLxFormula> allFacts = new HashSet<>();
 		/**
 		 * Introduce rules to enforce substitution over unary predicates when needed.
 		 * e.g., (VAL(?x,a) => (P(?x) <=> P(a))
 		 */
 
-		for (State varState : variableSubtitutions.getVariableDomain(variable)) {
-			for (PredicateLabel usedPred : varOccurances.getDataTypes(variable)) {
+		for (State varState : variableSubstitutions.getVariableDomain(variable)) {
+			for (PredicateLabel usedPred : varOccurrences.getDataTypes(variable)) {
 				/* (VAL(?x,a) => (P(?x) <=> P(a)) */
 				allFacts.add(new SLTLxImplication(
 						new SLTLxAtomVar(
@@ -223,7 +225,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 										varState))));
 			}
 
-			for (State usedPred : varOccurances.getMemoryReferences(variable)) {
+			for (State usedPred : varOccurrences.getMemoryReferences(variable)) {
 				/* (VAL(?x,a) => (P(?x) <=> P(a)) */
 				allFacts.add(new SLTLxImplication(
 						new SLTLxAtomVar(
@@ -249,13 +251,15 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * Generate the rules that enforce substitution over binary predicates. <br>
 	 * <i> e.g., VAL(?x,a) & VAL(?y,b) => (R_v(x,y) <=> R(a,b)) </i>
 	 * 
-	 * @param pair                 - a pair of variables that will be substituted
-	 * @param variableSubtitutions - collection of substitutions for each variable
-	 * @param varOccurances        - collection that tracks occurrences of variables
+	 * @param pair                  - a pair of variables that will be substituted
+	 * @param variableSubstitutions - collection of substitutions for each variable
+	 * @param varOccurrences        - collection that tracks occurrences of
+	 *                              variables
 	 * @return Set of formulas that represent the encoding of the rules
 	 */
 	private static Set<SLTLxFormula> generateBinarySubstitutionRules(Pair<SLTLxVariable> pair,
-			SLTLxVariableSubstitutionCollection variableSubtitutions, SLTLxVariableOccuranceCollection varOccurances) {
+			SLTLxVariableSubstitutionCollection variableSubstitutions,
+			SLTLxVariableOccurrenceCollection varOccurrences) {
 		Set<SLTLxFormula> allFacts = new HashSet<>();
 
 		SLTLxVariable var1 = pair.getFirst();
@@ -265,17 +269,17 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		 * Skip the pair if one of the variables is not in the scope (the rules were
 		 * implemented already).
 		 */
-		if (variableSubtitutions.getVariableDomain(var1) == null
-				|| variableSubtitutions.getVariableDomain(var2) == null) {
+		if (variableSubstitutions.getVariableDomain(var1) == null
+				|| variableSubstitutions.getVariableDomain(var2) == null) {
 			return allFacts;
 		}
-		for (AtomVarType atomVarType : varOccurances.getBinaryPredicates(pair)) {
+		for (AtomVarType atomVarType : varOccurrences.getBinaryPredicates(pair)) {
 			AtomType atomType = inferAtomType(atomVarType);
 			if (atomType == null)
 				continue;
 
-			for (State var1State : variableSubtitutions.getVariableDomain(var1)) {
-				for (State var2State : variableSubtitutions.getVariableDomain(var2)) {
+			for (State var1State : variableSubstitutions.getVariableDomain(var1)) {
+				for (State var2State : variableSubstitutions.getVariableDomain(var2)) {
 					/* VAL(?x,a) & VAL(?y,b) => (P(?x,?y) <=> P(a,b)) */
 					allFacts.add(new SLTLxImplication(
 							new SLTLxConjunction(
@@ -313,9 +317,9 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 */
 	private static AtomType inferAtomType(AtomVarType atomVarType) {
 		if (atomVarType.equals(AtomVarType.VAR_EQUIVALENCE)) {
-			return AtomType.IDENTITI_RELATION;
+			return AtomType.IDENTITY_RELATION;
 		} else if (atomVarType.equals(AtomVarType.R_RELATION_V)) {
-			return AtomType.R_RELATON;
+			return AtomType.R_RELATION;
 		} else if (atomVarType.equals(AtomVarType.MEM_TYPE_REF_V)) {
 			return AtomType.MEM_TYPE_REFERENCE;
 		} else {
@@ -333,7 +337,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * @return
 	 */
 	public static Set<State> getVariableDomain(int stateNo, SATSynthesisEngine synthesisEngine) {
-		Set<State> variableDomain = new HashSet<State>();
+		Set<State> variableDomain = new HashSet<>();
 		/**
 		 * Domain includes the objects generated by the next tool,
 		 * and thus we use the next state to get the domain of the variable.
@@ -347,7 +351,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 
 	public Set<String> getVariableMutualExclusion(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> allClauses = new HashSet<String>();
+		Set<String> allClauses = new HashSet<>();
 		/**
 		 * Domain includes the objects generated by the next tool,
 		 * and thus we use the next state to get the domain of the variable.

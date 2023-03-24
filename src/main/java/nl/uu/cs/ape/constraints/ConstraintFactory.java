@@ -30,7 +30,7 @@ public class ConstraintFactory {
 	 * Instantiates a new Constraint factory.
 	 */
 	public ConstraintFactory() {
-		this.constraintTemplates = new HashMap<String, ConstraintTemplate>();
+		this.constraintTemplates = new HashMap<>();
 	}
 
 	/**

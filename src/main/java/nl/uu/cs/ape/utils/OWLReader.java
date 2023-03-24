@@ -34,7 +34,7 @@ public class OWLReader {
 	/** List of all types in the domain */
 	private final AllTypes allTypes;
 	/** Mapping from each dimension to the list of the types within it */
-	private Map<String, Set<String>> typeDimensions = new HashMap<String, Set<String>>();
+	private Map<String, Set<String>> typeDimensions = new HashMap<>();
 
 	private OWLOntology ontology;
 	private OWLDataFactory factory;
@@ -93,7 +93,7 @@ public class OWLReader {
 		}
 
 		/* Get roots for each of the data dimensions. */
-		List<OWLClass> dimensionRootClasses = new ArrayList<OWLClass>();
+		List<OWLClass> dimensionRootClasses = new ArrayList<>();
 		for (String dimensionIRI : allTypes.getDataTaxonomyDimensionIDs()) {
 			OWLClass dimensionClass = manager.getOWLDataFactory().getOWLClass(IRI.create(dimensionIRI));
 			if (!ontology.containsClassInSignature(IRI.create(dimensionIRI))) {
@@ -106,7 +106,7 @@ public class OWLReader {
 
 		exploreModuleOntologyRec(reasoner, moduleRootClass, null, null);
 
-		dimensionRootClasses.forEach(typeClass -> typeDimensions.put(getIRI(typeClass), new HashSet<String>()));
+		dimensionRootClasses.forEach(typeClass -> typeDimensions.put(getIRI(typeClass), new HashSet<>()));
 		dimensionRootClasses.forEach(typeClass -> exploreTypeOntologyRec(reasoner, typeClass, null, null));
 
 		String ovesrlap;
@@ -172,10 +172,10 @@ public class OWLReader {
 			for (OWLClass class2 : typeClasses) {
 				String classID1 = getIRI(class1);
 				String classID2 = getIRI(class2);
-				if (!classID1.equals(classID2)) {
-					if (!Collections.disjoint(typeDimensions.get(classID1), typeDimensions.get(classID2))) {
-						return classID1 + " & " + classID2;
-					}
+				if (!classID1.equals(classID2)
+						&& (!Collections.disjoint(typeDimensions.get(classID1), typeDimensions.get(classID2)))) {
+					return classID1 + " & " + classID2;
+
 				}
 			}
 		}

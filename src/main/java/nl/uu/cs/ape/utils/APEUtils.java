@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -43,9 +44,9 @@ import java.util.stream.IntStream;
  */
 public final class APEUtils {
 
-	private final static Map<String, Long> timers = new HashMap<>();
-	private final static PrintStream original = System.err;
-	private final static PrintStream nullStream = new PrintStream(new OutputStream() {
+	private static final Map<String, Long> timers = new HashMap<>();
+	private static final PrintStream original = System.err;
+	private static final PrintStream nullStream = new PrintStream(new OutputStream() {
 		@Override
 		public void write(int b) {
 		}
@@ -80,7 +81,7 @@ public final class APEUtils {
 		for (ConstraintTemplateData constraint : domainSetup.getUnformattedConstr()) {
 			currConst++;
 			/* ENCODE THE CONSTRAINT */
-			if (domainSetup.getConstraintTamplate(constraint.getConstraintID()) == null) {
+			if (domainSetup.getConstraintTemplate(constraint.getConstraintID()) == null) {
 				System.err.println("Constraint ID provided: '" + constraint.getConstraintID()
 						+ "' is not valid. Constraint skipped.");
 			} else {
@@ -102,7 +103,7 @@ public final class APEUtils {
 			Set<SLTLxFormula> sltlxFormulas = SLTLxSATVisitor.parseFormula(synthesisEngine, constraint);
 			for (SLTLxFormula sltlxFormula : sltlxFormulas) {
 				sltlxFormula.getConstraintCNFEncoding(synthesisEngine)
-						.forEach(sltlxString -> cnf_SLTL.append(sltlxString));
+						.forEach(cnf_SLTL::append);
 			}
 		}
 
@@ -127,7 +128,7 @@ public final class APEUtils {
 			APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
 			SATAtomMappings mappings) {
 
-		return domainSetup.getConstraintTamplate(constraintID).getConstraint(list, domainSetup, moduleAutomaton,
+		return domainSetup.getConstraintTemplate(constraintID).getConstraint(list, domainSetup, moduleAutomaton,
 				typeAutomaton, mappings);
 	}
 
@@ -161,7 +162,7 @@ public final class APEUtils {
 	 */
 	public static JSONObject readPathToJSONObject(String path) throws IOException, JSONException {
 		File file = APEUtils.getFileFromPath(path);
-		String content = FileUtils.readFileToString(file, "utf-8");
+		String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 		return new JSONObject(content);
 	}
 
@@ -174,7 +175,7 @@ public final class APEUtils {
 	 * @throws JSONException Error if the file is not in expected JSON format
 	 */
 	public static JSONObject readFileToJSONObject(File file) throws IOException, JSONException {
-		String content = FileUtils.readFileToString(file, "utf-8");
+		String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 		return new JSONObject(content);
 	}
 
@@ -187,7 +188,7 @@ public final class APEUtils {
 	 * @throws JSONException Error if the file is not in expected JSON format
 	 */
 	public static JSONArray readFileToJSONArray(File file) throws IOException, JSONException {
-		String content = FileUtils.readFileToString(file, "utf-8");
+		String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 		return new JSONArray(content);
 	}
 
@@ -278,7 +279,7 @@ public final class APEUtils {
 	 * @throws IOException Error in handling a JSON file.
 	 */
 	public static List<JSONObject> getListFromJson(File jsonFile, String key) throws IOException, JSONException {
-		String content = FileUtils.readFileToString(jsonFile, "utf-8");
+		String content = FileUtils.readFileToString(jsonFile, StandardCharsets.UTF_8);
 		JSONObject jsonObject = new JSONObject(content);
 
 		return getListFromJson(jsonObject, key, JSONObject.class);
@@ -374,43 +375,45 @@ public final class APEUtils {
 	 *                    types.
 	 */
 	public static void debugPrintout(APERunConfig runConfig, APEDomainSetup domainSetup) {
+		String line = "-------------------------------------------------------------";
+
 		if (runConfig.getDebugMode()) {
 
 			/*
 			 * Printing the constraint templates
 			 */
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tConstraint templates:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println(domainSetup.getConstraintFactory().printConstraintsCodes() + "\n");
 
 			/*
 			 * Printing the Module and Taxonomy Tree
 			 */
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tTool Taxonomy:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			domainSetup.getAllModules().getRootModule().printTree(" ", domainSetup.getAllModules());
-			System.out.println("\n-------------------------------------------------------------");
+			System.out.println("\n" + line);
 			System.out.println("\tData Taxonomy dimensions:");
 			for (TaxonomyPredicate dimension : domainSetup.getAllTypes().getRootPredicates()) {
-				System.out.println("\n-------------------------------------------------------------");
+				System.out.println("\n" + line);
 				System.out.println("\t" + dimension.getPredicateLabel() + "Taxonomy:");
-				System.out.println("-------------------------------------------------------------");
+				System.out.println(line);
 				dimension.printTree(" ", domainSetup.getAllTypes());
 			}
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tLabels Taxonomy:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			domainSetup.getAllTypes().getLabelRoot().printTree(" ", domainSetup.getAllTypes());
 
 			/*
 			 * Printing the tool annotations
 			 */
 			boolean noTools = true;
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tAnnotated tools:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			for (TaxonomyPredicate module : domainSetup.getAllModules().getModules()) {
 				if (module instanceof Module) {
 					System.out.println(module.toString());
@@ -424,27 +427,27 @@ public final class APEUtils {
 			/*
 			 * Print out the constraints
 			 */
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tConstraints:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			for (ConstraintTemplateData constr : domainSetup.getUnformattedConstr()) {
 				System.out.println(domainSetup.getConstraintFactory().getDescription(constr));
 			}
 			if (domainSetup.getUnformattedConstr().isEmpty()) {
 				System.out.println("\tNo constraints.");
 			}
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 
 			int i = 1;
 			for (Type input : runConfig.getProgramInputs()) {
 				System.out.println((i++) + ". program input is " + input.toShortString());
 			}
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			i = 1;
 			for (Type output : runConfig.getProgramOutputs()) {
 				System.out.println((i++) + ". program output is " + output.toShortString());
 			}
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 		}
 	}
 
@@ -455,14 +458,16 @@ public final class APEUtils {
 	 * @param title    The mail content of the title.
 	 */
 	public static void printHeader(Integer argument, String... title) {
+		String line = "-------------------------------------------------------------";
+
 		String arg = (argument == null) ? "" : (" " + argument);
 
-		System.out.println("\n-------------------------------------------------------------");
+		System.out.println("\n" + line);
 		System.out.println("\t" + title[0] + arg);
 		if (title.length > 1) {
 			System.out.println("\t" + title[1] + arg);
 		}
-		System.out.println("-------------------------------------------------------------");
+		System.out.println(line);
 	}
 
 	/**
@@ -532,7 +537,7 @@ public final class APEUtils {
 	 * @throws IOException In case that the string.
 	 */
 	public static int countNewLines(String inputString) throws IOException {
-		try (InputStream stream = IOUtils.toInputStream(inputString, "UTF-8")) {
+		try (InputStream stream = IOUtils.toInputStream(inputString, StandardCharsets.UTF_8)) {
 			byte[] c = new byte[1024];
 
 			int readChars = stream.read(c);
@@ -586,7 +591,7 @@ public final class APEUtils {
 	 * @param debugMode the debug mode
 	 */
 	public static void timerStart(String timerID, Boolean debugMode) {
-		if (debugMode) {
+		if (Boolean.TRUE.equals(debugMode)) {
 			timers.put(timerID, System.currentTimeMillis());
 		} else {
 			timers.put(timerID, (long) -1);
@@ -599,9 +604,7 @@ public final class APEUtils {
 		}
 
 		long elapsedTimeMs = System.currentTimeMillis() - timers.get(timerID);
-		long timeLeftMs = timeout - elapsedTimeMs;
-		return timeLeftMs;
-
+		return timeout - elapsedTimeMs;
 	}
 
 	/**
@@ -941,9 +944,7 @@ public final class APEUtils {
 	 */
 	public static void appendToFile(File file, Set<CNFClause> cnfEncoding) throws IOException, NullPointerException {
 		StringBuilder string = new StringBuilder();
-		cnfEncoding.forEach(clause -> {
-			string.append(clause.toCNF());
-		});
+		cnfEncoding.forEach(clause -> string.append(clause.toCNF()));
 		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
 		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
 		writer.write(string.toString());
@@ -984,8 +985,6 @@ public final class APEUtils {
 				lines++;
 
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1022,14 +1021,11 @@ public final class APEUtils {
 	 * @return Set of unique pairs.
 	 */
 	public static Set<Pair<PredicateLabel>> getUniquePairs(Collection<? extends PredicateLabel> set) {
-		Set<Pair<PredicateLabel>> pairs = new HashSet<Pair<PredicateLabel>>();
-		set.stream().forEach(ele1 -> {
-			set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
-					.forEach(ele2 -> {
-						pairs.add(new Pair<PredicateLabel>(ele1, ele2));
-					});
-		});
+		Set<Pair<PredicateLabel>> pairs = new HashSet<>();
+		set.stream().forEach(ele1 -> set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
+				.forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
+
 	}
 
 	/**
@@ -1042,12 +1038,8 @@ public final class APEUtils {
 	 * @return Set of unique pairs.
 	 */
 	public static <T> Set<Pair<T>> getUniquePairs(Collection<T> set1, Collection<T> set2) {
-		Set<Pair<T>> pairs = new HashSet<Pair<T>>();
-		set1.stream().forEach(ele1 -> {
-			set2.stream().forEach(ele2 -> {
-				pairs.add(new Pair<T>(ele1, ele2));
-			});
-		});
+		Set<Pair<T>> pairs = new HashSet<>();
+		set1.stream().forEach(ele1 -> set2.stream().forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
 	}
 
@@ -1078,7 +1070,7 @@ public final class APEUtils {
 	 * @throws IOException Exception in case of a badly formatted URL or file.
 	 */
 	private static File getFileFromURL(String fileUrl) throws IOException {
-		File loadedFile = new File(fileUrl);
+		File loadedFile = File.createTempFile("ape_temp_", "");
 		FileUtils.copyURLToFile(
 				new URL(fileUrl),
 				loadedFile,

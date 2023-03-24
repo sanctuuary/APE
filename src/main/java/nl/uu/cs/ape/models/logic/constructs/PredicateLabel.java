@@ -9,17 +9,20 @@ package nl.uu.cs.ape.models.logic.constructs;
 public interface PredicateLabel extends Comparable<PredicateLabel>, APEPredicate {
 
     /**
-     * Get string that corresponds to the predicate ID.
+     * Get the unique predicate identifier defined as String.
      *
-     * @return String identifying the predicate.
+     * @return String representation of the predicate, used to uniquely identify the
+     *         predicate.
      */
-    public String getPredicateID();
+    public abstract String getPredicateID();
 
     /**
      * Get string that corresponds to the predicate label (e.g. OWL label). The
      * label is not guaranteed to be unique.
      *
-     * @return String representation of the predicate.
+     * @return String representation of the predicate label, used for presentation
+     *         in case when the predicate ID is too complex/long.
+     * 
      */
     public String getPredicateLabel();
 

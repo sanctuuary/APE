@@ -26,7 +26,8 @@ import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * The {@code UseCaseTest} test is an initial version for functional testing that makes use of the API.
+ * The {@code UseCaseTest} test is an initial version for functional testing
+ * that makes use of the API.
  *
  * @author Maurin Voshol
  */
@@ -40,7 +41,8 @@ class UseCaseTest {
         repo = new GitHubRepo("sanctuuary/APE_UseCases", "master");
 
         final boolean canConnect = repo.canConnect();
-        final String message = "There needs to be an active internet connection to run the use case tests.\nSKIP: " + UseCaseTest.class.getName();
+        final String message = "There needs to be an active internet connection to run the use case tests.\nSKIP: "
+                + UseCaseTest.class.getName();
 
         if (!canConnect)
             APEUtils.printWarning(message);
@@ -69,7 +71,8 @@ class UseCaseTest {
         testUseCase("MassSpectometry", "use_cases/MassSpectometry_UseCase_Evaluation.json");
     }
 
-    void testUseCase(String name, String evaluationPath) throws APEConfigException, OWLOntologyCreationException, IOException {
+    void testUseCase(String name, String evaluationPath)
+            throws APEConfigException, OWLOntologyCreationException, IOException {
 
         System.out.println("-------------------------------------------------------------");
         System.out.println("       TEST " + name);
@@ -84,8 +87,10 @@ class UseCaseTest {
             final JSONObject config = mutation.execute(useCase.base_configuration);
 
             /*
-             * If these are the generated solution lengths: S=[3,3,3,3,3, 4,4,4,4,4,4,4,4,4,4 ...] (from runSynthesis)
-             * with starting value v=3 and number of solutions N=[5, 1000] (from use_cases/GeoGMT_UseCase_Evaluation.json)
+             * If these are the generated solution lengths: S=[3,3,3,3,3,
+             * 4,4,4,4,4,4,4,4,4,4 ...] (from runSynthesis)
+             * with starting value v=3 and number of solutions N=[5, 1000] (from
+             * use_cases/GeoGMT_UseCase_Evaluation.json)
              * then the following tests must succeed:
              * For each N[i] in N: (S[N[i] - 1] == v + i) AND (S[N[i]] == v + i + 1)
              */
@@ -98,18 +103,27 @@ class UseCaseTest {
             final int max_no_solutions = config.getInt("solutions");
             int current_solution_length = mutation.solution_length_start;
             for (int no_solutions : mutation.expected_no_solutions) {
-            	if(solutions.size() < max_no_solutions) {
-            		fail("The number of expected workflow solutions is be %d, but the number of generated workflows was %d.", max_no_solutions, solutions.size());
-            	}
-                assertEquals(current_solution_length, solutions.get(no_solutions - 1).getSolutionlength(),
-                        String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions - 1, current_solution_length, solutions.get(no_solutions - 1).getSolutionlength()));
-                success("Workflow solution at index %s has expected length of %s", no_solutions - 1, current_solution_length);
+                if (solutions.size() < max_no_solutions) {
+                    fail("The number of expected workflow solutions is be %d, but the number of generated workflows was %d.",
+                            max_no_solutions, solutions.size());
+                }
+                assertEquals(current_solution_length, solutions.get(no_solutions - 1).getSolutionLength(),
+                        String.format(
+                                "Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.",
+                                no_solutions - 1, current_solution_length,
+                                solutions.get(no_solutions - 1).getSolutionLength()));
+                success("Workflow solution at index %s has expected length of %s", no_solutions - 1,
+                        current_solution_length);
 
                 // if there are still solutions left (so not above 1000), test the upper bound
                 if (no_solutions < max_no_solutions && solutions.getNumberOfSolutions() > no_solutions) {
-                    assertEquals(current_solution_length + 1, solutions.get(no_solutions).getSolutionlength(),
-                            String.format("Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.", no_solutions, current_solution_length + 1, solutions.get(no_solutions).getSolutionlength()));
-                    success("Workflow solution at index %s has expected length of %s", no_solutions, current_solution_length + 1);
+                    assertEquals(current_solution_length + 1, solutions.get(no_solutions).getSolutionLength(),
+                            String.format(
+                                    "Solution with index '%s' should have a length of '%s', but has an actual length of '%s'.",
+                                    no_solutions, current_solution_length + 1,
+                                    solutions.get(no_solutions).getSolutionLength()));
+                    success("Workflow solution at index %s has expected length of %s", no_solutions,
+                            current_solution_length + 1);
                 }
 
                 current_solution_length++;
@@ -118,7 +132,8 @@ class UseCaseTest {
             // no solutions can be found
             if (mutation.expected_no_solutions.length == 0) {
                 final int no_solutions = new APE(config).runSynthesis(config).getNumberOfSolutions();
-                assertEquals(0, no_solutions, String.format("APE found '%s' solutions, while for this use case APE should have found 0.", no_solutions));
+                assertEquals(0, no_solutions, String.format(
+                        "APE found '%s' solutions, while for this use case APE should have found 0.", no_solutions));
                 success("APE did not find any solutions as expected.");
             }
 
@@ -164,8 +179,10 @@ class UseCaseTest {
             this.base_configuration.put("solutions_dir_path", repo.getRoot());
             this.base_configuration.put("debug_mode", false);
 
-            this.base_configuration.put("ontology_path", repo.getFile(this.base_configuration.getString("ontology_path")));
-            this.base_configuration.put("tool_annotations_path", repo.getFile(this.base_configuration.getString("tool_annotations_path")));
+            this.base_configuration.put("ontology_path",
+                    repo.getFile(this.base_configuration.getString("ontology_path")));
+            this.base_configuration.put("tool_annotations_path",
+                    repo.getFile(this.base_configuration.getString("tool_annotations_path")));
 
             String initial_constraints_path = this.base_configuration.getString("constraints_path");
             this.base_configuration.put("constraints_path", repo.getFile(initial_constraints_path));
@@ -222,7 +239,8 @@ class UseCaseTest {
                     for (int i = 0; i < this.add_constraints.length(); i++) {
                         currentConstraints.put(this.add_constraints.get(i));
                     }
-                    this.constraints_path = folder.createJSONFile(new JSONObject().put(CONSTRAINTS, currentConstraints), CONSTRAINTS);
+                    this.constraints_path = folder.createJSONFile(new JSONObject().put(CONSTRAINTS, currentConstraints),
+                            CONSTRAINTS);
                 }
             }
 
@@ -265,7 +283,8 @@ class UseCaseTest {
                 }
 
                 if (replace_constraints != null) {
-                    System.out.println("    REPLACE CONSTRAINTS: " + replace_constraints.getJSONArray(CONSTRAINTS).toString());
+                    System.out.println(
+                            "    REPLACE CONSTRAINTS: " + replace_constraints.getJSONArray(CONSTRAINTS).toString());
                 }
 
                 if (number_of_cwl_files != 0) {
@@ -273,7 +292,8 @@ class UseCaseTest {
                 }
 
                 System.out.println("    MINIMAL SOLUTION LENGTH: " + solution_length_start);
-                System.out.println("    EXPECTED AMOUNT OF SOLUTIONS STARTING AT MINIMAL SOLUTIONS: " + Arrays.toString(expected_no_solutions));
+                System.out.println("    EXPECTED AMOUNT OF SOLUTIONS STARTING AT MINIMAL SOLUTIONS: "
+                        + Arrays.toString(expected_no_solutions));
                 System.out.println("-------------------------------------------------------------\n");
             }
         }

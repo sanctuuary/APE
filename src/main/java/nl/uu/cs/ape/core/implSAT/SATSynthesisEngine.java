@@ -19,7 +19,7 @@ import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccuranceCollection;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccurrenceCollection;
 import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
      * Mapping of all the variables that are utilised in the encoding to the
      * predicates use them.
      */
-    private SLTLxVariableOccuranceCollection varUsage;
+    private SLTLxVariableOccurrenceCollection varUsage;
 
     /**
      * Static variable used to count the encoding time of the APE instance run,
@@ -119,7 +120,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         this.runConfig = runConfig;
         this.mappings = allSolutions.getMappings();
         this.mappings.resetAuxVariables();
-        this.varUsage = new SLTLxVariableOccuranceCollection();
+        this.varUsage = new SLTLxVariableOccurrenceCollection();
 
         this.satInputFile = null;
         this.cnfEncoding = File.createTempFile("satCNF" + workflowLength, null);
@@ -194,12 +195,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         for (Pair<PredicateLabel> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
             SLTLxFormula.appendCNFToFile(cnfEncoding, this,
                     EnforceTypeRelatedRules.memoryTypesMutualExclusion(pair, typeAutomaton));
-            // SLTLxFormula.appendCNFToFile(cnfEncoding, this,
-            // EnforceTypeRelatedRules.usedTypeMutualExclusion(pair, typeAutomaton));
         }
-        // APEUtils.appendSetToFile(cnfEncoding,
-        // EnforceTypeRelatedRules.typeMutualExclusion(this, domainSetup.getAllTypes(),
-        // typeAutomaton));
         APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
 
         SLTLxFormula.appendCNFToFile(cnfEncoding, this,
@@ -245,7 +241,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * Encode rule that the given inputs should not be used as workflow outputs
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
-                .inputsAreNotOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
+                .inputsAreNotOutputs(typeAutomaton));
 
         /*
          * Encode the constraints from the file based on the templates (manual
@@ -271,9 +267,9 @@ public class SATSynthesisEngine implements SynthesisEngine {
          */
         int variables = mappings.getSize();
         int clauses = APEUtils.countLines(cnfEncoding);
-        String sat_input_header = "p cnf " + variables + " " + clauses + "\n";
+        String satInputHeader = "p cnf " + variables + " " + clauses + "\n";
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
-        satInputFile = APEUtils.prependToFile(sat_input_header, cnfEncoding);
+        satInputFile = APEUtils.prependToFile(satInputHeader, cnfEncoding);
         cnfEncoding.delete();
 
         /* add the cnf encoding file to Desktop */
@@ -322,11 +318,11 @@ public class SATSynthesisEngine implements SynthesisEngine {
      * Returns a set of {@link SATSolution SAT_solutions} by parsing the SAT
      * output. In case of the UNSAT the list is empty.
      *
-     * @param sat_input CNF formula in dimacs form.
+     * @param satInput CNF formula in dimacs form.
      * @return List of {@link SATSolution SAT_solutions}. Possibly empty list.
      */
-    private List<SolutionWorkflow> runMiniSAT(InputStream sat_input, int solutionsFound, int solutionsFoundMax) {
-        List<SolutionWorkflow> solutions = new ArrayList<SolutionWorkflow>();
+    private List<SolutionWorkflow> runMiniSAT(InputStream satInput, int solutionsFound, int solutionsFoundMax) {
+        List<SolutionWorkflow> solutions = new ArrayList<>();
         ISolver solver = SolverFactory.newDefault();
         long globalTimeoutMs = runConfig.getTimeoutMs();
         long currTimeout = APEUtils.timerTimeLeft("globalTimer", globalTimeoutMs);
@@ -341,11 +337,11 @@ public class SATSynthesisEngine implements SynthesisEngine {
         Reader reader = new DimacsReader(solver);
         try {
             // loading CNF encoding of the problem
-            IProblem problem = reader.parseInstance(sat_input);
+            IProblem problem = reader.parseInstance(satInput);
             realStartTime = System.currentTimeMillis();
             while (solutionsFound < solutionsFoundMax && problem.isSatisfiable()) {
-                SolutionWorkflow sat_solution = new SolutionWorkflow(problem.model(), this);
-                solutions.add(sat_solution);
+                SolutionWorkflow satSolution = new SolutionWorkflow(problem.model(), this);
+                solutions.add(satSolution);
                 solutionsFound++;
                 if (solutionsFound % 500 == 0) {
                     realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
@@ -356,11 +352,11 @@ public class SATSynthesisEngine implements SynthesisEngine {
                  * Adding the negation of the positive part of the solution as a constraint
                  * (default negation does not work)
                  */
-                IVecInt negSol = new VecInt(((SATSolution) sat_solution.getNativeSolution())
+                IVecInt negSol = new VecInt(((SATSolution) satSolution.getNativeSolution())
                         .getNegatedMappedSolutionArray(runConfig.getAllowToolSeqRepeat()));
                 solver.addClause(negSol);
             }
-            sat_input.close();
+            satInput.close();
         } catch (ParseFormatException e) {
             System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
             System.err.println(e.getMessage());
@@ -464,19 +460,23 @@ public class SATSynthesisEngine implements SynthesisEngine {
      * Get mapping of all the variables that are utilised in the encoding to the
      * predicates use them.
      * 
-     * @return Variable usage class {@link SLTLxVariableOccuranceCollection}.
+     * @return Variable usage class {@link SLTLxVariableOccurrenceCollection}.
      */
-    public SLTLxVariableOccuranceCollection getVariableUsage() {
+    public SLTLxVariableOccurrenceCollection getVariableUsage() {
         return varUsage;
     }
 
     /**
      * Delete all temporary files created.
+     * 
+     * @throws IOException - Failed to delete temp files.
      */
-    public void deleteTempFiles() {
-        cnfEncoding.delete();
-        satInputFile.delete();
-
+    public void deleteTempFiles() throws IOException {
+        try {
+            Files.delete(cnfEncoding.toPath());
+            Files.delete(satInputFile.toPath());
+        } catch (IOException ignored) {
+        }
     }
 
 }

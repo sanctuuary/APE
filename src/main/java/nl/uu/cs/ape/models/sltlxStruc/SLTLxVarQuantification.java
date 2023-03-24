@@ -16,47 +16,47 @@ public abstract class SLTLxVarQuantification extends SLTLxFormula {
 	protected SLTLxVariable boundVariable;
 	protected SLTLxFormula formula;
 
-	public SLTLxVarQuantification(SLTLxVariable boundVariable, SLTLxFormula formula) {
+	protected SLTLxVarQuantification(SLTLxVariable boundVariable, SLTLxFormula formula) {
 		super();
 		this.boundVariable = boundVariable;
 		this.formula = formula;
 	}
 
 	@Override
-	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection newVarMappping,
+	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection newVarMapping,
 			SATSynthesisEngine synthesisEngine) {
 		Set<String> clauses = new HashSet<String>();
-		SLTLxVariable flatBindedVariable = newVarMappping.getVarSabstitute(boundVariable);
+		SLTLxVariable flatBoundVariable = newVarMapping.getVarSabstitute(boundVariable);
 		/** Encode the underlying formula. */
-		clauses.addAll(formula.getCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(formula.getCNFEncoding(stateNo, newVarMapping, synthesisEngine));
 		/**
 		 * Ensure that the variables and states they substitute satisfy the same
 		 * properties.
 		 * The rules have to be applied after visiting the bound formula (as done in the
 		 * previous step).
 		 */
-		clauses.addAll(flatBindedVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMappping,
+		clauses.addAll(flatBoundVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMapping,
 				synthesisEngine));
-		clauses.addAll(flatBindedVariable.getVariableMutualExclusion(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(flatBoundVariable.getVariableMutualExclusion(stateNo, newVarMapping, synthesisEngine));
 		return clauses;
 	}
 
 	@Override
-	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection newVarMappping,
+	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection newVarMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> clauses = new HashSet<String>();
-		SLTLxVariable flatBindedVariable = newVarMappping.getVarSabstitute(boundVariable);
+		Set<String> clauses = new HashSet<>();
+		SLTLxVariable flatBoundVariable = newVarMapping.getVarSabstitute(boundVariable);
 		/** Encode the underlying formula. */
-		clauses.addAll(formula.getNegatedCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(formula.getNegatedCNFEncoding(stateNo, newVarMapping, synthesisEngine));
 		/**
 		 * Ensure that the variables and states they substitute satisfy the same
 		 * properties.
 		 * The rules have to be applied after visiting the bound formula (as done in the
 		 * previous step).
 		 */
-		clauses.addAll(flatBindedVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMappping,
+		clauses.addAll(flatBoundVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMapping,
 				synthesisEngine));
-		clauses.addAll(flatBindedVariable.getVariableMutualExclusion(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(flatBoundVariable.getVariableMutualExclusion(stateNo, newVarMapping, synthesisEngine));
 		return clauses;
 	}
 

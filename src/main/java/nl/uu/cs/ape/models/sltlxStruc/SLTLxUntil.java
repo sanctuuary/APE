@@ -7,6 +7,7 @@ import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 
 /**
  * Structure used to model Until (U) modal statement in SLTLx.
+ * TODO: Implement operator.
  * 
  * @author Vedran Kasalica
  *
@@ -25,7 +26,7 @@ public class SLTLxUntil extends SLTLxFormula {
 	@Override
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		Set<String> clauses = new HashSet<>();
 		// for(int i = stateNo; i < synthesisEngine.getSolutionSize(); i++) {

@@ -29,9 +29,9 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 public class APEDomainSetup {
 
     /* Helper objects used to keep track of the domain quality. */
-    public Set<String> emptyTools = new HashSet<String>();
-    public Set<String> wrongToolIO = new HashSet<String>();
-    public Set<String> wrongToolTax = new HashSet<String>();
+    private Set<String> emptyTools = new HashSet<>();
+    private Set<String> wrongToolIO = new HashSet<>();
+    private Set<String> wrongToolTax = new HashSet<>();
     /**
      * All modules/operations used in the domain.
      */
@@ -79,7 +79,7 @@ public class APEDomainSetup {
     private static final String CONSTR_ID_TAG = "constraintid";
     private static final String CONSTR_SLTLx = "formula";
     private static final String CONSTR_PARAM_JSON_TAG = "parameters";
-    private static final String TOOLS_JSOM_TAG = "functions";
+    private static final String TOOLS_JSON_TAG = "functions";
 
     /**
      * Instantiates a new Ape domain setup.
@@ -87,12 +87,12 @@ public class APEDomainSetup {
      * @param config the config
      */
     public APEDomainSetup(APECoreConfig config) {
-        this.unformattedConstr = new ArrayList<ConstraintTemplateData>();
+        this.unformattedConstr = new ArrayList<>();
         this.allModules = new AllModules(config);
         this.allTypes = new AllTypes(config);
         this.constraintFactory = new ConstraintFactory();
-        this.helperPredicates = new ArrayList<AuxiliaryPredicate>();
-        this.constraintsSLTLx = new ArrayList<String>();
+        this.helperPredicates = new ArrayList<>();
+        this.constraintsSLTLx = new ArrayList<>();
         this.ontologyPrefixIRI = config.getOntologyPrefixIRI();
         this.useStrictToolAnnotations = config.getUseStrictToolAnnotations();
     }
@@ -202,7 +202,7 @@ public class APEDomainSetup {
      * @return The {@code ConstraintTemplate} that corresponds to the given ID, or
      *         null if the ID is not mapped to any constraint.
      */
-    public ConstraintTemplate getConstraintTamplate(String constraintID) {
+    public ConstraintTemplate getConstraintTemplate(String constraintID) {
         return constraintFactory.getConstraintTemplate(constraintID);
     }
 
@@ -235,14 +235,14 @@ public class APEDomainSetup {
                     if (constraintID.equals("SLTLx")) {
                         String formulaSLTLx = jsonConstraint.getString(CONSTR_SLTLx);
                         if (formulaSLTLx == null) {
-                            throw ConstraintFormatException.wrongNumberOfParameters(String
-                                    .format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+                            throw ConstraintFormatException.wrongNumberOfParameters(
+                                    getConstrErrorMsg(currNode, constraintID));
                         }
                         this.addSLTLxConstraint(formulaSLTLx);
                         continue;
                     } else {
                         throw ConstraintFormatException.wrongConstraintID(
-                                String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+                                getConstrErrorMsg(currNode, constraintID));
                     }
                 }
 
@@ -252,33 +252,37 @@ public class APEDomainSetup {
                         JSONObject.class);
                 if (currTemplateParameters.size() != jsonConstParam.size()) {
                     throw ConstraintFormatException.wrongNumberOfParameters(
-                            String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+                            getConstrErrorMsg(currNode, constraintID));
                 }
                 int paramNo = 0;
-                List<TaxonomyPredicate> constraintParametes = new ArrayList<TaxonomyPredicate>();
+                List<TaxonomyPredicate> constraintParameters = new ArrayList<>();
                 /* for each constraint parameter */
                 for (JSONObject jsonParam : jsonConstParam) {
                     ConstraintTemplateParameter taxInstanceFromJson = currTemplateParameters.get(paramNo++);
                     TaxonomyPredicate currParameter = taxInstanceFromJson.readConstraintParameterFromJson(jsonParam,
                             this);
-                    constraintParametes.add(currParameter);
+                    constraintParameters.add(currParameter);
                 }
 
                 ConstraintTemplateData currConstr = getConstraintFactory()
-                        .generateConstraintTemplateData(constraintID, constraintParametes);
-                if (constraintParametes.stream().anyMatch(Objects::isNull)) {
+                        .generateConstraintTemplateData(constraintID, constraintParameters);
+                if (constraintParameters.stream().anyMatch(Objects::isNull)) {
                     throw ConstraintFormatException.wrongParameter(
-                            String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+                            getConstrErrorMsg(currNode, constraintID));
                 } else {
                     this.addConstraintData(currConstr);
                 }
 
             } catch (JSONException e) {
                 throw ConstraintFormatException.badFormat(
-                        String.format("Error at constraint no: %d, constraint ID: %d", currNode, constraintID));
+                        getConstrErrorMsg(currNode, constraintID));
             }
 
         }
+    }
+
+    private String getConstrErrorMsg(int currNode, String constraintID) {
+        return String.format("Error at constraint no: %d, constraint ID: %s", currNode, constraintID);
     }
 
     /**
@@ -296,7 +300,7 @@ public class APEDomainSetup {
     public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException, JSONException {
         int currModule = 0;
         for (JSONObject jsonModule : APEUtils
-                .safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSOM_TAG, JSONObject.class))) {
+                .safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSON_TAG, JSONObject.class))) {
             currModule++;
             updateModuleFromJson(jsonModule);
         }
@@ -323,11 +327,11 @@ public class APEDomainSetup {
             moduleIRI = moduleIRI + "[tool]";
         }
         String moduleLabel = jsonModule.getString(APECoreConfig.getJsonTags("label"));
-        Set<String> taxonomyModules = new HashSet<String>(
+        Set<String> taxonomyModules = new HashSet<>(
                 APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("taxonomyOperations"), String.class));
         taxonomyModules = APEUtils.createIRIsFromLabels(taxonomyModules, ontologyPrefixIRI);
         /* Check if the referenced module taxonomy classes exist. */
-        List<String> toRemove = new ArrayList<String>();
+        List<String> toRemove = new ArrayList<>();
         for (String taxonomyModule : taxonomyModules) {
             String taxonomyModuleIRI = APEUtils.createClassIRI(taxonomyModule, ontologyPrefixIRI);
             if (allModules.get(taxonomyModuleIRI) == null) {
@@ -366,8 +370,8 @@ public class APEDomainSetup {
                 JSONObject.class);
         updateMaxNoToolOutputs(jsonModuleOutput.size());
 
-        List<Type> inputs = new ArrayList<Type>();
-        List<Type> outputs = new ArrayList<Type>();
+        List<Type> inputs = new ArrayList<>();
+        List<Type> outputs = new ArrayList<>();
 
         try {
             /* For each input and output, allocate the corresponding abstract types. */

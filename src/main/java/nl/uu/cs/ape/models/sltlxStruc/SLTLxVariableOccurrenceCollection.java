@@ -17,7 +17,7 @@ import nl.uu.cs.ape.utils.APEUtils;
  * @author Vedran Kasalica
  *
  */
-public class SLTLxVariableOccuranceCollection {
+public class SLTLxVariableOccurrenceCollection {
 
 	/** Mapping variables to their predicate properties. */
 	private Map<SLTLxVariable, Set<PredicateLabel>> variableDataTypes;
@@ -34,7 +34,7 @@ public class SLTLxVariableOccuranceCollection {
 	/**
 	 * Create the variable usage class.
 	 */
-	public SLTLxVariableOccuranceCollection() {
+	public SLTLxVariableOccurrenceCollection() {
 		super();
 		this.variableDataTypes = new HashMap<>();
 		this.variableMemoryReferences = new HashMap<>();

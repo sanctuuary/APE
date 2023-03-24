@@ -21,7 +21,7 @@ public class SLTLxExists extends SLTLxVarQuantification {
 	@Override
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection curVarMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> clauses = new HashSet<String>();
+		Set<String> clauses = new HashSet<>();
 		SLTLxVariableSubstitutionCollection newVarMappping = new SLTLxVariableSubstitutionCollection(curVarMapping);
 		SLTLxVariable flatBindedVariable = newVarMappping.addNewVariable(boundVariable,
 				SLTLxVariable.getVariableDomain(stateNo, synthesisEngine));
@@ -37,7 +37,7 @@ public class SLTLxExists extends SLTLxVarQuantification {
 	@Override
 	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection curVarMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> clauses = new HashSet<String>();
+		Set<String> clauses = new HashSet<>();
 
 		/** Encode the possible substitutions for the given variable. */
 		SLTLxVariable.getVariableDomain(stateNo, synthesisEngine).forEach(

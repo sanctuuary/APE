@@ -9,7 +9,8 @@ package nl.uu.cs.ape.models;
  */
 public class Pair<T> {
 
-	private T first, second;
+	private T first;
+	private T second;
 
 	/**
 	 * Instantiates a new Pair.

@@ -24,6 +24,8 @@ import nl.uu.cs.ape.utils.APEUtils;
  */
 public class SATSolution extends SolutionInterpreter {
 
+    private static final String textUnsat = "UNSAT";
+
     /**
      * List of all the literals provided by the solution.
      */
@@ -71,13 +73,13 @@ public class SATSolution extends SolutionInterpreter {
      */
     public SATSolution(int[] satSolution, SATSynthesisEngine synthesisInstance) {
         unsat = false;
-        literals = new ArrayList<SLTLxLiteral>();
-        positiveLiterals = new ArrayList<SLTLxLiteral>();
-        relevantModules = new ArrayList<SLTLxLiteral>();
-        relevantTypes = new ArrayList<SLTLxLiteral>();
-        relevantElements = new ArrayList<SLTLxLiteral>();
-        references2MemTypes = new ArrayList<SLTLxLiteral>();
-        usedTypeStates = new HashSet<PredicateLabel>();
+        literals = new ArrayList<>();
+        positiveLiterals = new ArrayList<>();
+        relevantModules = new ArrayList<>();
+        relevantTypes = new ArrayList<>();
+        relevantElements = new ArrayList<>();
+        references2MemTypes = new ArrayList<>();
+        usedTypeStates = new HashSet<>();
         for (int mappedLiteral : satSolution) {
             if (mappedLiteral >= synthesisInstance.getMappings().getInitialNumOfMappedAtoms()) {
                 SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral),
@@ -93,7 +95,7 @@ public class SATSolution extends SolutionInterpreter {
                         relevantModules.add(currLiteral);
                     } else if (currLiteral.getWorkflowElementType() != AtomType.MODULE
                             && currLiteral.getWorkflowElementType() != AtomType.MEM_TYPE_REFERENCE
-                            && currLiteral.getWorkflowElementType() != AtomType.R_RELATON
+                            && currLiteral.getWorkflowElementType() != AtomType.R_RELATION
                             && (currLiteral.getPredicate() instanceof Type)
                             && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
                         /* add all positive literals that describe simple types */
@@ -145,7 +147,7 @@ public class SATSolution extends SolutionInterpreter {
     public String getSolution() {
         StringBuilder solution = new StringBuilder();
         if (unsat) {
-            solution = new StringBuilder("UNSAT");
+            solution = new StringBuilder(textUnsat);
         } else {
             for (SLTLxLiteral literal : positiveLiterals) {
                 solution.append(literal.toString()).append(" ");
@@ -163,7 +165,7 @@ public class SATSolution extends SolutionInterpreter {
     public String getCompleteSolution() {
         StringBuilder solution = new StringBuilder();
         if (unsat) {
-            solution = new StringBuilder("UNSAT");
+            solution = new StringBuilder(textUnsat);
         } else {
             for (SLTLxLiteral literal : literals) {
                 solution.append(literal.toString()).append("\n");
@@ -183,7 +185,7 @@ public class SATSolution extends SolutionInterpreter {
     public String getRelevantToolsInSolution() {
         StringBuilder solution = new StringBuilder();
         if (unsat) {
-            solution = new StringBuilder("UNSAT");
+            solution = new StringBuilder(textUnsat);
         } else {
             for (SLTLxLiteral literal : relevantModules) {
                 solution.append(literal.getPredicate().getPredicateLabel()).append(" -> ");
@@ -203,7 +205,7 @@ public class SATSolution extends SolutionInterpreter {
     public String getRelevantSolution() {
         StringBuilder solution = new StringBuilder();
         if (unsat) {
-            solution = new StringBuilder("UNSAT");
+            solution = new StringBuilder(textUnsat);
         } else {
             for (SLTLxLiteral relevantElement : relevantElements) {
                 solution.append(relevantElement.toString() + " ");
@@ -220,7 +222,7 @@ public class SATSolution extends SolutionInterpreter {
      *         workflow.
      */
     public List<Module> getRelevantSolutionModules(AllModules allModules) {
-        List<Module> solutionModules = new ArrayList<Module>();
+        List<Module> solutionModules = new ArrayList<>();
         if (unsat) {
             return null;
         } else {
@@ -257,7 +259,7 @@ public class SATSolution extends SolutionInterpreter {
      * @return int[] representing the negated solution
      */
     public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
-        List<Integer> negSol = new ArrayList<Integer>();
+        List<Integer> negSol = new ArrayList<>();
         if (!unsat) {
             if (!toolSeqRepeat) {
                 for (SLTLxLiteral literal : relevantModules) {

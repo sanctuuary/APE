@@ -42,7 +42,7 @@ public abstract class ConstraintTemplate {
      *                    requires.
      * @param description Description of the constraint.
      */
-    public ConstraintTemplate(String id, List<ConstraintTemplateParameter> parameters, String description) {
+    protected ConstraintTemplate(String id, List<ConstraintTemplateParameter> parameters, String description) {
         this.constraintID = id;
         this.parameters = parameters;
         this.description = description;

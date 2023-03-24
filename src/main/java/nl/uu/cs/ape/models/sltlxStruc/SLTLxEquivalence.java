@@ -25,7 +25,7 @@ public class SLTLxEquivalence extends SLTLxFormula {
 	@Override
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> allClauses = new HashSet<String>();
+		Set<String> allClauses = new HashSet<>();
 
 		/* Add the elements that represent the 2 way implication. */
 		allClauses.addAll(
@@ -39,7 +39,7 @@ public class SLTLxEquivalence extends SLTLxFormula {
 	@Override
 	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> allClauses = new HashSet<String>();
+		Set<String> allClauses = new HashSet<>();
 
 		/* Ensure that the 2 arguments are not the same. */
 		allClauses.addAll(

@@ -18,7 +18,7 @@ public class SLTLxDisjunction extends SLTLxFormula {
 
 	public SLTLxDisjunction(SLTLxFormula arg1, SLTLxFormula arg2) {
 		super();
-		this.disjointFacts = new HashSet<SLTLxFormula>();
+		this.disjointFacts = new HashSet<>();
 		if (arg1 != null)
 			this.disjointFacts.add(arg1);
 		if (arg2 != null)
@@ -27,7 +27,7 @@ public class SLTLxDisjunction extends SLTLxFormula {
 
 	public SLTLxDisjunction(Collection<? extends SLTLxFormula> conjunctedFacts) {
 		super();
-		this.disjointFacts = new HashSet<SLTLxFormula>();
+		this.disjointFacts = new HashSet<>();
 		conjunctedFacts.forEach(fact -> {
 			if (fact != null)
 				this.disjointFacts.add(fact);
@@ -42,7 +42,7 @@ public class SLTLxDisjunction extends SLTLxFormula {
 			return SLTLxAtom.getFalse().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		}
 
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/*
 		 * Disjoint the collection of clauses that encode each of the disjoint elements.
@@ -61,7 +61,7 @@ public class SLTLxDisjunction extends SLTLxFormula {
 			return SLTLxAtom.getTrue().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		}
 
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/*
 		 * Conjunct the collection of clauses that encode negations of each of the

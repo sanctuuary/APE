@@ -26,7 +26,7 @@ public class SLTLxImplication extends SLTLxFormula {
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
 
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/* Add the elements of the if element of the implication.. */
 		allClauses.add(ifFact.getNegatedCNFEncoding(stateNo, variableMapping, synthesisEngine));
@@ -39,7 +39,7 @@ public class SLTLxImplication extends SLTLxFormula {
 	@Override
 	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/* Add the elements of the if element of the implication.. */
 		allClauses.add(ifFact.getCNFEncoding(stateNo, variableMapping, synthesisEngine));

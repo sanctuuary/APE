@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-
 /**
  * The class represents a clause/fact used in the SAT encoding (CNF).
  * 
@@ -27,7 +25,7 @@ public class CNFClause {
 	 */
 	public CNFClause(List<Integer> atoms) {
 		super();
-		this.atoms = new ArrayList<Integer>();
+		this.atoms = new ArrayList<>();
 		atoms.forEach(atom -> this.atoms.add(atom));
 	}
 
@@ -38,7 +36,7 @@ public class CNFClause {
 	 */
 	public CNFClause(Integer atom) {
 		super();
-		this.atoms = new ArrayList<Integer>();
+		this.atoms = new ArrayList<>();
 		this.atoms.add(atom);
 	}
 
@@ -52,7 +50,7 @@ public class CNFClause {
 	 *         collections of clauses.
 	 */
 	public static Set<String> conjunctClausesCollection(Set<Set<String>> facts) {
-		Set<String> allClauses = new HashSet<String>();
+		Set<String> allClauses = new HashSet<>();
 		facts.forEach(col -> allClauses.addAll(col));
 
 		return allClauses;
@@ -68,7 +66,7 @@ public class CNFClause {
 	 *         collections of clauses.
 	 */
 	public static Set<String> disjoinClausesCollection(Set<Set<String>> facts) {
-		List<String> clausesList = new ArrayList<String>();
+		List<String> clausesList = new ArrayList<>();
 		Iterator<Set<String>> currDisjFact = facts.iterator();
 
 		if (currDisjFact.hasNext()) {
@@ -89,7 +87,7 @@ public class CNFClause {
 				}
 			}
 		}
-		Set<String> allClauses = new HashSet<String>();
+		Set<String> allClauses = new HashSet<>();
 		allClauses.addAll(clausesList);
 		return allClauses;
 	}
@@ -107,13 +105,13 @@ public class CNFClause {
 		return clause1Cleaned + clause2;
 	}
 
-	public Set<CNFClause> createCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> createCNFEncoding() {
 		Set<CNFClause> clause = new HashSet<>();
 		clause.add(this);
 		return clause;
 	}
 
-	public Set<CNFClause> createNegatedCNFEncoding(SATSynthesisEngine synthesisEngine) {
+	public Set<CNFClause> createNegatedCNFEncoding() {
 		Set<CNFClause> clauses = new HashSet<>();
 		for (int element : this.atoms) {
 			clauses.add(new CNFClause(-element));
@@ -127,13 +125,13 @@ public class CNFClause {
 		atoms.forEach(elem -> cnf.append(elem + " "));
 		cnf.append("0\n");
 
-		Set<String> clauses = new HashSet<String>();
+		Set<String> clauses = new HashSet<>();
 		clauses.add(cnf.toString());
 		return clauses;
 	}
 
 	public Set<String> toNegatedCNF() {
-		Set<String> clauses = new HashSet<String>();
+		Set<String> clauses = new HashSet<>();
 		atoms.forEach(elem -> clauses.add((-elem) + " 0\n"));
 
 		return clauses;
