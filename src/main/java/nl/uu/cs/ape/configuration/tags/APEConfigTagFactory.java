@@ -19,7 +19,6 @@ import static nl.uu.cs.ape.configuration.tags.APEConfigTag.TagType.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,7 @@ public class APEConfigTagFactory {
             protected File constructFromJSON(JSONObject obj) {
                 final String input = obj.getString(getTagName());
                 try {
-                    return APEFiles.readFileFromPath(getTagName(), input, getRequiredPermissions());
+                    return APEFiles.readPathToFile(input);
                 } catch (IOException e) {
                     throw APEConfigException.invalidValue(getTagName(), input, e.getMessage());
                 }

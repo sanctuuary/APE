@@ -50,13 +50,13 @@ public class APEFiles {
     }
 
     /**
-     * Verify and get full path based based on the field.
+     * Verify and get full local path based based on the field.
      * 
      * @param tag  - tag
      * @param path - path
      * @return Return the path to the file
      */
-    private static Path getPath(String tag, String path) {
+    private static Path getLocalPath(String tag, String path) {
 
         // check on empty values
         if (path == null) {
@@ -75,7 +75,14 @@ public class APEFiles {
         }
     }
 
-    public static boolean pathExists(String path) {
+    /**
+     * Verify whether the path is a valid local path.
+     * 
+     * @param path - local path
+     * @return Return {@code true} if the local path exists, {@code false}
+     *         otherwise.
+     */
+    public static boolean localPathExists(String path) {
         Path localPath = Paths.get(path);
         return Files.exists(localPath);
     }
@@ -122,10 +129,10 @@ public class APEFiles {
      * @throws JSONException      Error in parsing the value for specified tag.
      * @throws APEConfigException Error in setting up the the configuration.
      */
-    public static File readFileFromPath(String tag, String inputPath, Permission... requestedPermissions)
+    public static File readFileFromPathX(String tag, String inputPath, Permission... requestedPermissions)
             throws IOException, JSONException, APEConfigException {
 
-        final Path path = getPath(tag, inputPath);
+        final Path path = getLocalPath(tag, inputPath);
 
         if (Files.notExists(path)) {
             throw APEConfigException.pathNotFound(tag, inputPath);
@@ -157,7 +164,7 @@ public class APEFiles {
     public static Path readDirectoryPath(String tag, String inputPath, Permission... requestedPermissions)
             throws IOException, JSONException, APEConfigException {
 
-        final Path path = getPath(tag, inputPath);
+        final Path path = getLocalPath(tag, inputPath);
         final String absolutePath = path.toAbsolutePath().toString();
 
         // first check if the format of the string resembles a path to a folder
@@ -290,9 +297,9 @@ public class APEFiles {
      * @return File containing info provided at the path.
      * @throws IOException Exception in case of a badly formatted path or file.
      */
-    public static File getFileFromPath(String filePath) throws IOException {
+    public static File readPathToFile(String filePath) throws IOException {
 
-        return (isURI(filePath) ? getFileFromURL(filePath) : new File(filePath));
+        return (isURI(filePath) ? readURLToFile(filePath) : new File(filePath));
 
     }
 
@@ -303,7 +310,7 @@ public class APEFiles {
      * @return File containing info provided at the URL.
      * @throws IOException Exception in case of a badly formatted URL or file.
      */
-    private static File getFileFromURL(String fileUrl) throws IOException {
+    private static File readURLToFile(String fileUrl) throws IOException {
         File loadedFile = File.createTempFile("ape_temp_", "");
         FileUtils.copyURLToFile(
                 new URL(fileUrl),
@@ -491,7 +498,7 @@ public class APEFiles {
      * @throws JSONException Error if the file is not in expected JSON format
      */
     public static JSONObject readPathToJSONObject(String path) throws IOException, JSONException {
-        File file = getFileFromPath(path);
+        File file = readPathToFile(path);
         return readFileToJSONObject(file);
     }
 
