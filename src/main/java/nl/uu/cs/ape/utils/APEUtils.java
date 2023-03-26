@@ -132,66 +132,6 @@ public final class APEUtils {
 				typeAutomaton, mappings);
 	}
 
-	/**
-	 * Used to write the {@code text} to a file {@code file}. If @append is true,
-	 * the {@code text} is appended to the {@code file}, otherwise the {@code file}
-	 * is rewritten.
-	 *
-	 * @param text   Text that will be written in the file.
-	 * @param file   The system-dependent file name.
-	 * @param append If true, then bytes will be written to the end of the file
-	 *               rather than the beginning.
-	 * @return True if write to file was successful, false otherwise.
-	 * @throws IOException Exception if file not found.
-	 */
-	public static boolean write2file(String text, File file, boolean append) throws IOException {
-		FileWriter fw = new FileWriter(file, append);
-		fw.write(text);
-		fw.close();
-
-		return true;
-	}
-
-	/**
-	 * Reads the path and provides the JSONObject that represents its content.
-	 *
-	 * @param path the path (local or URL) to the file
-	 * @return JSONObject representing the content of the file.
-	 * @throws IOException   Error if the file is corrupted
-	 * @throws JSONException Error if the file is not in expected JSON format
-	 */
-	public static JSONObject readPathToJSONObject(String path) throws IOException, JSONException {
-		File file = APEUtils.getFileFromPath(path);
-		String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-		return new JSONObject(content);
-	}
-
-	/**
-	 * Reads the file and provides the JSONObject that represents its content.
-	 *
-	 * @param file the JSON file
-	 * @return JSONObject representing the content of the file.
-	 * @throws IOException   Error if the file is corrupted
-	 * @throws JSONException Error if the file is not in expected JSON format
-	 */
-	public static JSONObject readFileToJSONObject(File file) throws IOException, JSONException {
-		String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-		return new JSONObject(content);
-	}
-
-	/**
-	 * Reads the file and provides the JSONArray that represents its content.
-	 *
-	 * @param file the JSON file
-	 * @return JSONArray representing the content of the file.
-	 * @throws IOException   Error if the file is corrupted
-	 * @throws JSONException Error if the file is not in expected JSON format
-	 */
-	public static JSONArray readFileToJSONArray(File file) throws IOException, JSONException {
-		String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-		return new JSONArray(content);
-	}
-
 	/*
 	 * Transforms the propositional formula into the CNF form.
 	 *
@@ -340,31 +280,6 @@ public final class APEUtils {
 			newList.add(element);
 		}
 		return newList;
-	}
-
-	/**
-	 * Method checks whether the provided path corresponds to an existing file with
-	 * required reading permissions.
-	 *
-	 * @param path Path to the file.
-	 * @return true if the file exists and can be read, false otherwise.
-	 */
-	public static boolean isValidReadFile(String path) {
-		if (path == null || path.equals("")) {
-			System.err.println("Path is not provided correctly.");
-			return false;
-		}
-		File f = new File(path);
-		if (!f.isFile()) {
-			System.err.println("Provided path: \"" + path + "\" is not a file.");
-			return false;
-		} else {
-			if (!f.canRead()) {
-				System.err.println("Provided file: \"" + path + "\" is missing the reading permission.");
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**
@@ -569,19 +484,6 @@ public final class APEUtils {
 
 			return count == 0 ? 1 : count;
 		}
-	}
-
-	/**
-	 * Read the file to a String.
-	 *
-	 * @param path     Path to the file.
-	 * @param encoding The charset encoding.
-	 * @return File content as a String.
-	 * @throws IOException Error while reading the file.
-	 */
-	public static String readFile(String path, Charset encoding) throws IOException {
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		return new String(encoded, encoding);
 	}
 
 	/**
@@ -803,20 +705,6 @@ public final class APEUtils {
 		return humanReadable.toString();
 	}
 
-	public static void write2file(InputStream temp_sat_input, File file, Boolean append) throws IOException {
-		StringBuilder humanReadable = new StringBuilder();
-		Scanner scanner = new Scanner(temp_sat_input);
-
-		while (scanner.hasNextLine()) {
-			String str = scanner.nextLine();
-
-			humanReadable.append(str).append("\n");
-		}
-		scanner.close();
-
-		APEUtils.write2file(humanReadable.toString(), file, append);
-	}
-
 	/**
 	 * Return the string without its last character.
 	 *
@@ -899,85 +787,6 @@ public final class APEUtils {
 		return new JSONObject(original, JSONObject.getNames(original));
 	}
 
-	/**
-	 * Append text to the existing file. It adds the text at the end of the content
-	 * of the file.
-	 * 
-	 * @param file    - existing file
-	 * @param content - content that should be appended
-	 * @throws IOException          in case of an I/O error
-	 * @throws NullPointerException if the file is null
-	 */
-	public static void appendToFile(File file, String content) throws IOException, NullPointerException {
-		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
-		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
-		writer.write(content);
-		writer.close();
-	}
-
-	/**
-	 * Append text to the existing file. It adds the text at the end of the content
-	 * of the file.
-	 * 
-	 * @param file    - existing file
-	 * @param content - content that should be appended
-	 * @throws IOException          in case of an I/O error
-	 * @throws NullPointerException if the file is null
-	 */
-	public static void appendSetToFile(File file, Set<String> content) throws IOException, NullPointerException {
-		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
-		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
-		for (String str : content) {
-			writer.write(str);
-		}
-		writer.close();
-	}
-
-	/**
-	 * Append text to the existing file. It adds the text at the end of the content
-	 * of the file.
-	 * 
-	 * @param file        - existing file
-	 * @param cnfEncoding - cnf clauses that should be appended
-	 * @throws IOException          in case of an I/O error
-	 * @throws NullPointerException if the file is null
-	 */
-	public static void appendToFile(File file, Set<CNFClause> cnfEncoding) throws IOException, NullPointerException {
-		StringBuilder string = new StringBuilder();
-		cnfEncoding.forEach(clause -> string.append(clause.toCNF()));
-		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
-		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
-		writer.write(string.toString());
-		writer.close();
-	}
-
-	/**
-	 * Prepend text to the existing file content and create a new file out of it.
-	 * It adds the text at the beginning, before the existing content of the file.
-	 * 
-	 * @param file
-	 * @param prefix
-	 * @throws IOException
-	 */
-	public static File prependToFile(String prefix, File file) throws IOException {
-		LineIterator li = FileUtils.lineIterator(file);
-		File tempFile = File.createTempFile("prependPrefix", ".tmp");
-		tempFile.deleteOnExit();
-		Writer fileWriter = new FileWriterWithEncoding(tempFile, "ASCII", true);
-		BufferedWriter writer = new BufferedWriter(fileWriter);
-		try {
-			writer.write(prefix);
-			while (li.hasNext()) {
-				writer.write(li.next());
-				writer.write("\n");
-			}
-		} finally {
-			writer.close();
-			li.close();
-		}
-		return tempFile;
-	}
-
 	public static int countLines(File cnfEncoding) {
 		int lines = 0;
 		try (BufferedReader b = new BufferedReader(new FileReader(cnfEncoding))) {
@@ -1041,42 +850,6 @@ public final class APEUtils {
 		Set<Pair<T>> pairs = new HashSet<>();
 		set1.stream().forEach(ele1 -> set2.stream().forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
-	}
-
-	/**
-	 * Read file content from the given path (local path or a public URL) and return
-	 * the content as a File object.
-	 * 
-	 * @param filePath - Local path or a public URL with the content.
-	 * @return File containing info provided at the path.
-	 * @throws IOException Exception in case of a badly formatted path or file.
-	 */
-	public static File getFileFromPath(String filePath) throws IOException {
-
-		try {
-			new URL(filePath).toURI();
-			return getFileFromURL(filePath);
-		} catch (MalformedURLException | URISyntaxException e1) {
-			return new File(filePath);
-		}
-
-	}
-
-	/**
-	 * Read content from a URL and return it as a file.
-	 * 
-	 * @param fileUrl - URL of the content
-	 * @return File containing info provided at the URL.
-	 * @throws IOException Exception in case of a badly formatted URL or file.
-	 */
-	private static File getFileFromURL(String fileUrl) throws IOException {
-		File loadedFile = File.createTempFile("ape_temp_", "");
-		FileUtils.copyURLToFile(
-				new URL(fileUrl),
-				loadedFile,
-				1000,
-				1000);
-		return loadedFile;
 	}
 
 }

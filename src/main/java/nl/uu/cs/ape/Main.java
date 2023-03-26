@@ -4,6 +4,7 @@ import guru.nidi.graphviz.attribute.Rank.RankDir;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.io.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
 
 import org.json.JSONException;
@@ -43,7 +44,7 @@ public class Main {
         } else {
             path = "./config.json";
         }
-        if (!APEUtils.isValidReadFile(path)) {
+        if (!APEFiles.isValidReadFile(path)) {
             System.err.println("Bad path.");
             return;
         }
@@ -63,7 +64,7 @@ public class Main {
         SolutionsList solutions;
         try {
 
-            JSONObject runConfigJson = APEUtils.readFileToJSONObject(new File(path));
+            JSONObject runConfigJson = APEFiles.readFileToJSONObject(new File(path));
             APERunConfig runConfig = new APERunConfig(runConfigJson, apeFramework.getDomainSetup());
 
             if (solutionsNo > 0) {

@@ -13,6 +13,7 @@ import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.io.APEFiles;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
@@ -248,7 +249,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * templates)
          */
         if (!domainSetup.getUnformattedConstr().isEmpty() || !domainSetup.getSLTLxConstraints().isEmpty()) {
-            APEUtils.appendToFile(cnfEncoding,
+            APEFiles.appendToFile(cnfEncoding,
                     APEUtils.encodeAPEConstraints(this, domainSetup, mappings, moduleAutomaton, typeAutomaton));
             APEUtils.timerRestartAndPrint(currLengthTimer, "SLTLx constraints");
         }
@@ -269,7 +270,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         int clauses = APEUtils.countLines(cnfEncoding);
         String satInputHeader = "p cnf " + variables + " " + clauses + "\n";
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
-        satInputFile = APEUtils.prependToFile(satInputHeader, cnfEncoding);
+        satInputFile = APEFiles.prependToFile(satInputHeader, cnfEncoding);
         cnfEncoding.delete();
 
         /* add the cnf encoding file to Desktop */

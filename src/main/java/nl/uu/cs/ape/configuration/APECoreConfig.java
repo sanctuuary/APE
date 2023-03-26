@@ -11,6 +11,7 @@ import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
+import nl.uu.cs.ape.io.APEFiles;
 import nl.uu.cs.ape.utils.APEDimensionsException;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.utils.OWLReader;
@@ -33,7 +34,7 @@ public class APECoreConfig {
     /**
      * The taxonomy (ontology) file
      */
-    public final APEConfigTag<Path> ONTOLOGY = new APEConfigTagFactory.TAGS.ONTOLOGY();
+    public final APEConfigTag<File> ONTOLOGY = new APEConfigTagFactory.TAGS.ONTOLOGY();
     /**
      * Prefix used to define OWL class IDs
      */
@@ -53,7 +54,7 @@ public class APECoreConfig {
     /**
      * The JSON file with all tool annotations.
      */
-    public final APEConfigTag<Path> TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.TOOL_ANNOTATIONS();
+    public final APEConfigTag<File> TOOL_ANNOTATIONS = new APEConfigTagFactory.TAGS.TOOL_ANNOTATIONS();
     /**
      * {@code true} if the domain expects strict tool annotations, where,
      * {@code false} in case of a
@@ -63,7 +64,7 @@ public class APECoreConfig {
     /**
      * The CWL file with all CWL annotations.
      */
-    public final APEConfigTag<Path> CWL_ANNOTATIONS = new APEConfigTagFactory.TAGS.CWL_ANNOTATIONS();
+    public final APEConfigTag<File> CWL_ANNOTATIONS = new APEConfigTagFactory.TAGS.CWL_ANNOTATIONS();
 
     /**
      * All the Tags specified in this class. Should be in correct order of
@@ -111,7 +112,7 @@ public class APECoreConfig {
             List<String> dataDimensionRoots, File toolAnnotations, boolean strictToolAnnotations) {
 
         /* Path to the OWL file. */
-        this.ONTOLOGY.setValue(ontology.toPath());
+        this.ONTOLOGY.setValue(ontology);
 
         /* IRI of the ontology classes. */
         this.ONTOLOGY_PREFIX.setValue(ontologyPrefixIRI);
@@ -126,7 +127,7 @@ public class APECoreConfig {
                         .collect(Collectors.toList()));
 
         /* Path to the tool annotations JSON file. */
-        this.TOOL_ANNOTATIONS.setValue(toolAnnotations.toPath());
+        this.TOOL_ANNOTATIONS.setValue(toolAnnotations);
         /* Set the tool annotation model for the domain. */
         this.STRICT_TOOL_ANNOTATIONS.setValue(strictToolAnnotations);
     }
@@ -145,7 +146,7 @@ public class APECoreConfig {
             throw new NullPointerException("The provided core configuration file path is null.");
         }
 
-        coreConfigSetup(APEUtils.readPathToJSONObject(configPath));
+        coreConfigSetup(APEFiles.readPathToJSONObject(configPath));
     }
 
     /**
@@ -287,7 +288,7 @@ public class APECoreConfig {
      * @return the value of tag {@link #ONTOLOGY}
      */
     public File getOntologyFile() {
-        return ONTOLOGY.getValue().toFile();
+        return ONTOLOGY.getValue();
     }
 
     /**
@@ -296,7 +297,7 @@ public class APECoreConfig {
      * @param ontology - ontology file
      */
     public void setOntologyFile(File ontology) {
-        ONTOLOGY.setValue(ontology.toPath());
+        ONTOLOGY.setValue(ontology);
     }
 
     /**
@@ -332,7 +333,7 @@ public class APECoreConfig {
      * @return the value of tag {@link #TOOL_ANNOTATIONS}
      */
     public File getToolAnnotationsFile() {
-        return TOOL_ANNOTATIONS.getValue().toFile();
+        return TOOL_ANNOTATIONS.getValue();
     }
 
     /**
@@ -342,7 +343,7 @@ public class APECoreConfig {
      *
      */
     public void setToolAnnotationsFile(File toolAnnotations) {
-        TOOL_ANNOTATIONS.setValue(toolAnnotations.toPath());
+        TOOL_ANNOTATIONS.setValue(toolAnnotations);
     }
 
     /**
@@ -354,7 +355,7 @@ public class APECoreConfig {
         if (CWL_ANNOTATIONS.getValue() == null) {
             return Optional.empty();
         } else {
-            return Optional.of(CWL_ANNOTATIONS.getValue().toFile());
+            return Optional.of(CWL_ANNOTATIONS.getValue());
         }
     }
 

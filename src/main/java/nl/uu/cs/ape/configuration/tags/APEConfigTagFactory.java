@@ -17,6 +17,7 @@ import javax.inject.Provider;
 
 import static nl.uu.cs.ape.configuration.tags.APEConfigTag.TagType.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,7 +47,7 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public abstract static class ExistingFile extends APEConfigTag<Path> {
+        public abstract static class ExistingFile extends APEConfigTag<File> {
 
             @Override
             public TagType getType() {
@@ -54,7 +55,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected Path constructFromJSON(JSONObject obj) {
+            protected File constructFromJSON(JSONObject obj) {
                 final String input = obj.getString(getTagName());
                 try {
                     return APEFiles.readFileFromPath(getTagName(), input, getRequiredPermissions());
@@ -66,8 +67,8 @@ public class APEConfigTagFactory {
             protected abstract APEFiles.Permission[] getRequiredPermissions();
 
             @Override
-            public ValidationResults validate(Path path, ValidationResults results) {
-                results.add(getTagName(), "The file should exist.", Files.exists(path));
+            public ValidationResults validate(File file, ValidationResults results) {
+                results.add(getTagName(), "The file should exist.", file.exists());
                 return results;
             }
         }
@@ -319,7 +320,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(String uri, ValidationResults results) {
-                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isIRI(uri));
+                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isURI(uri));
                 return results;
             }
         }
@@ -339,7 +340,7 @@ public class APEConfigTagFactory {
                 String constraintsPath = obj.getString(getTagName());
                 JSONObject constraints = null;
                 try {
-                    constraints = APEUtils.readPathToJSONObject(constraintsPath);
+                    constraints = APEFiles.readPathToJSONObject(constraintsPath);
                 } catch (IOException | JSONException e) {
                     throw APEConfigException.invalidValue(getTagName(), constraintsPath, e.getMessage());
                 }
@@ -385,7 +386,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigDefaultValue<Path> getDefault() {
+            public APEConfigDefaultValue<File> getDefault() {
                 return APEConfigDefaultValue.noDefault();
             }
 
@@ -627,7 +628,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigDefaultValue<Path> getDefault() {
+            public APEConfigDefaultValue<File> getDefault() {
                 return APEConfigDefaultValue.noDefault();
             }
         }
@@ -658,7 +659,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigDefaultValue<Path> getDefault() {
+            public APEConfigDefaultValue<File> getDefault() {
                 return APEConfigDefaultValue.withDefault(null);
             }
         }

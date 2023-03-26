@@ -14,6 +14,7 @@ import nl.uu.cs.ape.core.solutionStructure.AbstractCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.ExecutableCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.io.APEFiles;
 import nl.uu.cs.ape.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.configuration.APECoreConfig;
@@ -133,7 +134,7 @@ public class APE implements APEInterface {
 
 		// Update allModules and allTypes sets based on the tool annotations
 		succRun &= apeDomainSetup
-				.updateToolAnnotationsFromJson(APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()));
+				.updateToolAnnotationsFromJson(APEFiles.readFileToJSONObject(config.getToolAnnotationsFile()));
 
 		// Update allModules with CWL annotations, if CWL annotations file is given
 		if (config.getCwlAnnotationsFile().isPresent()) {
@@ -252,7 +253,7 @@ public class APE implements APEInterface {
 	 *                     file.
 	 */
 	public SolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException {
-		JSONObject configObject = APEUtils.readFileToJSONObject(new File(runConfigPath));
+		JSONObject configObject = APEFiles.readFileToJSONObject(new File(runConfigPath));
 		return runSynthesis(configObject, this.getDomainSetup());
 	}
 
@@ -393,7 +394,7 @@ public class APE implements APEInterface {
 			solutions2write
 					.append(allSolutions.get(i).getNativeSolution().getCompleteSolution()).append("\n");
 		}
-		APEUtils.write2file(solutions2write.toString(),
+		APEFiles.write2file(solutions2write.toString(),
 				allSolutions.getRunConfiguration().getSolutionDirPath2("solutions.txt").toFile(), false);
 
 		return true;
@@ -430,7 +431,7 @@ public class APE implements APEInterface {
 			try {
 				String title = "workflowSolution_" + solution.getIndex() + ".sh";
 				File script = executionsFolder.resolve(title).toFile();
-				APEUtils.write2file(solution.getScriptExecution(), script, false);
+				APEFiles.write2file(solution.getScriptExecution(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
 				System.err.println("Error occurred while writing a graph to the file system.");
@@ -613,7 +614,7 @@ public class APE implements APEInterface {
 				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = cwlFolder.resolve(title).toFile();
 				AbstractCWLCreator cwlCreator = new AbstractCWLCreator(solution);
-				APEUtils.write2file(cwlCreator.generate(), script, false);
+				APEFiles.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
 				System.err.println("Error occurred while writing a CWL file to the file system.");
@@ -680,7 +681,7 @@ public class APE implements APEInterface {
 				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = executableCWLFolder.resolve(title).toFile();
 				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(solution);
-				APEUtils.write2file(cwlCreator.generate(), script, false);
+				APEFiles.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
 				System.err.println("Error occurred while writing an executable CWL file to the file system.");
