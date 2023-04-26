@@ -276,11 +276,11 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /* add the cnf encoding file to Desktop */
         // Files.copy(satInputFile, new File("~/Desktop/tmp"+ problemSetupStartTime));
 
-        /* add human readable version of the cnf encoding file to Desktop */
+        /* add human readable version of the cnf encoding file to Desktop. Used when needed. */
         // FileInputStream cnfStream = new FileInputStream(satInputFile);
         // String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
         // cnfStream.close();
-        // APEUtils.write2file(encoding, new File("~/Desktop/tmp.txt"), false);
+        // APEFiles.write2file(encoding, new File("~/Desktop/tmp.txt"), false);
 
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
         System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec (" + clauses

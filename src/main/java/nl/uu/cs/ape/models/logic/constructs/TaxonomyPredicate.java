@@ -57,7 +57,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param rootNode Root of the OWL tree that this node belongs to.
      * @param nodeType Type of the node.
      */
-    public TaxonomyPredicate(String rootNode, NodeType nodeType) {
+    protected TaxonomyPredicate(String rootNode, NodeType nodeType) {
         this.rootNodeID = rootNode;
         this.nodeType = nodeType;
         this.isRelevant = false;
@@ -75,7 +75,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param oldPredicate Predicate that is copied
      * @param nodeType     Type of the node
      */
-    public TaxonomyPredicate(TaxonomyPredicate oldPredicate, NodeType nodeType) {
+    protected TaxonomyPredicate(TaxonomyPredicate oldPredicate, NodeType nodeType) {
         this.rootNodeID = oldPredicate.rootNodeID;
         this.nodeType = nodeType;
         this.isRelevant = oldPredicate.isRelevant;

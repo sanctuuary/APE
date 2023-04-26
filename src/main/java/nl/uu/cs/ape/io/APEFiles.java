@@ -26,13 +26,11 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Set;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 
 /**
  * The type Ape files.
@@ -315,8 +313,8 @@ public class APEFiles {
         FileUtils.copyURLToFile(
                 new URL(fileUrl),
                 loadedFile,
-                1000,
-                1000);
+                10000,
+                10000);
         return loadedFile;
     }
 
@@ -398,19 +396,6 @@ public class APEFiles {
             li.close();
         }
         return tempFile;
-    }
-
-    /**
-     * Read the file to a String.
-     *
-     * @param path     Path to the file.
-     * @param encoding The charset encoding.
-     * @return File content as a String.
-     * @throws IOException Error while reading the file.
-     */
-    public static String readFileX(String path, Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
     }
 
     /**

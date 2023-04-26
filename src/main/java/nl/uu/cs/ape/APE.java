@@ -265,7 +265,7 @@ public class APE implements APEInterface {
 	 * @throws IOException Error in case of not providing a proper configuration
 	 *                     file.
 	 */
-	public SolutionsList runSynthesis(APERunConfig runConfig) throws IOException {
+	public SolutionsList runSynthesis(APERunConfig runConfig) throws IOException, JSONException {
 		runConfig.apeDomainSetup.clearConstraints();
 		return executeSynthesis(runConfig);
 	}
@@ -418,9 +418,8 @@ public class APE implements APEInterface {
 
 		final File executeDir = executionsFolder.toFile();
 		if (executeDir.isDirectory()) {
-			Arrays.stream(executionsFolder.toFile()
-					.listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_".toLowerCase())))
-					.forEach(File::delete);
+			// If the directory already exists, empty it first
+			deleteExistingFiles(executeDir, "workflowSolution_");
 		} else {
 			executeDir.mkdir();
 		}
@@ -451,9 +450,8 @@ public class APE implements APEInterface {
 	 *
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @return true if the generating was successfully performed, false otherwise.
-	 * @throws IOException Exception if graph cannot be written to the file system.
 	 */
-	public static boolean writeDataFlowGraphs(SolutionsList allSolutions) throws IOException {
+	public static boolean writeDataFlowGraphs(SolutionsList allSolutions) {
 		return writeDataFlowGraphs(allSolutions, RankDir.TOP_TO_BOTTOM);
 	}
 
@@ -465,9 +463,8 @@ public class APE implements APEInterface {
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @param orientation  Orientation in which the graph will be presented.
 	 * @return true if the generating was successfully performed, false otherwise.
-	 * @throws IOException Exception if graph cannot be written to the file system.
 	 */
-	public static boolean writeDataFlowGraphs(SolutionsList allSolutions, RankDir orientation) throws IOException {
+	public static boolean writeDataFlowGraphs(SolutionsList allSolutions, RankDir orientation) {
 		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
 		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -479,9 +476,8 @@ public class APE implements APEInterface {
 		/* Removing the existing files from the file system. */
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
-			Arrays.stream(graphsFolder.toFile()
-					.listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo".toLowerCase())))
-					.forEach(File::delete);
+			// If the directory already exists, empty it first
+			deleteExistingFiles(graphDir, "SolutionNo");
 		} else {
 			graphDir.mkdir();
 		}
@@ -513,9 +509,8 @@ public class APE implements APEInterface {
 	 *
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @return true if the generating was successfully performed, false otherwise.
-	 * @throws IOException Exception if graphs cannot be written to the file system.
 	 */
-	public static boolean writeControlFlowGraphs(SolutionsList allSolutions) throws IOException {
+	public static boolean writeControlFlowGraphs(SolutionsList allSolutions) {
 		return writeControlFlowGraphs(allSolutions, RankDir.LEFT_TO_RIGHT);
 	}
 
@@ -527,10 +522,9 @@ public class APE implements APEInterface {
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @param orientation  Orientation in which the graph will be presented.
 	 * @return true if the generating was successfully performed, false otherwise.
-	 * @throws IOException Exception if graphs cannot be written to the file system.
 	 */
 	public static boolean writeControlFlowGraphs(SolutionsList allSolutions, RankDir orientation)
-			throws IOException {
+			{
 		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
 		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -542,8 +536,8 @@ public class APE implements APEInterface {
 		/* Removing the existing files from the file system. */
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
-			Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
-					.forEach(File::delete);
+			// If the directory already exists, empty it first
+			deleteExistingFiles(graphDir, "SolutionNo");
 		} else {
 			graphDir.mkdir();
 		}
@@ -588,23 +582,11 @@ public class APE implements APEInterface {
 		final String filePrefix = "workflowSolution_";
 		final File cwlDir = cwlFolder.toFile();
 		if (cwlDir.isDirectory()) {
-			// If the CWL directory already exists, empty it first
-			File[] oldFiles = cwlDir.listFiles((dir, name) -> name.toLowerCase().startsWith(filePrefix.toLowerCase()));
-			if (oldFiles != null) {
-				Arrays.stream(oldFiles).forEach(f -> {
-					try {
-						Files.delete(f.toPath());
-					} catch (IOException e) {
-						System.err.printf("Failed to delete file %s%n", f.getName());
-					}
-				});
-			}
+			// If the directory already exists, empty it first
+			deleteExistingFiles(cwlDir, filePrefix);
 		} else {
 			// Create the CWL directory if it does not already exist
-			boolean dirMade = cwlDir.mkdir();
-			if (!dirMade) {
-				System.err.println("Could not create CWL directory.");
-			}
+			cwlDir.mkdir();
 		}
 		System.out.print("Loading");
 
@@ -624,6 +606,25 @@ public class APE implements APEInterface {
 
 		APEUtils.timerPrintText(timerID, "\nCWL files have been generated.");
 		return true;
+	}
+
+	/**
+	 * Delete all files in the given directory that start with the given prefix.
+	 * 
+	 * @param dirName    The directory to delete files from.
+	 * @param filePrefix The prefix of the files to delete.
+	 */
+	private static void deleteExistingFiles(File dirName, String filePrefix) {
+		File[] oldFiles = dirName.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith(filePrefix.toLowerCase()));
+		if (oldFiles != null) {
+			Arrays.stream(oldFiles).forEach(f -> {
+				try {
+					Files.delete(f.toPath());
+				} catch (IOException e) {
+					System.err.printf("Failed to delete file %s%n", f.getName());
+				}
+			});
+		}
 	}
 
 	/**
@@ -655,23 +656,11 @@ public class APE implements APEInterface {
 		final String filePrefix = "workflowSolution_";
 		final File cwlDir = executableCWLFolder.toFile();
 		if (cwlDir.isDirectory()) {
-			// If the CWL directory already exists, empty it first
-			File[] oldFiles = cwlDir.listFiles((dir, name) -> name.toLowerCase().startsWith(filePrefix.toLowerCase()));
-			if (oldFiles != null) {
-				Arrays.stream(oldFiles).forEach(f -> {
-					try {
-						Files.delete(f.toPath());
-					} catch (IOException e) {
-						System.err.printf("Failed to delete file %s%n", f.getName());
-					}
-				});
-			}
+			// If the directory already exists, empty it first
+			deleteExistingFiles(cwlDir, filePrefix);
 		} else {
 			// Create the CWL directory if it does not already exist
-			boolean dirMade = cwlDir.mkdir();
-			if (!dirMade) {
-				System.err.println("Could not create CWL directory.");
-			}
+			cwlDir.mkdir();
 		}
 		System.out.print("Loading");
 
