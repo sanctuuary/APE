@@ -11,6 +11,7 @@ import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.solutionStructure.AbstractCWLCreator;
+import nl.uu.cs.ape.core.solutionStructure.DefaultCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.ExecutableCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
@@ -487,7 +488,7 @@ public class APE implements APEInterface {
 			try {
 				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionLength();
 				Path path = graphsFolder.resolve(title);
-				solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile(),
+				solution.getDataflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
 				System.out.print(".");
 			} catch (IOException e) {
@@ -547,7 +548,7 @@ public class APE implements APEInterface {
 			try {
 				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionLength();
 				Path path = graphsFolder.resolve(title);
-				solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile(),
+				solution.getControlflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
 				System.out.print(".");
 			} catch (IOException e) {
@@ -595,7 +596,7 @@ public class APE implements APEInterface {
 			try {
 				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = cwlFolder.resolve(title).toFile();
-				AbstractCWLCreator cwlCreator = new AbstractCWLCreator(solution);
+				DefaultCWLCreator cwlCreator = new DefaultCWLCreator(solution);
 				APEFiles.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {

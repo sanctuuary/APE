@@ -127,7 +127,7 @@ public class APEFiles {
      * @throws JSONException      Error in parsing the value for specified tag.
      * @throws APEConfigException Error in setting up the the configuration.
      */
-    public static File readFileFromPathX(String tag, String inputPath, Permission... requestedPermissions)
+    public static File readFileFromPath(String tag, String inputPath, Permission... requestedPermissions)
             throws IOException, JSONException, APEConfigException {
 
         final Path path = getLocalPath(tag, inputPath);
