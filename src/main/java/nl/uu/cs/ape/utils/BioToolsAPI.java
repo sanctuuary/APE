@@ -37,7 +37,7 @@ public class BioToolsAPI {
 		JSONArray bioToolsRAW = readListOfTools(listFilePath);
 		
 		JSONObject apeToolAnnotation = convertBioTools2Ape(bioToolsRAW);
-		APEFiles.write2file(apeToolAnnotation.toString(), new File(destinationFilePath), false);
+		APEFiles.write2file(apeToolAnnotation.toString(4), new File(destinationFilePath), false);
 	}
 
     /**
