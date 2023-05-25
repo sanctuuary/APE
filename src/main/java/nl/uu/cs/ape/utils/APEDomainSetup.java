@@ -207,7 +207,7 @@ public class APEDomainSetup {
     }
 
     /**
-     * Method read the constraints from a JSON object and updates the
+     * Method reads the constraints from a JSON object and updates the
      * {@link APEDomainSetup} object accordingly.
      *
      * @param constraintsJSON JSON object containing the constraints

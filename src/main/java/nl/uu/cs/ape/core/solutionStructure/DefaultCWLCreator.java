@@ -198,7 +198,7 @@ public class DefaultCWLCreator extends CWLCreatorBase {
             // Class
             .append(ind(baseInd + 1))
             .append("class: Operation")
-            .append("\n"); */
+            .append("\n"); 
         // Inputs
         cwlRepresentation
             .append(ind(baseInd + 1))

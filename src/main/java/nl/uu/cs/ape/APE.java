@@ -10,7 +10,6 @@ import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.core.solutionStructure.AbstractCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.DefaultCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.ExecutableCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
@@ -524,8 +523,7 @@ public class APE implements APEInterface {
 	 * @param orientation  Orientation in which the graph will be presented.
 	 * @return true if the generating was successfully performed, false otherwise.
 	 */
-	public static boolean writeControlFlowGraphs(SolutionsList allSolutions, RankDir orientation)
-			{
+	public static boolean writeControlFlowGraphs(SolutionsList allSolutions, RankDir orientation) {
 		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
 		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -616,7 +614,8 @@ public class APE implements APEInterface {
 	 * @param filePrefix The prefix of the files to delete.
 	 */
 	private static void deleteExistingFiles(File dirName, String filePrefix) {
-		File[] oldFiles = dirName.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith(filePrefix.toLowerCase()));
+		File[] oldFiles = dirName
+				.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith(filePrefix.toLowerCase()));
 		if (oldFiles != null) {
 			Arrays.stream(oldFiles).forEach(f -> {
 				try {
