@@ -41,6 +41,8 @@ import static guru.nidi.graphviz.model.Factory.*;
  */
 public class SolutionWorkflow {
 
+    private static final String fileNamePrefix = "workflowSolution_";
+
     /**
      * List of module nodes ordered according to their position in the workflow.
      */
@@ -352,6 +354,23 @@ public class SolutionWorkflow {
         }
     }
 
+    /** 
+     * Get the prefix of the file name that is used to store the solution.
+     * 
+     * @return the field {@link #fileNamePrefix}.
+     */
+    public static String getFileNamePrefix() {
+        return fileNamePrefix;
+    }
+
+    /**
+     * Get file name of the solution file (without the extension).
+     * @return The file name of the solution file (without the file extension).
+     */
+    public String getFileName() {
+        return String.format("%s%o", this.fileNamePrefix, getIndex());
+    }
+
     /**
      * Get the graphical representation of the control-flow diagram with the
      * required title and in the defined orientation.
@@ -367,19 +386,6 @@ public class SolutionWorkflow {
             return generateFieldControlflowGraph("", orientation).getPNGImage(false);
         }
     }
-
-    /**
-     * Returns the negated solution in mapped format. Negating the original solution
-     * created by the SAT solver. Usually used to add to the solver to find new
-     * solutions.
-     *
-     * @param toolSeqRepeat variable defining if the provided solutions should be
-     *                      distinguished based on the tool sequences alone
-     * @return int[] representing the negated solution
-     */
-    // public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
-    // return this.nativeSolution.getNegatedMappedSolutionArray(toolSeqRepeat);
-    // }
 
     /**
      * Get a readable version of the workflow solution.

@@ -419,7 +419,7 @@ public class APE implements APEInterface {
 		final File executeDir = executionsFolder.toFile();
 		if (executeDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(executeDir, "workflowSolution_");
+			deleteExistingFiles(executeDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			executeDir.mkdir();
 		}
@@ -428,8 +428,7 @@ public class APE implements APEInterface {
 		/* Creating the requested scripts in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noExecutions).forEach(solution -> {
 			try {
-				String title = "workflowSolution_" + solution.getIndex() + ".sh";
-				File script = executionsFolder.resolve(title).toFile();
+				File script = executionsFolder.resolve(solution.getFileName() + ".sh").toFile();
 				APEFiles.write2file(solution.getScriptExecution(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
@@ -477,7 +476,7 @@ public class APE implements APEInterface {
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(graphDir, "SolutionNo");
+			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			graphDir.mkdir();
 		}
@@ -485,7 +484,7 @@ public class APE implements APEInterface {
 		/* Creating the requested graphs in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
 			try {
-				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionLength();
+				String title = solution.getFileName();
 				Path path = graphsFolder.resolve(title);
 				solution.getDataflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
@@ -536,7 +535,7 @@ public class APE implements APEInterface {
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(graphDir, "SolutionNo");
+			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			graphDir.mkdir();
 		}
@@ -544,7 +543,7 @@ public class APE implements APEInterface {
 		/* Creating the requested graphs in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
 			try {
-				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionLength();
+				String title = solution.getFileName();
 				Path path = graphsFolder.resolve(title);
 				solution.getControlflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
@@ -578,11 +577,10 @@ public class APE implements APEInterface {
 		APEUtils.printHeader(null, String.format("Writing the first %o solution(s) to CWL files", noCWLFiles));
 		APEUtils.timerStart(timerID, true);
 
-		final String filePrefix = "workflowSolution_";
 		final File cwlDir = cwlFolder.toFile();
 		if (cwlDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(cwlDir, filePrefix);
+			deleteExistingFiles(cwlDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			// Create the CWL directory if it does not already exist
 			cwlDir.mkdir();
@@ -592,7 +590,7 @@ public class APE implements APEInterface {
 		// Write the CWL files
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noCWLFiles).forEach(solution -> {
 			try {
-				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
+				String title = solution.getFileName() +	".cwl";
 				File script = cwlFolder.resolve(title).toFile();
 				DefaultCWLCreator cwlCreator = new DefaultCWLCreator(solution);
 				APEFiles.write2file(cwlCreator.generate(), script, false);
@@ -653,11 +651,10 @@ public class APE implements APEInterface {
 		APEUtils.printHeader(null, String.format("Writing the first %o solution(s) to executable CWL files", noFiles));
 		APEUtils.timerStart(timerID, true);
 
-		final String filePrefix = "workflowSolution_";
 		final File cwlDir = executableCWLFolder.toFile();
 		if (cwlDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(cwlDir, filePrefix);
+			deleteExistingFiles(cwlDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			// Create the CWL directory if it does not already exist
 			cwlDir.mkdir();
@@ -667,7 +664,7 @@ public class APE implements APEInterface {
 		// Write the CWL files
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noFiles).forEach(solution -> {
 			try {
-				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
+				String title = solution.getFileName() +	".cwl";
 				File script = executableCWLFolder.resolve(title).toFile();
 				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(solution);
 				APEFiles.write2file(cwlCreator.generate(), script, false);
