@@ -354,7 +354,7 @@ public class SolutionWorkflow {
         }
     }
 
-    /** 
+    /**
      * Get the prefix of the file name that is used to store the solution.
      * 
      * @return the field {@link #fileNamePrefix}.
@@ -365,6 +365,7 @@ public class SolutionWorkflow {
 
     /**
      * Get file name of the solution file (without the extension).
+     * 
      * @return The file name of the solution file (without the file extension).
      */
     public String getFileName() {
@@ -458,7 +459,7 @@ public class SolutionWorkflow {
 
         for (TypeNode workflowInput : this.workflowInputTypeStates) {
             if (!inputDefined) {
-                System.out.println(input + " [shape=box, color = red];\n");
+                // System.out.println(input + " [shape=box, color = red];\n");
                 inputDefined = true;
             }
             solution.append(input + "->" + workflowInput.getNodeID() + ";\n");

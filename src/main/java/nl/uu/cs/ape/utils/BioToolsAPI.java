@@ -1,51 +1,55 @@
 package nl.uu.cs.ape.utils;
 
-
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.io.APEFiles;
-import nl.uu.cs.ape.utils.APEUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * The {@code BioToolsAPI} class provides methods for fetching tool annotations
+ * from bio.tools API.
+ */
+@Slf4j
 public class BioToolsAPI {
 
 	/** Http-Client */
 	public final static OkHttpClient client = new OkHttpClient();
 
-
-    /**
-     * Send Get request to get tool annotations for each elements in JSONArray from bio.tools API. It writes the result to a file.
-     * 
-     * @param listFilePath Path to the file with the list of tools.
-     * @param destinationFilePath Path to the file where the result will be written.
-     * @throws IOException - If the file cannot be read or written.
-     */
+	/**
+	 * Send Get request to get tool annotations for each elements in JSONArray from
+	 * bio.tools API. It writes the result to a file.
+	 * 
+	 * @param listFilePath        Path to the file with the list of tools.
+	 * @param destinationFilePath Path to the file where the result will be written.
+	 * @throws IOException - If the file cannot be read or written.
+	 */
 	public static void fetchToolSet(String listFilePath, String destinationFilePath) throws IOException {
-		
+
 		// Fetch the Limited (predefined) set of tool
 		JSONArray bioToolsRAW = readListOfTools(listFilePath);
-		
+
 		JSONObject apeToolAnnotation = convertBioTools2Ape(bioToolsRAW);
 		APEFiles.write2file(apeToolAnnotation.toString(4), new File(destinationFilePath), false);
 	}
 
-    /**
-     * Send Get request to get tool annotations for each elements in JSONArray from bio.tools API. It writes the result to a JSONArray.
-     * @param filePath  Path to the file with the list of tools.
-     * @return JSONArray with the tool annotations.
-     * @throws IOException - If the file cannot be read or written.
-     */
+	/**
+	 * Send Get request to get tool annotations for each elements in JSONArray from
+	 * bio.tools API. It writes the result to a JSONArray.
+	 * 
+	 * @param filePath Path to the file with the list of tools.
+	 * @return JSONArray with the tool annotations.
+	 * @throws IOException - If the file cannot be read or written.
+	 */
 	public static JSONArray readListOfTools(String filePath) throws IOException {
 
 		File toolList = new File(filePath);
@@ -55,11 +59,13 @@ public class BioToolsAPI {
 	}
 
 	/**
-     * Send Get request to get tool annotations for each elements in JSONArray from bio.tools API. It writes the result to a JSONArray.
-     * @param domainName Path to the file with the list of tools.
-     * @return JSONArray with the tool annotations.
-     * @throws IOException - If the file cannot be read or written.
-     */
+	 * Send Get request to get tool annotations for each elements in JSONArray from
+	 * bio.tools API. It writes the result to a JSONArray.
+	 * 
+	 * @param domainName Path to the file with the list of tools.
+	 * @return JSONArray with the tool annotations.
+	 * @throws IOException - If the file cannot be read or written.
+	 */
 	public static JSONArray getToolsFromDomain(String domainName) throws IOException {
 		JSONArray toolAnnotations = null;
 		if (!domainName.equals("")) {
@@ -69,10 +75,11 @@ public class BioToolsAPI {
 		}
 		return toolAnnotations;
 	}
-	
+
 	/**
-	 * Send Get request to get tool annotations Saves JSONArray with all 
+	 * Send Get request to get tool annotations Saves JSONArray with all
 	 * bio.tools that belong to a certain EDAM topic.
+	 * 
 	 * @throws IOException
 	 */
 	public static JSONArray getToolsFromEDAMTopic(String topicName) throws IOException {
@@ -106,7 +113,7 @@ public class BioToolsAPI {
 				bioToolAnnotations.put(i, responseJson);
 			}
 		}
-		System.out.println("Tools fetched.");
+		log.debug("The list of tools successfully fetched from bio.tools.");
 		return bioToolAnnotations;
 	}
 
@@ -144,7 +151,7 @@ public class BioToolsAPI {
 			}
 
 		}
-		System.out.println("Tools fetched.");
+		log.debug("Tools fetched from a given URL.");
 		return bioToolAnnotations;
 	}
 

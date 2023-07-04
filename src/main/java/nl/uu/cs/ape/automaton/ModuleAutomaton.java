@@ -92,21 +92,6 @@ public class ModuleAutomaton implements Automaton {
     }
 
     /**
-     * Print.
-     */
-    public void print() {
-        System.out.println("-------------------------------------------------------------");
-        System.out.println("\tModule automaton:");
-        System.out.println("-------------------------------------------------------------");
-        for (State state : moduleStates) {
-            System.out.println(
-                    "\tModule state: " + state.getPredicateID() + ", order number: " + state.getAbsoluteStateNumber());
-        }
-        System.out.println("-------------------------------------------------------------");
-
-    }
-
-    /**
      * Gets state object which corresponds to the type and order number (w.r.t. the
      * type) of the state.
      * 

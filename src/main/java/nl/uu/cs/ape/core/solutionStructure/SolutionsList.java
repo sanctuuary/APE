@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.models.Pair;
@@ -17,6 +18,7 @@ import nl.uu.cs.ape.models.enums.SynthesisFlag;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class SolutionsList {
 
     private List<SolutionWorkflow> solutions;
@@ -39,23 +41,23 @@ public class SolutionsList {
      * APE run configuration.
      */
     private final APERunConfig runConfig;
-    
+
     /**
-     * Synthesis result flag, i.e., the reason why the synthesis execution was interrupted.
+     * Synthesis result flag, i.e., the reason why the synthesis execution was
+     * interrupted.
      */
     private SynthesisFlag runFlag;
-    
+
     /**
      * Total synthesis solving time in MS.
      */
     private long synthesisTimeMS;
-    
+
     /**
      * Pars of the numbeR of solutions found at each workflow length.
      */
-	private List<Pair<Integer>> solutionsPerLength;
-	
-	
+    private List<Pair<Integer>> solutionsPerLength;
+
     /**
      * Create an object that will contain all the solutions of the synthesis.
      *
@@ -64,16 +66,18 @@ public class SolutionsList {
     public SolutionsList(APERunConfig runConfig) {
         this.solutions = new ArrayList<SolutionWorkflow>();
         this.runConfig = runConfig;
-        /* Provides mapping from each atom/predicate to a number/string, and vice versa */
-        if(runConfig.getSolverType() == SolverType.SAT) {
-        	this. mappings = new SATAtomMappings();
+        /*
+         * Provides mapping from each atom/predicate to a number/string, and vice versa
+         */
+        if (runConfig.getSolverType() == SolverType.SAT) {
+            this.mappings = new SATAtomMappings();
         } else {
-        	throw new APEConfigException("Solver type has to be SAT.");
+            throw new APEConfigException("Solver type has to be SAT.");
         }
-        /* Variables defining the current and maximum lengths and solutions count.*/
+        /* Variables defining the current and maximum lengths and solutions count. */
         this.maxSolutions = runConfig.getMaxNoSolutions();
-        if (this.maxSolutions > 1000) {
-            System.out.println("Looking for " + maxSolutions + " solutions might take some time.");
+        if (this.maxSolutions > 100) {
+            log.info("Looking for " + maxSolutions + " solutions might take some time.");
         }
     }
 
@@ -87,7 +91,8 @@ public class SolutionsList {
     }
 
     /**
-     * Get max number of solutions that should be found. This number is defined in the config.json file.
+     * Get max number of solutions that should be found. This number is defined in
+     * the config.json file.
      *
      * @return Max number of solutions that should be found.
      */
@@ -112,23 +117,29 @@ public class SolutionsList {
     public boolean isEmpty() {
         return this.solutions.isEmpty();
     }
-    
+
     /**
      * Get the ape run configuration available at the start.
+     * 
      * @return the object that contains the run configuration information.
      */
     public APERunConfig getRunConfiguration() {
-    	return runConfig;
+        return runConfig;
     }
 
     /**
-     * Appends all of the elements in the specified collection to the end of this list, in the order
-     * that they are returned by the specified collection's iterator (optional operation). The behavior
-     * of this operation is undefined if the specified collection is modified while the operation
-     * is in progress. (Note that this will occur if the specified collection is this list,
+     * Appends all of the elements in the specified collection to the end of this
+     * list, in the order
+     * that they are returned by the specified collection's iterator (optional
+     * operation). The behavior
+     * of this operation is undefined if the specified collection is modified while
+     * the operation
+     * is in progress. (Note that this will occur if the specified collection is
+     * this list,
      * and it's nonempty.)
      *
-     * @param currSolutions Solutions that should be added to the list of all solutions.
+     * @param currSolutions Solutions that should be added to the list of all
+     *                      solutions.
      * @return true if this list changed as a result of the call.
      */
     public boolean addSolutions(List<SolutionWorkflow> currSolutions) {
@@ -159,29 +170,34 @@ public class SolutionsList {
     public int size() {
         return this.solutions.size();
     }
-    
+
     /**
-     * Set a specific number to be the number of solutions that are found up to the specified length.
-     * @param length - the length up until which the solutions are evaluated
-     * @param noSolutions - number of solutions that can be found up until the given length
+     * Set a specific number to be the number of solutions that are found up to the
+     * specified length.
+     * 
+     * @param length      - the length up until which the solutions are evaluated
+     * @param noSolutions - number of solutions that can be found up until the given
+     *                    length
      */
     public void addNoSolutionsForLength(Integer length, Integer noSolutions) {
-    	if(noSolutions == 0)
-    		return;
-    	if(solutionsPerLength == null) {
-    		solutionsPerLength = new ArrayList<>();
-    	}
-    	solutionsPerLength.add(new Pair<Integer>(length, noSolutions));
+        if (noSolutions == 0)
+            return;
+        if (solutionsPerLength == null) {
+            solutionsPerLength = new ArrayList<>();
+        }
+        solutionsPerLength.add(new Pair<Integer>(length, noSolutions));
     }
-    
+
     /**
-     * Returns list of pairs (X, Y), where Y describes the number of solutions up until length X.
+     * Returns list of pairs (X, Y), where Y describes the number of solutions up
+     * until length X.
+     * 
      * @return
      */
     public List<Pair<Integer>> getSolutionsPerLength() {
-    	return solutionsPerLength;
+        return solutionsPerLength;
     }
-    
+
     /**
      * Return the stream that represent the solutions.
      *
@@ -201,36 +217,43 @@ public class SolutionsList {
     }
 
     /**
-     *  Set the synthesis result flag, i.e., set the reason why the synthesis execution was interrupted.
+     * Set the synthesis result flag, i.e., set the reason why the synthesis
+     * execution was interrupted.
+     * 
      * @param flag - the {@link SynthesisFlag} that should be set
      */
-	public void setFlag(SynthesisFlag flag) {
-		this.runFlag = flag;
-		
-	}
-	
-	/**
-     *  Get the synthesis result flag, i.e., the reason why the synthesis execution was interrupted.
-     * @return Returns the {@link SynthesisFlag} representing the reason synthesis execution was interrupted.
-     */
-	public SynthesisFlag getFlag() {
-		return runFlag;
-	}
-	
-	/**
-	 * Get total synthesis time (in MS).
-	 * @return the total synthesis time in MS.
-	 */
-	public long getSolvingTime() {
-		return this.synthesisTimeMS;
-	}
+    public void setFlag(SynthesisFlag flag) {
+        this.runFlag = flag;
 
-	/**
-	 * Set total synthesis time (in MS).
-	 * @param synthesisTimeMS the synthesis time in MS
-	 */
-	public void setSolvingTime(long synthesisTimeMS) {
-		this.synthesisTimeMS = synthesisTimeMS;
-	}
-	
+    }
+
+    /**
+     * Get the synthesis result flag, i.e., the reason why the synthesis execution
+     * was interrupted.
+     * 
+     * @return Returns the {@link SynthesisFlag} representing the reason synthesis
+     *         execution was interrupted.
+     */
+    public SynthesisFlag getFlag() {
+        return runFlag;
+    }
+
+    /**
+     * Get total synthesis time (in MS).
+     * 
+     * @return the total synthesis time in MS.
+     */
+    public long getSolvingTime() {
+        return this.synthesisTimeMS;
+    }
+
+    /**
+     * Set total synthesis time (in MS).
+     * 
+     * @param synthesisTimeMS the synthesis time in MS
+     */
+    public void setSolvingTime(long synthesisTimeMS) {
+        this.synthesisTimeMS = synthesisTimeMS;
+    }
+
 }

@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.models.sltlxStruc.CNFClause;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -35,6 +36,7 @@ import java.net.URISyntaxException;
 /**
  * The type Ape files.
  */
+@Slf4j
 public class APEFiles {
 
     /**
@@ -205,7 +207,7 @@ public class APEFiles {
             APEUtils.printWarning(absolutePath + "' does not exist. Directory will be created.");
 
             if (new File(absolutePath).mkdirs()) {
-                System.out.println("Successfully created directory '" + absolutePath + "'");
+                log.debug("Successfully created directory '" + absolutePath + "'");
             } else {
                 throw new APEConfigException("Could not create directory '" + absolutePath + "' for tag '" + tag + "'");
             }

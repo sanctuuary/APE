@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
@@ -31,11 +32,11 @@ import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code ModuleUtils} class is used to encode SLTLx constraints based on
- * the
- * module annotations that would encode the workflow structure.
+ * the module annotations that would encode the workflow structure.
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public final class EnforceModuleRelatedRules {
 
 	/**
@@ -985,8 +986,9 @@ public final class EnforceModuleRelatedRules {
 	}
 
 	/**
-	 * Providing the recursive method used in
-	 * {@link #moduleEnforceTaxonomyStructure}.
+	 * The recursive method used in
+	 * {@link #moduleEnforceTaxonomyStructure}, to enforce the taxonomy structure in
+	 * the solution.
 	 *
 	 * @param allModules  All the modules.
 	 * @param currModule  Module that should be used.
@@ -1005,7 +1007,7 @@ public final class EnforceModuleRelatedRules {
 			 */
 			for (TaxonomyPredicate subModule : APEUtils.safe(currModule.getSubPredicates())) {
 				if (subModule == null) {
-					System.out.println("Null error: " + currModule.getPredicateID() + " ->"
+					log.error("Submodule is 'null': " + currModule.getPredicateID() + " ->"
 							+ currModule.getSubPredicates().toString());
 				}
 				SLTLxAtom subModuleState = new SLTLxAtom(AtomType.MODULE, subModule, moduleState);

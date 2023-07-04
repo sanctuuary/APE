@@ -6,6 +6,7 @@ import java.util.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.constraints.ConstraintFactory;
 import nl.uu.cs.ape.constraints.ConstraintFormatException;
@@ -26,6 +27,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class APEDomainSetup {
 
     /* Helper objects used to keep track of the domain quality. */
@@ -387,8 +389,7 @@ public class APEDomainSetup {
             }
         } catch (APEDimensionsException badDimension) {
             wrongToolIO.add(moduleLabel);
-            System.err.println("Operation '" + "' was not included." + badDimension.getMessage());
-            // System.out.println("Skipped " + (counterErrors ++) + " tool annotations.");
+            log.warn("Operation '" + "' was not included." + badDimension.getMessage());
             return false;
         }
 
@@ -398,7 +399,7 @@ public class APEDomainSetup {
         }
         if (inputs.isEmpty() && outputs.isEmpty()) {
             emptyTools.add(moduleLabel);
-            System.out.println("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
+            log.debug("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
             return false;
         }
         /*

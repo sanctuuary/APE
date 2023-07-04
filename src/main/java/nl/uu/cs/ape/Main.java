@@ -1,11 +1,11 @@
 package nl.uu.cs.ape;
 
 import guru.nidi.graphviz.attribute.Rank.RankDir;
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.io.APEFiles;
-import nl.uu.cs.ape.utils.APEUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,6 +20,7 @@ import java.io.IOException;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class Main {
 
     /**
@@ -92,7 +93,7 @@ public class Main {
          * Writing solutions to the specified file in human readable format
          */
         if (solutions.isEmpty()) {
-            System.out.println("UNSAT");
+            log.info("The problem is UNSAT.");
         } else {
             try {
                 APE.writeSolutionToFile(solutions);

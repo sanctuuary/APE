@@ -2,13 +2,16 @@ package nl.uu.cs.ape.sat.test.utils;
 
 import org.junit.jupiter.api.Assertions;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public abstract class Evaluation {
 
     private static boolean debugMode = true;
 
     public static void success(String message, Object... params) {
         if (debugMode) {
-            System.out.println("\u001B[32mSUCCESS: " + String.format(message, params) + "\u001B[0m");
+            log.info("\u001B[32mSUCCESS: " + String.format(message, params) + "\u001B[0m");
         }
     }
 
