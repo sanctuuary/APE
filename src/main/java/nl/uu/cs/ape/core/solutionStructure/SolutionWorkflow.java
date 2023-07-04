@@ -459,7 +459,7 @@ public class SolutionWorkflow {
 
         for (TypeNode workflowInput : this.workflowInputTypeStates) {
             if (!inputDefined) {
-                // System.out.println(input + " [shape=box, color = red];\n");
+                solution.append(input + " [shape=box, color = red];\n");
                 inputDefined = true;
             }
             solution.append(input + "->" + workflowInput.getNodeID() + ";\n");

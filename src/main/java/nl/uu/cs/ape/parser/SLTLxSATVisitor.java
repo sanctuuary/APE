@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
@@ -61,6 +62,7 @@ import nl.uu.cs.ape.utils.APEUtils;
  * @author Vedran Kasalica
  *
  */
+@Slf4j
 public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 
 	static int usedState = 0;
@@ -145,7 +147,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		} else if (ctx.getChild(0).getText().equals("X")) {
 			return new SLTLxNext(subFormula);
 		} else {
-			System.err.println("Modal operation '" + ctx.getChild(1).getText() + "' id not recognised.");
+			log.warn("Modal operation '" + ctx.getChild(1).getText() + "' is not recognised.");
 			/* In case modal operator is not recognized return null. */
 			return null;
 		}
@@ -179,7 +181,7 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 		} else if (ctx.getChild(1).getText().equals("<->")) {
 			return new SLTLxEquivalence(subFormula1, subFormula2);
 		} else {
-			System.err.println("Binary operation '" + ctx.getChild(1).getText() + "' is not recognised.");
+			log.warn("Binary operation '" + ctx.getChild(1).getText() + "' is not recognised.");
 			/* In case binary operator is not recognised return null. */
 			return null;
 		}

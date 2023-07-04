@@ -82,8 +82,7 @@ public final class APEUtils {
 				String currConstrEncoding = constraintSATEncoding(constraint.getConstraintID(),
 						constraint.getParameters(), domainSetup, moduleAutomaton, typeAutomaton, mappings);
 				if (currConstrEncoding == null) {
-					System.err
-							.println("Error in constraint file. Constraint no: " + currConst + ". Constraint skipped.");
+					log.warn("Error in constraint file. Constraint no: " + currConst + ". Constraint skipped.");
 				} else {
 					cnf_SLTL.append(currConstrEncoding);
 				}

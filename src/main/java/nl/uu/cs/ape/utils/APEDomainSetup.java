@@ -307,7 +307,7 @@ public class APEDomainSetup {
             updateModuleFromJson(jsonModule);
         }
         if (currModule == 0) {
-            System.err.println("No tools were annotated.");
+            log.warn("No tools were annotated in the current domain.");
             return false;
         }
         return true;
@@ -337,7 +337,7 @@ public class APEDomainSetup {
         for (String taxonomyModule : taxonomyModules) {
             String taxonomyModuleIRI = APEUtils.createClassIRI(taxonomyModule, ontologyPrefixIRI);
             if (allModules.get(taxonomyModuleIRI) == null) {
-                System.err.println("Tool '" + moduleIRI + "' annotation issue. "
+                log.warn("Tool '" + moduleIRI + "' annotation issue. "
                         + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleIRI
                         + "' cannot be found in the Tool Taxonomy.");
                 wrongToolTax.add(moduleLabel);
@@ -351,7 +351,7 @@ public class APEDomainSetup {
          * used as superclass of the tool.
          */
         if (taxonomyModules.isEmpty()) {
-            System.err.println("Tool '" + moduleIRI + "' annotation issue. "
+            log.warn("Tool '" + moduleIRI + "' annotation issue. "
                     + "None of the referenced '" + APECoreConfig.getJsonTags("taxonomyOperations")
                     + "' can be found in the Tool Taxonomy.");
             taxonomyModules.add(allModules.getRootModuleID());

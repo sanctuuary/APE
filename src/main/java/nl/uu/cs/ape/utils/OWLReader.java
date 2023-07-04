@@ -8,6 +8,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AllTypes;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class OWLReader {
 
 	/** File containing the ontology */
@@ -263,7 +265,7 @@ public class OWLReader {
 		}
 
 		List<OWLClass> subClasses = reasoner.getSubClasses(currClass, true).entities()
-				.filter(child -> reasoner.isSatisfiable(child)).collect(Collectors.toList());
+				.filter(reasoner::isSatisfiable).collect(Collectors.toList());
 
 		subClasses.forEach(child -> exploreTypeOntologyRec(reasoner, child, currClass, currRoot));
 
@@ -279,11 +281,20 @@ public class OWLReader {
 				artificialSubType.addSuperPredicate(currType);
 				artificialSubType.setNodePredicate(NodeType.LEAF);
 			} else {
-				System.err.println("Artificial predicate '" + getLabel(currClass) + "' was not created correctly.");
+				log.warn("Artificial predicate '" + getLabel(currClass) + "' was not created correctly.");
 			}
 		}
 	}
 
+	/**
+	 * Adding a new type to the {@link #allTypes} object.
+	 * 
+	 * @param classLabel   The label of the class.
+	 * @param classID      The ID of the class.
+	 * @param rootID       The ID of the root class.
+	 * @param currNodeType The node type of the class.
+	 * @return The newly created type.
+	 */
 	private Type addNewTypeToAllTypes(String classLabel, String classID, String rootID, NodeType currNodeType) {
 		Type currType = null;
 		/* Generate the Type that corresponds to the taxonomy class. */
@@ -332,7 +343,7 @@ public class OWLReader {
 	 */
 	private String getIRI(OWLClass currClass) {
 		if (currClass == null) {
-			return null;
+			return "N/A";
 		}
 		return currClass.toStringID();
 	}

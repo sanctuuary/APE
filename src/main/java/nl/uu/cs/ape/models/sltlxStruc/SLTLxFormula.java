@@ -8,7 +8,6 @@ import java.util.Set;
 
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.io.APEFiles;
-import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * Abstract class that represents any SLTLx formula.

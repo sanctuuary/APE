@@ -38,12 +38,12 @@ public class APEConfigTagTest {
         for (APEConfigTag.Info<?> tag : APERunConfig.TAGS.getAll()) {
 
             if (tag.type == APEConfigTag.TagType.INTEGER) {
-                System.out.printf("Web API shows `%s` box for tag `%s`, with min:`%s` and max:`%s`\n", tag.type,
+                log.debug("Web API shows `{}` box for tag `{}`, with min:`{}` and max:`{}`\n", tag.type,
                         tag.label, tag.constraints.getInt("min"), tag.constraints.getInt("max"));
             }
         }
 
-        System.out.printf("\n### Display all tag info ####\nCORE:\n%s\n\nRUN:\n%s\n",
+        log.debug("\n### Display all tag info ####\nCORE:\n{}\n\nRUN:\n{}\n",
                 APECoreConfig.TAGS.toJSON().toString(3),
                 APERunConfig.TAGS.toJSON().toString(3));
     }

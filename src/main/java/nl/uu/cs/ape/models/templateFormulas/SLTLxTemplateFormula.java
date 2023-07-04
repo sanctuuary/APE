@@ -117,27 +117,27 @@ public abstract class SLTLxTemplateFormula {
 
     /**
      * Creates a CNF representation of the Constraint:<br>
-     * If <b>if_predicate</b> is used, tool <b>then_predicate</b> has to be used
+     * If <b>ifPredicate</b> is used, tool <b>thenPredicate</b> has to be used
      * subsequently.
      *
-     * @param if_predicate    Predicate that enforce the usage of
-     *                        <b>then_predicate</b>.
-     * @param then_predicate  Predicate that is enforced by <b>if_predicate</b>.
+     * @param ifPredicate     Predicate that enforce the usage of
+     *                        <b>thenPredicate</b>.
+     * @param thenPredicate   Predicate that is enforced by <b>ifPredicate</b>.
      * @param moduleAutomaton Module automaton.
      * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
-    public static String ite_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate,
+    public static String iteModule(TaxonomyPredicate ifPredicate, TaxonomyPredicate thenPredicate,
             ModuleAutomaton moduleAutomaton,
             SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
             constraints.append("-"
-                    + mappings.add(if_predicate, moduleAutomaton.getAllStates().get(i), AtomType.MODULE)
+                    + mappings.add(ifPredicate, moduleAutomaton.getAllStates().get(i), AtomType.MODULE)
                     + " ");
             for (int j = i + 1; j < automatonSize; j++) {
-                constraints.append(mappings.add(then_predicate, moduleAutomaton.get(j), AtomType.MODULE)).append(" ");
+                constraints.append(mappings.add(thenPredicate, moduleAutomaton.get(j), AtomType.MODULE)).append(" ");
             }
             constraints.append("0\n");
         }
@@ -146,12 +146,12 @@ public abstract class SLTLxTemplateFormula {
 
     /**
      * Creates a CNF representation of the Constraint:<br>
-     * If type <b>if_predicate</b> is used/generated (depending on the @typeBlocks),
-     * then type <b>then_predicate</b> has to be used/generated subsequently.
+     * If type <b>ifPredicate</b> is used/generated (depending on the @typeBlocks),
+     * then type <b>thenPredicate</b> has to be used/generated subsequently.
      *
-     * @param if_predicate    Predicate that enforce the usage of
-     *                        <b>then_predicate</b>.
-     * @param then_predicate  Predicate that is enforced by <b>if_predicate</b>.
+     * @param ifPredicate     Predicate that enforce the usage of
+     *                        <b>thenPredicate</b>.
+     * @param thenPredicate   Predicate that is enforced by <b>ifPredicate</b>.
      * @param typeElement     Workflow element type.
      * @param moduleAutomaton Module automaton.
      * @param typeBlocks      Type blocks (corresponding to the memory or used type
@@ -159,8 +159,8 @@ public abstract class SLTLxTemplateFormula {
      * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
-    public static String ite_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_predicate,
-            AtomType typeElement, ModuleAutomaton moduleAutomaton,
+    public static String iteType(TaxonomyPredicate ifPredicate, TaxonomyPredicate thenPredicate,
+            AtomType typeElement,
             List<Block> typeBlocks, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int numberOfBlocks = typeBlocks.size();
@@ -168,14 +168,14 @@ public abstract class SLTLxTemplateFormula {
         for (int i_block = 0; i_block < numberOfBlocks; i_block++) {
             for (int i_state = 0; i_state < numberOfStates; i_state++) {
 
-                /* If if_predicate is used in any state of a certain block */
-                constraints.append("-").append(mappings.add(if_predicate,
+                /* If ifPredicate is used in any state of a certain block */
+                constraints.append("-").append(mappings.add(ifPredicate,
                         typeBlocks.get(i_block).getState(i_state), typeElement)).append(" ");
 
-                /* then then_predicate must be used in a state of the subsequent blocks. */
+                /* then thenPredicate must be used in a state of the subsequent blocks. */
                 for (int j_block = i_block + 1; j_block < numberOfBlocks; j_block++) {
                     for (int j_state = i_state + 1; j_state < numberOfBlocks; j_state++) {
-                        constraints.append(mappings.add(then_predicate,
+                        constraints.append(mappings.add(thenPredicate,
                                 typeBlocks.get(j_block).getState(j_state), typeElement)).append(" ");
                     }
 
@@ -188,27 +188,27 @@ public abstract class SLTLxTemplateFormula {
 
     /**
      * Creates a CNF representation of the Constraint:<br>
-     * If <b>if_predicate</b> is used, tool <b>then_predicate</b> cannot be used
+     * If <b>ifPredicate</b> is used, tool <b>thenPredicate</b> cannot be used
      * subsequently.
      *
-     * @param if_predicate       Predicate that forbids the usage of
-     *                           <b>then_not_predicate</b>.
-     * @param then_not_predicate Module that is forbidden by <b>if_predicate</b>.
-     * @param moduleAutomaton    Module automaton.
-     * @param mappings           Set of the mappings for the literals.
+     * @param ifPredicate      Predicate that forbids the usage of
+     *                         <b>thenNotPredicate</b>.
+     * @param thenNotPredicate Module that is forbidden by <b>ifPredicate</b>.
+     * @param moduleAutomaton  Module automaton.
+     * @param mappings         Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
-    public static String itn_module(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate,
+    public static String itnModule(TaxonomyPredicate ifPredicate, TaxonomyPredicate thenNotPredicate,
             ModuleAutomaton moduleAutomaton, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize - 1; i++) {
             State currModuleState = moduleAutomaton.getAllStates().get(i);
             for (int j = i + 1; j < automatonSize; j++) {
-                constraints.append("-").append(mappings.add(if_predicate, currModuleState, AtomType.MODULE))
+                constraints.append("-").append(mappings.add(ifPredicate, currModuleState, AtomType.MODULE))
                         .append(" ");
                 constraints.append("-"
-                        + mappings.add(then_not_predicate, moduleAutomaton.get(j), AtomType.MODULE)
+                        + mappings.add(thenNotPredicate, moduleAutomaton.get(j), AtomType.MODULE)
                         + " 0\n");
             }
         }
@@ -218,21 +218,21 @@ public abstract class SLTLxTemplateFormula {
 
     /**
      * Creates a CNF representation of the Constraint:<br>
-     * If type <b>if_predicate</b> is used/generated (depending on the @typeBlocks),
-     * then do not use/generate type <b>then_not_predicate</b> subsequently.
+     * If type <b>ifPredicate</b> is used/generated (depending on the @typeBlocks),
+     * then do not use/generate type <b>thenNotPredicate</b> subsequently.
      *
-     * @param if_predicate       Predicate that forbids the usage of
-     *                           <b>then_not_predicate</b>.
-     * @param then_not_predicate Predicate that is forbidden by <b>if_predicate</b>.
-     * @param typeElement        Workflow element type.
-     * @param moduleAutomaton    Module automaton.
-     * @param typeBlocks         Type blocks (corresponding to the memory or used
-     *                           type states).
-     * @param mappings           Set of the mappings for the literals.
+     * @param ifPredicate      Predicate that forbids the usage of
+     *                         <b>thenNotPredicate</b>.
+     * @param thenNotPredicate Predicate that is forbidden by <b>ifPredicate</b>.
+     * @param typeElement      Workflow element type.
+     * @param moduleAutomaton  Module automaton.
+     * @param typeBlocks       Type blocks (corresponding to the memory or used
+     *                         type states).
+     * @param mappings         Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
-    public static String itn_type(TaxonomyPredicate if_predicate, TaxonomyPredicate then_not_predicate,
-            AtomType typeElement, ModuleAutomaton moduleAutomaton,
+    public static String itnType(TaxonomyPredicate ifPredicate, TaxonomyPredicate thenNotPredicate,
+            AtomType typeElement,
             List<Block> typeBlocks, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int numberOfBlocks = typeBlocks.size();
@@ -242,14 +242,14 @@ public abstract class SLTLxTemplateFormula {
                 for (int j_block = i_block + 1; j_block < numberOfBlocks; j_block++) {
                     for (int j_state = 0; j_state < numberOfStates; j_state++) {
                         /*
-                         * If if_predicate is used in any state of a certain block
+                         * If ifPredicate is used in any state of a certain block
                          */
-                        constraints.append("-").append(mappings.add(if_predicate,
+                        constraints.append("-").append(mappings.add(ifPredicate,
                                 typeBlocks.get(i_block).getState(i_state), typeElement)).append(" ");
                         /*
-                         * then then_predicate cannot be used in a state of the subsequent blocks.
+                         * then thenPredicate cannot be used in a state of the subsequent blocks.
                          */
-                        constraints.append("-").append(mappings.add(then_not_predicate,
+                        constraints.append("-").append(mappings.add(thenNotPredicate,
                                 typeBlocks.get(j_block).getState(j_state), typeElement)).append(" 0\n");
                     }
 
@@ -261,27 +261,27 @@ public abstract class SLTLxTemplateFormula {
 
     /**
      * Creates a CNF representation of the Constraint:<br>
-     * If we use module <b>second_module_in_sequence</b>,
-     * then we must have used <b>first_module_in_sequence</b> prior to it.
+     * If we use module <b>secondModuleInSequence</b>,
+     * then we must have used <b>firstModuleInSequence</b> prior to it.
      *
-     * @param second_module_in_sequence Predicate that enforces the usage of
-     *                                  <b>first_predicate</b>.
-     * @param first_module_in_sequence  Predicate that is enforced by
-     *                                  <b>second_predicate</b>.
-     * @param moduleAutomaton           Module automaton.
-     * @param mappings                  Set of the mappings for the literals.
+     * @param secondModuleInSequence Predicate that enforces the usage of
+     *                               <b>firstPredicate</b>.
+     * @param firstModuleInSequence  Predicate that is enforced by
+     *                               <b>secondPredicate</b>.
+     * @param moduleAutomaton        Module automaton.
+     * @param mappings               Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
-    public static String depend_module(TaxonomyPredicate second_module_in_sequence,
-            TaxonomyPredicate first_module_in_sequence,
+    public static String dependModule(TaxonomyPredicate secondModuleInSequence,
+            TaxonomyPredicate firstModuleInSequence,
             ModuleAutomaton moduleAutomaton, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
-            constraints.append("-").append(mappings.add(second_module_in_sequence,
+            constraints.append("-").append(mappings.add(secondModuleInSequence,
                     moduleAutomaton.getAllStates().get(i), AtomType.MODULE)).append(" ");
             for (int j = 0; j < i; j++) {
-                constraints.append(mappings.add(first_module_in_sequence,
+                constraints.append(mappings.add(firstModuleInSequence,
                         moduleAutomaton.get(j), AtomType.MODULE)).append(" ");
             }
             constraints.append("0\n");
@@ -291,29 +291,29 @@ public abstract class SLTLxTemplateFormula {
 
     /**
      * Creates a CNF representation of the Constraint:<br>
-     * If we use predicate <b>first_module_in_sequence</b>, then use
-     * <b>second_module_in_sequence</b> as a next predicate in the sequence.
+     * If we use predicate <b>firstModuleInSequence</b>, then use
+     * <b>secondModuleInSequence</b> as a next predicate in the sequence.
      *
-     * @param first_module_in_sequence  Predicate that enforce the usage of
-     *                                  <b>second_predicate</b>.
-     * @param second_module_in_sequence Predicate that is enforced by
-     *                                  <b>first_predicate</b>.
-     * @param moduleAutomaton           Module automaton.
-     * @param mappings                  Set of the mappings for the literals.
+     * @param firstModuleInSequence  Predicate that enforce the usage of
+     *                               <b>secondPredicate</b>.
+     * @param secondModuleInSequence Predicate that is enforced by
+     *                               <b>firstPredicate</b>.
+     * @param moduleAutomaton        Module automaton.
+     * @param mappings               Set of the mappings for the literals.
      * @return The String CNF representation of the constraint.
      */
-    public static String next_module(TaxonomyPredicate first_module_in_sequence,
-            TaxonomyPredicate second_module_in_sequence,
+    public static String nextModule(TaxonomyPredicate firstModuleInSequence,
+            TaxonomyPredicate secondModuleInSequence,
             ModuleAutomaton moduleAutomaton, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
-            constraints.append("-").append(mappings.add(first_module_in_sequence,
+            constraints.append("-").append(mappings.add(firstModuleInSequence,
                     moduleAutomaton.getAllStates().get(i), AtomType.MODULE)).append(" ");
 
-            /* Clause that forbids using first_predicate as the last in the sequence */
+            /* Clause that forbids using firstPredicate as the last in the sequence */
             if (i < automatonSize - 1) {
-                constraints.append(mappings.add(second_module_in_sequence,
+                constraints.append(mappings.add(secondModuleInSequence,
                         moduleAutomaton.get(i + 1), AtomType.MODULE)).append(" ");
             }
             constraints.append("0\n");
@@ -323,32 +323,32 @@ public abstract class SLTLxTemplateFormula {
 
     /**
      * Creates a CNF representation of the Constraint:<br>
-     * If we use predicate <b>first_predicate</b>, then use
-     * <b>second_predicate</b> as a next predicate in the sequence.
+     * If we use predicate <b>firstPredicate</b>, then use
+     * <b>secondPredicate</b> as a next predicate in the sequence.
      *
-     * @param second_module_in_sequence Predicate that is enforced by
-     *                                  <b>first_predicate</b>.
-     * @param first_module_in_sequence  Predicate that enforce the usage of
-     *                                  <b>second_predicate</b>.
-     * @param moduleAutomaton           Module automaton.
-     * @param mappings                  Set of the mappings for the literals.
+     * @param secondModuleInSequence Predicate that is enforced by
+     *                               <b>firstPredicate</b>.
+     * @param firstModuleInSequence  Predicate that enforce the usage of
+     *                               <b>secondPredicate</b>.
+     * @param moduleAutomaton        Module automaton.
+     * @param mappings               Set of the mappings for the literals.
      * @return The String CNF representation of the constraint.
      */
-    public static String prev_module(TaxonomyPredicate second_module_in_sequence,
-            TaxonomyPredicate first_module_in_sequence,
+    public static String prevModule(TaxonomyPredicate secondModuleInSequence,
+            TaxonomyPredicate firstModuleInSequence,
             ModuleAutomaton moduleAutomaton, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int i = 0; i < automatonSize; i++) {
-            constraints.append("-").append(mappings.add(second_module_in_sequence,
+            constraints.append("-").append(mappings.add(secondModuleInSequence,
                     moduleAutomaton.getAllStates().get(i), AtomType.MODULE)).append(" ");
 
             /*
-             * Clause that forbids using second_module_in_sequence as the first tool in the
+             * Clause that forbids using secondModuleInSequence as the first tool in the
              * sequence
              */
             if (i > 0) {
-                constraints.append(mappings.add(first_module_in_sequence,
+                constraints.append(mappings.add(firstModuleInSequence,
                         moduleAutomaton.get(i - 1), AtomType.MODULE)).append(" ");
             }
             constraints.append("0\n");
@@ -358,20 +358,20 @@ public abstract class SLTLxTemplateFormula {
 
     /**
      * Creates a CNF representation of the Constraint:<br>
-     * Use <b>last_module</b> as last module in the solution.
+     * Use <b>lastModule</b> as last module in the solution.
      *
-     * @param last_module     The module.
+     * @param lastModule      The module.
      * @param moduleAutomaton Automaton of all the module states.
      * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
-    public static String useAsLastModule(TaxonomyPredicate last_module, ModuleAutomaton moduleAutomaton,
+    public static String useAsLastModule(TaxonomyPredicate lastModule, ModuleAutomaton moduleAutomaton,
             SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
 
         List<State> moduleAutomatonStates = moduleAutomaton.getAllStates();
         State lastModuleState = moduleAutomatonStates.get(moduleAutomatonStates.size() - 1);
-        constraints.append(mappings.add(last_module, lastModuleState, AtomType.MODULE)).append(" 0\n");
+        constraints.append(mappings.add(lastModule, lastModuleState, AtomType.MODULE)).append(" 0\n");
 
         return constraints.toString();
     }
@@ -398,27 +398,6 @@ public abstract class SLTLxTemplateFormula {
     }
 
     /**
-     * TODO: Creates a CNF representation of the Constraint:<br>
-     * Use <b>module</b> in the solution exactly <b>n</b> times.
-     *
-     * @param module          Module to be used.
-     * @param n               Number of repetitions.
-     * @param moduleAutomaton Automaton of all the module states.
-     * @param mappings        Set of the mappings for the literals.
-     * @return The String CNF representation of the SLTLx formula.
-     */
-    public static String useModuleNtimes(TaxonomyPredicate module, int n, ModuleAutomaton moduleAutomaton,
-            SATAtomMappings mappings) {
-        // StringBuilder constraints = new StringBuilder();
-        //
-        // List<State> moduleAutomatonStates = moduleAutomaton.getModuleStates();
-        // ModuleState nthModuleState = moduleAutomatonStates.get(index - 1);
-        // constraints.append(mappings.add(module, nthModuleState)).append(" 0\n";
-
-        return null;
-    }
-
-    /**
      * Creates a CNF representation of the Constraint:<br>
      * Use <b>module</b> with data <b>inputType</b> as one of the inputs.
      * 
@@ -429,7 +408,7 @@ public abstract class SLTLxTemplateFormula {
      * @param mappings        Set of the mappings for the literals.
      * @return
      */
-    public static String use_module_input(TaxonomyPredicate module, TaxonomyPredicate inputType,
+    public static String useModuleInput(TaxonomyPredicate module, TaxonomyPredicate inputType,
             ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 
         StringBuilder constraints = new StringBuilder();
@@ -484,7 +463,7 @@ public abstract class SLTLxTemplateFormula {
      * @param mappings        Set of the mappings for the literals.
      * @return
      */
-    public static String use_module_output(TaxonomyPredicate module, TaxonomyPredicate outputType,
+    public static String useModuleOutput(TaxonomyPredicate module, TaxonomyPredicate outputType,
             ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 
         StringBuilder constraints = new StringBuilder();
@@ -532,16 +511,15 @@ public abstract class SLTLxTemplateFormula {
      * Creates a CNF representation of the Constraint:<br>
      * 1st operation should generate an output used by the 2nd operation.
      *
-     * @param first_predicate  - Module type that generates the data as output
-     * @param second_predicate - Module type that uses the generated data as input
-     * @param domainSetup      - setup of the domain
-     * @param moduleAutomaton  - module automaton.
-     * @param typeAutomaton    - type automaton
-     * @param mappings         - Set of the mappings for the literals.
+     * @param firstPredicate  - Module type that generates the data as output
+     * @param secondPredicate - Module type that uses the generated data as input
+     * @param moduleAutomaton - module automaton.
+     * @param typeAutomaton   - type automaton
+     * @param mappings        - Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
-    public static String connected_modules(TaxonomyPredicate first_predicate, TaxonomyPredicate second_predicate,
-            APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+    public static String connectedModules(TaxonomyPredicate firstPredicate, TaxonomyPredicate secondPredicate,
+            ModuleAutomaton moduleAutomaton,
             TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         Set<Integer> allCombinations = new HashSet<>();
@@ -576,10 +554,10 @@ public abstract class SLTLxTemplateFormula {
         for (Integer currComb : allCombinations) {
             // enforce tools
             constraints.append("-" + currComb + " ")
-                    .append(mappings.add(first_predicate, opOrderStates.get(currComb).getFirst(), AtomType.MODULE))
+                    .append(mappings.add(firstPredicate, opOrderStates.get(currComb).getFirst(), AtomType.MODULE))
                     .append(" 0\n");
             constraints.append("-" + currComb + " ")
-                    .append(mappings.add(second_predicate, opOrderStates.get(currComb).getSecond(), AtomType.MODULE))
+                    .append(mappings.add(secondPredicate, opOrderStates.get(currComb).getSecond(), AtomType.MODULE))
                     .append(" 0\n");
             // enforce output/input dependencies
             constraints.append("-" + currComb + " ");
@@ -598,16 +576,16 @@ public abstract class SLTLxTemplateFormula {
      * Creates a CNF representation of the Constraint:<br>
      * 1st operation should not generate an output used by the 2nd operation.
      *
-     * @param first_predicate  - Module type that generates the data as output
-     * @param second_predicate - Module type that uses the generated data as input
-     * @param domainSetup      - setup of the domain
-     * @param moduleAutomaton  - module automaton.
-     * @param typeAutomaton    - type automaton
-     * @param mappings         - Set of the mappings for the literals.
+     * @param firstPredicate  - Module type that generates the data as output
+     * @param secondPredicate - Module type that uses the generated data as input
+     * @param domainSetup     - setup of the domain
+     * @param moduleAutomaton - module automaton.
+     * @param typeAutomaton   - type automaton
+     * @param mappings        - Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
-    public static String not_connected_modules(TaxonomyPredicate first_predicate, TaxonomyPredicate second_predicate,
-            APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton,
+    public static String notConnectedModules(TaxonomyPredicate firstPredicate, TaxonomyPredicate secondPredicate,
+            ModuleAutomaton moduleAutomaton,
             TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
 
@@ -625,13 +603,13 @@ public abstract class SLTLxTemplateFormula {
                 // are not connected
                 Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
                 for (Pair<State> currIOpair : statePairs) {
-                    constraints.append("-").append(mappings.add(first_predicate, firstModuleState, AtomType.MODULE))
+                    constraints.append("-").append(mappings.add(firstPredicate, firstModuleState, AtomType.MODULE))
                             .append(" ");
                     constraints.append("-"
                             + mappings.add(currIOpair.getFirst(), currIOpair.getSecond(), AtomType.MEM_TYPE_REFERENCE)
                             + " ");
                     constraints.append("-"
-                            + mappings.add(second_predicate, secondModuleState, AtomType.MODULE)
+                            + mappings.add(secondPredicate, secondModuleState, AtomType.MODULE)
                             + " 0\n");
                 }
 

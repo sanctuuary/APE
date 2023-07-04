@@ -130,7 +130,6 @@ public class BioToolsAPI {
 		String next = "";
 		int i = 1;
 		while (next != null) {
-			System.out.print("\n" + (i++) + ") ");
 			Request request = new Request.Builder().url(url + "&format=json" + next.replace('?', '&')).build();
 			try (Response response = client.newCall(request).execute()) {
 				if (!response.isSuccessful())
@@ -141,7 +140,6 @@ public class BioToolsAPI {
 				for (int j = 0; j < toolListJson.length(); j++) {
 					JSONObject tool = toolListJson.getJSONObject(j);
 					bioToolAnnotations.put(tool);
-					System.out.print(".");
 				}
 				try {
 					next = responseJson.getString("next");
@@ -149,9 +147,10 @@ public class BioToolsAPI {
 					next = null;
 				}
 			}
+			log.trace("bio.tools: page " + i + " fetched.");
 
 		}
-		log.debug("Tools fetched from a given URL.");
+		log.debug("All tools fetched from a given URL.");
 		return bioToolAnnotations;
 	}
 

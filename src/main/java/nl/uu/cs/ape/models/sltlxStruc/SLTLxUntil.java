@@ -21,6 +21,7 @@ public class SLTLxUntil extends SLTLxFormula {
 		super();
 		this.formulaFrom = formulaFrom;
 		this.formulaUntil = formulaUntil;
+		throw new UnsupportedOperationException("Not implemented yet.");
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package nl.uu.cs.ape.core.solutionStructure;
 
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.model.Graph;
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.models.Type;
@@ -25,10 +26,12 @@ import static guru.nidi.graphviz.model.Factory.node;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class TypeNode extends SolutionWorkflowNode {
 
     /**
-     * Types that define the data instance. The set cannot contain {@code EmptyType}.
+     * Types that define the data instance. The set cannot contain
+     * {@code EmptyType}.
      */
     private SortedSet<Type> usedTypes;
 
@@ -52,9 +55,12 @@ public class TypeNode extends SolutionWorkflowNode {
     /**
      * Creating Workflow Node that corresponds to a type instance in memory.
      *
-     * @param automatonState State in the {@link TypeAutomaton} that corresponds to the workflow node.
-     * @throws ExceptionInInitializerError Exception when the Type Workflow Node is instantiated using a State in
-     * TypeAutomaton that does not correspond to a {@code AtomType#MEMORY_TYPE}.
+     * @param automatonState State in the {@link TypeAutomaton} that corresponds to
+     *                       the workflow node.
+     * @throws ExceptionInInitializerError Exception when the Type Workflow Node is
+     *                                     instantiated using a State in
+     *                                     TypeAutomaton that does not correspond to
+     *                                     a {@code AtomType#MEMORY_TYPE}.
      */
     public TypeNode(State automatonState) throws ExceptionInInitializerError {
         super(automatonState);
@@ -78,7 +84,7 @@ public class TypeNode extends SolutionWorkflowNode {
         if (simpleType.isSimplePredicate()) {
             this.usedTypes.add(simpleType);
         } else {
-            System.err.println("Abstract and Empty Type cannot be used to define an instance.");
+            log.warn("Abstract and Empty Type cannot be used to define an instance.");
         }
     }
 
@@ -91,7 +97,7 @@ public class TypeNode extends SolutionWorkflowNode {
         if (!abstractType.isSimplePredicate()) {
             this.abstractTypes.add(abstractType);
         } else {
-            System.err.println("Simple Type cannot be used to describe an instance.");
+            log.warn("Simple Type cannot be used to describe an instance.");
         }
     }
 
@@ -99,7 +105,8 @@ public class TypeNode extends SolutionWorkflowNode {
      * Add a tool, that uses this data instance as input, to the List
      * {@link TypeNode#usedByModules}.
      *
-     * @param usedByTool Tool/module node in the workflow, that uses this data instance as input.
+     * @param usedByTool Tool/module node in the workflow, that uses this data
+     *                   instance as input.
      */
     public void addUsedByTool(ModuleNode usedByTool) {
         usedByModules.add(usedByTool);
@@ -108,7 +115,8 @@ public class TypeNode extends SolutionWorkflowNode {
     /**
      * Sets created by module.
      *
-     * @param createdByModule Set the tool/workflow step that creates this data instance.
+     * @param createdByModule Set the tool/workflow step that creates this data
+     *                        instance.
      */
     public void setCreatedByModule(ModuleNode createdByModule) {
         this.createdByModule = createdByModule;
@@ -136,7 +144,8 @@ public class TypeNode extends SolutionWorkflowNode {
     /**
      * Get tool step in the workflow that creates this data instance as output.
      *
-     * @return The {@link ModuleNode} that uses this data type. If null data instance corresponds to the initial workflow input.
+     * @return The {@link ModuleNode} that uses this data type. If null data
+     *         instance corresponds to the initial workflow input.
      */
     public ModuleNode getCreatedByModule() {
         return createdByModule;
@@ -146,7 +155,8 @@ public class TypeNode extends SolutionWorkflowNode {
      * Get all module nodes that use the data instance in input. If null is
      * in the list, the type is used as workflow output.
      *
-     * @return List of modules that used the type instance (a null value represent the workflow output).
+     * @return List of modules that used the type instance (a null value represent
+     *         the workflow output).
      */
     public List<ModuleNode> getUsedByModules() {
         return usedByModules;
@@ -165,7 +175,7 @@ public class TypeNode extends SolutionWorkflowNode {
      * Get string representation of the TypeNode.
      *
      * @return Printable string that can be used for the presentation of this
-     * workflow node.
+     *         workflow node.
      */
     public String toString() {
         StringBuilder printString = new StringBuilder();
@@ -199,7 +209,7 @@ public class TypeNode extends SolutionWorkflowNode {
      * @return The {@link Graph} extended with the current {@link TypeNode}.
      */
     public Graph addTypeToGraph(Graph workflowGraph) {
-        return workflowGraph = workflowGraph.with(node(getNodeID()).with(Label.of(getNodeLabel() + "   ")));
+        return workflowGraph.with(node(getNodeID()).with(Label.of(getNodeLabel() + "   ")));
     }
 
     /**
@@ -209,11 +219,11 @@ public class TypeNode extends SolutionWorkflowNode {
         StringBuilder printString = new StringBuilder();
         int i = 0;
         for (Type type : this.usedTypes) {
-        	 String typeLabel = type.getPredicateLabel();
-        	 if(typeLabel.endsWith("_p")) {
-        		 // remove "_plain" suffix
-        		 typeLabel = APEUtils.removeNLastChar(typeLabel, 2);
-        	 }
+            String typeLabel = type.getPredicateLabel();
+            if (typeLabel.endsWith("_p")) {
+                // remove "_plain" suffix
+                typeLabel = APEUtils.removeNLastChar(typeLabel, 2);
+            }
             printString.append(typeLabel);
             if (++i < this.usedTypes.size()) {
                 printString.append(", ");
@@ -246,31 +256,30 @@ public class TypeNode extends SolutionWorkflowNode {
     public String getFormat() {
         StringBuilder printString = new StringBuilder("\"");
 
-        int i = 0;
         for (Type type : this.usedTypes) {
-            if(type.getRootNodeID().equals("http://edamontology.org/format_1915")){
+            if (type.getRootNodeID().equals("http://edamontology.org/format_1915")) {
                 printString.append(type.getPredicateID()).append("\" # ").append(type.getPredicateLabel());
             }
-            
+
         }
 
         return printString.toString();
     }
-    
+
     /**
      * Gets node descriptive label, containing type IDs.
      */
     public String getNodeLongLabel() {
-    	 StringBuilder printString = new StringBuilder();
-         int i = 0;
-         for (Type type : this.usedTypes) {
-        	 String typeLabel = type.getPredicateLongLabel();
-             printString.append(typeLabel);
-             if (++i < this.usedTypes.size()) {
-                 printString.append(", ");
-             }
-         }
-         return printString.toString();
+        StringBuilder printString = new StringBuilder();
+        int i = 0;
+        for (Type type : this.usedTypes) {
+            String typeLabel = type.getPredicateLongLabel();
+            printString.append(typeLabel);
+            if (++i < this.usedTypes.size()) {
+                printString.append(", ");
+            }
+        }
+        return printString.toString();
     }
 
     /**

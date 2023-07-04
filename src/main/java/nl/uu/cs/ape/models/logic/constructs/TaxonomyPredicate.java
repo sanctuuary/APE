@@ -325,7 +325,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
             subPredicates.add(predicate);
             return true;
         } else {
-            System.err.println("Cannot add sub-predicate to a leaf or empty taxonomy term: " + getPredicateID() + ".");
+            log.warn("Cannot add sub-predicate to a leaf or empty taxonomy term: " + getPredicateID() + ".");
             return false;
         }
     }
@@ -359,7 +359,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     public boolean removeAllSubPredicates(Collection<TaxonomyPredicate> subPredicatesToRemove) {
         boolean done = false;
         if (subPredicatesToRemove != null && !subPredicatesToRemove.isEmpty()) {
-            done = done || this.subPredicates.removeAll(subPredicatesToRemove);
+            done = this.subPredicates.removeAll(subPredicatesToRemove);
         }
         return done;
     }
@@ -379,7 +379,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
             superPredicates.add(predicate);
             return true;
         } else {
-            System.err.println("Cannot add super-predicate to a root taxonomy term!");
+            log.warn("Cannot add super-predicate to a root taxonomy term!");
             return false;
         }
     }

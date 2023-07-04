@@ -409,16 +409,16 @@ public class APEFiles {
      */
     public static boolean isValidReadFile(String path) {
         if (path == null || path.equals("")) {
-            System.err.println("Path is not provided correctly.");
+            log.error("Path is not provided correctly.");
             return false;
         }
         File f = new File(path);
         if (!f.isFile()) {
-            System.err.println("Provided path: \"" + path + "\" is not a file.");
+            log.error("Provided path: \"" + path + "\" is not a file.");
             return false;
         } else {
             if (!f.canRead()) {
-                System.err.println("Provided file: \"" + path + "\" is missing the reading permission.");
+                log.error("Provided file: \"" + path + "\" is missing the reading permission.");
                 return false;
             }
         }

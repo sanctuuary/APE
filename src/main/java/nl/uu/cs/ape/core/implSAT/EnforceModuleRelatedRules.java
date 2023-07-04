@@ -941,7 +941,7 @@ public final class EnforceModuleRelatedRules {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
 		if (allModules.getModules().isEmpty()) {
-			System.err.println("No tools were I/O annotated.");
+			log.warn("No tools were I/O annotated.");
 			return fullEncoding;
 		}
 

@@ -50,7 +50,7 @@ public class GitHubRepo {
             FileUtils.deleteDirectory(directory);
             assertFalse(directory.exists());
         } catch (IOException e) {
-            log.info(String.format("Could not delete folder '%s':\n%s", this.absoluteLocalRoot, e.getMessage()));
+            log.info("Could not delete folder '{}':\n{}", this.absoluteLocalRoot, e.getMessage());
         }
     }
 
@@ -156,7 +156,7 @@ public class GitHubRepo {
                 fw.write(content);
                 fw.flush();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
                 fail("Cannot write to file '%s'", getFilePath());
             }
         }

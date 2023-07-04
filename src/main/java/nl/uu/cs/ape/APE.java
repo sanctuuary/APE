@@ -424,21 +424,21 @@ public class APE implements APEInterface {
 		} else {
 			executeDir.mkdir();
 		}
-		log.trace("Loading");
+		log.debug("Generating executable scripts.");
 
 		/* Creating the requested scripts in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noExecutions).forEach(solution -> {
 			try {
 				File script = executionsFolder.resolve(solution.getFileName() + ".sh").toFile();
 				APEFiles.write2file(solution.getScriptExecution(), script, false);
-				log.trace(".");
+
 			} catch (IOException e) {
-				log.error("Error occurred while writing a graph to the file system.");
+				log.error("Error occurred while writing an executable (workflow) script to the file system.");
 				e.printStackTrace();
 			}
 		});
 
-		APEUtils.timerPrintText("executingWorkflows", "Workflows have been executed.");
+		APEUtils.timerPrintText("executingWorkflows", "Workflow executables have been generated.");
 		return true;
 	}
 
@@ -481,7 +481,7 @@ public class APE implements APEInterface {
 		} else {
 			graphDir.mkdir();
 		}
-		log.trace("Loading");
+		log.debug("Generating data flow graphs (png).");
 		/* Creating the requested graphs in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
 			try {
@@ -489,9 +489,9 @@ public class APE implements APEInterface {
 				Path path = graphsFolder.resolve(title);
 				solution.getDataflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
-				log.trace(".");
+
 			} catch (IOException e) {
-				log.error("Error occurred while writing a graph to the file system.");
+				log.error("Error occurred while data flow graphs (png) to the file system.");
 				e.printStackTrace();
 			}
 		});
@@ -540,7 +540,7 @@ public class APE implements APEInterface {
 		} else {
 			graphDir.mkdir();
 		}
-		log.trace("Loading");
+		log.debug("Generating control flow graphs (png).");
 		/* Creating the requested graphs in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
 			try {
@@ -548,9 +548,9 @@ public class APE implements APEInterface {
 				Path path = graphsFolder.resolve(title);
 				solution.getControlflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
-				log.trace(".");
+
 			} catch (IOException e) {
-				log.error("Error occurred while writing a graph to the file system.");
+				log.error("Error occurred while writing control flow graphs (png) to the file system.");
 				e.printStackTrace();
 			}
 		});
@@ -586,16 +586,22 @@ public class APE implements APEInterface {
 			// Create the CWL directory if it does not already exist
 			cwlDir.mkdir();
 		}
-		log.trace("Loading");
+		log.debug("Generating CWL files.");
 
 		// Write the CWL files
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noCWLFiles).forEach(solution -> {
 			try {
-				String title = solution.getFileName() + ".cwl";
-				File script = cwlFolder.resolve(title).toFile();
+				// Write the cwl file to the file system
+				String titleCWL = solution.getFileName() + ".cwl";
+				File script = cwlFolder.resolve(titleCWL).toFile();
 				DefaultCWLCreator cwlCreator = new DefaultCWLCreator(solution);
 				APEFiles.write2file(cwlCreator.generate(), script, false);
-				log.trace(".");
+
+				// Write the cwl input file (in YML) to the file system
+				String titleInputs = solution.getFileName() + "_inp.yml";
+				File inputScipt = cwlFolder.resolve(titleInputs).toFile();
+				APEFiles.write2file(cwlCreator.generateCWLWorkflowInputs(), inputScipt, false);
+
 			} catch (IOException e) {
 				log.error("Error occurred while writing a CWL file to the file system.");
 				e.printStackTrace();
@@ -620,7 +626,7 @@ public class APE implements APEInterface {
 				try {
 					Files.delete(f.toPath());
 				} catch (IOException e) {
-					System.err.printf("Failed to delete file %s%n", f.getName());
+					log.warn("Failed to delete file {}.", f.getName());
 				}
 			});
 		}
@@ -669,7 +675,7 @@ public class APE implements APEInterface {
 				File script = executableCWLFolder.resolve(title).toFile();
 				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(solution);
 				APEFiles.write2file(cwlCreator.generate(), script, false);
-				log.trace(".");
+
 			} catch (IOException e) {
 				log.error("Error occurred while writing an executable CWL file to the file system.");
 				e.printStackTrace();

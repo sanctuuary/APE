@@ -5,9 +5,12 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import java.util.HashMap;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Class to generate a CWL workflow structure from a given workflow solution.
  */
+@Slf4j
 public class DefaultCWLCreator extends CWLCreatorBase {
     /**
      * Maintain a list of the CWL parameter names which represent {@link TypeNode}s.
@@ -36,21 +39,34 @@ public class DefaultCWLCreator extends CWLCreatorBase {
     @Override
     protected void generateCWLRepresentation() {
         // Workflow
-        generateWorkflowInputs();
+        generateWorkflowInputs(false);
         generateWorkflowSteps();
         generateWorkflowOutputs();
     }
 
     /**
      * Generate the top-level inputs definition of the workflow.
+     * 
+     * @param includePath Whether to include the file path in the definition.
      */
-    private void generateWorkflowInputs() {
+    private void generateWorkflowInputs(boolean includePath) {
         cwlRepresentation.append("inputs:").append("\n");
-        // Inputs
+        cwlRepresentation.append(getInputsInCWL(includePath));
+    }
+
+    /**
+     * Generate the top-level outputs definition of the workflow.
+     * 
+     * @param includePath Whether to include the file path in the definition.
+     *
+     * @return The CWL representation of the workflow outputs.
+     */
+    private String getInputsInCWL(boolean includePath) {
+        StringBuilder inputsInCWL = new StringBuilder();
         for (TypeNode typeNode : solution.getWorkflowInputTypeStates()) {
             String inputName = String.format("input%o", workflowParameters.size() + 1);
             addParameter(typeNode, inputName);
-            cwlRepresentation
+            inputsInCWL
                     // Name
                     .append(ind(1))
                     .append(inputName)
@@ -64,7 +80,15 @@ public class DefaultCWLCreator extends CWLCreatorBase {
                     .append("format: ")
                     .append(typeNode.getFormat())
                     .append("\n");
+            if (includePath) {
+                inputsInCWL
+                        .append(ind(2))
+                        .append("path: ")
+                        .append("set_path_to_the_file_here")
+                        .append("\n");
+            }
         }
+        return inputsInCWL.toString();
     }
 
     /**
@@ -386,7 +410,7 @@ public class DefaultCWLCreator extends CWLCreatorBase {
      */
     private void addParameter(TypeNode typeNode, String name) {
         if (workflowParameters.putIfAbsent(typeNode.getNodeID(), name) != null) {
-            System.err.printf("Duplicate key \"%s\" in workflow inputs!%n", typeNode.getNodeID());
+            log.warn("Duplicate key \"{}\" in workflow inputs!", typeNode.getNodeID());
         }
     }
 
@@ -399,5 +423,14 @@ public class DefaultCWLCreator extends CWLCreatorBase {
     private String stepName(ModuleNode moduleNode) {
         return moduleNode.getUsedModule().getPredicateLabel() +
                 moduleNode.getAutomatonState().getLocalStateNumber();
+    }
+
+    /**
+     * Generates the CWL inputs as a YML file content.
+     * 
+     * @return Content of a YML file that describes the CWL workflow inputs.
+     */
+    public String generateCWLWorkflowInputs() {
+        return getInputsInCWL(true);
     }
 }
