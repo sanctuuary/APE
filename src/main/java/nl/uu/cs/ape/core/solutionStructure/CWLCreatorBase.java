@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.core.solutionStructure;
 
 /**
- * Base class with shared behaviour for CWL export classes.
+ * Base class with shared behavior for CWL export classes.
  */
 public abstract class CWLCreatorBase {
     /**
@@ -96,7 +96,7 @@ public abstract class CWLCreatorBase {
                     .append(moduleNode.getNodeLabel())
                     .append(", ");
         }
-        deleteLastCharacters(2);
+        deleteLastNCharactersFromCWL(2);
         cwlRepresentation.append(".").append("\n").append("\n");
     }
 
@@ -117,10 +117,10 @@ public abstract class CWLCreatorBase {
     /**
      * Delete a number of characters at the end of the CWL file.
      * 
-     * @param number The number of characters to remove.
+     * @param numberOfCharToDel The number of characters to remove.
      */
-    protected void deleteLastCharacters(int number) {
-        cwlRepresentation.delete(cwlRepresentation.length() - number, cwlRepresentation.length());
+    protected void deleteLastNCharactersFromCWL(int numberOfCharToDel) {
+        cwlRepresentation.delete(cwlRepresentation.length() - numberOfCharToDel, cwlRepresentation.length());
     }
 
     /**

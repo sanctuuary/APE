@@ -4,6 +4,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,52 +40,59 @@ public class DefaultCWLCreator extends CWLCreatorBase {
     @Override
     protected void generateCWLRepresentation() {
         // Workflow
-        generateWorkflowInputs(false);
+        generateWorkflowInputs();
         generateWorkflowSteps();
         generateWorkflowOutputs();
     }
 
     /**
      * Generate the top-level inputs definition of the workflow.
-     * 
-     * @param includePath Whether to include the file path in the definition.
      */
-    private void generateWorkflowInputs(boolean includePath) {
+    private void generateWorkflowInputs() {
         cwlRepresentation.append("inputs:").append("\n");
-        cwlRepresentation.append(getInputsInCWL(includePath));
+        cwlRepresentation.append(getInputsInCWL(false));
     }
 
     /**
      * Generate the top-level outputs definition of the workflow.
      * 
-     * @param includePath Whether to include the file path in the definition.
+     * @param formatForCwlInputsYmlFile Whether the inputs are used to generate the
+     *                                  CWL inputs.yml file.
      *
      * @return The CWL representation of the workflow outputs.
      */
-    private String getInputsInCWL(boolean includePath) {
+    private String getInputsInCWL(boolean formatForCwlInputsYmlFile) {
         StringBuilder inputsInCWL = new StringBuilder();
+
+        int indentLevel = 1;
+        String typeLabel = "type";
+        if (formatForCwlInputsYmlFile) {
+            indentLevel = 0;
+            typeLabel = "class";
+        }
+        int i = 1;
         for (TypeNode typeNode : solution.getWorkflowInputTypeStates()) {
-            String inputName = String.format("input%o", workflowParameters.size() + 1);
-            addParameter(typeNode, inputName);
+            String inputName = String.format("input%o", i++);
+            addNewParameterToMap(typeNode, inputName);
             inputsInCWL
                     // Name
-                    .append(ind(1))
+                    .append(ind(indentLevel))
                     .append(inputName)
                     .append(":\n")
                     // Data type
-                    .append(ind(2))
-                    .append("type: File")
+                    .append(ind(indentLevel + 1))
+                    .append(typeLabel + ": File")
                     .append("\n")
                     // Format
-                    .append(ind(2))
+                    .append(ind(indentLevel + 1))
                     .append("format: ")
                     .append(typeNode.getFormat())
                     .append("\n");
-            if (includePath) {
+            if (formatForCwlInputsYmlFile) {
                 inputsInCWL
-                        .append(ind(2))
+                        .append(ind(indentLevel + 1))
                         .append("path: ")
-                        .append("set_path_to_the_file_here")
+                        .append("set_full_path_to_the_file_with_extension_here")
                         .append("\n");
             }
         }
@@ -166,25 +174,22 @@ public class DefaultCWLCreator extends CWLCreatorBase {
         // "in" key
         cwlRepresentation.append(ind(baseInd)).append("in").append(":\n");
         // If there are no inputs, give an empty array as input
-        if (moduleNode.getInputTypes().isEmpty()) {
+        if (!moduleNode.hasInputTypes()) {
             // Remove the last newline so the array is on the same line as "in:"
-            deleteLastCharacters(1);
+            deleteLastNCharactersFromCWL(1);
             cwlRepresentation
                     .append(" ")
                     .append("[]")
                     .append("\n");
-            return;
-        }
-
-        int i = 0;
-        for (TypeNode typeNode : moduleNode.getInputTypes()) {
-            cwlRepresentation
-                    .append(ind(baseInd + 1))
-                    .append(inOutName(moduleNode, "in", i + 1))
-                    .append(": ")
-                    .append(workflowParameters.get(typeNode.getNodeID()))
-                    .append("\n");
-            i++;
+        } else {
+            List<TypeNode> inputs = moduleNode.getInputTypes();
+            IntStream.range(0, inputs.size()).filter(i -> !inputs.get(i).isEmpty())
+                    .forEach(i -> cwlRepresentation
+                            .append(ind(baseInd + 1))
+                            .append(inOutName(moduleNode, "in", i + 1))
+                            .append(": ")
+                            .append(workflowParameters.get(inputs.get(i).getNodeID()))
+                            .append("\n"));
         }
     }
 
@@ -201,16 +206,20 @@ public class DefaultCWLCreator extends CWLCreatorBase {
                 .append("out: ")
                 // The outputs array
                 .append("[");
-        int i = 1;
-        for (TypeNode typeNode : moduleNode.getOutputTypes()) {
-            String name = inOutName(moduleNode, "out", i);
-            addParameter(typeNode, String.format("%s/%s", stepName(moduleNode), name));
-            cwlRepresentation
-                    .append(name)
-                    .append(", ");
-            i++;
+
+        List<TypeNode> outputs = moduleNode.getOutputTypes();
+        IntStream.range(0, outputs.size()).filter(i -> !outputs.get(i).isEmpty())
+                .forEach(i -> {
+                    String name = inOutName(moduleNode, "out", i + 1);
+                    addNewParameterToMap(outputs.get(i), String.format("%s/%s", stepName(moduleNode), name));
+                    cwlRepresentation
+                            .append(name)
+                            .append(", ");
+                });
+        if (moduleNode.hasOutputTypes()) {
+            // Remove the last comma
+            deleteLastNCharactersFromCWL(2);
         }
-        deleteLastCharacters(2);
         cwlRepresentation.append("]").append("\n");
     }
 
@@ -228,24 +237,6 @@ public class DefaultCWLCreator extends CWLCreatorBase {
                 .append("run: /cwl/tools/" + moduleName + "/" + moduleName + ".cwl")
                 .append("\n");
         /*
-         * // Class
-         * .append(ind(baseInd + 1))
-         * .append("class: Operation")
-         * .append("\n");
-         * // Inputs
-         * cwlRepresentation
-         * .append(ind(baseInd + 1))
-         * .append("inputs:")
-         * .append("\n");
-         * generateTypeNodes(moduleNode, moduleNode.getInputTypes(), true, baseInd + 2);
-         * // Outputs
-         * cwlRepresentation
-         * .append(ind(baseInd + 1))
-         * .append("outputs:")
-         * .append("\n");
-         * generateTypeNodes(moduleNode, moduleNode.getOutputTypes(), false, baseInd +
-         * 2);
-         * /*
          * // Hints and intent
          * generateStepHints(moduleNode, baseInd + 1);
          * generateStepIntent(moduleNode, baseInd + 1);
@@ -332,7 +323,7 @@ public class DefaultCWLCreator extends CWLCreatorBase {
                     .append("\"")
                     .append(", ");
         }
-        deleteLastCharacters(2);
+        deleteLastNCharactersFromCWL(2);
         cwlRepresentation.append("]").append("\n");
     }
 
@@ -352,7 +343,7 @@ public class DefaultCWLCreator extends CWLCreatorBase {
         // output
         if (typeNodeList.isEmpty()) {
             // Remove the last newline so the array is on the same line as "inputs:"
-            deleteLastCharacters(1);
+            deleteLastNCharactersFromCWL(1);
             cwlRepresentation
                     .append(" ")
                     .append("[]")
@@ -407,11 +398,13 @@ public class DefaultCWLCreator extends CWLCreatorBase {
      * 
      * @param typeNode The {@link TypeNode} that is the input parameter.
      * @param name     The name of the parameter.
+     * @return The ID of the parameter.
      */
-    private void addParameter(TypeNode typeNode, String name) {
+    private String addNewParameterToMap(TypeNode typeNode, String name) {
         if (workflowParameters.putIfAbsent(typeNode.getNodeID(), name) != null) {
             log.warn("Duplicate key \"{}\" in workflow inputs!", typeNode.getNodeID());
         }
+        return typeNode.getNodeID();
     }
 
     /**

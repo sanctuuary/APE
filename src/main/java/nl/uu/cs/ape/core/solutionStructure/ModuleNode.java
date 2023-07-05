@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static guru.nidi.graphviz.model.Factory.node;
 
@@ -223,12 +224,30 @@ public class ModuleNode extends SolutionWorkflowNode {
     }
 
     /**
+     * Check if the module has any non empty input types.
+     *
+     * @return {@code true} is the module has input types, {@code false} otherwise.
+     */
+    public boolean hasInputTypes() {
+        return !inputTypes.stream().filter(typeNode -> !typeNode.isEmpty()).collect(Collectors.toList()).isEmpty();
+    }
+
+    /**
      * Gets output types.
      *
      * @return the output types
      */
     public List<TypeNode> getOutputTypes() {
         return outputTypes;
+    }
+
+    /**
+     * Check if the module has any non empty output types.
+     *
+     * @return {@code true} is the module has output types, {@code false} otherwise.
+     */
+    public boolean hasOutputTypes() {
+        return !outputTypes.stream().filter(typeNode -> !typeNode.isEmpty()).collect(Collectors.toList()).isEmpty();
     }
 
     /**

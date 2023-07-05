@@ -149,7 +149,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
         // If there are no inputs, give an empty array as input
         if (moduleNode.getInputTypes().isEmpty()) {
             // Remove the last newline so the array is on the same line as "in:"
-            deleteLastCharacters(1);
+            deleteLastNCharactersFromCWL(1);
             cwlRepresentation
                     .append(" ")
                     .append("[]")
@@ -191,7 +191,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
                     .append(", ");
             i++;
         }
-        deleteLastCharacters(2);
+        deleteLastNCharactersFromCWL(2);
         cwlRepresentation.append("]").append("\n");
     }
 
@@ -275,7 +275,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
                     .append("\"")
                     .append(", ");
         }
-        deleteLastCharacters(2);
+        deleteLastNCharactersFromCWL(2);
         cwlRepresentation.append("]").append("\n");
     }
 
@@ -295,7 +295,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
         // output
         if (typeNodeList.isEmpty()) {
             // Remove the last newline so the array is on the same line as "inputs:"
-            deleteLastCharacters(1);
+            deleteLastNCharactersFromCWL(1);
             cwlRepresentation
                     .append(" ")
                     .append("[]")
