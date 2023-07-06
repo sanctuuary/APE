@@ -254,13 +254,15 @@ public class TypeNode extends SolutionWorkflowNode {
      * Get the unique ID of the current workflow node in .dot representation.
      */
     public String getFormat() {
-        StringBuilder printString = new StringBuilder("\"");
+        StringBuilder printString = new StringBuilder();
 
         for (Type type : this.usedTypes) {
             if (type.getRootNodeID().equals("http://edamontology.org/format_1915")) {
-                printString.append(type.getPredicateID()).append("\" # ").append(type.getPredicateLabel());
+                printString.append("\"").append(type.getPredicateID()).append("\" # ").append(type.getPredicateLabel());
             }
-
+        }
+        if (printString.isEmpty()) {
+            printString.append("\"unknown\"");
         }
 
         return printString.toString();
