@@ -261,7 +261,7 @@ public class TypeNode extends SolutionWorkflowNode {
                 printString.append("\"").append(type.getPredicateID()).append("\" # ").append(type.getPredicateLabel());
             }
         }
-        if (printString.isEmpty()) {
+        if (printString.length() == 0) {
             printString.append("\"unknown\"");
         }
 
