@@ -152,6 +152,8 @@ class UseCaseTest {
                 assertNotNull(files);
                 assertEquals(mutation.number_of_cwl_files,
                         Stream.of(files).filter(file -> file.getName().endsWith(".cwl")).count());
+                assertEquals(mutation.number_of_cwl_files,
+                        Stream.of(files).filter(file -> file.getName().endsWith("inp.yml")).count());
                 for (File f : files) {
                     assertTrue(f.getName().startsWith("workflowSolution_"));
                 }
