@@ -149,14 +149,13 @@ public abstract class SLTLxTemplateFormula {
      * If type <b>ifPredicate</b> is used/generated (depending on the @typeBlocks),
      * then type <b>thenPredicate</b> has to be used/generated subsequently.
      *
-     * @param ifPredicate     Predicate that enforce the usage of
-     *                        <b>thenPredicate</b>.
-     * @param thenPredicate   Predicate that is enforced by <b>ifPredicate</b>.
-     * @param typeElement     Workflow element type.
-     * @param moduleAutomaton Module automaton.
-     * @param typeBlocks      Type blocks (corresponding to the memory or used type
-     *                        states).
-     * @param mappings        Set of the mappings for the literals.
+     * @param ifPredicate   Predicate that enforce the usage of
+     *                      <b>thenPredicate</b>.
+     * @param thenPredicate Predicate that is enforced by <b>ifPredicate</b>.
+     * @param typeElement   Workflow element type.
+     * @param typeBlocks    Type blocks (corresponding to the memory or used type
+     *                      states).
+     * @param mappings      Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
     public static String iteType(TaxonomyPredicate ifPredicate, TaxonomyPredicate thenPredicate,
@@ -225,7 +224,6 @@ public abstract class SLTLxTemplateFormula {
      *                         <b>thenNotPredicate</b>.
      * @param thenNotPredicate Predicate that is forbidden by <b>ifPredicate</b>.
      * @param typeElement      Workflow element type.
-     * @param moduleAutomaton  Module automaton.
      * @param typeBlocks       Type blocks (corresponding to the memory or used
      *                         type states).
      * @param mappings         Set of the mappings for the literals.
@@ -578,8 +576,6 @@ public abstract class SLTLxTemplateFormula {
      *
      * @param firstPredicate  - Module type that generates the data as output
      * @param secondPredicate - Module type that uses the generated data as input
-     * @param domainSetup     - setup of the domain
-     * @param moduleAutomaton - module automaton.
      * @param typeAutomaton   - type automaton
      * @param mappings        - Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
