@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
 import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
@@ -149,7 +150,8 @@ class UseCaseTest {
 
                 File[] files = cwlFolder.toFile().listFiles();
                 assertNotNull(files);
-                assertEquals(mutation.number_of_cwl_files, files.length);
+                assertEquals(mutation.number_of_cwl_files,
+                        Stream.of(files).filter(file -> file.getName().endsWith(".cwl")).count());
                 for (File f : files) {
                     assertTrue(f.getName().startsWith("workflowSolution_"));
                 }
