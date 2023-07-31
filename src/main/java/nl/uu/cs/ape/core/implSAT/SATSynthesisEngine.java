@@ -7,6 +7,7 @@ import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.*;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
@@ -43,6 +44,7 @@ import java.util.List;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class SATSynthesisEngine implements SynthesisEngine {
     /**
      * Object that contains all the domain information.
@@ -144,7 +146,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         TaxonomyPredicate rootModule = domainSetup.getAllModules().getRootModule();
 
         if (rootModule == null) {
-            System.err.println("Taxonomies have not been setup properly.");
+            log.error("Taxonomies have not been setup properly.");
             return false;
         }
         /* Generate the automaton */
@@ -276,14 +278,17 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /* add the cnf encoding file to Desktop */
         // Files.copy(satInputFile, new File("~/Desktop/tmp"+ problemSetupStartTime));
 
-        /* add human readable version of the cnf encoding file to Desktop. Used when needed. */
+        /*
+         * add human readable version of the cnf encoding file to Desktop. Used when
+         * needed.
+         */
         // FileInputStream cnfStream = new FileInputStream(satInputFile);
         // String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
         // cnfStream.close();
         // APEFiles.write2file(encoding, new File("~/Desktop/tmp.txt"), false);
 
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
-        System.out.println("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec (" + clauses
+        log.info("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec (" + clauses
                 + " clauses).");
         encodingTime += problemSetupTimeElapsedMillis;
         return true;
@@ -328,7 +333,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
         long globalTimeoutMs = runConfig.getTimeoutMs();
         long currTimeout = APEUtils.timerTimeLeft("globalTimer", globalTimeoutMs);
         if (currTimeout <= 0) {
-            System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
+            log.warn("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
             return solutions;
         }
         // set timeout (in ms)
@@ -346,7 +351,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
                 solutionsFound++;
                 if (solutionsFound % 500 == 0) {
                     realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-                    System.out.println("Found in total " + solutionsFound + " solutions. Solving time: "
+                    log.info("Found in total " + solutionsFound + " solutions. Solving time: "
                             + (realTimeElapsedMillis / 1000F) + " sec.");
                 }
                 /*
@@ -359,24 +364,24 @@ public class SATSynthesisEngine implements SynthesisEngine {
             }
             satInput.close();
         } catch (ParseFormatException e) {
-            System.out.println("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
-            System.err.println(e.getMessage());
+            log.error("Error while parsing the cnf encoding of the problem by the MiniSAT solver.");
+            log.error(e.getMessage());
             return solutions;
         } catch (ContradictionException e) {
             if (solutionsFound == 0) {
-                System.err.println("Unsatisfiable");
+                log.warn("Unsatisfiable");
                 return solutions;
             }
         } catch (TimeoutException e) {
-            System.err.println("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
+            log.warn("Timeout. Total solving took longer than the timeout: " + globalTimeoutMs + " ms.");
         } catch (IOException e) {
-            System.err.println("Internal error while parsing the encoding.");
+            log.warn("Internal error while parsing the encoding.");
             return solutions;
         }
 
         if (solutionsFound == 0 || solutionsFound % 500 != 0) {
             realTimeElapsedMillis = System.currentTimeMillis() - realStartTime;
-            System.out.println("Found " + solutionsFound + " solutions. Solving time: "
+            log.info("Found " + solutionsFound + " solutions. Solving time: "
                     + (realTimeElapsedMillis / 1000F) + " sec.");
             satSolvingTime += realTimeElapsedMillis;
         }

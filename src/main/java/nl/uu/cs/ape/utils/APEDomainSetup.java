@@ -6,6 +6,7 @@ import java.util.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.constraints.ConstraintFactory;
 import nl.uu.cs.ape.constraints.ConstraintFormatException;
@@ -26,6 +27,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class APEDomainSetup {
 
     /* Helper objects used to keep track of the domain quality. */
@@ -207,7 +209,7 @@ public class APEDomainSetup {
     }
 
     /**
-     * Method read the constraints from a JSON object and updates the
+     * Method reads the constraints from a JSON object and updates the
      * {@link APEDomainSetup} object accordingly.
      *
      * @param constraintsJSON JSON object containing the constraints
@@ -305,7 +307,7 @@ public class APEDomainSetup {
             updateModuleFromJson(jsonModule);
         }
         if (currModule == 0) {
-            System.err.println("No tools were annotated.");
+            log.warn("No tools were annotated in the current domain.");
             return false;
         }
         return true;
@@ -335,7 +337,7 @@ public class APEDomainSetup {
         for (String taxonomyModule : taxonomyModules) {
             String taxonomyModuleIRI = APEUtils.createClassIRI(taxonomyModule, ontologyPrefixIRI);
             if (allModules.get(taxonomyModuleIRI) == null) {
-                System.err.println("Tool '" + moduleIRI + "' annotation issue. "
+                log.warn("Tool '" + moduleIRI + "' annotation issue. "
                         + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleIRI
                         + "' cannot be found in the Tool Taxonomy.");
                 wrongToolTax.add(moduleLabel);
@@ -349,7 +351,7 @@ public class APEDomainSetup {
          * used as superclass of the tool.
          */
         if (taxonomyModules.isEmpty()) {
-            System.err.println("Tool '" + moduleIRI + "' annotation issue. "
+            log.warn("Tool '" + moduleIRI + "' annotation issue. "
                     + "None of the referenced '" + APECoreConfig.getJsonTags("taxonomyOperations")
                     + "' can be found in the Tool Taxonomy.");
             taxonomyModules.add(allModules.getRootModuleID());
@@ -387,8 +389,7 @@ public class APEDomainSetup {
             }
         } catch (APEDimensionsException badDimension) {
             wrongToolIO.add(moduleLabel);
-            System.err.println("Operation '" + "' was not included." + badDimension.getMessage());
-            // System.out.println("Skipped " + (counterErrors ++) + " tool annotations.");
+            log.warn("Operation '" + "' was not included." + badDimension.getMessage());
             return false;
         }
 
@@ -398,7 +399,7 @@ public class APEDomainSetup {
         }
         if (inputs.isEmpty() && outputs.isEmpty()) {
             emptyTools.add(moduleLabel);
-            System.out.println("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
+            log.debug("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
             return false;
         }
         /*

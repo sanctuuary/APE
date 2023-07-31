@@ -179,10 +179,9 @@ public class Type extends TaxonomyPredicate {
 				parameterDimensions.add(allTypes.getLabelRoot());
 			}
 		}
-		Type taxonomyInstance = AuxTypePredicate.generateAuxiliaryPredicate(parameterDimensions, LogicOperation.AND,
+		return AuxTypePredicate.generateAuxiliaryPredicate(parameterDimensions, LogicOperation.AND,
 				domainSetup);
 
-		return taxonomyInstance;
 	}
 
 }

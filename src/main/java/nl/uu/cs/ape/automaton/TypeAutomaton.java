@@ -317,31 +317,6 @@ public class TypeAutomaton implements Automaton {
         return afterStates;
     }
 
-    /**
-     * Prints the used types and memory types to the console.
-     */
-    public void print() {
-        System.out.println("-------------------------------------------------------------");
-        System.out.println("\tType automaton:");
-        System.out.println("-------------------------------------------------------------");
-        for (Block memBlock : memoryTypesAutomaton) {
-            for (State memState : memBlock.getStates()) {
-                System.out.println("\tType state: " + memState.getPredicateID() + ", order number: "
-                        + memState.getAbsoluteStateNumber());
-            }
-        }
-        System.out.println("-------------------------------------------------------------");
-        for (Block usedBlock : usedTypesAutomaton) {
-            for (State usedState : usedBlock.getStates()) {
-                System.out.println("\tType state: " + usedState.getPredicateID() + ", order number: "
-                        + usedState.getAbsoluteStateNumber());
-            }
-        }
-
-        System.out.println("-------------------------------------------------------------");
-
-    }
-
     /*
      * (non-Javadoc)
      * 

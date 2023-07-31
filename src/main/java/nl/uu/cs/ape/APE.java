@@ -1,6 +1,3 @@
-/**
- *
- */
 package nl.uu.cs.ape;
 
 import guru.nidi.graphviz.attribute.Rank.RankDir;
@@ -10,12 +7,12 @@ import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.core.solutionStructure.AbstractCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.DefaultCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.ExecutableCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.io.APEFiles;
+import nl.uu.cs.ape.models.MappingsException;
 import nl.uu.cs.ape.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.configuration.APECoreConfig;
@@ -38,12 +35,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * The {@code APE} class is the main class of the library and is supposed to be
  * the main interface for working with the library.
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class APE implements APEInterface {
 
 	/** Core configuration object defined from the configuration file. */
@@ -129,7 +129,7 @@ public class APE implements APEInterface {
 		boolean ontologyRead = owlReader.readOntology();
 
 		if (!ontologyRead) {
-			System.out.println("Error occurred while reading the provided ontology.");
+			log.warn("Error occurred while reading the provided ontology.");
 			return false;
 		}
 
@@ -146,7 +146,7 @@ public class APE implements APEInterface {
 				succRun &= apeDomainSetup
 						.updateCWLAnnotationsFromYaml(cwlAnnotations);
 			} catch (FileNotFoundException e) {
-				System.err.println("Could not find CWL yaml configuration file!");
+				log.error("Could not find CWL yaml configuration file!");
 				e.printStackTrace();
 			}
 		}
@@ -326,7 +326,7 @@ public class APE implements APEInterface {
 
 			/* Encoding of the synthesis problem */
 			if (!implSynthesis.synthesisEncoding()) {
-				System.err.println("Internal error in problem encoding.");
+				log.error("Internal error in problem encoding.");
 				return null;
 			}
 			/* Execution of the synthesis - updates the object allSolutions */
@@ -350,7 +350,7 @@ public class APE implements APEInterface {
 			allSolutions.setFlag(SynthesisFlag.UNKNOWN);
 		}
 
-		System.out.println(allSolutions.getFlag().getMessage());
+		log.info(allSolutions.getFlag().getMessage());
 		long runTimeMS = APEUtils.timerPrintSolutions(globalTimerID, allSolutions.getNumberOfSolutions());
 
 		allSolutions.setSolvingTime(runTimeMS);
@@ -420,26 +420,25 @@ public class APE implements APEInterface {
 		final File executeDir = executionsFolder.toFile();
 		if (executeDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(executeDir, "workflowSolution_");
+			deleteExistingFiles(executeDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			executeDir.mkdir();
 		}
-		System.out.print("Loading");
+		log.debug("Generating executable scripts.");
 
 		/* Creating the requested scripts in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noExecutions).forEach(solution -> {
 			try {
-				String title = "workflowSolution_" + solution.getIndex() + ".sh";
-				File script = executionsFolder.resolve(title).toFile();
+				File script = executionsFolder.resolve(solution.getFileName() + ".sh").toFile();
 				APEFiles.write2file(solution.getScriptExecution(), script, false);
-				System.out.print(".");
+
 			} catch (IOException e) {
-				System.err.println("Error occurred while writing a graph to the file system.");
+				log.error("Error occurred while writing an executable (workflow) script to the file system.");
 				e.printStackTrace();
 			}
 		});
 
-		APEUtils.timerPrintText("executingWorkflows", "\nWorkflows have been executed.");
+		APEUtils.timerPrintText("executingWorkflows", "Workflow executables have been generated.");
 		return true;
 	}
 
@@ -473,31 +472,31 @@ public class APE implements APEInterface {
 		}
 		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
-		System.out.println();
+
 		/* Removing the existing files from the file system. */
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(graphDir, "SolutionNo");
+			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			graphDir.mkdir();
 		}
-		System.out.print("Loading");
+		log.debug("Generating data flow graphs (png).");
 		/* Creating the requested graphs in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
 			try {
-				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionLength();
+				String title = solution.getFileName();
 				Path path = graphsFolder.resolve(title);
 				solution.getDataflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
-				System.out.print(".");
+
 			} catch (IOException e) {
-				System.err.println("Error occurred while writing a graph to the file system.");
+				log.error("Error occurred while data flow graphs (png) to the file system.");
 				e.printStackTrace();
 			}
 		});
 
-		APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
+		APEUtils.timerPrintText("drawingGraphs", "Graphical files have been generated.");
 
 		return true;
 	}
@@ -524,8 +523,7 @@ public class APE implements APEInterface {
 	 * @param orientation  Orientation in which the graph will be presented.
 	 * @return true if the generating was successfully performed, false otherwise.
 	 */
-	public static boolean writeControlFlowGraphs(SolutionsList allSolutions, RankDir orientation)
-			{
+	public static boolean writeControlFlowGraphs(SolutionsList allSolutions, RankDir orientation) {
 		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
 		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -533,30 +531,30 @@ public class APE implements APEInterface {
 		}
 		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
-		System.out.println();
+
 		/* Removing the existing files from the file system. */
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(graphDir, "SolutionNo");
+			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			graphDir.mkdir();
 		}
-		System.out.print("Loading");
+		log.debug("Generating control flow graphs (png).");
 		/* Creating the requested graphs in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
 			try {
-				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionLength();
+				String title = solution.getFileName();
 				Path path = graphsFolder.resolve(title);
 				solution.getControlflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
-				System.out.print(".");
+
 			} catch (IOException e) {
-				System.err.println("Error occurred while writing a graph to the file system.");
+				log.error("Error occurred while writing control flow graphs (png) to the file system.");
 				e.printStackTrace();
 			}
 		});
-		APEUtils.timerPrintText("drawingGraphs", "\nGraphical files have been generated.");
+		APEUtils.timerPrintText("drawingGraphs", "Graphical files have been generated.");
 
 		return true;
 	}
@@ -580,32 +578,37 @@ public class APE implements APEInterface {
 		APEUtils.printHeader(null, String.format("Writing the first %o solution(s) to CWL files", noCWLFiles));
 		APEUtils.timerStart(timerID, true);
 
-		final String filePrefix = "workflowSolution_";
 		final File cwlDir = cwlFolder.toFile();
 		if (cwlDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(cwlDir, filePrefix);
+			deleteExistingFiles(cwlDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			// Create the CWL directory if it does not already exist
 			cwlDir.mkdir();
 		}
-		System.out.print("Loading");
+		log.debug("Generating CWL files.");
 
 		// Write the CWL files
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noCWLFiles).forEach(solution -> {
 			try {
-				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
-				File script = cwlFolder.resolve(title).toFile();
+				// Write the cwl file to the file system
+				String titleCWL = solution.getFileName() + ".cwl";
+				File script = cwlFolder.resolve(titleCWL).toFile();
 				DefaultCWLCreator cwlCreator = new DefaultCWLCreator(solution);
 				APEFiles.write2file(cwlCreator.generate(), script, false);
-				System.out.print(".");
+
+				// Write the cwl input file (in YML) to the file system
+				String titleInputs = solution.getFileName() + "_inp.yml";
+				File inputScipt = cwlFolder.resolve(titleInputs).toFile();
+				APEFiles.write2file(cwlCreator.generateCWLWorkflowInputs(), inputScipt, false);
+
 			} catch (IOException e) {
-				System.err.println("Error occurred while writing a CWL file to the file system.");
+				log.error("Error occurred while writing a CWL file to the file system.");
 				e.printStackTrace();
 			}
 		});
 
-		APEUtils.timerPrintText(timerID, "\nCWL files have been generated.");
+		APEUtils.timerPrintText(timerID, "CWL files have been generated.");
 		return true;
 	}
 
@@ -616,13 +619,14 @@ public class APE implements APEInterface {
 	 * @param filePrefix The prefix of the files to delete.
 	 */
 	private static void deleteExistingFiles(File dirName, String filePrefix) {
-		File[] oldFiles = dirName.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith(filePrefix.toLowerCase()));
+		File[] oldFiles = dirName
+				.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith(filePrefix.toLowerCase()));
 		if (oldFiles != null) {
 			Arrays.stream(oldFiles).forEach(f -> {
 				try {
 					Files.delete(f.toPath());
 				} catch (IOException e) {
-					System.err.printf("Failed to delete file %s%n", f.getName());
+					log.warn("Failed to delete file {}.", f.getName());
 				}
 			});
 		}
@@ -640,7 +644,7 @@ public class APE implements APEInterface {
 	public static boolean writeExecutableCWLWorkflows(SolutionsList allSolutions, APECoreConfig coreConfig) {
 		// Check if the CWL annotations file is configured.
 		if (!coreConfig.getCwlAnnotationsFile().isPresent()) {
-			System.out.println("CWL annotations file not configured. No executable CWL files are generated.");
+			log.warn("CWL annotations file not configured. No executable CWL files are generated.");
 			return false;
 		}
 
@@ -654,32 +658,31 @@ public class APE implements APEInterface {
 		APEUtils.printHeader(null, String.format("Writing the first %o solution(s) to executable CWL files", noFiles));
 		APEUtils.timerStart(timerID, true);
 
-		final String filePrefix = "workflowSolution_";
 		final File cwlDir = executableCWLFolder.toFile();
 		if (cwlDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(cwlDir, filePrefix);
+			deleteExistingFiles(cwlDir, SolutionWorkflow.getFileNamePrefix());
 		} else {
 			// Create the CWL directory if it does not already exist
 			cwlDir.mkdir();
 		}
-		System.out.print("Loading");
+		log.trace("Loading");
 
 		// Write the CWL files
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noFiles).forEach(solution -> {
 			try {
-				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
+				String title = solution.getFileName() + ".cwl";
 				File script = executableCWLFolder.resolve(title).toFile();
 				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(solution);
 				APEFiles.write2file(cwlCreator.generate(), script, false);
-				System.out.print(".");
+
 			} catch (IOException e) {
-				System.err.println("Error occurred while writing an executable CWL file to the file system.");
+				log.error("Error occurred while writing an executable CWL file to the file system.");
 				e.printStackTrace();
 			}
 		});
 
-		APEUtils.timerPrintText(timerID, "\nExecutable CWL files have been generated.");
+		APEUtils.timerPrintText(timerID, "Executable CWL files have been generated.");
 		return true;
 	}
 }

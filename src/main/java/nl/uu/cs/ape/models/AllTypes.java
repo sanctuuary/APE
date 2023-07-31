@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
@@ -19,6 +20,7 @@ import nl.uu.cs.ape.utils.APEUtils;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class AllTypes extends AllPredicates {
 
     private static String empty = "empty";
@@ -67,7 +69,7 @@ public class AllTypes extends AllPredicates {
         super(Stream.concat(typeTaxonomyRoots.stream(), Stream.of(apeLabel))
                 .collect(Collectors.toList()));
         emptyType = new Type(empty, empty, empty, NodeType.EMPTY);
-        Type apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
+        apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
         emptyLabelType = new Type(emptyLabel, emptyLabel, apeLabel, NodeType.EMPTY_LABEL);
         setRelevant(emptyType);
         setRelevant(apeLabelRoot);
@@ -93,8 +95,7 @@ public class AllTypes extends AllPredicates {
      * @return The {@link Collection} of {@link Type}s.
      */
     public Collection<? extends TaxonomyPredicate> getTypes() {
-        Collection<? extends TaxonomyPredicate> types = getMappedPredicates().values();
-        return types;
+        return getMappedPredicates().values();
     }
 
     /**
@@ -148,20 +149,6 @@ public class AllTypes extends AllPredicates {
         return tmpType;
 
     }
-
-    /*
-     * Returns the type to which the specified key is mapped to, or null if
-     * the typeID has no mappings.
-     *
-     * @param typeID - the key whose associated value is to be returned
-     * 
-     * @return The {@link Type} to which the specified key is mapped to, or null
-     * if the typeID has no mappings
-     * 
-     * public Type get(String typeID) {
-     * return (Type) getPredicates().get(typeID);
-     * }
-     */
 
     /**
      * Returns the type to which the specified key is mapped to under the given
@@ -219,6 +206,7 @@ public class AllTypes extends AllPredicates {
      * @param dimensionID ID of the data dimension that is searched for.
      * @return true if the dimensionID exists in the domain.
      */
+    @Override
     public boolean existsRoot(String dimensionID) {
         return getAllRootIDs().contains(dimensionID);
     }
@@ -269,7 +257,7 @@ public class AllTypes extends AllPredicates {
                 if (subTreesMap.get(type.getRootNodeID()) != null) {
                     subTreesMap.get(type.getRootNodeID()).add(type);
                 } else {
-                    System.err.println("ERROR!!");
+                    log.error("Type " + type.getPredicateID() + " has no root node");
                 }
             } else if (type.isEmptyPredicate()) {
 

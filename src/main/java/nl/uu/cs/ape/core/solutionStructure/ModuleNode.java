@@ -5,6 +5,7 @@ import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.AbstractModule;
@@ -16,18 +17,22 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static guru.nidi.graphviz.model.Factory.node;
 
 /**
- * The {@code ModuleNode} class is used to represent module step in the actual solution workflow.
+ * The {@code ModuleNode} class is used to represent module step in the actual
+ * solution workflow.
  * Each {@code ModuleNode} represents an action/tool in the solution workflow.
  * <p>
- * When compared to the {@link ModuleAutomaton} representation of the problem, a Workflow {@code TypeNode}
+ * When compared to the {@link ModuleAutomaton} representation of the problem, a
+ * Workflow {@code TypeNode}
  * correspond to a {@link State} of a {@link AtomType#MODULE} element.
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class ModuleNode extends SolutionWorkflowNode {
 
     /**
@@ -63,9 +68,12 @@ public class ModuleNode extends SolutionWorkflowNode {
     /**
      * Creating Workflow Node that corresponds to a tool usage.
      *
-     * @param automatonState state in the {@link ModuleAutomaton} that corresponds to the workflow node.
-     * @throws ExceptionInInitializerError Exception when the Tool Workflow Node is instantiated using
-     * a State in ModuleAutomaton that does not correspond to a {@code AtomType#MODULE}..
+     * @param automatonState state in the {@link ModuleAutomaton} that corresponds
+     *                       to the workflow node.
+     * @throws ExceptionInInitializerError Exception when the Tool Workflow Node is
+     *                                     instantiated using
+     *                                     a State in ModuleAutomaton that does not
+     *                                     correspond to a {@code AtomType#MODULE}..
      */
     public ModuleNode(State automatonState) throws ExceptionInInitializerError {
         super(automatonState);
@@ -91,7 +99,8 @@ public class ModuleNode extends SolutionWorkflowNode {
     }
 
     /**
-     * Add the abstract module to the list of modules that describes the tool instance.
+     * Add the abstract module to the list of modules that describes the tool
+     * instance.
      *
      * @param abstractModule - abstract type that describes the instance.
      */
@@ -99,7 +108,7 @@ public class ModuleNode extends SolutionWorkflowNode {
         if (!abstractModule.isSimplePredicate()) {
             this.abstractModules.add(abstractModule);
         } else {
-            System.err.println("Actual tool cannot be uset to describe a module in an abstract way.");
+            log.warn("A concrete tool  cannot be used to describe an abstract module.");
         }
     }
 
@@ -179,7 +188,8 @@ public class ModuleNode extends SolutionWorkflowNode {
     /**
      * Has next module boolean.
      *
-     * @return True if the current operation is not the last one in the workflow, false otherwise.
+     * @return True if the current operation is not the last one in the workflow,
+     *         false otherwise.
      */
     public boolean hasNextModule() {
         return nextModuleNode != null;
@@ -188,7 +198,8 @@ public class ModuleNode extends SolutionWorkflowNode {
     /**
      * Has prev module boolean.
      *
-     * @return True if the current operation is not the first one in the workflow, false otherwise.
+     * @return True if the current operation is not the first one in the workflow,
+     *         false otherwise.
      */
     public boolean hasPrevModule() {
         return prevModuleNode != null;
@@ -213,12 +224,30 @@ public class ModuleNode extends SolutionWorkflowNode {
     }
 
     /**
+     * Check if the module has any non empty input types.
+     *
+     * @return {@code true} is the module has input types, {@code false} otherwise.
+     */
+    public boolean hasInputTypes() {
+        return !inputTypes.stream().filter(typeNode -> !typeNode.isEmpty()).collect(Collectors.toList()).isEmpty();
+    }
+
+    /**
      * Gets output types.
      *
      * @return the output types
      */
     public List<TypeNode> getOutputTypes() {
         return outputTypes;
+    }
+
+    /**
+     * Check if the module has any non empty output types.
+     *
+     * @return {@code true} is the module has output types, {@code false} otherwise.
+     */
+    public boolean hasOutputTypes() {
+        return !outputTypes.stream().filter(typeNode -> !typeNode.isEmpty()).collect(Collectors.toList()).isEmpty();
     }
 
     /**
@@ -233,7 +262,8 @@ public class ModuleNode extends SolutionWorkflowNode {
     /**
      * Get string representation of the ModuleNode.
      *
-     * @return Printable string that can be used for the presentation of this workflow node.
+     * @return Printable string that can be used for the presentation of this
+     *         workflow node.
      */
     public String toString() {
         if (usedModule == null) {
@@ -262,7 +292,8 @@ public class ModuleNode extends SolutionWorkflowNode {
      */
     public Graph addModuleToGraph(Graph workflowGraph) {
         return workflowGraph = workflowGraph
-                .with(node(getNodeID()).with(Label.of(getNodeLabel() + "              "), Shape.RECTANGLE, Color.BLUE, Style.BOLD));
+                .with(node(getNodeID()).with(Label.of(getNodeLabel() + "              "), Shape.RECTANGLE, Color.BLUE,
+                        Style.BOLD));
     }
 
     /**
@@ -282,11 +313,11 @@ public class ModuleNode extends SolutionWorkflowNode {
     public String getNodeLabel() {
         return this.usedModule.getPredicateLabel();
     }
-    
+
     /**
-     *  Gets node descriptive label, containing module IDs.
+     * Gets node descriptive label, containing module IDs.
      */
     public String getNodeLongLabel() {
-    	return this.usedModule.getPredicateLongLabel();
+        return this.usedModule.getPredicateLongLabel();
     }
 }

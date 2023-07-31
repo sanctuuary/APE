@@ -15,11 +15,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
 import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
@@ -31,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Maurin Voshol
  */
+@Slf4j
 class UseCaseTest {
 
     private static GitHubRepo repo;
@@ -74,9 +78,7 @@ class UseCaseTest {
     void testUseCase(String name, String evaluationPath)
             throws APEConfigException, OWLOntologyCreationException, IOException {
 
-        System.out.println("-------------------------------------------------------------");
-        System.out.println("       TEST " + name);
-        System.out.println("-------------------------------------------------------------");
+        log.debug("PERFORM  TEST: " + name);
 
         UseCase useCase = new UseCase(evaluationPath, repo);
 
@@ -148,7 +150,10 @@ class UseCaseTest {
 
                 File[] files = cwlFolder.toFile().listFiles();
                 assertNotNull(files);
-                assertEquals(mutation.number_of_cwl_files, files.length);
+                assertEquals(mutation.number_of_cwl_files,
+                        Stream.of(files).filter(file -> file.getName().endsWith(".cwl")).count());
+                assertEquals(mutation.number_of_cwl_files,
+                        Stream.of(files).filter(file -> file.getName().endsWith("inp.yml")).count());
                 for (File f : files) {
                     assertTrue(f.getName().startsWith("workflowSolution_"));
                 }
@@ -267,34 +272,32 @@ class UseCaseTest {
             }
 
             public void print(String name) {
-                System.out.println("-------------------------------------------------------------");
-                System.out.println("    MUTATION FOR: " + name);
+                log.debug("\tMUTATION FOR: " + name);
 
                 if (description != null) {
-                    System.out.println("    DESCRIPTION: " + description);
+                    log.debug("\tDESCRIPTION: " + description);
                 }
 
                 if (config_mutations != null) {
-                    System.out.println("    CONFIG MUTATION: " + config_mutations.toString());
+                    log.debug("\tCONFIG MUTATION: " + config_mutations.toString());
                 }
 
                 if (add_constraints != null) {
-                    System.out.println("    ADD CONSTRAINTS: " + add_constraints.toString());
+                    log.debug("\tADD CONSTRAINTS: " + add_constraints.toString());
                 }
 
                 if (replace_constraints != null) {
-                    System.out.println(
-                            "    REPLACE CONSTRAINTS: " + replace_constraints.getJSONArray(CONSTRAINTS).toString());
+                    log.debug(
+                            "\tREPLACE CONSTRAINTS: " + replace_constraints.getJSONArray(CONSTRAINTS).toString());
                 }
 
                 if (number_of_cwl_files != 0) {
-                    System.out.println("    NUMBER OF CWL FILES: " + number_of_cwl_files);
+                    log.debug("\tNUMBER OF CWL FILES: " + number_of_cwl_files);
                 }
 
-                System.out.println("    MINIMAL SOLUTION LENGTH: " + solution_length_start);
-                System.out.println("    EXPECTED AMOUNT OF SOLUTIONS STARTING AT MINIMAL SOLUTIONS: "
+                log.debug("\tMINIMAL SOLUTION LENGTH: " + solution_length_start);
+                log.debug("\tEXPECTED AMOUNT OF SOLUTIONS STARTING AT MINIMAL SOLUTIONS: "
                         + Arrays.toString(expected_no_solutions));
-                System.out.println("-------------------------------------------------------------\n");
             }
         }
     }

@@ -1,11 +1,11 @@
 package nl.uu.cs.ape;
 
 import guru.nidi.graphviz.attribute.Rank.RankDir;
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.io.APEFiles;
-import nl.uu.cs.ape.utils.APEUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,6 +20,7 @@ import java.io.IOException;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class Main {
 
     /**
@@ -39,13 +40,13 @@ public class Main {
             try {
                 solutionsNo = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
-                System.err.println("Second parameter is not an integer.");
+                log.error("Second parameter is not an integer.");
             }
         } else {
             path = "./config.json";
         }
         if (!APEFiles.isValidReadFile(path)) {
-            System.err.println("Bad path.");
+            log.error("Bad path.");
             return;
         }
 
@@ -56,8 +57,8 @@ public class Main {
             apeFramework = new APE(path);
 
         } catch (APEConfigException | JSONException | IOException | OWLOntologyCreationException e) {
-            System.err.println("Error in setting up the APE framework:");
-            System.err.println(e.getMessage());
+            log.error("Error in setting up the APE framework:");
+            log.error(e.getMessage());
             return;
         }
 
@@ -74,17 +75,17 @@ public class Main {
             solutions = apeFramework.runSynthesis(runConfig);
 
         } catch (APEConfigException e) {
-            System.err.println("Error in synthesis execution. APE configuration error:");
-            System.err.println(e.getMessage());
+            log.error("Error in synthesis execution. APE configuration error:");
+            log.error(e.getMessage());
             return;
         } catch (JSONException e) {
-            System.err.println(
+            log.error(
                     "Error in synthesis execution. Bad JSON formatting (APE configuration or constriants JSON). ");
-            System.err.println(e.getMessage());
+            log.error(e.getMessage());
             return;
         } catch (IOException e) {
-            System.err.println("Error in synthesis execution.");
-            System.err.println(e.getMessage());
+            log.error("Error in synthesis execution.");
+            log.error(e.getMessage());
             return;
         }
 
@@ -92,7 +93,7 @@ public class Main {
          * Writing solutions to the specified file in human readable format
          */
         if (solutions.isEmpty()) {
-            System.out.println("UNSAT");
+            log.info("The problem is UNSAT.");
         } else {
             try {
                 APE.writeSolutionToFile(solutions);
@@ -100,9 +101,9 @@ public class Main {
                 // APE.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
                 APE.writeExecutableWorkflows(solutions);
                 APE.writeCWLWorkflows(solutions);
-                APE.writeExecutableCWLWorkflows(solutions, apeFramework.getConfig());
+                // APE.writeExecutableCWLWorkflows(solutions, apeFramework.getConfig());
             } catch (IOException e) {
-                System.err.println("Error in writing the solutions. to the file system.");
+                log.error("Error in writing the solutions. to the file system.");
                 e.printStackTrace();
             }
         }
