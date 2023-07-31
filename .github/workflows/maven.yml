@@ -35,10 +35,10 @@ jobs:
         pip3 install cwlref-runner
     - name: Test CWL generation
       run: |
-        git clone https://github.com/sanctuuary/APE_UseCases
-        cd APE_UseCases
-        java -jar ../target/APE-*-executable.jar ./GeoGMT/E0/config.json
-        cd ./GeoGMT/E0/CWL
+        git clone https://github.com/Workflomics/domain-annotations
+        cd domain-annotations
+        java -jar ../target/APE-*-executable.jar ./WombatP_tools/config_local.json
+        cd ./WombatP_tools/CWL
         cwltool --enable-dev --validate workflowSolution_0.cwl
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
