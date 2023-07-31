@@ -99,7 +99,7 @@ public class Main {
                 APE.writeSolutionToFile(solutions);
                 APE.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
                 // APE.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
-                // APE.writeExecutableWorkflows(solutions);
+                APE.writeExecutableWorkflows(solutions);
                 APE.writeCWLWorkflows(solutions);
                 // APE.writeExecutableCWLWorkflows(solutions, apeFramework.getConfig());
             } catch (IOException e) {
