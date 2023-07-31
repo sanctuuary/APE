@@ -22,9 +22,9 @@ jobs:
         # Build JAR
         - mvn package -DskipTests=true
         # Run use case
-        - git clone https://github.com/sanctuuary/APE_UseCases
-        - cd APE_UseCases
-        - java -jar ../target/APE-*-executable.jar ./GeoGMT/E0/config.json
+        - git clone https://github.com/Workflomics/domain-annotations
+        - cd domain-annotations
+        - java -jar ../target/APE-*-executable.jar config_local.json
         # Validate with CWL runner
-        - cd ./GeoGMT/E0/CWL
+        - cd ./WombatP_tools/CWL
         - cwltool --enable-dev --validate workflowSolution_0.cwl

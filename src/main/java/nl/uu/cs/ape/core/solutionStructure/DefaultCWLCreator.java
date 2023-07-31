@@ -234,7 +234,8 @@ public class DefaultCWLCreator extends CWLCreatorBase {
         cwlRepresentation
                 // Main key
                 .append(ind(baseInd))
-                .append("run: /cwl/tools/" + moduleName + "/" + moduleName + ".cwl")
+                .append("run: https://raw.githubusercontent.com/Workflomics/containers/main/cwl/tools/" + moduleName
+                        + "/" + moduleName + ".cwl")
                 .append("\n");
         /*
          * // Hints and intent
