@@ -19,9 +19,9 @@
 	<developers>
 		<developer>
 			<name>Vedran Kasalica</name>
-			<email>v.kasalica@uu.nl</email>
-			<organization>Utrecht University</organization>
-			<organizationUrl>https://www.uu.nl/</organizationUrl>
+			<email>v.kasalica@esciencecenter.nl</email>
+			<organization>Netherlands eScience Center</organization>
+			<organizationUrl>https://www.esciencecenter.nl/</organizationUrl>
 		</developer>
 	</developers>
 	<scm>
