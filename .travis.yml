@@ -24,7 +24,7 @@ jobs:
         # Run use case
         - git clone https://github.com/Workflomics/domain-annotations
         - cd domain-annotations
-        - java -jar ../target/APE-*-executable.jar config_local.json
+        - java -jar ../target/APE-*-executable.jar WombatP_tools/config_local.json
         # Validate with CWL runner
         - cd ./WombatP_tools/CWL
         - cwltool --enable-dev --validate workflowSolution_0.cwl
