@@ -152,10 +152,10 @@ class UseCaseTest {
                 assertNotNull(files);
                 assertEquals(mutation.number_of_cwl_files,
                         Stream.of(files).filter(file -> file.getName().endsWith(".cwl")).count());
-                assertEquals(mutation.number_of_cwl_files,
-                        Stream.of(files).filter(file -> file.getName().endsWith("inp.yml")).count());
+                assertEquals(1,
+                        Stream.of(files).filter(file -> file.getName().startsWith("input.yml")).count());
                 for (File f : files) {
-                    assertTrue(f.getName().startsWith("workflowSolution_"));
+                    assertTrue(f.getName().startsWith("workflowSolution_") || f.getName().startsWith("input.yml"));
                 }
                 success("All %s expected CWL files were generated", mutation.number_of_cwl_files);
             }
