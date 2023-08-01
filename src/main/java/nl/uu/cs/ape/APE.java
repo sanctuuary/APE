@@ -568,6 +568,10 @@ public class APE implements APEInterface {
 	 * @return true if the execution was successfully performed, false otherwise.
 	 */
 	public static boolean writeCWLWorkflows(SolutionsList allSolutions) {
+
+		if (allSolutions.isEmpty()) {
+			return false;
+		}
 		// Check the configuration before continuing.
 		Path cwlFolder = allSolutions.getRunConfiguration().getSolutionDirPath2CWL();
 		int noCWLFiles = allSolutions.getRunConfiguration().getNoCWL();
@@ -597,16 +601,22 @@ public class APE implements APEInterface {
 				DefaultCWLCreator cwlCreator = new DefaultCWLCreator(solution);
 				APEFiles.write2file(cwlCreator.generate(), script, false);
 
-				// Write the cwl input file (in YML) to the file system
-				String titleInputs = solution.getFileName() + "_inp.yml";
-				File inputScipt = cwlFolder.resolve(titleInputs).toFile();
-				APEFiles.write2file(cwlCreator.generateCWLWorkflowInputs(), inputScipt, false);
-
 			} catch (IOException e) {
 				log.error("Error occurred while writing a CWL file to the file system.");
 				e.printStackTrace();
 			}
 		});
+
+		// Write the cwl input file (in YML) to the file system
+		String titleInputs = "input.yml";
+		File inputScipt = cwlFolder.resolve(titleInputs).toFile();
+		DefaultCWLCreator cwlCreator = new DefaultCWLCreator(allSolutions.get(0));
+		try {
+			APEFiles.write2file(cwlCreator.generateCWLWorkflowInputs(), inputScipt, false);
+		} catch (IOException e) {
+			log.error("Error occurred while writing a CWL input file (yml) to the file system.");
+			e.printStackTrace();
+		}
 
 		APEUtils.timerPrintText(timerID, "CWL files have been generated.");
 		return true;
