@@ -59,22 +59,21 @@ public abstract class ModuleUtils {
 		constraints.append(enforceDataReferenceRules(synthesisInstance));
 		return constraints.toString();
 	}
-	
+
 	/**
 	 * Encode data instance dependency constraints.
 	 * 
 	 * @param typeAutomaton type automaton
-	 * @param mappings all the atom mappings
+	 * @param mappings      all the atom mappings
 	 * @return String representation of constraints.
 	 */
 	public String encodeDataInstanceDependencyCons(TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 		StringBuilder constraints = new StringBuilder();
-		
-		
+
 		constraints.append(allowDataDependencyCons(typeAutomaton, mappings));
 		constraints.append(enforceDataDependencyOverModules(typeAutomaton, mappings));
 		constraints.append(enforceDataDependencyOverDataReferencing(typeAutomaton, mappings));
-		
+
 		return constraints.toString();
 	}
 
@@ -83,6 +82,7 @@ public abstract class ModuleUtils {
 	 * tool specifications.<br>
 	 * Returns the representation of the input type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.
+	 * 
 	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representation of constraints.
@@ -94,12 +94,14 @@ public abstract class ModuleUtils {
 	 * data type as the one that is used as the input for the tool. Constraints
 	 * ensure that the {@link AtomType#MEM_TYPE_REFERENCE} are implemented
 	 * correctly.
+	 * 
 	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link AtomType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
 	public abstract String enforceDataReferenceRules(Class<? extends SynthesisEngine> synthesisInstance);
+
 	/**
 	 * Generate constraints that ensure that the all tool inputs can reference data
 	 * that is available in memory at the time.
@@ -108,6 +110,7 @@ public abstract class ModuleUtils {
 	 * Return the representation of the input type constraints for all modules,
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
 	 * the Shared Memory Approach.
+	 * 
 	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representation of constraints.
@@ -120,7 +123,7 @@ public abstract class ModuleUtils {
 	 * on itself.
 	 *
 	 * @param typeAutomaton type automaton
-	 * @param mappings all the atom mappings
+	 * @param mappings      all the atom mappings
 	 * 
 	 * @return String representation of constraints.
 	 */
@@ -131,17 +134,18 @@ public abstract class ModuleUtils {
 	 * memory depend on the same data as the referenced data instance.
 	 *
 	 * @param typeAutomaton type automaton
-	 * @param mappings all the atom mappings
+	 * @param mappings      all the atom mappings
 	 * 
 	 * @return String representation of constraints.
 	 */
-	public abstract String enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton, SATAtomMappings mappings);
+	public abstract String enforceDataDependencyOverDataReferencing(TypeAutomaton typeAutomaton,
+			SATAtomMappings mappings);
 
 	/**
 	 * Generate constraints that data dependency is preserved over modules.
 	 * 
 	 * @param typeAutomaton type automaton
-	 * @param mappings all the atom mappings
+	 * @param mappings      all the atom mappings
 	 * 
 	 * @return String representation of constraints.
 	 */
@@ -152,6 +156,7 @@ public abstract class ModuleUtils {
 	 * according to the configuration, e.g. if the config specifies that all
 	 * workflow inputs have to be used, then each of them has to be referenced at
 	 * least once.
+	 * 
 	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representation of constraints.
@@ -162,11 +167,13 @@ public abstract class ModuleUtils {
 	 * Return the representation of the output type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.<br>
 	 * Generate constraints that preserve tool outputs.
+	 * 
 	 * @param synthesisInstance - synthesis instance
 	 *
 	 * @return String representation of constraints.
 	 */
 	public abstract String outputCons(Class<? extends SynthesisEngine> synthesisInstance);
+
 	/**
 	 * Generating the mutual exclusion constraints for each pair of tools from
 	 * modules (excluding abstract modules from the taxonomy) in each state of
@@ -206,7 +213,7 @@ public abstract class ModuleUtils {
 	 */
 	public abstract String moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
 			ModuleAutomaton moduleAutomaton, SATAtomMappings mappings);
-	
+
 	/**
 	 * Gets predicate pairs.
 	 *
@@ -216,12 +223,12 @@ public abstract class ModuleUtils {
 	 *         representing actual tools.
 	 */
 	public static List<Pair<PredicateLabel>> getPredicatePairs(List<? extends PredicateLabel> predicateList) {
-		List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();
+		List<Pair<PredicateLabel>> pairs = new ArrayList<>();
 
 		for (int i = 0; i < predicateList.size() - 1; i++) {
 			for (int j = i + 1; j < predicateList.size(); j++) {
 
-				pairs.add(new Pair<PredicateLabel>(predicateList.get(i), predicateList.get(j)));
+				pairs.add(new Pair<>(predicateList.get(i), predicateList.get(j)));
 			}
 		}
 

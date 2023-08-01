@@ -64,7 +64,7 @@ public class SolutionGraph {
      * @param debug true if the debugging mode is ON
      * @throws IOException Exception in case of error in file handling.
      */
-    public void getWrite2File(File file, boolean debug) throws IOException {
+    public void write2File(File file, boolean debug) throws IOException {
         final Renderer renderer = getPNGRenderer();
         if(true) {
         APEUtils.disableErr();

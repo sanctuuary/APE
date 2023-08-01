@@ -18,14 +18,14 @@ public class SLTLxNegatedConjunction extends SLTLxFormula {
 
 	public SLTLxNegatedConjunction(SLTLxFormula arg1, SLTLxFormula arg2) {
 		super();
-		this.nconjunctedFacts = new HashSet<SLTLxFormula>();
+		this.nconjunctedFacts = new HashSet<>();
 		this.nconjunctedFacts.add(arg1);
 		this.nconjunctedFacts.add(arg2);
 	}
 
 	public SLTLxNegatedConjunction(Collection<? extends SLTLxFormula> nconjunctedFacts) {
 		super();
-		this.nconjunctedFacts = new HashSet<SLTLxFormula>();
+		this.nconjunctedFacts = new HashSet<>();
 		nconjunctedFacts.forEach(fact -> this.nconjunctedFacts.add(fact));
 	}
 

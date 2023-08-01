@@ -35,13 +35,13 @@ public enum AtomType {
      * relation in SLTLx. It depicts that a data instance is dependent (was derived
      * from) on another data instance.
      */
-    R_RELATON("r_rel"),
+    R_RELATION("r_rel"),
 
     /**
      * This is a reflexive function, where X and Y are in relation IFF they are the
      * same data object
      */
-    IDENTITI_RELATION("is_rel");
+    IDENTITY_RELATION("is_rel");
 
     private final String text;
 
@@ -59,11 +59,7 @@ public enum AtomType {
      * @return {@code true} if it is a unary property, {@code false} otherwise.
      */
     public boolean isUnaryProperty() {
-        if (this.equals(MODULE) | this.equals(MEMORY_TYPE) | this.equals(USED_TYPE)) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.equals(MODULE) || this.equals(MEMORY_TYPE) || this.equals(USED_TYPE);
     }
 
     /**
@@ -72,11 +68,7 @@ public enum AtomType {
      * @return {@code true} if it is a unary property, {@code false} otherwise.
      */
     public boolean isBinaryRel() {
-        if (this.equals(R_RELATON) | this.equals(MEM_TYPE_REFERENCE) | this.equals(IDENTITI_RELATION)) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.equals(R_RELATION) || this.equals(MEM_TYPE_REFERENCE) || this.equals(IDENTITY_RELATION);
     }
 
     /**

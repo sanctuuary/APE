@@ -1,7 +1,5 @@
 package nl.uu.cs.ape.models.enums;
 
-import org.checkerframework.checker.units.qual.m;
-
 /**
  * Defines the values describing the predicates over variables, that will
  * reflect in states in the workflow.
@@ -47,6 +45,7 @@ public enum AtomVarType {
 		this.text = s;
 	}
 
+	@Override
 	public String toString() {
 		return this.text;
 	}
@@ -75,12 +74,8 @@ public enum AtomVarType {
 	 * @return {@code true} if it is a unary property, {@code false} otherwise.
 	 */
 	public boolean isBinaryRel() {
-		if (this.equals(VAR_VALUE) | this.equals(R_RELATION_V) | this.equals(VAR_EQUIVALENCE)
-				|| this.equals(MEM_TYPE_REF_V)) {
-			return true;
-		} else {
-			return false;
-		}
+		return (this.equals(VAR_VALUE) || this.equals(R_RELATION_V) || this.equals(VAR_EQUIVALENCE)
+				|| this.equals(MEM_TYPE_REF_V));
 	}
 
 }

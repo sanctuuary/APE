@@ -160,7 +160,7 @@ public class APEConfigException extends RuntimeException {
     public static APEConfigException ruleViolations(ValidationResults validationResults) {
         StringBuilder sb = new StringBuilder();
         validationResults.getFails().forEach(fail -> sb
-                .append(String.format("Tag '%s' is incorrect: %s\n", fail.getTag(), fail.getRuleDescription())));
+                .append(String.format("Tag '%s' is incorrect: %s%n", fail.getTag(), fail.getRuleDescription())));
         return new APEConfigException(sb.toString());
     }
 
@@ -174,6 +174,6 @@ public class APEConfigException extends RuntimeException {
      */
     public static APEConfigException workflowIODataTypeNotInDomain(String typeID) {
         return new APEConfigException(String.format(
-                "Data type '%s'used to annotate workdlow input/output is not defined in the taxonomy.", typeID));
+                "Data type '%s'used to annotate workflow input/output is not defined in the taxonomy.", typeID));
     }
 }

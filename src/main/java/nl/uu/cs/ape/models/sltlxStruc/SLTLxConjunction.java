@@ -18,7 +18,7 @@ public class SLTLxConjunction extends SLTLxFormula {
 
 	public SLTLxConjunction(SLTLxFormula arg1, SLTLxFormula arg2) {
 		super();
-		this.conjunctedFacts = new HashSet<SLTLxFormula>();
+		this.conjunctedFacts = new HashSet<>();
 		if (arg1 != null)
 			this.conjunctedFacts.add(arg1);
 		if (arg2 != null)
@@ -27,7 +27,7 @@ public class SLTLxConjunction extends SLTLxFormula {
 
 	public SLTLxConjunction(SLTLxFormula arg1, SLTLxFormula arg2, SLTLxFormula arg3) {
 		super();
-		this.conjunctedFacts = new HashSet<SLTLxFormula>();
+		this.conjunctedFacts = new HashSet<>();
 		if (arg1 != null)
 			this.conjunctedFacts.add(arg1);
 		if (arg2 != null)
@@ -38,7 +38,7 @@ public class SLTLxConjunction extends SLTLxFormula {
 
 	public SLTLxConjunction(Collection<? extends SLTLxFormula> conjunctedFacts) {
 		super();
-		this.conjunctedFacts = new HashSet<SLTLxFormula>();
+		this.conjunctedFacts = new HashSet<>();
 		conjunctedFacts.forEach(fact -> {
 			if (fact != null)
 				this.conjunctedFacts.add(fact);
@@ -53,7 +53,7 @@ public class SLTLxConjunction extends SLTLxFormula {
 			return SLTLxAtom.getTrue().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		}
 
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/*
 		 * Conjunct the collection of clauses that encode each of the conjuncted
@@ -73,7 +73,7 @@ public class SLTLxConjunction extends SLTLxFormula {
 			return SLTLxAtom.getFalse().getCNFEncoding(stateNo, variableMapping, synthesisEngine);
 		}
 
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/*
 		 * Disjoint the collection of clauses that encode negatioNs of each of the

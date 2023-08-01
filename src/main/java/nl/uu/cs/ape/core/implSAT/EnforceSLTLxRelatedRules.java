@@ -28,6 +28,10 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
  */
 public class EnforceSLTLxRelatedRules {
 
+    /** Hide the implicit public constructor. */
+    private EnforceSLTLxRelatedRules() {
+    }
+
     /**
      * Define the base cases for the SLTLx relations.
      * Ensure the truth value of:
@@ -39,7 +43,7 @@ public class EnforceSLTLxRelatedRules {
      * @return A set of formulas that ensure the encoding.
      */
     public static Collection<SLTLxFormula> setTrueFalse() {
-        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+        Set<SLTLxFormula> cnfEncoding = new HashSet<>();
 
         /* Encode {@code true} and {@code false} SLTLx terms. */
         cnfEncoding.add(SLTLxAtom.getTrue());
@@ -64,7 +68,7 @@ public class EnforceSLTLxRelatedRules {
      */
     public static Set<SLTLxFormula> preserveAuxiliaryPredicateRules(ModuleAutomaton moduleAutomaton,
             TypeAutomaton typeAutomaton, List<AuxiliaryPredicate> helperPredicates) {
-        Set<SLTLxFormula> cnfEncoding = new HashSet<SLTLxFormula>();
+        Set<SLTLxFormula> cnfEncoding = new HashSet<>();
 
         Automaton automaton = null;
         AtomType workflowElem = null;
@@ -73,7 +77,6 @@ public class EnforceSLTLxRelatedRules {
                 automaton = typeAutomaton;
             } else {
                 automaton = moduleAutomaton;
-                workflowElem = AtomType.MODULE;
             }
             for (State currState : automaton.getAllStates()) {
                 workflowElem = currState.getWorkflowStateType();
@@ -82,7 +85,7 @@ public class EnforceSLTLxRelatedRules {
                      * Ensures that if the abstract predicate is used, at least one of the
                      * disjointLabels has to be used.
                      */
-                    Set<SLTLxFormula> allORPossibilities = new HashSet<SLTLxFormula>();
+                    Set<SLTLxFormula> allORPossibilities = new HashSet<>();
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                         allORPossibilities.add(
                                 new SLTLxAtom(
@@ -136,7 +139,7 @@ public class EnforceSLTLxRelatedRules {
                      * Ensures that if all of the conjointLabels were used, the abstract predicate
                      * has to be used as well.
                      */
-                    Set<SLTLxFormula> allANDPossibilities = new HashSet<SLTLxFormula>();
+                    Set<SLTLxFormula> allANDPossibilities = new HashSet<>();
 
                     for (TaxonomyPredicate subLabel : helperPredicate.getGeneralizedPredicates()) {
                         allANDPossibilities.add(

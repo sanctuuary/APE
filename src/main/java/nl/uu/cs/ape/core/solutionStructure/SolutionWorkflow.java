@@ -20,7 +20,6 @@ import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.NodeType;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxLiteral;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -31,12 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import static guru.nidi.graphviz.model.Factory.*;
 
 /**
  * The {@code SolutionWorkflow} class is used to represent a single workflow
- * solution. The workflow consists of multiple instances of {@link SolutionWorkflowNode}.
+ * solution. The workflow consists of multiple instances of
+ * {@link SolutionWorkflowNode}.
  *
  * @author Vedran Kasalica
  */
@@ -55,7 +54,7 @@ public class SolutionWorkflow {
 
     /**
      * List of used type nodes provided as the final workflow output, ordered
-     * according the initial description (config.jsong file).
+     * according the initial description (config.json file).
      */
     private List<TypeNode> workflowOutputTypeStates;
 
@@ -104,17 +103,18 @@ public class SolutionWorkflow {
      * Create the structure of the {@link SolutionWorkflow} based on the
      * {@link ModuleAutomaton} and {@link TypeAutomaton} provided.
      *
-     * @throws ExceptionInInitializerError exception in case of a mismatch between the type of
+     * @throws ExceptionInInitializerError exception in case of a mismatch between
+     *                                     the type of
      *                                     automaton states and workflow nodes.
      */
     private SolutionWorkflow(ModuleAutomaton toolAutomaton, TypeAutomaton typeAutomaton)
             throws ExceptionInInitializerError {
-        this.moduleNodes = new ArrayList<ModuleNode>();
-        this.workflowInputTypeStates = new ArrayList<TypeNode>();
-        this.workflowOutputTypeStates = new ArrayList<TypeNode>();
-        this.mappedModuleNodes = new HashMap<State, ModuleNode>();
-        this.mappedMemoryTypeNodes = new HashMap<State, TypeNode>();
-        this.usedType2ToolMap = new HashMap<State, ModuleNode>();
+        this.moduleNodes = new ArrayList<>();
+        this.workflowInputTypeStates = new ArrayList<>();
+        this.workflowOutputTypeStates = new ArrayList<>();
+        this.mappedModuleNodes = new HashMap<>();
+        this.mappedMemoryTypeNodes = new HashMap<>();
+        this.usedType2ToolMap = new HashMap<>();
 
         ModuleNode prev = null;
         for (State currState : toolAutomaton.getAllStates()) {
@@ -144,7 +144,7 @@ public class SolutionWorkflow {
                 if (currBlock.getBlockNumber() == 0) {
                     this.workflowInputTypeStates.add(currTypeNode);
                 } else if (currBlock.getBlockNumber() == toolAutomaton.size()) {
-//					this.workflowOutputTypeStates.add(currTypeNode); THIS IS WRONG
+                    // this.workflowOutputTypeStates.add(currTypeNode); THIS IS WRONG
                 }
             }
         }
@@ -175,9 +175,14 @@ public class SolutionWorkflow {
 
         for (int mappedLiteral : satSolution) {
             if (mappedLiteral >= synthesisInstance.getMappings().getInitialNumOfMappedAtoms()) {
-                SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral), synthesisInstance.getMappings());
+                SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral),
+                        synthesisInstance.getMappings());
                 if (!currLiteral.isNegated()) {
-                    if (currLiteral.getPredicate() instanceof AuxiliaryPredicate) {
+                    // Skip elements that should not be presented.
+                    if (currLiteral.getPredicate() instanceof AuxiliaryPredicate
+                            || (currLiteral.isWorkflowElementType(AtomType.USED_TYPE)
+                                    && ((Type) currLiteral.getPredicate()).isSimplePredicate())
+                            || currLiteral.isWorkflowElementType(AtomType.R_RELATION)) {
                         continue;
                     } else if (currLiteral.isWorkflowElementType(AtomType.MODULE)) {
                         ModuleNode currNode = this.mappedModuleNodes.get(currLiteral.getUsedInStateArgument());
@@ -191,14 +196,12 @@ public class SolutionWorkflow {
                         if (currLiteral.getPredicate() instanceof Type
                                 && ((Type) currLiteral.getPredicate()).isNodeType(NodeType.LEAF)) {
                             currNode.addUsedType((Type) currLiteral.getPredicate());
-                        } else if ((currLiteral.getPredicate() instanceof Type) && !((Type) currLiteral.getPredicate()).isNodeType(NodeType.EMPTY_LABEL))  {
+                        } else if ((currLiteral.getPredicate() instanceof Type)
+                                && !((Type) currLiteral.getPredicate()).isNodeType(NodeType.EMPTY_LABEL)) {
                             currNode.addAbstractDescriptionOfUsedType((Type) currLiteral.getPredicate());
                         } else {
                             /* Memory type cannot be anything else except a Type. */
                         }
-                    } else if (currLiteral.isWorkflowElementType(AtomType.USED_TYPE)
-                            && ((Type) currLiteral.getPredicate()).isSimplePredicate()) {
-                        continue;
                     } else if (currLiteral.isWorkflowElementType(AtomType.MEM_TYPE_REFERENCE)
                             && ((State) (currLiteral.getPredicate())).getAbsoluteStateNumber() != -1) {
                         /*
@@ -216,43 +219,46 @@ public class SolutionWorkflow {
                             APEUtils.safeSet(this.workflowOutputTypeStates, inputIndex, memoryTypeNode);
                         }
                         memoryTypeNode.addUsedByTool(usedTypeNode);
-                    } else if (currLiteral.isWorkflowElementType(AtomType.R_RELATON)) {
-                    	// skip
                     }
                 }
             }
         }
 
         /* Remove empty elements of the sets. */
-        this.workflowInputTypeStates.removeIf(node -> node.isEmpty());
+        this.workflowInputTypeStates.removeIf(TypeNode::isEmpty);
 
-        this.workflowOutputTypeStates.removeIf(node -> node.isEmpty());
+        this.workflowOutputTypeStates.removeIf(TypeNode::isEmpty);
 
     }
 
-	/**
+    /**
      * Method returns the list of nodes that represent operations in the workflow,
      * in order in which they should be executed.
      *
-     * @return List of {@link ModuleNode} objects, in order in which they should be executed.
+     * @return List of {@link ModuleNode} objects, in order in which they should be
+     *         executed.
      */
     public List<ModuleNode> getModuleNodes() {
         return this.moduleNodes;
     }
 
     /**
-     * Method returns the set of initial data types that are given as an input to the workflow.
+     * Method returns the set of initial data types that are given as an input to
+     * the workflow.
      *
-     * @return List of {@link TypeNode} objects, where each node describes a specific data instance.
+     * @return List of {@link TypeNode} objects, where each node describes a
+     *         specific data instance.
      */
     public List<TypeNode> getWorkflowInputTypeStates() {
         return this.workflowInputTypeStates;
     }
 
     /**
-     * Method returns the set of final data types that are given as an output of the workflow.
+     * Method returns the set of final data types that are given as an output of the
+     * workflow.
      *
-     * @return List of {@link TypeNode} objects, where each node describes a specific data instance.
+     * @return List of {@link TypeNode} objects, where each node describes a
+     *         specific data instance.
      */
     public List<TypeNode> getWorkflowOutputTypeStates() {
         return this.workflowOutputTypeStates;
@@ -261,7 +267,8 @@ public class SolutionWorkflow {
     /**
      * Get non-structured solution obtained directly from the SAT output.
      *
-     * @return A {@link SATSolution} object, that contains information about the native SAT encoding, and how it translates into human readable text.
+     * @return A {@link SATSolution} object, that contains information about the
+     *         native SAT encoding, and how it translates into human readable text.
      */
     public SolutionInterpreter getNativeSolution() {
         return this.nativeSolution;
@@ -286,7 +293,8 @@ public class SolutionWorkflow {
      * title and in the defined orientation.
      *
      * @param title       The title of the SolutionGraph.
-     * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}.
+     * @param orientation Orientation of the solution graph (e.g.
+     *                    {@link RankDir#TOP_TO_BOTTOM}.
      * @return The solution graph.
      */
     public SolutionGraph getDataflowGraph(String title, RankDir orientation) {
@@ -296,12 +304,13 @@ public class SolutionWorkflow {
             return generateFieldDataflowGraph(title, orientation);
         }
     }
-    
+
     /**
      * Get the graphical representation of the data-flow diagram with the
      * required title and in the defined orientation.
      *
-     * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
+     * @param orientation Orientation of the solution graph (e.g.
+     *                    {@link RankDir#TOP_TO_BOTTOM}).
      * @return The solution graph in PNG format.
      */
     public BufferedImage getDataflowGraphPNG(RankDir orientation) {
@@ -331,7 +340,8 @@ public class SolutionWorkflow {
      * required title and in the defined orientation.
      *
      * @param title       The title of the SolutionGraph.
-     * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
+     * @param orientation Orientation of the solution graph (e.g.
+     *                    {@link RankDir#TOP_TO_BOTTOM}).
      * @return The solution graph.
      */
     public SolutionGraph getControlflowGraph(String title, RankDir orientation) {
@@ -341,12 +351,13 @@ public class SolutionWorkflow {
             return generateFieldControlflowGraph(title, orientation);
         }
     }
-    
+
     /**
      * Get the graphical representation of the control-flow diagram with the
      * required title and in the defined orientation.
      *
-     * @param orientation Orientation of the solution graph (e.g. {@link RankDir#TOP_TO_BOTTOM}).
+     * @param orientation Orientation of the solution graph (e.g.
+     *                    {@link RankDir#TOP_TO_BOTTOM}).
      * @return The solution graph in PNG format.
      */
     public BufferedImage getControlflowGraphPNG(RankDir orientation) {
@@ -359,14 +370,16 @@ public class SolutionWorkflow {
 
     /**
      * Returns the negated solution in mapped format. Negating the original solution
-     * created by the SAT solver. Usually used to add to the solver to find new solutions.
+     * created by the SAT solver. Usually used to add to the solver to find new
+     * solutions.
      *
-     * @param toolSeqRepeat variable defining if the provided solutions should be distinguished based on the tool sequences alone
+     * @param toolSeqRepeat variable defining if the provided solutions should be
+     *                      distinguished based on the tool sequences alone
      * @return int[] representing the negated solution
      */
-//    public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
-//        return this.nativeSolution.getNegatedMappedSolutionArray(toolSeqRepeat);
-//    }
+    // public int[] getNegatedMappedSolutionArray(boolean toolSeqRepeat) {
+    // return this.nativeSolution.getNegatedMappedSolutionArray(toolSeqRepeat);
+    // }
 
     /**
      * Get a readable version of the workflow solution.
@@ -424,7 +437,8 @@ public class SolutionWorkflow {
     }
 
     /**
-     * Get a graph that represent the solution in .dot format (see http://www.graphviz.org/).
+     * Get a graph that represent the solution in .dot format (see
+     * http://www.graphviz.org/).
      *
      * @return String that represents the solution workflow in .dot graph format.
      */
@@ -433,7 +447,8 @@ public class SolutionWorkflow {
 
         String input = "\"Workflow INPUT\"";
         String output = "\"Workflow OUTPUT\"";
-        boolean inputDefined = false, outputDefined = false;
+        boolean inputDefined = false;
+        boolean outputDefined = false;
 
         for (TypeNode workflowInput : this.workflowInputTypeStates) {
             if (!inputDefined) {
@@ -482,13 +497,14 @@ public class SolutionWorkflow {
     private SolutionGraph generateFieldDataflowGraph(String title, RankDir orientation) {
         Graph workflowGraph = graph(title).directed();
 
-        if(orientation != RankDir.TOP_TO_BOTTOM){
+        if (orientation != RankDir.TOP_TO_BOTTOM) {
             workflowGraph = workflowGraph.graphAttr().with(Rank.dir(orientation));
         }
 
         String input = "Workflow INPUT" + "     ";
         String output = "Workflow OUTPUT" + "     ";
-        boolean inputDefined = false, outputDefined = false;
+        boolean inputDefined = false;
+        boolean outputDefined = false;
         int index = 0;
         int workflowInNo = 1;
         for (TypeNode workflowInput : this.workflowInputTypeStates) {
@@ -561,11 +577,11 @@ public class SolutionWorkflow {
     }
 
     /**
-     * Gets solutionlength.
+     * Gets solution length.
      *
-     * @return the solutionlength
+     * @return the solution length
      */
-    public int getSolutionlength() {
+    public int getSolutionLength() {
         return this.moduleNodes.size();
     }
 
@@ -590,7 +606,8 @@ public class SolutionWorkflow {
     /**
      * Return the executable shell script, that corresponds to the given workflow.
      *
-     * @return String that represents the shell script for executing the given workflow.
+     * @return String that represents the shell script for executing the given
+     *         workflow.
      */
     public String getScriptExecution() {
         StringBuffer script = new StringBuffer("#!/bin/bash\n");

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.io.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
 
 /**
@@ -34,7 +35,7 @@ public abstract class SLTLxFormula implements SLTLxElem {
 		StringBuilder cnf = new StringBuilder();
 		createCNFEncoding(formulas, 0, synthesisEngine)
 				.forEach(clause -> cnf.append(clause));
-		APEUtils.appendToFile(file, cnf.toString());
+		APEFiles.appendToFile(file, cnf.toString());
 	}
 
 	/**
@@ -48,7 +49,7 @@ public abstract class SLTLxFormula implements SLTLxElem {
 	 */
 	private static Set<String> createCNFEncoding(Collection<SLTLxFormula> facts, int stateNo,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> clauses = new HashSet<String>();
+		Set<String> clauses = new HashSet<>();
 		facts.forEach(fact -> clauses
 				.addAll(fact.getCNFEncoding(stateNo, new SLTLxVariableSubstitutionCollection(), synthesisEngine)));
 		return clauses;

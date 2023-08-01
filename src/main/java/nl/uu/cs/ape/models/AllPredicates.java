@@ -28,9 +28,9 @@ public abstract class AllPredicates {
      *
      * @param taxonomyRoots the taxonomy roots
      */
-    public AllPredicates(List<String> taxonomyRoots) {
+    protected AllPredicates(List<String> taxonomyRoots) {
         this.dimensionRoots = taxonomyRoots;
-        this.mappedPredicates = new HashMap<String, TaxonomyPredicate>();
+        this.mappedPredicates = new HashMap<>();
     }
 
     /**
@@ -39,11 +39,11 @@ public abstract class AllPredicates {
      * @return The root predicate.
      */
     public List<TaxonomyPredicate> getRootPredicates() {
-        List<TaxonomyPredicate> rootpredicates = new ArrayList<>();
+        List<TaxonomyPredicate> rootPredicates = new ArrayList<>();
         for (String rootID : dimensionRoots) {
-            rootpredicates.add(get(rootID));
+            rootPredicates.add(get(rootID));
         }
-        return rootpredicates;
+        return rootPredicates;
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class AllPredicates {
      */
     public boolean trimTaxonomy() {
         for (TaxonomyPredicate root : getRootPredicates()) {
-            List<TaxonomyPredicate> toRemove = new ArrayList<TaxonomyPredicate>();
+            List<TaxonomyPredicate> toRemove = new ArrayList<>();
             for (TaxonomyPredicate subClass : APEUtils.safe(root.getSubPredicates())) {
                 if (subClass == null) {
                 } else if (subClass.getIsRelevant()) {
@@ -96,7 +96,7 @@ public abstract class AllPredicates {
     }
 
     /**
-     * Remove the parts of the given subtaxonomy that are not in use for the given
+     * Remove the parts of the given sub-taxonomy that are not in use for the given
      * set of available tools and types in the domain.
      *
      * @param subTaxRoot SubTaxonomy that is to be trimmed.
@@ -106,7 +106,7 @@ public abstract class AllPredicates {
         if (subTaxRoot == null) {
             return true;
         }
-        List<TaxonomyPredicate> toRemove = new ArrayList<TaxonomyPredicate>();
+        List<TaxonomyPredicate> toRemove = new ArrayList<>();
         for (TaxonomyPredicate subClass : APEUtils.safe(subTaxRoot.getSubPredicates())) {
             if (subClass == null) {
             } else if (subClass.getIsRelevant()) {

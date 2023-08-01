@@ -2,8 +2,6 @@ package nl.uu.cs.ape.models.logic.constructs;
 
 import java.util.*;
 
-import org.json.JSONObject;
-
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.AllPredicates;
 import nl.uu.cs.ape.models.enums.NodeType;
@@ -23,7 +21,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 
     /**
      * Describes the node in from the taxonomy hierarchy. The type can represent a
-     * root type, subroot type, an abstract or a simple (implemented leaf) term, or
+     * root type, sub-root type, an abstract or a simple (implemented leaf) term, or
      * be an empty term.
      */
     protected NodeType nodeType;
@@ -59,15 +57,15 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param rootNode Root of the OWL tree that this node belongs to.
      * @param nodeType Type of the node.
      */
-    public TaxonomyPredicate(String rootNode, NodeType nodeType) {
+    protected TaxonomyPredicate(String rootNode, NodeType nodeType) {
         this.rootNodeID = rootNode;
         this.nodeType = nodeType;
         this.isRelevant = false;
         if (!(nodeType == NodeType.LEAF || nodeType == NodeType.EMPTY)) {
-            this.subPredicates = new HashSet<TaxonomyPredicate>();
+            this.subPredicates = new HashSet<>();
         }
         if (nodeType != NodeType.ROOT) {
-            this.superPredicates = new HashSet<TaxonomyPredicate>();
+            this.superPredicates = new HashSet<>();
         }
     }
 
@@ -77,7 +75,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param oldPredicate Predicate that is copied
      * @param nodeType     Type of the node
      */
-    public TaxonomyPredicate(TaxonomyPredicate oldPredicate, NodeType nodeType) {
+    protected TaxonomyPredicate(TaxonomyPredicate oldPredicate, NodeType nodeType) {
         this.rootNodeID = oldPredicate.rootNodeID;
         this.nodeType = nodeType;
         this.isRelevant = oldPredicate.isRelevant;
@@ -197,7 +195,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @return Transform the main 2 characteristics of the term into a map.
      */
     public Map<String, String> toMap() {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("value", this.getPredicateID());
         map.put("label", this.getPredicateLabel());
         return map;
@@ -206,7 +204,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Set the current predicate as a relevant part of the taxonomy and all the
      * corresponding subClasses and superClasses.
-     * TODO Should it be topdown??
+     * TODO Should it be top-down??
      *
      * @param allPredicates Map of all the predicates of the given type.
      * @return true if the predicates were successfully set to be relevant.
@@ -272,22 +270,6 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         }
         return succExe;
     }
-
-    /**
-     * Function is used to return the unique predicate identifier defined as String.
-     *
-     * @return String representation of the predicate, used to uniquely identify the
-     *         predicate.
-     */
-    public abstract String getPredicateID();
-
-    /**
-     * Function is used to return the label that describes the predicate.
-     *
-     * @return String representation of the predicate label, used for presentation
-     *         in case when the predicate id is too complex/long.
-     */
-    public abstract String getPredicateLabel();
 
     /**
      * The function is used to determine the type of the predicate

@@ -235,7 +235,24 @@ public class TypeNode extends SolutionWorkflowNode {
                 printString.append(",");
             }
         }
-        printString.append("_").append(super.getAutomatonState().getPredicateID()).append("\"");
+        printString.append("[").append(super.getAutomatonState().getPredicateID()).append("]").append("\"");
+
+        return printString.toString();
+    }
+
+    /**
+     * Get the unique ID of the current workflow node in .dot representation.
+     */
+    public String getFormat() {
+        StringBuilder printString = new StringBuilder("\"");
+
+        int i = 0;
+        for (Type type : this.usedTypes) {
+            if(type.getRootNodeID().equals("http://edamontology.org/format_1915")){
+                printString.append(type.getPredicateID()).append("\" # ").append(type.getPredicateLabel());
+            }
+            
+        }
 
         return printString.toString();
     }

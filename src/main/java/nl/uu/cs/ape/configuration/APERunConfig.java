@@ -631,15 +631,6 @@ public class APERunConfig {
     }
 
     /**
-     * Gets cwl format root. TODO: Set real values.
-     *
-     * @return the cwl format root
-     */
-    public String getCWLFormatRoot() {
-        return "format_1915";
-    }
-
-    /**
      * Gets the Solver type that should be used for solving.
      * 
      * @return {@link SolverType} that corresponds to the solver type
@@ -708,7 +699,7 @@ public class APERunConfig {
 
         IBuildStage withNoCWL(int noCWL);
 
-        IBuildStage withNoExecutableCWL(int noExecutableCWLCWL);
+        IBuildStage withNoExecutableCWL(int noExecutableCWL);
 
         IBuildStage withProgramInputs(List<Type> programInputs);
 
@@ -812,8 +803,8 @@ public class APERunConfig {
         }
 
         @Override
-        public IBuildStage withNoExecutableCWL(int noExecutableCWLCWL) {
-            this.noExecutableCWL = noExecutableCWLCWL;
+        public IBuildStage withNoExecutableCWL(int noExecutableCWL) {
+            this.noExecutableCWL = noExecutableCWL;
             return this;
         }
 

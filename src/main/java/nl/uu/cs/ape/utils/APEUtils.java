@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -43,9 +44,9 @@ import java.util.stream.IntStream;
  */
 public final class APEUtils {
 
-	private final static Map<String, Long> timers = new HashMap<>();
-	private final static PrintStream original = System.err;
-	private final static PrintStream nullStream = new PrintStream(new OutputStream() {
+	private static final Map<String, Long> timers = new HashMap<>();
+	private static final PrintStream original = System.err;
+	private static final PrintStream nullStream = new PrintStream(new OutputStream() {
 		@Override
 		public void write(int b) {
 		}
@@ -80,7 +81,7 @@ public final class APEUtils {
 		for (ConstraintTemplateData constraint : domainSetup.getUnformattedConstr()) {
 			currConst++;
 			/* ENCODE THE CONSTRAINT */
-			if (domainSetup.getConstraintTamplate(constraint.getConstraintID()) == null) {
+			if (domainSetup.getConstraintTemplate(constraint.getConstraintID()) == null) {
 				System.err.println("Constraint ID provided: '" + constraint.getConstraintID()
 						+ "' is not valid. Constraint skipped.");
 			} else {
@@ -102,7 +103,7 @@ public final class APEUtils {
 			Set<SLTLxFormula> sltlxFormulas = SLTLxSATVisitor.parseFormula(synthesisEngine, constraint);
 			for (SLTLxFormula sltlxFormula : sltlxFormulas) {
 				sltlxFormula.getConstraintCNFEncoding(synthesisEngine)
-						.forEach(sltlxString -> cnf_SLTL.append(sltlxString));
+						.forEach(cnf_SLTL::append);
 			}
 		}
 
@@ -127,68 +128,8 @@ public final class APEUtils {
 			APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
 			SATAtomMappings mappings) {
 
-		return domainSetup.getConstraintTamplate(constraintID).getConstraint(list, domainSetup, moduleAutomaton,
+		return domainSetup.getConstraintTemplate(constraintID).getConstraint(list, domainSetup, moduleAutomaton,
 				typeAutomaton, mappings);
-	}
-
-	/**
-	 * Used to write the {@code text} to a file {@code file}. If @append is true,
-	 * the {@code text} is appended to the {@code file}, otherwise the {@code file}
-	 * is rewritten.
-	 *
-	 * @param text   Text that will be written in the file.
-	 * @param file   The system-dependent file name.
-	 * @param append If true, then bytes will be written to the end of the file
-	 *               rather than the beginning.
-	 * @return True if write to file was successful, false otherwise.
-	 * @throws IOException Exception if file not found.
-	 */
-	public static boolean write2file(String text, File file, boolean append) throws IOException {
-		FileWriter fw = new FileWriter(file, append);
-		fw.write(text);
-		fw.close();
-
-		return true;
-	}
-
-	/**
-	 * Reads the path and provides the JSONObject that represents its content.
-	 *
-	 * @param path the path (local or URL) to the file
-	 * @return JSONObject representing the content of the file.
-	 * @throws IOException   Error if the file is corrupted
-	 * @throws JSONException Error if the file is not in expected JSON format
-	 */
-	public static JSONObject readPathToJSONObject(String path) throws IOException, JSONException {
-		File file = APEUtils.getFileFromPath(path);
-		String content = FileUtils.readFileToString(file, "utf-8");
-		return new JSONObject(content);
-	}
-
-	/**
-	 * Reads the file and provides the JSONObject that represents its content.
-	 *
-	 * @param file the JSON file
-	 * @return JSONObject representing the content of the file.
-	 * @throws IOException   Error if the file is corrupted
-	 * @throws JSONException Error if the file is not in expected JSON format
-	 */
-	public static JSONObject readFileToJSONObject(File file) throws IOException, JSONException {
-		String content = FileUtils.readFileToString(file, "utf-8");
-		return new JSONObject(content);
-	}
-
-	/**
-	 * Reads the file and provides the JSONArray that represents its content.
-	 *
-	 * @param file the JSON file
-	 * @return JSONArray representing the content of the file.
-	 * @throws IOException   Error if the file is corrupted
-	 * @throws JSONException Error if the file is not in expected JSON format
-	 */
-	public static JSONArray readFileToJSONArray(File file) throws IOException, JSONException {
-		String content = FileUtils.readFileToString(file, "utf-8");
-		return new JSONArray(content);
 	}
 
 	/*
@@ -278,7 +219,7 @@ public final class APEUtils {
 	 * @throws IOException Error in handling a JSON file.
 	 */
 	public static List<JSONObject> getListFromJson(File jsonFile, String key) throws IOException, JSONException {
-		String content = FileUtils.readFileToString(jsonFile, "utf-8");
+		String content = FileUtils.readFileToString(jsonFile, StandardCharsets.UTF_8);
 		JSONObject jsonObject = new JSONObject(content);
 
 		return getListFromJson(jsonObject, key, JSONObject.class);
@@ -342,31 +283,6 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Method checks whether the provided path corresponds to an existing file with
-	 * required reading permissions.
-	 *
-	 * @param path Path to the file.
-	 * @return true if the file exists and can be read, false otherwise.
-	 */
-	public static boolean isValidReadFile(String path) {
-		if (path == null || path.equals("")) {
-			System.err.println("Path is not provided correctly.");
-			return false;
-		}
-		File f = new File(path);
-		if (!f.isFile()) {
-			System.err.println("Provided path: \"" + path + "\" is not a file.");
-			return false;
-		} else {
-			if (!f.canRead()) {
-				System.err.println("Provided file: \"" + path + "\" is missing the reading permission.");
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
 	 * Debug printout.
 	 *
 	 * @param runConfig   Configuration of the APE run.
@@ -374,43 +290,45 @@ public final class APEUtils {
 	 *                    types.
 	 */
 	public static void debugPrintout(APERunConfig runConfig, APEDomainSetup domainSetup) {
+		String line = "-------------------------------------------------------------";
+
 		if (runConfig.getDebugMode()) {
 
 			/*
 			 * Printing the constraint templates
 			 */
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tConstraint templates:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println(domainSetup.getConstraintFactory().printConstraintsCodes() + "\n");
 
 			/*
 			 * Printing the Module and Taxonomy Tree
 			 */
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tTool Taxonomy:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			domainSetup.getAllModules().getRootModule().printTree(" ", domainSetup.getAllModules());
-			System.out.println("\n-------------------------------------------------------------");
+			System.out.println("\n" + line);
 			System.out.println("\tData Taxonomy dimensions:");
 			for (TaxonomyPredicate dimension : domainSetup.getAllTypes().getRootPredicates()) {
-				System.out.println("\n-------------------------------------------------------------");
+				System.out.println("\n" + line);
 				System.out.println("\t" + dimension.getPredicateLabel() + "Taxonomy:");
-				System.out.println("-------------------------------------------------------------");
+				System.out.println(line);
 				dimension.printTree(" ", domainSetup.getAllTypes());
 			}
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tLabels Taxonomy:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			domainSetup.getAllTypes().getLabelRoot().printTree(" ", domainSetup.getAllTypes());
 
 			/*
 			 * Printing the tool annotations
 			 */
 			boolean noTools = true;
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tAnnotated tools:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			for (TaxonomyPredicate module : domainSetup.getAllModules().getModules()) {
 				if (module instanceof Module) {
 					System.out.println(module.toString());
@@ -424,27 +342,27 @@ public final class APEUtils {
 			/*
 			 * Print out the constraints
 			 */
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			System.out.println("\tConstraints:");
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			for (ConstraintTemplateData constr : domainSetup.getUnformattedConstr()) {
 				System.out.println(domainSetup.getConstraintFactory().getDescription(constr));
 			}
 			if (domainSetup.getUnformattedConstr().isEmpty()) {
 				System.out.println("\tNo constraints.");
 			}
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 
 			int i = 1;
 			for (Type input : runConfig.getProgramInputs()) {
 				System.out.println((i++) + ". program input is " + input.toShortString());
 			}
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 			i = 1;
 			for (Type output : runConfig.getProgramOutputs()) {
 				System.out.println((i++) + ". program output is " + output.toShortString());
 			}
-			System.out.println("-------------------------------------------------------------");
+			System.out.println(line);
 		}
 	}
 
@@ -455,14 +373,16 @@ public final class APEUtils {
 	 * @param title    The mail content of the title.
 	 */
 	public static void printHeader(Integer argument, String... title) {
+		String line = "-------------------------------------------------------------";
+
 		String arg = (argument == null) ? "" : (" " + argument);
 
-		System.out.println("\n-------------------------------------------------------------");
+		System.out.println("\n" + line);
 		System.out.println("\t" + title[0] + arg);
 		if (title.length > 1) {
 			System.out.println("\t" + title[1] + arg);
 		}
-		System.out.println("-------------------------------------------------------------");
+		System.out.println(line);
 	}
 
 	/**
@@ -532,7 +452,7 @@ public final class APEUtils {
 	 * @throws IOException In case that the string.
 	 */
 	public static int countNewLines(String inputString) throws IOException {
-		try (InputStream stream = IOUtils.toInputStream(inputString, "UTF-8")) {
+		try (InputStream stream = IOUtils.toInputStream(inputString, StandardCharsets.UTF_8)) {
 			byte[] c = new byte[1024];
 
 			int readChars = stream.read(c);
@@ -567,26 +487,13 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Read the file to a String.
-	 *
-	 * @param path     Path to the file.
-	 * @param encoding The charset encoding.
-	 * @return File content as a String.
-	 * @throws IOException Error while reading the file.
-	 */
-	public static String readFile(String path, Charset encoding) throws IOException {
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		return new String(encoded, encoding);
-	}
-
-	/**
 	 * Timer start if in debug mode.
 	 *
 	 * @param timerID   the timer id
 	 * @param debugMode the debug mode
 	 */
 	public static void timerStart(String timerID, Boolean debugMode) {
-		if (debugMode) {
+		if (Boolean.TRUE.equals(debugMode)) {
 			timers.put(timerID, System.currentTimeMillis());
 		} else {
 			timers.put(timerID, (long) -1);
@@ -599,9 +506,7 @@ public final class APEUtils {
 		}
 
 		long elapsedTimeMs = System.currentTimeMillis() - timers.get(timerID);
-		long timeLeftMs = timeout - elapsedTimeMs;
-		return timeLeftMs;
-
+		return timeout - elapsedTimeMs;
 	}
 
 	/**
@@ -657,101 +562,6 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Method converts tools annotated using 'bio.tools' standard (see <a href=
-	 * "https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools
-	 * API</a>), into standard supported by the APE library.
-	 * <p>
-	 * In practice, the method takes a {@link JSONArray} as an argument, where each
-	 * {@link JSONObject} in the array represents a tool annotated using 'bio.tools'
-	 * standard, and returns a {@link JSONObject} that represents tool annotations
-	 * that can be used by the APE library.
-	 *
-	 * @param bioToolsAnnotation A {@link JSONArray} object, that contains list of
-	 *                           annotated tools ({@link JSONObject}s) according the
-	 *                           bio.tools specification (see <a href=
-	 *                           "https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools
-	 *                           API</a>)
-	 * @return {@link JSONObject} that represents the tool annotation supported by
-	 *         the APE library.
-	 * @throws JSONException the json exception
-	 */
-	public static JSONObject convertBioTools2Ape(JSONArray bioToolsAnnotation) throws JSONException {
-		JSONArray apeToolsAnnotations = new JSONArray();
-		for (int i = 0; i < bioToolsAnnotation.length(); i++) {
-
-			JSONObject bioJsonTool = bioToolsAnnotation.getJSONObject(i);
-			List<JSONObject> functions = APEUtils.getListFromJson(bioJsonTool, "function", JSONObject.class);
-			int functionNo = 1;
-			for (JSONObject function : functions) {
-				JSONObject apeJsonTool = new JSONObject();
-				apeJsonTool.put("label", bioJsonTool.getString("name"));
-				apeJsonTool.put("id", bioJsonTool.getString("biotoolsID") + functionNo++);
-
-				JSONArray apeTaxonomyTerms = new JSONArray();
-
-				JSONArray operations = function.getJSONArray("operation");
-				for (int j = 0; j < operations.length(); j++) {
-					JSONObject bioOperation = operations.getJSONObject(j);
-					apeTaxonomyTerms.put(bioOperation.get("uri"));
-				}
-				apeJsonTool.put("taxonomyOperations", apeTaxonomyTerms);
-				// reading inputs
-				JSONArray apeInputs = new JSONArray();
-				JSONArray bioInputs = function.getJSONArray("input");
-				// for each input
-				for (int j = 0; j < bioInputs.length(); j++) {
-					JSONObject bioInput = bioInputs.getJSONObject(j);
-					JSONObject apeInput = new JSONObject();
-					JSONArray apeInputTypes = new JSONArray();
-					JSONArray apeInputFormats = new JSONArray();
-					// add all data types
-					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "data", JSONObject.class)) {
-						apeInputTypes.put(bioType.getString("uri"));
-					}
-					apeInput.put("data_0006", apeInputTypes);
-					// add all data formats (or just the first one)
-					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
-						apeInputFormats.put(bioType.getString("uri"));
-					}
-					apeInput.put("format_1915", apeInputFormats);
-
-					apeInputs.put(apeInput);
-				}
-				apeJsonTool.put("inputs", apeInputs);
-
-				// reading outputs
-				JSONArray apeOutputs = new JSONArray();
-				JSONArray bioOutputs = function.getJSONArray("output");
-				// for each output
-				for (int j = 0; j < bioOutputs.length(); j++) {
-
-					JSONObject bioOutput = bioOutputs.getJSONObject(j);
-					JSONObject apeOutput = new JSONObject();
-					JSONArray apeOutputTypes = new JSONArray();
-					JSONArray apeOutputFormats = new JSONArray();
-					// add all data types
-					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "data", JSONObject.class)) {
-						apeOutputTypes.put(bioType.getString("uri"));
-					}
-					apeOutput.put("data_0006", apeOutputTypes);
-					// add all data formats
-					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
-						apeOutputFormats.put(bioType.getString("uri"));
-					}
-					apeOutput.put("format_1915", apeOutputFormats);
-
-					apeOutputs.put(apeOutput);
-				}
-				apeJsonTool.put("outputs", apeOutputs);
-
-				apeToolsAnnotations.put(apeJsonTool);
-			}
-		}
-
-		return new JSONObject().put("functions", apeToolsAnnotations);
-	}
-
-	/**
 	 * Convert cnf 2 human readable string.
 	 *
 	 * @param temp_sat_input the temp sat input
@@ -798,20 +608,6 @@ public final class APEUtils {
 		scanner.close();
 
 		return humanReadable.toString();
-	}
-
-	public static void write2file(InputStream temp_sat_input, File file, Boolean append) throws IOException {
-		StringBuilder humanReadable = new StringBuilder();
-		Scanner scanner = new Scanner(temp_sat_input);
-
-		while (scanner.hasNextLine()) {
-			String str = scanner.nextLine();
-
-			humanReadable.append(str).append("\n");
-		}
-		scanner.close();
-
-		APEUtils.write2file(humanReadable.toString(), file, append);
 	}
 
 	/**
@@ -896,87 +692,6 @@ public final class APEUtils {
 		return new JSONObject(original, JSONObject.getNames(original));
 	}
 
-	/**
-	 * Append text to the existing file. It adds the text at the end of the content
-	 * of the file.
-	 * 
-	 * @param file    - existing file
-	 * @param content - content that should be appended
-	 * @throws IOException          in case of an I/O error
-	 * @throws NullPointerException if the file is null
-	 */
-	public static void appendToFile(File file, String content) throws IOException, NullPointerException {
-		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
-		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
-		writer.write(content);
-		writer.close();
-	}
-
-	/**
-	 * Append text to the existing file. It adds the text at the end of the content
-	 * of the file.
-	 * 
-	 * @param file    - existing file
-	 * @param content - content that should be appended
-	 * @throws IOException          in case of an I/O error
-	 * @throws NullPointerException if the file is null
-	 */
-	public static void appendSetToFile(File file, Set<String> content) throws IOException, NullPointerException {
-		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
-		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
-		for (String str : content) {
-			writer.write(str);
-		}
-		writer.close();
-	}
-
-	/**
-	 * Append text to the existing file. It adds the text at the end of the content
-	 * of the file.
-	 * 
-	 * @param file        - existing file
-	 * @param cnfEncoding - cnf clauses that should be appended
-	 * @throws IOException          in case of an I/O error
-	 * @throws NullPointerException if the file is null
-	 */
-	public static void appendToFile(File file, Set<CNFClause> cnfEncoding) throws IOException, NullPointerException {
-		StringBuilder string = new StringBuilder();
-		cnfEncoding.forEach(clause -> {
-			string.append(clause.toCNF());
-		});
-		Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
-		BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4);
-		writer.write(string.toString());
-		writer.close();
-	}
-
-	/**
-	 * Prepend text to the existing file content and create a new file out of it.
-	 * It adds the text at the beginning, before the existing content of the file.
-	 * 
-	 * @param file
-	 * @param prefix
-	 * @throws IOException
-	 */
-	public static File prependToFile(String prefix, File file) throws IOException {
-		LineIterator li = FileUtils.lineIterator(file);
-		File tempFile = File.createTempFile("prependPrefix", ".tmp");
-		tempFile.deleteOnExit();
-		Writer fileWriter = new FileWriterWithEncoding(tempFile, "ASCII", true);
-		BufferedWriter writer = new BufferedWriter(fileWriter);
-		try {
-			writer.write(prefix);
-			while (li.hasNext()) {
-				writer.write(li.next());
-				writer.write("\n");
-			}
-		} finally {
-			writer.close();
-			li.close();
-		}
-		return tempFile;
-	}
-
 	public static int countLines(File cnfEncoding) {
 		int lines = 0;
 		try (BufferedReader b = new BufferedReader(new FileReader(cnfEncoding))) {
@@ -984,8 +699,6 @@ public final class APEUtils {
 				lines++;
 
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1022,14 +735,11 @@ public final class APEUtils {
 	 * @return Set of unique pairs.
 	 */
 	public static Set<Pair<PredicateLabel>> getUniquePairs(Collection<? extends PredicateLabel> set) {
-		Set<Pair<PredicateLabel>> pairs = new HashSet<Pair<PredicateLabel>>();
-		set.stream().forEach(ele1 -> {
-			set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
-					.forEach(ele2 -> {
-						pairs.add(new Pair<PredicateLabel>(ele1, ele2));
-					});
-		});
+		Set<Pair<PredicateLabel>> pairs = new HashSet<>();
+		set.stream().forEach(ele1 -> set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
+				.forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
+
 	}
 
 	/**
@@ -1042,49 +752,9 @@ public final class APEUtils {
 	 * @return Set of unique pairs.
 	 */
 	public static <T> Set<Pair<T>> getUniquePairs(Collection<T> set1, Collection<T> set2) {
-		Set<Pair<T>> pairs = new HashSet<Pair<T>>();
-		set1.stream().forEach(ele1 -> {
-			set2.stream().forEach(ele2 -> {
-				pairs.add(new Pair<T>(ele1, ele2));
-			});
-		});
+		Set<Pair<T>> pairs = new HashSet<>();
+		set1.stream().forEach(ele1 -> set2.stream().forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
-	}
-
-	/**
-	 * Read file content from the given path (local path or a public URL) and return
-	 * the content as a File object.
-	 * 
-	 * @param filePath - Local path or a public URL with the content.
-	 * @return File containing info provided at the path.
-	 * @throws IOException Exception in case of a badly formatted path or file.
-	 */
-	public static File getFileFromPath(String filePath) throws IOException {
-
-		try {
-			new URL(filePath).toURI();
-			return getFileFromURL(filePath);
-		} catch (MalformedURLException | URISyntaxException e1) {
-			return new File(filePath);
-		}
-
-	}
-
-	/**
-	 * Read content from a URL and return it as a file.
-	 * 
-	 * @param fileUrl - URL of the content
-	 * @return File containing info provided at the URL.
-	 * @throws IOException Exception in case of a badly formatted URL or file.
-	 */
-	private static File getFileFromURL(String fileUrl) throws IOException {
-		File loadedFile = new File(fileUrl);
-		FileUtils.copyURLToFile(
-				new URL(fileUrl),
-				loadedFile,
-				1000,
-				1000);
-		return loadedFile;
 	}
 
 }

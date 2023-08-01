@@ -10,10 +10,11 @@ import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.core.solutionStructure.AbstractCWLCreator;
+import nl.uu.cs.ape.core.solutionStructure.DefaultCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.ExecutableCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.io.APEFiles;
 import nl.uu.cs.ape.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.configuration.APECoreConfig;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -60,9 +62,7 @@ public class APE implements APEInterface {
 	 */
 	public APE(String configPath) throws IOException, OWLOntologyCreationException {
 		config = new APECoreConfig(configPath);
-		if (config == null) {
-			throw new APEConfigException("Configuration failed. Error in configuration file.");
-		}
+
 		boolean setupSucc = setupDomain();
 		if (!setupSucc) {
 			throw new APEConfigException("Error setting up the domain.");
@@ -134,7 +134,7 @@ public class APE implements APEInterface {
 
 		// Update allModules and allTypes sets based on the tool annotations
 		succRun &= apeDomainSetup
-				.updateToolAnnotationsFromJson(APEUtils.readFileToJSONObject(config.getToolAnnotationsFile()));
+				.updateToolAnnotationsFromJson(APEFiles.readFileToJSONObject(config.getToolAnnotationsFile()));
 
 		// Update allModules with CWL annotations, if CWL annotations file is given
 		if (config.getCwlAnnotationsFile().isPresent()) {
@@ -253,7 +253,7 @@ public class APE implements APEInterface {
 	 *                     file.
 	 */
 	public SolutionsList runSynthesis(String runConfigPath) throws IOException, JSONException, APEConfigException {
-		JSONObject configObject = APEUtils.readFileToJSONObject(new File(runConfigPath));
+		JSONObject configObject = APEFiles.readFileToJSONObject(new File(runConfigPath));
 		return runSynthesis(configObject, this.getDomainSetup());
 	}
 
@@ -265,7 +265,7 @@ public class APE implements APEInterface {
 	 * @throws IOException Error in case of not providing a proper configuration
 	 *                     file.
 	 */
-	public SolutionsList runSynthesis(APERunConfig runConfig) throws IOException {
+	public SolutionsList runSynthesis(APERunConfig runConfig) throws IOException, JSONException {
 		runConfig.apeDomainSetup.clearConstraints();
 		return executeSynthesis(runConfig);
 	}
@@ -285,9 +285,7 @@ public class APE implements APEInterface {
 			throws IOException, JSONException, APEConfigException {
 		apeDomainSetup.clearConstraints();
 		APERunConfig runConfig = new APERunConfig(runConfigJson, apeDomainSetup);
-		SolutionsList solutions = executeSynthesis(runConfig);
-
-		return solutions;
+		return executeSynthesis(runConfig);
 	}
 
 	/**
@@ -300,10 +298,6 @@ public class APE implements APEInterface {
 	 *                     file.
 	 */
 	private SolutionsList executeSynthesis(APERunConfig runConfig) throws IOException, JSONException {
-		// APEUtils.write2file(apeDomainSetup.emptyTools.toString(), new
-		// File("~/Desktop/tools"), false);
-		// APEUtils.write2file(apeDomainSetup.wrongToolIO.toString(), new
-		// File("~/Desktop/wrongToolIO"), false);
 
 		/* List of all the solutions */
 		SolutionsList allSolutions = new SolutionsList(runConfig);
@@ -322,7 +316,7 @@ public class APE implements APEInterface {
 		int solutionLength = runConfig.getSolutionLength().getMin();
 		while (allSolutions.getNumberOfSolutions() < allSolutions.getMaxNumberOfSolutions()
 				&& solutionLength <= runConfig.getSolutionLength().getMax()
-				&& APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) > 0) {
+				&& APEUtils.timerTimeLeft(globalTimerID, runConfig.getTimeoutMs()) > 0) {
 
 			SynthesisEngine implSynthesis = new SATSynthesisEngine(apeDomainSetup, allSolutions, runConfig,
 					solutionLength);
@@ -345,7 +339,7 @@ public class APE implements APEInterface {
 
 		if ((allSolutions.getNumberOfSolutions() >= allSolutions.getMaxNumberOfSolutions() - 1)) {
 			allSolutions.setFlag(SynthesisFlag.NONE);
-		} else if (APEUtils.timerTimeLeft("globalTimer", runConfig.getTimeoutMs()) <= 0) {
+		} else if (APEUtils.timerTimeLeft(globalTimerID, runConfig.getTimeoutMs()) <= 0) {
 			allSolutions.setFlag(SynthesisFlag.TIMEOUT);
 		} else if (allSolutions.getNumberOfSolutions() == 0) {
 			allSolutions.setFlag(SynthesisFlag.UNSAT);
@@ -380,6 +374,7 @@ public class APE implements APEInterface {
 			APE ape = new APE(config);
 			results.add(APERunConfig.validate(config, ape.getDomainSetup()));
 		} catch (IOException | OWLOntologyCreationException ignored) {
+			results.add("ape_setup", "Configuration should be used to setup APE.", false);
 		}
 
 		return results;
@@ -399,7 +394,7 @@ public class APE implements APEInterface {
 			solutions2write
 					.append(allSolutions.get(i).getNativeSolution().getCompleteSolution()).append("\n");
 		}
-		APEUtils.write2file(solutions2write.toString(),
+		APEFiles.write2file(solutions2write.toString(),
 				allSolutions.getRunConfiguration().getSolutionDirPath2("solutions.txt").toFile(), false);
 
 		return true;
@@ -423,9 +418,8 @@ public class APE implements APEInterface {
 
 		final File executeDir = executionsFolder.toFile();
 		if (executeDir.isDirectory()) {
-			Arrays.stream(executionsFolder.toFile()
-					.listFiles((dir, name) -> name.toLowerCase().startsWith("workflowSolution_".toLowerCase())))
-					.forEach(File::delete);
+			// If the directory already exists, empty it first
+			deleteExistingFiles(executeDir, "workflowSolution_");
 		} else {
 			executeDir.mkdir();
 		}
@@ -436,7 +430,7 @@ public class APE implements APEInterface {
 			try {
 				String title = "workflowSolution_" + solution.getIndex() + ".sh";
 				File script = executionsFolder.resolve(title).toFile();
-				APEUtils.write2file(solution.getScriptExecution(), script, false);
+				APEFiles.write2file(solution.getScriptExecution(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
 				System.err.println("Error occurred while writing a graph to the file system.");
@@ -456,9 +450,8 @@ public class APE implements APEInterface {
 	 *
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @return true if the generating was successfully performed, false otherwise.
-	 * @throws IOException Exception if graph cannot be written to the file system.
 	 */
-	public static boolean writeDataFlowGraphs(SolutionsList allSolutions) throws IOException {
+	public static boolean writeDataFlowGraphs(SolutionsList allSolutions) {
 		return writeDataFlowGraphs(allSolutions, RankDir.TOP_TO_BOTTOM);
 	}
 
@@ -470,9 +463,8 @@ public class APE implements APEInterface {
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @param orientation  Orientation in which the graph will be presented.
 	 * @return true if the generating was successfully performed, false otherwise.
-	 * @throws IOException Exception if graph cannot be written to the file system.
 	 */
-	public static boolean writeDataFlowGraphs(SolutionsList allSolutions, RankDir orientation) throws IOException {
+	public static boolean writeDataFlowGraphs(SolutionsList allSolutions, RankDir orientation) {
 		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
 		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -484,9 +476,8 @@ public class APE implements APEInterface {
 		/* Removing the existing files from the file system. */
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
-			Arrays.stream(graphsFolder.toFile()
-					.listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo".toLowerCase())))
-					.forEach(File::delete);
+			// If the directory already exists, empty it first
+			deleteExistingFiles(graphDir, "SolutionNo");
 		} else {
 			graphDir.mkdir();
 		}
@@ -494,9 +485,9 @@ public class APE implements APEInterface {
 		/* Creating the requested graphs in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
 			try {
-				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
+				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionLength();
 				Path path = graphsFolder.resolve(title);
-				solution.getDataflowGraph(title, orientation).getWrite2File(path.toFile(),
+				solution.getDataflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
 				System.out.print(".");
 			} catch (IOException e) {
@@ -518,9 +509,8 @@ public class APE implements APEInterface {
 	 *
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @return true if the generating was successfully performed, false otherwise.
-	 * @throws IOException Exception if graphs cannot be written to the file system.
 	 */
-	public static boolean writeControlFlowGraphs(SolutionsList allSolutions) throws IOException {
+	public static boolean writeControlFlowGraphs(SolutionsList allSolutions) {
 		return writeControlFlowGraphs(allSolutions, RankDir.LEFT_TO_RIGHT);
 	}
 
@@ -532,10 +522,8 @@ public class APE implements APEInterface {
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @param orientation  Orientation in which the graph will be presented.
 	 * @return true if the generating was successfully performed, false otherwise.
-	 * @throws IOException Exception if graphs cannot be written to the file system.
 	 */
-	public static boolean writeControlFlowGraphs(SolutionsList allSolutions, RankDir orientation)
-			throws IOException {
+	public static boolean writeControlFlowGraphs(SolutionsList allSolutions, RankDir orientation) {
 		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
 		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -547,8 +535,8 @@ public class APE implements APEInterface {
 		/* Removing the existing files from the file system. */
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
-			Arrays.stream(graphsFolder.toFile().listFiles((dir, name) -> name.toLowerCase().startsWith("SolutionNo")))
-					.forEach(File::delete);
+			// If the directory already exists, empty it first
+			deleteExistingFiles(graphDir, "SolutionNo");
 		} else {
 			graphDir.mkdir();
 		}
@@ -556,9 +544,9 @@ public class APE implements APEInterface {
 		/* Creating the requested graphs in parallel. */
 		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
 			try {
-				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionlength();
+				String title = "SolutionNo_" + solution.getIndex() + "_length_" + solution.getSolutionLength();
 				Path path = graphsFolder.resolve(title);
-				solution.getControlflowGraph(title, orientation).getWrite2File(path.toFile(),
+				solution.getControlflowGraph(title, orientation).write2File(path.toFile(),
 						allSolutions.getRunConfiguration().getDebugMode());
 				System.out.print(".");
 			} catch (IOException e) {
@@ -593,21 +581,11 @@ public class APE implements APEInterface {
 		final String filePrefix = "workflowSolution_";
 		final File cwlDir = cwlFolder.toFile();
 		if (cwlDir.isDirectory()) {
-			// If the CWL directory already exists, empty it first
-			File[] oldFiles = cwlDir.listFiles((dir, name) -> name.toLowerCase().startsWith(filePrefix.toLowerCase()));
-			if (oldFiles != null) {
-				Arrays.stream(oldFiles).forEach((f) -> {
-					if (!f.delete()) {
-						System.err.printf("Failed to delete file %s%n", f.getName());
-					}
-				});
-			}
+			// If the directory already exists, empty it first
+			deleteExistingFiles(cwlDir, filePrefix);
 		} else {
 			// Create the CWL directory if it does not already exist
-			boolean dirMade = cwlDir.mkdir();
-			if (!dirMade) {
-				System.err.println("Could not create CWL directory.");
-			}
+			cwlDir.mkdir();
 		}
 		System.out.print("Loading");
 
@@ -616,8 +594,8 @@ public class APE implements APEInterface {
 			try {
 				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = cwlFolder.resolve(title).toFile();
-				AbstractCWLCreator cwlCreator = new AbstractCWLCreator(solution);
-				APEUtils.write2file(cwlCreator.generate(), script, false);
+				DefaultCWLCreator cwlCreator = new DefaultCWLCreator(solution);
+				APEFiles.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
 				System.err.println("Error occurred while writing a CWL file to the file system.");
@@ -627,6 +605,26 @@ public class APE implements APEInterface {
 
 		APEUtils.timerPrintText(timerID, "\nCWL files have been generated.");
 		return true;
+	}
+
+	/**
+	 * Delete all files in the given directory that start with the given prefix.
+	 * 
+	 * @param dirName    The directory to delete files from.
+	 * @param filePrefix The prefix of the files to delete.
+	 */
+	private static void deleteExistingFiles(File dirName, String filePrefix) {
+		File[] oldFiles = dirName
+				.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith(filePrefix.toLowerCase()));
+		if (oldFiles != null) {
+			Arrays.stream(oldFiles).forEach(f -> {
+				try {
+					Files.delete(f.toPath());
+				} catch (IOException e) {
+					System.err.printf("Failed to delete file %s%n", f.getName());
+				}
+			});
+		}
 	}
 
 	/**
@@ -658,21 +656,11 @@ public class APE implements APEInterface {
 		final String filePrefix = "workflowSolution_";
 		final File cwlDir = executableCWLFolder.toFile();
 		if (cwlDir.isDirectory()) {
-			// If the CWL directory already exists, empty it first
-			File[] oldFiles = cwlDir.listFiles((dir, name) -> name.toLowerCase().startsWith(filePrefix.toLowerCase()));
-			if (oldFiles != null) {
-				Arrays.stream(oldFiles).forEach((f) -> {
-					if (!f.delete()) {
-						System.err.printf("Failed to delete file %s%n", f.getName());
-					}
-				});
-			}
+			// If the directory already exists, empty it first
+			deleteExistingFiles(cwlDir, filePrefix);
 		} else {
 			// Create the CWL directory if it does not already exist
-			boolean dirMade = cwlDir.mkdir();
-			if (!dirMade) {
-				System.err.println("Could not create CWL directory.");
-			}
+			cwlDir.mkdir();
 		}
 		System.out.print("Loading");
 
@@ -682,7 +670,7 @@ public class APE implements APEInterface {
 				String title = String.format("%s%o.cwl", filePrefix, solution.getIndex());
 				File script = executableCWLFolder.resolve(title).toFile();
 				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(solution);
-				APEUtils.write2file(cwlCreator.generate(), script, false);
+				APEFiles.write2file(cwlCreator.generate(), script, false);
 				System.out.print(".");
 			} catch (IOException e) {
 				System.err.println("Error occurred while writing an executable CWL file to the file system.");

@@ -153,7 +153,7 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
             return elementType.toString() + "(" + predicate.getPredicateID() + "," + argumentState.getPredicateID()
                     + ")";
         } else {
-            return null;
+            return "SLTLxAtom_ERROR";
         }
     }
 

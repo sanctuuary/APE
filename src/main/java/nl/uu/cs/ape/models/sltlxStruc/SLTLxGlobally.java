@@ -23,7 +23,7 @@ public class SLTLxGlobally extends SLTLxFormula {
 	@Override
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/*
 		 * Conjunct the collection of clauses that encode the formula at each of the
@@ -38,7 +38,7 @@ public class SLTLxGlobally extends SLTLxFormula {
 	@Override
 	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<Set<String>> allClauses = new HashSet<Set<String>>();
+		Set<Set<String>> allClauses = new HashSet<>();
 
 		/*
 		 * Disjoint the collection of clauses that encode negation of the formula at

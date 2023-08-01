@@ -555,7 +555,7 @@ public abstract class SLTLxTemplateFormula {
                 int currComb = mappings.getNextAuxNum();
                 allCombinations.add(currComb);
 
-                opOrderStates.put(currComb, new Pair<State>(moduleAutomaton.getAllStates().get(op1),
+                opOrderStates.put(currComb, new Pair<>(moduleAutomaton.getAllStates().get(op1),
                         moduleAutomaton.getAllStates().get(op2)));
 
                 List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();

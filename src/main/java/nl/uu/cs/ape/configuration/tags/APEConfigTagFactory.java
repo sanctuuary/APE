@@ -19,7 +19,6 @@ import static nl.uu.cs.ape.configuration.tags.APEConfigTag.TagType.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +26,10 @@ import java.util.List;
 public class APEConfigTagFactory {
 
     private static final String ONTOLOGY_IRI_MSG = "Ontology IRI should be an absolute IRI (Internationalized Resource Identifier).";
+
+    /** Hide the implicit public constructor. */
+    private APEConfigTagFactory() {
+    }
 
     /**
      * Types of tag fields.
@@ -36,10 +39,14 @@ public class APEConfigTagFactory {
      */
     public static class TYPES {
 
+        /** Hide the implicit public constructor. */
+        private TYPES() {
+        }
+
         /**
          * Abstract field type.
          */
-        public static abstract class ExistingFile extends APEConfigTag<Path> {
+        public abstract static class ExistingFile extends APEConfigTag<File> {
 
             @Override
             public TagType getType() {
@@ -47,10 +54,10 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected Path constructFromJSON(JSONObject obj) {
+            protected File constructFromJSON(JSONObject obj) {
                 final String input = obj.getString(getTagName());
                 try {
-                    return APEFiles.readFileFromPath(getTagName(), input, getRequiredPermissions());
+                    return APEFiles.readPathToFile(input);
                 } catch (IOException e) {
                     throw APEConfigException.invalidValue(getTagName(), input, e.getMessage());
                 }
@@ -59,8 +66,8 @@ public class APEConfigTagFactory {
             protected abstract APEFiles.Permission[] getRequiredPermissions();
 
             @Override
-            public ValidationResults validate(Path path, ValidationResults results) {
-                results.add(getTagName(), "The file should exist.", Files.exists(path));
+            public ValidationResults validate(File file, ValidationResults results) {
+                results.add(getTagName(), "The file should exist.", file.exists());
                 return results;
             }
         }
@@ -68,16 +75,16 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public static abstract class DataDimensions extends APEConfigDependentTag.One<List<String>, String> {
+        public abstract static class DataDimensions extends APEConfigDependentTag.One<List<String>, String> {
 
             protected DataDimensions(Provider<String> provider) {
                 super(provider);
             }
 
             @Override
-            protected List<String> constructFromJSON(JSONObject obj, String ontology_prefix) {
+            protected List<String> constructFromJSON(JSONObject obj, String ontologyPrefix) {
 
-                if (ontology_prefix == null) {
+                if (ontologyPrefix == null) {
                     throw APEConfigException.requiredValidationTag(getTagName(),
                             new TAGS.ONTOLOGY_PREFIX().getTagName(), "");
                 }
@@ -85,7 +92,7 @@ public class APEConfigTagFactory {
                 List<String> dataDimensionRoots = new ArrayList<>();
                 try {
                     for (String subTaxonomy : APEUtils.getListFromJson(obj, getTagName(), String.class)) {
-                        dataDimensionRoots.add(APEUtils.createClassIRI(subTaxonomy, ontology_prefix));
+                        dataDimensionRoots.add(APEUtils.createClassIRI(subTaxonomy, ontologyPrefix));
                     }
                 } catch (ClassCastException e) {
                     throw APEConfigException.invalidValue(getTagName(), obj, "expected a list in correct format.");
@@ -96,7 +103,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected ValidationResults validate(List<String> value, String ontology_prefix,
+            protected ValidationResults validate(List<String> value, String ontologyPrefix,
                     ValidationResults results) {
                 // TODO
                 return results;
@@ -112,7 +119,7 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public static abstract class DataInstances extends APEConfigDependentTag.One<List<Type>, APEDomainSetup> {
+        public abstract static class DataInstances extends APEConfigDependentTag.One<List<Type>, APEDomainSetup> {
 
             protected DataInstances(Provider<APEDomainSetup> provider) {
                 super(provider);
@@ -140,7 +147,7 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public static abstract class Bool extends APEConfigTag<Boolean> {
+        public abstract static class Bool extends APEConfigTag<Boolean> {
 
             @Override
             public TagType getType() {
@@ -161,7 +168,7 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public static abstract class Int extends APEConfigTag<Integer> {
+        public abstract static class Int extends APEConfigTag<Integer> {
 
             private final Range range;
 
@@ -193,7 +200,7 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public static abstract class IntRange extends APEConfigTag<Range> {
+        public abstract static class IntRange extends APEConfigTag<Range> {
 
             private final Range boundaries;
 
@@ -233,7 +240,7 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public static abstract class Directory extends APEConfigTag<Path> {
+        public abstract static class Directory extends APEConfigTag<Path> {
 
             protected abstract APEFiles.Permission[] getRequiredPermissions();
 
@@ -266,7 +273,7 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public static abstract class Option<E extends Enum<E>> extends APEConfigTag<E> {
+        public abstract static class Option<E extends Enum<E>> extends APEConfigTag<E> {
 
             @Override
             public TagType getType() {
@@ -298,7 +305,7 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public static abstract class IRI extends APEConfigTag<String> {
+        public abstract static class IRI extends APEConfigTag<String> {
 
             @Override
             public TagType getType() {
@@ -312,7 +319,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(String uri, ValidationResults results) {
-                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isIRI(uri));
+                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isURI(uri));
                 return results;
             }
         }
@@ -320,7 +327,7 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public static abstract class JSON extends APEConfigTag<JSONObject> {
+        public abstract static class JSON extends APEConfigTag<JSONObject> {
 
             @Override
             public TagType getType() {
@@ -329,14 +336,12 @@ public class APEConfigTagFactory {
 
             @Override
             protected JSONObject constructFromJSON(JSONObject obj) {
-                String constrintsPath = obj.getString(getTagName());
+                String constraintsPath = obj.getString(getTagName());
                 JSONObject constraints = null;
                 try {
-                    constraints = APEUtils.readPathToJSONObject(constrintsPath);
-                } catch (IOException e) {
-                    throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
-                } catch (JSONException e) {
-                    throw APEConfigException.invalidValue(getTagName(), constrintsPath, e.getMessage());
+                    constraints = APEFiles.readPathToJSONObject(constraintsPath);
+                } catch (IOException | JSONException e) {
+                    throw APEConfigException.invalidValue(getTagName(), constraintsPath, e.getMessage());
                 }
 
                 return constraints;
@@ -354,6 +359,10 @@ public class APEConfigTagFactory {
      * Configuration tags.
      */
     public static class TAGS {
+
+        /** Hide the implicit public constructor. */
+        private TAGS() {
+        }
 
         /**
          * Configuration field.
@@ -376,7 +385,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigDefaultValue<Path> getDefault() {
+            public APEConfigDefaultValue<File> getDefault() {
                 return APEConfigDefaultValue.noDefault();
             }
 
@@ -551,8 +560,8 @@ public class APEConfigTagFactory {
          */
         public static class TOOL_ONTOLOGY_ROOT extends APEConfigDependentTag.One<String, String> {
 
-            public TOOL_ONTOLOGY_ROOT(Provider<String> prefix_provider) {
-                super(prefix_provider);
+            public TOOL_ONTOLOGY_ROOT(Provider<String> prefixProvider) {
+                super(prefixProvider);
             }
 
             @Override
@@ -618,7 +627,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigDefaultValue<Path> getDefault() {
+            public APEConfigDefaultValue<File> getDefault() {
                 return APEConfigDefaultValue.noDefault();
             }
         }
@@ -649,7 +658,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            public APEConfigDefaultValue<Path> getDefault() {
+            public APEConfigDefaultValue<File> getDefault() {
                 return APEConfigDefaultValue.withDefault(null);
             }
         }

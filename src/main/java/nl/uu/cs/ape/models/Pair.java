@@ -9,7 +9,10 @@ package nl.uu.cs.ape.models;
  */
 public class Pair<T> {
 
-	private T first, second;
+	/** First pair element. */
+	private T first;
+	/** Second pair element. */
+	private T second;
 
 	/**
 	 * Instantiates a new Pair.
