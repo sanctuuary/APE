@@ -3,6 +3,8 @@ package nl.uu.cs.ape.sat.test.utils;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,6 +20,11 @@ import static nl.uu.cs.ape.sat.test.utils.Evaluation.fail;
 import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+/**
+ * The {@code GitHubRepo} class is used to download test use cases from a GitHub
+ * repository.
+ */
+@Slf4j
 public class GitHubRepo {
 
     private String absoluteLocalRoot;
@@ -43,7 +50,7 @@ public class GitHubRepo {
             FileUtils.deleteDirectory(directory);
             assertFalse(directory.exists());
         } catch (IOException e) {
-            System.out.println(String.format("Could not delete folder '%s':\n%s", this.absoluteLocalRoot, e.getMessage()));
+            log.info("Could not delete folder '{}':\n{}", this.absoluteLocalRoot, e.getMessage());
         }
     }
 
@@ -88,7 +95,8 @@ public class GitHubRepo {
     private static int file_count = 0;
 
     public String createJSONFile(JSONObject put, String name) {
-        TempFile temp = new TempFile(absoluteLocalRoot, new SimpleDateFormat("yyyyMMdd_HHmmss_").format(new Date()) + name + "_" + (file_count++) + ".json");
+        TempFile temp = new TempFile(absoluteLocalRoot,
+                new SimpleDateFormat("yyyyMMdd_HHmmss_").format(new Date()) + name + "_" + (file_count++) + ".json");
         temp.write(put.toString(3));
         int key = temp.hash();
         if (!files.containsKey(key)) {
@@ -102,14 +110,15 @@ public class GitHubRepo {
         private String folder = "";
         private String file = "";
 
-        public TempFile(String folder, String file){
+        public TempFile(String folder, String file) {
             this.folder = folder;
             this.file = file;
         }
 
-        public TempFile(){ }
+        public TempFile() {
+        }
 
-        public String getFilePath(){
+        public String getFilePath() {
             return Paths.get(folder, file).toString();
         }
 
@@ -147,7 +156,7 @@ public class GitHubRepo {
                 fw.write(content);
                 fw.flush();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
                 fail("Cannot write to file '%s'", getFilePath());
             }
         }
@@ -194,7 +203,8 @@ public class GitHubRepo {
             File targetFile;
             byte[] fileData;
             try {
-                url = new URL(String.format("https://raw.githubusercontent.com/%s/%s/%s", this.repository, this.commit, this.relative_file_path).replace("\\", "/"));
+                url = new URL(String.format("https://raw.githubusercontent.com/%s/%s/%s", this.repository, this.commit,
+                        this.relative_file_path).replace("\\", "/"));
                 con = url.openConnection(); // open the url connection.
                 dis = new DataInputStream(con.getInputStream());
                 fileData = new byte[con.getContentLength()];
@@ -214,7 +224,8 @@ public class GitHubRepo {
 
         @Override
         public String toString() {
-            return String.format("https://github.com/%s/blob/%s/%s", this.repository, this.commit, this.relative_file_path);
+            return String.format("https://github.com/%s/blob/%s/%s", this.repository, this.commit,
+                    this.relative_file_path);
         }
     }
 }

@@ -3,6 +3,7 @@ package nl.uu.cs.ape.constraints;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.models.SATAtomMappings;
@@ -17,6 +18,7 @@ import java.util.List;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public abstract class ConstraintTemplate {
 
     /**
@@ -155,7 +157,7 @@ public abstract class ConstraintTemplate {
      * @param givenParameters Provided number of parameters.
      */
     public void throwParametersError(int givenParameters) {
-        System.err.println(
+        log.error(
                 "Error in the constraints file.\nConstraint: " + this.description + "\nExpected number of parameters: "
                         + parameters.size() + ".\nProvided number of parameters: " + givenParameters);
 

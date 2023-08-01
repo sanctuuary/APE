@@ -59,7 +59,7 @@ public class SLTLxVariableSubstitutionCollection {
 	 * @return Unique variable that corresponds to the current variable binding.
 	 */
 	public SLTLxVariable addNewVariable(SLTLxVariable existingVar, Set<State> varDomain) {
-		SLTLxVariable newVar = new SLTLxVariable("uniqVar_" + this.variableNo++);
+		SLTLxVariable newVar = new SLTLxVariable("uniqVar_" + (this.variableNo++));
 		this.mappedVariables.put(existingVar, newVar);
 		this.mappedVariables.put(newVar, newVar);
 		this.variableDomain.put(newVar, varDomain);

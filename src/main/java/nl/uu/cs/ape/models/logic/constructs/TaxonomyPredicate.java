@@ -2,6 +2,7 @@ package nl.uu.cs.ape.models.logic.constructs;
 
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.AllPredicates;
 import nl.uu.cs.ape.models.enums.NodeType;
@@ -17,6 +18,7 @@ import nl.uu.cs.ape.utils.APEUtils;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public abstract class TaxonomyPredicate implements PredicateLabel {
 
     /**
@@ -306,7 +308,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param allPredicates Set of all the predicates.
      */
     public void printTree(String str, AllPredicates allPredicates) {
-        System.out.println(str + toShortString() + "[" + getNodeType() + "]");
+        log.debug(str + toShortString() + "[" + getNodeType() + "]");
         for (TaxonomyPredicate predicate : APEUtils.safe(this.subPredicates)) {
             predicate.printTree(str + ". ", allPredicates);
         }
@@ -323,7 +325,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
             subPredicates.add(predicate);
             return true;
         } else {
-            System.err.println("Cannot add sub-predicate to a leaf or empty taxonomy term: " + getPredicateID() + ".");
+            log.warn("Cannot add sub-predicate to a leaf or empty taxonomy term: " + getPredicateID() + ".");
             return false;
         }
     }
@@ -357,7 +359,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     public boolean removeAllSubPredicates(Collection<TaxonomyPredicate> subPredicatesToRemove) {
         boolean done = false;
         if (subPredicatesToRemove != null && !subPredicatesToRemove.isEmpty()) {
-            done = done || this.subPredicates.removeAll(subPredicatesToRemove);
+            done = this.subPredicates.removeAll(subPredicatesToRemove);
         }
         return done;
     }
@@ -377,7 +379,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
             superPredicates.add(predicate);
             return true;
         } else {
-            System.err.println("Cannot add super-predicate to a root taxonomy term!");
+            log.warn("Cannot add super-predicate to a root taxonomy term!");
             return false;
         }
     }

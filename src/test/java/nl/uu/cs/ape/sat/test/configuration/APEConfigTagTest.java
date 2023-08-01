@@ -13,6 +13,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,21 +23,27 @@ import static nl.uu.cs.ape.sat.test.utils.Evaluation.success;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * The {@code APEConfigTagTest} class is used to test the functionality of the
+ * {@link APEConfigTag} class.
+ */
+@Slf4j
 public class APEConfigTagTest {
 
     @Test
     public void infoOutputTest() {
 
-        System.out.println("Test type tags..");
+        log.debug("Test type tags..");
 
         for (APEConfigTag.Info<?> tag : APERunConfig.TAGS.getAll()) {
 
             if (tag.type == APEConfigTag.TagType.INTEGER) {
-                System.out.printf("Web API shows `%s` box for tag `%s`, with min:`%s` and max:`%s`\n", tag.type, tag.label, tag.constraints.getInt("min"), tag.constraints.getInt("max"));
+                log.debug("Web API shows `{}` box for tag `{}`, with min:`{}` and max:`{}`\n", tag.type,
+                        tag.label, tag.constraints.getInt("min"), tag.constraints.getInt("max"));
             }
         }
 
-        System.out.printf("\n### Display all tag info ####\nCORE:\n%s\n\nRUN:\n%s\n",
+        log.debug("\n### Display all tag info ####\nCORE:\n{}\n\nRUN:\n{}\n",
                 APECoreConfig.TAGS.toJSON().toString(3),
                 APERunConfig.TAGS.toJSON().toString(3));
     }
@@ -53,8 +61,9 @@ public class APEConfigTagTest {
 
         assertFalse(results.hasFails());
 
-        /* Test missing obligatory tag  */
-        List<String> tags = APECoreConfig.TAGS.getObligatory().stream().map(info -> info.tag_name).collect(Collectors.toList());
+        /* Test missing obligatory tag */
+        List<String> tags = APECoreConfig.TAGS.getObligatory().stream().map(info -> info.tag_name)
+                .collect(Collectors.toList());
         for (String tag : tags) {
 
             JSONObject altered_config = APEUtils.clone(correct_config);
@@ -68,7 +77,7 @@ public class APEConfigTagTest {
             success("CoreConfig is missing an obligatory tag -> %s", results.getFails().get(0).toJSON().toString());
         }
 
-        /* Test missing optional tag  */
+        /* Test missing optional tag */
         tags = APECoreConfig.TAGS.getOptional().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 
@@ -80,7 +89,7 @@ public class APEConfigTagTest {
             assertFalse(results.hasFails());
         }
 
-        /* Test incorrect tag  */
+        /* Test incorrect tag */
         tags = APECoreConfig.TAGS.getAll().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 
@@ -111,8 +120,9 @@ public class APEConfigTagTest {
 
         assertFalse(results.hasFails());
 
-        /* Test missing obligatory tag  */
-        List<String> tags = APERunConfig.TAGS.getObligatory().stream().map(info -> info.tag_name).collect(Collectors.toList());
+        /* Test missing obligatory tag */
+        List<String> tags = APERunConfig.TAGS.getObligatory().stream().map(info -> info.tag_name)
+                .collect(Collectors.toList());
         for (String tag : tags) {
 
             JSONObject altered_config = APEUtils.clone(correct_config);
@@ -126,7 +136,7 @@ public class APEConfigTagTest {
             success("RunConfig is missing an obligatory tag -> %s", results.getFails().get(0).toJSON().toString());
         }
 
-        /* Test missing optional tag  */
+        /* Test missing optional tag */
         tags = APERunConfig.TAGS.getOptional().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 
@@ -138,7 +148,7 @@ public class APEConfigTagTest {
             assertFalse(results.hasFails());
         }
 
-        /* Test incorrect tag  */
+        /* Test incorrect tag */
         tags = APERunConfig.TAGS.getAll().stream().map(info -> info.tag_name).collect(Collectors.toList());
         for (String tag : tags) {
 

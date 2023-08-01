@@ -6,6 +6,7 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
@@ -21,6 +22,7 @@ import nl.uu.cs.ape.utils.APEUtils;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class ConstraintTemplateParameter {
 
 	/**
@@ -57,7 +59,7 @@ public class ConstraintTemplateParameter {
 	 */
 	public void addParameter(TaxonomyPredicate newParam) {
 		if (newParam == null) {
-			System.err.println("Cannot add null as a dimension that characterises a Taxonomy Instance.");
+			log.warn("Cannot add null as a dimension that characterises a Taxonomy Instance.");
 		} else {
 			this.parameterTypes.add(newParam);
 		}

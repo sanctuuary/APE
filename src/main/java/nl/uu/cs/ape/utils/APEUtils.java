@@ -2,8 +2,6 @@ package nl.uu.cs.ape.utils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.LineIterator;
-import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,28 +18,24 @@ import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.models.sltlxStruc.CNFClause;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.parser.SLTLxSATVisitor;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.IntStream;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The {@link APEUtils} class is used for storing {@code Static} methods.
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public final class APEUtils {
 
 	private static final Map<String, Long> timers = new HashMap<>();
@@ -82,14 +76,13 @@ public final class APEUtils {
 			currConst++;
 			/* ENCODE THE CONSTRAINT */
 			if (domainSetup.getConstraintTemplate(constraint.getConstraintID()) == null) {
-				System.err.println("Constraint ID provided: '" + constraint.getConstraintID()
+				log.warn("Constraint ID provided: '" + constraint.getConstraintID()
 						+ "' is not valid. Constraint skipped.");
 			} else {
 				String currConstrEncoding = constraintSATEncoding(constraint.getConstraintID(),
 						constraint.getParameters(), domainSetup, moduleAutomaton, typeAutomaton, mappings);
 				if (currConstrEncoding == null) {
-					System.err
-							.println("Error in constraint file. Constraint no: " + currConst + ". Constraint skipped.");
+					log.warn("Error in constraint file. Constraint no: " + currConst + ". Constraint skipped.");
 				} else {
 					cnf_SLTL.append(currConstrEncoding);
 				}
@@ -251,7 +244,7 @@ public final class APEUtils {
 					jsonList.add(element);
 				}
 			} catch (JSONException e) {
-				System.err.println("Json parsing error. Expected object '" + clazz.getSimpleName() + "' under the tag '"
+				log.warn("Json parsing error. Expected object '" + clazz.getSimpleName() + "' under the tag '"
 						+ key + "'. The following object does not match the provided format:\n"
 						+ jsonObject.toString());
 				return jsonList;
@@ -297,72 +290,72 @@ public final class APEUtils {
 			/*
 			 * Printing the constraint templates
 			 */
-			System.out.println(line);
-			System.out.println("\tConstraint templates:");
-			System.out.println(line);
-			System.out.println(domainSetup.getConstraintFactory().printConstraintsCodes() + "\n");
+			log.debug(line);
+			log.debug("\tConstraint templates:");
+			log.debug(line);
+			log.debug(domainSetup.getConstraintFactory().printConstraintsCodes() + "\n");
 
 			/*
 			 * Printing the Module and Taxonomy Tree
 			 */
-			System.out.println(line);
-			System.out.println("\tTool Taxonomy:");
-			System.out.println(line);
+			log.debug(line);
+			log.debug("\tTool Taxonomy:");
+			log.debug(line);
 			domainSetup.getAllModules().getRootModule().printTree(" ", domainSetup.getAllModules());
-			System.out.println("\n" + line);
-			System.out.println("\tData Taxonomy dimensions:");
+			log.debug("\n" + line);
+			log.debug("\tData Taxonomy dimensions:");
 			for (TaxonomyPredicate dimension : domainSetup.getAllTypes().getRootPredicates()) {
-				System.out.println("\n" + line);
-				System.out.println("\t" + dimension.getPredicateLabel() + "Taxonomy:");
-				System.out.println(line);
+				log.debug("\n" + line);
+				log.debug("\t" + dimension.getPredicateLabel() + "Taxonomy:");
+				log.debug(line);
 				dimension.printTree(" ", domainSetup.getAllTypes());
 			}
-			System.out.println(line);
-			System.out.println("\tLabels Taxonomy:");
-			System.out.println(line);
+			log.debug(line);
+			log.debug("\tLabels Taxonomy:");
+			log.debug(line);
 			domainSetup.getAllTypes().getLabelRoot().printTree(" ", domainSetup.getAllTypes());
 
 			/*
 			 * Printing the tool annotations
 			 */
 			boolean noTools = true;
-			System.out.println(line);
-			System.out.println("\tAnnotated tools:");
-			System.out.println(line);
+			log.debug(line);
+			log.debug("\tAnnotated tools:");
+			log.debug(line);
 			for (TaxonomyPredicate module : domainSetup.getAllModules().getModules()) {
 				if (module instanceof Module) {
-					System.out.println(module.toString());
+					log.debug(module.toString());
 					noTools = false;
 				}
 			}
 			if (noTools) {
-				System.out.println("\tNo annotated tools.");
+				log.debug("\tNo annotated tools.");
 			}
 
 			/*
 			 * Print out the constraints
 			 */
-			System.out.println(line);
-			System.out.println("\tConstraints:");
-			System.out.println(line);
+			log.debug(line);
+			log.debug("\tConstraints:");
+			log.debug(line);
 			for (ConstraintTemplateData constr : domainSetup.getUnformattedConstr()) {
-				System.out.println(domainSetup.getConstraintFactory().getDescription(constr));
+				log.debug(domainSetup.getConstraintFactory().getDescription(constr));
 			}
 			if (domainSetup.getUnformattedConstr().isEmpty()) {
-				System.out.println("\tNo constraints.");
+				log.debug("\tNo constraints.");
 			}
-			System.out.println(line);
+			log.debug(line);
 
 			int i = 1;
 			for (Type input : runConfig.getProgramInputs()) {
-				System.out.println((i++) + ". program input is " + input.toShortString());
+				log.debug((i++) + ". program input is " + input.toShortString());
 			}
-			System.out.println(line);
+			log.debug(line);
 			i = 1;
 			for (Type output : runConfig.getProgramOutputs()) {
-				System.out.println((i++) + ". program output is " + output.toShortString());
+				log.debug((i++) + ". program output is " + output.toShortString());
 			}
-			System.out.println(line);
+			log.debug(line);
 		}
 	}
 
@@ -377,12 +370,12 @@ public final class APEUtils {
 
 		String arg = (argument == null) ? "" : (" " + argument);
 
-		System.out.println("\n" + line);
-		System.out.println("\t" + title[0] + arg);
+		log.info(line);
+		log.info("\t" + title[0] + arg);
 		if (title.length > 1) {
-			System.out.println("\t" + title[1] + arg);
+			log.info("\t" + title[1] + arg);
 		}
-		System.out.println(line);
+		log.info(line);
 	}
 
 	/**
@@ -520,7 +513,7 @@ public final class APEUtils {
 			return;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
-		System.out.println(printString + " setup time: " + (printTime / 1000F) + " sec.");
+		log.info(printString + " setup time: " + (printTime / 1000F) + " sec.");
 		timers.put(timerID, System.currentTimeMillis());
 
 		// APEUtils.printMemoryStatus(true);
@@ -538,12 +531,10 @@ public final class APEUtils {
 			return -1;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
-		System.out.println("\n"
-				+ "APE found " + solutionsFound + " solutions.\n"
-				+ "Total APE runtime: \t\t" + (printTime / 1000F) + " sec.\n"
-				+ "Total encoding time: \t\t" + (SATSynthesisEngine.encodingTime / 1000F) + " sec.\n"
-				+ "Total SAT solving time: \t" + (SATSynthesisEngine.satSolvingTime / 1000F) + " sec.");
-		System.out.println();
+		log.info("APE found " + solutionsFound + " solutions.");
+		log.info("Total APE runtime: \t\t" + (printTime / 1000F) + " sec.");
+		log.info("Total encoding time: \t\t" + (SATSynthesisEngine.encodingTime / 1000F) + " sec.");
+		log.info("Total SAT solving time: \t" + (SATSynthesisEngine.satSolvingTime / 1000F) + " sec.");
 		return printTime;
 	}
 
@@ -558,7 +549,7 @@ public final class APEUtils {
 			return;
 		}
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
-		System.out.println("\n" + text + " Running time: " + (printTime / 1000F) + " sec.");
+		log.info(text + " Running time: " + (printTime / 1000F) + " sec.");
 	}
 
 	/**
@@ -596,9 +587,11 @@ public final class APEUtils {
 				SLTLxAtom atom = mappings.findOriginal(-intAtom);
 				if (atom == null) {
 					SLTLxAtomVar varAtom = mappings.findOriginalVar(-intAtom);
-					if (varAtom == null)
-						System.out.println(intAtom);
-					humanReadable.append("-").append(varAtom.toString()).append(" ");
+					if (varAtom == null) {
+						log.error("Error: Could not find atom for " + intAtom);
+					} else {
+						humanReadable.append("-").append(varAtom.toString()).append(" ");
+					}
 				} else {
 					humanReadable.append("-").append(atom.toString()).append(" ");
 				}
@@ -663,7 +656,7 @@ public final class APEUtils {
 	 * @param params  additional parameters (uses String.format)
 	 */
 	public static void printWarning(String message, Object... params) {
-		System.out.println("\u001B[35mWARNING: " + String.format(message, params) + "\u001B[0m");
+		log.warn("\u001B[35mWARNING: " + String.format(message, params) + "\u001B[0m");
 	}
 
 	/**
@@ -692,6 +685,12 @@ public final class APEUtils {
 		return new JSONObject(original, JSONObject.getNames(original));
 	}
 
+	/**
+	 * Count the number of lines in a file.
+	 * 
+	 * @param cnfEncoding - file to count lines
+	 * @return number of lines
+	 */
 	public static int countLines(File cnfEncoding) {
 		int lines = 0;
 		try (BufferedReader b = new BufferedReader(new FileReader(cnfEncoding))) {
@@ -724,7 +723,7 @@ public final class APEUtils {
 		StringBuilder memoryStatus = new StringBuilder();
 		IntStream.range(0, currMemChars).forEach(step -> memoryStatus.append("#"));
 		IntStream.range(currMemChars, totalMemChars).forEach(step -> memoryStatus.append(" "));
-		System.out.print("\n[" + memoryStatus.toString() + "]\t" + totalMemMB + "\tMB \r");
+		log.info("\n[" + memoryStatus.toString() + "]\t" + totalMemMB + "\tMB \r");
 
 	}
 

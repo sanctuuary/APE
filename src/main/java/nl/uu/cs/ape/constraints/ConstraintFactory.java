@@ -2,6 +2,7 @@ package nl.uu.cs.ape.constraints;
 
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.models.AllModules;
@@ -22,6 +23,7 @@ import nl.uu.cs.ape.utils.APEDomainSetup;
  *
  * @author Vedran Kasalica
  */
+@Slf4j
 public class ConstraintFactory {
 
 	private Map<String, ConstraintTemplate> constraintTemplates;
@@ -63,7 +65,7 @@ public class ConstraintFactory {
 	 */
 	public boolean addConstraintTemplate(ConstraintTemplate constraintTemplate) {
 		if (constraintTemplates.put(constraintTemplate.getConstraintID(), constraintTemplate) != null) {
-			System.err.println("Duplicate constraint ID: " + constraintTemplate.getConstraintID()
+			log.warn("Duplicate constraint ID: " + constraintTemplate.getConstraintID()
 					+ ". Please change the ID in order to be able to use the constraint template.");
 			return false;
 		}
@@ -111,124 +113,124 @@ public class ConstraintFactory {
 		/*
 		 * ID: ite_m
 		 */
-		ConstraintTemplate currTemplate = new Constraint_if_then_module("ite_m", moduleParam2,
+		ConstraintTemplate currTemplate = new ConstraintIfThenModule("ite_m", moduleParam2,
 				"If 1st operation is used, then 2nd operation must be used subsequently.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: itn_m
 		 */
-		currTemplate = new Constraint_if_then_not_module("itn_m", moduleParam2,
+		currTemplate = new ConstraintIfThenNotModule("itn_m", moduleParam2,
 				"If 1st operation is used, then 2nd operation cannot be used subsequently.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: depend_m
 		 */
-		currTemplate = new Constraint_depend_module("depend_m", moduleParam2,
+		currTemplate = new ConstraintDependModule("depend_m", moduleParam2,
 				"If 1st operation is used, then we must have used 2nd operation prior to it.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: next_m
 		 */
-		currTemplate = new Constraint_next_module("next_m", moduleParam2,
+		currTemplate = new Constraint_nextModule("next_m", moduleParam2,
 				"If 1st operation is used, then 2nd operation must be used as the next operation in the sequence.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: prev_m
 		 */
-		currTemplate = new Constraint_prev_module("prev_m", moduleParam2,
+		currTemplate = new Constraint_prevModule("prev_m", moduleParam2,
 				"If 1st operation is used, then we must have used 2nd operation as a previous operation in the sequence.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: use_m
 		 */
-		currTemplate = new Constraint_use_module("use_m", moduleParam1, "Use operation in the solution.");
+		currTemplate = new ConstraintUseModule("use_m", moduleParam1, "Use operation in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: nuse_m
 		 */
-		currTemplate = new Constraint_not_use_module("nuse_m", moduleParam1,
+		currTemplate = new ConstraintNotUseModule("nuse_m", moduleParam1,
 				"Do not use operation in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: last_m
 		 */
-		currTemplate = new Constraint_last_module("last_m", moduleParam1,
+		currTemplate = new Constraint_lastModule("last_m", moduleParam1,
 				"Use operation as the last operation in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: use_t
 		 */
-		currTemplate = new Constraint_use_type("use_t", typeParam1, "Use type in the solution.");
+		currTemplate = new ConstraintUseType("use_t", typeParam1, "Use type in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: nuse_t
 		 */
-		currTemplate = new Constraint_not_use_type("nuse_t", typeParam1,
+		currTemplate = new ConstraintNotUseType("nuse_t", typeParam1,
 				"Do not use type in the solution.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: use_ite_t
 		 */
-		currTemplate = new Constraint_if_use_then_type("use_ite_t", typeParam2,
+		currTemplate = new ConstraintIfUseThenType("use_ite_t", typeParam2,
 				"If 1st data is used, then 2nd data must be used subsequently.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: use_itn_t
 		 */
-		currTemplate = new Constraint_if_use_then_not_type("use_itn_t", typeParam2,
+		currTemplate = new ConstraintIfUseThenNotType("use_itn_t", typeParam2,
 				"If 1st data is used, then 2nd data cannot be used subsequently.");
 		addConstraintTemplate(currTemplate);
 
 		/*
-		 * ID: operation_input
+		 * ID: operationInput
 		 */
-		currTemplate = new Constraint_use_module_with_input("operation_input", moduleNlabel,
+		currTemplate = new ConstraintUseModuleWithInput("operationInput", moduleNlabel,
 				"Use the operation with an input of the given type.");
 		addConstraintTemplate(currTemplate);
 
 		/*
-		 * ID: operation_output
+		 * ID: operationOutput
 		 */
-		currTemplate = new Constraint_use_module_with_output("operation_output", moduleNlabel,
+		currTemplate = new ConstraintUseModuleWithOutput("operationOutput", moduleNlabel,
 				"Use the operation to generate an output of the given type.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: connected_op
 		 */
-		currTemplate = new Constraint_connected_modules("connected_op", moduleParam2,
+		currTemplate = new Constraint_connectedModules("connected_op", moduleParam2,
 				"1st operation should generate an output used by the 2nd operation.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: not_connected_op
 		 */
-		currTemplate = new Constraint_not_connected_modules("not_connected_op", moduleParam2,
+		currTemplate = new ConstraintNot_connectedModules("not_connected_op", moduleParam2,
 				"1st operation should never generate an output used by the 2nd operation.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: not_repeat_op
 		 */
-		currTemplate = new Constraint_not_repeat_modules("not_repeat_op", moduleParam1,
+		currTemplate = new ConstraintNot_repeatModules("not_repeat_op", moduleParam1,
 				"No operation that belongs to the subtree should be repeated over.");
 		addConstraintTemplate(currTemplate);
 
 		/*
 		 * ID: gen_t
 		 * 
-		 * currTemplate = new Constraint_gen_type("gen_t", typeParam1,
+		 * currTemplate = new ConstraintGenType("gen_t", typeParam1,
 		 * "Generate type ${parameter_1} in the solution.");
 		 * addConstraintTemplate(currTemplate);
 		 */
@@ -236,7 +238,7 @@ public class ConstraintFactory {
 		/*
 		 * ID: ngen_t Do not generate type ${parameter_1} in the solution.
 		 * 
-		 * currTemplate = new Constraint_not_gen_type("ngen_t", typeParam1,
+		 * currTemplate = new ConstraintNotGenType("ngen_t", typeParam1,
 		 * "Do not generate type ${parameter_1} in the solution.");
 		 * addConstraintTemplate(currTemplate);
 		 */
@@ -245,7 +247,7 @@ public class ConstraintFactory {
 		 * ID: gen_ite_t If we have data type ${parameter_1}, then generate type
 		 * ${parameter_2} subsequently.
 		 * 
-		 * currTemplate = new Constraint_if_gen_then_type("gen_ite_t", typeParam2,
+		 * currTemplate = new ConstraintIf_genThenType("gen_ite_t", typeParam2,
 		 * "If we have generated data type ${parameter_1}, then generate type ${parameter_2} subsequently."
 		 * );
 		 * addConstraintTemplate(currTemplate);
@@ -254,7 +256,7 @@ public class ConstraintFactory {
 		/*
 		 * ID: gen_itn_t If we have generated data type ${parameter_1}, then do not
 		 * generate type ${parameter_2} subsequently.
-		 * currTemplate = new Constraint_if_gen_then_not_type("gen_itn_t", typeParam2,
+		 * currTemplate = new ConstraintIf_genThenNotType("gen_itn_t", typeParam2,
 		 * "If we have generated data type ${parameter_1}, then do not generate type ${parameter_2} subsequently."
 		 * );
 		 * addConstraintTemplate(currTemplate);
@@ -315,7 +317,7 @@ public class ConstraintFactory {
 	 * If we use module <b>parameters[0]</b>, then we must have used
 	 * <b>parameters[1]</b> prior to it using the function {@link #getConstraint}.
 	 */
-	public class Constraint_depend_module extends ConstraintTemplate {
+	public class ConstraintDependModule extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint depend module.
 		 *
@@ -323,7 +325,7 @@ public class ConstraintFactory {
 		 * @param parameterTypes the parameter types
 		 * @param description    the description
 		 */
-		protected Constraint_depend_module(String id, List<ConstraintTemplateParameter> parameterTypes,
+		protected ConstraintDependModule(String id, List<ConstraintTemplateParameter> parameterTypes,
 				String description) {
 			super(id, parameterTypes, description);
 		}
@@ -335,7 +337,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.depend_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+			return SLTLxTemplateFormula.dependModule(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
 		}
 	}
 
@@ -344,7 +346,7 @@ public class ConstraintFactory {
 	 * Generate type <b>parameters[0]</b> in the solution using the function
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_gen_type extends ConstraintTemplate {
+	public class ConstraintGenType extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint gen type.
 		 *
@@ -352,7 +354,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_gen_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+		protected ConstraintGenType(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
 			super(id, parametersNo, description);
 		}
 
@@ -376,7 +378,7 @@ public class ConstraintFactory {
 	 * type <b>parameters[1]</b> subsequently using the function
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_if_gen_then_not_type extends ConstraintTemplate {
+	public class ConstraintIf_genThenNotType extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint if gen then not type.
 		 *
@@ -384,7 +386,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_if_gen_then_not_type(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintIf_genThenNotType(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -396,8 +398,8 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.itn_type(parameters.get(0), parameters.get(1), AtomType.MEMORY_TYPE,
-					moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
+			return SLTLxTemplateFormula.itnType(parameters.get(0), parameters.get(1), AtomType.MEMORY_TYPE,
+					typeAutomaton.getMemoryTypesBlocks(), mappings);
 		}
 	}
 
@@ -406,7 +408,7 @@ public class ConstraintFactory {
 	 * If we have generated data module <b>parameters[0]</b>, then generate
 	 * <b>parameters[1]</b> subsequently using the function {@link #getConstraint}.
 	 */
-	public class Constraint_if_gen_then_type extends ConstraintTemplate {
+	public class ConstraintIf_genThenType extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint if gen then type.
 		 *
@@ -414,7 +416,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_if_gen_then_type(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintIf_genThenType(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -426,8 +428,8 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.ite_type(parameters.get(0), parameters.get(1), AtomType.MEMORY_TYPE,
-					moduleAutomaton, typeAutomaton.getMemoryTypesBlocks(), mappings);
+			return SLTLxTemplateFormula.iteType(parameters.get(0), parameters.get(1), AtomType.MEMORY_TYPE,
+					typeAutomaton.getMemoryTypesBlocks(), mappings);
 		}
 	}
 
@@ -436,7 +438,7 @@ public class ConstraintFactory {
 	 * If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b>
 	 * subsequently using the function {@link #getConstraint}.
 	 */
-	public class Constraint_if_then_module extends ConstraintTemplate {
+	public class ConstraintIfThenModule extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint if then module.
 		 *
@@ -444,7 +446,7 @@ public class ConstraintFactory {
 		 * @param parameterTypes the parameter types
 		 * @param description    the description
 		 */
-		protected Constraint_if_then_module(String id, List<ConstraintTemplateParameter> parameterTypes,
+		protected ConstraintIfThenModule(String id, List<ConstraintTemplateParameter> parameterTypes,
 				String description) {
 			super(id, parameterTypes, description);
 		}
@@ -456,7 +458,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.ite_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+			return SLTLxTemplateFormula.iteModule(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
 		}
 	}
 
@@ -465,7 +467,7 @@ public class ConstraintFactory {
 	 * If we use module <b>parameters[0]</b>, then do not use <b>parameters[1]</b>
 	 * subsequently using the function {@link #getConstraint}.
 	 */
-	public class Constraint_if_then_not_module extends ConstraintTemplate {
+	public class ConstraintIfThenNotModule extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint if then not module.
 		 *
@@ -473,7 +475,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_if_then_not_module(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintIfThenNotModule(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -485,7 +487,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.itn_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+			return SLTLxTemplateFormula.itnModule(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
 		}
 	}
 
@@ -494,7 +496,7 @@ public class ConstraintFactory {
 	 * If we have used data module <b>parameters[0]</b>, then do not use type
 	 * <b>parameters[1]</b> subsequently using the function {@link #getConstraint}.
 	 */
-	public class Constraint_if_use_then_not_type extends ConstraintTemplate {
+	public class ConstraintIfUseThenNotType extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint if use then not type.
 		 *
@@ -502,7 +504,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_if_use_then_not_type(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintIfUseThenNotType(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -514,8 +516,8 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.itn_type(parameters.get(0), parameters.get(1), AtomType.USED_TYPE,
-					moduleAutomaton, typeAutomaton.getUsedTypesBlocks(), mappings);
+			return SLTLxTemplateFormula.itnType(parameters.get(0), parameters.get(1), AtomType.USED_TYPE,
+					typeAutomaton.getUsedTypesBlocks(), mappings);
 		}
 	}
 
@@ -524,7 +526,7 @@ public class ConstraintFactory {
 	 * If we have used data module <b>parameters[0]</b>, then use
 	 * <b>parameters[1]</b> subsequently using the function {@link #getConstraint}.
 	 */
-	public class Constraint_if_use_then_type extends ConstraintTemplate {
+	public class ConstraintIfUseThenType extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint if use then type.
 		 *
@@ -532,7 +534,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_if_use_then_type(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintIfUseThenType(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -544,8 +546,8 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.ite_type(parameters.get(0), parameters.get(1), AtomType.USED_TYPE,
-					moduleAutomaton, typeAutomaton.getUsedTypesBlocks(), mappings);
+			return SLTLxTemplateFormula.iteType(parameters.get(0), parameters.get(1), AtomType.USED_TYPE,
+					typeAutomaton.getUsedTypesBlocks(), mappings);
 		}
 	}
 
@@ -554,7 +556,7 @@ public class ConstraintFactory {
 	 * Use <b>parameters[0]</b> as last module in the solution. using the function
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_last_module extends ConstraintTemplate {
+	public class Constraint_lastModule extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint last module.
 		 *
@@ -562,7 +564,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_last_module(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected Constraint_lastModule(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -583,7 +585,7 @@ public class ConstraintFactory {
 	 * If we use module <b>parameters[0]</b>, then use <b>parameters[1]</b> as a
 	 * next module in the sequence using the function {@link #getConstraint}.
 	 */
-	public class Constraint_next_module extends ConstraintTemplate {
+	public class Constraint_nextModule extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint next module.
 		 *
@@ -591,7 +593,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_next_module(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected Constraint_nextModule(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -603,7 +605,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.next_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+			return SLTLxTemplateFormula.nextModule(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
 		}
 	}
 
@@ -612,7 +614,7 @@ public class ConstraintFactory {
 	 * Do not generate type <b>parameters[0]</b> in the solution using the function
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_not_gen_type extends ConstraintTemplate {
+	public class ConstraintNotGenType extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint not gen type.
 		 *
@@ -620,7 +622,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_not_gen_type(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintNotGenType(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -644,7 +646,7 @@ public class ConstraintFactory {
 	 * Do not use module <b>parameters[0]</b> in the solution using the function
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_not_use_module extends ConstraintTemplate {
+	public class ConstraintNotUseModule extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint not use module.
 		 *
@@ -652,7 +654,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_not_use_module(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintNotUseModule(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -675,7 +677,7 @@ public class ConstraintFactory {
 	 * Do not use type <b>parameters[0]</b> in the solution using the function
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_not_use_type extends ConstraintTemplate {
+	public class ConstraintNotUseType extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint not use type.
 		 *
@@ -683,7 +685,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_not_use_type(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintNotUseType(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -707,7 +709,7 @@ public class ConstraintFactory {
 	 * <b>parameters[1]</b> as a previous module in the sequence. using the function
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_prev_module extends ConstraintTemplate {
+	public class Constraint_prevModule extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint prev module.
 		 *
@@ -715,7 +717,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_prev_module(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected Constraint_prevModule(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -727,7 +729,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.prev_module(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
+			return SLTLxTemplateFormula.prevModule(parameters.get(0), parameters.get(1), moduleAutomaton, mappings);
 		}
 	}
 
@@ -736,7 +738,7 @@ public class ConstraintFactory {
 	 * Use module <b>parameters[0]</b> in the solution using the function
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_use_module extends ConstraintTemplate {
+	public class ConstraintUseModule extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint use module.
 		 *
@@ -744,7 +746,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_use_module(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+		protected ConstraintUseModule(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
 			super(id, parametersNo, description);
 		}
 
@@ -766,7 +768,7 @@ public class ConstraintFactory {
 	 * Use type <b>parameters[0]</b> in the solution using the function
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_use_type extends ConstraintTemplate {
+	public class ConstraintUseType extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint use type.
 		 *
@@ -774,7 +776,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_use_type(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
+		protected ConstraintUseType(String id, List<ConstraintTemplateParameter> parametersNo, String description) {
 			super(id, parametersNo, description);
 		}
 
@@ -796,7 +798,7 @@ public class ConstraintFactory {
 	 * Use operation ${parameter_1} with input labeled ${parameter_2}.
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_use_module_with_input extends ConstraintTemplate {
+	public class ConstraintUseModuleWithInput extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint use type.
 		 *
@@ -804,7 +806,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_use_module_with_input(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintUseModuleWithInput(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -817,7 +819,7 @@ public class ConstraintFactory {
 				return null;
 			}
 
-			return SLTLxTemplateFormula.use_module_input(parameters.get(0), parameters.get(1), moduleAutomaton,
+			return SLTLxTemplateFormula.useModuleInput(parameters.get(0), parameters.get(1), moduleAutomaton,
 					typeAutomaton, mappings);
 		}
 	}
@@ -827,7 +829,7 @@ public class ConstraintFactory {
 	 * Use operation ${parameter_1} to generate output labeled ${parameter_2}
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_use_module_with_output extends ConstraintTemplate {
+	public class ConstraintUseModuleWithOutput extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint use type.
 		 *
@@ -835,7 +837,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_use_module_with_output(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintUseModuleWithOutput(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
@@ -848,7 +850,7 @@ public class ConstraintFactory {
 				return null;
 			}
 
-			return SLTLxTemplateFormula.use_module_output(parameters.get(0), parameters.get(1), moduleAutomaton,
+			return SLTLxTemplateFormula.useModuleOutput(parameters.get(0), parameters.get(1), moduleAutomaton,
 					typeAutomaton, mappings);
 		}
 	}
@@ -858,7 +860,7 @@ public class ConstraintFactory {
 	 * 1st operation should generate an output used by the 2nd operation
 	 * subsequently using the function {@link #getConstraint}.
 	 */
-	public class Constraint_connected_modules extends ConstraintTemplate {
+	public class Constraint_connectedModules extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint if then module.
 		 *
@@ -866,7 +868,7 @@ public class ConstraintFactory {
 		 * @param parameterTypes the parameter types
 		 * @param description    the description
 		 */
-		protected Constraint_connected_modules(String id, List<ConstraintTemplateParameter> parameterTypes,
+		protected Constraint_connectedModules(String id, List<ConstraintTemplateParameter> parameterTypes,
 				String description) {
 			super(id, parameterTypes, description);
 		}
@@ -878,7 +880,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.connected_modules(parameters.get(0), parameters.get(1), domainSetup,
+			return SLTLxTemplateFormula.connectedModules(parameters.get(0), parameters.get(1),
 					moduleAutomaton, typeAutomaton, mappings);
 		}
 	}
@@ -888,7 +890,7 @@ public class ConstraintFactory {
 	 * 1st operation should not generate an output used by the 2nd operation
 	 * subsequently using the function {@link #getConstraint}.
 	 */
-	public class Constraint_not_connected_modules extends ConstraintTemplate {
+	public class ConstraintNot_connectedModules extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint if then module.
 		 *
@@ -896,7 +898,7 @@ public class ConstraintFactory {
 		 * @param parameterTypes the parameter types
 		 * @param description    the description
 		 */
-		protected Constraint_not_connected_modules(String id, List<ConstraintTemplateParameter> parameterTypes,
+		protected ConstraintNot_connectedModules(String id, List<ConstraintTemplateParameter> parameterTypes,
 				String description) {
 			super(id, parameterTypes, description);
 		}
@@ -908,7 +910,7 @@ public class ConstraintFactory {
 				super.throwParametersError(parameters.size());
 				return null;
 			}
-			return SLTLxTemplateFormula.not_connected_modules(parameters.get(0), parameters.get(1), domainSetup,
+			return SLTLxTemplateFormula.notConnectedModules(parameters.get(0), parameters.get(1),
 					moduleAutomaton, typeAutomaton, mappings);
 		}
 	}
@@ -918,7 +920,7 @@ public class ConstraintFactory {
 	 * No operation that belongs to the subtree should be repeated over.
 	 * {@link #getConstraint}.
 	 */
-	public class Constraint_not_repeat_modules extends ConstraintTemplate {
+	public class ConstraintNot_repeatModules extends ConstraintTemplate {
 		/**
 		 * Instantiates a new Constraint last module.
 		 *
@@ -926,7 +928,7 @@ public class ConstraintFactory {
 		 * @param parametersNo the parameters no
 		 * @param description  the description
 		 */
-		protected Constraint_not_repeat_modules(String id, List<ConstraintTemplateParameter> parametersNo,
+		protected ConstraintNot_repeatModules(String id, List<ConstraintTemplateParameter> parametersNo,
 				String description) {
 			super(id, parametersNo, description);
 		}
