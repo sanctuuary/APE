@@ -140,8 +140,8 @@ public abstract class ConstraintTemplate {
      */
     public JSONObject toJSON() {
         JSONObject currJson = new JSONObject();
-        currJson.put("constraintID", constraintID);
-        currJson.put("description", description);
+        currJson.put("id", constraintID);
+        currJson.put("label", description);
         JSONArray params = new JSONArray();
         for (ConstraintTemplateParameter param : parameters) {
             params.put(param.toJSON());

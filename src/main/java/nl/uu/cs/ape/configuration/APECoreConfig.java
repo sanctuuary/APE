@@ -173,34 +173,6 @@ public class APECoreConfig {
     }
 
     /**
-     * Function that returns the tags that are used in the JSON files. Function
-     * can be used to rename the tags.
-     *
-     * @param tag that is used
-     * @return json tags
-     */
-    public static String getJsonTags(String tag) {
-        switch (tag) {
-            case "id":
-                return "id";
-            case "label":
-                return "label";
-            case "inputs":
-                return "inputs";
-            case "taxonomyOperations":
-                return "taxonomyOperations";
-            case "outputs":
-                return "outputs";
-            case "implementation":
-                return "implementation";
-            case "code":
-                return "code";
-            default:
-                return null;
-        }
-    }
-
-    /**
      * Setting up the core configuration of the library.
      * <p>
      * //@throws IOException Error in reading the configuration file.

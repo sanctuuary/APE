@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
+import nl.uu.cs.ape.configuration.ToolAnnotationTag;
 import nl.uu.cs.ape.constraints.ConstraintFactory;
 import nl.uu.cs.ape.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
@@ -323,14 +324,14 @@ public class APEDomainSetup {
      */
     private boolean updateModuleFromJson(JSONObject jsonModule)
             throws JSONException, APEDimensionsException {
-        String moduleIRI = APEUtils.createClassIRI(jsonModule.getString(APECoreConfig.getJsonTags("id")),
+        String moduleIRI = APEUtils.createClassIRI(jsonModule.getString(ToolAnnotationTag.ID.toString()),
                 ontologyPrefixIRI);
         if (allModules.get(moduleIRI) != null) {
             moduleIRI = moduleIRI + "[tool]";
         }
-        String moduleLabel = jsonModule.getString(APECoreConfig.getJsonTags("label"));
+        String moduleLabel = jsonModule.getString(ToolAnnotationTag.LABEL.toString());
         Set<String> taxonomyModules = new HashSet<>(
-                APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("taxonomyOperations"), String.class));
+                APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.TAXONOMY_OPERATIONS.toString(), String.class));
         taxonomyModules = APEUtils.createIRIsFromLabels(taxonomyModules, ontologyPrefixIRI);
         /* Check if the referenced module taxonomy classes exist. */
         List<String> toRemove = new ArrayList<>();
@@ -338,7 +339,7 @@ public class APEDomainSetup {
             String taxonomyModuleIRI = APEUtils.createClassIRI(taxonomyModule, ontologyPrefixIRI);
             if (allModules.get(taxonomyModuleIRI) == null) {
                 log.warn("Tool '" + moduleIRI + "' annotation issue. "
-                        + "Referenced '" + APECoreConfig.getJsonTags("taxonomyOperations") + "': '" + taxonomyModuleIRI
+                        + "Referenced '" + ToolAnnotationTag.TAXONOMY_OPERATIONS.toString() + "': '" + taxonomyModuleIRI
                         + "' cannot be found in the Tool Taxonomy.");
                 wrongToolTax.add(moduleLabel);
                 toRemove.add(taxonomyModuleIRI);
@@ -352,23 +353,23 @@ public class APEDomainSetup {
          */
         if (taxonomyModules.isEmpty()) {
             log.warn("Tool '" + moduleIRI + "' annotation issue. "
-                    + "None of the referenced '" + APECoreConfig.getJsonTags("taxonomyOperations")
+                    + "None of the referenced '" + ToolAnnotationTag.TAXONOMY_OPERATIONS.toString()
                     + "' can be found in the Tool Taxonomy.");
             taxonomyModules.add(allModules.getRootModuleID());
         }
 
         String executionCode = null;
         try {
-            executionCode = jsonModule.getJSONObject(APECoreConfig.getJsonTags("implementation"))
-                    .getString(APECoreConfig.getJsonTags("code"));
+            executionCode = jsonModule.getJSONObject(ToolAnnotationTag.IMPLEMENTATION.toString())
+                    .getString(ToolAnnotationTag.CODE.toString());
         } catch (JSONException e) {
             /* Skip the execution code */
         }
 
-        List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("inputs"),
+        List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.INPUTS.toString(),
                 JSONObject.class);
         updateMaxNoToolInputs(jsonModuleInput.size());
-        List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, APECoreConfig.getJsonTags("outputs"),
+        List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.OUTPUTS.toString(),
                 JSONObject.class);
         updateMaxNoToolOutputs(jsonModuleOutput.size());
 

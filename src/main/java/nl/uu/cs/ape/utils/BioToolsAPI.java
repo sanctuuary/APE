@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
+import nl.uu.cs.ape.configuration.ToolAnnotationTag;
 import nl.uu.cs.ape.io.APEFiles;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -182,8 +183,8 @@ public class BioToolsAPI {
 			int functionNo = 1;
 			for (JSONObject function : functions) {
 				JSONObject apeJsonTool = new JSONObject();
-				apeJsonTool.put("label", bioJsonTool.getString("name"));
-				apeJsonTool.put("id", bioJsonTool.getString("biotoolsID") + functionNo++);
+				apeJsonTool.put(ToolAnnotationTag.LABEL.toString(), bioJsonTool.getString("name"));
+				apeJsonTool.put(ToolAnnotationTag.ID.toString(), bioJsonTool.getString("biotoolsID") + functionNo++);
 
 				JSONArray apeTaxonomyTerms = new JSONArray();
 
@@ -192,7 +193,7 @@ public class BioToolsAPI {
 					JSONObject bioOperation = operations.getJSONObject(j);
 					apeTaxonomyTerms.put(bioOperation.get("uri"));
 				}
-				apeJsonTool.put("taxonomyOperations", apeTaxonomyTerms);
+				apeJsonTool.put(ToolAnnotationTag.TAXONOMY_OPERATIONS.toString(), apeTaxonomyTerms);
 				// reading inputs
 				JSONArray apeInputs = new JSONArray();
 				JSONArray bioInputs = function.getJSONArray("input");
@@ -215,7 +216,7 @@ public class BioToolsAPI {
 
 					apeInputs.put(apeInput);
 				}
-				apeJsonTool.put("inputs", apeInputs);
+				apeJsonTool.put(ToolAnnotationTag.INPUTS.toString(), apeInputs);
 
 				// reading outputs
 				JSONArray apeOutputs = new JSONArray();
@@ -240,7 +241,7 @@ public class BioToolsAPI {
 
 					apeOutputs.put(apeOutput);
 				}
-				apeJsonTool.put("outputs", apeOutputs);
+				apeJsonTool.put(ToolAnnotationTag.OUTPUTS.toString(), apeOutputs);
 
 				apeToolsAnnotations.put(apeJsonTool);
 			}
