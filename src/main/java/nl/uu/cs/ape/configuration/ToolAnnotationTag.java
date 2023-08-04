@@ -62,4 +62,9 @@ public enum ToolAnnotationTag {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return tagName;
+    }
 }
