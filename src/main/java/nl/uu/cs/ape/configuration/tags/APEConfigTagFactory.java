@@ -50,7 +50,7 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return FILE_PATH;
+                return TagType.FILE_PATH;
             }
 
             @Override
@@ -111,7 +111,7 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return DATA_DIMENSIONS;
+                return TagType.DATA_DIMENSIONS;
             }
 
         }
@@ -127,7 +127,7 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return DATA_INSTANCES;
+                return TagType.DATA_INSTANCES;
             }
 
             @Override
@@ -151,7 +151,7 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return BOOLEAN;
+                return TagType.BOOLEAN;
             }
 
             @Override
@@ -178,7 +178,7 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return INTEGER;
+                return TagType.INTEGER;
             }
 
             @Override
@@ -220,7 +220,7 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return INTEGER_RANGE;
+                return TagType.INTEGER_RANGE;
             }
 
             @Override
@@ -246,7 +246,7 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return FOLDER_PATH;
+                return TagType.FOLDER_PATH;
             }
 
             @Override
@@ -266,6 +266,8 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(Path value, ValidationResults results) {
+                // results.add(getTagName(), "Directory does not exist.",
+                // APEFiles.directoryExists(value));
                 return results;
             }
         }
@@ -277,7 +279,7 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return ENUM;
+                return TagType.ENUM;
             }
 
             public abstract Class<E> getEnumClass();
@@ -309,7 +311,7 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return IRI;
+                return TagType.IRI;
             }
 
             @Override
@@ -319,7 +321,7 @@ public class APEConfigTagFactory {
 
             @Override
             protected ValidationResults validate(String uri, ValidationResults results) {
-                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isURI(uri));
+                results.add(getTagName(), "ONTOLOGY_IRI_MSG", APEFiles.isURI(uri));
                 return results;
             }
         }
@@ -327,19 +329,19 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public abstract static class JSON extends APEConfigTag<JSONObject> {
+        public abstract static class JSONFile extends APEConfigTag<JSONArray> {
 
             @Override
             public TagType getType() {
-                return JSON;
+                return TagType.FILE_PATH;
             }
 
             @Override
-            protected JSONObject constructFromJSON(JSONObject obj) {
+            protected JSONArray constructFromJSON(JSONObject obj) {
                 String constraintsPath = obj.getString(getTagName());
-                JSONObject constraints = null;
+                JSONArray constraints = null;
                 try {
-                    constraints = APEFiles.readPathToJSONObject(constraintsPath);
+                    constraints = APEFiles.readPathToJSONObject(constraintsPath).getJSONArray("constraints");
                 } catch (IOException | JSONException e) {
                     throw APEConfigException.invalidValue(getTagName(), constraintsPath, e.getMessage());
                 }
@@ -348,8 +350,34 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected ValidationResults validate(JSONObject jsonObject, ValidationResults results) {
-                results.add(getTagName(), ONTOLOGY_IRI_MSG, APEFiles.isJSON(jsonObject));
+            protected ValidationResults validate(JSONArray jsonArray, ValidationResults results) {
+                results.add(getTagName(), "JSON Array is not well formatted.", APEFiles.isJSONArray(jsonArray));
+                return results;
+            }
+        }
+
+        /**
+         * Abstract field type.
+         */
+        public abstract static class JSONContent extends APEConfigTag<JSONArray> {
+
+            @Override
+            public TagType getType() {
+                return TagType.JSON;
+            }
+
+            @Override
+            protected JSONArray constructFromJSON(JSONObject obj) {
+                try {
+                    return obj.getJSONArray(getTagName());
+                } catch (JSONException e) {
+                    throw APEConfigException.invalidValue(getTagName(), obj, e.getMessage());
+                }
+            }
+
+            @Override
+            protected ValidationResults validate(JSONArray jsonArray, ValidationResults results) {
+                results.add(getTagName(), "JSON Array is not well formatted.", APEFiles.isJSONArray(jsonArray));
                 return results;
             }
         }
@@ -443,8 +471,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "List of ontology classes that represent data dimensions (e.g., data type, data format).";
             }
 
             @Override
@@ -474,8 +501,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "";
+                return "List of input data instances. Each input data instance is defined by a taxonomy class per dimension.";
             }
 
             @Override
@@ -525,8 +551,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "";
+                return "List of output data instances. Each output data instance is defined by a taxonomy class per dimension.";
             }
 
             @Override
@@ -576,13 +601,12 @@ public class APEConfigTagFactory {
 
             @Override
             public TagType getType() {
-                return MODULE;
+                return TagType.MODULE;
             }
 
             @Override
             public String getDescription() {
-                // TODO
-                return "";
+                return "Ontology class that represents the root of the tools taxonomy.";
             }
 
             @Override
@@ -666,11 +690,37 @@ public class APEConfigTagFactory {
         /**
          * Configuration field.
          */
-        public static class CONSTRAINTS extends TYPES.JSON {
+        public static class CONSTRAINTS_FILE extends TYPES.JSONFile {
 
             @Override
             public String getTagName() {
                 return "constraints_path";
+            }
+
+            @Override
+            public String getLabel() {
+                return "Constraints file path";
+            }
+
+            @Override
+            public String getDescription() {
+                return "Path to the .json file containing the constraints.";
+            }
+
+            @Override
+            public APEConfigDefaultValue<JSONArray> getDefault() {
+                return APEConfigDefaultValue.withDefault(null);
+            }
+        }
+
+        /**
+         * Configuration field.
+         */
+        public static class CONSTRAINTS_CONTENT extends TYPES.JSONContent {
+
+            @Override
+            public String getTagName() {
+                return "constraints";
             }
 
             @Override
@@ -680,12 +730,11 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "JSON object containing the constraints.";
             }
 
             @Override
-            public APEConfigDefaultValue<JSONObject> getDefault() {
+            public APEConfigDefaultValue<JSONArray> getDefault() {
                 return APEConfigDefaultValue.withDefault(null);
             }
         }
@@ -707,8 +756,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "Tag to indicate whether strict tool annotations should be implemented.";
             }
 
             @Override
@@ -738,8 +786,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "Number of desired steps in the solution. The minimal solution length should be greater or equal to 0.";
             }
 
             @Override
@@ -773,8 +820,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "Number of solutions to be generated. The number of solutions should be greater or equal to 0.";
             }
 
             @Override
@@ -806,8 +852,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "Path to the directory where the solutions should be stored.";
             }
         }
 
@@ -832,8 +877,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "";
+                return "Number of execution scripts to be generated. The number of execution scripts should be greater or equal to 0.";
             }
 
             @Override
@@ -863,8 +907,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "";
+                return "Number of generated graphs. The number of generated graphs should be greater or equal to 0.";
             }
 
             @Override
@@ -910,40 +953,6 @@ public class APEConfigTagFactory {
         /**
          * Configuration field.
          */
-        public static class NO_EXECUTABLE_CWL extends TYPES.Int {
-            public NO_EXECUTABLE_CWL() {
-                super(Range.of(0, Integer.MAX_VALUE));
-            }
-
-            @Override
-            public APEConfigDefaultValue<Integer> getDefault() {
-                return APEConfigDefaultValue.withDefault(0);
-            }
-
-            @Override
-            public String getTagName() {
-                return "number_of_executable_cwl_files";
-            }
-
-            @Override
-            public String getLabel() {
-                return "Number of executable CWL files";
-            }
-
-            @Override
-            public String getDescription() {
-                return "The number of CWL representations of executable solutions should be generated.";
-            }
-
-            @Override
-            protected ValidationResults validate(Integer value, ValidationResults results) {
-                return results;
-            }
-        }
-
-        /**
-         * Configuration field.
-         */
         public static class TIMEOUT_SEC extends TYPES.Int {
 
             public TIMEOUT_SEC() {
@@ -962,8 +971,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "";
+                return "Timeout in seconds. The timeout should be greater or equal to 0.";
             }
 
             @Override
@@ -999,8 +1007,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "Tag to indicate whether the workflow input should always be used.";
             }
 
             @Override
@@ -1031,8 +1038,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "Tag to indicate whether all generated data outputs per tool should be used.";
             }
 
             @Override
@@ -1058,8 +1064,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "Tag to indicate whether the debug mode should be activated.";
             }
 
             @Override
@@ -1085,8 +1090,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                // TODO
-                return "TODO";
+                return "Tag to indicate whether the tool sequence repetition is allowed.";
             }
 
             @Override

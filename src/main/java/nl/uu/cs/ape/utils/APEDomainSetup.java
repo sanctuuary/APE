@@ -3,6 +3,7 @@ package nl.uu.cs.ape.utils;
 import java.io.IOException;
 import java.util.*;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -213,18 +214,18 @@ public class APEDomainSetup {
      * Method reads the constraints from a JSON object and updates the
      * {@link APEDomainSetup} object accordingly.
      *
-     * @param constraintsJSON JSON object containing the constraints
+     * @param constraintsJSONArray JSON array containing the constraints
      * @throws ConstraintFormatException exception in case of bad constraint json
      *                                   formatting
      */
-    public void updateConstraints(JSONObject constraintsJSON) throws ConstraintFormatException {
-        if (constraintsJSON == null) {
+    public void updateConstraints(JSONArray constraintsJSONArray) throws ConstraintFormatException {
+        if (constraintsJSONArray == null) {
             return;
         }
         String constraintID = null;
         int currNode = 0;
 
-        List<JSONObject> constraints = APEUtils.getListFromJson(constraintsJSON, CONSTR_JSON_TAG, JSONObject.class);
+        List<JSONObject> constraints = APEUtils.getListFromJsonList(constraintsJSONArray, JSONObject.class);
 
         /* Iterate through each constraint in the list */
         for (JSONObject jsonConstraint : APEUtils.safe(constraints)) {
