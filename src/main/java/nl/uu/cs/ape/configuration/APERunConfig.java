@@ -1,8 +1,10 @@
 package nl.uu.cs.ape.configuration;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.Getter;
 import nl.uu.cs.ape.configuration.tags.APEConfigDependentTag;
 import nl.uu.cs.ape.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory;
@@ -31,7 +33,11 @@ public class APERunConfig {
     /**
      * Path to the file with all workflow constraints.
      */
-    private final APEConfigTag<JSONObject> CONSTRAINTS = new APEConfigTagFactory.TAGS.CONSTRAINTS();
+    private final APEConfigTag<JSONArray> CONSTRAINTS_FILE = new APEConfigTagFactory.TAGS.CONSTRAINTS_FILE();
+    /**
+     * Content of workflow constraints.
+     */
+    private final APEConfigTag<JSONArray> CONSTRAINTS_CONTENT = new APEConfigTagFactory.TAGS.CONSTRAINTS_CONTENT();
     /**
      * Path to the directory that will contain all the solutions to the problem.
      */
@@ -60,12 +66,6 @@ public class APERunConfig {
      * Default is 0.
      */
     private final APEConfigTag<Integer> NO_CWL = new APEConfigTagFactory.TAGS.NO_CWL();
-    /**
-     * Number of executable CWL files that should be generated from candidate
-     * workflows.
-     * Default is 0.
-     */
-    private final APEConfigTag<Integer> NO_EXECUTABLE_CWL = new APEConfigTagFactory.TAGS.NO_EXECUTABLE_CWL();
     /**
      * Determines the required usage for the data instances that are given as
      * workflow input:<br>
@@ -111,14 +111,14 @@ public class APERunConfig {
      * dependencies.
      */
     private final APEConfigTag<?>[] all_tags = new APEConfigTag[] {
-            this.CONSTRAINTS,
+            this.CONSTRAINTS_FILE,
+            this.CONSTRAINTS_CONTENT,
             this.SOLUTION_DIR_PATH,
             this.SOLUTION_LENGTH_RANGE,
             this.NO_SOLUTIONS,
             this.NO_EXECUTIONS,
             this.NO_GRAPHS,
             this.NO_CWL,
-            this.NO_EXECUTABLE_CWL,
             this.USE_WORKFLOW_INPUT,
             this.USE_ALL_GENERATED_DATA,
             this.DEBUG_MODE,
@@ -133,14 +133,14 @@ public class APERunConfig {
      * order for the Web API.
      */
     public static final APEConfigTags TAGS = new APEConfigTags(
-            new CONSTRAINTS(),
+            new CONSTRAINTS_FILE(),
+            new CONSTRAINTS_CONTENT(),
             new SOLUTION_DIR_PATH(),
             new SOLUTION_LENGTH_RANGE(),
             new NO_SOLUTIONS(),
             new NO_EXECUTIONS(),
             new NO_GRAPHS(),
             new NO_CWL(),
-            new NO_EXECUTABLE_CWL(),
             new USE_WORKFLOW_INPUT(),
             new USE_ALL_GENERATED_DATA(),
             new DEBUG_MODE(),
@@ -152,7 +152,8 @@ public class APERunConfig {
     /**
      * Object containing domain information needed for the execution.
      */
-    public APEDomainSetup apeDomainSetup;
+    @Getter
+    private APEDomainSetup apeDomainSetup;
 
     /** Solver type that should be used (SAT). */
     private SolverType solverType = SolverType.SAT;
@@ -178,7 +179,6 @@ public class APERunConfig {
         setNoExecutions(builder.noExecutions);
         setNoGraphs(builder.noGraphs);
         setNoCWL(builder.noCWL);
-        setNoExecutableCWL(builder.noExecutableCWL);
         setUseWorkflowInput(builder.useWorkflowInput);
         setUseAllGeneratedData(builder.useAllGeneratedData);
         setDebugMode(builder.debugMode);
@@ -197,7 +197,7 @@ public class APERunConfig {
     }
 
     /**
-     * Validate tje JSONObject for each RUN tag.
+     * Validate the JSONObject for each RUN tag.
      * If {@link ValidationResults#success()} ()} returns true,
      * the configuration object can be safely used to create
      * an APERunConfig object.
@@ -259,21 +259,14 @@ public class APERunConfig {
     }
 
     /**
-     * Get domain setup.
-     * 
-     * @return Object containing domain specific parameters/annotations.
-     */
-    public APEDomainSetup getApeDomainSetup() {
-        return this.apeDomainSetup;
-    }
-
-    /**
-     * Gets constraints path.
+     * Gets constraints as a JSONArray, represented as either
+     * {@link #CONSTRAINTS_CONTENT} or {@link #CONSTRAINTS_FILE}.
      *
-     * @return the value of {@link #CONSTRAINTS}
+     * @return the constraints as a JSONArray.
      */
-    public JSONObject getConstraintsJSON() {
-        return CONSTRAINTS.getValue();
+    public JSONArray getConstraintsJSON() {
+        return CONSTRAINTS_CONTENT.getValue() != null ? CONSTRAINTS_CONTENT.getValue()
+                : CONSTRAINTS_FILE.getValue();
     }
 
     /**
@@ -281,8 +274,8 @@ public class APERunConfig {
      * 
      * @param constraintsJSON JSON object that contains the constraints
      */
-    public void setConstraintsJSON(JSONObject constraintsJSON) {
-        CONSTRAINTS.setValue(constraintsJSON);
+    public void setConstraintsJSON(JSONArray constraintsJSON) {
+        CONSTRAINTS_CONTENT.setValue(constraintsJSON);
     }
 
     /**
@@ -470,24 +463,6 @@ public class APERunConfig {
     }
 
     /**
-     * Gets number of executable CWL files.
-     * 
-     * @return The value of {@link #NO_EXECUTABLE_CWL}
-     */
-    public int getNoExecutableCWL() {
-        return NO_EXECUTABLE_CWL.getValue();
-    }
-
-    /**
-     * Set the number of executable CWL files.
-     * 
-     * @param noExecutableCWL The number to set.
-     */
-    public void setNoExecutableCWL(int noExecutableCWL) {
-        NO_EXECUTABLE_CWL.setValue(noExecutableCWL);
-    }
-
-    /**
      * Gets program inputs.
      *
      * @return the value of {@link #PROGRAM_INPUTS}
@@ -572,7 +547,7 @@ public class APERunConfig {
     /**
      * Set the timeout in sec.
      * 
-     * @param timeoutSec
+     * @param timeoutSec Timeout in sec.
      */
     public void setTimeoutSec(int timeoutSec) {
         TIMEOUT_SEC.setValue(timeoutSec);
@@ -659,7 +634,7 @@ public class APERunConfig {
      *
      */
     public interface IBuildStage {
-        IBuildStage withConstraintsJSON(JSONObject constraintsJSON);
+        IBuildStage withConstraintsJSON(JSONArray constraintsJSON);
 
         IBuildStage withToolSeqRepeat(boolean toolSeqRepeat);
 
@@ -697,7 +672,7 @@ public class APERunConfig {
         private int solutionMaxLength;
         private int maxNoSolutions;
         private APEDomainSetup apeDomainSetup;
-        private JSONObject constraintsJSON;
+        private JSONArray constraintsJSON;
         private boolean toolSeqRepeat;
         private String solutionDirPath;
         private int noExecutions;
@@ -739,7 +714,7 @@ public class APERunConfig {
         }
 
         @Override
-        public IBuildStage withConstraintsJSON(JSONObject constraintsJSON) {
+        public IBuildStage withConstraintsJSON(JSONArray constraintsJSON) {
             this.constraintsJSON = constraintsJSON;
             return this;
         }

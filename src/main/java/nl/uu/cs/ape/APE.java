@@ -267,7 +267,7 @@ public class APE implements APEInterface {
 	 *                     file.
 	 */
 	public SolutionsList runSynthesis(APERunConfig runConfig) throws IOException, JSONException {
-		runConfig.apeDomainSetup.clearConstraints();
+		runConfig.getApeDomainSetup().clearConstraints();
 		return executeSynthesis(runConfig);
 	}
 
@@ -640,59 +640,5 @@ public class APE implements APEInterface {
 				}
 			});
 		}
-	}
-
-	/**
-	 * Generate executable CWL scripts that represent executable versions of the
-	 * workflows solutions.
-	 * 
-	 * @param allSolutions Set of {@link SolutionWorkflow} which should be
-	 *                     represented in CWL.
-	 * @param coreConfig   The core configuration of APE.
-	 * @return true if the execution was successfully performed, false otherwise.
-	 */
-	public static boolean writeExecutableCWLWorkflows(SolutionsList allSolutions, APECoreConfig coreConfig) {
-		// Check if the CWL annotations file is configured.
-		if (!coreConfig.getCwlAnnotationsFile().isPresent()) {
-			log.warn("CWL annotations file not configured. No executable CWL files are generated.");
-			return false;
-		}
-
-		// Check the configuration before continuing.
-		Path executableCWLFolder = allSolutions.getRunConfiguration().getSolutionDirPath2ExecutableCWL();
-		int noFiles = allSolutions.getRunConfiguration().getNoExecutableCWL();
-		if (executableCWLFolder == null || noFiles == 0 || allSolutions.isEmpty()) {
-			return false;
-		}
-		final String timerID = "writingExecutableCWL";
-		APEUtils.printHeader(null, String.format("Writing the first %o solution(s) to executable CWL files", noFiles));
-		APEUtils.timerStart(timerID, true);
-
-		final File cwlDir = executableCWLFolder.toFile();
-		if (cwlDir.isDirectory()) {
-			// If the directory already exists, empty it first
-			deleteExistingFiles(cwlDir, SolutionWorkflow.getFileNamePrefix());
-		} else {
-			// Create the CWL directory if it does not already exist
-			cwlDir.mkdir();
-		}
-		log.trace("Loading");
-
-		// Write the CWL files
-		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noFiles).forEach(solution -> {
-			try {
-				String title = solution.getFileName() + ".cwl";
-				File script = executableCWLFolder.resolve(title).toFile();
-				ExecutableCWLCreator cwlCreator = new ExecutableCWLCreator(solution);
-				APEFiles.write2file(cwlCreator.generate(), script, false);
-
-			} catch (IOException e) {
-				log.error("Error occurred while writing an executable CWL file to the file system.");
-				e.printStackTrace();
-			}
-		});
-
-		APEUtils.timerPrintText(timerID, "Executable CWL files have been generated.");
-		return true;
 	}
 }

@@ -265,13 +265,23 @@ public class APEFiles {
     }
 
     /**
-     * Directory exists boolean.
+     * The exists boolean.
      *
-     * @param jsonObject the path
+     * @param jsonObject the object
      * @return the boolean
      */
     public static boolean isJSON(JSONObject jsonObject) {
         return jsonObject != null;
+    }
+
+    /**
+     * Directory exists boolean.
+     *
+     * @param jsonArray the path
+     * @return the boolean
+     */
+    public static boolean isJSONArray(JSONArray jsonArray) {
+        return jsonArray != null;
     }
 
     /**
