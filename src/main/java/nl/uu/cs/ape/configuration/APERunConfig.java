@@ -259,9 +259,10 @@ public class APERunConfig {
     }
 
     /**
-     * Gets constraints as a JSONArray.
+     * Gets constraints as a JSONArray, represented as either
+     * {@link #CONSTRAINTS_CONTENT} or {@link #CONSTRAINTS_FILE}.
      *
-     * @return the value of {@link #CONSTRAINTS_PATH}
+     * @return the constraints as a JSONArray.
      */
     public JSONArray getConstraintsJSON() {
         return CONSTRAINTS_CONTENT.getValue() != null ? CONSTRAINTS_CONTENT.getValue()
@@ -546,7 +547,7 @@ public class APERunConfig {
     /**
      * Set the timeout in sec.
      * 
-     * @param timeoutSec
+     * @param timeoutSec Timeout in sec.
      */
     public void setTimeoutSec(int timeoutSec) {
         TIMEOUT_SEC.setValue(timeoutSec);
