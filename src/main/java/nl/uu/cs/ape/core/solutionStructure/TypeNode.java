@@ -258,7 +258,7 @@ public class TypeNode extends SolutionWorkflowNode {
 
         for (Type type : this.usedTypes) {
             if (type.getRootNodeID().equals("http://edamontology.org/format_1915")) {
-                printString.append("\"").append(type.getPredicateID()).append("\" # ").append(type.getPredicateLabel());
+                printString.append("\"").append(type.getPredicateLongLabel()).append("\" # ").append(type.getPredicateLabel());
             }
         }
         if (printString.length() == 0) {

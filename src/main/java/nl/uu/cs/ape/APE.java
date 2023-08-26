@@ -8,7 +8,6 @@ import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.core.SynthesisEngine;
 import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.core.solutionStructure.DefaultCWLCreator;
-import nl.uu.cs.ape.core.solutionStructure.ExecutableCWLCreator;
 import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.io.APEFiles;

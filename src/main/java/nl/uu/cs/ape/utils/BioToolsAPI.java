@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.ToolAnnotationTag;
 import nl.uu.cs.ape.io.APEFiles;
@@ -21,6 +23,7 @@ import okhttp3.Response;
  * from bio.tools API.
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BioToolsAPI {
 
 	/** Http-Client */

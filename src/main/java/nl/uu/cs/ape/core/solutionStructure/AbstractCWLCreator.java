@@ -67,7 +67,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
                     // Format
                     .append(ind(2))
                     .append("format: ")
-                    .append(typeNode.getNodeID())
+                    .append(typeNode.getFormat())
                     .append("\n");
         }
     }
@@ -92,7 +92,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
                     // Format
                     .append(ind(2))
                     .append("format: ")
-                    .append(typeNode.getNodeID())
+                    .append(typeNode.getFormat())
                     .append("\n")
                     // outputSource
                     .append(ind(2))
@@ -323,7 +323,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
                     // Format
                     .append(ind(baseInd + 1))
                     .append("format: ")
-                    .append(typeNode.getNodeID())
+                    .append(typeNode.getFormat())
                     .append("\n");
         }
     }
