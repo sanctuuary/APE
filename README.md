@@ -12,7 +12,7 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5749/badge)](https://bestpractices.coreinfrastructure.org/projects/5749)
 
 
-APE is a command line tool and Java API for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. 
+APE is a command line tool and Java API for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. Generated workflows can be exported in [CWL](https://www.commonwl.org/) format, as well as in graphical (PNG, SVG) formats.
 
 APE relies on a semantic domain model that includes tool and type taxonomies as controlled vocabularies for the description of computational tools, and functional tool annotations (inputs, outputs, operations performed) using terms from these taxonomies. Based on this domain model and a specification of the available workflow inputs, the intended workflow outputs and possibly additional constraints, APE then computes possible workflows. 
 
