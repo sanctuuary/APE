@@ -251,7 +251,7 @@ public class TypeNode extends SolutionWorkflowNode {
     }
 
     /**
-     * Get the unique ID of the current workflow node in .dot representation.
+     * Get the format of the current workflow node and a label for the CWL file.
      */
     public String getFormat() {
         StringBuilder printString = new StringBuilder();
