@@ -36,9 +36,9 @@ jobs:
     - name: Test CWL generation
       run: |
         git clone https://github.com/Workflomics/domain-annotations
-        cd domain-annotations
-        java -jar ../target/APE-*-executable.jar ./WombatP_tools/config_local.json
-        cd ./WombatP_tools/CWL
+        cd domain-annotations/WombatP_tools
+        java -jar ../../target/APE-*-executable.jar ./config.json
+        cd ./CWL
         cwltool --enable-dev --validate workflowSolution_0.cwl
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive

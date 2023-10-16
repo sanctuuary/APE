@@ -251,14 +251,14 @@ public class TypeNode extends SolutionWorkflowNode {
     }
 
     /**
-     * Get the unique ID of the current workflow node in .dot representation.
+     * Get the format of the current workflow node and a label for the CWL file.
      */
     public String getFormat() {
         StringBuilder printString = new StringBuilder();
 
         for (Type type : this.usedTypes) {
             if (type.getRootNodeID().equals("http://edamontology.org/format_1915")) {
-                printString.append("\"").append(type.getPredicateID()).append("\" # ").append(type.getPredicateLabel());
+                printString.append("\"").append(type.getPredicateLongLabel()).append("\" # ").append(type.getPredicateLabel());
             }
         }
         if (printString.length() == 0) {

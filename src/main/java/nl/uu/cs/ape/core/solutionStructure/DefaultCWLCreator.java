@@ -1,9 +1,11 @@
 package nl.uu.cs.ape.core.solutionStructure;
 
+import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +64,19 @@ public class DefaultCWLCreator extends CWLCreatorBase {
      * @return The CWL representation of the workflow outputs.
      */
     private String getInputsInCWL(boolean formatForCwlInputsYmlFile) {
+
+        Map<String, String> availableData = new HashMap<>();
+        availableData.put("http://edamontology.org/format_3244",// mzML
+                "https://raw.githubusercontent.com/Workflomics/DemoKit/main/data/inputs/2021-10-8_Ecoli.mzML");
+        availableData.put("http://edamontology.org/format_1929",// FASTA
+                "https://raw.githubusercontent.com/Workflomics/DemoKit/main/data/inputs/up00000062.fasta");
+        availableData.put("http://edamontology.org/format_2196_plain",// OBO format_p
+                "https://raw.githubusercontent.com/Workflomics/DemoKit/main/data/inputs/go.obo");
+        availableData.put("http://edamontology.org/format_3475_plain",// TSV_p
+                "https://raw.githubusercontent.com/Workflomics/DemoKit/main/data/inputs/goa_human_smaller.gaf");
+
+                
+        
         StringBuilder inputsInCWL = new StringBuilder();
 
         int indentLevel = 1;
@@ -72,6 +87,13 @@ public class DefaultCWLCreator extends CWLCreatorBase {
         }
         int i = 1;
         for (TypeNode typeNode : solution.getWorkflowInputTypeStates()) {
+            String currTypeFormat = "";
+            for (Type type : typeNode.getTypes()) {
+                if (type.getRootNodeID().equals("http://edamontology.org/format_1915")) {
+                    currTypeFormat = type.getPredicateID();
+                }
+            }
+            String inputPath = availableData.containsKey(currTypeFormat) ? availableData.get(currTypeFormat) : "set_full_path_to_the_file_with_extension_here";
             String inputName = String.format("input%o", i++);
             addNewParameterToMap(typeNode, inputName);
             inputsInCWL
@@ -92,7 +114,7 @@ public class DefaultCWLCreator extends CWLCreatorBase {
                 inputsInCWL
                         .append(ind(indentLevel + 1))
                         .append("path: ")
-                        .append("set_full_path_to_the_file_with_extension_here")
+                        .append(inputPath)
                         .append("\n");
             }
         }
@@ -234,7 +256,7 @@ public class DefaultCWLCreator extends CWLCreatorBase {
         cwlRepresentation
                 // Main key
                 .append(ind(baseInd))
-                .append("run: https://raw.githubusercontent.com/Workflomics/containers/main/cwl/tools/" + moduleName
+                .append("run: https://raw.githubusercontent.com/Workflomics/containers/docker/cwl/tools/" + moduleName
                         + "/" + moduleName + ".cwl")
                 .append("\n");
         /*
