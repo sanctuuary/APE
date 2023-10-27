@@ -15,6 +15,10 @@ authors:
     email: vanna-lena.lamprecht@uni-potsdam.de
     affiliation: University of Potsdam
     orcid: https://orcid.org/0000-0003-1953-5606
+  - family-names: Koen
+    given-names: Haverkort
+  - family-names: Maurin
+    given-names: Voshol
 identifiers:
   - type: doi
     value: 10.5281/zenodo.5638988
