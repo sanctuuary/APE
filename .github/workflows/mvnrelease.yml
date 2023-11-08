@@ -1,26 +1,26 @@
-name: Deploy to Maven Repository
+name: Publish package to the Maven Central Repository
 
 on:
   push:
     branches:
       - main
-
+      
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up JDK
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v4
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
           java-version: '11'
-
-      - name: Deploy to OSSRH
-        run: mvn clean deploy -Dmaven.test.skip=true -Dmaven.repo.local=./.m2/repository -DaltDeploymentRepository=ossrh::default::https://oss.sonatype.org/service/local/staging/deploy/maven2/ -Dsonatype.username=${{ secrets.OSSRH_USERNAME }} -Dsonatype.password=${{ secrets.OSSRH_PASSWORD }}
+          distribution: 'temurin'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      - name: Publish package
+        run: mvn clean deploy -Dmaven.test.skip=true
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          
