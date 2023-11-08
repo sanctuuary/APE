@@ -6,32 +6,39 @@ on:
       - main
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up JDK
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v2
+      - name: Set up Java for publishing to Maven Central Repository
+        uses: actions/setup-java@v1
         with:
-          distribution: 'adopt'
-          java-version: '11'
-
-      - name: Set up Maven
-        run: echo 'MAVEN_OPTS="-Xmx2048m -XX:MaxPermSize=512m -Djava.net.preferIPv4Stack=true"' >> $GITHUB_ENV
-      
-      - name: Run test
-        run: gpg --list-secret-keys --keyid-format=long
-        
-      - name: Import GPG key
-        run: echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
+          java-version: 1.8
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_PASSWORD
+      - name: build artifact
+        run: mvn clean package
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: "${{ github.workspace }}/target/*.jar"
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish to the Maven Central Repository
+        run: |
+          mvn \
+            --no-transfer-progress \
+            --batch-mode \
+            deploy
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
 
-      - name: Deploy to OSSRH
-        run: mvn clean deploy -Dmaven.test.skip=true -Dgpg.sign -Dgpg.useagent -Dsonatype.username=${{ secrets.OSSRH_USERNAME }} -Dsonatype.password=${{ secrets.OSSRH_PASSWORD }}
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+# name: release and push to central
+# on:
+#   push:
+#     tags:
+#       - '*'
