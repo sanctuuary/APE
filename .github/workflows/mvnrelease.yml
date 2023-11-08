@@ -21,7 +21,10 @@ jobs:
 
       - name: Set up Maven
         run: echo 'MAVEN_OPTS="-Xmx2048m -XX:MaxPermSize=512m -Djava.net.preferIPv4Stack=true"' >> $GITHUB_ENV
-
+      
+      - name: Run test
+        run: gpg --list-secret-keys --keyid-format=long
+        
       - name: Import GPG key
         run: echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
         env:
