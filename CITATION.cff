@@ -12,9 +12,9 @@ authors:
     orcid: 'https://orcid.org/0000-0002-0097-1056'
   - family-names: Anna-Lena
     given-names: Lamprecht
-    email: vanna-lena.lamprecht@uni-potsdam.de
+    email: anna-lena.lamprecht@uni-potsdam.de
     affiliation: University of Potsdam
-    orcid: https://orcid.org/0000-0003-1953-5606
+    orcid: 'https://orcid.org/0000-0003-1953-5606'
   - family-names: Koen
     given-names: Haverkort
   - family-names: Maurin
@@ -27,13 +27,13 @@ url: 'https://ape-framework.readthedocs.io/en/latest/'
 abstract: >-
   APE (Automated Pipeline Explorer) is a command line tool and Java API for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools.
 
-APE relies on a semantic domain model that includes tool and type taxonomies as controlled vocabularies for the description of computational tools, and functional tool annotations (inputs, outputs, operations performed) using terms from these taxonomies. Based on this domain model and a specification of the available workflow inputs, the intended workflow outputs and possibly additional constraints, APE then computes possible workflows.
+  APE relies on a semantic domain model that includes tool and type taxonomies as controlled vocabularies for the description of computational tools, and functional tool annotations (inputs, outputs, operations performed) using terms from these taxonomies. Based on this domain model and a specification of the available workflow inputs, the intended workflow outputs and possibly additional constraints, APE then computes possible workflows.
 
-Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. 
+  Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows.
 keywords:
   - automated workflow composition
   - workflow synthesis
 license: Apache-2.0
-commit: 693fe147ade0ee6727fa25e7de6f185e9336cf09
-version: 2.1.7
-date-released: 2023-10-27
+commit: e9d88243841fde2b0dc5fd3888d54199bde897cb
+version: 2.1.8
+date-released: '2023-10-27'
