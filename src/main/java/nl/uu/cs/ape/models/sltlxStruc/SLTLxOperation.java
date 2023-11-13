@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Set;
 
 import nl.uu.cs.ape.automaton.State;
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
  * Structure used to model the operation specification, used as a part of the

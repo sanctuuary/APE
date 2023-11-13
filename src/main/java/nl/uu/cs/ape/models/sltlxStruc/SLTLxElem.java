@@ -2,7 +2,7 @@ package nl.uu.cs.ape.models.sltlxStruc;
 
 import java.util.Set;
 
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
  * Class represents any element of the SLTLx encoding.

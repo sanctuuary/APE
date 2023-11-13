@@ -2,8 +2,8 @@ package nl.uu.cs.ape.models;
 
 import java.util.*;
 
-import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
  * The {@code AllPredicates} class is used to group all mappedPredicates of the

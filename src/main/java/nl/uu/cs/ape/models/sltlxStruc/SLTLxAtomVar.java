@@ -3,11 +3,11 @@ package nl.uu.cs.ape.models.sltlxStruc;
 import java.util.Set;
 
 import nl.uu.cs.ape.automaton.State;
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
  * The {@code SLTLxAtomVar} class represents {@link SLTLxAtom}s in SLTLx that

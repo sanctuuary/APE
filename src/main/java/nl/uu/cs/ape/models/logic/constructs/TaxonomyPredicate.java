@@ -4,10 +4,10 @@ import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.State;
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AllPredicates;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
-import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code TaxonomyPredicate} class represents a single

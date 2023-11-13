@@ -5,21 +5,21 @@ import guru.nidi.graphviz.attribute.Rank.RankDir;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.core.SynthesisEngine;
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.core.solutionStructure.DefaultCWLCreator;
-import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
-import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
-import nl.uu.cs.ape.io.APEFiles;
+import nl.uu.cs.ape.domain.APEDimensionsException;
+import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.utils.APEFiles;
+import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.domain.OWLReader;
 import nl.uu.cs.ape.models.MappingsException;
 import nl.uu.cs.ape.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.solver.SynthesisEngine;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
+import nl.uu.cs.ape.solver.solutionStructure.DefaultCWLCreator;
+import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
+import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.configuration.APECoreConfig;
-import nl.uu.cs.ape.utils.APEDimensionsException;
-import nl.uu.cs.ape.utils.APEDomainSetup;
 import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.utils.OWLReader;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -469,7 +469,8 @@ public class APE implements APEInterface {
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
-		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.printHeader(null, "Generating graphical representation",
+				"of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 
 		/* Removing the existing files from the file system. */
@@ -528,7 +529,8 @@ public class APE implements APEInterface {
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
-		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.printHeader(null, "Generating graphical representation",
+				"of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 
 		/* Removing the existing files from the file system. */

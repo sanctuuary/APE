@@ -5,9 +5,9 @@ import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.sat.test.utils.TestResources;
-import nl.uu.cs.ape.utils.APEDomainSetup;
+import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.sat.test.utils.TestResources;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

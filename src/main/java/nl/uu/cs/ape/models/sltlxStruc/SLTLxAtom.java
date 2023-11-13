@@ -3,9 +3,9 @@ package nl.uu.cs.ape.models.sltlxStruc;
 import java.util.Set;
 
 import nl.uu.cs.ape.automaton.State;
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
  * The {@code SLTLxAtom} class represents Atoms supported by the SLTLx syntax.

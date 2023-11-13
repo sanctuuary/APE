@@ -5,12 +5,12 @@ import java.util.Set;
 
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.StateInterface;
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /***
  * The {@code State} class is used to represent a variable for type states. The

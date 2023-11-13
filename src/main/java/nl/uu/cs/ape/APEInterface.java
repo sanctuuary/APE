@@ -11,9 +11,9 @@ import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.utils.APEDomainSetup;
+import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 
 /**
  * The {@code APEInterface} is the interface of the main class of the library

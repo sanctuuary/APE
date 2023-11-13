@@ -6,10 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import nl.uu.cs.ape.automaton.ModuleAutomaton;
-import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Pair;
@@ -20,22 +18,25 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
-import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
-import nl.uu.cs.ape.parser.SLTLxSATVisitor;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The {@link APEUtils} class is used for storing {@code Static} methods.
- *
+ * The {@link APEUtils} class provide static helper methods used within the
+ * project.
+ * 
  * @author Vedran Kasalica
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class APEUtils {
 
 	private static final Map<String, Long> timers = new HashMap<>();
@@ -45,125 +46,6 @@ public final class APEUtils {
 		public void write(int b) {
 		}
 	});
-
-	/**
-	 * Private constructor is used to to prevent instantiation.
-	 */
-	private APEUtils() {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Encode ape constraints string.
-	 * 
-	 * @param synthesisEngine
-	 *
-	 * @param domainSetup     Domain information, including all the existing tools
-	 *                        and types.
-	 * @param mappings        Mapping function.
-	 * @param moduleAutomaton Module automaton.
-	 * @param typeAutomaton   Type automaton.
-	 * @return The CNF representation of the SLTL constraints in our project.
-	 */
-	public static String encodeAPEConstraints(SATSynthesisEngine synthesisEngine, APEDomainSetup domainSetup,
-			SATAtomMappings mappings,
-			ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton) {
-
-		StringBuilder cnf_SLTL = new StringBuilder();
-		int currConst = 0;
-
-		for (ConstraintTemplateData constraint : domainSetup.getUnformattedConstr()) {
-			currConst++;
-			/* ENCODE THE CONSTRAINT */
-			if (domainSetup.getConstraintTemplate(constraint.getConstraintID()) == null) {
-				log.warn("Constraint ID provided: '" + constraint.getConstraintID()
-						+ "' is not valid. Constraint skipped.");
-			} else {
-				String currConstrEncoding = constraintSATEncoding(constraint.getConstraintID(),
-						constraint.getParameters(), domainSetup, moduleAutomaton, typeAutomaton, mappings);
-				if (currConstrEncoding == null) {
-					log.warn("Error in constraint file. Constraint no: " + currConst + ". Constraint skipped.");
-				} else {
-					cnf_SLTL.append(currConstrEncoding);
-				}
-			}
-		}
-
-		/*
-		 * Parse the constraints specified in SLTLx.
-		 */
-		for (String constraint : domainSetup.getSLTLxConstraints()) {
-			Set<SLTLxFormula> sltlxFormulas = SLTLxSATVisitor.parseFormula(synthesisEngine, constraint);
-			for (SLTLxFormula sltlxFormula : sltlxFormulas) {
-				sltlxFormula.getConstraintCNFEncoding(synthesisEngine)
-						.forEach(cnf_SLTL::append);
-			}
-		}
-
-		return cnf_SLTL.toString();
-	}
-
-	/**
-	 * Function used to provide SAT encoding of a constrain based on the constraint
-	 * ID specified and provided parameters.
-	 *
-	 * @param constraintID    ID of the constraint.
-	 * @param list            Parameters for the constraint template.
-	 * @param domainSetup     Domain information, including all the existing tools
-	 *                        and types.
-	 * @param moduleAutomaton Module automaton.
-	 * @param typeAutomaton   Type automaton.
-	 * @param mappings        Mapping function.
-	 * @return String representation of the SAT encoding for the specified
-	 *         constraint.
-	 */
-	public static String constraintSATEncoding(String constraintID, List<TaxonomyPredicate> list,
-			APEDomainSetup domainSetup, ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton,
-			SATAtomMappings mappings) {
-
-		return domainSetup.getConstraintTemplate(constraintID).getConstraint(list, domainSetup, moduleAutomaton,
-				typeAutomaton, mappings);
-	}
-
-	/*
-	 * Transforms the propositional formula into the CNF form.
-	 *
-	 * @param propositionalFormula - propositional formula
-	 *
-	 * @return CNF representation of the formula
-	 */
-	// public static String convert2CNF(String propositionalFormula, SATAtomMappings
-	// mappings) {
-	// final FormulaFactory f = new FormulaFactory();
-	// final PropositionalParser p = new PropositionalParser(f);
-	//
-	// Formula formula;
-	// try {
-	// formula = p.parse(propositionalFormula.replace('-', '~'));
-	// final Formula cnf = formula.cnf();
-	// String transformedCNF = cnf.toString().replace('~', '-').replace(") & (", "
-	// 0\n").replace(" | ", " ")
-	// .replace("(", "").replace(")", "") + " 0\n";
-	// boolean exists = true;
-	// int counterErrors = 0;
-	// String auxVariable = "";
-	// while (exists) {
-	// auxVariable = "@RESERVED_CNF_" + counterErrors + " ";
-	// if (transformedCNF.contains("@RESERVED_CNF_")) {
-	// transformedCNF = transformedCNF.replace(auxVariable, mappings.getNextAuxNum()
-	// + " ");
-	// } else {
-	// exists = false;
-	// }
-	// counterErrors++;
-	// }
-	// return transformedCNF;
-	// } catch (ParserException e) {
-	// e.printStackTrace();
-	// return null;
-	// }
-	//
-	// }
 
 	/**
 	 * Create the full class IRI (ID) based on the label and the OWL prefix.
@@ -533,8 +415,8 @@ public final class APEUtils {
 		long printTime = System.currentTimeMillis() - timers.get(timerID);
 		log.info("APE found " + solutionsFound + " solutions.");
 		log.info("Total APE runtime: \t\t" + (printTime / 1000F) + " sec.");
-		log.info("Total encoding time: \t\t" + (SATSynthesisEngine.encodingTime / 1000F) + " sec.");
-		log.info("Total SAT solving time: \t" + (SATSynthesisEngine.satSolvingTime / 1000F) + " sec.");
+		log.info("Total encoding time: \t\t" + (SATSynthesisEngine.getTotalEncodingTime() / 1000F) + " sec.");
+		log.info("Total SAT solving time: \t" + (SATSynthesisEngine.getTotalSolvingTime() / 1000F) + " sec.");
 		return printTime;
 	}
 
@@ -555,13 +437,13 @@ public final class APEUtils {
 	/**
 	 * Convert cnf 2 human readable string.
 	 *
-	 * @param temp_sat_input the temp sat input
-	 * @param mappings       the mappings
+	 * @param tempSatInput the temp sat input
+	 * @param mappings     the mappings
 	 * @return the string
 	 */
-	public static String convertCNF2humanReadable(InputStream temp_sat_input, SATAtomMappings mappings) {
+	public static String convertCNF2humanReadable(InputStream tempSatInput, SATAtomMappings mappings) {
 		StringBuilder humanReadable = new StringBuilder();
-		Scanner scanner = new Scanner(temp_sat_input);
+		Scanner scanner = new Scanner(tempSatInput);
 		scanner.nextLine();
 		while (scanner.hasNextInt()) {
 			int intAtom = scanner.nextInt();

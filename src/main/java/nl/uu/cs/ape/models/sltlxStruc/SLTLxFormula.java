@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.io.APEFiles;
+import nl.uu.cs.ape.utils.APEFiles;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
  * Abstract class that represents any SLTLx formula.
