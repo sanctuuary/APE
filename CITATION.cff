@@ -36,6 +36,6 @@ keywords:
   - automated workflow composition
   - workflow synthesis
 license: Apache-2.0
-commit: e9d88243841fde2b0dc5fd3888d54199bde897cb
-version: 2.1.8
-date-released: '2023-10-27'
+commit: 8d13cb975dacf7e757cd5faf2276449bea16f93c
+version: 2.2.0
+date-released: '2023-11-14'
