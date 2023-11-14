@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.solutionStructure;
+package nl.uu.cs.ape.solver.solutionStructure.graphviz;
 
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
@@ -27,28 +27,33 @@ public class SolutionGraph {
      *
      * @param graph the graph
      */
-    SolutionGraph(Graph graph) {
+    public SolutionGraph(Graph graph) {
         this.graph = graph;
     }
 
     /**
      * Get the PNG rendered file, based on the workflow structure.
      *
-     * @return Theh {@link Renderer} object.
+     * @param format The format in which the graph should be rendered (e.g., PNG,
+     *               SVG, etc.).
+     *
+     * @return The {@link Renderer} object.
      */
-    public Renderer getPNGRenderer() {
-        return Graphviz.fromGraph(graph).render(Format.PNG);
+    public Renderer getRenderer(Format format) {
+        return Graphviz.fromGraph(graph).render(format);
     }
 
     /**
      * Get the PNG file, depicting the workflow structure.
      * 
-     * @param debug true if the debugging mode is ON
+     * @param format The format in which the graph should be rendered (e.g., PNG,
+     *               SVG, etc.)
+     * @param debug  true if the debugging mode is ON
      * 
      * @return The {@link BufferedImage} object that correspond to the workflow.
      */
-    public BufferedImage getPNGImage(boolean debug) {
-        final Renderer renderer = getPNGRenderer();
+    public BufferedImage getImage(Format format, boolean debug) {
+        final Renderer renderer = getRenderer(format);
         if (true) {
             APEUtils.disableErr();
         }
@@ -62,12 +67,14 @@ public class SolutionGraph {
     /**
      * Write to a file the PNG version of the graph.
      *
-     * @param file  The file that should be written to.
-     * @param debug true if the debugging mode is ON
+     * @param file   The file that should be written to.
+     * @param format The format in which the graph should be rendered (e.g., PNG,
+     *               SVG, etc.)
+     * @param debug  true if the debugging mode is ON
      * @throws IOException Exception in case of error in file handling.
      */
-    public void write2File(File file, boolean debug) throws IOException {
-        final Renderer renderer = getPNGRenderer();
+    public void write2File(File file, Format format, boolean debug) throws IOException {
+        final Renderer renderer = getRenderer(format);
         if (true) {
             APEUtils.disableErr();
         }

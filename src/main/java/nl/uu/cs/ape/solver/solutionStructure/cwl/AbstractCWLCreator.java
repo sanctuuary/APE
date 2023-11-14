@@ -1,6 +1,9 @@
-package nl.uu.cs.ape.solver.solutionStructure;
+package nl.uu.cs.ape.solver.solutionStructure.cwl;
 
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.solver.solutionStructure.ModuleNode;
+import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
+import nl.uu.cs.ape.solver.solutionStructure.TypeNode;
 
 import java.util.HashMap;
 import java.util.List;

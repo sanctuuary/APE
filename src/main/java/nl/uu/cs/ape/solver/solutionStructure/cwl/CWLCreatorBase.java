@@ -1,4 +1,7 @@
-package nl.uu.cs.ape.solver.solutionStructure;
+package nl.uu.cs.ape.solver.solutionStructure.cwl;
+
+import nl.uu.cs.ape.solver.solutionStructure.ModuleNode;
+import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
 
 /**
  * Base class with shared behavior for CWL export classes.

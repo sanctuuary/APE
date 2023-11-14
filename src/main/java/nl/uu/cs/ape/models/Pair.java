@@ -1,5 +1,7 @@
 package nl.uu.cs.ape.models;
 
+import lombok.Getter;
+
 /**
  * The {@code Pair} class represents pairs of objects.<br>
  * E.g.: {@code <a, b>}.
@@ -10,7 +12,9 @@ package nl.uu.cs.ape.models;
 public class Pair<T> {
 
 	/** First pair element. */
+	@Getter
 	private T first;
+	@Getter
 	/** Second pair element. */
 	private T second;
 
@@ -23,24 +27,6 @@ public class Pair<T> {
 	public Pair(T first, T second) {
 		this.first = first;
 		this.second = second;
-	}
-
-	/**
-	 * Gets first.
-	 *
-	 * @return the first
-	 */
-	public T getFirst() {
-		return first;
-	}
-
-	/**
-	 * Gets second.
-	 *
-	 * @return the second
-	 */
-	public T getSecond() {
-		return second;
 	}
 
 	@Override
