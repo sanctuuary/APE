@@ -375,6 +375,13 @@ public final class APEUtils {
 		}
 	}
 
+	/**
+	 * Return the time left on the timer in milliseconds.
+	 * 
+	 * @param timerID Timer ID, used to identify the timer.
+	 * @param timeout Set timeout (for the synthesis).
+	 * @return Time left on the timer in milliseconds.
+	 */
 	public static long timerTimeLeft(String timerID, long timeout) {
 		if (timers.get(timerID) == -1) {
 			return 0;

@@ -26,8 +26,7 @@ import nl.uu.cs.ape.solver.solutionStructure.TypeNode;
 public class SolutionGraphFactory {
 
     /**
-     * Generate a graph that represent the control-flow solution and set is as the
-     * field {@link #controlflowGraph} of the current object .
+     * Generate a graph that represent the control-flow solution.
      *
      * @param workflow    The {@link SolutionWorkflow} object that represents the
      *                    solution.
@@ -57,8 +56,7 @@ public class SolutionGraphFactory {
     }
 
     /**
-     * Generate a graph that represent the control-flow solution and set is as the
-     * field {@link #controlflowGraph} of the current object .
+     * Generate a graph that represent the control-flow solution.
      *
      * @param workflow    The {@link SolutionWorkflow} object that represents the
      *                    solution.
