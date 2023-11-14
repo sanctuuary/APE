@@ -1,40 +1,43 @@
 package nl.uu.cs.ape;
 
-import guru.nidi.graphviz.attribute.Rank.RankDir;
-
-import nl.uu.cs.ape.configuration.APEConfigException;
-import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.core.SynthesisEngine;
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
-import nl.uu.cs.ape.core.solutionStructure.DefaultCWLCreator;
-import nl.uu.cs.ape.core.solutionStructure.SolutionWorkflow;
-import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
-import nl.uu.cs.ape.io.APEFiles;
-import nl.uu.cs.ape.models.MappingsException;
-import nl.uu.cs.ape.models.enums.SynthesisFlag;
-import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.configuration.APECoreConfig;
-import nl.uu.cs.ape.utils.APEDimensionsException;
-import nl.uu.cs.ape.utils.APEDomainSetup;
-import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.utils.OWLReader;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.yaml.snakeyaml.Yaml;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.SortedSet;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.yaml.snakeyaml.Yaml;
+
+import guru.nidi.graphviz.attribute.For;
+import guru.nidi.graphviz.attribute.Rank.RankDir;
+import guru.nidi.graphviz.engine.Format;
 import lombok.extern.slf4j.Slf4j;
+import nl.uu.cs.ape.configuration.APEConfigException;
+import nl.uu.cs.ape.configuration.APECoreConfig;
+import nl.uu.cs.ape.configuration.APERunConfig;
+import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
+import nl.uu.cs.ape.constraints.ConstraintTemplate;
+import nl.uu.cs.ape.domain.APEDimensionsException;
+import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.domain.OWLReader;
+import nl.uu.cs.ape.models.MappingsException;
+import nl.uu.cs.ape.models.enums.SynthesisFlag;
+import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.solver.SynthesisEngine;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
+import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
+import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.solver.solutionStructure.cwl.DefaultCWLCreator;
+import nl.uu.cs.ape.utils.APEFiles;
+import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code APE} class is the main class of the library and is supposed to be
@@ -444,8 +447,8 @@ public class APE implements APEInterface {
 	/**
 	 * Generate the graphical representations of the workflow solutions, in top to
 	 * bottom orientation, and write them to the file system. Each graph is shown in
-	 * data-flow representation (in top to bottom orientation), i.e. transformation
-	 * of data is in focus.
+	 * data-flow representation (in the default, top-to-bottom orientation)., i.e.
+	 * transformation of data is in focus.
 	 *
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
 	 * @return true if the generating was successfully performed, false otherwise.
@@ -469,7 +472,8 @@ public class APE implements APEInterface {
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
-		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.printHeader(null, "Generating graphical representation",
+				"of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 
 		/* Removing the existing files from the file system. */
@@ -486,7 +490,66 @@ public class APE implements APEInterface {
 			try {
 				String title = solution.getFileName();
 				Path path = graphsFolder.resolve(title);
-				solution.getDataflowGraph(title, orientation).write2File(path.toFile(),
+				solution.getDataflowGraph(title, orientation).write2File(path.toFile(), Format.PNG,
+						allSolutions.getRunConfiguration().getDebugMode());
+
+			} catch (IOException e) {
+				log.error("Error occurred while data flow graphs (png) to the file system.");
+				e.printStackTrace();
+			}
+		});
+
+		APEUtils.timerPrintText("drawingGraphs", "Graphical files have been generated.");
+
+		return true;
+	}
+
+	/**
+	 * Generate the graphical representations of the workflow solutions, and write
+	 * them to the file system. Each graph is styled based on the Apache Taverna
+	 * workflow management system (in the default, top-to-bottom orientation).
+	 *
+	 * @param allSolutions Set of {@link SolutionWorkflow}.
+	 * @return true if the generating was successfully performed, false otherwise.
+	 */
+	public static boolean writeTavernaDesignGraphs(SolutionsList allSolutions) {
+		return writeTavernaDesignGraphs(allSolutions, Format.PNG);
+	}
+
+	/**
+	 * Generate the graphical representations of the workflow solutions, and write
+	 * them to the file system. Each graph is styled based on the Apache Taverna
+	 * workflow management system.
+	 *
+	 * @param allSolutions Set of {@link SolutionWorkflow}.
+	 * @param orientation  Orientation in which the graph will be presented.
+	 * @return true if the generating was successfully performed, false otherwise.
+	 */
+	public static boolean writeTavernaDesignGraphs(SolutionsList allSolutions, Format format) {
+		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
+		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
+		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
+			return false;
+		}
+		APEUtils.printHeader(null, "Generating graphical representation",
+				"of the first " + noGraphs + " workflows");
+		APEUtils.timerStart("drawingGraphs", true);
+
+		/* Removing the existing files from the file system. */
+		File graphDir = graphsFolder.toFile();
+		if (graphDir.isDirectory()) {
+			// If the directory already exists, empty it first
+			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix());
+		} else {
+			graphDir.mkdir();
+		}
+		log.debug("Generating data flow graphs (png).");
+		/* Creating the requested graphs in parallel. */
+		allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noGraphs).forEach(solution -> {
+			try {
+				String title = solution.getFileName();
+				Path path = graphsFolder.resolve(title);
+				solution.getTavernaStyleGraph(title).write2File(path.toFile(), format,
 						allSolutions.getRunConfiguration().getDebugMode());
 
 			} catch (IOException e) {
@@ -528,7 +591,8 @@ public class APE implements APEInterface {
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
 			return false;
 		}
-		APEUtils.printHeader(null, "Generating graphical representation", "of the first " + noGraphs + " workflows");
+		APEUtils.printHeader(null, "Generating graphical representation",
+				"of the first " + noGraphs + " workflows");
 		APEUtils.timerStart("drawingGraphs", true);
 
 		/* Removing the existing files from the file system. */
@@ -545,7 +609,7 @@ public class APE implements APEInterface {
 			try {
 				String title = solution.getFileName();
 				Path path = graphsFolder.resolve(title);
-				solution.getControlflowGraph(title, orientation).write2File(path.toFile(),
+				solution.getControlflowGraph(title, orientation).write2File(path.toFile(), Format.PNG,
 						allSolutions.getRunConfiguration().getDebugMode());
 
 			} catch (IOException e) {

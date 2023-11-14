@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.uu.cs.ape.automaton.State;
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
-import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * Class used to list all usages of the given variables within the formulas.

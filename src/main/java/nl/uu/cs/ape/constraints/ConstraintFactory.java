@@ -5,6 +5,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
+import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
@@ -14,7 +15,6 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateFormula;
 import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateFinally;
 import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateGlobally;
-import nl.uu.cs.ape.utils.APEDomainSetup;
 
 /**
  * The {@code ConstraintFactory} class represents the Factory Method Pattern for

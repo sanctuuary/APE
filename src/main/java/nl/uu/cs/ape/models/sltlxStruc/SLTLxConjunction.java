@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.uu.cs.ape.core.implSAT.SATSynthesisEngine;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
  * Structure used to model conjunction of terms in SLTLx.

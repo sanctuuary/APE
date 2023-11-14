@@ -4,8 +4,8 @@ import guru.nidi.graphviz.attribute.Rank.RankDir;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.core.solutionStructure.SolutionsList;
-import nl.uu.cs.ape.io.APEFiles;
+import nl.uu.cs.ape.utils.APEFiles;
+import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 
 import org.json.JSONException;
 import org.json.JSONObject;

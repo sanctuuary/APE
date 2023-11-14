@@ -6,12 +6,12 @@ import java.util.TreeSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import nl.uu.cs.ape.domain.APEDimensionsException;
+import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.utils.APEDimensionsException;
-import nl.uu.cs.ape.utils.APEDomainSetup;
-import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code Type} class represents data dimension (e.g. data type, data

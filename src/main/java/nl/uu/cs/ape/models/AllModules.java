@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nl.uu.cs.ape.configuration.APECoreConfig;
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code AllModules} class represent the set of all modules/tools that can

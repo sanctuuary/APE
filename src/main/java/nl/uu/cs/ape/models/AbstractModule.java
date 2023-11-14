@@ -2,9 +2,9 @@ package nl.uu.cs.ape.models;
 
 import java.util.List;
 
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code AbstractModule} class represents modules/tools provided by the

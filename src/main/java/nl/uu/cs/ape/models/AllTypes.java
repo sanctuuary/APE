@@ -6,11 +6,11 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
+import nl.uu.cs.ape.domain.APEDimensionsException;
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.utils.APEDimensionsException;
-import nl.uu.cs.ape.utils.APEUtils;
 
 /**
  * The {@code AllTypes} class represent the set of all the data dimensions that
