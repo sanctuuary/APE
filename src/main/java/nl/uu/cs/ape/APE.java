@@ -522,7 +522,7 @@ public class APE implements APEInterface {
 	 * workflow management system.
 	 *
 	 * @param allSolutions Set of {@link SolutionWorkflow}.
-	 * @param orientation  Orientation in which the graph will be presented.
+	 * @param format       Format in which the graph will be rendered.
 	 * @return true if the generating was successfully performed, false otherwise.
 	 */
 	public static boolean writeTavernaDesignGraphs(SolutionsList allSolutions, Format format) {
