@@ -1,6 +1,9 @@
 package nl.uu.cs.ape.solver.solutionStructure;
 
+import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
+import guru.nidi.graphviz.attribute.Shape;
+import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.State;
@@ -212,6 +215,12 @@ public class TypeNode extends SolutionWorkflowNode {
         return workflowGraph.with(node(getNodeID()).with(Label.of(getNodeLabel() + "   ")));
     }
 
+    public Graph addTavernaStyleTypeToGraph(Graph workflowGraph) {
+        return workflowGraph
+                .with(node(getNodeID()).with(Style.FILLED, Color.rgb("6CF1FF").fill(),
+                        Label.html(getNodeLabelHTML()), Shape.RECTANGLE));
+    }
+
     /**
      * Get label of the current workflow node in .dot representation.
      */
@@ -230,6 +239,26 @@ public class TypeNode extends SolutionWorkflowNode {
             }
         }
         return printString.toString();
+    }
+
+    /**
+     * Get label of the current workflow node as an HTML element.
+     */
+    public String getNodeLabelHTML() {
+        StringBuilder printString = new StringBuilder("<b>");
+        int i = 0;
+        for (Type type : this.usedTypes) {
+            String typeLabel = type.getPredicateLabel();
+            if (typeLabel.endsWith("_p")) {
+                // remove "_plain" suffix
+                typeLabel = APEUtils.removeNLastChar(typeLabel, 2);
+            }
+            printString.append(typeLabel);
+            if (++i < this.usedTypes.size()) {
+                printString.append(",<br/> ");
+            }
+        }
+        return printString.append("</b>").toString();
     }
 
     /**

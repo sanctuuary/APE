@@ -291,9 +291,15 @@ public class ModuleNode extends SolutionWorkflowNode {
      * @return The {@link Graph} extended with the current {@link ModuleNode}.
      */
     public Graph addModuleToGraph(Graph workflowGraph) {
-        return workflowGraph = workflowGraph
+        return workflowGraph
                 .with(node(getNodeID()).with(Label.of(getNodeLabel() + "              "), Shape.RECTANGLE, Color.BLUE,
                         Style.BOLD));
+    }
+
+    public Graph addTavernaStyleModuleToGraph(Graph workflowGraph) {
+        return workflowGraph
+                .with(node(getNodeID()).with(Style.FILLED, Color.rgb("F8FFB0").fill(),
+                        Label.html(getNodeLabelHTML()), Shape.RECTANGLE));
     }
 
     /**
@@ -312,6 +318,13 @@ public class ModuleNode extends SolutionWorkflowNode {
      */
     public String getNodeLabel() {
         return this.usedModule.getPredicateLabel();
+    }
+
+    /**
+     * Get label of the current workflow node as an HTML element.
+     */
+    public String getNodeLabelHTML() {
+        return "<b>" + this.usedModule.getPredicateLabel() + "</b>";
     }
 
     /**

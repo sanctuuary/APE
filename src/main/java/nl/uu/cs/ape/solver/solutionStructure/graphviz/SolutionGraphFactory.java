@@ -141,42 +141,52 @@ public class SolutionGraphFactory {
         int index = 0;
         int workflowInNo = 1;
         for (TypeNode workflowInput : workflowInputs) {
-            if (!inputDefined) {
-                workflowGraph = workflowGraph.with(node(input).with(Color.RED, Shape.RECTANGLE, Style.BOLD));
-                inputDefined = true;
-            }
-            workflowGraph = workflowInput.addTypeToGraph(workflowGraph);
-            workflowGraph = workflowGraph.with(node(input).link(to(node(workflowInput.getNodeID()))
-                    .with(Label.of((workflowInNo++) + "  "), LinkAttr.weight(index++), Style.DOTTED)));
+            // if (!inputDefined) {
+            // workflowGraph = workflowGraph.with(node(input).with(Color.RED,
+            // Shape.RECTANGLE, Style.BOLD));
+            // inputDefined = true;
+            // }
+            workflowGraph = workflowInput.addTavernaStyleTypeToGraph(workflowGraph);
+            // workflowGraph =
+            // workflowGraph.with(node(input).link(to(node(workflowInput.getNodeID()))
+            // .with(Label.of((workflowInNo++) + " "), LinkAttr.weight(index++),
+            // Style.DOTTED)));
         }
 
         for (ModuleNode currTool : moduleNodes) {
-            workflowGraph = currTool.addModuleToGraph(workflowGraph);
-            int inputNo = 1;
+            workflowGraph = currTool.addTavernaStyleModuleToGraph(workflowGraph);
             for (TypeNode toolInput : currTool.getInputTypes()) {
                 if (!toolInput.isEmpty()) {
-                    workflowGraph = workflowGraph.with(node(toolInput.getNodeID()).link(to(node(currTool.getNodeID()))
-                            .with(Label.of("in " + (inputNo++) + "  "), Color.ORANGE, LinkAttr.weight(index++))));
-                }
-            }
-            int outputNo = 1;
-            for (TypeNode toolOutput : currTool.getOutputTypes()) {
-                if (!toolOutput.isEmpty()) {
-                    workflowGraph = toolOutput.addTypeToGraph(workflowGraph);
-                    workflowGraph = workflowGraph.with(node(currTool.getNodeID()).link(to(node(toolOutput.getNodeID()))
-                            .with(Label.of("out " + (outputNo++) + "  "), LinkAttr.weight(index++))));
+                    if (toolInput.getCreatedByModule() == null) {
+                        workflowGraph = workflowGraph
+                                .with(node(toolInput.getNodeID()).link(to(node(currTool.getNodeID()))
+                                        .with(Label.html(toolInput.getNodeLabelHTML()), Color.BLACK,
+                                                LinkAttr.weight(index++))));
+                    } else {
+                        workflowGraph = workflowGraph
+                                .with(node(toolInput.getCreatedByModule().getNodeID())
+                                        .link(to(node(currTool.getNodeID()))
+                                                .with(Label.html(toolInput.getNodeLabelHTML()), Color.BLACK,
+                                                        LinkAttr.weight(index++))));
+                    }
                 }
             }
         }
         int workflowOutNo = 1;
         for (TypeNode workflowOutput : workflowOutputs) {
-            if (!outputDefined) {
-                workflowGraph = workflowGraph.with(node(output).with(Color.RED, Shape.RECTANGLE, Style.BOLD));
-                outputDefined = true;
-            }
-            workflowGraph = workflowOutput.addTypeToGraph(workflowGraph);
-            workflowGraph = workflowGraph.with(node(workflowOutput.getNodeID()).link(
-                    to(node(output)).with(Label.of((workflowOutNo++) + "  "), LinkAttr.weight(index++), Style.DOTTED)));
+            // if (!outputDefined) {
+            // workflowGraph = workflowGraph.with(node(output).with(Color.RED,
+            // Shape.RECTANGLE, Style.BOLD));
+            // outputDefined = true;
+            // }
+            workflowGraph = workflowOutput.addTavernaStyleTypeToGraph(workflowGraph);
+            workflowGraph = workflowGraph.with(node(workflowOutput.getCreatedByModule().getNodeID())
+                    .link(to(node(workflowOutput.getNodeID()))
+                            .with(Label.html(workflowOutput.getNodeLabelHTML()), Color.BLACK,
+                                    LinkAttr.weight(index++))));
+            // workflowGraph = workflowGraph.with(node(workflowOutput.getNodeID()).link(
+            // to(node(output)).with(Label.of((workflowOutNo++) + " "),
+            // LinkAttr.weight(index++), Style.DOTTED)));
         }
         return new SolutionGraph(workflowGraph);
     }
