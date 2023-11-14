@@ -301,14 +301,12 @@ public class SolutionWorkflow {
     /**
      * Get the graphical representation of the workflow solution with styling based
      * on the Apache Taverna workflow management system with the required
-     * title and in the defined orientation.
+     * title and in the default orientation ({@link RankDir#TOP_TO_BOTTOM}).
      *
-     * @param title       The title of the SolutionGraph.
-     * @param orientation Orientation of the solution graph (e.g.
-     *                    {@link RankDir#TOP_TO_BOTTOM}.
+     * @param title The title of the SolutionGraph.
      * @return The solution graph.
      */
-    public SolutionGraph getTavernaStyleGraph(String title, RankDir orientation) {
+    public SolutionGraph getTavernaStyleGraph(String title) {
         if (this.tavernaStyleGraph == null) {
             this.tavernaStyleGraph = SolutionGraphFactory.generateTavernaDesignGraph(this, title);
         }

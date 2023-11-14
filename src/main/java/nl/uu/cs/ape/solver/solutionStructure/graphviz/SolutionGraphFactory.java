@@ -4,6 +4,7 @@ import static guru.nidi.graphviz.model.Factory.graph;
 import static guru.nidi.graphviz.model.Factory.node;
 import static guru.nidi.graphviz.model.Factory.to;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import guru.nidi.graphviz.attribute.Color;
@@ -14,6 +15,7 @@ import guru.nidi.graphviz.attribute.Rank.RankDir;
 import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
+import guru.nidi.graphviz.model.Node;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import nl.uu.cs.ape.solver.solutionStructure.ModuleNode;
@@ -134,24 +136,25 @@ public class SolutionGraphFactory {
         List<TypeNode> workflowOutputs = workflow.getWorkflowOutputTypeStates();
         List<ModuleNode> moduleNodes = workflow.getModuleNodes();
 
-        String input = "Workflow INPUT" + "     ";
-        String output = "Workflow OUTPUT" + "     ";
-        boolean inputDefined = false;
-        boolean outputDefined = false;
         int index = 0;
-        int workflowInNo = 1;
+        boolean inputDefined = false;
+        Node toolInputNodes = null;
         for (TypeNode workflowInput : workflowInputs) {
-            // if (!inputDefined) {
-            // workflowGraph = workflowGraph.with(node(input).with(Color.RED,
-            // Shape.RECTANGLE, Style.BOLD));
-            // inputDefined = true;
-            // }
+            if (!inputDefined) {
+                toolInputNodes = node(workflowInput.getNodeID());
+                inputDefined = true;
+            } else {
+                toolInputNodes = node(workflowInput.getNodeID())
+                        .link(to(toolInputNodes).with(Style.INVIS, LinkAttr.weight(index++)));
+            }
             workflowGraph = workflowInput.addTavernaStyleTypeToGraph(workflowGraph);
-            // workflowGraph =
-            // workflowGraph.with(node(input).link(to(node(workflowInput.getNodeID()))
-            // .with(Label.of((workflowInNo++) + " "), LinkAttr.weight(index++),
-            // Style.DOTTED)));
+
         }
+
+        workflowGraph = workflowGraph.with(graph("inputs").cluster()
+                .graphAttr()
+                .with(Style.DASHED, Color.BLACK, Label.html("<b>Workflow Inputs</b>"), Rank.dir(RankDir.LEFT_TO_RIGHT))
+                .with(toolInputNodes));
 
         for (ModuleNode currTool : moduleNodes) {
             workflowGraph = currTool.addTavernaStyleModuleToGraph(workflowGraph);
@@ -172,22 +175,27 @@ public class SolutionGraphFactory {
                 }
             }
         }
-        int workflowOutNo = 1;
+        boolean outputDefined = false;
+        Node toolOutputNodes = null;
         for (TypeNode workflowOutput : workflowOutputs) {
-            // if (!outputDefined) {
-            // workflowGraph = workflowGraph.with(node(output).with(Color.RED,
-            // Shape.RECTANGLE, Style.BOLD));
-            // outputDefined = true;
-            // }
+
+            if (!outputDefined) {
+                toolOutputNodes = node(workflowOutput.getNodeID());
+                outputDefined = true;
+            } else {
+                toolOutputNodes = node(workflowOutput.getNodeID())
+                        .link(to(toolOutputNodes).with(Style.INVIS, LinkAttr.weight(100)));
+            }
             workflowGraph = workflowOutput.addTavernaStyleTypeToGraph(workflowGraph);
             workflowGraph = workflowGraph.with(node(workflowOutput.getCreatedByModule().getNodeID())
                     .link(to(node(workflowOutput.getNodeID()))
                             .with(Label.html(workflowOutput.getNodeLabelHTML()), Color.BLACK,
                                     LinkAttr.weight(index++))));
-            // workflowGraph = workflowGraph.with(node(workflowOutput.getNodeID()).link(
-            // to(node(output)).with(Label.of((workflowOutNo++) + " "),
-            // LinkAttr.weight(index++), Style.DOTTED)));
         }
+        workflowGraph = workflowGraph.with(graph("outputs").cluster()
+                .graphAttr().with(Style.DASHED, Color.BLACK, Label.html("<b>Workflow Outputs</b>"))
+                .with(toolOutputNodes));
+
         return new SolutionGraph(workflowGraph);
     }
 

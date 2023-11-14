@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.yaml.snakeyaml.Yaml;
 
+import guru.nidi.graphviz.attribute.For;
 import guru.nidi.graphviz.attribute.Rank.RankDir;
 import guru.nidi.graphviz.engine.Format;
 import lombok.extern.slf4j.Slf4j;
@@ -512,7 +513,7 @@ public class APE implements APEInterface {
 	 * @return true if the generating was successfully performed, false otherwise.
 	 */
 	public static boolean writeTavernaDesignGraphs(SolutionsList allSolutions) {
-		return writeTavernaDesignGraphs(allSolutions, RankDir.TOP_TO_BOTTOM);
+		return writeTavernaDesignGraphs(allSolutions, Format.PNG);
 	}
 
 	/**
@@ -524,7 +525,7 @@ public class APE implements APEInterface {
 	 * @param orientation  Orientation in which the graph will be presented.
 	 * @return true if the generating was successfully performed, false otherwise.
 	 */
-	public static boolean writeTavernaDesignGraphs(SolutionsList allSolutions, RankDir orientation) {
+	public static boolean writeTavernaDesignGraphs(SolutionsList allSolutions, Format format) {
 		Path graphsFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Figures();
 		Integer noGraphs = allSolutions.getRunConfiguration().getNoGraphs();
 		if (graphsFolder == null || noGraphs == null || noGraphs == 0 || allSolutions.isEmpty()) {
@@ -548,7 +549,7 @@ public class APE implements APEInterface {
 			try {
 				String title = solution.getFileName();
 				Path path = graphsFolder.resolve(title);
-				solution.getTavernaStyleGraph(title, orientation).write2File(path.toFile(), Format.PNG,
+				solution.getTavernaStyleGraph(title).write2File(path.toFile(), format,
 						allSolutions.getRunConfiguration().getDebugMode());
 
 			} catch (IOException e) {
