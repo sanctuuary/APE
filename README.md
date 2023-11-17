@@ -1,21 +1,24 @@
-<img src="https://user-images.githubusercontent.com/11068408/227203515-210bd14e-19c6-48d8-9134-d3812cb2eb0c.png" alt="logo" width=20% align="left"/>
+<img src="https://user-images.githubusercontent.com/11068408/227203515-210bd14e-19c6-48d8-9134-d3812cb2eb0c.png" alt="logo" width=20% />
 
 # APE (Automated Pipeline Explorer)
 
 [![Latest release](https://img.shields.io/github/release/sanctuuary/APE.svg)](https://github.com/sanctuuary/APE/releases/latest)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.sanctuuary/APE/badge.svg)](https://mvnrepository.com/artifact/io.github.sanctuuary/APE)
-[![CodeQL Analysis](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml/badge.svg)](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml)
-[![Documentation Status](https://readthedocs.org/projects/ape-framework/badge/?version=latest)](https://ape-framework.readthedocs.io/en/latest/?badge=latest)
-[![GitHub license](https://img.shields.io/github/license/sanctuuary/APE)](https://github.com/sanctuuary/APE/blob/master/LICENSE)
-[![DOI](https://zenodo.org/badge/227861653.svg)](https://zenodo.org/badge/latestdoi/227861653)
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5749/badge)](https://bestpractices.coreinfrastructure.org/projects/5749)
 
+[![Build](https://github.com/sanctuuary/APE/actions/workflows/mvnbuild.yml/badge.svg)](https://github.com/sanctuuary/APE/actions/workflows/mvnbuild.yml)
+[![CodeQL Analysis](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml/badge.svg)](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml)
+
+[![Documentation Status](https://readthedocs.org/projects/ape-framework/badge/?version=latest)](https://ape-framework.readthedocs.io/en/latest/?badge=latest)
+[![DOI](https://zenodo.org/badge/227861653.svg)](https://zenodo.org/badge/latestdoi/227861653)
+
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5749/badge)](https://bestpractices.coreinfrastructure.org/projects/5749)
+[![GitHub license](https://img.shields.io/github/license/sanctuuary/APE)](https://github.com/sanctuuary/APE/blob/master/LICENSE)
 
 APE is a command line tool and Java API for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. Generated workflows can be exported in [CWL](https://www.commonwl.org/) format, as well as in graphical (PNG, SVG) formats.
 
 APE relies on a semantic domain model that includes tool and type taxonomies as controlled vocabularies for the description of computational tools, and functional tool annotations (inputs, outputs, operations performed) using terms from these taxonomies. Based on this domain model and a specification of the available workflow inputs, the intended workflow outputs and possibly additional constraints, APE then computes possible workflows. 
 
-Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. For detailed description we refer to [[1]](#1).
+Internally, APE uses a component-based program synthesis approach. It translates the domain knowledge and workflow specification into logical formulas that are then fed to a SAT solver to compute satisfying instances. These solutions are then translated into the actual candidate workflows. For a detailed description, we refer to [[1]](#1).
 
 For our paper at [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) [[2]](#2) we created a video that explains APE in 5 minutes:
 <div align="left">
@@ -25,9 +28,9 @@ For our paper at [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) [[2]](#2) w
 #### For detailed information please visit [our page](https://ape-framework.readthedocs.io).
 
 ## Requirements
-To [run](https://github.com/sanctuuary/APE#how-to-run-ape-from-the-command-line) APE locally you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use command `$ java -version` to check your local version). 
+To [run](https://github.com/sanctuuary/APE#how-to-run-ape-from-the-command-line) APE locally you need to have [Java 1.8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) (or higher) installed on your system (use the command `$ java -version` to check your local version). 
 
-To [build](https://github.com/sanctuuary/APE#build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use command `$ mvn -version` to check your local version).
+To [build](https://github.com/sanctuuary/APE#build-ape-from-source-using-maven) APE from source, [Maven 3.3+](https://maven.apache.org/download.cgi) has to be installed as well (use the command `$ mvn -version` to check your local version).
 
 #### Note
 Building APE from source is not required to run it, as the latest stable version is available at [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
@@ -162,10 +165,10 @@ For any questions concerning APE please get in touch with Vedran Kasalica (v.kas
 ## Contributions
 We welcome all contributions (bug reports, bug fixes, feature requests, extensions, use cases, etc.) to APE. Please get in touch with Vedran Kasalica (v.kasalica@uu.nl) to coordinate your contribution. We expect all contributors to follow our [Code of Conduct](https://github.com/sanctuuary/APE/blob/master/CODE_OF_CONDUCT.md).
 
-In case you have a specific requiest, want to report a bug or a suggest a new constraint template please make an issue [here](https://github.com/sanctuuary/APE/issues/new).
+In case you have a specific request, want to report a bug or suggest a new constraint template please make an issue [here](https://github.com/sanctuuary/APE/issues/new).
 
 ## Credits
-APE has been inspired by the [Loose Programming framework PROPHETS](http://ls5-www.cs.tu-dortmund.de/projects/prophets/index.php). It uses similar mechanisms for semantic domain modeling, workflow specification and synthesis, but strives to provide the automated exploration and composition functionality independent from a concrete workflow system.
+APE has been inspired by the [Loose Programming framework PROPHETS](http://ls5-www.cs.tu-dortmund.de/projects/prophets/index.php). It uses similar mechanisms for semantic domain modelling, workflow specification and synthesis, but strives to provide the automated exploration and composition functionality independent from a concrete workflow system.
 
 We thank our brave first-generation users for their patience and constructive feedback that helped us to get APE into shape. 
 
