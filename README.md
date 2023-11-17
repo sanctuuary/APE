@@ -7,7 +7,7 @@
 | Badges | |
 |:----:|----|
 | **Fairness** |  [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5749/badge)](https://bestpractices.coreinfrastructure.org/projects/5749) |
-| **Packages and Releases** |  [![Latest release](https://img.shields.io/github/release/sanctuuary/APE.svg)](https://github.com/sanctuuary/APE/releases/latest) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.sanctuuary/APE/badge.svg)](https://mvnrepository.com/artifact/io.github.sanctuuary/APE)
+| **Packages and Releases** |  [![Latest release](https://img.shields.io/github/release/sanctuuary/APE.svg)](https://github.com/sanctuuary/APE/releases/latest) [![Maven Central](https://img.shields.io/maven-central/v/io.github.sanctuuary/APE)](https://mvnrepository.com/artifact/io.github.sanctuuary/APE)
  |
 | **Build Status** | [![Build](https://github.com/sanctuuary/APE/actions/workflows/mvnbuild.yml/badge.svg)](https://github.com/sanctuuary/APE/actions/workflows/mvnbuild.yml) [![CodeQL Analysis](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml/badge.svg)](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml) [![Documentation Status](https://readthedocs.org/projects/ape-framework/badge/?version=latest)](https://ape-framework.readthedocs.io/en/latest/?badge=latest)
  |
