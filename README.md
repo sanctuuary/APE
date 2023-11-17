@@ -2,17 +2,18 @@
 
 # APE (Automated Pipeline Explorer)
 
-[![Latest release](https://img.shields.io/github/release/sanctuuary/APE.svg)](https://github.com/sanctuuary/APE/releases/latest)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.sanctuuary/APE/badge.svg)](https://mvnrepository.com/artifact/io.github.sanctuuary/APE)
 
-[![Build](https://github.com/sanctuuary/APE/actions/workflows/mvnbuild.yml/badge.svg)](https://github.com/sanctuuary/APE/actions/workflows/mvnbuild.yml)
-[![CodeQL Analysis](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml/badge.svg)](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml)
 
-[![Documentation Status](https://readthedocs.org/projects/ape-framework/badge/?version=latest)](https://ape-framework.readthedocs.io/en/latest/?badge=latest)
-[![DOI](https://zenodo.org/badge/227861653.svg)](https://zenodo.org/badge/latestdoi/227861653)
+| Badges | |
+|:----:|----|
+| **Fairness** |  [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5749/badge)](https://bestpractices.coreinfrastructure.org/projects/5749) |
+| **Packages and Releases** |  [![Latest release](https://img.shields.io/github/release/sanctuuary/APE.svg)](https://github.com/sanctuuary/APE/releases/latest) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.sanctuuary/APE/badge.svg)](https://mvnrepository.com/artifact/io.github.sanctuuary/APE)
+ |
+| **Build Status** | [![Build](https://github.com/sanctuuary/APE/actions/workflows/mvnbuild.yml/badge.svg)](https://github.com/sanctuuary/APE/actions/workflows/mvnbuild.yml) [![CodeQL Analysis](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml/badge.svg)](https://github.com/sanctuuary/APE/actions/workflows/codeql.yml) [![Documentation Status](https://readthedocs.org/projects/ape-framework/badge/?version=latest)](https://ape-framework.readthedocs.io/en/latest/?badge=latest)
+ |
+| **DOI** | [![DOI](https://zenodo.org/badge/227861653.svg)](https://zenodo.org/badge/latestdoi/227861653) |
+| **License** |  [![GitHub license](https://img.shields.io/github/license/sanctuuary/APE)](https://github.com/sanctuuary/APE/blob/master/LICENSE) |
 
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5749/badge)](https://bestpractices.coreinfrastructure.org/projects/5749)
-[![GitHub license](https://img.shields.io/github/license/sanctuuary/APE)](https://github.com/sanctuuary/APE/blob/master/LICENSE)
 
 APE is a command line tool and Java API for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. Generated workflows can be exported in [CWL](https://www.commonwl.org/) format, as well as in graphical (PNG, SVG) formats.
 
