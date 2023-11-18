@@ -16,9 +16,11 @@
 
 
 <p style="display: none;"> 
-	https://badgen.net/maven/v/maven-central/ 
+	 
   https://pypi.python.org/pypi/somepackage
   [![RSD](https://img.shields.io/badge/rsd-python--template-00a3e3.svg)](https://research-software.nl/software/nlesc-python-template)
+  [![Maven Central](https://badgen.net/maven/v/maven-central/io.github.sanctuuary/APE)](https://badgen.net/maven/v/maven-central/io.github.sanctuuary/APE)
+  [![PyPI version](https://badge.fury.io/py/deeprank2.svg)](https://badge.fury.io/py/deeprank2)
 </p> 
 
 
