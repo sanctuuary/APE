@@ -17,6 +17,8 @@
 
 <p style="display: none;"> 
 	https://badgen.net/maven/v/maven-central/ 
+  https://pypi.python.org/pypi/somepackage
+  [![RSD](https://img.shields.io/badge/rsd-python--template-00a3e3.svg)](https://research-software.nl/software/nlesc-python-template)
 </p> 
 
 
