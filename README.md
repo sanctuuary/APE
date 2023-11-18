@@ -15,13 +15,10 @@
 | **License** |  [![GitHub license](https://img.shields.io/github/license/sanctuuary/APE)](https://github.com/sanctuuary/APE/blob/master/LICENSE) |
 
 
-<p style="display: none;"> 
 	 
-  https://pypi.python.org/pypi/somepackage
   [![RSD](https://img.shields.io/badge/rsd-python--template-00a3e3.svg)](https://research-software.nl/software/nlesc-python-template)
   [![Maven Central](https://badgen.net/maven/v/maven-central/io.github.sanctuuary/APE)](https://badgen.net/maven/v/maven-central/io.github.sanctuuary/APE)
   [![PyPI version](https://badge.fury.io/py/deeprank2.svg)](https://badge.fury.io/py/deeprank2)
-</p> 
 
 
 APE is a command line tool and Java API for the automated exploration of possible computational pipelines (scientific workflows) from large collections of computational tools. Generated workflows can be exported in [CWL](https://www.commonwl.org/) format, as well as in graphical (PNG, SVG) formats.
