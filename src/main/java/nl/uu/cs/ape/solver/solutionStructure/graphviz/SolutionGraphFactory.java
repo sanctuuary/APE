@@ -4,14 +4,17 @@ import static guru.nidi.graphviz.model.Factory.graph;
 import static guru.nidi.graphviz.model.Factory.node;
 import static guru.nidi.graphviz.model.Factory.to;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import guru.nidi.graphviz.attribute.Attributes;
 import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.attribute.Font;
+import guru.nidi.graphviz.attribute.ForAll;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.LinkAttr;
 import guru.nidi.graphviz.attribute.Rank;
 import guru.nidi.graphviz.attribute.Rank.RankDir;
+import guru.nidi.graphviz.attribute.Rank.RankType;
 import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Graph;
@@ -129,7 +132,12 @@ public class SolutionGraphFactory {
      *         workflow.
      */
     public static SolutionGraph generateTavernaDesignGraph(SolutionWorkflow workflow, String title) {
-        Graph workflowGraph = graph(title).directed().graphAttr().with(Rank.dir(RankDir.TOP_TO_BOTTOM));
+        Attributes<ForAll> helveticaFont = Font.name("Helvetica");
+        Graph workflowGraph = graph(title).directed().graphAttr()
+                .with(Rank.dir(RankDir.TOP_TO_BOTTOM))
+                .graphAttr().with(helveticaFont)
+                .nodeAttr().with(helveticaFont)
+                .linkAttr().with(helveticaFont);
         List<TypeNode> workflowInputs = workflow.getWorkflowInputTypeStates();
         List<TypeNode> workflowOutputs = workflow.getWorkflowOutputTypeStates();
         List<ModuleNode> moduleNodes = workflow.getModuleNodes();
@@ -149,10 +157,11 @@ public class SolutionGraphFactory {
 
         }
 
-        workflowGraph = workflowGraph.with(graph("inputs").cluster()
+        workflowGraph = workflowGraph.with(graph("inputs_frame").cluster()
                 .graphAttr()
-                .with(Style.DASHED, Color.BLACK, Label.html("<b>Workflow Inputs</b>"), Rank.dir(RankDir.LEFT_TO_RIGHT))
-                .with(toolInputNodes));
+                .with(Style.DASHED, Color.BLACK, Label.html("<b>Workflow Inputs</b>"))
+                .with(graph("inputs").directed().graphAttr()
+                        .with(Rank.inSubgraph(RankType.MIN), Rank.dir(RankDir.LEFT_TO_RIGHT)).with(toolInputNodes)));
 
         for (ModuleNode currTool : moduleNodes) {
             workflowGraph = currTool.addTavernaStyleModuleToGraph(workflowGraph);
@@ -182,7 +191,7 @@ public class SolutionGraphFactory {
                 outputDefined = true;
             } else {
                 toolOutputNodes = node(workflowOutput.getNodeID())
-                        .link(to(toolOutputNodes).with(Style.INVIS, LinkAttr.weight(100)));
+                        .link(to(toolOutputNodes).with(Style.INVIS, LinkAttr.weight(100 + index++)));
             }
             workflowGraph = workflowOutput.addTavernaStyleTypeToGraph(workflowGraph);
             workflowGraph = workflowGraph.with(node(workflowOutput.getCreatedByModule().getNodeID())
@@ -190,9 +199,10 @@ public class SolutionGraphFactory {
                             .with(Label.html(workflowOutput.getNodeLabelHTML()), Color.BLACK,
                                     LinkAttr.weight(index++))));
         }
-        workflowGraph = workflowGraph.with(graph("outputs").cluster()
+        workflowGraph = workflowGraph.with(graph("outputs_frame").cluster()
                 .graphAttr().with(Style.DASHED, Color.BLACK, Label.html("<b>Workflow Outputs</b>"))
-                .with(toolOutputNodes));
+                .with(graph("outputs").directed().graphAttr()
+                        .with(Rank.inSubgraph(RankType.MIN), Rank.dir(RankDir.LEFT_TO_RIGHT)).with(toolOutputNodes)));
 
         return new SolutionGraph(workflowGraph);
     }
