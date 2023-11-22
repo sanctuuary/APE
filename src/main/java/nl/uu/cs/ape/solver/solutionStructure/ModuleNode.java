@@ -299,7 +299,7 @@ public class ModuleNode extends SolutionWorkflowNode {
     public Graph addTavernaStyleModuleToGraph(Graph workflowGraph) {
         return workflowGraph
                 .with(node(getNodeID()).with(Style.FILLED, Color.rgb("F8FFB0").fill(),
-                        Label.html(getNodeLabelHTML()), Shape.RECTANGLE));
+                        Label.html(getNodeGraphLabel()), Shape.RECTANGLE));
     }
 
     /**
@@ -323,7 +323,7 @@ public class ModuleNode extends SolutionWorkflowNode {
     /**
      * Get label of the current workflow node as an HTML element.
      */
-    public String getNodeLabelHTML() {
+    public String getNodeGraphLabel() {
         return "<b>" + this.usedModule.getPredicateLabel() + "</b>";
     }
 

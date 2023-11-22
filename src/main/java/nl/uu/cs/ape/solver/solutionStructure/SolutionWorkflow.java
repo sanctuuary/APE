@@ -1,14 +1,6 @@
 package nl.uu.cs.ape.solver.solutionStructure;
 
-import guru.nidi.graphviz.attribute.Color;
-import guru.nidi.graphviz.attribute.Label;
-import guru.nidi.graphviz.attribute.LinkAttr;
-import guru.nidi.graphviz.attribute.Rank;
 import guru.nidi.graphviz.attribute.Rank.RankDir;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.attribute.Shape;
-import guru.nidi.graphviz.attribute.Style;
-import guru.nidi.graphviz.model.Graph;
 import lombok.Getter;
 import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
@@ -28,13 +20,10 @@ import nl.uu.cs.ape.solver.solutionStructure.graphviz.SolutionGraph;
 import nl.uu.cs.ape.solver.solutionStructure.graphviz.SolutionGraphFactory;
 import nl.uu.cs.ape.models.enums.AtomType;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static guru.nidi.graphviz.model.Factory.*;
 
 /**
  * The {@code SolutionWorkflow} class is used to represent a single workflow
@@ -320,6 +309,25 @@ public class SolutionWorkflow {
      */
     public String getFileName() {
         return String.format("%s%o", getFileNamePrefix(), getIndex());
+    }
+
+    public String getDescriptiveName() {
+        StringBuilder descrName = new StringBuilder();
+        this.moduleNodes.forEach(moduleNode -> descrName.append(moduleNode.toString()).append("->"));
+        descrName.delete(descrName.length() - 2, descrName.length());
+        return descrName.toString();
+    }
+
+    public String getDescription() {
+        StringBuilder descrName = new StringBuilder();
+        int stepNo = 1;
+        for (ModuleNode moduleNode : this.moduleNodes) {
+            descrName.append("Step ").append(stepNo++).append(": ").append(moduleNode.getUsedModule().getPredicateID())
+                    .append("\n");
+        }
+        descrName.delete(descrName.length() - 2, descrName.length());
+        return descrName.toString();
+
     }
 
     /**

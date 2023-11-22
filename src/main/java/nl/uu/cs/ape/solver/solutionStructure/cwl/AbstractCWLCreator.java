@@ -56,7 +56,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
         cwlRepresentation.append("inputs:").append("\n");
         // Inputs
         for (TypeNode typeNode : solution.getWorkflowInputTypeStates()) {
-            String inputName = String.format("input%o", workflowParameters.size() + 1);
+            String inputName = String.format("input_%o", workflowParameters.size() + 1);
             addParameter(typeNode, inputName);
             cwlRepresentation
                     // Name
@@ -86,7 +86,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
             cwlRepresentation
                     // Name
                     .append(ind(1))
-                    .append(String.format("output%o", i))
+                    .append(String.format("output_%o", i))
                     .append(":\n")
                     // Data type
                     .append(ind(2))
@@ -107,7 +107,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
             int outId = typeNode.getCreatedByModule().getOutputTypes().get(i - 1).getAutomatonState()
                     .getLocalStateNumber();
             cwlRepresentation
-                    .append(inOutName(typeNode.getCreatedByModule(), "out", outId + 1))
+                    .append(generateInputOrOutputName(typeNode.getCreatedByModule(), "out", outId + 1))
                     .append("\n");
             i++;
         }
@@ -164,7 +164,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
         for (TypeNode typeNode : moduleNode.getInputTypes()) {
             cwlRepresentation
                     .append(ind(baseInd + 1))
-                    .append(inOutName(moduleNode, "in", i + 1))
+                    .append(generateInputOrOutputName(moduleNode, "in", i + 1))
                     .append(": ")
                     .append(workflowParameters.get(typeNode.getNodeID()))
                     .append("\n");
@@ -187,7 +187,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
                 .append("[");
         int i = 1;
         for (TypeNode typeNode : moduleNode.getOutputTypes()) {
-            String name = inOutName(moduleNode, "out", i);
+            String name = generateInputOrOutputName(moduleNode, "out", i);
             addParameter(typeNode, String.format("%s/%s", stepName(moduleNode), name));
             cwlRepresentation
                     .append(name)
@@ -317,7 +317,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
             cwlRepresentation
                     // Name
                     .append(ind(baseInd))
-                    .append(inOutName(moduleNode, input ? "in" : "out", i))
+                    .append(generateInputOrOutputName(moduleNode, input ? "in" : "out", i))
                     .append(":\n")
                     // Data type
                     .append(ind(baseInd + 1))
@@ -332,22 +332,6 @@ public class AbstractCWLCreator extends CWLCreatorBase {
     }
 
     /**
-     * Generate the name of the input or output of a step's run input or output.
-     * I.e. "moduleName_indicator_n".
-     * 
-     * @param moduleNode The {@link ModuleNode} that is the workflow step.
-     * @param indicator  Indicator whether it is an input or an output.
-     * @param n          The n-th input or output this is.
-     * @return The name of the input or output.
-     */
-    private String inOutName(ModuleNode moduleNode, String indicator, int n) {
-        return String.format("%s_%s_%o",
-                moduleNode.getNodeLabel(),
-                indicator,
-                n);
-    }
-
-    /**
      * Add a parameter to the parameter hashmap.
      * Will log an error to the error output if {@link TypeNode} is already known.
      * 
@@ -356,18 +340,8 @@ public class AbstractCWLCreator extends CWLCreatorBase {
      */
     private void addParameter(TypeNode typeNode, String name) {
         if (workflowParameters.putIfAbsent(typeNode.getNodeID(), name) != null) {
-            log.warn("Duplicate key \"{}\" in workflow inputs!\n", typeNode.getNodeID());
+            log.warn("Duplicate key \"%s\" in workflow inputs!\n", typeNode.getNodeID());
         }
     }
 
-    /**
-     * Generate the name for a step in the workflow.
-     * 
-     * @param moduleNode The {@link ModuleNode} that is the workflow step.
-     * @return The name of the workflow step.
-     */
-    private String stepName(ModuleNode moduleNode) {
-        return moduleNode.getUsedModule().getPredicateLabel() +
-                moduleNode.getAutomatonState().getLocalStateNumber();
-    }
 }

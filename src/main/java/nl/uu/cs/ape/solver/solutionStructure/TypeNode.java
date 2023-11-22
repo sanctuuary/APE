@@ -4,6 +4,7 @@ import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Style;
+import guru.nidi.graphviz.attribute.Label.Justification;
 import guru.nidi.graphviz.model.Graph;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.State;
@@ -218,7 +219,7 @@ public class TypeNode extends SolutionWorkflowNode {
     public Graph addTavernaStyleTypeToGraph(Graph workflowGraph) {
         return workflowGraph
                 .with(node(getNodeID()).with(Style.FILLED, Color.rgb("6CF1FF").fill(),
-                        Label.html(getNodeLabelHTML()), Shape.RECTANGLE));
+                        Label.lines(Justification.MIDDLE, getNodeGraphLabels()), Shape.RECTANGLE));
     }
 
     /**
@@ -244,8 +245,8 @@ public class TypeNode extends SolutionWorkflowNode {
     /**
      * Get label of the current workflow node as an HTML element.
      */
-    public String getNodeLabelHTML() {
-        StringBuilder printString = new StringBuilder("<b>");
+    public String[] getNodeGraphLabels() {
+        String[] labels = new String[this.usedTypes.size()];
         int i = 0;
         for (Type type : this.usedTypes) {
             String typeLabel = type.getPredicateLabel();
@@ -253,12 +254,9 @@ public class TypeNode extends SolutionWorkflowNode {
                 // remove "_plain" suffix
                 typeLabel = APEUtils.removeNLastChar(typeLabel, 2);
             }
-            printString.append(typeLabel);
-            if (++i < this.usedTypes.size()) {
-                printString.append(",<br/> ");
-            }
+            labels[i++] = typeLabel;
         }
-        return printString.append("</b>").toString();
+        return labels;
     }
 
     /**
@@ -320,6 +318,6 @@ public class TypeNode extends SolutionWorkflowNode {
      * @return A short non descriptive node ID, that can be used as a variable name.
      */
     public String getShortNodeID() {
-        return "node" + Math.abs(getNodeID().hashCode());
+        return "node" + getNodeID().hashCode();
     }
 }

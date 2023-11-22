@@ -100,7 +100,7 @@ public class Type extends TaxonomyPredicate {
 	public static Type taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup, boolean isOutputData)
 			throws JSONException, APEDimensionsException {
 		/* Set of predicates where each describes a type dimension */
-		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<TaxonomyPredicate>();
+		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<>();
 		boolean labelDefined = false;
 		AllTypes allTypes = domainSetup.getAllTypes();
 		/* Iterate through each of the dimensions */
@@ -115,7 +115,7 @@ public class Type extends TaxonomyPredicate {
 								+ "', in JSON: '" + jsonParam + "'");
 			}
 			LogicOperation logConn = LogicOperation.OR;
-			SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<TaxonomyPredicate>();
+			SortedSet<TaxonomyPredicate> logConnectedPredicates = new TreeSet<>();
 			/* for each dimensions a disjoint array of types/tools is given */
 			for (String currTypeLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
 				String currTypeIRI = currTypeLabel;
