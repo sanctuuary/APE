@@ -40,7 +40,7 @@ public class SolutionGraph {
      * @return The {@link Renderer} object.
      */
     public Renderer getRenderer(Format format) {
-        return Graphviz.fromGraph(graph).render(format);
+        return Graphviz.fromGraph(graph).scale(2).render(format);
     }
 
     /**
