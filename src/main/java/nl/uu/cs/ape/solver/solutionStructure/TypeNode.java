@@ -219,7 +219,7 @@ public class TypeNode extends SolutionWorkflowNode {
     public Graph addTavernaStyleTypeToGraph(Graph workflowGraph) {
         return workflowGraph
                 .with(node(getNodeID()).with(Style.FILLED, Color.rgb("6CF1FF").fill(),
-                        Label.lines(Justification.MIDDLE, getNodeGraphLabels()), Shape.RECTANGLE));
+                        Label.html(getNodeGraphLabels()), Shape.RECTANGLE));
     }
 
     /**
@@ -245,8 +245,8 @@ public class TypeNode extends SolutionWorkflowNode {
     /**
      * Get label of the current workflow node as an HTML element.
      */
-    public String[] getNodeGraphLabels() {
-        String[] labels = new String[this.usedTypes.size()];
+    public String getNodeGraphLabels() {
+        StringBuilder labelBuilder = new StringBuilder();
         int i = 0;
         for (Type type : this.usedTypes) {
             String typeLabel = type.getPredicateLabel();
@@ -254,9 +254,26 @@ public class TypeNode extends SolutionWorkflowNode {
                 // remove "_plain" suffix
                 typeLabel = APEUtils.removeNLastChar(typeLabel, 2);
             }
-            labels[i++] = typeLabel;
+            String formatting = "%s";
+
+            switch (i++ % 4) {
+                case 1:
+                    formatting = "<b><i>%s</i></b>";
+                    break;
+                case 2:
+                    formatting = "<i>%s</i>";
+                    break;
+                case 3:
+                    formatting = "<b>%s</b>";
+                    break;
+                default:
+                    formatting = "%s";
+
+            }
+            labelBuilder.append(String.format(formatting, typeLabel)).append("<br/>");
         }
-        return labels;
+        labelBuilder.delete(labelBuilder.length() - 5, labelBuilder.length());
+        return labelBuilder.toString();
     }
 
     /**

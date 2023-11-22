@@ -35,7 +35,7 @@ import java.util.Map;
 public class SolutionWorkflow {
 
     @Getter
-    private static final String fileNamePrefix = "workflowSolution_";
+    private static final String fileNamePrefix = "candidate_solution_";
 
     /**
      * List of module nodes ordered according to their position in the workflow.
@@ -308,13 +308,14 @@ public class SolutionWorkflow {
      * @return The file name of the solution file (without the file extension).
      */
     public String getFileName() {
-        return String.format("%s%o", getFileNamePrefix(), getIndex());
+        return String.format("%s%o", getFileNamePrefix(), getIndex() + 1);
     }
 
     public String getDescriptiveName() {
         StringBuilder descrName = new StringBuilder();
-        this.moduleNodes.forEach(moduleNode -> descrName.append(moduleNode.toString()).append("->"));
-        descrName.delete(descrName.length() - 2, descrName.length());
+        this.moduleNodes
+                .forEach(moduleNode -> descrName.append(moduleNode.getUsedModule().getPredicateLabel()).append("->"));
+        descrName.delete(descrName.length() - 1, descrName.length());
         return descrName.toString();
     }
 
@@ -322,7 +323,8 @@ public class SolutionWorkflow {
         StringBuilder descrName = new StringBuilder();
         int stepNo = 1;
         for (ModuleNode moduleNode : this.moduleNodes) {
-            descrName.append("Step ").append(stepNo++).append(": ").append(moduleNode.getUsedModule().getPredicateID())
+            descrName.append("Step ").append(stepNo++).append(": ")
+                    .append(moduleNode.getUsedModule().getPredicateLabel())
                     .append("\n");
         }
         descrName.delete(descrName.length() - 2, descrName.length());
