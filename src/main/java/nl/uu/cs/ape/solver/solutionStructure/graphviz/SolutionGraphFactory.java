@@ -132,7 +132,7 @@ public class SolutionGraphFactory {
      *         workflow.
      */
     public static SolutionGraph generateTavernaDesignGraph(SolutionWorkflow workflow, String title) {
-        Attributes<ForAll> helveticaFont = Font.name("Helvetica");
+        Attributes<ForAll> helveticaFont = Font.name("Arial");
         Graph workflowGraph = graph(title).directed().graphAttr()
                 .with(Rank.dir(RankDir.TOP_TO_BOTTOM))
                 .graphAttr().with(helveticaFont)
@@ -170,13 +170,13 @@ public class SolutionGraphFactory {
                     if (toolInput.getCreatedByModule() == null) {
                         workflowGraph = workflowGraph
                                 .with(node(toolInput.getNodeID()).link(to(node(currTool.getNodeID()))
-                                        .with(Label.html(toolInput.getNodeLabelHTML()), Color.BLACK,
+                                        .with(Label.lines(toolInput.getNodeGraphLabels()), Color.BLACK,
                                                 LinkAttr.weight(index++))));
                     } else {
                         workflowGraph = workflowGraph
                                 .with(node(toolInput.getCreatedByModule().getNodeID())
                                         .link(to(node(currTool.getNodeID()))
-                                                .with(Label.html(toolInput.getNodeLabelHTML()), Color.BLACK,
+                                                .with(Label.lines(toolInput.getNodeGraphLabels()), Color.BLACK,
                                                         LinkAttr.weight(index++))));
                     }
                 }
@@ -196,7 +196,7 @@ public class SolutionGraphFactory {
             workflowGraph = workflowOutput.addTavernaStyleTypeToGraph(workflowGraph);
             workflowGraph = workflowGraph.with(node(workflowOutput.getCreatedByModule().getNodeID())
                     .link(to(node(workflowOutput.getNodeID()))
-                            .with(Label.html(workflowOutput.getNodeLabelHTML()), Color.BLACK,
+                            .with(Label.lines(workflowOutput.getNodeGraphLabels()), Color.BLACK,
                                     LinkAttr.weight(index++))));
         }
         workflowGraph = workflowGraph.with(graph("outputs_frame").cluster()

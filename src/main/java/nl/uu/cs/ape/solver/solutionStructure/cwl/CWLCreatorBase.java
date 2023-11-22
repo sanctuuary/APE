@@ -104,6 +104,37 @@ public abstract class CWLCreatorBase {
     }
 
     /**
+     * Generate the name of the input or output of a step's run input or output.
+     * I.e. "moduleName_indicator_n".
+     * 
+     * @param moduleNode The {@link ModuleNode} that is the workflow step.
+     * @param indicator  Indicator whether it is an input or an output.
+     * @param n          The n-th input or output this is.
+     * @return The name of the input or output.
+     */
+    protected String generateInputOrOutputName(ModuleNode moduleNode, String indicator, int n) {
+        return String.format("%s_%s_%o",
+                moduleNode.getNodeLabel(),
+                indicator,
+                n);
+    }
+
+    /**
+     * Generate the name for a step in the workflow.
+     * 
+     * @param moduleNode The {@link ModuleNode} that is the workflow step.
+     * @return The name of the workflow step.
+     */
+    protected String stepName(ModuleNode moduleNode) {
+        int stepNumber = moduleNode.getAutomatonState().getLocalStateNumber();
+        if (stepNumber < 10) {
+            return String.format("%s_0%o", moduleNode.getUsedModule().getPredicateLabel(), stepNumber);
+        } else {
+            return String.format("%s_%o", moduleNode.getUsedModule().getPredicateLabel(), stepNumber);
+        }
+    }
+
+    /**
      * Generate the main part of the CWL representation.
      */
     protected abstract void generateCWLRepresentation();

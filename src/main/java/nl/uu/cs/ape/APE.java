@@ -422,7 +422,7 @@ public class APE implements APEInterface {
 		final File executeDir = executionsFolder.toFile();
 		if (executeDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(executeDir, SolutionWorkflow.getFileNamePrefix());
+			deleteExistingFiles(executeDir, SolutionWorkflow.getFileNamePrefix(), "sh");
 		} else {
 			executeDir.mkdir();
 		}
@@ -480,7 +480,7 @@ public class APE implements APEInterface {
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix());
+			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix(), "png");
 		} else {
 			graphDir.mkdir();
 		}
@@ -539,7 +539,7 @@ public class APE implements APEInterface {
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix());
+			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix(), format.fileExtension);
 		} else {
 			graphDir.mkdir();
 		}
@@ -599,7 +599,7 @@ public class APE implements APEInterface {
 		File graphDir = graphsFolder.toFile();
 		if (graphDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix());
+			deleteExistingFiles(graphDir, SolutionWorkflow.getFileNamePrefix(), "png");
 		} else {
 			graphDir.mkdir();
 		}
@@ -648,7 +648,7 @@ public class APE implements APEInterface {
 		final File cwlDir = cwlFolder.toFile();
 		if (cwlDir.isDirectory()) {
 			// If the directory already exists, empty it first
-			deleteExistingFiles(cwlDir, SolutionWorkflow.getFileNamePrefix());
+			deleteExistingFiles(cwlDir, SolutionWorkflow.getFileNamePrefix(), "cwl");
 		} else {
 			// Create the CWL directory if it does not already exist
 			cwlDir.mkdir();
@@ -686,14 +686,17 @@ public class APE implements APEInterface {
 	}
 
 	/**
-	 * Delete all files in the given directory that start with the given prefix.
+	 * Delete all files in the given directory that start with the given prefix and
+	 * have the given extension.
 	 * 
-	 * @param dirName    The directory to delete files from.
-	 * @param filePrefix The prefix of the files to delete.
+	 * @param dirName       The directory to delete files from.
+	 * @param filePrefix    The prefix of the files to delete.
+	 * @param fileExtension The extension of the files to delete.
 	 */
-	private static void deleteExistingFiles(File dirName, String filePrefix) {
+	private static void deleteExistingFiles(File dirName, String filePrefix, String fileExtension) {
 		File[] oldFiles = dirName
-				.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith(filePrefix.toLowerCase()));
+				.listFiles((dir, fileName) -> fileName.toLowerCase().startsWith(filePrefix.toLowerCase())
+						&& fileName.toLowerCase().endsWith(fileExtension.toLowerCase()));
 		if (oldFiles != null) {
 			Arrays.stream(oldFiles).forEach(f -> {
 				try {
