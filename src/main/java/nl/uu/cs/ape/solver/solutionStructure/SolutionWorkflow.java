@@ -315,7 +315,7 @@ public class SolutionWorkflow {
         StringBuilder descrName = new StringBuilder();
         this.moduleNodes
                 .forEach(moduleNode -> descrName.append(moduleNode.getUsedModule().getPredicateLabel()).append("->"));
-        descrName.delete(descrName.length() - 1, descrName.length());
+        descrName.delete(descrName.length() - 2, descrName.length());
         return descrName.toString();
     }
 
