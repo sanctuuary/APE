@@ -39,7 +39,7 @@ jobs:
         cd domain-annotations/WombatP_tools
         java -jar ../../target/APE-*-executable.jar ./config.json
         cd ./CWL
-        cwltool --enable-dev --validate candidate_solution_0.cwl
+        cwltool --enable-dev --validate candidate_solution_1.cwl
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
