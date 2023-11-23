@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Use this section to inform users about which versions of APE are currently supported with security updates.
+The following versions of APE are currently supported with security updates:
 
 | Version | Supported          |
 | ------- | ------------------ |
