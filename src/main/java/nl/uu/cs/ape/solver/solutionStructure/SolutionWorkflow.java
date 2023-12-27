@@ -327,7 +327,7 @@ public class SolutionWorkflow {
                     .append(moduleNode.getUsedModule().getPredicateLabel())
                     .append("\n");
         }
-        descrName.delete(descrName.length() - 2, descrName.length());
+        descrName.delete(descrName.length() - 1, descrName.length());
         return descrName.toString();
 
     }
