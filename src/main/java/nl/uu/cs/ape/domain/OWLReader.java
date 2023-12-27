@@ -56,7 +56,7 @@ public class OWLReader {
 	 *                     types.
 	 * @param ontologyFile Path to the OWL file.
 	 */
-	public OWLReader(APEDomainSetup domain, File ontologyFile) {
+	public OWLReader(Domain domain, File ontologyFile) {
 		this.ontologyFile = ontologyFile;
 		this.allModules = domain.getAllModules();
 		this.allTypes = domain.getAllTypes();

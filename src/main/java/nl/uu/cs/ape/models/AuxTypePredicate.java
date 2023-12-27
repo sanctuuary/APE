@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.NodeType;
@@ -67,7 +67,7 @@ public class AuxTypePredicate extends Type implements AuxiliaryPredicate {
      *         disjunction/conjunction of the labels.
      */
     public static Type generateAuxiliaryPredicate(SortedSet<TaxonomyPredicate> relatedPredicates,
-            LogicOperation logicOp, APEDomainSetup domainSetup) {
+            LogicOperation logicOp, Domain domainSetup) {
         if (relatedPredicates.isEmpty()) {
             return null;
         }

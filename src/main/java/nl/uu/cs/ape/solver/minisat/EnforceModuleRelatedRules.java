@@ -10,7 +10,7 @@ import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.Module;
@@ -18,7 +18,7 @@ import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxConjunction;
@@ -218,7 +218,7 @@ public final class EnforceModuleRelatedRules {
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link AtomType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static Set<SLTLxFormula> dataReference(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> dataReference(Domain domainSetup, TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
 		/* For each type instance */
@@ -318,7 +318,7 @@ public final class EnforceModuleRelatedRules {
 				fullEncoding.add(new SLTLxDisjunction(allPossibilities));
 
 				/* Defining that each input can reference only one state in the shared memory */
-				for (Pair<PredicateLabel> pair : getPredicatePairs(possibleMemStates)) {
+				for (Pair<Predicate> pair : getPredicatePairs(possibleMemStates)) {
 					fullEncoding.add(
 							new SLTLxNegatedConjunction(
 									new SLTLxAtom(
@@ -907,7 +907,7 @@ public final class EnforceModuleRelatedRules {
 	 * @return The Set of SLTLx formulas that represent the constraints.
 	 */
 
-	public static Set<SLTLxFormula> moduleMutualExclusion(Pair<PredicateLabel> pair, ModuleAutomaton moduleAutomaton) {
+	public static Set<SLTLxFormula> moduleMutualExclusion(Pair<Predicate> pair, ModuleAutomaton moduleAutomaton) {
 
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
@@ -1044,8 +1044,8 @@ public final class EnforceModuleRelatedRules {
 	 *         modules are not returned, only the unique pairs of modules that are
 	 *         representing actual tools.
 	 */
-	public static List<Pair<PredicateLabel>> getPredicatePairs(List<? extends PredicateLabel> predicateList) {
-		List<Pair<PredicateLabel>> pairs = new ArrayList<>();
+	public static List<Pair<Predicate>> getPredicatePairs(List<? extends Predicate> predicateList) {
+		List<Pair<Predicate>> pairs = new ArrayList<>();
 
 		for (int i = 0; i < predicateList.size() - 1; i++) {
 			for (int j = i + 1; j < predicateList.size(); j++) {

@@ -4,7 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import nl.uu.cs.ape.domain.APEDimensionsException;
-import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.NodeType;
@@ -222,7 +222,7 @@ public class Module extends AbstractModule {
      * @throws JSONException          if the given JSON is not well formatted
      * @throws APEDimensionsException if the referenced modules are not well defined
      */
-    public static AbstractModule taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
+    public static AbstractModule taxonomyInstanceFromJson(JSONObject jsonParam, Domain domainSetup)
             throws JSONException {
         /* Set of predicates where each describes a type dimension */
         SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<TaxonomyPredicate>();

@@ -12,13 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccurrenceCollection;
@@ -52,7 +52,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
      * Object that contains all the domain information.
      */
     @Getter
-    private final APEDomainSetup domainSetup;
+    private final Domain domainSetup;
 
     /**
      * APE library configuration object.
@@ -126,7 +126,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
      * @param workflowLength Workflow length
      * @throws IOException - Error if the temp file cannot be created
      */
-    public SATSynthesisEngine(APEDomainSetup domainSetup, SolutionsList allSolutions,
+    public SATSynthesisEngine(Domain domainSetup, SolutionsList allSolutions,
             APERunConfig runConfig, int workflowLength) throws IOException {
         this.domainSetup = domainSetup;
         this.allSolutions = allSolutions;
@@ -186,7 +186,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 2. Mandatory usage of the tools - from taxonomy.
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        for (Pair<PredicateLabel> pair : domainSetup.getAllModules().getSimplePairs()) {
+        for (Pair<Predicate> pair : domainSetup.getAllModules().getSimplePairs()) {
             SLTLxFormula.appendCNFToFile(cnfEncoding, this,
                     EnforceModuleRelatedRules.moduleMutualExclusion(pair, moduleAutomaton));
         }
@@ -205,7 +205,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * is considered a type)
          * 3. Adding the constraints enforcing the taxonomy structure.
          */
-        for (Pair<PredicateLabel> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
+        for (Pair<Predicate> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
             SLTLxFormula.appendCNFToFile(cnfEncoding, this,
                     EnforceTypeRelatedRules.memoryTypesMutualExclusion(pair, typeAutomaton));
         }
@@ -236,6 +236,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.setTrueFalse());
 
         /*
+         * Encode rule that the given inputs should not be used as workflow outputs
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
+                .inputsAreNotOutputs(typeAutomaton));
+
+        /*
          * Workflow I/O are encoded the last in order to
          * reuse the mappings for states, instead of introducing new ones, using the I/O
          * types of NodeType.UNKNOWN.
@@ -249,12 +255,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
                 .workdlowOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
-
-        /*
-         * Encode rule that the given inputs should not be used as workflow outputs
-         */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
-                .inputsAreNotOutputs(typeAutomaton));
 
         /*
          * Encode the constraints from the file based on the templates (manual

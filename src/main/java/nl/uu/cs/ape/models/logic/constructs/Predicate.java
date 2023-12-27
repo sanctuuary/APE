@@ -1,12 +1,12 @@
 package nl.uu.cs.ape.models.logic.constructs;
 
 /**
- * The {@code PredicateLabel} class is used to represent a label that describes
+ * The {@code Predicate} class is used to represent a label that describes
  * predicates, such as data types, operations or states in the system.
  *
  * @author Vedran Kasalica
  */
-public interface PredicateLabel extends Comparable<PredicateLabel>, APEPredicate {
+public interface Predicate extends Comparable<Predicate> {
 
     /**
      * Get the unique predicate identifier defined as String.

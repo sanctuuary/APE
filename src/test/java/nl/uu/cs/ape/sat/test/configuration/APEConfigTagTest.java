@@ -5,7 +5,7 @@ import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.sat.test.utils.TestResources;
 
@@ -114,7 +114,7 @@ public class APEConfigTagTest {
                 .put("constraints_path", TestResources.getAbsoluteResourcePath("cli/gmt/constraints_e0.json"))
                 .put("solutions_dir_path", TestResources.getAbsoluteResourcePath("cli/gmt"));
 
-        APEDomainSetup domainSetup = new APE(correct_config).getDomainSetup();
+        Domain domainSetup = new APE(correct_config).getDomainSetup();
 
         ValidationResults results = APERunConfig.validate(correct_config, domainSetup);
 

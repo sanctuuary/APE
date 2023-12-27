@@ -9,7 +9,7 @@ import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.SATAtomMappings;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
@@ -222,8 +222,8 @@ public abstract class ModuleUtils {
 	 *         modules are not returned, only the unique pairs of modules that are
 	 *         representing actual tools.
 	 */
-	public static List<Pair<PredicateLabel>> getPredicatePairs(List<? extends PredicateLabel> predicateList) {
-		List<Pair<PredicateLabel>> pairs = new ArrayList<>();
+	public static List<Pair<Predicate>> getPredicatePairs(List<? extends Predicate> predicateList) {
+		List<Pair<Predicate>> pairs = new ArrayList<>();
 
 		for (int i = 0; i < predicateList.size() - 1; i++) {
 			for (int j = i + 1; j < predicateList.size(); j++) {

@@ -9,7 +9,7 @@ import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxLiteral;
 import nl.uu.cs.ape.solver.SolutionInterpreter;
 
@@ -57,7 +57,7 @@ public class SATOutput extends SolutionInterpreter {
      * inputs.
      */
     private final List<SLTLxLiteral> references2MemTypes;
-    private final Set<PredicateLabel> usedTypeStates;
+    private final Set<Predicate> usedTypeStates;
 
     /**
      * true if the there is no solution to the problem. Problem is UNASATISFIABLE.

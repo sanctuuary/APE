@@ -19,7 +19,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
  * @author Vedran Kasalica
  */
 @Slf4j
-public abstract class TaxonomyPredicate implements PredicateLabel {
+public abstract class TaxonomyPredicate implements Predicate {
 
     /**
      * Describes the node in from the taxonomy hierarchy. The type can represent a
@@ -131,7 +131,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         return true;
     }
 
-    public int compareTo(PredicateLabel other) {
+    public int compareTo(Predicate other) {
         if (!(other instanceof TaxonomyPredicate)) {
             return this.getPredicateID().compareTo(other.getPredicateID());
         }

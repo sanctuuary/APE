@@ -5,7 +5,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
@@ -331,7 +331,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -359,7 +359,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -392,7 +392,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -422,7 +422,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -452,7 +452,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -481,7 +481,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -510,7 +510,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -540,7 +540,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -570,7 +570,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -599,7 +599,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -628,7 +628,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -660,7 +660,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -691,7 +691,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -723,7 +723,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -751,7 +751,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -781,7 +781,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -812,7 +812,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -843,7 +843,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -874,7 +874,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -904,7 +904,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());
@@ -934,7 +934,7 @@ public class ConstraintFactory {
 		}
 
 		@Override
-		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+		public String getConstraint(List<TaxonomyPredicate> parameters, Domain domainSetup,
 				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
 			if (parameters.size() != this.getNoOfParameters()) {
 				super.throwParametersError(parameters.size());

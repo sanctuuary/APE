@@ -9,7 +9,7 @@ import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.NodeType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
@@ -233,8 +233,8 @@ public class AllTypes extends AllPredicates {
      *
      * @return List of pairs of types.
      */
-    public List<Pair<PredicateLabel>> getTypePairsForEachSubTaxonomy() {
-        List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();
+    public List<Pair<Predicate>> getTypePairsForEachSubTaxonomy() {
+        List<Pair<Predicate>> pairs = new ArrayList<Pair<Predicate>>();
 
         /*
          * Create a list for each subtree of the Data Taxonomy (e.g. TypeSubTaxonomy,
@@ -272,7 +272,7 @@ public class AllTypes extends AllPredicates {
         for (List<TaxonomyPredicate> iterator : subTreesMap.values()) {
             for (int i = 0; i < iterator.size() - 1; i++) {
                 for (int j = i + 1; j < iterator.size(); j++) {
-                    pairs.add(new Pair<PredicateLabel>(iterator.get(i), iterator.get(j)));
+                    pairs.add(new Pair<Predicate>(iterator.get(i), iterator.get(j)));
                 }
             }
         }

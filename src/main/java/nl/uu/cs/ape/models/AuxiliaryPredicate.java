@@ -3,7 +3,7 @@ package nl.uu.cs.ape.models;
 import java.util.SortedSet;
 
 import nl.uu.cs.ape.models.enums.LogicOperation;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
@@ -13,7 +13,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  * @author Vedran Kasalica
  *
  */
-public interface AuxiliaryPredicate extends PredicateLabel {
+public interface AuxiliaryPredicate extends Predicate {
 
      /**
       * Gets logic operator used to group the abstracted predicates.

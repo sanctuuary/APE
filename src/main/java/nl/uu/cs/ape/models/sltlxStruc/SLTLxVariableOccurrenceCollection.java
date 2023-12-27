@@ -9,7 +9,7 @@ import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 
 /**
  * Class used to list all usages of the given variables within the formulas.
@@ -20,7 +20,7 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
 public class SLTLxVariableOccurrenceCollection {
 
 	/** Mapping variables to their predicate properties. */
-	private Map<SLTLxVariable, Set<PredicateLabel>> variableDataTypes;
+	private Map<SLTLxVariable, Set<Predicate>> variableDataTypes;
 	/**
 	 * Mapping variables (depicting memory states) to tool inputs that reference
 	 * them.
@@ -50,9 +50,9 @@ public class SLTLxVariableOccurrenceCollection {
 	 * @return {@code true} if the property was associated with the variable,
 	 *         {@code false} otherwise.
 	 */
-	public boolean addDataType(PredicateLabel dataType, SLTLxVariable variableState) {
+	public boolean addDataType(Predicate dataType, SLTLxVariable variableState) {
 		if (this.variableDataTypes.get(variableState) == null) {
-			Set<PredicateLabel> preds = new HashSet<>();
+			Set<Predicate> preds = new HashSet<>();
 			boolean tmp = preds.add(dataType);
 			this.variableDataTypes.put(variableState, preds);
 			return tmp;
@@ -136,9 +136,9 @@ public class SLTLxVariableOccurrenceCollection {
 	 * @return Set (possibly empty) of memory references that are mentioned in
 	 *         combination with the given variable.
 	 */
-	public Set<PredicateLabel> getDataTypes(SLTLxVariable satVariable) {
-		Set<PredicateLabel> unaryPreds = this.variableDataTypes.get(satVariable);
-		return ((unaryPreds == null) ? new HashSet<PredicateLabel>() : unaryPreds);
+	public Set<Predicate> getDataTypes(SLTLxVariable satVariable) {
+		Set<Predicate> unaryPreds = this.variableDataTypes.get(satVariable);
+		return ((unaryPreds == null) ? new HashSet<Predicate>() : unaryPreds);
 	}
 
 	/**

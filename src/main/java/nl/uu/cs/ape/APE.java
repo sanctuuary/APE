@@ -26,7 +26,7 @@ import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.domain.APEDimensionsException;
-import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.domain.OWLReader;
 import nl.uu.cs.ape.models.MappingsException;
 import nl.uu.cs.ape.models.enums.SynthesisFlag;
@@ -52,7 +52,7 @@ public class APE implements APEInterface {
 	private final APECoreConfig config;
 
 	/** Object containing general APE encoding. */
-	private APEDomainSetup apeDomainSetup;
+	private Domain apeDomainSetup;
 
 	/**
 	 * Create instance of the APE solver.
@@ -125,7 +125,7 @@ public class APE implements APEInterface {
 		 * Encode the taxonomies as objects - generate the list of all types / modules
 		 * occurring in the taxonomies defining their submodules/subtypes
 		 */
-		apeDomainSetup = new APEDomainSetup(config);
+		apeDomainSetup = new Domain(config);
 
 		OWLReader owlReader = new OWLReader(apeDomainSetup, config.getOntologyFile());
 		boolean ontologyRead = owlReader.readOntology();
@@ -185,7 +185,7 @@ public class APE implements APEInterface {
 	 * @return The object that contains all crucial information about the domain
 	 *         (e.g. list of tools, data types, constraint factory, etc.)
 	 */
-	public APEDomainSetup getDomainSetup() {
+	public Domain getDomainSetup() {
 		return apeDomainSetup;
 	}
 
@@ -284,7 +284,7 @@ public class APE implements APEInterface {
 	 *                       file.
 	 * @throws JSONException Error in configuration object.
 	 */
-	private SolutionsList runSynthesis(JSONObject runConfigJson, APEDomainSetup apeDomainSetup)
+	private SolutionsList runSynthesis(JSONObject runConfigJson, Domain apeDomainSetup)
 			throws IOException, JSONException, APEConfigException {
 		apeDomainSetup.clearConstraints();
 		APERunConfig runConfig = new APERunConfig(runConfigJson, apeDomainSetup);

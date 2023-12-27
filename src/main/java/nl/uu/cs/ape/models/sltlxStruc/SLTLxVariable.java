@@ -9,7 +9,7 @@ import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /***
@@ -23,7 +23,7 @@ import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
  *
  * @author Vedran Kasalica
  */
-public class SLTLxVariable implements StateInterface, PredicateLabel {
+public class SLTLxVariable implements StateInterface, Predicate {
 
 	/** Unique name of the type state variable */
 	private final String variableID;
@@ -75,7 +75,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		return variableID;
 	}
 
-	public int compareTo(PredicateLabel other) {
+	public int compareTo(Predicate other) {
 		return this.getPredicateID().compareTo(other.getPredicateID());
 	}
 
@@ -207,7 +207,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		 */
 
 		for (State varState : variableSubstitutions.getVariableDomain(variable)) {
-			for (PredicateLabel usedPred : varOccurrences.getDataTypes(variable)) {
+			for (Predicate usedPred : varOccurrences.getDataTypes(variable)) {
 				/* (VAL(?x,a) => (P(?x) <=> P(a)) */
 				allFacts.add(new SLTLxImplication(
 						new SLTLxAtomVar(
@@ -357,7 +357,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		 * and thus we use the next state to get the domain of the variable.
 		 */
 		int nextStateNo = stateNo + 1;
-		Set<Pair<PredicateLabel>> statePairs = APEUtils
+		Set<Pair<Predicate>> statePairs = APEUtils
 				.getUniquePairs(synthesisEngine.getTypeAutomaton().getAllMemoryStatesUntilBlockNo(nextStateNo));
 
 		statePairs.forEach(statePair -> {

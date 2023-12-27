@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.domain.APEDimensionsException;
-import nl.uu.cs.ape.domain.APEDomainSetup;
+import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.Module;
@@ -108,7 +108,7 @@ public class ConstraintTemplateParameter {
 	 * @throws APEDimensionsException if the referenced types/modules are not well
 	 *                                defined
 	 */
-	public TaxonomyPredicate readConstraintParameterFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
+	public TaxonomyPredicate readConstraintParameterFromJson(JSONObject jsonParam, Domain domainSetup)
 			throws JSONException, APEDimensionsException {
 		if (parameterTypes.get(0) instanceof Type) {
 			return Type.taxonomyInstanceFromJson(jsonParam, domainSetup, false);

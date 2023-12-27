@@ -7,7 +7,7 @@ import java.util.Set;
 
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
@@ -125,9 +125,9 @@ public class AllModules extends AllPredicates {
      *
      * @return List of pairs of modules.
      */
-    public Set<Pair<PredicateLabel>> getSimplePairs() {
+    public Set<Pair<Predicate>> getSimplePairs() {
 
-        Set<PredicateLabel> iterator = new HashSet<PredicateLabel>();
+        Set<Predicate> iterator = new HashSet<Predicate>();
         for (TaxonomyPredicate module : getMappedPredicates().values()) {
             if (module.isSimplePredicate()) {
                 iterator.add(module);

@@ -3,7 +3,7 @@ package nl.uu.cs.ape.models.sltlxStruc;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 
 /**
  * The {@code SLTLxLiteral} class represents literals (atoms that can be
@@ -160,7 +160,7 @@ public class SLTLxLiteral implements Comparable<SLTLxLiteral> {
      *
      * @return StateInterface object that is referred by the literal.
      */
-    public PredicateLabel getPredicate() {
+    public Predicate getPredicate() {
         return atom.getPredicate();
     }
 

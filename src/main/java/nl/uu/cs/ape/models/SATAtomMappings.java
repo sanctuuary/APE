@@ -1,11 +1,12 @@
 package nl.uu.cs.ape.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
@@ -20,7 +21,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
  *
  * @author Vedran Kasalica
  */
-public class SATAtomMappings {
+public class SATAtomMappings implements Serializable {
 
     /**
      * First variable that can be used for auxiliary variables.
@@ -67,12 +68,12 @@ public class SATAtomMappings {
      * Instantiates a new SLTLxAtom mappings.
      */
     public SATAtomMappings() {
-        mappings = new HashMap<SLTLxAtom, Integer>();
-        reverseMapping = new HashMap<Integer, SLTLxAtom>();
-        mapped = new HashMap<String, SLTLxAtom>();
-        vMappings = new HashMap<SLTLxAtomVar, Integer>();
-        vReverseMapping = new HashMap<Integer, SLTLxAtomVar>();
-        vMapped = new HashMap<String, SLTLxAtomVar>();
+        mappings = new HashMap<>();
+        reverseMapping = new HashMap<>();
+        mapped = new HashMap<>();
+        vMappings = new HashMap<>();
+        vReverseMapping = new HashMap<>();
+        vMapped = new HashMap<>();
 
         /* First auxMax variables are reserved for auxiliary variables */
         auxiliary = auxDefaultInit;
@@ -93,7 +94,7 @@ public class SATAtomMappings {
      *                    (such as {@link AtomType#MODULE}.
      * @return Mapping number of the atom (number is always &gt; 0).
      */
-    public synchronized Integer add(PredicateLabel predicate, State usedInState, AtomType elementType)
+    public synchronized Integer add(Predicate predicate, State usedInState, AtomType elementType)
             throws MappingsException {
         SLTLxAtom atom = new SLTLxAtom(elementType, predicate, usedInState);
 
