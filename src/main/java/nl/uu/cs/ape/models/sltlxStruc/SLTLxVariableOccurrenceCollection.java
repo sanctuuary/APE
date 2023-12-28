@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.NoArgsConstructor;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Pair;
@@ -17,30 +18,20 @@ import nl.uu.cs.ape.models.logic.constructs.Predicate;
  * @author Vedran Kasalica
  *
  */
+@NoArgsConstructor
 public class SLTLxVariableOccurrenceCollection {
 
 	/** Mapping variables to their predicate properties. */
-	private Map<SLTLxVariable, Set<Predicate>> variableDataTypes;
+	private final Map<SLTLxVariable, Set<Predicate>> variableDataTypes = new HashMap<>();
 	/**
 	 * Mapping variables (depicting memory states) to tool inputs that reference
 	 * them.
 	 */
-	private Map<SLTLxVariable, Set<State>> variableMemoryReferences;
+	private final Map<SLTLxVariable, Set<State>> variableMemoryReferences = new HashMap<>();
 	/** Mapping pairs variables to their usages under binary predicates. */
-	private Map<Pair<SLTLxVariable>, Set<AtomVarType>> binaryPredicates;
+	private final Map<Pair<SLTLxVariable>, Set<AtomVarType>> binaryPredicates = new HashMap<>();
 	/** Variable mapping to variables it is combined with under a pair. */
-	private Map<SLTLxVariable, Set<Pair<SLTLxVariable>>> variablePairs;
-
-	/**
-	 * Create the variable usage class.
-	 */
-	public SLTLxVariableOccurrenceCollection() {
-		super();
-		this.variableDataTypes = new HashMap<>();
-		this.variableMemoryReferences = new HashMap<>();
-		this.binaryPredicates = new HashMap<>();
-		this.variablePairs = new HashMap<>();
-	}
+	private final Map<SLTLxVariable, Set<Pair<SLTLxVariable>>> variablePairs = new HashMap<>();
 
 	/**
 	 * Associate the data type to the corresponding variable.

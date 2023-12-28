@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.domain;
+package nl.uu.cs.ape.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +13,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.ToolAnnotationTag;
-import nl.uu.cs.ape.utils.APEFiles;
-import nl.uu.cs.ape.utils.APEUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

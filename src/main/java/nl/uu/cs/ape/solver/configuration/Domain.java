@@ -1,25 +1,20 @@
-package nl.uu.cs.ape.domain;
+package nl.uu.cs.ape.solver.configuration;
 
 import java.io.IOException;
 import java.util.*;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.ToolAnnotationTag;
-import nl.uu.cs.ape.constraints.ConstraintFactory;
-import nl.uu.cs.ape.constraints.ConstraintFormatException;
-import nl.uu.cs.ape.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.constraints.ConstraintTemplateParameter;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AbstractModule;
-import nl.uu.cs.ape.models.AllModules;
-import nl.uu.cs.ape.models.AllTypes;
+import nl.uu.cs.ape.models.DomainModules;
+import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
-import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
@@ -33,47 +28,52 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 @Slf4j
 public class Domain {
 
-    /* Helper objects used to keep track of the domain quality. */
-    private Set<String> emptyTools = new HashSet<>();
-    private Set<String> wrongToolIO = new HashSet<>();
-    private Set<String> wrongToolTax = new HashSet<>();
+    private static final String TOOLS_JSON_TAG = "functions";
     /**
      * All modules/operations used in the domain.
      */
-    private AllModules allModules;
+    private DomainModules allModules;
 
     /**
      * All data types defined in the domain.
      */
-    private AllTypes allTypes;
+    private DomainTypes allTypes;
 
     /**
      * Prefix used to define OWL class IDs
      */
+    @Getter
     private String ontologyPrefixIRI;
 
     /**
      * Helper predicates defined within the domain model.
      */
-    private List<AuxiliaryPredicate> helperPredicates;
+    @Getter
+    private final List<AuxiliaryPredicate> helperPredicates = new ArrayList<>();
 
     /**
      * Maximum number of inputs that a tool can have.
      */
+    @Getter
     private int maxNoToolInputs = 0;
 
     /**
      * Maximum number of outputs that a tool can have.
      */
+    @Getter
     private int maxNoToolOutputs = 0;
 
     /**
      * Holds information whether the domain was annotated under the strict rules of
      * the output dependency.
      */
+    @Getter
     private boolean useStrictToolAnnotations;
 
-    private static final String TOOLS_JSON_TAG = "functions";
+    /* Helper objects used to keep track of the domain quality. */
+    private Set<String> emptyTools = new HashSet<>();
+    private Set<String> wrongToolIO = new HashSet<>();
+    private Set<String> wrongToolTax = new HashSet<>();
 
     /**
      * Instantiates a new Ape domain setup.
@@ -81,9 +81,8 @@ public class Domain {
      * @param config the config
      */
     public Domain(APECoreConfig config) {
-        this.allModules = new AllModules(config);
-        this.allTypes = new AllTypes(config);
-        this.helperPredicates = new ArrayList<>();
+        this.allModules = new DomainModules(config);
+        this.allTypes = new DomainTypes(config);
         this.ontologyPrefixIRI = config.getOntologyPrefixIRI();
         this.useStrictToolAnnotations = config.getUseStrictToolAnnotations();
     }
@@ -93,7 +92,7 @@ public class Domain {
      *
      * @return The field {@link #allModules}.
      */
-    public AllModules getAllModules() {
+    public DomainModules getAllModules() {
         return allModules;
     }
 
@@ -102,7 +101,7 @@ public class Domain {
      *
      * @return the field {@link #allTypes}.
      */
-    public AllTypes getAllTypes() {
+    public DomainTypes getAllTypes() {
         return allTypes;
     }
 
@@ -147,7 +146,8 @@ public class Domain {
 
     /**
      * Creates/updates a module from a tool annotation instance from a JSON file and
-     * updates the list of modules ({@link AllModules}) in the domain accordingly.
+     * updates the list of modules ({@link DomainModules}) in the domain
+     * accordingly.
      *
      * @param jsonModule JSON representation of a module
      * @return {@code true} if the domain was updated, false otherwise.
@@ -296,24 +296,6 @@ public class Domain {
     }
 
     /**
-     * Gets ontology prefix IRI.
-     *
-     * @return the ontology prefix IRI
-     */
-    public String getOntologyPrefixIRI() {
-        return ontologyPrefixIRI;
-    }
-
-    /**
-     * Get the maximum number of inputs that a tool can have.
-     *
-     * @return the field {@link #maxNoToolInputs}.
-     */
-    public int getMaxNoToolInputs() {
-        return maxNoToolInputs;
-    }
-
-    /**
      * Update the maximum number of inputs that a tool can have, i.e. increase the
      * number if the current max number is smaller than the new number of inputs.
      *
@@ -323,15 +305,6 @@ public class Domain {
         if (this.maxNoToolInputs < currNoInputs) {
             this.maxNoToolInputs = currNoInputs;
         }
-    }
-
-    /**
-     * Get the maximum number of outputs that a tool can have.
-     *
-     * @return the field {@link #maxNoToolOutputs}.
-     */
-    public int getMaxNoToolOutputs() {
-        return maxNoToolOutputs;
     }
 
     /**
@@ -351,28 +324,8 @@ public class Domain {
      * 
      * @param helperPredicate
      */
-    public void addHelperPredicate(AuxiliaryPredicate helperPredicate) {
+    protected void addHelperPredicate(AuxiliaryPredicate helperPredicate) {
         helperPredicates.add(helperPredicate);
-
-    }
-
-    /**
-     * Get information whether the domain was annotated under the strict rules of
-     * the output dependency.
-     * 
-     * @return {@code true} if the strict rules apply, {@code false} otherwise.
-     */
-    public boolean getUseStrictToolAnnotations() {
-        return useStrictToolAnnotations;
-    }
-
-    /**
-     * Get the list of helper predicates used in the domain.
-     * 
-     * @return List of the auxiliary helper predicates.
-     */
-    public List<AuxiliaryPredicate> getHelperPredicates() {
-        return helperPredicates;
     }
 
 }

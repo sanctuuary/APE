@@ -25,19 +25,19 @@ import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.domain.APEDimensionsException;
-import nl.uu.cs.ape.domain.Domain;
-import nl.uu.cs.ape.domain.OWLReader;
 import nl.uu.cs.ape.models.MappingsException;
 import nl.uu.cs.ape.models.enums.SynthesisFlag;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.solver.SynthesisEngine;
+import nl.uu.cs.ape.solver.configuration.APEDimensionsException;
+import nl.uu.cs.ape.solver.configuration.Domain;
 import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.solver.solutionStructure.cwl.DefaultCWLCreator;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.utils.OWLReader;
 
 /**
  * The {@code APE} class is the main class of the library and is supposed to be

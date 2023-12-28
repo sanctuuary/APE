@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.NoArgsConstructor;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.Predicate;
@@ -21,6 +22,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
  *
  * @author Vedran Kasalica
  */
+@NoArgsConstructor
 public class SATAtomMappings implements Serializable {
 
     /**
@@ -29,57 +31,37 @@ public class SATAtomMappings implements Serializable {
      * {@code false}.
      */
     private static final int auxDefaultInit = 3;
-    /** Max number of all auxiliary variables. */
-    private static final int auxMax = 100000;
-    /** Max number of all expected atoms containing variables. */
-    private static final int atomVarMaxNo = 100000;
-    /** Mapping of the atoms to integers. */
-    private Map<SLTLxAtom, Integer> mappings;
-    /** Inverse mapping from integers to atoms. */
-    private Map<Integer, SLTLxAtom> reverseMapping;
-    /** Map of all the IDs that were mapped to atoms. */
-    private Map<String, SLTLxAtom> mapped;
-
-    /** Mapping of the atoms over variables to integers. */
-    private Map<SLTLxAtomVar, Integer> vMappings;
-    /** Inverse mapping from integers to atoms containing variables. */
-    private Map<Integer, SLTLxAtomVar> vReverseMapping;
-    /** Map of all the IDs that were mapped to atoms containing variables. */
-    private Map<String, SLTLxAtomVar> vMapped;
-
-    /**
-     * Number of mapped atoms.
-     */
-    private int atomNo;
-
-    /**
-     * Number of mapped atoms containing variables.
-     */
-    private int atomVarNo;
-
     /**
      * Last number used to represent auxiliary introduced variables.
      * Numbers 1 and 2 are special symbols. 1 is {@code true} and 2 is
      * {@code false}.
      */
-    private int auxiliary;
+    private int auxiliary = auxDefaultInit;
+    /** Max number of all auxiliary variables. */
+    private static final int auxMax = 100000;
 
-    /**
-     * Instantiates a new SLTLxAtom mappings.
-     */
-    public SATAtomMappings() {
-        mappings = new HashMap<>();
-        reverseMapping = new HashMap<>();
-        mapped = new HashMap<>();
-        vMappings = new HashMap<>();
-        vReverseMapping = new HashMap<>();
-        vMapped = new HashMap<>();
+    /** Max number of all expected atoms containing variables. */
+    private static final int atomVarMaxNo = 100000;
 
-        /* First auxMax variables are reserved for auxiliary variables */
-        auxiliary = auxDefaultInit;
-        atomVarNo = auxMax + 1;
-        atomNo = auxMax + atomVarMaxNo + 1;
-    }
+    /** Number of mapped atoms. */
+    private int atomNo = auxMax + atomVarMaxNo + 1;
+
+    /** Number of mapped atoms containing variables. */
+    private int atomVarNo = auxMax + 1;
+
+    /** Mapping of the atoms to integers. */
+    private final Map<SLTLxAtom, Integer> mappings = new HashMap<>();
+    /** Inverse mapping from integers to atoms. */
+    private final Map<Integer, SLTLxAtom> reverseMapping = new HashMap<>();
+    /** Map of all the IDs that were mapped to atoms. */
+    private final Map<String, SLTLxAtom> mapped = new HashMap<>();
+
+    /** Mapping of the atoms over variables to integers. */
+    private final Map<SLTLxAtomVar, Integer> vMappings = new HashMap<>();
+    /** Inverse mapping from integers to atoms containing variables. */
+    private final Map<Integer, SLTLxAtomVar> vReverseMapping = new HashMap<>();
+    /** Map of all the IDs that were mapped to atoms containing variables. */
+    private final Map<String, SLTLxAtomVar> vMapped = new HashMap<>();
 
     /**
      * Function is returning the mapping number of the

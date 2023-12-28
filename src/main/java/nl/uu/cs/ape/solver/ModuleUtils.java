@@ -5,7 +5,7 @@ import java.util.List;
 
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.models.AllModules;
+import nl.uu.cs.ape.models.DomainModules;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.SATAtomMappings;
@@ -184,7 +184,7 @@ public abstract class ModuleUtils {
 	 * @param mappings        Mapping function.
 	 * @return The String representation of constraints.
 	 */
-	public abstract String moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton,
+	public abstract String moduleMutualExclusion(DomainModules allModules, ModuleAutomaton moduleAutomaton,
 			SATAtomMappings mappings);
 
 	/**
@@ -196,7 +196,7 @@ public abstract class ModuleUtils {
 	 * @param mappings        Mapping function.
 	 * @return String representation of constraints.
 	 */
-	public abstract String moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton,
+	public abstract String moduleMandatoryUsage(DomainModules allModules, ModuleAutomaton moduleAutomaton,
 			SATAtomMappings mappings);
 
 	/**
@@ -211,7 +211,7 @@ public abstract class ModuleUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications.
 	 */
-	public abstract String moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
+	public abstract String moduleEnforceTaxonomyStructure(DomainModules allModules, TaxonomyPredicate currModule,
 			ModuleAutomaton moduleAutomaton, SATAtomMappings mappings);
 
 	/**

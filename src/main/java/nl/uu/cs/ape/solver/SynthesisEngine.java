@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.List;
 
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.models.SATAtomMappings;
+import nl.uu.cs.ape.solver.configuration.Domain;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
 
 /**

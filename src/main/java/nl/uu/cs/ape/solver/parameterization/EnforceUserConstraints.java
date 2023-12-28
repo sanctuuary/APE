@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.minisat;
+package nl.uu.cs.ape.solver.parameterization;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,8 +11,7 @@ import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APEConfigException;
-import nl.uu.cs.ape.domain.Domain;
-import nl.uu.cs.ape.models.AllTypes;
+import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
@@ -21,6 +20,8 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.parserSLTLx.SLTLxSATVisitor;
+import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,7 +37,7 @@ public class EnforceUserConstraints {
      * @throws APEConfigException Exception thrown when one of the output types is
      *                            not defined in the taxonomy.
      */
-    public static Set<SLTLxFormula> workflowInputs(AllTypes allTypes, List<Type> program_inputs,
+    public static Set<SLTLxFormula> workflowInputs(DomainTypes allTypes, List<Type> program_inputs,
             TypeAutomaton typeAutomaton) throws APEConfigException {
         Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
@@ -75,7 +76,7 @@ public class EnforceUserConstraints {
      * @throws APEConfigException Exception thrown when one of the output types is
      *                            not defined in the taxonomy.
      */
-    public static Set<SLTLxFormula> workdlowOutputs(AllTypes allTypes, List<Type> program_outputs,
+    public static Set<SLTLxFormula> workdlowOutputs(DomainTypes allTypes, List<Type> program_outputs,
             TypeAutomaton typeAutomaton) throws APEConfigException {
         Set<SLTLxFormula> fullEncoding = new HashSet<>();
 

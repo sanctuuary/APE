@@ -27,13 +27,13 @@ public class TypeAutomaton implements Automaton {
      * Blocks of data types that are being added to the memory (usually outputs from
      * the tools, apart from the initial workflow input).
      */
-    private List<Block> memoryTypesAutomaton;
+    private final List<Block> memoryTypesAutomaton = new ArrayList<>();
 
     /**
      * Blocks of data types that are being used by tools from the memory (inputs to
      * the tools).
      */
-    private List<Block> usedTypesAutomaton;
+    private final List<Block> usedTypesAutomaton = new ArrayList<>();
 
     /**
      * State is used in order to represent no state.
@@ -54,8 +54,6 @@ public class TypeAutomaton implements Automaton {
      *                        modules)
      */
     public TypeAutomaton(int automataBound, int inputBranching, int outputBranching) {
-        memoryTypesAutomaton = new ArrayList<Block>();
-        usedTypesAutomaton = new ArrayList<Block>();
         nullState = new State(null, null, -1, inputBranching, outputBranching);
 
         automataBound = automataBound < 1 ? 1 : automataBound;
@@ -224,7 +222,7 @@ public class TypeAutomaton implements Automaton {
      * @return List of memory States.
      */
     public List<State> getMemoryStatesUntilBlockNo(int maxBlockNo) {
-        List<State> untilStates = new ArrayList<State>();
+        List<State> untilStates = new ArrayList<>();
         for (int i = 0; i <= maxBlockNo && i < this.usedTypesAutomaton.size(); i++) {
             Block currBlock = this.getMemoryTypesBlock(i);
             for (State currState : currBlock.getStates()) {
@@ -244,7 +242,7 @@ public class TypeAutomaton implements Automaton {
      * @return List of Type States.
      */
     public List<State> getAllStatesUntilBlockNo(int maxBlockNo) {
-        List<State> untilStates = new ArrayList<State>();
+        List<State> untilStates = new ArrayList<>();
         for (int i = 0; i <= maxBlockNo && i < this.usedTypesAutomaton.size(); i++) {
             Block currBlock = this.usedTypesAutomaton.get(i);
             for (State currState : currBlock.getStates()) {
@@ -268,7 +266,7 @@ public class TypeAutomaton implements Automaton {
      * @return List of Memory Type States.
      */
     public List<State> getAllMemoryStatesUntilBlockNo(int maxBlockNo) {
-        List<State> untilStates = new ArrayList<State>();
+        List<State> untilStates = new ArrayList<>();
         for (int i = 0; i <= maxBlockNo && i < this.usedTypesAutomaton.size(); i++) {
             Block currBlock = this.memoryTypesAutomaton.get(i);
             for (State currState : currBlock.getStates()) {
@@ -287,7 +285,7 @@ public class TypeAutomaton implements Automaton {
      * @return List of memory States.
      */
     public List<State> getMemoryStatesAfterBlockNo(int minBlockNo) {
-        List<State> afterStates = new ArrayList<State>();
+        List<State> afterStates = new ArrayList<>();
         for (int i = minBlockNo + 1; i < this.memoryTypesAutomaton.size(); i++) {
             Block currBlock = this.getMemoryTypesBlock(i);
             for (State currState : currBlock.getStates()) {
@@ -307,7 +305,7 @@ public class TypeAutomaton implements Automaton {
      * @return List of Used States.
      */
     public List<State> getUsedStatesAfterBlockNo(int minBlockNo) {
-        List<State> afterStates = new ArrayList<State>();
+        List<State> afterStates = new ArrayList<>();
         for (int i = minBlockNo + 1; i < this.usedTypesAutomaton.size(); i++) {
             Block currBlock = this.usedTypesAutomaton.get(i);
             for (State currState : currBlock.getStates()) {
@@ -324,7 +322,7 @@ public class TypeAutomaton implements Automaton {
      */
     @Override
     public List<State> getAllStates() {
-        List<State> allStates = new ArrayList<State>();
+        List<State> allStates = new ArrayList<>();
         for (Block currBlock : getAllBlocks()) {
             for (State currState : currBlock.getStates()) {
                 allStates.add(currState);
@@ -339,7 +337,7 @@ public class TypeAutomaton implements Automaton {
      * @return List of memory type states.
      */
     public List<State> getAllMemoryTypesStates() {
-        List<State> allMemoryStates = new ArrayList<State>();
+        List<State> allMemoryStates = new ArrayList<>();
         for (Block currBlock : getMemoryTypesBlocks()) {
             for (State currState : currBlock.getStates()) {
                 allMemoryStates.add(currState);
@@ -354,7 +352,7 @@ public class TypeAutomaton implements Automaton {
      * @return List of used type states.
      */
     public List<State> getAllUsedTypesStates() {
-        List<State> allUsedStates = new ArrayList<State>();
+        List<State> allUsedStates = new ArrayList<>();
         for (Block currBlock : getUsedTypesBlocks()) {
             for (State currState : currBlock.getStates()) {
                 allUsedStates.add(currState);

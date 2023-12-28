@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.minisat;
+package nl.uu.cs.ape.solver.configuration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,9 +10,8 @@ import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.models.AllModules;
+import nl.uu.cs.ape.models.DomainModules;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
@@ -29,6 +28,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxImplication;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegatedConjunction;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxXOR;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
  * The {@code ModuleUtils} class is used to encode SLTLx constraints based on
@@ -937,7 +937,7 @@ public final class EnforceModuleRelatedRules {
 	 * @param moduleAutomaton Module automaton.
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	public static Set<SLTLxFormula> moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton) {
+	public static Set<SLTLxFormula> moduleMandatoryUsage(DomainModules allModules, ModuleAutomaton moduleAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
 		if (allModules.getModules().isEmpty()) {
@@ -975,7 +975,7 @@ public final class EnforceModuleRelatedRules {
 	 *         taxonomy
 	 *         classifications.
 	 */
-	public static Set<SLTLxFormula> moduleTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
+	public static Set<SLTLxFormula> moduleTaxonomyStructure(DomainModules allModules, TaxonomyPredicate currModule,
 			ModuleAutomaton moduleAutomaton) {
 
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
@@ -994,7 +994,7 @@ public final class EnforceModuleRelatedRules {
 	 * @param currModule  Module that should be used.
 	 * @param moduleState State in which the module should be used.
 	 */
-	private static Set<SLTLxFormula> moduleTaxonomyStructureForState(AllModules allModules,
+	private static Set<SLTLxFormula> moduleTaxonomyStructureForState(DomainModules allModules,
 			TaxonomyPredicate currModule, State moduleState) {
 		SLTLxAtom superModuleState = new SLTLxAtom(AtomType.MODULE, currModule, moduleState);
 

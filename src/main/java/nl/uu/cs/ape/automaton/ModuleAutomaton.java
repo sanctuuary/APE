@@ -19,7 +19,7 @@ import nl.uu.cs.ape.models.enums.AtomType;
  */
 public class ModuleAutomaton implements Automaton {
 
-    private List<State> moduleStates;
+    private final List<State> moduleStates = new ArrayList<>();
 
     /**
      * Generate the Module State automatons based on the defined length.
@@ -31,7 +31,6 @@ public class ModuleAutomaton implements Automaton {
      *                        modules).
      */
     public ModuleAutomaton(int automataBound, int inputBranching, int outputBranching) {
-        moduleStates = new ArrayList<State>();
         automataBound = Math.max(automataBound, 1);
 
         for (int i = 1; i <= automataBound; i++) {

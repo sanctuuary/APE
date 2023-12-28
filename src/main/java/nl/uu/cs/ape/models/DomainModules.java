@@ -11,21 +11,21 @@ import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
- * The {@code AllModules} class represent the set of all modules/tools that can
- * be
- * part of our program. Each of them is either {@link Module} or
+ * The {@code DomainModules} class represent the set of all modules/tools that
+ * are part of the configured domain. They can
+ * be steps in generated workflows. Each of them is either {@link Module} or
  * {@link AbstractModule}.
  *
  * @author Vedran Kasalica
  */
-public class AllModules extends AllPredicates {
+public class DomainModules extends DomainPredicates {
 
     /**
      * Instantiates a new All modules.
      *
      * @param config the config
      */
-    public AllModules(APECoreConfig config) {
+    public DomainModules(APECoreConfig config) {
         super(Arrays.asList(config.getToolTaxonomyRoot()));
     }
 
@@ -34,7 +34,7 @@ public class AllModules extends AllPredicates {
      *
      * @param moduleTaxonomyRoot root module
      */
-    public AllModules(String moduleTaxonomyRoot) {
+    public DomainModules(String moduleTaxonomyRoot) {
         super(Arrays.asList(moduleTaxonomyRoot));
     }
 

@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.minisat;
+package nl.uu.cs.ape.solver.configuration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,9 +9,8 @@ import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APEConfigException;
-import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.models.AllTypes;
+import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.AuxTypePredicate;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
@@ -163,7 +162,7 @@ public class EnforceTypeRelatedRules {
      * @return The String representation of constraints enforcing taxonomy
      *         classifications.
      */
-    public static Set<SLTLxFormula> typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton) {
+    public static Set<SLTLxFormula> typeEnforceTaxonomyStructure(DomainTypes allTypes, TypeAutomaton typeAutomaton) {
         Set<SLTLxFormula> fullEncoding = new HashSet<>();
         // taxonomy enforcement of types in in all the states (those that represent
         // general memory and used data instances)

@@ -11,11 +11,11 @@ import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.models.Range;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.SolverType;
+import nl.uu.cs.ape.solver.configuration.Domain;
 
 import java.io.IOException;
 import java.nio.file.Path;

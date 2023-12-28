@@ -7,13 +7,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.uu.cs.ape.domain.APEDimensionsException;
-import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.solver.configuration.APEDimensionsException;
+import nl.uu.cs.ape.solver.configuration.Domain;
 
 /**
  * The {@code ConstraintTemplateParameter} class is used to represent a

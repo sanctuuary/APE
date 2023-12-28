@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class CNFClause {
 
-	List<Integer> atoms;
+	private final List<Integer> atoms = new ArrayList<>();
 
 	/**
 	 * Create clause based on the list of elements (integers, bigger that 0)
@@ -25,7 +25,6 @@ public class CNFClause {
 	 */
 	public CNFClause(List<Integer> atoms) {
 		super();
-		this.atoms = new ArrayList<>();
 		atoms.forEach(atom -> this.atoms.add(atom));
 	}
 
@@ -36,7 +35,6 @@ public class CNFClause {
 	 */
 	public CNFClause(Integer atom) {
 		super();
-		this.atoms = new ArrayList<>();
 		this.atoms.add(atom);
 	}
 
@@ -51,7 +49,7 @@ public class CNFClause {
 	 */
 	public static Set<String> conjunctClausesCollection(Set<Set<String>> facts) {
 		Set<String> allClauses = new HashSet<>();
-		facts.forEach(col -> allClauses.addAll(col));
+		facts.forEach(allClauses::addAll);
 
 		return allClauses;
 	}

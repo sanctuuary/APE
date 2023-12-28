@@ -7,7 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Pair;
@@ -18,6 +17,7 @@ import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
+import nl.uu.cs.ape.solver.configuration.Domain;
 import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 import java.io.*;

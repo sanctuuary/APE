@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Pair;
@@ -23,6 +22,11 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccurrenceCollection;
 import nl.uu.cs.ape.solver.SynthesisEngine;
+import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.configuration.EnforceModuleRelatedRules;
+import nl.uu.cs.ape.solver.configuration.EnforceSLTLxRelatedRules;
+import nl.uu.cs.ape.solver.configuration.EnforceTypeRelatedRules;
+import nl.uu.cs.ape.solver.parameterization.EnforceUserConstraints;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 
@@ -248,12 +252,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * 
          * Encode the workflow input.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceUserConstraints
                 .workflowInputs(domainSetup.getAllTypes(), runConfig.getProgramInputs(), typeAutomaton));
         /*
          * Encode the workflow output
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceUserConstraints
                 .workdlowOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
 
         /*

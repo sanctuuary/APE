@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.domain;
+package nl.uu.cs.ape.solver.parameterization;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,20 +8,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nl.uu.cs.ape.constraints.ConstraintFactory;
 import nl.uu.cs.ape.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.constraints.ConstraintTemplateParameter;
-import nl.uu.cs.ape.models.AllModules;
-import nl.uu.cs.ape.models.AllTypes;
+import nl.uu.cs.ape.models.DomainModules;
+import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.solver.configuration.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
 
+@NoArgsConstructor
 public class UserSpecification {
 
-    private static final String CONSTR_JSON_TAG = "constraints";
     private static final String CONSTR_ID_TAG = "constraintid";
     private static final String CONSTR_SLTLx = "formula";
     private static final String CONSTR_PARAM_JSON_TAG = "parameters";
@@ -29,29 +32,26 @@ public class UserSpecification {
     /**
      * Object used to create temporal constraints.
      */
-    private ConstraintFactory constraintFactory;
+    @Getter
+    private final ConstraintFactory constraintFactory = new ConstraintFactory();
 
     /**
      * List of data gathered from the constraint file.
      */
-    private List<ConstraintTemplateData> unformattedConstr;
+    @Getter
+    private final List<ConstraintTemplateData> unformattedConstr = new ArrayList<>();
 
     /**
      * List of helper predicates that are used to encode the constraints.
      */
-    private List<AuxiliaryPredicate> helperPredicates;
+    @Getter
+    private final List<AuxiliaryPredicate> helperPredicates = new ArrayList<>();
 
     /**
      * List of constraints provided as Strings in SLTLx format.
      */
-    private List<String> constraintsSLTLx;
-
-    public UserSpecification() {
-        this.unformattedConstr = new ArrayList<>();
-        this.constraintsSLTLx = new ArrayList<>();
-        this.helperPredicates = new ArrayList<>();
-        this.constraintFactory = new ConstraintFactory();
-    }
+    @Getter
+    private final List<String> constraintsSLTLx = new ArrayList<>();
 
     /**
      * Add constraint data.
@@ -72,24 +72,6 @@ public class UserSpecification {
      */
     public void addSLTLxConstraint(String formulaSLTLx) {
         this.constraintsSLTLx.add(formulaSLTLx);
-    }
-
-    /**
-     * Gets unformatted constraints.
-     *
-     * @return the field {@link #unformattedConstr}.
-     */
-    public List<ConstraintTemplateData> getUnformattedConstr() {
-        return unformattedConstr;
-    }
-
-    /**
-     * Gets all SLTLx constraints specified by the user in SLTLx as text.
-     * 
-     * @return Set of string representations of the constraints.
-     */
-    public List<String> getSLTLxConstraints() {
-        return constraintsSLTLx;
     }
 
     /**
@@ -181,20 +163,11 @@ public class UserSpecification {
     }
 
     /**
-     * Gets constraint factory.
-     *
-     * @return the field {@link #constraintFactory}.
-     */
-    public ConstraintFactory getConstraintFactory() {
-        return constraintFactory;
-    }
-
-    /**
      * Adding each constraint format in the set of all cons. formats. method
      * should be called only once all the data types and modules have been
      * initialized.
      */
-    public void initializeConstraints(AllModules allModules, AllTypes allTypes) {
+    public void initializeConstraints(DomainModules allModules, DomainTypes allTypes) {
         constraintFactory.initializeConstraints(allModules, allTypes);
     }
 
@@ -209,4 +182,14 @@ public class UserSpecification {
     public ConstraintTemplate getConstraintTemplate(String constraintID) {
         return constraintFactory.getConstraintTemplate(constraintID);
     }
+
+    /**
+     * Add predicate to the list of auxiliary predicates that should be encoded.
+     * 
+     * @param helperPredicate
+     */
+    protected void addHelperPredicate(AuxiliaryPredicate helperPredicate) {
+        helperPredicates.add(helperPredicate);
+    }
+
 }

@@ -2,12 +2,12 @@ package nl.uu.cs.ape.constraints;
 
 import java.util.*;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.domain.Domain;
-import nl.uu.cs.ape.models.AllModules;
-import nl.uu.cs.ape.models.AllTypes;
+import nl.uu.cs.ape.models.DomainModules;
+import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.enums.AtomType;
@@ -15,6 +15,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateFormula;
 import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateFinally;
 import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateGlobally;
+import nl.uu.cs.ape.solver.configuration.Domain;
 
 /**
  * The {@code ConstraintFactory} class represents the Factory Method Pattern for
@@ -24,16 +25,10 @@ import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateGlobally;
  * @author Vedran Kasalica
  */
 @Slf4j
+@NoArgsConstructor
 public class ConstraintFactory {
 
-	private Map<String, ConstraintTemplate> constraintTemplates;
-
-	/**
-	 * Instantiates a new Constraint factory.
-	 */
-	public ConstraintFactory() {
-		this.constraintTemplates = new HashMap<>();
-	}
+	private final Map<String, ConstraintTemplate> constraintTemplates = new HashMap<>();
 
 	/**
 	 * Retrieves a list of the constraint templates.
@@ -95,7 +90,7 @@ public class ConstraintFactory {
 	 * @return String description of all the formats (ID, description and number of
 	 *         parameters for each).
 	 */
-	public boolean initializeConstraints(AllModules allModules, AllTypes allTypes) {
+	public boolean initializeConstraints(DomainModules allModules, DomainTypes allTypes) {
 
 		TaxonomyPredicate rootModule = allModules.getRootModule();
 		List<TaxonomyPredicate> rootTypes = allTypes.getDataTaxonomyDimensions();

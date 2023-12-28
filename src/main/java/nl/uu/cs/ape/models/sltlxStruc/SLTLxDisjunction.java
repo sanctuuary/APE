@@ -14,11 +14,11 @@ import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
  */
 public class SLTLxDisjunction extends SLTLxFormula {
 
-	private Set<SLTLxFormula> disjointFacts;
+	/** Set of disjoint facts. */
+	private final Set<SLTLxFormula> disjointFacts = new HashSet<>();
 
 	public SLTLxDisjunction(SLTLxFormula arg1, SLTLxFormula arg2) {
 		super();
-		this.disjointFacts = new HashSet<>();
 		if (arg1 != null)
 			this.disjointFacts.add(arg1);
 		if (arg2 != null)
@@ -27,7 +27,6 @@ public class SLTLxDisjunction extends SLTLxFormula {
 
 	public SLTLxDisjunction(Collection<? extends SLTLxFormula> conjunctedFacts) {
 		super();
-		this.disjointFacts = new HashSet<>();
 		conjunctedFacts.forEach(fact -> {
 			if (fact != null)
 				this.disjointFacts.add(fact);

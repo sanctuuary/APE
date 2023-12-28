@@ -6,12 +6,12 @@ import org.json.JSONObject;
 
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.domain.Domain;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Range;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
+import nl.uu.cs.ape.solver.configuration.Domain;
 
 import javax.inject.Provider;
 

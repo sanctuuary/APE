@@ -41,33 +41,33 @@ public class SolutionWorkflow {
      * List of module nodes ordered according to their position in the workflow.
      */
     @Getter
-    private List<ModuleNode> moduleNodes;
+    private final List<ModuleNode> moduleNodes = new ArrayList<>();
 
     /**
      * List of memory type nodes provided as the initial workflow input, ordered
      * according the initial description (config.json file).
      */
     @Getter
-    private List<TypeNode> workflowInputTypeStates;
+    private final List<TypeNode> workflowInputTypeStates = new ArrayList<>();
 
     /**
      * List of used type nodes provided as the final workflow output, ordered
      * according the initial description (config.json file).
      */
     @Getter
-    private List<TypeNode> workflowOutputTypeStates;
+    private final List<TypeNode> workflowOutputTypeStates = new ArrayList<>();
 
     /**
      * Map of all {@code ModuleNodes}, where key value is the {@link State} provided
      * by the {@link ModuleAutomaton}.
      */
-    private Map<State, ModuleNode> mappedModuleNodes;
+    private final Map<State, ModuleNode> mappedModuleNodes = new HashMap<>();
 
     /**
      * Map of all {@code MemTypeNode}, where key value is the {@link State} provided
      * by the {@link TypeAutomaton}.
      */
-    private Map<State, TypeNode> mappedMemoryTypeNodes;
+    private final Map<State, TypeNode> mappedMemoryTypeNodes = new HashMap<>();
 
     /**
      * Mapping used to allow us to determine the correlation between the usage of
@@ -76,7 +76,7 @@ public class SolutionWorkflow {
      * {@link AtomType#USED_TYPE} and a {@link ModuleNode}.<br>
      * If the second is NULL, the data is used as WORKFLOW OUTPUT.
      */
-    private Map<State, ModuleNode> usedType2ToolMap;
+    private final Map<State, ModuleNode> usedType2ToolMap = new HashMap<>();
 
     /**
      * Non-structured solution obtained directly from the SAT output.
@@ -121,6 +121,7 @@ public class SolutionWorkflow {
     /**
      * Index of the solution.
      */
+    @Getter
     private int index;
 
     /**
@@ -133,13 +134,6 @@ public class SolutionWorkflow {
      */
     private SolutionWorkflow(ModuleAutomaton toolAutomaton, TypeAutomaton typeAutomaton)
             throws ExceptionInInitializerError {
-        this.moduleNodes = new ArrayList<>();
-        this.workflowInputTypeStates = new ArrayList<>();
-        this.workflowOutputTypeStates = new ArrayList<>();
-        this.mappedModuleNodes = new HashMap<>();
-        this.mappedMemoryTypeNodes = new HashMap<>();
-        this.usedType2ToolMap = new HashMap<>();
-
         ModuleNode prev = null;
         for (State currState : toolAutomaton.getAllStates()) {
             ModuleNode currNode = new ModuleNode(currState);
@@ -350,12 +344,4 @@ public class SolutionWorkflow {
         this.index = i;
     }
 
-    /**
-     * Gets index.
-     *
-     * @return The index of the solution in all the solutions.
-     */
-    public int getIndex() {
-        return this.index;
-    }
 }

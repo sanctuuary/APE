@@ -11,10 +11,10 @@ import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.domain.OWLReader;
+import nl.uu.cs.ape.utils.OWLReader;
+import nl.uu.cs.ape.solver.configuration.APEDimensionsException;
 
 import java.io.File;
 import java.io.IOException;
