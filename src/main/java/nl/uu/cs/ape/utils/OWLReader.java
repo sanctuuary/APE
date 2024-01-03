@@ -14,8 +14,8 @@ import nl.uu.cs.ape.models.DomainModules;
 import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.NodeType;
-import nl.uu.cs.ape.solver.configuration.APEDimensionsException;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.APEDimensionsException;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import java.io.File;
 import java.util.*;

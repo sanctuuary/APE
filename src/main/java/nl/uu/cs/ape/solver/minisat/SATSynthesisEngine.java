@@ -22,13 +22,14 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxVariableOccurrenceCollection;
 import nl.uu.cs.ape.solver.SynthesisEngine;
-import nl.uu.cs.ape.solver.configuration.Domain;
-import nl.uu.cs.ape.solver.configuration.EnforceModuleRelatedRules;
-import nl.uu.cs.ape.solver.configuration.EnforceSLTLxRelatedRules;
-import nl.uu.cs.ape.solver.configuration.EnforceTypeRelatedRules;
-import nl.uu.cs.ape.solver.parameterization.EnforceUserConstraints;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.EncodeDomainConfig;
+import nl.uu.cs.ape.solver.domainconfiguration.EnforceModuleRelatedRules;
+import nl.uu.cs.ape.solver.domainconfiguration.EnforceSLTLxRelatedRules;
+import nl.uu.cs.ape.solver.domainconfiguration.EnforceTypeRelatedRules;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.solver.userspecification.EnforceUserConstraints;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -79,7 +80,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
     /**
      * CNF encoding of the problem.
      */
-    @Getter
     private File cnfEncoding;
 
     /**
@@ -164,86 +164,17 @@ public class SATSynthesisEngine implements SynthesisEngine {
             return false;
         }
         /* Generate the automaton */
-        String currLengthTimer = "length" + this.getSolutionSize();
+        String currLengthTimer = APEUtils.getTimerId(this.getSolutionSize());
+
         APEUtils.timerStart(currLengthTimer, runConfig.getDebugMode());
 
         APEUtils.timerRestartAndPrint(currLengthTimer, "Automaton encoding");
 
         /*
-         * Create constraints from the tool_annotations.json file regarding the
-         * Inputs/Outputs, preserving the structure of input and output fields.
+         * Encode the configured domain for the given workflow length and save it to the
+         * file.
          */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.moduleAnnotations(this));
-        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
-
-        /*
-         * The constraints preserve the memory structure, i.e. preserve the data
-         * available in memory and the
-         * logic of referencing data from memory in case of tool inputs.
-         */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.memoryStructure(this));
-        APEUtils.timerRestartAndPrint(currLengthTimer, "Memory structure encoding");
-
-        /*
-         * Create the constraints enforcing:
-         * 1. Mutual exclusion of the tools
-         * 2. Mandatory usage of the tools - from taxonomy.
-         * 3. Adding the constraints enforcing the taxonomy structure.
-         */
-        for (Pair<Predicate> pair : domainSetup.getAllModules().getSimplePairs()) {
-            SLTLxFormula.appendCNFToFile(cnfEncoding, this,
-                    EnforceModuleRelatedRules.moduleMutualExclusion(pair, moduleAutomaton));
-        }
-        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
-
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
-                EnforceModuleRelatedRules.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
-
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules
-                .moduleTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
-        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
-        /*
-         * Create the constraints enforcing:
-         * 1. Mutual exclusion of the types/formats (according to the search model)
-         * 2. Mandatory usage of the types in the transition nodes (note: "empty type"
-         * is considered a type)
-         * 3. Adding the constraints enforcing the taxonomy structure.
-         */
-        for (Pair<Predicate> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
-            SLTLxFormula.appendCNFToFile(cnfEncoding, this,
-                    EnforceTypeRelatedRules.memoryTypesMutualExclusion(pair, typeAutomaton));
-        }
-        APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
-
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
-                EnforceTypeRelatedRules.typeMandatoryUsage(domainSetup, typeAutomaton));
-
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
-                EnforceTypeRelatedRules.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
-        APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
-
-        /*
-         * Encode data ancestor relation (R) constraints.
-         */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules.ancestorRelationsDependency(this));
-
-        /*
-         * Encode data equivalence/identity relation (IS) constraints.
-         */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
-                EnforceModuleRelatedRules.identityRelationsDependency(typeAutomaton));
-
-        /*
-         * Setup encoding of 'true' and 'false' atoms to ensure proper SLTLx
-         * interpretation.
-         */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.setTrueFalse());
-
-        /*
-         * Encode rule that the given inputs should not be used as workflow outputs
-         */
-        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
-                .inputsAreNotOutputs(typeAutomaton));
+        domainSetup.domainEncoding(cnfEncoding, this.getSolutionSize(), moduleAutomaton, typeAutomaton);
 
         /*
          * Workflow I/O are encoded the last in order to
@@ -325,11 +256,11 @@ public class SATSynthesisEngine implements SynthesisEngine {
     }
 
     /**
-     * Gets cnf encoding.
+     * Gets cnf encoding content as string.
      *
-     * @return the cnf encoding
+     * @return The cnf encoding content as string.
      */
-    public String getCnfEncoding() {
+    public String getCnfEncodingContent() {
         return cnfEncoding.toString();
     }
 

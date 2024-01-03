@@ -12,8 +12,8 @@ import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.solver.configuration.APEDimensionsException;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.APEDimensionsException;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 /**
  * The {@code ConstraintTemplateParameter} class is used to represent a

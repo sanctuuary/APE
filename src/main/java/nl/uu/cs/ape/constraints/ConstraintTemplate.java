@@ -8,7 +8,7 @@ import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import java.util.List;
 

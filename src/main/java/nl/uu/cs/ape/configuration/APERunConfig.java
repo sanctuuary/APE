@@ -15,7 +15,7 @@ import nl.uu.cs.ape.models.Range;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.SolverType;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import java.io.IOException;
 import java.nio.file.Path;

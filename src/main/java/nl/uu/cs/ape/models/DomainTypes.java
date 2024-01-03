@@ -10,7 +10,7 @@ import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.solver.configuration.APEDimensionsException;
+import nl.uu.cs.ape.solver.domainconfiguration.APEDimensionsException;
 
 /**
  * The {@code DomainTypes} class represent the collection of all the data types

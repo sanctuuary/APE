@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.parameterization;
+package nl.uu.cs.ape.solver.userspecification;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +20,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.parserSLTLx.SLTLxSATVisitor;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 @Slf4j

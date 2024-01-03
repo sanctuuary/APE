@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.uu.cs.ape.solver.configuration;
+package nl.uu.cs.ape.solver.domainconfiguration;
 
 /**
  * The {@code APEDataDimensionsOverlapException} exception will be thrown if the

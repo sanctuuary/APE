@@ -15,7 +15,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateFormula;
 import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateFinally;
 import nl.uu.cs.ape.models.templateFormulas.SLTLxTemplateGlobally;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 /**
  * The {@code ConstraintFactory} class represents the Factory Method Pattern for

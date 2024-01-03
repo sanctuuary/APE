@@ -1,5 +1,6 @@
-package nl.uu.cs.ape.solver.configuration;
+package nl.uu.cs.ape.solver.domainconfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -8,16 +9,21 @@ import org.json.JSONObject;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import nl.uu.cs.ape.automaton.ModuleAutomaton;
+import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.ToolAnnotationTag;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.DomainModules;
 import nl.uu.cs.ape.models.DomainTypes;
-import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
+import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
+import nl.uu.cs.ape.solver.EncodingPredicates;
 
 /**
  * The {@code APEDomainSetup} class is used to store the domain information and
@@ -26,7 +32,7 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  * @author Vedran Kasalica
  */
 @Slf4j
-public class Domain {
+public class Domain extends EncodingPredicates {
 
     private static final String TOOLS_JSON_TAG = "functions";
     /**
@@ -44,12 +50,6 @@ public class Domain {
      */
     @Getter
     private String ontologyPrefixIRI;
-
-    /**
-     * Helper predicates defined within the domain model.
-     */
-    @Getter
-    private final List<AuxiliaryPredicate> helperPredicates = new ArrayList<>();
 
     /**
      * Maximum number of inputs that a tool can have.
@@ -320,12 +320,104 @@ public class Domain {
     }
 
     /**
-     * Add predicate to the list of auxiliary predicates that should be encoded.
+     * Generate the SAT encoding of the configured domain and save it to the given
+     * file.
      * 
-     * @param helperPredicate
+     * @param cnfEncoding     File where the encoding should be saved.
+     * @param currLengthTimer
+     *
+     * @return true if the encoding was performed successfully, false otherwise.
+     * @throws IOException Error if taxonomies have not been setup properly.
      */
-    protected void addHelperPredicate(AuxiliaryPredicate helperPredicate) {
-        helperPredicates.add(helperPredicate);
+    public boolean domainEncoding(File cnfEncoding, int solutionSize, ModuleAutomaton moduleAutomaton,
+            TypeAutomaton typeAutomaton) throws IOException {
+
+        String currLengthTimer = APEUtils.getTimerId(solutionSize);
+        /*
+         * Create constraints from the tool_annotations.json file regarding the
+         * Inputs/Outputs, preserving the structure of input and output fields.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.moduleAnnotations(this, moduleAutomaton, typeAutomaton));
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
+
+        /*
+         * The constraints preserve the memory structure, i.e. preserve the data
+         * available in memory and the
+         * logic of referencing data from memory in case of tool inputs.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.memoryStructure(this, moduleAutomaton, typeAutomaton));
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Memory structure encoding");
+
+        /*
+         * Create the constraints enforcing:
+         * 1. Mutual exclusion of the tools
+         * 2. Mandatory usage of the tools - from taxonomy.
+         * 3. Adding the constraints enforcing the taxonomy structure.
+         */
+        for (Pair<Predicate> pair : domainSetup.getAllModules().getSimplePairs()) {
+            SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                    EnforceModuleRelatedRules.moduleMutualExclusion(pair, moduleAutomaton));
+        }
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules
+                .moduleTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
+        /*
+         * Create the constraints enforcing:
+         * 1. Mutual exclusion of the types/formats (according to the search model)
+         * 2. Mandatory usage of the types in the transition nodes (note: "empty type"
+         * is considered a type)
+         * 3. Adding the constraints enforcing the taxonomy structure.
+         */
+        for (Pair<Predicate> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
+            SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                    EnforceTypeRelatedRules.memoryTypesMutualExclusion(pair, typeAutomaton));
+        }
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceTypeRelatedRules.typeMandatoryUsage(domainSetup, typeAutomaton));
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceTypeRelatedRules.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
+
+        /*
+         * Encode data ancestor relation (R) constraints.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.ancestorRelationsDependency(this, moduleAutomaton, typeAutomaton));
+
+        /*
+         * Encode data equivalence/identity relation (IS) constraints.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.identityRelationsDependency(typeAutomaton));
+
+        /*
+         * Setup encoding of 'true' and 'false' atoms to ensure proper SLTLx
+         * interpretation.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.setTrueFalse());
+
+        /*
+         * Encode rule that the given inputs should not be used as workflow outputs
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
+                .inputsAreNotOutputs(typeAutomaton));
+
+        /*
+         * Setup the constraints ensuring that the auxiliary predicates are properly
+         * used and linked to the underlying taxonomy predicates.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules
+                .preserveAuxiliaryPredicateRules(moduleAutomaton, typeAutomaton, domainSetup.getHelperPredicates()));
     }
 
 }

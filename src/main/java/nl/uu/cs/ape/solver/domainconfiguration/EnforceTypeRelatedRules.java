@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.configuration;
+package nl.uu.cs.ape.solver.domainconfiguration;
 
 import java.util.ArrayList;
 import java.util.HashSet;

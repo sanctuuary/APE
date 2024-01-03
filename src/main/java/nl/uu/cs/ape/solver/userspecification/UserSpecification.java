@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.parameterization;
+package nl.uu.cs.ape.solver.userspecification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +19,12 @@ import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.EncodingPredicates;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 import nl.uu.cs.ape.utils.APEUtils;
 
 @NoArgsConstructor
-public class UserSpecification {
+public class UserSpecification extends EncodingPredicates {
 
     private static final String CONSTR_ID_TAG = "constraintid";
     private static final String CONSTR_SLTLx = "formula";
@@ -34,12 +35,6 @@ public class UserSpecification {
      */
     @Getter
     private final ConstraintFactory constraintFactory = new ConstraintFactory();
-
-    /**
-     * List of data gathered from the constraint file.
-     */
-    @Getter
-    private final List<ConstraintTemplateData> unformattedConstr = new ArrayList<>();
 
     /**
      * List of helper predicates that are used to encode the constraints.
@@ -181,15 +176,6 @@ public class UserSpecification {
      */
     public ConstraintTemplate getConstraintTemplate(String constraintID) {
         return constraintFactory.getConstraintTemplate(constraintID);
-    }
-
-    /**
-     * Add predicate to the list of auxiliary predicates that should be encoded.
-     * 
-     * @param helperPredicate
-     */
-    protected void addHelperPredicate(AuxiliaryPredicate helperPredicate) {
-        helperPredicates.add(helperPredicate);
     }
 
 }

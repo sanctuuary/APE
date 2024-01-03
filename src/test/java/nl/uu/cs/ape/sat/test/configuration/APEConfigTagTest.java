@@ -7,7 +7,7 @@ import nl.uu.cs.ape.configuration.tags.APEConfigTag;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.sat.test.utils.TestResources;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

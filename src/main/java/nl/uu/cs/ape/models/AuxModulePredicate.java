@@ -8,7 +8,7 @@ import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 /**
  * The {@code AuxModulePredicate} class represents an abstract class used

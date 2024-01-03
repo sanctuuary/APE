@@ -7,8 +7,8 @@ import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
-import nl.uu.cs.ape.solver.configuration.APEDimensionsException;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.APEDimensionsException;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import java.util.*;
 
@@ -112,12 +112,15 @@ public class Module extends AbstractModule {
     }
 
     /**
-     * Sets module input.
+     * Sets module input to the given list of types.
      *
      * @param moduleInputs the module inputs
      */
     public void setModuleInput(List<Type> moduleInputs) {
-        this.moduleInput = moduleInputs;
+        moduleInput.clear();
+        for (Type currModuleInput : moduleInputs) {
+            addModuleInput(currModuleInput);
+        }
     }
 
     /**
@@ -149,7 +152,10 @@ public class Module extends AbstractModule {
      * @param moduleOutput the module output
      */
     public void setModuleOutput(List<Type> moduleOutput) {
-        this.moduleOutput = moduleOutput;
+        moduleOutput.clear();
+        for (Type currModuleOutput : moduleOutput) {
+            addModuleOutput(currModuleOutput);
+        }
     }
 
     /**

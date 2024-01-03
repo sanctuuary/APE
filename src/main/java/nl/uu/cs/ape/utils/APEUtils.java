@@ -17,7 +17,7 @@ import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
-import nl.uu.cs.ape.solver.configuration.Domain;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 import java.io.*;
@@ -643,6 +643,16 @@ public final class APEUtils {
 		Set<Pair<T>> pairs = new HashSet<>();
 		set1.stream().forEach(ele1 -> set2.stream().forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
+	}
+
+	/**
+	 * Get a unique timer ID for the given solution size.
+	 * 
+	 * @param solutionSize - size of the solution
+	 * @return A unique timer ID for the given solution size
+	 */
+	public static String getTimerId(int solutionSize) {
+		return "length" + solutionSize;
 	}
 
 }
