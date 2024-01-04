@@ -155,9 +155,6 @@ public class APERunConfig {
     @Getter
     private Domain apeDomainSetup;
 
-    /** Solver type that should be used (SAT). */
-    private SolverType solverType = SolverType.SAT;
-
     /**
      * Constructor used to implement the Builder Pattern.
      *
@@ -575,22 +572,6 @@ public class APERunConfig {
      */
     public void setSolutionLength(int solutionMinLength, int solutionMaxLength) {
         this.SOLUTION_LENGTH_RANGE.setValue(Range.of(solutionMinLength, solutionMaxLength));
-    }
-
-    /**
-     * Gets the Solver type that should be used for solving.
-     * 
-     * @return {@link SolverType} that corresponds to the solver type
-     */
-    public SolverType getSolverType() {
-        return this.solverType;
-    }
-
-    /**
-     * @param solverType the solverType to set
-     */
-    public void setSolverType(SolverType solverType) {
-        this.solverType = solverType;
     }
 
     /**

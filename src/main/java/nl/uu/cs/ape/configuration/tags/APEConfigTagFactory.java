@@ -15,8 +15,6 @@ import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import javax.inject.Provider;
 
-import static nl.uu.cs.ape.configuration.tags.APEConfigTag.TagType.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;

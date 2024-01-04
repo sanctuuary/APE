@@ -37,6 +37,12 @@ public class UserSpecification extends EncodingPredicates {
     private final ConstraintFactory constraintFactory = new ConstraintFactory();
 
     /**
+     * List of user specified constraint information. The constraint data is later
+     * provided to {@link ConstraintTemplate ConstraintTemplates}.
+     */
+    @Getter
+    private final List<ConstraintTemplateData> unformattedConstr = new ArrayList<>();
+    /**
      * List of helper predicates that are used to encode the constraints.
      */
     @Getter

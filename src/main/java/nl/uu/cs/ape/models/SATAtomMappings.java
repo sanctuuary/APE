@@ -194,7 +194,7 @@ public class SATAtomMappings implements Serializable {
     }
 
     /**
-     * Get the next auxiliary number and increase the counterErrors by 1.
+     * Get the next auxiliary number and increase the counter by 1.
      *
      * @return Mapping number that can be used for auxiliary variables.
      */

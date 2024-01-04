@@ -17,8 +17,7 @@ import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 /**
  * The {@code ConstraintTemplateParameter} class is used to represent a
- * parameter of a
- * constraint.
+ * parameter of a constraint.
  *
  * @author Vedran Kasalica
  */
@@ -40,7 +39,7 @@ public class ConstraintTemplateParameter {
 		if (parameterTypes != null) {
 			this.parameterTypes = parameterTypes;
 		} else {
-			this.parameterTypes = new ArrayList<TaxonomyPredicate>();
+			this.parameterTypes = new ArrayList<>();
 		}
 	}
 
@@ -48,7 +47,7 @@ public class ConstraintTemplateParameter {
 	 * Instantiates a new Constraint parameter.
 	 */
 	public ConstraintTemplateParameter() {
-		this.parameterTypes = new ArrayList<TaxonomyPredicate>();
+		this.parameterTypes = new ArrayList<>();
 	}
 
 	/**
