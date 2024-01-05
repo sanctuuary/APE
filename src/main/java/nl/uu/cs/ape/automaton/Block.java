@@ -14,7 +14,7 @@ public class Block {
      * States that comprise this block. Number of stater correspond to the max
      * number of inputs or outputs.
      */
-    private final List<State> typeStates = new ArrayList<>();
+    private final List<State> typeStates;
 
     /**
      * Order number of the block in the solution.
@@ -27,6 +27,7 @@ public class Block {
      * @param blockNumber The block number.
      */
     public Block(int blockNumber) {
+        typeStates = new ArrayList<>();
         this.blockNumber = blockNumber;
     }
 

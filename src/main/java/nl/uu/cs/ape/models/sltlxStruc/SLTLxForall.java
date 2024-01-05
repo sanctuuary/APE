@@ -26,17 +26,17 @@ public class SLTLxForall extends SLTLxVarQuantification {
 		/** Encode the possible substitutions for the given variable. */
 		SLTLxVariable.getVariableDomain(stateNo, synthesisEngine).forEach(
 				state -> {
-					SLTLxVariableSubstitutionCollection newVarMappping = new SLTLxVariableSubstitutionCollection(
+					SLTLxVariableSubstitutionCollection newVarMapping = new SLTLxVariableSubstitutionCollection(
 							curVarMapping);
 					Set<State> domainState = new HashSet<>();
 					domainState.add(state);
-					SLTLxVariable flatBindedVariable = newVarMappping.addNewVariable(boundVariable, domainState);
+					SLTLxVariable flatBindedVariable = newVarMapping.addNewVariable(boundVariable, domainState);
 
 					/* Encode the substitution. */
 					clauses.addAll(
-							flatBindedVariable.getUniversalCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+							flatBindedVariable.getUniversalCNFEncoding(stateNo, newVarMapping, synthesisEngine));
 					/** Encode the variable substitution and the underlying formula. */
-					clauses.addAll(super.getCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+					clauses.addAll(super.getCNFEncoding(stateNo, newVarMapping, synthesisEngine));
 				});
 
 		return clauses;
@@ -45,16 +45,16 @@ public class SLTLxForall extends SLTLxVarQuantification {
 	@Override
 	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection curVarMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> clauses = new HashSet<String>();
-		SLTLxVariableSubstitutionCollection newVarMappping = new SLTLxVariableSubstitutionCollection(curVarMapping);
-		SLTLxVariable flatBindedVariable = newVarMappping.addNewVariable(boundVariable,
+		Set<String> clauses = new HashSet<>();
+		SLTLxVariableSubstitutionCollection newVarMapping = new SLTLxVariableSubstitutionCollection(curVarMapping);
+		SLTLxVariable flatBindedVariable = newVarMapping.addNewVariable(boundVariable,
 				SLTLxVariable.getVariableDomain(stateNo, synthesisEngine));
 
 		/** Encode the possible substitutions for the given variable. */
-		clauses.addAll(flatBindedVariable.getExistentialCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(flatBindedVariable.getExistentialCNFEncoding(stateNo, newVarMapping, synthesisEngine));
 
 		/** Encode the variable substitution and the underlying formula. */
-		clauses.addAll(super.getNegatedCNFEncoding(stateNo, newVarMappping, synthesisEngine));
+		clauses.addAll(super.getNegatedCNFEncoding(stateNo, newVarMapping, synthesisEngine));
 		return clauses;
 	}
 
