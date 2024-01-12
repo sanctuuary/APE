@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 /**
  * The {@code AuxModulePredicate} class represents an abstract class used
@@ -74,7 +74,7 @@ public class AuxModulePredicate extends AbstractModule implements AuxiliaryPredi
      *         disjunction/conjunction of the labels.
      */
     public static AbstractModule generateAuxiliaryPredicate(SortedSet<TaxonomyPredicate> relatedPredicates,
-            LogicOperation logicOp, APEDomainSetup domainSetup) {
+            LogicOperation logicOp, Domain domainSetup) {
         if (relatedPredicates.isEmpty()) {
             return null;
         }

@@ -4,12 +4,12 @@ import java.util.*;
 
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.models.AllModules;
+import nl.uu.cs.ape.models.DomainModules;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxLiteral;
 import nl.uu.cs.ape.solver.SolutionInterpreter;
 
@@ -29,35 +29,35 @@ public class SATOutput extends SolutionInterpreter {
     /**
      * List of all the literals provided by the solution.
      */
-    private final List<SLTLxLiteral> literals;
+    private final List<SLTLxLiteral> literals = new ArrayList<>();
 
     /**
      * List of all the positive literals provided by the solution.
      */
-    private final List<SLTLxLiteral> positiveLiterals;
+    private final List<SLTLxLiteral> positiveLiterals = new ArrayList<>();
 
     /**
      * List of only relevant (positive) literals that represent implemented
      * modules/tools.
      */
-    private final List<SLTLxLiteral> relevantModules;
+    private final List<SLTLxLiteral> relevantModules = new ArrayList<>();
 
     /**
      * List of only relevant (positive) literals that represent simple types.
      */
-    private final List<SLTLxLiteral> relevantTypes;
+    private final List<SLTLxLiteral> relevantTypes = new ArrayList<>();
 
     /**
      * List of all the relevant types and modules combined.
      */
-    private final List<SLTLxLiteral> relevantElements;
+    private final List<SLTLxLiteral> relevantElements = new ArrayList<>();
 
     /**
      * List of all the references for the types in the memory, when used as tool
      * inputs.
      */
-    private final List<SLTLxLiteral> references2MemTypes;
-    private final Set<PredicateLabel> usedTypeStates;
+    private final List<SLTLxLiteral> references2MemTypes = new ArrayList<>();
+    private final Set<Predicate> usedTypeStates = new HashSet<>();
 
     /**
      * true if the there is no solution to the problem. Problem is UNASATISFIABLE.
@@ -73,13 +73,6 @@ public class SATOutput extends SolutionInterpreter {
      */
     public SATOutput(int[] satSolution, SATSynthesisEngine synthesisInstance) {
         unsat = false;
-        literals = new ArrayList<>();
-        positiveLiterals = new ArrayList<>();
-        relevantModules = new ArrayList<>();
-        relevantTypes = new ArrayList<>();
-        relevantElements = new ArrayList<>();
-        references2MemTypes = new ArrayList<>();
-        usedTypeStates = new HashSet<>();
         for (int mappedLiteral : satSolution) {
             if (mappedLiteral >= synthesisInstance.getMappings().getInitialNumOfMappedAtoms()) {
                 SLTLxLiteral currLiteral = new SLTLxLiteral(Integer.toString(mappedLiteral),
@@ -88,7 +81,7 @@ public class SATOutput extends SolutionInterpreter {
                 if (!currLiteral.isNegated()) {
                     positiveLiterals.add(currLiteral);
                     if (currLiteral.getPredicate() instanceof AuxiliaryPredicate) {
-                        continue;
+                        // No action needed, skip to the next iteration
                     } else if (currLiteral.getPredicate() instanceof Module) {
                         /* add all positive literals that describe tool implementations */
                         relevantElements.add(currLiteral);
@@ -130,13 +123,6 @@ public class SATOutput extends SolutionInterpreter {
      */
     public SATOutput() {
         unsat = true;
-        literals = null;
-        positiveLiterals = null;
-        relevantModules = null;
-        relevantTypes = null;
-        relevantElements = null;
-        references2MemTypes = null;
-        usedTypeStates = null;
     }
 
     /**
@@ -221,7 +207,7 @@ public class SATOutput extends SolutionInterpreter {
      * @return List of {@link Module}s in the order they appear in the solution
      *         workflow.
      */
-    public List<Module> getRelevantSolutionModules(AllModules allModules) {
+    public List<Module> getRelevantSolutionModules(DomainModules allModules) {
         List<Module> solutionModules = new ArrayList<>();
         if (unsat) {
             return null;

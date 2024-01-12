@@ -5,11 +5,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.NoArgsConstructor;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomVarType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 
 /**
  * Class used to list all usages of the given variables within the formulas.
@@ -17,30 +18,20 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  * @author Vedran Kasalica
  *
  */
+@NoArgsConstructor
 public class SLTLxVariableOccurrenceCollection {
 
 	/** Mapping variables to their predicate properties. */
-	private Map<SLTLxVariable, Set<PredicateLabel>> variableDataTypes;
+	private final Map<SLTLxVariable, Set<Predicate>> variableDataTypes = new HashMap<>();
 	/**
 	 * Mapping variables (depicting memory states) to tool inputs that reference
 	 * them.
 	 */
-	private Map<SLTLxVariable, Set<State>> variableMemoryReferences;
+	private final Map<SLTLxVariable, Set<State>> variableMemoryReferences = new HashMap<>();
 	/** Mapping pairs variables to their usages under binary predicates. */
-	private Map<Pair<SLTLxVariable>, Set<AtomVarType>> binaryPredicates;
+	private final Map<Pair<SLTLxVariable>, Set<AtomVarType>> binaryPredicates = new HashMap<>();
 	/** Variable mapping to variables it is combined with under a pair. */
-	private Map<SLTLxVariable, Set<Pair<SLTLxVariable>>> variablePairs;
-
-	/**
-	 * Create the variable usage class.
-	 */
-	public SLTLxVariableOccurrenceCollection() {
-		super();
-		this.variableDataTypes = new HashMap<>();
-		this.variableMemoryReferences = new HashMap<>();
-		this.binaryPredicates = new HashMap<>();
-		this.variablePairs = new HashMap<>();
-	}
+	private final Map<SLTLxVariable, Set<Pair<SLTLxVariable>>> variablePairs = new HashMap<>();
 
 	/**
 	 * Associate the data type to the corresponding variable.
@@ -50,9 +41,9 @@ public class SLTLxVariableOccurrenceCollection {
 	 * @return {@code true} if the property was associated with the variable,
 	 *         {@code false} otherwise.
 	 */
-	public boolean addDataType(PredicateLabel dataType, SLTLxVariable variableState) {
+	public boolean addDataType(Predicate dataType, SLTLxVariable variableState) {
 		if (this.variableDataTypes.get(variableState) == null) {
-			Set<PredicateLabel> preds = new HashSet<>();
+			Set<Predicate> preds = new HashSet<>();
 			boolean tmp = preds.add(dataType);
 			this.variableDataTypes.put(variableState, preds);
 			return tmp;
@@ -136,9 +127,9 @@ public class SLTLxVariableOccurrenceCollection {
 	 * @return Set (possibly empty) of memory references that are mentioned in
 	 *         combination with the given variable.
 	 */
-	public Set<PredicateLabel> getDataTypes(SLTLxVariable satVariable) {
-		Set<PredicateLabel> unaryPreds = this.variableDataTypes.get(satVariable);
-		return ((unaryPreds == null) ? new HashSet<PredicateLabel>() : unaryPreds);
+	public Set<Predicate> getDataTypes(SLTLxVariable satVariable) {
+		Set<Predicate> unaryPreds = this.variableDataTypes.get(satVariable);
+		return ((unaryPreds == null) ? new HashSet<Predicate>() : unaryPreds);
 	}
 
 	/**

@@ -1,22 +1,23 @@
 package nl.uu.cs.ape.models.logic.constructs;
 
 /**
- * The {@code CustomLabel} used to represent custom labels (dimension) of the
- * data.
+ * The {@code CustomPredicate} used to represent custom predicates describing
+ * the data,
+ * e.g., new data dimensions.
  * 
  * @author Vedran Kasalica
  *
  */
-public class CustomLabel implements PredicateLabel {
+public class CustomPredicate implements Predicate {
 
 	private String label;
 
-	public CustomLabel(String label) {
+	public CustomPredicate(String label) {
 		this.label = label;
 	}
 
 	@Override
-	public int compareTo(PredicateLabel arg0) {
+	public int compareTo(Predicate arg0) {
 		return this.getPredicateID().compareTo(arg0.getPredicateID());
 	}
 
@@ -61,7 +62,7 @@ public class CustomLabel implements PredicateLabel {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		CustomLabel other = (CustomLabel) obj;
+		CustomPredicate other = (CustomPredicate) obj;
 		if (label == null) {
 			if (other.label != null)
 				return false;

@@ -10,7 +10,6 @@ import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.Module;
@@ -19,6 +18,7 @@ import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 /**
  * The class is used to represent a predefined SLTLx constraints according to a
@@ -615,7 +615,7 @@ public abstract class SLTLxTemplateFormula {
         return constraints.toString();
     }
 
-    public static String notRepeatModules(TaxonomyPredicate predicate, APEDomainSetup domainSetup,
+    public static String notRepeatModules(TaxonomyPredicate predicate, Domain domainSetup,
             ModuleAutomaton moduleAutomaton,
             TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();

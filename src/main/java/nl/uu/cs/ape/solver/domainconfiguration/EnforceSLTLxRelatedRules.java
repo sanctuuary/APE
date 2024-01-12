@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.minisat;
+package nl.uu.cs.ape.solver.domainconfiguration;
 
 import java.util.Collection;
 import java.util.HashSet;

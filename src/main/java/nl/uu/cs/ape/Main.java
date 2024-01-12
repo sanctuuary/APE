@@ -27,8 +27,15 @@ public class Main {
      * The entry point of application when the library is used in a Command Line
      * Interface (CLI).
      *
-     * @param args APE expects at most one (1) argument: The absolute or relative
-     *             path to the configuration file.
+     * @param args APE expects at most two (2) arguments: <br/>
+     *             <br/>
+     *             (1) the absolute or relative path to the configuration file.<br/>
+     *             <br/>
+     *             (2) the maximum number of solutions to be returned.
+     * 
+     *             Note: If no arguments are provided, the default configuration
+     *             file on location ./config.json is used.
+     * 
      */
     public static void main(String[] args) {
         String path;

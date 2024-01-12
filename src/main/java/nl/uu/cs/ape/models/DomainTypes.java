@@ -6,53 +6,51 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
-import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.enums.NodeType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.solver.domainconfiguration.APEDimensionsException;
 
 /**
- * The {@code AllTypes} class represent the set of all the data dimensions that
- * can be used in our program. The data
- * can be grouped in multiple data dimensions (e.g. types,formats, etc.) and
+ * The {@code DomainTypes} class represent the collection of all the data types
+ * within the configured domain.
+ * The data types are grouped in one or more data dimensions (e.g.
+ * types,formats, etc.) and
  * each {@link Type} will belong to one of those dimensions.
  *
  * @author Vedran Kasalica
  */
 @Slf4j
-public class AllTypes extends AllPredicates {
+public class DomainTypes extends DomainPredicates {
 
-    private static String empty = "empty";
-    private static String apeLabel = "APE_label";
-    private static String emptyLabel = "emptyLabel";
+    private static final String empty = "empty";
+    private static final String apeLabel = "APE_label";
+    private static final String emptyLabel = "emptyLabel";
 
     /**
      * {@link Type} object representing the "empty type".
      */
-    private Type emptyType;
+    private final Type emptyType = new Type(empty, empty, empty, NodeType.EMPTY);
 
     /**
      * {@link Type} object representing the "empty label root".
      */
-    private Type apeLabelRoot;
+    private final Type apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
 
     /**
      * {@link Type} object representing the "empty label type".
      */
-    private Type emptyLabelType;
+    private final Type emptyLabelType = new Type(emptyLabel, emptyLabel, apeLabel, NodeType.EMPTY_LABEL);
 
     /**
      * Instantiates a new AllTypes object.
      *
      * @param config the config
      */
-    public AllTypes(APECoreConfig config) {
+    public DomainTypes(APECoreConfig config) {
         super(Stream.concat(config.getDataDimensionRoots().stream(), Stream.of(apeLabel))
                 .collect(Collectors.toList()));
-        emptyType = new Type(empty, empty, empty, NodeType.EMPTY);
-        apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
-        emptyLabelType = new Type(emptyLabel, emptyLabel, apeLabel, NodeType.EMPTY_LABEL);
         setRelevant(emptyType);
         setRelevant(apeLabelRoot);
         setRelevant(emptyLabelType);
@@ -65,12 +63,9 @@ public class AllTypes extends AllPredicates {
      *
      * @param typeTaxonomyRoots the list of data dimension roots
      */
-    public AllTypes(List<String> typeTaxonomyRoots) {
+    public DomainTypes(List<String> typeTaxonomyRoots) {
         super(Stream.concat(typeTaxonomyRoots.stream(), Stream.of(apeLabel))
                 .collect(Collectors.toList()));
-        emptyType = new Type(empty, empty, empty, NodeType.EMPTY);
-        apeLabelRoot = new Type(apeLabel, apeLabel, apeLabel, NodeType.ROOT);
-        emptyLabelType = new Type(emptyLabel, emptyLabel, apeLabel, NodeType.EMPTY_LABEL);
         setRelevant(emptyType);
         setRelevant(apeLabelRoot);
         setRelevant(emptyLabelType);
@@ -233,8 +228,8 @@ public class AllTypes extends AllPredicates {
      *
      * @return List of pairs of types.
      */
-    public List<Pair<PredicateLabel>> getTypePairsForEachSubTaxonomy() {
-        List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();
+    public List<Pair<Predicate>> getTypePairsForEachSubTaxonomy() {
+        List<Pair<Predicate>> pairs = new ArrayList<Pair<Predicate>>();
 
         /*
          * Create a list for each subtree of the Data Taxonomy (e.g. TypeSubTaxonomy,
@@ -272,7 +267,7 @@ public class AllTypes extends AllPredicates {
         for (List<TaxonomyPredicate> iterator : subTreesMap.values()) {
             for (int i = 0; i < iterator.size() - 1; i++) {
                 for (int j = i + 1; j < iterator.size(); j++) {
-                    pairs.add(new Pair<PredicateLabel>(iterator.get(i), iterator.get(j)));
+                    pairs.add(new Pair<Predicate>(iterator.get(i), iterator.get(j)));
                 }
             }
         }

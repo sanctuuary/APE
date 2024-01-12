@@ -30,13 +30,12 @@ public class GitHubRepo {
     private String absoluteLocalRoot;
     private String repository;
     private String commit;
-    private HashMap<Integer, TempFile> files;
+    private final HashMap<Integer, TempFile> files = new HashMap<>();
 
     public GitHubRepo(String repository, String commitOrBranch) {
         this.absoluteLocalRoot = Paths.get(TestResources.getAbsoluteRoot(), "temp").toString();
         this.repository = repository;
         this.commit = commitOrBranch;
-        this.files = new HashMap<>();
     }
 
     public String getRoot() {

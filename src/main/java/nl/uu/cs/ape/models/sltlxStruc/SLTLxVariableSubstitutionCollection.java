@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.NoArgsConstructor;
 import nl.uu.cs.ape.automaton.State;
 
 /**
@@ -13,23 +14,15 @@ import nl.uu.cs.ape.automaton.State;
  * @author Vedran Kasalica
  *
  */
+@NoArgsConstructor
 public class SLTLxVariableSubstitutionCollection {
 
 	/** Variable mapping to unique IDs. */
-	private Map<SLTLxVariable, SLTLxVariable> mappedVariables;
+	private final Map<SLTLxVariable, SLTLxVariable> mappedVariables = new HashMap<>();
 	/** Variable mapping to its domain. */
-	private Map<SLTLxVariable, Set<State>> variableDomain;
+	private final Map<SLTLxVariable, Set<State>> variableDomain = new HashMap<>();
 	/** Number of variables. */
 	private static int variableNo = 1;
-
-	/**
-	 * Create a new variable mapping class.
-	 */
-	public SLTLxVariableSubstitutionCollection() {
-		super();
-		this.mappedVariables = new HashMap<>();
-		this.variableDomain = new HashMap<>();
-	}
 
 	/**
 	 * Create a new variable mapping, based on the existing one.
@@ -38,11 +31,9 @@ public class SLTLxVariableSubstitutionCollection {
 	 */
 	public SLTLxVariableSubstitutionCollection(SLTLxVariableSubstitutionCollection existing) {
 		super();
-		this.mappedVariables = new HashMap<>();
 		for (SLTLxVariable key : existing.mappedVariables.keySet()) {
 			this.mappedVariables.put(key, existing.mappedVariables.get(key));
 		}
-		this.variableDomain = new HashMap<>();
 		for (SLTLxVariable key : existing.variableDomain.keySet()) {
 			this.variableDomain.put(key, existing.variableDomain.get(key));
 		}

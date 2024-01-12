@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.minisat;
+package nl.uu.cs.ape.solver.domainconfiguration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,15 +9,14 @@ import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APEConfigException;
-import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.models.AllTypes;
+import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.AuxTypePredicate;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxDisjunction;
@@ -51,10 +50,10 @@ public class EnforceTypeRelatedRules {
      * @param typeAutomaton - System that represents states in the workflow
      * @return String representation of constraints.
      */
-    public static Set<SLTLxFormula> memoryTypesMutualExclusion(Pair<PredicateLabel> pair, TypeAutomaton typeAutomaton) {
+    public static Set<SLTLxFormula> memoryTypesMutualExclusion(Pair<Predicate> pair, TypeAutomaton typeAutomaton) {
         Set<SLTLxFormula> fullEncoding = new HashSet<>();
-        PredicateLabel firstPair = pair.getFirst();
-        PredicateLabel secondPair = pair.getSecond();
+        Predicate firstPair = pair.getFirst();
+        Predicate secondPair = pair.getSecond();
         // mutual exclusion of types in all the states (those that represent general
         // memory)
         for (State memTypeState : typeAutomaton.getAllMemoryTypesStates()) {
@@ -81,10 +80,10 @@ public class EnforceTypeRelatedRules {
      * @param typeAutomaton - System that represents states in the workflow
      * @return String representation of constraints.
      */
-    public static Set<SLTLxFormula> usedTypeMutualExclusion(Pair<PredicateLabel> pair, TypeAutomaton typeAutomaton) {
+    public static Set<SLTLxFormula> usedTypeMutualExclusion(Pair<Predicate> pair, TypeAutomaton typeAutomaton) {
         Set<SLTLxFormula> fullEncoding = new HashSet<>();
-        PredicateLabel firstPair = pair.getFirst();
-        PredicateLabel secondPair = pair.getSecond();
+        Predicate firstPair = pair.getFirst();
+        Predicate secondPair = pair.getSecond();
         // mutual exclusion of types in all the states (those that represent general
         // memory)
         // mutual exclusion of types in all the states (those that represent used
@@ -113,7 +112,7 @@ public class EnforceTypeRelatedRules {
      * @param typeAutomaton - System that represents states in the workflow
      * @return String representation of constraints.
      */
-    public static Set<SLTLxFormula> typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
+    public static Set<SLTLxFormula> typeMandatoryUsage(Domain domainSetup, TypeAutomaton typeAutomaton) {
         Set<SLTLxFormula> fullEncoding = new HashSet<>();
         Type empty = domainSetup.getAllTypes().getEmptyType();
         Type dataType = AuxTypePredicate.generateAuxiliaryPredicate(
@@ -163,7 +162,7 @@ public class EnforceTypeRelatedRules {
      * @return The String representation of constraints enforcing taxonomy
      *         classifications.
      */
-    public static Set<SLTLxFormula> typeEnforceTaxonomyStructure(AllTypes allTypes, TypeAutomaton typeAutomaton) {
+    public static Set<SLTLxFormula> typeEnforceTaxonomyStructure(DomainTypes allTypes, TypeAutomaton typeAutomaton) {
         Set<SLTLxFormula> fullEncoding = new HashSet<>();
         // taxonomy enforcement of types in in all the states (those that represent
         // general memory and used data instances)
@@ -228,86 +227,6 @@ public class EnforceTypeRelatedRules {
                                 superTypeState));
             }
         }
-        return fullEncoding;
-    }
-
-    /**
-     * Encodes rules that ensure the initial workflow input.
-     *
-     * @param allTypes       Set of all the types in the domain
-     * @param program_inputs Input types for the program.
-     * @param typeAutomaton  Automaton representing the type states in the model
-     * @return The String representation of the initial input encoding.
-     * @throws APEConfigException Exception thrown when one of the output types is
-     *                            not defined in the taxonomy.
-     */
-    public static Set<SLTLxFormula> workflowInputs(AllTypes allTypes, List<Type> program_inputs,
-            TypeAutomaton typeAutomaton) throws APEConfigException {
-        Set<SLTLxFormula> fullEncoding = new HashSet<>();
-
-        List<State> workflowInputStates = typeAutomaton.getWorkflowInputBlock().getStates();
-        for (int i = 0; i < workflowInputStates.size(); i++) {
-            State currState = workflowInputStates.get(i);
-            if (i < program_inputs.size()) {
-                Type currType = program_inputs.get(i);
-                if (allTypes.get(currType.getPredicateID()) == null) {
-                    throw APEConfigException.workflowIODataTypeNotInDomain(currType.getPredicateID());
-                }
-                fullEncoding.add(
-                        new SLTLxAtom(
-                                AtomType.MEMORY_TYPE,
-                                currType,
-                                currState));
-            } else {
-                /* Forcing in the rest of the input states to be empty types. */
-                fullEncoding.add(
-                        new SLTLxAtom(
-                                AtomType.MEMORY_TYPE,
-                                allTypes.getEmptyType(),
-                                currState));
-            }
-        }
-        return fullEncoding;
-    }
-
-    /**
-     * Encodes the rules that ensure generation of the workflow output.
-     *
-     * @param allTypes        Set of all the types in the domain
-     * @param program_outputs Output types for the program.
-     * @param typeAutomaton   Automaton representing the type states in the model
-     * @return String representation of the workflow output encoding.
-     * @throws APEConfigException Exception thrown when one of the output types is
-     *                            not defined in the taxonomy.
-     */
-    public static Set<SLTLxFormula> workdlowOutputs(AllTypes allTypes, List<Type> program_outputs,
-            TypeAutomaton typeAutomaton) throws APEConfigException {
-        Set<SLTLxFormula> fullEncoding = new HashSet<>();
-
-        List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
-        for (int i = 0; i < workflowOutputStates.size(); i++) {
-            if (i < program_outputs.size()) {
-                TaxonomyPredicate currType = program_outputs.get(i);
-                if (allTypes.get(currType.getPredicateID()) == null) {
-                    throw APEConfigException.workflowIODataTypeNotInDomain(currType.getPredicateID());
-                }
-                fullEncoding.add(
-                        new SLTLxAtom(
-                                AtomType.USED_TYPE,
-                                currType,
-                                workflowOutputStates.get(i)));
-
-            } else {
-                /* Forcing in the rest of the input states to be empty types. */
-                fullEncoding.add(
-                        new SLTLxAtom(
-                                AtomType.USED_TYPE,
-                                allTypes.getEmptyType(),
-                                workflowOutputStates.get(i)));
-            }
-
-        }
-
         return fullEncoding;
     }
 

@@ -11,11 +11,11 @@ import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory;
 import nl.uu.cs.ape.configuration.tags.APEConfigTags;
 import nl.uu.cs.ape.configuration.tags.APEConfigTagFactory.TAGS.*;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.models.Range;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
 import nl.uu.cs.ape.models.enums.SolverType;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -99,12 +99,12 @@ public class APERunConfig {
     /**
      * Input types of the workflow.
      */
-    private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(
+    private final APEConfigDependentTag.One<List<Type>, Domain> PROGRAM_INPUTS = new APEConfigTagFactory.TAGS.PROGRAM_INPUTS(
             this::getApeDomainSetup);
     /**
      * Output types of the workflow.
      */
-    private final APEConfigDependentTag.One<List<Type>, APEDomainSetup> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(
+    private final APEConfigDependentTag.One<List<Type>, Domain> PROGRAM_OUTPUTS = new APEConfigTagFactory.TAGS.PROGRAM_OUTPUTS(
             this::getApeDomainSetup);
     /**
      * All the Tags specified in this class. Should be in correct order of
@@ -153,10 +153,7 @@ public class APERunConfig {
      * Object containing domain information needed for the execution.
      */
     @Getter
-    private APEDomainSetup apeDomainSetup;
-
-    /** Solver type that should be used (SAT). */
-    private SolverType solverType = SolverType.SAT;
+    private Domain apeDomainSetup;
 
     /**
      * Constructor used to implement the Builder Pattern.
@@ -189,10 +186,10 @@ public class APERunConfig {
 
     /**
      * Private constructor used by
-     * {@link APERunConfig#validate(JSONObject config, APEDomainSetup setup)}
+     * {@link APERunConfig#validate(JSONObject config, Domain setup)}
      * to create an empty instance.
      */
-    private APERunConfig(APEDomainSetup setup) {
+    private APERunConfig(Domain setup) {
         this.apeDomainSetup = setup;
     }
 
@@ -206,7 +203,7 @@ public class APERunConfig {
      * @param setup the domain setup
      * @return the validation results
      */
-    public static ValidationResults validate(JSONObject json, APEDomainSetup setup) {
+    public static ValidationResults validate(JSONObject json, Domain setup) {
         APERunConfig dummy = new APERunConfig(setup);
         ValidationResults results = new ValidationResults();
         for (APEConfigTag<?> tag : dummy.all_tags) {
@@ -229,7 +226,7 @@ public class APERunConfig {
      * @throws JSONException      Error in parsing the configuration file.
      * @throws APEConfigException Error in setting up the the configuration.
      */
-    public APERunConfig(JSONObject runConfiguration, APEDomainSetup apeDomainSetup)
+    public APERunConfig(JSONObject runConfiguration, Domain apeDomainSetup)
             throws IOException, JSONException, APEConfigException {
 
         /* JSONObject must have been parsed correctly. */
@@ -578,22 +575,6 @@ public class APERunConfig {
     }
 
     /**
-     * Gets the Solver type that should be used for solving.
-     * 
-     * @return {@link SolverType} that corresponds to the solver type
-     */
-    public SolverType getSolverType() {
-        return this.solverType;
-    }
-
-    /**
-     * @param solverType the solverType to set
-     */
-    public void setSolverType(SolverType solverType) {
-        this.solverType = solverType;
-    }
-
-    /**
      * Creates interface for the min length of {@link APERunConfig}.
      */
     public interface ISolutionMinLengthStage {
@@ -624,7 +605,7 @@ public class APERunConfig {
      * Creates interface to setup the domain of {@link APERunConfig}.
      */
     public interface IApeDomainSetupStage {
-        IBuildStage withApeDomainSetup(APEDomainSetup apeDomainSetup);
+        IBuildStage withApeDomainSetup(Domain apeDomainSetup);
     }
 
     /**
@@ -671,7 +652,7 @@ public class APERunConfig {
         private int solutionMinLength;
         private int solutionMaxLength;
         private int maxNoSolutions;
-        private APEDomainSetup apeDomainSetup;
+        private Domain apeDomainSetup;
         private JSONArray constraintsJSON;
         private boolean toolSeqRepeat;
         private String solutionDirPath;
@@ -708,7 +689,7 @@ public class APERunConfig {
         }
 
         @Override
-        public IBuildStage withApeDomainSetup(APEDomainSetup apeDomainSetup) {
+        public IBuildStage withApeDomainSetup(Domain apeDomainSetup) {
             this.apeDomainSetup = apeDomainSetup;
             return this;
         }

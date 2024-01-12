@@ -21,7 +21,7 @@ import nl.uu.cs.ape.models.enums.SynthesisFlag;
 @Slf4j
 public class SolutionsList {
 
-    private List<SolutionWorkflow> solutions;
+    private List<SolutionWorkflow> solutions = new ArrayList<>();
 
     /**
      * Max number of solutions that should be found.
@@ -31,7 +31,7 @@ public class SolutionsList {
     /**
      * Mapping of predicates into integers (for SAT encoding).
      */
-    private final SATAtomMappings mappings;
+    private final SATAtomMappings mappings = new SATAtomMappings();
 
     /**
      * Current solution index.
@@ -64,16 +64,8 @@ public class SolutionsList {
      * @param runConfig - setup configuration for the synthesis run.
      */
     public SolutionsList(APERunConfig runConfig) {
-        this.solutions = new ArrayList<SolutionWorkflow>();
         this.runConfig = runConfig;
-        /*
-         * Provides mapping from each atom/predicate to a number/string, and vice versa
-         */
-        if (runConfig.getSolverType() == SolverType.SAT) {
-            this.mappings = new SATAtomMappings();
-        } else {
-            throw new APEConfigException("Solver type has to be SAT.");
-        }
+
         /* Variables defining the current and maximum lengths and solutions count. */
         this.maxSolutions = runConfig.getMaxNoSolutions();
         if (this.maxSolutions > 100) {

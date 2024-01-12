@@ -6,16 +6,14 @@ import org.json.JSONObject;
 
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.tags.validation.ValidationResults;
-import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.Range;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import javax.inject.Provider;
-
-import static nl.uu.cs.ape.configuration.tags.APEConfigTag.TagType.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,9 +117,9 @@ public class APEConfigTagFactory {
         /**
          * Abstract field type.
          */
-        public abstract static class DataInstances extends APEConfigDependentTag.One<List<Type>, APEDomainSetup> {
+        public abstract static class DataInstances extends APEConfigDependentTag.One<List<Type>, Domain> {
 
-            protected DataInstances(Provider<APEDomainSetup> provider) {
+            protected DataInstances(Provider<Domain> provider) {
                 super(provider);
             }
 
@@ -131,7 +129,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected ValidationResults validate(List<Type> value, APEDomainSetup apeDomainSetup,
+            protected ValidationResults validate(List<Type> value, Domain apeDomainSetup,
                     ValidationResults results) {
                 // TODO: check data instances
                 return results;
@@ -485,7 +483,7 @@ public class APEConfigTagFactory {
          */
         public static class PROGRAM_INPUTS extends TYPES.DataInstances {
 
-            public PROGRAM_INPUTS(Provider<APEDomainSetup> provider) {
+            public PROGRAM_INPUTS(Provider<Domain> provider) {
                 super(provider);
             }
 
@@ -505,7 +503,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
+            protected List<Type> constructFromJSON(JSONObject obj, Domain apeDomainSetup) {
                 final ArrayList<Type> instances = new ArrayList<>();
 
                 if (apeDomainSetup == null) {
@@ -535,7 +533,7 @@ public class APEConfigTagFactory {
          */
         public static class PROGRAM_OUTPUTS extends TYPES.DataInstances {
 
-            public PROGRAM_OUTPUTS(Provider<APEDomainSetup> provider) {
+            public PROGRAM_OUTPUTS(Provider<Domain> provider) {
                 super(provider);
             }
 
@@ -555,7 +553,7 @@ public class APEConfigTagFactory {
             }
 
             @Override
-            protected List<Type> constructFromJSON(JSONObject obj, APEDomainSetup apeDomainSetup) {
+            protected List<Type> constructFromJSON(JSONObject obj, Domain apeDomainSetup) {
                 final ArrayList<Type> instances = new ArrayList<>();
 
                 if (apeDomainSetup == null) {

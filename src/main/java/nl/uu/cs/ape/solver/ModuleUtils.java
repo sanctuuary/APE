@@ -5,11 +5,11 @@ import java.util.List;
 
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.models.AllModules;
+import nl.uu.cs.ape.models.DomainModules;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.SATAtomMappings;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
@@ -184,7 +184,7 @@ public abstract class ModuleUtils {
 	 * @param mappings        Mapping function.
 	 * @return The String representation of constraints.
 	 */
-	public abstract String moduleMutualExclusion(AllModules allModules, ModuleAutomaton moduleAutomaton,
+	public abstract String moduleMutualExclusion(DomainModules allModules, ModuleAutomaton moduleAutomaton,
 			SATAtomMappings mappings);
 
 	/**
@@ -196,7 +196,7 @@ public abstract class ModuleUtils {
 	 * @param mappings        Mapping function.
 	 * @return String representation of constraints.
 	 */
-	public abstract String moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton,
+	public abstract String moduleMandatoryUsage(DomainModules allModules, ModuleAutomaton moduleAutomaton,
 			SATAtomMappings mappings);
 
 	/**
@@ -211,7 +211,7 @@ public abstract class ModuleUtils {
 	 * @return String representation of constraints enforcing taxonomy
 	 *         classifications.
 	 */
-	public abstract String moduleEnforceTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
+	public abstract String moduleEnforceTaxonomyStructure(DomainModules allModules, TaxonomyPredicate currModule,
 			ModuleAutomaton moduleAutomaton, SATAtomMappings mappings);
 
 	/**
@@ -222,8 +222,8 @@ public abstract class ModuleUtils {
 	 *         modules are not returned, only the unique pairs of modules that are
 	 *         representing actual tools.
 	 */
-	public static List<Pair<PredicateLabel>> getPredicatePairs(List<? extends PredicateLabel> predicateList) {
-		List<Pair<PredicateLabel>> pairs = new ArrayList<>();
+	public static List<Pair<Predicate>> getPredicatePairs(List<? extends Predicate> predicateList) {
+		List<Pair<Predicate>> pairs = new ArrayList<>();
 
 		for (int i = 0; i < predicateList.size() - 1; i++) {
 			for (int j = i + 1; j < predicateList.size(); j++) {

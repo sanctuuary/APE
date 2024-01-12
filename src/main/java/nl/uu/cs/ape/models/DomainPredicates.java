@@ -6,17 +6,18 @@ import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
- * The {@code AllPredicates} class is used to group all mappedPredicates of the
- * same type (such as module, data) into one collection.
+ * The {@code DomainPredicates} abstract class represents a collection of
+ * predicates of the
+ * same type (e.g., module, data) within the configured domain.
  *
  * @author Vedran Kasalica
  */
-public abstract class AllPredicates {
+public abstract class DomainPredicates {
 
     /**
      * Map of all predicated mapped to their predicateID.
      */
-    private Map<String, TaxonomyPredicate> mappedPredicates;
+    private final Map<String, TaxonomyPredicate> mappedPredicates = new HashMap<>();
 
     /**
      * Root of the taxonomy.
@@ -28,9 +29,8 @@ public abstract class AllPredicates {
      *
      * @param taxonomyRoots the taxonomy roots
      */
-    protected AllPredicates(List<String> taxonomyRoots) {
+    protected DomainPredicates(List<String> taxonomyRoots) {
         this.dimensionRoots = taxonomyRoots;
-        this.mappedPredicates = new HashMap<>();
     }
 
     /**

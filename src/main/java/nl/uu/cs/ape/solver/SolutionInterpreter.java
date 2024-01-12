@@ -2,7 +2,7 @@ package nl.uu.cs.ape.solver;
 
 import java.util.List;
 
-import nl.uu.cs.ape.models.AllModules;
+import nl.uu.cs.ape.models.DomainModules;
 import nl.uu.cs.ape.models.Module;
 
 /**
@@ -48,7 +48,7 @@ public abstract class SolutionInterpreter {
      * @param allModules the all modules
      * @return the relevant solution modules
      */
-    public abstract List<Module> getRelevantSolutionModules(AllModules allModules);
+    public abstract List<Module> getRelevantSolutionModules(DomainModules allModules);
 
     /**
      * Is sat boolean.

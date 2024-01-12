@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.domain;
+package nl.uu.cs.ape.utils;
 
 import org.apache.commons.io.FileExistsException;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -10,10 +10,12 @@ import org.semanticweb.owlapi.search.EntitySearcher;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.models.AbstractModule;
-import nl.uu.cs.ape.models.AllModules;
-import nl.uu.cs.ape.models.AllTypes;
+import nl.uu.cs.ape.models.DomainModules;
+import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.NodeType;
+import nl.uu.cs.ape.solver.domainconfiguration.APEDimensionsException;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import java.io.File;
 import java.util.*;
@@ -32,9 +34,9 @@ public class OWLReader {
 	/** File containing the ontology */
 	private final File ontologyFile;
 	/** List of all modules in the domain */
-	private final AllModules allModules;
+	private final DomainModules allModules;
 	/** List of all types in the domain */
-	private final AllTypes allTypes;
+	private final DomainTypes allTypes;
 	/** Mapping from each dimension to the list of the types within it */
 	private Map<String, Set<String>> typeDimensions = new HashMap<>();
 
@@ -56,7 +58,7 @@ public class OWLReader {
 	 *                     types.
 	 * @param ontologyFile Path to the OWL file.
 	 */
-	public OWLReader(APEDomainSetup domain, File ontologyFile) {
+	public OWLReader(Domain domain, File ontologyFile) {
 		this.ontologyFile = ontologyFile;
 		this.allModules = domain.getAllModules();
 		this.allTypes = domain.getAllTypes();
@@ -124,8 +126,8 @@ public class OWLReader {
 			throws APEDimensionsException, OWLOntologyCreationException, FileExistsException {
 
 		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		AllModules allModules = new AllModules(toolTaxonomyRoot);
-		AllTypes allTypes = new AllTypes(dataDimensionRoots);
+		DomainModules allModules = new DomainModules(toolTaxonomyRoot);
+		DomainTypes allTypes = new DomainTypes(dataDimensionRoots);
 		OWLOntology ontology = null;
 		if (ontologyFile.exists()) {
 			ontology = manager.loadOntologyFromOntologyDocument(ontologyFile);

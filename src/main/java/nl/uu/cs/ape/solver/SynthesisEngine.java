@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.List;
 
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.models.SATAtomMappings;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
 
 /**
@@ -46,7 +46,7 @@ public interface SynthesisEngine {
 	 * 
 	 * @return Object that contains the domain model annotations, params, etc.
 	 */
-	public APEDomainSetup getDomainSetup();
+	public Domain getDomainSetup();
 
 	/**
 	 * Get atom mappings

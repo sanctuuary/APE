@@ -4,7 +4,7 @@ import java.util.Set;
 
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
@@ -17,7 +17,7 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
     /**
      * StateInterface that is referred (tool or type).
      */
-    private final PredicateLabel predicate;
+    private final Predicate predicate;
 
     /**
      * State in which the type/operation was used.
@@ -46,7 +46,7 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
      * @param predicate   Predicate used.
      * @param usedInState State in the automaton it was used/created in.
      */
-    public SLTLxAtom(AtomType elementType, PredicateLabel predicate, State usedInState) {
+    public SLTLxAtom(AtomType elementType, Predicate predicate, State usedInState) {
         super();
         this.predicate = predicate;
         this.argumentState = usedInState;
@@ -71,7 +71,7 @@ public class SLTLxAtom extends SLTLxFormula implements Comparable<SLTLxAtom> {
      *
      * @return Field {@link #predicate}.
      */
-    public PredicateLabel getPredicate() {
+    public Predicate getPredicate() {
         return predicate;
     }
 

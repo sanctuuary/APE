@@ -7,17 +7,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import nl.uu.cs.ape.configuration.APERunConfig;
-import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.LogicOperation;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtomVar;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 import java.io.*;
@@ -164,7 +164,7 @@ public final class APEUtils {
 	 * @param domainSetup Domain information, including all the existing tools and
 	 *                    types.
 	 */
-	public static void debugPrintout(APERunConfig runConfig, APEDomainSetup domainSetup) {
+	public static void debugPrintout(APERunConfig runConfig, Domain domainSetup) {
 		String line = "-------------------------------------------------------------";
 
 		if (runConfig.getDebugMode()) {
@@ -622,8 +622,8 @@ public final class APEUtils {
 	 * @param set - Set of PredicateLabel that should be used to create the pairs
 	 * @return Set of unique pairs.
 	 */
-	public static Set<Pair<PredicateLabel>> getUniquePairs(Collection<? extends PredicateLabel> set) {
-		Set<Pair<PredicateLabel>> pairs = new HashSet<>();
+	public static Set<Pair<Predicate>> getUniquePairs(Collection<? extends Predicate> set) {
+		Set<Pair<Predicate>> pairs = new HashSet<>();
 		set.stream().forEach(ele1 -> set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
 				.forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
@@ -643,6 +643,16 @@ public final class APEUtils {
 		Set<Pair<T>> pairs = new HashSet<>();
 		set1.stream().forEach(ele1 -> set2.stream().forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
+	}
+
+	/**
+	 * Get a unique timer ID for the given solution size.
+	 * 
+	 * @param solutionSize - size of the solution
+	 * @return A unique timer ID for the given solution size
+	 */
+	public static String getTimerId(int solutionSize) {
+		return "length" + solutionSize;
 	}
 
 }

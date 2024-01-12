@@ -5,7 +5,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.models.AllPredicates;
+import nl.uu.cs.ape.models.DomainPredicates;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 
@@ -19,7 +19,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
  * @author Vedran Kasalica
  */
 @Slf4j
-public abstract class TaxonomyPredicate implements PredicateLabel {
+public abstract class TaxonomyPredicate implements Predicate {
 
     /**
      * Describes the node in from the taxonomy hierarchy. The type can represent a
@@ -131,7 +131,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         return true;
     }
 
-    public int compareTo(PredicateLabel other) {
+    public int compareTo(Predicate other) {
         if (!(other instanceof TaxonomyPredicate)) {
             return this.getPredicateID().compareTo(other.getPredicateID());
         }
@@ -211,7 +211,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param allPredicates Map of all the predicates of the given type.
      * @return true if the predicates were successfully set to be relevant.
      */
-    public boolean setAsRelevantTaxonomyTerm(AllPredicates allPredicates) {
+    public boolean setAsRelevantTaxonomyTerm(DomainPredicates allPredicates) {
         if (this.isRelevant) {
             return true;
         }
@@ -236,7 +236,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param allPredicates Map of all the predicates of the given type.
      * @return true if the predicates were successfully set to be relevant.
      */
-    private boolean setAsRelevantTaxonomyTermTopDown(AllPredicates allPredicates) {
+    private boolean setAsRelevantTaxonomyTermTopDown(DomainPredicates allPredicates) {
         if (this.isRelevant) {
             return true;
         }
@@ -258,7 +258,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param allPredicates Map of all the predicates of the given type.
      * @return true if the predicates were successfully set to be relevant.
      */
-    private boolean setAsRelevantTaxonomyTermBottomUp(AllPredicates allPredicates) {
+    private boolean setAsRelevantTaxonomyTermBottomUp(DomainPredicates allPredicates) {
         if (this.isRelevant) {
             return true;
         }
@@ -307,7 +307,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      *                      distinguish between the tree levels.
      * @param allPredicates Set of all the predicates.
      */
-    public void printTree(String str, AllPredicates allPredicates) {
+    public void printTree(String str, DomainPredicates allPredicates) {
         log.debug(str + toShortString() + "[" + getNodeType() + "]");
         for (TaxonomyPredicate predicate : APEUtils.safe(this.subPredicates)) {
             predicate.printTree(str + ". ", allPredicates);

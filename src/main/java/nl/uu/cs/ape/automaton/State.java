@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.automaton;
 
 import nl.uu.cs.ape.models.enums.AtomType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 
 /***
  * The {@code State} class is used to represent the states in module and type
@@ -15,7 +15,7 @@ import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
  *
  * @author Vedran Kasalica
  */
-public class State implements PredicateLabel, StateInterface {
+public class State implements Predicate, StateInterface {
 
     /** Unique name of the state */
     private final String stateName;
@@ -98,7 +98,7 @@ public class State implements PredicateLabel, StateInterface {
      *         before than, equal to, or after than the specified State.
      */
     @Override
-    public int compareTo(PredicateLabel other) {
+    public int compareTo(Predicate other) {
         if (!(other instanceof State)) {
             return this.getPredicateID().compareTo(other.getPredicateID());
         }

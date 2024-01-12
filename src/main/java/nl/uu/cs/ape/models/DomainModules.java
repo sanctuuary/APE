@@ -7,25 +7,25 @@ import java.util.Set;
 
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
- * The {@code AllModules} class represent the set of all modules/tools that can
- * be
- * part of our program. Each of them is either {@link Module} or
+ * The {@code DomainModules} class represent the set of all modules/tools that
+ * are part of the configured domain. They can
+ * be steps in generated workflows. Each of them is either {@link Module} or
  * {@link AbstractModule}.
  *
  * @author Vedran Kasalica
  */
-public class AllModules extends AllPredicates {
+public class DomainModules extends DomainPredicates {
 
     /**
      * Instantiates a new All modules.
      *
      * @param config the config
      */
-    public AllModules(APECoreConfig config) {
+    public DomainModules(APECoreConfig config) {
         super(Arrays.asList(config.getToolTaxonomyRoot()));
     }
 
@@ -34,7 +34,7 @@ public class AllModules extends AllPredicates {
      *
      * @param moduleTaxonomyRoot root module
      */
-    public AllModules(String moduleTaxonomyRoot) {
+    public DomainModules(String moduleTaxonomyRoot) {
         super(Arrays.asList(moduleTaxonomyRoot));
     }
 
@@ -125,9 +125,9 @@ public class AllModules extends AllPredicates {
      *
      * @return List of pairs of modules.
      */
-    public Set<Pair<PredicateLabel>> getSimplePairs() {
+    public Set<Pair<Predicate>> getSimplePairs() {
 
-        Set<PredicateLabel> iterator = new HashSet<PredicateLabel>();
+        Set<Predicate> iterator = new HashSet<Predicate>();
         for (TaxonomyPredicate module : getMappedPredicates().values()) {
             if (module.isSimplePredicate()) {
                 iterator.add(module);

@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.solver.minisat;
+package nl.uu.cs.ape.solver.domainconfiguration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,15 +10,14 @@ import nl.uu.cs.ape.automaton.Block;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.models.AllModules;
+import nl.uu.cs.ape.models.DomainModules;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.ConfigEnum;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxConjunction;
@@ -29,6 +28,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxImplication;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegatedConjunction;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxNegation;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxXOR;
+import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
  * The {@code ModuleUtils} class is used to encode SLTLx constraints based on
@@ -57,17 +57,18 @@ public final class EnforceModuleRelatedRules {
 	 *         the required INPUT
 	 *         and OUTPUT types of the modules.
 	 */
-	public static Set<SLTLxFormula> moduleAnnotations(SATSynthesisEngine synthesisInstance) {
+	public static Set<SLTLxFormula> moduleAnnotations(Domain domain, ModuleAutomaton moduleAutomaton,
+			TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
-		fullEncoding.addAll(toolInputTypes(synthesisInstance));
+		fullEncoding.addAll(toolInputTypes(domain, moduleAutomaton, typeAutomaton));
 
-		fullEncoding.addAll(toolOutputTypes(synthesisInstance));
+		fullEncoding.addAll(toolOutputTypes(domain, moduleAutomaton, typeAutomaton));
 		return fullEncoding;
 	}
 
 	/**
 	 * Return a CNF formula that preserves the memory structure that is being used
-	 * (e.g. 'shared memory'), i.e. ensures that the referenced items are available
+	 * (shared memory), i.e. ensures that the referenced items are available
 	 * according to the mem. structure and that the input type and the referenced
 	 * type from the memory represent the same data.
 	 *
@@ -77,13 +78,14 @@ public final class EnforceModuleRelatedRules {
 	 *         the required
 	 *         memory structure implementation.
 	 */
-	public static Set<SLTLxFormula> memoryStructure(SATSynthesisEngine synthesisInstance) {
+	public static Set<SLTLxFormula> memoryStructure(Domain domain, ModuleAutomaton moduleAutomaton,
+			TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
-		fullEncoding.addAll(allowDataReferencing(synthesisInstance.getTypeAutomaton()));
+		fullEncoding.addAll(allowDataReferencing(typeAutomaton));
 		fullEncoding.addAll(usageOfGeneratedTypes(synthesisInstance));
-		fullEncoding.addAll(dataReference(synthesisInstance.getDomainSetup(),
-				synthesisInstance.getTypeAutomaton()));
+		fullEncoding.addAll(dataReference(domain,
+				typeAutomaton));
 		return fullEncoding;
 	}
 
@@ -95,9 +97,9 @@ public final class EnforceModuleRelatedRules {
 	 *                          information specific for it.
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	public static Set<SLTLxFormula> ancestorRelationsDependency(SATSynthesisEngine synthesisInstance) {
+	public static Set<SLTLxFormula> ancestorRelationsDependency(Domain domain, ModuleAutomaton moduleAutomaton,
+			TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
-		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
 
 		/**
 		 * Encode reflexivity and transitivity of the relation.
@@ -115,8 +117,8 @@ public final class EnforceModuleRelatedRules {
 		 * - restrict that empty types don't depend on anything
 		 */
 		fullEncoding.addAll(restrictAncestorRelationDomain(typeAutomaton));
-		fullEncoding.addAll(ancestorRelRestrictOverModules(synthesisInstance));
-		fullEncoding.addAll(ancestorRelDependencyOverModules(synthesisInstance));
+		fullEncoding.addAll(ancestorRelRestrictOverModules(domain.getAllTypes().getEmptyType(), typeAutomaton));
+		fullEncoding.addAll(ancestorRelDependencyOverModules(domain.getAllTypes().getEmptyType(), typeAutomaton));
 		fullEncoding.addAll(ancestorRelOverDataReferencing(typeAutomaton));
 
 		return fullEncoding;
@@ -150,19 +152,20 @@ public final class EnforceModuleRelatedRules {
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> toolInputTypes(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> toolInputTypes(Domain domain, ModuleAutomaton moduleAutomaton,
+			TypeAutomaton typeAutomaton) {
 
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 		/* For each module.. */
-		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
+		for (TaxonomyPredicate potentialModule : domain.getAllModules().getModules()) {
 			/* ..which is a Tool.. */
 			if ((potentialModule instanceof Module)) {
 				Module module = (Module) potentialModule;
 				/* ..iterate through all the states.. */
-				for (State moduleState : synthesisInstance.getModuleAutomaton().getAllStates()) {
+				for (State moduleState : moduleAutomaton.getAllStates()) {
 					int moduleNo = moduleState.getLocalStateNumber();
 					/* ..and for each state and input state of that module state.. */
-					List<State> currInputStates = synthesisInstance.getTypeAutomaton().getUsedTypesBlock(moduleNo - 1)
+					List<State> currInputStates = typeAutomaton.getUsedTypesBlock(moduleNo - 1)
 							.getStates();
 					List<Type> moduleInputs = module.getModuleInput();
 					for (State currInputState : currInputStates) {
@@ -198,7 +201,7 @@ public final class EnforceModuleRelatedRules {
 													moduleState),
 											new SLTLxAtom(
 													AtomType.USED_TYPE,
-													synthesisInstance.getEmptyType(),
+													domain.getAllTypes().getEmptyType(),
 													currInputState)));
 						}
 					}
@@ -218,11 +221,11 @@ public final class EnforceModuleRelatedRules {
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link AtomType#MEM_TYPE_REFERENCE} are implemented correctly.
 	 */
-	private static Set<SLTLxFormula> dataReference(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
+	private static Set<SLTLxFormula> dataReference(Domain domain, TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
 		/* For each type instance */
-		for (TaxonomyPredicate currType : domainSetup.getAllTypes().getTypes()) {
+		for (TaxonomyPredicate currType : domain.getAllTypes().getTypes()) {
 			if (currType.isSimplePredicate() || currType.isEmptyPredicate()) {
 				/* ..for each state in which type can be used .. */
 				for (State currUsedTypeState : typeAutomaton.getAllUsedTypesStates()) {
@@ -318,7 +321,7 @@ public final class EnforceModuleRelatedRules {
 				fullEncoding.add(new SLTLxDisjunction(allPossibilities));
 
 				/* Defining that each input can reference only one state in the shared memory */
-				for (Pair<PredicateLabel> pair : getPredicatePairs(possibleMemStates)) {
+				for (Pair<Predicate> pair : getPredicatePairs(possibleMemStates)) {
 					fullEncoding.add(
 							new SLTLxNegatedConjunction(
 									new SLTLxAtom(
@@ -468,15 +471,14 @@ public final class EnforceModuleRelatedRules {
 	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> ancestorRelDependencyOverModules(SATSynthesisEngine synthesisInstance) {
-		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
+	private static Set<SLTLxFormula> ancestorRelDependencyOverModules(Type emptyType,
+			TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 		/** For tool inputs and outputs */
 		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
 			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
 			Block currMemBlock = typeAutomaton.getMemoryTypesBlock(i + 1);
 
-			Type emptyType = synthesisInstance.getEmptyType();
 			// For each output state..
 			for (State currMemState : currMemBlock.getStates()) {
 
@@ -515,10 +517,9 @@ public final class EnforceModuleRelatedRules {
 	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> ancestorRelRestrictOverModules(SATSynthesisEngine synthesisInstance) {
-		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
+	private static Set<SLTLxFormula> ancestorRelRestrictOverModules(Type emptyType,
+			TypeAutomaton typeAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
-		Type emptyType = synthesisInstance.getEmptyType();
 
 		for (int i = 0; i < typeAutomaton.getUsedTypesBlocks().size() - 1; i++) {
 			Block currInputBlock = typeAutomaton.getUsedTypesBlock(i);
@@ -717,123 +718,6 @@ public final class EnforceModuleRelatedRules {
 	}
 
 	/**
-	 * Function returns the encoding that ensures that tool outputs are used
-	 * according to the configuration, e.g. if the config specifies that all
-	 * workflow inputs have to be used, then each of them has to be referenced at
-	 * least once.
-	 * 
-	 * @param synthesisInstance - instance of the synthesis engine
-	 *
-	 * @return Set of SLTLx formulas that represent the constraints.
-	 */
-	private static Set<SLTLxFormula> usageOfGeneratedTypes(SATSynthesisEngine synthesisInstance) {
-
-		Type emptyType = synthesisInstance.getEmptyType();
-		TypeAutomaton typeAutomaton = synthesisInstance.getTypeAutomaton();
-		Set<SLTLxFormula> fullEncoding = new HashSet<>();
-		/*
-		 * Setting up the constraints that ensure usage of the generated types in the
-		 * memory, (e.g. all workflow inputs and at least one of each of the tool
-		 * outputs needs to be used in the program, unless they are empty.)
-		 */
-		for (Block currBlock : typeAutomaton.getMemoryTypesBlocks()) {
-			int blockNumber = currBlock.getBlockNumber();
-			/* If the memory is provided as input */
-			if (blockNumber == 0) {
-				/* In case that all workflow inputs need to be used */
-				if (synthesisInstance.getRunConfig().getUseWorkflowInput() == ConfigEnum.ALL) {
-					for (State currMemoryState : currBlock.getStates()) {
-						Set<SLTLxFormula> allPossibilities = new HashSet<>();
-
-						allPossibilities.add(
-								new SLTLxAtom(
-										AtomType.MEMORY_TYPE,
-										emptyType,
-										currMemoryState));
-
-						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							allPossibilities.add(
-									new SLTLxAtom(
-											AtomType.MEM_TYPE_REFERENCE,
-											currMemoryState,
-											inputState));
-						}
-						fullEncoding.add(new SLTLxDisjunction(allPossibilities));
-					}
-					/* In case that at least one workflow input need to be used */
-				} else if (synthesisInstance.getRunConfig().getUseWorkflowInput() == ConfigEnum.ONE) {
-					Set<SLTLxFormula> allPossibilities = new HashSet<>();
-					for (State currMemoryState : currBlock.getStates()) {
-						if (currMemoryState.getLocalStateNumber() == 0) {
-							allPossibilities.add(
-									new SLTLxAtom(
-											AtomType.MEMORY_TYPE,
-											emptyType,
-											currMemoryState));
-						}
-						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							allPossibilities.add(
-									new SLTLxAtom(
-											AtomType.MEM_TYPE_REFERENCE,
-											currMemoryState,
-											inputState));
-						}
-					}
-					fullEncoding.add(new SLTLxDisjunction(allPossibilities));
-				}
-				/* In case that none of the workflow input has to be used, do nothing. */
-			} else {
-				/* In case that all generated data need to be used. */
-				if (synthesisInstance.getRunConfig().getUseAllGeneratedData() == ConfigEnum.ALL) {
-					for (State currMemoryState : currBlock.getStates()) {
-						Set<SLTLxFormula> allPossibilities = new HashSet<>();
-						allPossibilities.add(
-								new SLTLxAtom(
-										AtomType.MEMORY_TYPE,
-										emptyType,
-										currMemoryState));
-						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							allPossibilities.add(
-									new SLTLxAtom(
-											AtomType.MEM_TYPE_REFERENCE,
-											currMemoryState,
-											inputState));
-						}
-						fullEncoding.add(new SLTLxDisjunction(allPossibilities));
-					}
-					/*
-					 * In case that at least one of the generated data instances per tool need to be
-					 * used.
-					 */
-				} else if (synthesisInstance.getRunConfig().getUseAllGeneratedData() == ConfigEnum.ONE) {
-					Set<SLTLxFormula> allPossibilities = new HashSet<>();
-					for (State currMemoryState : currBlock.getStates()) {
-						if (currMemoryState.getLocalStateNumber() == 0) {
-							allPossibilities.add(
-									new SLTLxAtom(
-											AtomType.MEMORY_TYPE,
-											emptyType,
-											currMemoryState));
-						}
-						for (State inputState : typeAutomaton.getUsedStatesAfterBlockNo(blockNumber - 1)) {
-							allPossibilities.add(
-									new SLTLxAtom(
-											AtomType.MEM_TYPE_REFERENCE,
-											currMemoryState,
-											inputState));
-						}
-					}
-					fullEncoding.add(new SLTLxDisjunction(allPossibilities));
-				}
-				/* In case that none generated data has to be used do nothing. */
-
-			}
-		}
-
-		return fullEncoding;
-	}
-
-	/**
 	 * Return the CNF representation of the output type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.<br>
 	 * Generate constraints that preserve tool outputs.
@@ -842,20 +726,21 @@ public final class EnforceModuleRelatedRules {
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	private static Set<SLTLxFormula> toolOutputTypes(SATSynthesisEngine synthesisInstance) {
+	private static Set<SLTLxFormula> toolOutputTypes(Domain domain, ModuleAutomaton moduleAutomaton,
+			TypeAutomaton typeAutomaton) {
 
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
 		// for each module
-		for (TaxonomyPredicate potentialModule : synthesisInstance.getDomainSetup().getAllModules().getModules()) {
+		for (TaxonomyPredicate potentialModule : domain.getAllModules().getModules()) {
 			// that is a Tool
 			if ((potentialModule instanceof Module)) {
 				Module module = (Module) potentialModule;
 				// iterate through all the states
-				for (State moduleState : synthesisInstance.getModuleAutomaton().getAllStates()) {
+				for (State moduleState : moduleAutomaton.getAllStates()) {
 					int moduleNo = moduleState.getLocalStateNumber();
 					// and for each state and output state of that module state
-					List<State> currOutputStates = synthesisInstance.getTypeAutomaton().getMemoryTypesBlock(moduleNo)
+					List<State> currOutputStates = typeAutomaton.getMemoryTypesBlock(moduleNo)
 							.getStates();
 					List<Type> moduleOutputs = module.getModuleOutput();
 					for (int i = 0; i < currOutputStates.size(); i++) {
@@ -886,7 +771,7 @@ public final class EnforceModuleRelatedRules {
 													moduleState),
 											new SLTLxAtom(
 													AtomType.MEMORY_TYPE,
-													synthesisInstance.getEmptyType(),
+													domain.getAllTypes().getEmptyType(),
 													currOutputStates.get(i))));
 						}
 					}
@@ -907,7 +792,7 @@ public final class EnforceModuleRelatedRules {
 	 * @return The Set of SLTLx formulas that represent the constraints.
 	 */
 
-	public static Set<SLTLxFormula> moduleMutualExclusion(Pair<PredicateLabel> pair, ModuleAutomaton moduleAutomaton) {
+	public static Set<SLTLxFormula> moduleMutualExclusion(Pair<Predicate> pair, ModuleAutomaton moduleAutomaton) {
 
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
@@ -937,7 +822,7 @@ public final class EnforceModuleRelatedRules {
 	 * @param moduleAutomaton Module automaton.
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
-	public static Set<SLTLxFormula> moduleMandatoryUsage(AllModules allModules, ModuleAutomaton moduleAutomaton) {
+	public static Set<SLTLxFormula> moduleMandatoryUsage(DomainModules allModules, ModuleAutomaton moduleAutomaton) {
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
 		if (allModules.getModules().isEmpty()) {
@@ -975,7 +860,7 @@ public final class EnforceModuleRelatedRules {
 	 *         taxonomy
 	 *         classifications.
 	 */
-	public static Set<SLTLxFormula> moduleTaxonomyStructure(AllModules allModules, TaxonomyPredicate currModule,
+	public static Set<SLTLxFormula> moduleTaxonomyStructure(DomainModules allModules, TaxonomyPredicate currModule,
 			ModuleAutomaton moduleAutomaton) {
 
 		Set<SLTLxFormula> fullEncoding = new HashSet<>();
@@ -994,7 +879,7 @@ public final class EnforceModuleRelatedRules {
 	 * @param currModule  Module that should be used.
 	 * @param moduleState State in which the module should be used.
 	 */
-	private static Set<SLTLxFormula> moduleTaxonomyStructureForState(AllModules allModules,
+	private static Set<SLTLxFormula> moduleTaxonomyStructureForState(DomainModules allModules,
 			TaxonomyPredicate currModule, State moduleState) {
 		SLTLxAtom superModuleState = new SLTLxAtom(AtomType.MODULE, currModule, moduleState);
 
@@ -1044,8 +929,8 @@ public final class EnforceModuleRelatedRules {
 	 *         modules are not returned, only the unique pairs of modules that are
 	 *         representing actual tools.
 	 */
-	public static List<Pair<PredicateLabel>> getPredicatePairs(List<? extends PredicateLabel> predicateList) {
-		List<Pair<PredicateLabel>> pairs = new ArrayList<>();
+	public static List<Pair<Predicate>> getPredicatePairs(List<? extends Predicate> predicateList) {
+		List<Pair<Predicate>> pairs = new ArrayList<>();
 
 		for (int i = 0; i < predicateList.size() - 1; i++) {
 			for (int j = i + 1; j < predicateList.size(); j++) {

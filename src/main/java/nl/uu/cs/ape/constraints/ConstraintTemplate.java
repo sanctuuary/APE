@@ -6,9 +6,9 @@ import org.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.ModuleAutomaton;
 import nl.uu.cs.ape.automaton.TypeAutomaton;
-import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.solver.domainconfiguration.Domain;
 
 import java.util.List;
 
@@ -118,7 +118,7 @@ public abstract class ConstraintTemplate {
      * @return The String CNF representation of the constraint. null in case of
      *         incorrect number of constraint parameters.
      */
-    public abstract String getConstraint(List<TaxonomyPredicate> list, APEDomainSetup domainSetup,
+    public abstract String getConstraint(List<TaxonomyPredicate> list, Domain domainSetup,
             ModuleAutomaton moduleAutomaton,
             TypeAutomaton typeAutomaton, SATAtomMappings mappings);
 

@@ -25,7 +25,7 @@ public abstract class SLTLxVarQuantification extends SLTLxFormula {
 	@Override
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection newVarMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> clauses = new HashSet<String>();
+		Set<String> clauses = new HashSet<>();
 		SLTLxVariable flatBoundVariable = newVarMapping.getVarSabstitute(boundVariable);
 		/** Encode the underlying formula. */
 		clauses.addAll(formula.getCNFEncoding(stateNo, newVarMapping, synthesisEngine));

@@ -1,28 +1,29 @@
-package nl.uu.cs.ape.domain;
+package nl.uu.cs.ape.solver.domainconfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import nl.uu.cs.ape.automaton.ModuleAutomaton;
+import nl.uu.cs.ape.automaton.TypeAutomaton;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.ToolAnnotationTag;
-import nl.uu.cs.ape.constraints.ConstraintFactory;
-import nl.uu.cs.ape.constraints.ConstraintFormatException;
-import nl.uu.cs.ape.constraints.ConstraintTemplate;
-import nl.uu.cs.ape.constraints.ConstraintTemplateParameter;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AbstractModule;
-import nl.uu.cs.ape.models.AllModules;
-import nl.uu.cs.ape.models.AllTypes;
-import nl.uu.cs.ape.models.AuxiliaryPredicate;
-import nl.uu.cs.ape.models.ConstraintTemplateData;
+import nl.uu.cs.ape.models.DomainModules;
+import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.Module;
+import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.Type;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
+import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
+import nl.uu.cs.ape.solver.EncodingPredicates;
 
 /**
  * The {@code APEDomainSetup} class is used to store the domain information and
@@ -31,73 +32,57 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  * @author Vedran Kasalica
  */
 @Slf4j
-public class APEDomainSetup {
+public class Domain extends EncodingPredicates {
 
-    /* Helper objects used to keep track of the domain quality. */
-    private Set<String> emptyTools = new HashSet<>();
-    private Set<String> wrongToolIO = new HashSet<>();
-    private Set<String> wrongToolTax = new HashSet<>();
+    private static final String TOOLS_JSON_TAG = "functions";
     /**
      * All modules/operations used in the domain.
      */
-    private AllModules allModules;
+    private DomainModules allModules;
 
     /**
      * All data types defined in the domain.
      */
-    private AllTypes allTypes;
+    private DomainTypes allTypes;
 
     /**
      * Prefix used to define OWL class IDs
      */
+    @Getter
     private String ontologyPrefixIRI;
-
-    /**
-     * Object used to create temporal constraints.
-     */
-    private ConstraintFactory constraintFactory;
-
-    /**
-     * List of data gathered from the constraint file.
-     */
-    private List<ConstraintTemplateData> unformattedConstr;
-    private List<AuxiliaryPredicate> helperPredicates;
-    private List<String> constraintsSLTLx;
 
     /**
      * Maximum number of inputs that a tool can have.
      */
+    @Getter
     private int maxNoToolInputs = 0;
 
     /**
      * Maximum number of outputs that a tool can have.
      */
+    @Getter
     private int maxNoToolOutputs = 0;
 
     /**
      * Holds information whether the domain was annotated under the strict rules of
      * the output dependency.
      */
+    @Getter
     private boolean useStrictToolAnnotations;
 
-    private static final String CONSTR_JSON_TAG = "constraints";
-    private static final String CONSTR_ID_TAG = "constraintid";
-    private static final String CONSTR_SLTLx = "formula";
-    private static final String CONSTR_PARAM_JSON_TAG = "parameters";
-    private static final String TOOLS_JSON_TAG = "functions";
+    /* Helper objects used to keep track of the domain quality. */
+    private Set<String> emptyTools = new HashSet<>();
+    private Set<String> wrongToolIO = new HashSet<>();
+    private Set<String> wrongToolTax = new HashSet<>();
 
     /**
      * Instantiates a new Ape domain setup.
      *
      * @param config the config
      */
-    public APEDomainSetup(APECoreConfig config) {
-        this.unformattedConstr = new ArrayList<>();
-        this.allModules = new AllModules(config);
-        this.allTypes = new AllTypes(config);
-        this.constraintFactory = new ConstraintFactory();
-        this.helperPredicates = new ArrayList<>();
-        this.constraintsSLTLx = new ArrayList<>();
+    public Domain(APECoreConfig config) {
+        this.allModules = new DomainModules(config);
+        this.allTypes = new DomainTypes(config);
         this.ontologyPrefixIRI = config.getOntologyPrefixIRI();
         this.useStrictToolAnnotations = config.getUseStrictToolAnnotations();
     }
@@ -107,56 +92,8 @@ public class APEDomainSetup {
      *
      * @return The field {@link #allModules}.
      */
-    public AllModules getAllModules() {
+    public DomainModules getAllModules() {
         return allModules;
-    }
-
-    /**
-     * Add constraint data.
-     *
-     * @param constr Add a constraint to the list of constraints, that should be
-     *               encoded during the execution of the synthesis.
-     */
-    public void addConstraintData(ConstraintTemplateData constr) {
-        this.unformattedConstr.add(constr);
-    }
-
-    /**
-     * Add the String that corresponds to an SLTLx formula that should be parsed to
-     * the list of constraints.
-     * 
-     * @param formulaSLTLx - String that corresponds to an SLTLx formula that should
-     *                     be parsed
-     */
-    public void addSLTLxConstraint(String formulaSLTLx) {
-        this.constraintsSLTLx.add(formulaSLTLx);
-    }
-
-    /**
-     * Gets unformatted constraints.
-     *
-     * @return the field {@link #unformattedConstr}.
-     */
-    public List<ConstraintTemplateData> getUnformattedConstr() {
-        return unformattedConstr;
-    }
-
-    /**
-     * Gets all SLTLx constraints specified by the user in SLTLx as text.
-     * 
-     * @return Set of string representations of the constraints.
-     */
-    public List<String> getSLTLxConstraints() {
-        return constraintsSLTLx;
-    }
-
-    /**
-     * Removes all of the unformatted constraints, in order to start a new synthesis
-     * run.
-     */
-    public void clearConstraints() {
-        this.unformattedConstr.clear();
-        this.constraintsSLTLx.clear();
     }
 
     /**
@@ -164,26 +101,8 @@ public class APEDomainSetup {
      *
      * @return the field {@link #allTypes}.
      */
-    public AllTypes getAllTypes() {
+    public DomainTypes getAllTypes() {
         return allTypes;
-    }
-
-    /**
-     * Gets constraint factory.
-     *
-     * @return the field {@link #constraintFactory}.
-     */
-    public ConstraintFactory getConstraintFactory() {
-        return constraintFactory;
-    }
-
-    /**
-     * Adding each constraint format in the set of all cons. formats. method
-     * should be called only once all the data types and modules have been
-     * initialized.
-     */
-    public void initializeConstraints() {
-        constraintFactory.initializeConstraints(allModules, allTypes);
     }
 
     /**
@@ -197,97 +116,6 @@ public class APEDomainSetup {
         succRun &= allModules.trimTaxonomy();
         succRun &= allTypes.trimTaxonomy();
         return succRun;
-    }
-
-    /**
-     * Return the {@link ConstraintTemplate} that corresponds to the given ID, or
-     * null if the constraint with the given ID does not exist.
-     *
-     * @param constraintID ID of the {@code ConstraintTemplate}.
-     * @return The {@code ConstraintTemplate} that corresponds to the given ID, or
-     *         null if the ID is not mapped to any constraint.
-     */
-    public ConstraintTemplate getConstraintTemplate(String constraintID) {
-        return constraintFactory.getConstraintTemplate(constraintID);
-    }
-
-    /**
-     * Method reads the constraints from a JSON object and updates the
-     * {@link APEDomainSetup} object accordingly.
-     *
-     * @param constraintsJSONArray JSON array containing the constraints
-     * @throws ConstraintFormatException exception in case of bad constraint json
-     *                                   formatting
-     */
-    public void updateConstraints(JSONArray constraintsJSONArray) throws ConstraintFormatException {
-        if (constraintsJSONArray == null) {
-            return;
-        }
-        String constraintID = null;
-        int currNode = 0;
-
-        List<JSONObject> constraints = APEUtils.getListFromJsonList(constraintsJSONArray, JSONObject.class);
-
-        /* Iterate through each constraint in the list */
-        for (JSONObject jsonConstraint : APEUtils.safe(constraints)) {
-            currNode++;
-            /* READ THE CONSTRAINT */
-            try {
-                constraintID = jsonConstraint.getString(CONSTR_ID_TAG);
-                ConstraintTemplate currConstrTemplate = getConstraintFactory()
-                        .getConstraintTemplate(constraintID);
-                if (currConstrTemplate == null) {
-                    if (constraintID.equals("SLTLx")) {
-                        String formulaSLTLx = jsonConstraint.getString(CONSTR_SLTLx);
-                        if (formulaSLTLx == null) {
-                            throw ConstraintFormatException.wrongNumberOfParameters(
-                                    getConstrErrorMsg(currNode, constraintID));
-                        }
-                        this.addSLTLxConstraint(formulaSLTLx);
-                        continue;
-                    } else {
-                        throw ConstraintFormatException.wrongConstraintID(
-                                getConstrErrorMsg(currNode, constraintID));
-                    }
-                }
-
-                List<ConstraintTemplateParameter> currTemplateParameters = currConstrTemplate.getParameters();
-
-                List<JSONObject> jsonConstParam = APEUtils.getListFromJson(jsonConstraint, CONSTR_PARAM_JSON_TAG,
-                        JSONObject.class);
-                if (currTemplateParameters.size() != jsonConstParam.size()) {
-                    throw ConstraintFormatException.wrongNumberOfParameters(
-                            getConstrErrorMsg(currNode, constraintID));
-                }
-                int paramNo = 0;
-                List<TaxonomyPredicate> constraintParameters = new ArrayList<>();
-                /* for each constraint parameter */
-                for (JSONObject jsonParam : jsonConstParam) {
-                    ConstraintTemplateParameter taxInstanceFromJson = currTemplateParameters.get(paramNo++);
-                    TaxonomyPredicate currParameter = taxInstanceFromJson.readConstraintParameterFromJson(jsonParam,
-                            this);
-                    constraintParameters.add(currParameter);
-                }
-
-                ConstraintTemplateData currConstr = getConstraintFactory()
-                        .generateConstraintTemplateData(constraintID, constraintParameters);
-                if (constraintParameters.stream().anyMatch(Objects::isNull)) {
-                    throw ConstraintFormatException.wrongParameter(
-                            getConstrErrorMsg(currNode, constraintID));
-                } else {
-                    this.addConstraintData(currConstr);
-                }
-
-            } catch (JSONException e) {
-                throw ConstraintFormatException.badFormat(
-                        getConstrErrorMsg(currNode, constraintID));
-            }
-
-        }
-    }
-
-    private String getConstrErrorMsg(int currNode, String constraintID) {
-        return String.format("Error at constraint no: %d, constraint ID: %s", currNode, constraintID);
     }
 
     /**
@@ -318,7 +146,8 @@ public class APEDomainSetup {
 
     /**
      * Creates/updates a module from a tool annotation instance from a JSON file and
-     * updates the list of modules ({@link AllModules}) in the domain accordingly.
+     * updates the list of modules ({@link DomainModules}) in the domain
+     * accordingly.
      *
      * @param jsonModule JSON representation of a module
      * @return {@code true} if the domain was updated, false otherwise.
@@ -467,24 +296,6 @@ public class APEDomainSetup {
     }
 
     /**
-     * Gets ontology prefix IRI.
-     *
-     * @return the ontology prefix IRI
-     */
-    public String getOntologyPrefixIRI() {
-        return ontologyPrefixIRI;
-    }
-
-    /**
-     * Get the maximum number of inputs that a tool can have.
-     *
-     * @return the field {@link #maxNoToolInputs}.
-     */
-    public int getMaxNoToolInputs() {
-        return maxNoToolInputs;
-    }
-
-    /**
      * Update the maximum number of inputs that a tool can have, i.e. increase the
      * number if the current max number is smaller than the new number of inputs.
      *
@@ -494,15 +305,6 @@ public class APEDomainSetup {
         if (this.maxNoToolInputs < currNoInputs) {
             this.maxNoToolInputs = currNoInputs;
         }
-    }
-
-    /**
-     * Get the maximum number of outputs that a tool can have.
-     *
-     * @return the field {@link #maxNoToolOutputs}.
-     */
-    public int getMaxNoToolOutputs() {
-        return maxNoToolOutputs;
     }
 
     /**
@@ -518,32 +320,104 @@ public class APEDomainSetup {
     }
 
     /**
-     * Add predicate to the list of auxiliary predicates that should be encoded.
+     * Generate the SAT encoding of the configured domain and save it to the given
+     * file.
      * 
-     * @param helperPredicate
+     * @param cnfEncoding     File where the encoding should be saved.
+     * @param currLengthTimer
+     *
+     * @return true if the encoding was performed successfully, false otherwise.
+     * @throws IOException Error if taxonomies have not been setup properly.
      */
-    public void addHelperPredicate(AuxiliaryPredicate helperPredicate) {
-        helperPredicates.add(helperPredicate);
+    public boolean domainEncoding(File cnfEncoding, int solutionSize, ModuleAutomaton moduleAutomaton,
+            TypeAutomaton typeAutomaton) throws IOException {
 
-    }
+        String currLengthTimer = APEUtils.getTimerId(solutionSize);
+        /*
+         * Create constraints from the tool_annotations.json file regarding the
+         * Inputs/Outputs, preserving the structure of input and output fields.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.moduleAnnotations(this, moduleAutomaton, typeAutomaton));
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool I/O constraints");
 
-    /**
-     * Get information whether the domain was annotated under the strict rules of
-     * the output dependency.
-     * 
-     * @return {@code true} if the strict rules apply, {@code false} otherwise.
-     */
-    public boolean getUseStrictToolAnnotations() {
-        return useStrictToolAnnotations;
-    }
+        /*
+         * The constraints preserve the memory structure, i.e. preserve the data
+         * available in memory and the
+         * logic of referencing data from memory in case of tool inputs.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.memoryStructure(this, moduleAutomaton, typeAutomaton));
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Memory structure encoding");
 
-    /**
-     * Get the list of helper predicates used in the domain.
-     * 
-     * @return List of the auxiliary helper predicates.
-     */
-    public List<AuxiliaryPredicate> getHelperPredicates() {
-        return helperPredicates;
+        /*
+         * Create the constraints enforcing:
+         * 1. Mutual exclusion of the tools
+         * 2. Mandatory usage of the tools - from taxonomy.
+         * 3. Adding the constraints enforcing the taxonomy structure.
+         */
+        for (Pair<Predicate> pair : domainSetup.getAllModules().getSimplePairs()) {
+            SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                    EnforceModuleRelatedRules.moduleMutualExclusion(pair, moduleAutomaton));
+        }
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool exclusions encoding");
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.moduleMandatoryUsage(domainSetup.getAllModules(), moduleAutomaton));
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceModuleRelatedRules
+                .moduleTaxonomyStructure(domainSetup.getAllModules(), rootModule, moduleAutomaton));
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Tool usage encoding");
+        /*
+         * Create the constraints enforcing:
+         * 1. Mutual exclusion of the types/formats (according to the search model)
+         * 2. Mandatory usage of the types in the transition nodes (note: "empty type"
+         * is considered a type)
+         * 3. Adding the constraints enforcing the taxonomy structure.
+         */
+        for (Pair<Predicate> pair : domainSetup.getAllTypes().getTypePairsForEachSubTaxonomy()) {
+            SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                    EnforceTypeRelatedRules.memoryTypesMutualExclusion(pair, typeAutomaton));
+        }
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Type exclusions encoding");
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceTypeRelatedRules.typeMandatoryUsage(domainSetup, typeAutomaton));
+
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceTypeRelatedRules.typeEnforceTaxonomyStructure(domainSetup.getAllTypes(), typeAutomaton));
+        APEUtils.timerRestartAndPrint(currLengthTimer, "Type usage encoding");
+
+        /*
+         * Encode data ancestor relation (R) constraints.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.ancestorRelationsDependency(this, moduleAutomaton, typeAutomaton));
+
+        /*
+         * Encode data equivalence/identity relation (IS) constraints.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this,
+                EnforceModuleRelatedRules.identityRelationsDependency(typeAutomaton));
+
+        /*
+         * Setup encoding of 'true' and 'false' atoms to ensure proper SLTLx
+         * interpretation.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules.setTrueFalse());
+
+        /*
+         * Encode rule that the given inputs should not be used as workflow outputs
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
+                .inputsAreNotOutputs(typeAutomaton));
+
+        /*
+         * Setup the constraints ensuring that the auxiliary predicates are properly
+         * used and linked to the underlying taxonomy predicates.
+         */
+        SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceSLTLxRelatedRules
+                .preserveAuxiliaryPredicateRules(moduleAutomaton, typeAutomaton, domainSetup.getHelperPredicates()));
     }
 
 }

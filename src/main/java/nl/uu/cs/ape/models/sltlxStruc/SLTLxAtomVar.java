@@ -6,7 +6,7 @@ import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.models.Pair;
 import nl.uu.cs.ape.models.enums.AtomType;
 import nl.uu.cs.ape.models.enums.AtomVarType;
-import nl.uu.cs.ape.models.logic.constructs.PredicateLabel;
+import nl.uu.cs.ape.models.logic.constructs.Predicate;
 import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 
 /**
@@ -21,7 +21,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
      * First argument is usually predicate that is referred (tool or type), or a
      * variable representing a type state.
      */
-    private PredicateLabel firstArg;
+    private Predicate firstArg;
 
     /**
      * Second argument is a variable representing a typeState.
@@ -50,7 +50,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
      * @param secondArg   - Variable representing state in the automaton it was
      *                    used/created in.
      */
-    public SLTLxAtomVar(AtomVarType elementType, PredicateLabel firstArg, SLTLxVariable secondArg) {
+    public SLTLxAtomVar(AtomVarType elementType, Predicate firstArg, SLTLxVariable secondArg) {
         super();
         this.firstArg = firstArg;
         this.secondArg = secondArg;
@@ -62,7 +62,7 @@ public class SLTLxAtomVar extends SLTLxFormula {
      *
      * @return Field {@link #firstArg}.
      */
-    public PredicateLabel getFirstArg() {
+    public Predicate getFirstArg() {
         return firstArg;
     }
 

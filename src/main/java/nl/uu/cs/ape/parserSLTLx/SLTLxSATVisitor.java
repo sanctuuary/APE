@@ -12,8 +12,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AbstractModule;
-import nl.uu.cs.ape.models.AllModules;
-import nl.uu.cs.ape.models.AllTypes;
+import nl.uu.cs.ape.models.DomainModules;
+import nl.uu.cs.ape.models.DomainTypes;
 import nl.uu.cs.ape.models.enums.AtomVarType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
@@ -67,8 +67,8 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 
 	static int usedState = 0;
 	int memIndexFactor;
-	private final AllTypes allTypes;
-	private final AllModules allModules;
+	private final DomainTypes allTypes;
+	private final DomainModules allModules;
 	private String ontologyPrexifIRI;
 
 	public SLTLxSATVisitor(SATSynthesisEngine synthesisEngine) {

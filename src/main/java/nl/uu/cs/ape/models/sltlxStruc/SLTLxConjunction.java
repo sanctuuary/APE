@@ -14,11 +14,11 @@ import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
  */
 public class SLTLxConjunction extends SLTLxFormula {
 
-	private Set<SLTLxFormula> conjunctedFacts;
+	/** Set of conjuncted facts. */
+	private final Set<SLTLxFormula> conjunctedFacts = new HashSet<>();
 
 	public SLTLxConjunction(SLTLxFormula arg1, SLTLxFormula arg2) {
 		super();
-		this.conjunctedFacts = new HashSet<>();
 		if (arg1 != null)
 			this.conjunctedFacts.add(arg1);
 		if (arg2 != null)
@@ -27,7 +27,6 @@ public class SLTLxConjunction extends SLTLxFormula {
 
 	public SLTLxConjunction(SLTLxFormula arg1, SLTLxFormula arg2, SLTLxFormula arg3) {
 		super();
-		this.conjunctedFacts = new HashSet<>();
 		if (arg1 != null)
 			this.conjunctedFacts.add(arg1);
 		if (arg2 != null)
@@ -38,7 +37,6 @@ public class SLTLxConjunction extends SLTLxFormula {
 
 	public SLTLxConjunction(Collection<? extends SLTLxFormula> conjunctedFacts) {
 		super();
-		this.conjunctedFacts = new HashSet<>();
 		conjunctedFacts.forEach(fact -> {
 			if (fact != null)
 				this.conjunctedFacts.add(fact);
