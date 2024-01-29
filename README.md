@@ -47,7 +47,7 @@ To add a dependency on APE using Maven, use the following:
 <dependency>
     <groupId>io.github.sanctuuary</groupId>
     <artifactId>APE</artifactId>
-    <version>2.0.0</version>
+    <version>2.x.x</version>
 </dependency>
 ```
 For information regarding **Gradle**, **Ivy**, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
@@ -84,7 +84,7 @@ or
 ```shell
 git clone https://github.com/sanctuuary/APE_UseCases.git
 ```
-Download the latest version of [`APE-[latest]-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
+Download the latest version of [`APE-[latest]-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
 ```shell
 cd ~/git/APE_UseCases
 java -jar APE-[latest]-executable.jar ImageMagick/Example1/config.json
