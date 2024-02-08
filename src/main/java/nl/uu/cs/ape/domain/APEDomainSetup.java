@@ -349,7 +349,7 @@ public class APEDomainSetup {
 
         /*
          * If the taxonomy terms were not properly specified the tool taxonomy root is
-         * used as parentclass of the tool.
+         * used as a parent class of the tool.
          */
         if (taxonomyParentModules.isEmpty()) {
             log.warn("Tool '" + moduleIRI + "' annotation issue. "
@@ -358,21 +358,17 @@ public class APEDomainSetup {
             taxonomyParentModules.add(allModules.getRootModuleID());
         }
 
-        String executionCode = null;
-        try {
-            executionCode = jsonModule.getJSONObject(ToolAnnotationTag.IMPLEMENTATION.toString())
-                    .getString(ToolAnnotationTag.CODE.toString());
-        } catch (JSONException e) {
-            /* Skip the execution code */
-        }
-
+        /*
+         * Set the inputs and outputs of the module. If the inputs and outputs are not
+         * valid, the module is not added to the domain.
+         */
         List<Type> inputs;
         List<Type> outputs;
         try {
-            inputs = calculateToolInputs(jsonModule);
+            inputs = getToolInputsFromAnnotation(jsonModule);
             updateMaxNoToolInputs(inputs.size());
 
-            outputs = calculateToolOutputs(jsonModule);
+            outputs = getToolOutputsFromAnnotation(jsonModule);
             updateMaxNoToolOutputs(outputs.size());
 
             if (inputs.isEmpty() && outputs.isEmpty()) {
@@ -387,16 +383,18 @@ public class APEDomainSetup {
             return false;
         }
 
-        String moduleExecutionImpl = null;
-        if (executionCode != null && !executionCode.equals("")) {
-            moduleExecutionImpl = executionCode;
-        }
+        /* Set the implementation cwl file reference of the module, if specified. */
+        String cwlReference = getModuleImplementationFromAnnotation(jsonModule, ToolAnnotationTag.CWL_REFERENCE);
+
+        /* Set the implementation code of the module, if specified. */
+        String executionCode = getModuleImplementationFromAnnotation(jsonModule, ToolAnnotationTag.CODE);
+
         /*
          * Add the module and make it sub module of the currSuperModule (if it was not
          * previously defined)
          */
         Module currModule = (Module) allModules
-                .addPredicate(new Module(moduleLabel, moduleIRI, allModules.getRootModuleID(), moduleExecutionImpl));
+                .addPredicate(new Module(moduleLabel, moduleIRI, allModules.getRootModuleID(), cwlReference, executionCode));
 
         /* For each parent module add the current module as a subset and vice versa. */
         for (String parentModuleID : taxonomyParentModules) {
@@ -415,12 +413,12 @@ public class APEDomainSetup {
     }
 
     /**
-     * Calculate tool inputs list.
+     * Get tool inputs list from the tool annotation.
      *
      * @param jsonModule the json tool annotation
      * @return The list of inputs of the module.
      */
-    private List<Type> calculateToolInputs(JSONObject jsonModule) throws APEDimensionsException {
+    private List<Type> getToolInputsFromAnnotation(JSONObject jsonModule) throws APEDimensionsException {
         /* Get the inputs of the module */
         List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.INPUTS.toString(),
                 JSONObject.class);
@@ -434,12 +432,12 @@ public class APEDomainSetup {
     }
 
     /**
-     * Calculate tool output list.
+     * Get tool output list from the tool annotation.
      *
      * @param jsonModule the json tool annotation
      * @return The list of outputs of the module.
      */
-    private List<Type> calculateToolOutputs(JSONObject jsonModule) throws APEDimensionsException {
+    private List<Type> getToolOutputsFromAnnotation(JSONObject jsonModule) throws APEDimensionsException {
         /* Get the outputs of the module */
         List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.OUTPUTS.toString(),
                 JSONObject.class);
@@ -452,42 +450,25 @@ public class APEDomainSetup {
         return outputs;
     }
 
-    /**
-     * Updates the list of All Modules to include the CWL annotations.
-     * 
-     * @param cwlAnnotations A Map of the content of the CWL annotations file.
-     * @return Whether the update was successful.
+     /**
+     * Get the implementation code of the module, if specified.
+     *
+     * @param jsonToolAnnotation the json tool annotation
+     * @param implementationType the implementation type ({@link ToolAnnotationTag#CWL_REFERENCE} or {@link ToolAnnotationTag#CODE})
+     * @return The implementation code of the module, if specified.
      */
-    public boolean updateCWLAnnotationsFromYaml(Map<String, Object> cwlAnnotations) {
-        for (Map.Entry<String, Object> entry : cwlAnnotations.entrySet()) {
-            Object[] ids = allModules.getModules().stream()
-                    .filter(m -> m.getPredicateID().toLowerCase().contains(entry.getKey().toLowerCase())
-                            && m.getType().equals("module"))
-                    .toArray();
-            String id;
-            if (ids.length > 0) {
-                TaxonomyPredicate predicate = (TaxonomyPredicate) ids[0];
-                id = predicate.getPredicateID();
-            } else {
-                // Could not find module related to annotation entry, skip the entry.
-                continue;
+    private String getModuleImplementationFromAnnotation(JSONObject jsonToolAnnotation, ToolAnnotationTag implementationType) {
+        try {
+            JSONObject implementationJson = jsonToolAnnotation.getJSONObject(ToolAnnotationTag.IMPLEMENTATION.toString());
+            String implementation = implementationJson.getString(implementationType.toString());
+            if (implementation.equals("")) {
+                return null;
             }
-            Module currModule = (Module) allModules.get(id);
-            Map<String, Object> tool = (Map<String, Object>) cwlAnnotations.get(currModule.getPredicateLabel());
-
-            ArrayList<LinkedHashMap<String, String>> cwlInputs = null;
-            Map<String, Object> implementation = null;
-            if (tool != null) {
-                ArrayList<LinkedHashMap<String, String>> cwlInp = (ArrayList<LinkedHashMap<String, String>>) tool
-                        .get("inputs");
-                Map<String, Object> imp = (Map<String, Object>) tool.get("implementation");
-                cwlInputs = cwlInp;
-                implementation = imp;
-            }
-            currModule.setCwlInputs(cwlInputs);
-            currModule.setCwlImplementation(implementation);
+            return implementation;
+        } catch (JSONException e) {
+            /* Do not annotate the execution code. */
+            return null;
         }
-        return true;
     }
 
     /**

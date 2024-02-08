@@ -282,7 +282,7 @@ public class SolutionGraphFactory {
         }
         script.append("\n");
         for (ModuleNode operation : moduleNodes) {
-            String code = operation.getUsedModule().getExecutionCode();
+            String code = operation.getUsedModule().getExecutionCommand();
             if (code == null || code.equals("")) {
                 script.append("\"Error. Tool '" + operation.getNodeLabel() + "' is missing the execution code.\"")
                         .append("\n");

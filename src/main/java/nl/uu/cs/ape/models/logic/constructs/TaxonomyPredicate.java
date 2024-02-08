@@ -11,7 +11,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 
 /**
  * The {@code TaxonomyPredicate} class represents a single
- * class in the taxonomy as a predicate. The predicate might have parent classes
+ * class in the taxonomy as a predicate. The predicate might have a parent classes
  * (parent-predicate) and child classes (sub-predicate).<br>
  * <b>Note:</b> Taxonomy predicates in combination with {@link State}s create
  * {@link SLTLxAtom}s.
@@ -205,7 +205,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 
     /**
      * Set the current predicate as a relevant part of the taxonomy and all the
-     * corresponding subClasses and parentClasses.
+     * corresponding child and a parent classes.
      * TODO Should it be top-down??
      *
      * @param allPredicates Map of all the predicates of the given type.
@@ -253,7 +253,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 
     /**
      * Set the current predicate as a relevant part of the taxonomy
-     * and all the corresponding parentClasses.
+     * and all the corresponding a parent classes.
      *
      * @param allPredicates Map of all the predicates of the given type.
      * @return true if the predicates were successfully set to be relevant.
@@ -368,7 +368,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Adds a parent-predicate to the current one, if it was not added present
      * already.
      *
-     * @param predicate Predicate that will be added as a parentclass.
+     * @param predicate Predicate that will be added as a parent class.
      * @return true if parent-predicate was added, false otherwise.
      */
     public boolean addParentPredicate(TaxonomyPredicate predicate) {
