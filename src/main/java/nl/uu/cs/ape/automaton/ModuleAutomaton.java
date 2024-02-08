@@ -31,7 +31,7 @@ public class ModuleAutomaton implements Automaton {
      *                        modules).
      */
     public ModuleAutomaton(int automataBound, int inputBranching, int outputBranching) {
-        moduleStates = new ArrayList<State>();
+        moduleStates = new ArrayList<>();
         automataBound = Math.max(automataBound, 1);
 
         for (int i = 1; i <= automataBound; i++) {

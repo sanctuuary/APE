@@ -55,14 +55,14 @@ public class APEDomainSetup {
     /**
      * Object used to create temporal constraints.
      */
-    private ConstraintFactory constraintFactory;
+    private ConstraintFactory constraintFactory = new ConstraintFactory();
 
     /**
      * List of data gathered from the constraint file.
      */
-    private List<ConstraintTemplateData> unformattedConstr;
-    private List<AuxiliaryPredicate> helperPredicates;
-    private List<String> constraintsSLTLx;
+    private List<ConstraintTemplateData> unformattedConstr = new ArrayList<>();
+    private List<AuxiliaryPredicate> helperPredicates = new ArrayList<>();
+    private List<String> constraintsSLTLx = new ArrayList<>();
 
     /**
      * Maximum number of inputs that a tool can have.
@@ -92,12 +92,8 @@ public class APEDomainSetup {
      * @param config the config
      */
     public APEDomainSetup(APECoreConfig config) {
-        this.unformattedConstr = new ArrayList<>();
         this.allModules = new AllModules(config);
         this.allTypes = new AllTypes(config);
-        this.constraintFactory = new ConstraintFactory();
-        this.helperPredicates = new ArrayList<>();
-        this.constraintsSLTLx = new ArrayList<>();
         this.ontologyPrefixIRI = config.getOntologyPrefixIRI();
         this.useStrictToolAnnotations = config.getUseStrictToolAnnotations();
     }
@@ -291,18 +287,19 @@ public class APEDomainSetup {
     }
 
     /**
-     * Updates the list of All Modules by annotating the existing ones (or adding
-     * non-existing) using the I/O DataInstance from the @file. Returns the list of
-     * Updated Modules.
+     * Annotate {@link #allModules} using the I/O DataInstance from
+     * the @toolAnnotationsFile.
+     * The existing modules (in {@link #allModules}) are updated, and new modules
+     * are added to the list of modules.
+     * Return true if the domain was updated, false otherwise.
      *
      * @param toolAnnotationsFile JSON file containing tool annotations.
-     * @return The list of all annotated Modules in the process (possibly empty
-     *         list).
+     * @return {@code true} if the domain was updated, {@code false} otherwise.
      * @throws IOException   Error in handling a JSON file containing tool
      *                       annotations.
      * @throws JSONException Error if the tool annotation JSON file, bad format
      */
-    public boolean updateToolAnnotationsFromJson(JSONObject toolAnnotationsFile) throws IOException, JSONException {
+    public boolean annotateToolFromJson(JSONObject toolAnnotationsFile) throws IOException, JSONException {
         int currModule = 0;
         for (JSONObject jsonModule : APEUtils
                 .safe(APEUtils.getListFromJson(toolAnnotationsFile, TOOLS_JSON_TAG, JSONObject.class))) {
@@ -332,32 +329,33 @@ public class APEDomainSetup {
             moduleIRI = moduleIRI + "[tool]";
         }
         String moduleLabel = jsonModule.getString(ToolAnnotationTag.LABEL.toString());
-        Set<String> taxonomyModules = new HashSet<>(
+        Set<String> taxonomyParentModules = new HashSet<>(
                 APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.TAXONOMY_OPERATIONS.toString(), String.class));
-        taxonomyModules = APEUtils.createIRIsFromLabels(taxonomyModules, ontologyPrefixIRI);
+        taxonomyParentModules = APEUtils.createIRIsFromLabels(taxonomyParentModules, ontologyPrefixIRI);
+
         /* Check if the referenced module taxonomy classes exist. */
         List<String> toRemove = new ArrayList<>();
-        for (String taxonomyModule : taxonomyModules) {
-            String taxonomyModuleIRI = APEUtils.createClassIRI(taxonomyModule, ontologyPrefixIRI);
-            if (allModules.get(taxonomyModuleIRI) == null) {
+        for (String parentModule : taxonomyParentModules) {
+            String parentModuleIRI = APEUtils.createClassIRI(parentModule, ontologyPrefixIRI);
+            if (allModules.get(parentModuleIRI) == null) {
                 log.warn("Tool '" + moduleIRI + "' annotation issue. "
-                        + "Referenced '" + ToolAnnotationTag.TAXONOMY_OPERATIONS.toString() + "': '" + taxonomyModuleIRI
+                        + "Referenced '" + ToolAnnotationTag.TAXONOMY_OPERATIONS.toString() + "': '" + parentModuleIRI
                         + "' cannot be found in the Tool Taxonomy.");
                 wrongToolTax.add(moduleLabel);
-                toRemove.add(taxonomyModuleIRI);
+                toRemove.add(parentModuleIRI);
             }
         }
-        taxonomyModules.removeAll(toRemove);
+        taxonomyParentModules.removeAll(toRemove);
 
         /*
          * If the taxonomy terms were not properly specified the tool taxonomy root is
-         * used as superclass of the tool.
+         * used as parentclass of the tool.
          */
-        if (taxonomyModules.isEmpty()) {
+        if (taxonomyParentModules.isEmpty()) {
             log.warn("Tool '" + moduleIRI + "' annotation issue. "
                     + "None of the referenced '" + ToolAnnotationTag.TAXONOMY_OPERATIONS.toString()
                     + "' can be found in the Tool Taxonomy.");
-            taxonomyModules.add(allModules.getRootModuleID());
+            taxonomyParentModules.add(allModules.getRootModuleID());
         }
 
         String executionCode = null;
@@ -368,28 +366,21 @@ public class APEDomainSetup {
             /* Skip the execution code */
         }
 
-        List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.INPUTS.toString(),
-                JSONObject.class);
-        updateMaxNoToolInputs(jsonModuleInput.size());
-        List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.OUTPUTS.toString(),
-                JSONObject.class);
-        updateMaxNoToolOutputs(jsonModuleOutput.size());
-
-        List<Type> inputs = new ArrayList<>();
-        List<Type> outputs = new ArrayList<>();
-
+        List<Type> inputs;
+        List<Type> outputs;
         try {
-            /* For each input and output, allocate the corresponding abstract types. */
-            for (JSONObject jsonInput : jsonModuleInput) {
-                if (!jsonInput.isEmpty()) {
-                    inputs.add(Type.taxonomyInstanceFromJson(jsonInput, this, false));
-                }
+            inputs = calculateToolInputs(jsonModule);
+            updateMaxNoToolInputs(inputs.size());
+
+            outputs = calculateToolOutputs(jsonModule);
+            updateMaxNoToolOutputs(outputs.size());
+
+            if (inputs.isEmpty() && outputs.isEmpty()) {
+                emptyTools.add(moduleLabel);
+                log.debug("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
+                return false;
             }
-            for (JSONObject jsonOutput : jsonModuleOutput) {
-                if (!jsonOutput.isEmpty()) {
-                    outputs.add(Type.taxonomyInstanceFromJson(jsonOutput, this, true));
-                }
-            }
+
         } catch (APEDimensionsException badDimension) {
             wrongToolIO.add(moduleLabel);
             log.warn("Operation '" + "' was not included." + badDimension.getMessage());
@@ -400,11 +391,6 @@ public class APEDomainSetup {
         if (executionCode != null && !executionCode.equals("")) {
             moduleExecutionImpl = executionCode;
         }
-        if (inputs.isEmpty() && outputs.isEmpty()) {
-            emptyTools.add(moduleLabel);
-            log.debug("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
-            return false;
-        }
         /*
          * Add the module and make it sub module of the currSuperModule (if it was not
          * previously defined)
@@ -412,12 +398,12 @@ public class APEDomainSetup {
         Module currModule = (Module) allModules
                 .addPredicate(new Module(moduleLabel, moduleIRI, allModules.getRootModuleID(), moduleExecutionImpl));
 
-        /* For each supermodule add the current module as a subset and vice versa. */
-        for (String superModuleID : taxonomyModules) {
-            AbstractModule superModule = allModules.get(superModuleID);
-            if (superModule != null) {
-                superModule.addSubPredicate(currModule);
-                currModule.addSuperPredicate(superModule);
+        /* For each parent module add the current module as a subset and vice versa. */
+        for (String parentModuleID : taxonomyParentModules) {
+            AbstractModule parentModule = allModules.get(parentModuleID);
+            if (parentModule != null) {
+                parentModule.addSubPredicate(currModule);
+                currModule.addParentPredicate(parentModule);
             }
         }
 
@@ -426,6 +412,44 @@ public class APEDomainSetup {
         currModule.setAsRelevantTaxonomyTerm(allModules);
 
         return currModule != null;
+    }
+
+    /**
+     * Calculate tool inputs list.
+     *
+     * @param jsonModule the json tool annotation
+     * @return The list of inputs of the module.
+     */
+    private List<Type> calculateToolInputs(JSONObject jsonModule) throws APEDimensionsException {
+        /* Get the inputs of the module */
+        List<JSONObject> jsonModuleInput = APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.INPUTS.toString(),
+                JSONObject.class);
+        List<Type> inputs = new ArrayList<>();
+        for (JSONObject jsonInput : jsonModuleInput) {
+            if (!jsonInput.isEmpty()) {
+                inputs.add(Type.taxonomyInstanceFromJson(jsonInput, this, false));
+            }
+        }
+        return inputs;
+    }
+
+    /**
+     * Calculate tool output list.
+     *
+     * @param jsonModule the json tool annotation
+     * @return The list of outputs of the module.
+     */
+    private List<Type> calculateToolOutputs(JSONObject jsonModule) throws APEDimensionsException {
+        /* Get the outputs of the module */
+        List<JSONObject> jsonModuleOutput = APEUtils.getListFromJson(jsonModule, ToolAnnotationTag.OUTPUTS.toString(),
+                JSONObject.class);
+        List<Type> outputs = new ArrayList<>();
+        for (JSONObject jsonOutput : jsonModuleOutput) {
+            if (!jsonOutput.isEmpty()) {
+                outputs.add(Type.taxonomyInstanceFromJson(jsonOutput, this, true));
+            }
+        }
+        return outputs;
     }
 
     /**

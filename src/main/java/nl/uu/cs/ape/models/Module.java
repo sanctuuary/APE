@@ -62,8 +62,8 @@ public class Module extends AbstractModule {
     public Module(String moduleName, String moduleID, String rootNode, List<Type> moduleInput,
             List<Type> moduleOutput, String moduleExecution) {
         super(moduleName, moduleID, rootNode, NodeType.LEAF);
-        this.moduleInput = new ArrayList<Type>(moduleInput);
-        this.moduleOutput = new ArrayList<Type>(moduleOutput);
+        this.moduleInput = new ArrayList<>(moduleInput);
+        this.moduleOutput = new ArrayList<>(moduleOutput);
         this.executionCommand = moduleExecution;
     }
 
@@ -79,8 +79,8 @@ public class Module extends AbstractModule {
      */
     public Module(String moduleName, String moduleID, String rootNode, String moduleExecution) {
         super(moduleName, moduleID, rootNode, NodeType.LEAF);
-        this.moduleInput = new ArrayList<Type>();
-        this.moduleOutput = new ArrayList<Type>();
+        this.moduleInput = new ArrayList<>();
+        this.moduleOutput = new ArrayList<>();
         this.executionCommand = moduleExecution;
     }
 

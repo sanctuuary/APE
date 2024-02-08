@@ -57,7 +57,7 @@ public class AllTypes extends AllPredicates {
         setRelevant(apeLabelRoot);
         setRelevant(emptyLabelType);
         apeLabelRoot.addSubPredicate(emptyLabelType);
-        emptyLabelType.addSuperPredicate(apeLabelRoot);
+        emptyLabelType.addParentPredicate(apeLabelRoot);
     }
 
     /**
@@ -75,7 +75,7 @@ public class AllTypes extends AllPredicates {
         setRelevant(apeLabelRoot);
         setRelevant(emptyLabelType);
         apeLabelRoot.addSubPredicate(emptyLabelType);
-        emptyLabelType.addSuperPredicate(apeLabelRoot);
+        emptyLabelType.addParentPredicate(apeLabelRoot);
     }
 
     /**

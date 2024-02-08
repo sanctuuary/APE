@@ -12,7 +12,7 @@ import nl.uu.cs.ape.models.sltlxStruc.SLTLxAtom;
 /**
  * The {@code TaxonomyPredicate} class represents a single
  * class in the taxonomy as a predicate. The predicate might have parent classes
- * (super-predicate) and child classes (sub-predicate).<br>
+ * (parent-predicate) and child classes (sub-predicate).<br>
  * <b>Note:</b> Taxonomy predicates in combination with {@link State}s create
  * {@link SLTLxAtom}s.
  *
@@ -51,7 +51,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Set of all the predicates that contain the current predicate (null if the
      * predicate is a root).
      */
-    private Set<TaxonomyPredicate> superPredicates;
+    private Set<TaxonomyPredicate> parentPredicates;
 
     /**
      * Create a taxonomy predicate.
@@ -67,7 +67,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
             this.subPredicates = new HashSet<>();
         }
         if (nodeType != NodeType.ROOT) {
-            this.superPredicates = new HashSet<>();
+            this.parentPredicates = new HashSet<>();
         }
     }
 
@@ -85,7 +85,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
             this.subPredicates = oldPredicate.getSubPredicates();
         }
         if (nodeType != NodeType.ROOT) {
-            this.superPredicates = oldPredicate.getSuperPredicates();
+            this.parentPredicates = oldPredicate.getParentPredicates();
         }
     }
 
@@ -205,7 +205,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 
     /**
      * Set the current predicate as a relevant part of the taxonomy and all the
-     * corresponding subClasses and superClasses.
+     * corresponding subClasses and parentClasses.
      * TODO Should it be top-down??
      *
      * @param allPredicates Map of all the predicates of the given type.
@@ -220,8 +220,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
             return false;
         }
         this.setIsRelevant();
-        for (TaxonomyPredicate superPredicate : APEUtils.safe(this.superPredicates)) {
-            succExe = succExe && superPredicate.setAsRelevantTaxonomyTermBottomUp(allPredicates);
+        for (TaxonomyPredicate parentPredicate : APEUtils.safe(this.parentPredicates)) {
+            succExe = succExe && parentPredicate.setAsRelevantTaxonomyTermBottomUp(allPredicates);
         }
         for (TaxonomyPredicate subPredicate : APEUtils.safe(this.subPredicates)) {
             succExe = succExe && subPredicate.setAsRelevantTaxonomyTermTopDown(allPredicates);
@@ -253,7 +253,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
 
     /**
      * Set the current predicate as a relevant part of the taxonomy
-     * and all the corresponding superClasses.
+     * and all the corresponding parentClasses.
      *
      * @param allPredicates Map of all the predicates of the given type.
      * @return true if the predicates were successfully set to be relevant.
@@ -267,8 +267,8 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
             return false;
         }
         this.setIsRelevant();
-        for (TaxonomyPredicate superPredicate : APEUtils.safe(this.superPredicates)) {
-            succExe = succExe && superPredicate.setAsRelevantTaxonomyTermBottomUp(allPredicates);
+        for (TaxonomyPredicate parentPredicate : APEUtils.safe(this.parentPredicates)) {
+            succExe = succExe && parentPredicate.setAsRelevantTaxonomyTermBottomUp(allPredicates);
         }
         return succExe;
     }
@@ -365,21 +365,21 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     }
 
     /**
-     * Adds a super-predicate to the current one, if it was not added present
+     * Adds a parent-predicate to the current one, if it was not added present
      * already.
      *
-     * @param predicate Predicate that will be added as a superclass.
-     * @return true if super-predicate was added, false otherwise.
+     * @param predicate Predicate that will be added as a parentclass.
+     * @return true if parent-predicate was added, false otherwise.
      */
-    public boolean addSuperPredicate(TaxonomyPredicate predicate) {
+    public boolean addParentPredicate(TaxonomyPredicate predicate) {
         if (predicate == null) {
             return false;
         }
         if (nodeType != NodeType.ROOT) {
-            superPredicates.add(predicate);
+            parentPredicates.add(predicate);
             return true;
         } else {
-            log.warn("Cannot add super-predicate to a root taxonomy term!");
+            log.warn("Cannot add parent-predicate to a root taxonomy term!");
             return false;
         }
     }
@@ -387,10 +387,10 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     /**
      * Returns the list of the predicates that contain the current predicate.
      *
-     * @return List of the super-predicates or null in case of a leaf predicate.
+     * @return List of the parent-predicates or null in case of a leaf predicate.
      */
-    public Set<TaxonomyPredicate> getSuperPredicates() {
-        return superPredicates;
+    public Set<TaxonomyPredicate> getParentPredicates() {
+        return parentPredicates;
     }
 
     /**
