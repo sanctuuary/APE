@@ -254,12 +254,15 @@ public class DefaultCWLCreator extends CWLCreatorBase {
      */
     private void generateDefaultStepRun(ModuleNode moduleNode) {
         final int baseInd = 2;
-        String moduleName = moduleNode.getUsedModule().getPredicateLabel();
+        String moduleReference = "add-path-to-the-implementation/" + moduleNode.getUsedModule().getPredicateLabel()
+                + ".cwl ";
+        if (moduleNode.getUsedModule().getCwlFileReference() != null) {
+            moduleReference = moduleNode.getUsedModule().getCwlFileReference();
+        }
         cwlRepresentation
                 // Main key
                 .append(ind(baseInd))
-                .append("run: https://raw.githubusercontent.com/Workflomics/containers/main/cwl/tools/" + moduleName
-                        + "/" + moduleName + ".cwl")
+                .append("run: " + moduleReference)
                 .append("\n");
     }
 
