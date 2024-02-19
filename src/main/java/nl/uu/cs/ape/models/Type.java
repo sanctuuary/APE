@@ -99,6 +99,7 @@ public class Type extends TaxonomyPredicate {
 	 */
 	public static Type taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup, boolean isOutputData)
 			throws JSONException, APEDimensionsException {
+				
 		/* Set of predicates where each describes a type dimension */
 		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<>();
 		boolean labelDefined = false;
@@ -143,7 +144,7 @@ public class Type extends TaxonomyPredicate {
 					currType = allTypes.addPredicate(new Type(currTypeLabel, currTypeLabel, curRootIRI, NodeType.LEAF));
 
 					allTypes.getLabelRoot().addSubPredicate(currType);
-					currType.addSuperPredicate(allTypes.getLabelRoot());
+					currType.addParentPredicate(allTypes.getLabelRoot());
 
 					/*
 					 * make the type relevant from the taxonomy perspective and add it to the list

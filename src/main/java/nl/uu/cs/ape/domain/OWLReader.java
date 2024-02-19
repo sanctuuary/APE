@@ -220,7 +220,7 @@ public class OWLReader {
 		}
 		/* Add the super-type for the current type */
 		if (currNodeType != NodeType.ROOT) {
-			currModule.addSuperPredicate(superModule);
+			currModule.addParentPredicate(superModule);
 		}
 		reasoner.getSubClasses(currClass, true).entities().filter(child -> reasoner.isSatisfiable(child))
 				.forEach(child -> exploreModuleOntologyRec(reasoner, child, currClass, currRootClass));
@@ -261,7 +261,7 @@ public class OWLReader {
 		}
 		/* Add the super-type for the current type */
 		if (currNodeType != NodeType.ROOT) {
-			currType.addSuperPredicate(superType);
+			currType.addParentPredicate(superType);
 		}
 
 		List<OWLClass> subClasses = reasoner.getSubClasses(currClass, true).entities()
@@ -278,7 +278,7 @@ public class OWLReader {
 				currType.addSubPredicate(artificialSubType);
 				currType.setPlainType(artificialSubType);
 
-				artificialSubType.addSuperPredicate(currType);
+				artificialSubType.addParentPredicate(currType);
 				artificialSubType.setNodePredicate(NodeType.LEAF);
 			} else {
 				log.warn("Artificial predicate '" + getLabel(currClass) + "' was not created correctly.");

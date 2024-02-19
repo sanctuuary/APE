@@ -137,21 +137,7 @@ public class APE implements APEInterface {
 
 		// Update allModules and allTypes sets based on the tool annotations
 		succRun &= apeDomainSetup
-				.updateToolAnnotationsFromJson(APEFiles.readFileToJSONObject(config.getToolAnnotationsFile()));
-
-		// Update allModules with CWL annotations, if CWL annotations file is given
-		if (config.getCwlAnnotationsFile().isPresent()) {
-			try {
-				Yaml yaml = new Yaml();
-				File file = config.getCwlAnnotationsFile().get();
-				Map<String, Object> cwlAnnotations = yaml.load(new FileInputStream(file));
-				succRun &= apeDomainSetup
-						.updateCWLAnnotationsFromYaml(cwlAnnotations);
-			} catch (FileNotFoundException e) {
-				log.error("Could not find CWL yaml configuration file!");
-				e.printStackTrace();
-			}
-		}
+				.annotateToolFromJson(APEFiles.readFileToJSONObject(config.getToolAnnotationsFile()));
 
 		succRun &= apeDomainSetup.trimTaxonomy();
 

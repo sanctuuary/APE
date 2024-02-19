@@ -213,7 +213,7 @@ public class TypeNode extends SolutionWorkflowNode {
      * @return The {@link Graph} extended with the current {@link TypeNode}.
      */
     public Graph addTypeToGraph(Graph workflowGraph) {
-        return workflowGraph.with(node(getNodeID()).with(Label.of(getNodeLabel() + "   ")));
+        return workflowGraph.with(node(getNodeID()).with(Label.of(getNodeLabel())));
     }
 
     public Graph addTavernaStyleTypeToGraph(Graph workflowGraph) {

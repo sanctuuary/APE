@@ -35,7 +35,7 @@ import java.util.Map;
 public class SolutionWorkflow {
 
     @Getter
-    private static final String fileNamePrefix = "candidate_solution_";
+    private static final String fileNamePrefix = "candidate_workflow_";
 
     /**
      * List of module nodes ordered according to their position in the workflow.

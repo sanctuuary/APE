@@ -27,7 +27,7 @@ public class Block {
      * @param blockNumber The block number.
      */
     public Block(int blockNumber) {
-        typeStates = new ArrayList<State>();
+        typeStates = new ArrayList<>();
         this.blockNumber = blockNumber;
     }
 

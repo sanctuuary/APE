@@ -271,7 +271,7 @@ public class AbstractCWLCreator extends CWLCreatorBase {
                 .append(ind(baseInd))
                 .append("intent: ")
                 .append("[");
-        for (TaxonomyPredicate predicate : moduleNode.getUsedModule().getSuperPredicates()) {
+        for (TaxonomyPredicate predicate : moduleNode.getUsedModule().getParentPredicates()) {
             cwlRepresentation
                     .append("\"")
                     .append(predicate.getPredicateID())

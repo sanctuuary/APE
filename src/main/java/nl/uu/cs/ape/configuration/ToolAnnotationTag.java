@@ -38,6 +38,12 @@ public enum ToolAnnotationTag {
     /**
      * Represents the implementation details of a tool.
      */
+    CWL_REFERENCE("cwl_reference"),
+
+
+    /**
+     * Represents the implementation details of a tool.
+     */
     IMPLEMENTATION("implementation"),
 
     /**
