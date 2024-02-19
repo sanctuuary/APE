@@ -35,13 +35,10 @@ To [build](https://github.com/sanctuuary/APE#build-ape-from-source-using-maven) 
 #### Note
 Building APE from source is not required to run it, as the latest stable version is available at [maven repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
 
-### Releases
-| Date       | Version | Download                                                                             |
-|------------|---------|--------------------------------------------------------------------------------------|
-| 15-07-2020 | 1.0.1   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.0.1/APE-1.0.1-sources.jar)|
-| 02-05-2021 | 1.1.7   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.7/APE-1.1.7-sources.jar)|
-| 20-12-2021 | 1.1.12   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/1.1.12/APE-1.1.12-sources.jar)|
-| 17-05-2021 | 2.0.0   | [jar](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0.jar), [executable](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar), [javadoc](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-javadoc.jar), [sources](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-sources.jar)|
+### Releases 
+
+- [Latest](https://github.com/sanctuuary/APE/releases/latest)
+- [All releases](https://github.com/sanctuuary/APE/releases)
 
 ### Add APE to your Maven project
 To add a dependency on APE using Maven, use the following:
@@ -50,7 +47,7 @@ To add a dependency on APE using Maven, use the following:
 <dependency>
     <groupId>io.github.sanctuuary</groupId>
     <artifactId>APE</artifactId>
-    <version>2.0.0</version>
+    <version>2.x.x</version>
 </dependency>
 ```
 For information regarding **Gradle**, **Ivy**, etc. we refer to the [APE mvn repository](https://mvnrepository.com/artifact/io.github.sanctuuary/APE/latest).
@@ -87,7 +84,7 @@ or
 ```shell
 git clone https://github.com/sanctuuary/APE_UseCases.git
 ```
-Download the latest version of [`APE-[latest]-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/2.0.0/APE-2.0.0-executable.jar) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
+Download the latest version of [`APE-[latest]-executable.jar`](https://repo.maven.apache.org/maven2/io/github/sanctuuary/APE/) and add it to the APE_UseCases directory (`~/git/APE_UseCases`)
 ```shell
 cd ~/git/APE_UseCases
 java -jar APE-[latest]-executable.jar ImageMagick/Example1/config.json
