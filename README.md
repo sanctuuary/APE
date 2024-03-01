@@ -143,11 +143,7 @@ The architecture of the APE v2 library is presented in the following figure. Com
 
 ## APE Web
 
-<div align="left">
-  <a href="https://ape.science.uu.nl/" target="_blank"><img src="https://user-images.githubusercontent.com/11068408/116879352-dce72980-ac20-11eb-8051-f486bf14a912.png" alt="APE Web" width=50%></a>
-</div>
-
-Graphical Web Interface for the APE library is available at https://ape.science.uu.nl/
+Graphical Web Interface for the APE library is available at [APE Web](https://github.com/sanctuuary/APE-Web).
 
 ## Use Cases and Demos
 Our use cases are motivated by practical problems in various domains (e.g. bioinformatics, GIS [[3]](#3)). Different examples are available at the [APE Use Cases Repository](https://github.com/sanctuuary/APE_UseCases).
@@ -160,10 +156,10 @@ Our use cases are motivated by practical problems in various domains (e.g. bioin
 * Anna-Lena Lamprecht (anna-lena.lamprecht[at]uni-potsdam.de), project initiator and principal investigator
 
 ## Contact
-For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica[at]uu.nl).
+For any questions concerning APE please get in touch with Vedran Kasalica (v.kasalica[at]esciencecenter.nl.nl).
 
 ## Contributions
-We welcome all contributions (bug reports, bug fixes, feature requests, extensions, use cases, etc.) to APE. Please get in touch with Vedran Kasalica (v.kasalica@uu.nl) to coordinate your contribution. We expect all contributors to follow our [Code of Conduct](https://github.com/sanctuuary/APE/blob/master/CODE_OF_CONDUCT.md).
+We welcome all contributions (bug reports, bug fixes, feature requests, extensions, use cases, etc.) to APE. Please get in touch with Vedran Kasalica (v.kasalica[at]esciencecenter.nl.nl) to coordinate your contribution. We expect all contributors to follow our [Code of Conduct](https://github.com/sanctuuary/APE/blob/master/CODE_OF_CONDUCT.md).
 
 In case you have a specific request, want to report a bug or suggest a new constraint template please make an issue [here](https://github.com/sanctuuary/APE/issues/new).
 
