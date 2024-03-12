@@ -4,10 +4,9 @@
   "mutations": [
     {
       "description": "[NEW] replace constraints",
-      "solution_length_start": 4,
+      "solution_length_start": 5,
       "expected_no_solutions": [
-        15,
-        130
+        100
       ],
       "replace_constraints": [
         {
@@ -26,7 +25,7 @@
       "description": "[NEW] add constraints",
       "solution_length_start": 9,
       "expected_no_solutions": [
-        130
+        100
       ],
       "add_constraints": [
         {
@@ -43,19 +42,18 @@
     },
     {
       "description": "The base configuration without any changes.",
-      "solution_length_start": 5,
+      "solution_length_start": 6,
       "expected_no_solutions": [
-        32,
-        130
+        86,
+        100
       ]
     },
     {
       "description": "Change min solution length",
-      "solution_length_start": 3,
+      "solution_length_start": 4,
       "expected_no_solutions": [
-        3,
-        128,
-        130
+        27,
+        100
       ],
       "config": {
         "outputs": []
@@ -64,20 +62,19 @@
     },
     {
       "description": "Change min solution length",
-      "solution_length_start": 2,
+      "solution_length_start": 3,
       "expected_no_solutions": [
-        3,
-        128,
-        130
+        27,
+        100
       ],
       "replace_constraints": []
     },
     {
       "description": "Change min solution length",
-      "solution_length_start": 5,
+      "solution_length_start": 6,
       "expected_no_solutions": [
-        32,
-        130
+        86,
+        100
       ],
       "config": {
         "tool_seq_repeat": "false"
@@ -89,7 +86,7 @@
       "expected_no_solutions": [
         1,
         16,
-        130
+        100
       ],
       "config": {
         "inputs": [],
@@ -101,7 +98,8 @@
       "description": "Change inputs",
       "solution_length_start": 6,
       "expected_no_solutions": [
-        130
+        86,
+        100
       ],
       "config": {
         "inputs": [
@@ -122,7 +120,8 @@
       "description": "Change outputs",
       "solution_length_start": 5,
       "expected_no_solutions": [
-        130
+        86,
+        100
       ],
       "config": {
         "outputs": [
@@ -143,7 +142,8 @@
       "description": "Change inputs and outputs",
       "solution_length_start": 6,
       "expected_no_solutions": [
-        130
+        86,
+        100
       ],
       "config": {
         "inputs": [
@@ -174,10 +174,10 @@
     },
     {
       "description": "No inputs",
-      "solution_length_start": 6,
+      "solution_length_start": 4,
       "expected_no_solutions": [
-        32,
-        130
+        6,
+        100
       ],
       "config": {
         "inputs": []
@@ -185,10 +185,10 @@
     },
     {
       "description": "Are the correct number of CWL files generated?",
-      "solution_length_start": 5,
+      "solution_length_start": 6,
       "expected_no_solutions": [
-        32,
-        130
+        86,
+        100
       ],
       "number_of_cwl_files": 3
     }
