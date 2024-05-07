@@ -21,7 +21,7 @@ Internally, APE uses a component-based program synthesis approach. It translates
 
 For our paper at [ICCS 2020](https://www.iccs-meeting.org/iccs2020/) [[2]](#2) we created a video that explains APE in 5 minutes:
 <div align="left">
-  <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="https://raw.githubusercontent.com/wiki/sanctuuary/APE/youtube_thumbnail.png" alt="APE - Youtube video" width=30%></a>
+  <a href="https://www.youtube.com/watch?v=CzecqRJXmoM" target="_blank"><img src="https://github.com/Workflomics/workflomics-QCmetric/assets/11068408/6c699a2b-7fce-44a4-bf1f-ad11a865c6c3" alt="APE - Youtube video" width=40%></a>
 </div>
 
 **For detailed information please visit [our page](https://ape-framework.readthedocs.io).**
