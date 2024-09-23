@@ -617,18 +617,18 @@ public final class APEUtils {
 	}
 
 	/**
-	 * Get all unique pairs of PredicateLabels within the collection.
-	 * 
-	 * @param set - Set of PredicateLabel that should be used to create the pairs
-	 * @return Set of unique pairs.
-	 */
-	public static Set<Pair<PredicateLabel>> getUniquePairs(Collection<? extends PredicateLabel> set) {
-		Set<Pair<PredicateLabel>> pairs = new HashSet<>();
-		set.stream().forEach(ele1 -> set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
-				.forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
-		return pairs;
-
-	}
+     * Get all unique pairs of PredicateLabels within the collection.
+     * 
+     * @param <T> - The type that extends PredicateLabel
+     * @param set - Set of PredicateLabel that should be used to create the pairs
+     * @return Set of unique pairs.
+     */
+    public static <T extends PredicateLabel> Set<Pair<T>> getUniquePairs(Collection<T> set) {
+        Set<Pair<T>> pairs = new HashSet<>();
+        set.stream().forEach(ele1 -> set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
+                .forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
+        return pairs;
+    }
 
 	/**
 	 * Get unique pairs of elements within 2 collections.

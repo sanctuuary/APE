@@ -615,11 +615,61 @@ public abstract class SLTLxTemplateFormula {
         return constraints.toString();
     }
 
+    /**
+     * Creates a CNF representation of the Constraint:<br>
+     * Do not repeat using the same tool.
+     * 
+     * @param predicate
+     * @param domainSetup
+     * @param moduleAutomaton
+     * @param typeAutomaton
+     * @param mappings
+     * @return
+     */
     public static String notRepeatModules(TaxonomyPredicate predicate, APEDomainSetup domainSetup,
             ModuleAutomaton moduleAutomaton,
             TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
 
+        int automatonSize = moduleAutomaton.getAllStates().size();
+        for (int op1 = 0; op1 < automatonSize - 1; op1++) {
+            for (int op2 = op1 + 1; op2 < automatonSize; op2++) {
+
+                State firstModuleState = moduleAutomaton.get(op1);
+                State secondModuleState = moduleAutomaton.get(op2);
+
+                // filter all operations
+                domainSetup.getAllModules().getElementsFromSubTaxonomy(predicate).stream()
+                        .filter(x -> x.isSimplePredicate()).forEach(operation -> {
+
+                            constraints.append("-")
+                                    .append(mappings.add(operation, firstModuleState, AtomType.MODULE)).append(" ");
+                            constraints.append("-"
+                                    + mappings.add(operation, secondModuleState, AtomType.MODULE)
+                                    + " 0\n");
+                        });
+
+            }
+        }
+
+        return constraints.toString();
+    }
+
+    /**
+     * Creates a CNF representation of the Constraint:<br>
+     * The same tools that belong to the sub-taxonomy should not be connected.
+     * 
+     * @param predicate       - Root predicate of the sub-taxonomy.
+     * @param domainSetup
+     * @param moduleAutomaton
+     * @param typeAutomaton
+     * @param mappings
+     * @return
+     */
+    public static String notConnectModules(TaxonomyPredicate predicate, APEDomainSetup domainSetup,
+            ModuleAutomaton moduleAutomaton,
+            TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+        StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
         for (int op1 = 0; op1 < automatonSize - 1; op1++) {
             for (int op2 = op1 + 1; op2 < automatonSize; op2++) {
@@ -657,14 +707,36 @@ public abstract class SLTLxTemplateFormula {
     }
 
     /**
-     * Simple method that combines a pair of integers into a unique String.
      * 
-     * @param int1 - first integer
-     * @param int2 - second integer
-     * @return Unique combination of the pair, as String.
+     * Creates a CNF representation of the Constraint:<br>
+     * Tools (that belong to the sub-taxonomy) should have all inputs unique.
+     * 
+     * @param moduleAutomaton
+     * @param typeAutomaton
+     * @param mappings
+     * @return
      */
-    private static String combine(int int1, int int2) {
-        return int1 + "_" + int2;
+    public static String useUniqueInputs(
+            ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+
+        StringBuilder constraints = new StringBuilder();
+        for (int blockNo = 0; blockNo < typeAutomaton.getLength(); blockNo++) {
+            Block inputs = typeAutomaton.getUsedTypesBlock(blockNo);
+            Set<Pair<State>> inputPairs = new HashSet<>();
+            inputPairs.addAll(APEUtils.getUniquePairs(inputs.getStates()));
+            for(State memoryState : typeAutomaton.getAllMemoryStatesUntilBlockNo(blockNo)){
+                for (Pair<State> inputPair : inputPairs) {
+                    constraints.append("-").append(mappings.add(memoryState, inputPair.getFirst(), AtomType.MEM_TYPE_REFERENCE)).append(" ");
+                    constraints.append("-").append(mappings.add(memoryState, inputPair.getSecond(), AtomType.MEM_TYPE_REFERENCE)).append(" 0\n");
+                }
+            }
+
+
+        }
+        return constraints.toString();
     }
 
 }
+
+
+// pairs of inputs X1 X2  not ref(x1, O) or not ref(x2, O)

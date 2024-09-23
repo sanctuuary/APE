@@ -235,21 +235,21 @@ public class EnforceTypeRelatedRules {
      * Encodes rules that ensure the initial workflow input.
      *
      * @param allTypes       Set of all the types in the domain
-     * @param program_inputs Input types for the program.
+     * @param programInputs Input types for the program.
      * @param typeAutomaton  Automaton representing the type states in the model
      * @return The String representation of the initial input encoding.
      * @throws APEConfigException Exception thrown when one of the output types is
      *                            not defined in the taxonomy.
      */
-    public static Set<SLTLxFormula> workflowInputs(AllTypes allTypes, List<Type> program_inputs,
+    public static Set<SLTLxFormula> workflowInputs(AllTypes allTypes, List<Type> programInputs,
             TypeAutomaton typeAutomaton) throws APEConfigException {
         Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
         List<State> workflowInputStates = typeAutomaton.getWorkflowInputBlock().getStates();
         for (int i = 0; i < workflowInputStates.size(); i++) {
             State currState = workflowInputStates.get(i);
-            if (i < program_inputs.size()) {
-                Type currType = program_inputs.get(i);
+            if (i < programInputs.size()) {
+                Type currType = programInputs.get(i);
                 if (allTypes.get(currType.getPredicateID()) == null) {
                     throw APEConfigException.workflowIODataTypeNotInDomain(currType.getPredicateID());
                 }
@@ -274,20 +274,20 @@ public class EnforceTypeRelatedRules {
      * Encodes the rules that ensure generation of the workflow output.
      *
      * @param allTypes        Set of all the types in the domain
-     * @param program_outputs Output types for the program.
+     * @param programOutputs Output types for the program.
      * @param typeAutomaton   Automaton representing the type states in the model
      * @return String representation of the workflow output encoding.
      * @throws APEConfigException Exception thrown when one of the output types is
      *                            not defined in the taxonomy.
      */
-    public static Set<SLTLxFormula> workdlowOutputs(AllTypes allTypes, List<Type> program_outputs,
+    public static Set<SLTLxFormula> workflowOutputs(AllTypes allTypes, List<Type> programOutputs,
             TypeAutomaton typeAutomaton) throws APEConfigException {
         Set<SLTLxFormula> fullEncoding = new HashSet<>();
 
         List<State> workflowOutputStates = typeAutomaton.getWorkflowOutputBlock().getStates();
         for (int i = 0; i < workflowOutputStates.size(); i++) {
-            if (i < program_outputs.size()) {
-                TaxonomyPredicate currType = program_outputs.get(i);
+            if (i < programOutputs.size()) {
+                TaxonomyPredicate currType = programOutputs.get(i);
                 if (allTypes.get(currType.getPredicateID()) == null) {
                     throw APEConfigException.workflowIODataTypeNotInDomain(currType.getPredicateID());
                 }

@@ -248,7 +248,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * Encode the workflow output
          */
         SLTLxFormula.appendCNFToFile(cnfEncoding, this, EnforceTypeRelatedRules
-                .workdlowOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
+                .workflowOutputs(domainSetup.getAllTypes(), runConfig.getProgramOutputs(), typeAutomaton));
 
         /*
          * Encode rule that the given inputs should not be used as workflow outputs
@@ -287,14 +287,12 @@ public class SATSynthesisEngine implements SynthesisEngine {
         /* add the cnf encoding file to Desktop */
         // Files.copy(satInputFile, new File("~/Desktop/tmp"+ problemSetupStartTime));
 
+
         /*
-         * Add human readable version of the cnf encoding file to Desktop. Used when
-         * needed.
+         * Add human readable version of the cnf encoding file to Desktop. Used only when
+         * explicitly specified (used for local testing).
          */
-        // FileInputStream cnfStream = new FileInputStream(satInputFile);
-        // String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
-        // cnfStream.close();
-        // APEFiles.write2file(encoding, new File("~/Desktop/tmp.txt"), false);
+        domainSetup.localCNF(satInputFile, mappings);
 
         long problemSetupTimeElapsedMillis = System.currentTimeMillis() - problemSetupStartTime;
         log.info("Total problem setup time: " + (problemSetupTimeElapsedMillis / 1000F) + " sec (" + clauses

@@ -349,7 +349,14 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		return variableDomain;
 	}
 
-	public Set<String> getVariableMutualExclusion(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+	/**
+	 * Get the set of clauses that enforce that the a variable cannot reference two different data instances. 
+	 * @param stateNo - current state in the SLTLx model
+	 * @param variableMapping - collection of substitutions for each variable
+	 * @param synthesisEngine - synthesis engine
+	 * @return Set of clauses that encode the possible variable substitution.
+	 */
+	public Set<String> getVariableUniqueSubstitution(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
 		Set<String> allClauses = new HashSet<>();
 		/**
@@ -357,10 +364,10 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		 * and thus we use the next state to get the domain of the variable.
 		 */
 		int nextStateNo = stateNo + 1;
-		Set<Pair<PredicateLabel>> statePairs = APEUtils
+		Set<Pair<State>> statePairs = APEUtils
 				.getUniquePairs(synthesisEngine.getTypeAutomaton().getAllMemoryStatesUntilBlockNo(nextStateNo));
 
-		statePairs.forEach(statePair -> {
+		statePairs.forEach(statePair -> 
 			allClauses.addAll(
 					new SLTLxNegatedConjunction(
 							new SLTLxAtomVar(
@@ -371,8 +378,8 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 									AtomVarType.VAR_VALUE,
 									statePair.getSecond(),
 									this))
-							.getCNFEncoding(stateNo, variableMapping, synthesisEngine));
-		});
+							.getCNFEncoding(stateNo, variableMapping, synthesisEngine))
+		);
 
 		return allClauses;
 	}

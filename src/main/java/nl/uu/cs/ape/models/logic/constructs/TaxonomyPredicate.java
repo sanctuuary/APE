@@ -308,7 +308,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param allPredicates Set of all the predicates.
      */
     public void printTree(String str, AllPredicates allPredicates) {
-        log.debug(str + toShortString() + "[" + getNodeType() + "]");
+        log.info(str + toShortString() + "[" + getNodeType() + "]");
         for (TaxonomyPredicate predicate : APEUtils.safe(this.subPredicates)) {
             predicate.printTree(str + ". ", allPredicates);
         }

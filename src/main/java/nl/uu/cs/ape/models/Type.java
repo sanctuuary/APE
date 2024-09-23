@@ -120,14 +120,17 @@ public class Type extends TaxonomyPredicate {
 			/* for each dimensions a disjoint array of types/tools is given */
 			for (String currTypeLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
 				String currTypeIRI = currTypeLabel;
-				if (allTypes.get(currTypeIRI, curRootIRI) == null) {
+
+				Type currType = allTypes.get(currTypeIRI, curRootIRI);
+				if (currType == null) {
 					currTypeIRI = APEUtils.createClassIRI(currTypeLabel, domainSetup.getOntologyPrefixIRI());
+					currType = allTypes.get(currTypeIRI, curRootIRI);
 				}
 
 				if (currRootLabel.equals(allTypes.getLabelRootID())) {
 					labelDefined = true;
 				}
-				Type currType = allTypes.get(currTypeIRI, curRootIRI);
+				
 				if (currType != null) {
 					if (isOutputData) {
 						currType.setAsRelevantTaxonomyTerm(allTypes);

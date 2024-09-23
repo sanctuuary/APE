@@ -1,6 +1,5 @@
 package nl.uu.cs.ape;
 
-import guru.nidi.graphviz.attribute.Rank.RankDir;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
@@ -97,7 +96,7 @@ public class Main {
         } else {
             try {
                 APE.writeSolutionToFile(solutions);
-                APE.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
+                APE.writeTavernaDesignGraphs(solutions);
                 // APE.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
                 APE.writeExecutableWorkflows(solutions);
                 APE.writeCWLWorkflows(solutions);

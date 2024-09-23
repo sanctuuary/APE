@@ -84,9 +84,9 @@ public enum AtomType {
         if (elem == MODULE) {
             return "Tool" + stateNumber;
         } else if (elem == MEMORY_TYPE) {
-            return "MemT" + blockNumber + "." + stateNumber;
+            return "Out" + blockNumber + "." + stateNumber;
         } else if (elem == USED_TYPE) {
-            return "UsedT" + blockNumber + "." + stateNumber;
+            return "In" + blockNumber + "." + stateNumber;
         } else if (elem == null) {
             return "nullMem";
         }

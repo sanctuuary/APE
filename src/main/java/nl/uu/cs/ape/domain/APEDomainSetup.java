@@ -1,5 +1,7 @@
 package nl.uu.cs.ape.domain;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -7,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.ToolAnnotationTag;
@@ -14,6 +18,7 @@ import nl.uu.cs.ape.constraints.ConstraintFactory;
 import nl.uu.cs.ape.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.constraints.ConstraintTemplateParameter;
+import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
@@ -21,6 +26,7 @@ import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.Module;
+import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
@@ -51,6 +57,12 @@ public class APEDomainSetup {
      * Prefix used to define OWL class IDs
      */
     private String ontologyPrefixIRI;
+
+    @Setter
+    /**
+     * Object used to write locally CNF SAT problem specification (in human readable format).
+     */
+    private String writeLocalCNF = null;
 
     /**
      * Object used to create temporal constraints.
@@ -549,6 +561,23 @@ public class APEDomainSetup {
      */
     public List<AuxiliaryPredicate> getHelperPredicates() {
         return helperPredicates;
+    }
+
+    /**
+     * Write locally the SAT (CNF) workflow specification in human readable format.
+     * 
+     * @param satInputFile - File containing the SAT problem specification.
+     * @param mappings - Mappings between the SAT problem and the domain.
+     * @throws IOException - Error in writing the file to the local file system.
+     */
+    public void localCNF(File satInputFile, SATAtomMappings mappings) throws IOException {
+        if (writeLocalCNF != null) {
+            FileInputStream cnfStream = new FileInputStream(satInputFile);
+            String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
+            cnfStream.close();
+            
+                APEFiles.write2file(encoding, new File(writeLocalCNF), false);
+        }
     }
 
 }

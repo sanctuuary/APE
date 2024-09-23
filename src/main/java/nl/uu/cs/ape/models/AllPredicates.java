@@ -83,7 +83,9 @@ public abstract class AllPredicates {
             List<TaxonomyPredicate> toRemove = new ArrayList<>();
             for (TaxonomyPredicate subClass : APEUtils.safe(root.getSubPredicates())) {
                 if (subClass == null) {
-                } else if (subClass.getIsRelevant()) {
+                    continue;
+                }
+                if (subClass.getIsRelevant()) {
                     trimSubTaxonomy(subClass);
                 } else {
                     toRemove.add(subClass);

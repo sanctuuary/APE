@@ -234,17 +234,17 @@ public class AllTypes extends AllPredicates {
      * @return List of pairs of types.
      */
     public List<Pair<PredicateLabel>> getTypePairsForEachSubTaxonomy() {
-        List<Pair<PredicateLabel>> pairs = new ArrayList<Pair<PredicateLabel>>();
+        List<Pair<PredicateLabel>> pairs = new ArrayList<>();
 
         /*
          * Create a list for each subtree of the Data Taxonomy (e.g. TypeSubTaxonomy,
          * FormatSubTaxonomy). Each of these lists represents a class of mutually
          * exclusive types.
          */
-        Map<String, List<TaxonomyPredicate>> subTreesMap = new HashMap<String, List<TaxonomyPredicate>>();
+        Map<String, List<TaxonomyPredicate>> subTreesMap = new HashMap<>();
         // Add each of the dimension roots (type and format taxonomy) to the list
         for (String subRoot : APEUtils.safe(getAllRootIDs())) {
-            subTreesMap.put(subRoot, new ArrayList<TaxonomyPredicate>());
+            subTreesMap.put(subRoot, new ArrayList<>());
         }
 
         /*
@@ -272,7 +272,7 @@ public class AllTypes extends AllPredicates {
         for (List<TaxonomyPredicate> iterator : subTreesMap.values()) {
             for (int i = 0; i < iterator.size() - 1; i++) {
                 for (int j = i + 1; j < iterator.size(); j++) {
-                    pairs.add(new Pair<PredicateLabel>(iterator.get(i), iterator.get(j)));
+                    pairs.add(new Pair<>(iterator.get(i), iterator.get(j)));
                 }
             }
         }

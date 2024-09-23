@@ -37,7 +37,7 @@ public abstract class SLTLxVarQuantification extends SLTLxFormula {
 		 */
 		clauses.addAll(flatBoundVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMapping,
 				synthesisEngine));
-		clauses.addAll(flatBoundVariable.getVariableMutualExclusion(stateNo, newVarMapping, synthesisEngine));
+		clauses.addAll(flatBoundVariable.getVariableUniqueSubstitution(stateNo, newVarMapping, synthesisEngine));
 		return clauses;
 	}
 
@@ -56,7 +56,7 @@ public abstract class SLTLxVarQuantification extends SLTLxFormula {
 		 */
 		clauses.addAll(flatBoundVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMapping,
 				synthesisEngine));
-		clauses.addAll(flatBoundVariable.getVariableMutualExclusion(stateNo, newVarMapping, synthesisEngine));
+		clauses.addAll(flatBoundVariable.getVariableUniqueSubstitution(stateNo, newVarMapping, synthesisEngine));
 		return clauses;
 	}
 
