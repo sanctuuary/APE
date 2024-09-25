@@ -1,13 +1,16 @@
 ---
-name: Bug Report
-about: Create a report to help improve the APE library
-title: '[BUG] '
-labels: 'bug'
-assignees: vedran-kasalica
+name: Bug report
+about: Create a report to help us improve the APE library
+title: ''
+labels: bug
+assignees: ''
 
 ---
 
-**Note:** Not all fields are obligatory, but the more details you provide, the easier it will be for us to address the issue. Feel free to omit sections that you feel are not relevant to your report.
+## Checklist before submitting a bug report
+
+- [ ] I have checked the [existing issues](https://github.com/NLeSC/python-template/issues) and couldn't find an issue about this bug.
+
 
 ## Description
 <!-- Provide a clear and concise description of what the bug is. -->
@@ -16,12 +19,10 @@ assignees: vedran-kasalica
 <!-- Indicate whether this issue is related to the API or the CLI. -->
 - [ ] API
 - [ ] CLI
+- [ ] REST API
 
-## APE Version
-<!-- Specify the version of APE you're using. -->
-
-## Java Version
-<!-- Specify the Java version you're using. -->
+## APE and Java Version
+<!-- Specify the version of APE and Java you're using. -->
 
 ## Steps to Reproduce
 <!-- Provide detailed steps to reproduce the bug: -->
@@ -30,14 +31,7 @@ assignees: vedran-kasalica
 3. 
 4. 
 
-## Expected Behavior
-<!-- Describe what you expected to happen. -->
 
-## Actual Behavior
-<!-- Describe what actually happened. Include complete error messages, screenshots, or logs if possible. -->
-
-## Possible Solution
-<!-- Suggest a fix/reason for the bug, if you have one in mind. -->
 
 ## Additional Context
 <!-- Add any other context about the problem here, such as special configurations, environment details, etc. -->
