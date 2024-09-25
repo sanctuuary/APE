@@ -28,7 +28,8 @@ public class Main {
      * The entry point of application when the library is used in a Command Line
      * Interface (CLI).
      *
-     * @param args APE expects at most two (2) arguments.
+     * @param args APE expects the first argument to specify the method to be executed.
+     *            The rest of the arguments are provided depending on the method.
      */
     public static void main(String[] args) {
 
@@ -57,6 +58,13 @@ public class Main {
 
     }
 
+    /**
+     * Retrieve tools from bio.tools using bio.tools API and convert them to
+     * APE-compatible tool annotation format.
+     * 
+     * @param args The arguments provided to the method. Only one argument is
+     *            expected, the path to the file where the biotoolsIDs are stored. 
+     */
     public static void convertBioToolsAnnotations(String[] args) {
         String path;
         if (args.length != 1) {
@@ -80,10 +88,8 @@ public class Main {
     }
 
     /**
-     * The entry point of application when the library is used in a Command Line
-     * Interface (CLI).
-     *
-     * @param args APE expects at most two (2) arguments.
+     * Executes the synthesis based on the provided configuration file.
+     * @param args The arguments provided to the method.
      */
     public static void executeSynthesis(String[] args) {
         String path;
