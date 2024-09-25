@@ -3,9 +3,11 @@ package nl.uu.cs.ape;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
+import nl.uu.cs.ape.domain.BioToolsAPI;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -26,12 +28,72 @@ public class Main {
      * The entry point of application when the library is used in a Command Line
      * Interface (CLI).
      *
-     * @param args APE expects at most one (1) argument: The absolute or relative
-     *             path to the configuration file.
+     * @param args APE expects at most two (2) arguments.
      */
     public static void main(String[] args) {
+
+        String method = args[0];
+        switch (method) {
+            case "synthesis":
+                executeSynthesis(ArrayUtils.remove(args, 0));
+                break;
+            case "convert-tools":
+                convertBioToolsAnnotations(ArrayUtils.remove(args, 0));
+                break;
+            case "bio.tools":
+                try {
+                    BioToolsAPI.fetchBioTools("./tools.json");
+                } catch (IOException e) {
+                    log.error("Error in fetching the tools from bio.tools.");
+                }
+                break;
+            default:
+                if (args.length == 0 || args.length == 1) {
+                    executeSynthesis(args);
+                } else {
+                    log.error("Invalid method provided.");
+                }
+        }
+
+    }
+
+    public static void convertBioToolsAnnotations(String[] args) {
+        String path;
+        if (args.length != 1) {
+            log.error("Error: bio.tools method expects path as the only additional argument.");
+            return;
+        }
+
+        path = args[0];
+        if (!APEFiles.isValidReadFile(path)) {
+            log.error("Error: Invalid path provided.");
+            return;
+        }
+
+        try {
+            BioToolsAPI.fetchToolSet(path, "./tools.json");
+        } catch (IOException e) {
+            log.error("Error in fetching the tools from bio.tools.");
+            return;
+        }
+        log.info("File generated successfully in the current directory.");
+    }
+
+    /**
+     * The entry point of application when the library is used in a Command Line
+     * Interface (CLI).
+     *
+     * @param args APE expects at most two (2) arguments.
+     */
+    public static void executeSynthesis(String[] args) {
         String path;
         int solutionsNo = -1;
+
+        if (args.length > 2) {
+            log.error("Error: synthesis method expects at most two additional arguments.");
+            return;
+        }
+
         if (args.length == 1) {
             path = args[0];
         } else if (args.length == 2) {
@@ -96,11 +158,11 @@ public class Main {
         } else {
             try {
                 APE.writeSolutionToFile(solutions);
+                // The following method can be changed to write the solutions in different
+                // formats (e.g., control flow graph, data flow graph)
                 APE.writeTavernaDesignGraphs(solutions);
-                // APE.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
                 APE.writeExecutableWorkflows(solutions);
                 APE.writeCWLWorkflows(solutions);
-                // APE.writeExecutableCWLWorkflows(solutions, apeFramework.getConfig());
             } catch (IOException e) {
                 log.error("Error in writing the solutions. to the file system.");
                 e.printStackTrace();

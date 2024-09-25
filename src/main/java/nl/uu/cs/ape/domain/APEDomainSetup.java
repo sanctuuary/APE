@@ -234,7 +234,7 @@ public class APEDomainSetup {
         String constraintID = null;
         int currNode = 0;
 
-        List<JSONObject> constraints = APEUtils.getListFromJsonList(constraintsJSONArray, JSONObject.class);
+        List<JSONObject> constraints = APEUtils.getJSONListFromJSONArray(constraintsJSONArray);
 
         /* Iterate through each constraint in the list */
         for (JSONObject jsonConstraint : APEUtils.safe(constraints)) {

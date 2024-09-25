@@ -120,7 +120,7 @@ public final class APEUtils {
 			Object tmp = jsonObject.get(key);
 			try {
 				if (tmp instanceof JSONArray) {
-					jsonList = getListFromJsonList((JSONArray) tmp, clazz);
+					jsonList = getListFromJSONArray((JSONArray) tmp, clazz);
 				} else {
 					T element = (T) tmp;
 					jsonList.add(element);
@@ -139,6 +139,20 @@ public final class APEUtils {
 	}
 
 	/**
+	 * The method return a list of {@link JSONObject} elements that correspond to 
+	 * the value of a given key in the given json object. If the key corresponds to 
+	 * a {@link JSONArray} all the elements are put in a {@link List}, otherwise if
+	 * the key corresponds to a {@link JSONObject} list will contain only that object.
+	 * @param jsonObject {@link JSONObject} that is being explored.
+	 * @param key Key label that corresponds to the elements.
+	 * 
+	 * @return List of elements that corresponds to the key. If the key does not exists returns empty list.
+	 */
+	public static List<JSONObject> getJSONListFromJson(JSONObject jsonObject, String key) {
+		return getListFromJson(jsonObject, key, JSONObject.class);
+	}
+
+	/**
 	 * The method converts the {@link JSONArray} object to {@link List} of objects
 	 * of the given structure.
 	 *
@@ -148,13 +162,24 @@ public final class APEUtils {
 	 * @return List of objects of type {@link T}.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> getListFromJsonList(JSONArray jsonArray, Class<T> clazz) {
+	public static <T> List<T> getListFromJSONArray(JSONArray jsonArray, Class<T> clazz) {
 		List<T> newList = new ArrayList<>();
 		for (int i = 0; i < jsonArray.length(); i++) {
 			T element = (T) jsonArray.get(i);
 			newList.add(element);
 		}
 		return newList;
+	}
+
+	/**
+	 * The method converts the {@link JSONArray} object to {@link List} of
+	 * {@link JSONObject} objects.
+	 *
+	 * @param jsonArray JSON array object.
+	 * @return List of {@link JSONObject} objects.
+	 */
+	public static List<JSONObject> getJSONListFromJSONArray(JSONArray jsonArray) {
+		return getListFromJSONArray(jsonArray, JSONObject.class);
 	}
 
 	/**

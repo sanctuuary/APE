@@ -45,8 +45,21 @@ public class BioToolsAPI {
 		// Fetch the Limited (predefined) set of tool
 		JSONArray bioToolsRAW = readListOfTools(listFilePath);
 
-		JSONObject apeToolAnnotation = convertBioTools2Ape(bioToolsRAW);
+		JSONObject apeToolAnnotation = convertBioTools2Ape(bioToolsRAW, false);
 		APEFiles.write2file(apeToolAnnotation.toString(4), new File(destinationFilePath), false);
+	}
+
+	/**
+	 * Fetch the list of all the tools from the bio.tools API and save them to a
+	 * file in a format that can be used by the APE library.
+	 * @param destinationFilePath The path to the file where the tool annotations will be saved.
+	 * @throws IOException If an error occurs while fetching the tools.
+	 */
+	public static void fetchBioTools(String destinationFilePath) throws IOException {
+
+		// Fetch the Limited (predefined) set of tool
+		JSONObject biotools = BioToolsAPI.getToolsFromEDAMTopic("");
+		APEFiles.write2file(biotools.toString(4), new File(destinationFilePath), false);
 	}
 
 	/**
@@ -73,21 +86,24 @@ public class BioToolsAPI {
 	 * @return JSONArray with the tool annotations.
 	 * @throws IOException - If the file cannot be read or written.
 	 */
-	private static JSONArray getToolsFromDomain(String domainName) throws IOException {
+	private static JSONObject getToolsFromDomain(String domainName) throws IOException {
 		JSONArray toolAnnotations = null;
 		if (!domainName.equals("")) {
 			toolAnnotations = fetchToolsFromURI("https://bio.tools/api/t?domain=" + domainName + "&format=json");
 		} else {
 			toolAnnotations = fetchToolsFromURI("https://bio.tools/api/t?format=json");
 		}
-		return toolAnnotations;
+		return convertBioTools2Ape(toolAnnotations, true);
 	}
 
 	/**
-	 * Send Get request to get tool annotations Saves JSONArray with all
-	 * bio.tools that belong to a certain EDAM topic.
+	 * Retrieve tools from the bio.tools API for a given topic and convert them to
+	 * the tool annotation format used by the APE library.
 	 * 
-	 * @throws IOException
+	 * @param topicName The name of the topic.
+	 * @return The JSONObject containing the tool annotations in the APE format.
+	 * 
+	 * @throws IOException If an error occurs while fetching the tools.
 	 */
 	public static JSONObject getToolsFromEDAMTopic(String topicName) throws IOException {
 		JSONArray toolAnnotations = null;
@@ -97,7 +113,7 @@ public class BioToolsAPI {
 			toolAnnotations = fetchToolsFromURI("https://bio.tools/api/t?format=json");
 		}
 
-		return convertBioTools2ApeStrict(toolAnnotations);
+		return convertBioTools2Ape(toolAnnotations, true);
 	}
 
 	/**
@@ -108,14 +124,15 @@ public class BioToolsAPI {
 	 * @throws IOException
 	 * @throws JSONException
 	 */
-	private static JSONArray fetchToolListFromBioTools(JSONArray toolListJson) throws JSONException, IOException {
+	public static JSONArray fetchToolListFromBioTools(JSONArray toolListJson) throws JSONException, IOException {
 		JSONArray bioToolAnnotations = new JSONArray();
 		for (int i = 0; i < toolListJson.length(); i++) {
 			String currTool = toolListJson.getString(i);
 			Request request = new Request.Builder().url("https://bio.tools/api/" + currTool + "?format=json").build();
 			try (Response response = client.newCall(request).execute()) {
-				if (!response.isSuccessful())
-					throw new IOException("Unexpected code when trying to fetch" + response);
+				if (!response.isSuccessful()) {
+					log.error("The tool " + currTool + " could not be fetched from bio.tools.");
+				}
 				// Get response body
 				JSONObject responseJson = new JSONObject(response.body().string());
 				bioToolAnnotations.put(i, responseJson);
@@ -135,6 +152,7 @@ public class BioToolsAPI {
 	 */
 	private static JSONArray fetchToolsFromURI(String url) throws JSONException, IOException {
 		JSONArray bioToolAnnotations = new JSONArray();
+		log.info("Fetching tools from bio.tools: " + url);
 		String next = "";
 		int i = 1;
 		while (next != null) {
@@ -155,108 +173,12 @@ public class BioToolsAPI {
 					next = null;
 				}
 			}
-			log.trace("bio.tools: page " + i + " fetched.");
+			log.info("bio.tools: page " + i + " fetched.");
 
 		}
-		log.debug("All tools fetched from a given URL.");
+		log.info("All tools fetched from a given URL.");
 		return bioToolAnnotations;
 	}
-
-	/**
-	 * Method converts tools annotated using 'bio.tools' standard (see <a href=
-	 * "https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools
-	 * API</a>), into standard supported by the APE library.
-	 * <p>
-	 * In practice, the method takes a {@link JSONArray} as an argument, where each
-	 * {@link JSONObject} in the array represents a tool annotated using 'bio.tools'
-	 * standard, and returns a {@link JSONObject} that represents tool annotations
-	 * that can be used by the APE library.
-	 *
-	 * @param bioToolsAnnotation A {@link JSONArray} object, that contains list of
-	 *                           annotated tools ({@link JSONObject}s) according the
-	 *                           bio.tools specification (see <a href=
-	 *                           "https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools
-	 *                           API</a>)
-	 * @return {@link JSONObject} that represents the tool annotation supported by
-	 *         the APE library.
-	 * @throws JSONException the json exception
-	 */
-	private static JSONObject convertBioTools2Ape(JSONArray bioToolsAnnotation) throws JSONException {
-		JSONArray apeToolsAnnotations = new JSONArray();
-		for (int i = 0; i < bioToolsAnnotation.length(); i++) {
-
-			JSONObject bioJsonTool = bioToolsAnnotation.getJSONObject(i);
-			List<JSONObject> functions = APEUtils.getListFromJson(bioJsonTool, "function", JSONObject.class);
-			int functionNo = 1;
-			for (JSONObject function : functions) {
-				JSONObject apeJsonTool = new JSONObject();
-				apeJsonTool.put(ToolAnnotationTag.LABEL.toString(), bioJsonTool.getString("name"));
-				apeJsonTool.put(ToolAnnotationTag.ID.toString(), bioJsonTool.getString("biotoolsID") + functionNo++);
-
-				JSONArray apeTaxonomyTerms = new JSONArray();
-
-				JSONArray operations = function.getJSONArray("operation");
-				for (int j = 0; j < operations.length(); j++) {
-					JSONObject bioOperation = operations.getJSONObject(j);
-					apeTaxonomyTerms.put(bioOperation.get("uri"));
-				}
-				apeJsonTool.put(ToolAnnotationTag.TAXONOMY_OPERATIONS.toString(), apeTaxonomyTerms);
-				// reading inputs
-				JSONArray apeInputs = new JSONArray();
-				JSONArray bioInputs = function.getJSONArray("input");
-				// for each input
-				for (int j = 0; j < bioInputs.length(); j++) {
-					JSONObject bioInput = bioInputs.getJSONObject(j);
-					JSONObject apeInput = new JSONObject();
-					JSONArray apeInputTypes = new JSONArray();
-					JSONArray apeInputFormats = new JSONArray();
-					// add all data types
-					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "data", JSONObject.class)) {
-						apeInputTypes.put(bioType.getString("uri"));
-					}
-					apeInput.put("data_0006", apeInputTypes);
-					// add all data formats (or just the first one)
-					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
-						apeInputFormats.put(bioType.getString("uri"));
-					}
-					apeInput.put("format_1915", apeInputFormats);
-
-					apeInputs.put(apeInput);
-				}
-				apeJsonTool.put(ToolAnnotationTag.INPUTS.toString(), apeInputs);
-
-				// reading outputs
-				JSONArray apeOutputs = new JSONArray();
-				JSONArray bioOutputs = function.getJSONArray("output");
-				// for each output
-				for (int j = 0; j < bioOutputs.length(); j++) {
-
-					JSONObject bioOutput = bioOutputs.getJSONObject(j);
-					JSONObject apeOutput = new JSONObject();
-					JSONArray apeOutputTypes = new JSONArray();
-					JSONArray apeOutputFormats = new JSONArray();
-					// add all data types
-					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "data", JSONObject.class)) {
-						apeOutputTypes.put(bioType.getString("uri"));
-					}
-					apeOutput.put("data_0006", apeOutputTypes);
-					// add all data formats
-					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
-						apeOutputFormats.put(bioType.getString("uri"));
-					}
-					apeOutput.put("format_1915", apeOutputFormats);
-
-					apeOutputs.put(apeOutput);
-				}
-				apeJsonTool.put(ToolAnnotationTag.OUTPUTS.toString(), apeOutputs);
-
-				apeToolsAnnotations.put(apeJsonTool);
-			}
-		}
-
-		return new JSONObject().put("functions", apeToolsAnnotations);
-	}
-
 
 	/**
 	 * Method converts tools annotated using 'bio.tools' standard (see <a href=
@@ -273,147 +195,119 @@ public class BioToolsAPI {
 	 * @param bioToolsAnnotation A {@link JSONArray} object, that contains list of
 	 *                           annotated tools ({@link JSONObject}s) according the
 	 *                           bio.tools specification (see <a href=
-	 *                           "https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools
-	 *                           API</a>)
+	 *                           "https://biotools.readthedocs.io/en/latest/api_usage_guide.html">bio.tools API</a>)
+	 * @param excludeBadAnnotation If set to {@code true}, the method will exclude tools 
+	 * that do not have both the input and the output fully specified, i.e., with data and format types and formats specified. If set to {@code false}, the method will return annotations that have at least one of the two fully specified (at least one input or or output).
 	 * @return {@link JSONObject} that represents the tool annotation supported by
 	 *         the APE library.
 	 * @throws JSONException the json exception
 	 */
-	public static JSONObject convertBioTools2ApeStrict(JSONArray bioToolsAnnotation) throws JSONException {
-		
-		Set<String> notAcceptedTools = new HashSet<>();
-		Set<String> noFunctionAnnotation = new HashSet<>();
-		Set<String> toolsMissingDimension = new HashSet<>();
-		Set<String> annotatedBioTools = new HashSet<>();
+	public static JSONObject convertBioTools2Ape(JSONArray bioToolsAnnotation, boolean excludeBadAnnotation)
+			throws JSONException {
+
 		int notAcceptedOperations = 0;
+		
 		int bioToolFunctions = 0;
 
 		JSONArray apeToolsAnnotations = new JSONArray();
-		Set<String> toolsList = new HashSet<>();
 
-		for (int i = 0; i < bioToolsAnnotation.length(); i++) {
-
-			JSONObject bioJsonTool = bioToolsAnnotation.getJSONObject(i);
-			List<JSONObject> functions = APEUtils.getListFromJson(bioJsonTool, "function", JSONObject.class);
+		for (JSONObject bioJsonTool : APEUtils.getJSONListFromJSONArray(bioToolsAnnotation)) {
+			List<JSONObject> functions = APEUtils.getJSONListFromJson(bioJsonTool, "function");
 			if (functions.isEmpty()) {
-				noFunctionAnnotation.add(bioJsonTool.getString("biotoolsID"));
-				notAcceptedTools.add(bioJsonTool.getString("biotoolsID"));
 				continue;
 			}
 			int functionNo = 1;
-			functionloop: for (JSONObject function : functions) {
+
+			for (JSONObject function : functions) {
 				bioToolFunctions++;
 				JSONObject apeJsonTool = new JSONObject();
 				apeJsonTool.put("label", bioJsonTool.getString("name"));
-				if (functions.size() > 1) {
-					apeJsonTool.put("id", bioJsonTool.getString("biotoolsID") + "_op" + (functionNo++));
-				} else {
-					apeJsonTool.put("id", bioJsonTool.getString("biotoolsID"));
-				}
+
+				apeJsonTool.put("id",
+						bioJsonTool.getString("biotoolsID") +
+								(functions.size() > 1 ? "_op" + (functionNo++) : ""));
 
 				JSONArray apeTaxonomyTerms = new JSONArray();
 
 				JSONArray operations = function.getJSONArray("operation");
-				for (int j = 0; j < operations.length(); j++) {
-					JSONObject bioOperation = operations.getJSONObject(j);
+				for (JSONObject bioOperation : APEUtils.getJSONListFromJSONArray(operations)) {
 					apeTaxonomyTerms.put(bioOperation.get("uri"));
 				}
 				apeJsonTool.put("taxonomyOperations", apeTaxonomyTerms);
-//			reading inputs
+				// reading inputs
 				JSONArray apeInputs = new JSONArray();
-				JSONArray bioInputs = function.getJSONArray("input");
-//			for each input
-				for (int j = 0; j < bioInputs.length(); j++) {
-					JSONObject bioInput = bioInputs.getJSONObject(j);
-					JSONObject apeInput = new JSONObject();
-					JSONArray apeInputTypes = new JSONArray();
-					JSONArray apeInputFormats = new JSONArray();
-//				add all data types
-					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "data", JSONObject.class)) {
-						apeInputTypes.put(bioType.getString("uri"));
-					}
-					if (apeInputTypes.length() == 0) {
-						notAcceptedTools.add(bioJsonTool.getString("biotoolsID"));
-						toolsMissingDimension.add(bioJsonTool.getString("biotoolsID"));
+				try {
+					apeInputs = calculateBioToolsInputOutput(function.getJSONArray("input"),
+							bioJsonTool.getString("biotoolsID"));
+					apeJsonTool.put("inputs", apeInputs);
+				} catch (BioToolsAnnotationException e) {
+					if (excludeBadAnnotation) {
 						notAcceptedOperations++;
-						continue functionloop;
+						continue;
 					}
-					apeInput.put("data_0006", apeInputTypes);
-//				add all data formats (or just the first one)
-					for (JSONObject bioType : APEUtils.getListFromJson(bioInput, "format", JSONObject.class)) {
-						apeInputFormats.put(bioType.getString("uri"));
-					}
-					if (apeInputFormats.length() == 0) {
-						notAcceptedTools.add(bioJsonTool.getString("biotoolsID"));
-						toolsMissingDimension.add(bioJsonTool.getString("biotoolsID"));
-						notAcceptedOperations++;
-						continue functionloop;
-					}
-					apeInput.put("format_1915", apeInputFormats);
-
-					apeInputs.put(apeInput);
 				}
-				apeJsonTool.put("inputs", apeInputs);
-
-//			reading outputs
 				JSONArray apeOutputs = new JSONArray();
-				JSONArray bioOutputs = function.getJSONArray("output");
-//			for each output
-				for (int j = 0; j < bioOutputs.length(); j++) {
-
-					JSONObject bioOutput = bioOutputs.getJSONObject(j);
-					JSONObject apeOutput = new JSONObject();
-					JSONArray apeOutputTypes = new JSONArray();
-					JSONArray apeOutputFormats = new JSONArray();
-//				add all data types
-					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "data", JSONObject.class)) {
-						apeOutputTypes.put(bioType.getString("uri"));
-					}
-					if (apeOutputTypes.length() == 0) {
-						notAcceptedTools.add(bioJsonTool.getString("biotoolsID"));
-						toolsMissingDimension.add(bioJsonTool.getString("biotoolsID"));
+				try {
+					apeOutputs = calculateBioToolsInputOutput(function.getJSONArray("output"),
+							bioJsonTool.getString("biotoolsID"));
+					apeJsonTool.put("outputs", apeOutputs);
+				} catch (BioToolsAnnotationException e) {
+					if (excludeBadAnnotation) {
 						notAcceptedOperations++;
-						continue functionloop;
+						continue;
 					}
-					apeOutput.put("data_0006", apeOutputTypes);
-//				add all data formats
-					for (JSONObject bioType : APEUtils.getListFromJson(bioOutput, "format", JSONObject.class)) {
-						apeOutputFormats.put(bioType.getString("uri"));
-					}
-					if (apeOutputFormats.length() == 0) {
-						notAcceptedTools.add(bioJsonTool.getString("biotoolsID"));
-						toolsMissingDimension.add(bioJsonTool.getString("biotoolsID"));
-						notAcceptedOperations++;
-						continue functionloop;
-					}
-					apeOutput.put("format_1915", apeOutputFormats);
-
-					apeOutputs.put(apeOutput);
 				}
-				apeJsonTool.put("outputs", apeOutputs);
-
-				// if the tool has outputs add it to the tool annotation
-				if (apeInputs.length() > 0 && apeOutputs.length() > 0) {
-					toolsList.add(bioJsonTool.getString("biotoolsID"));
-					apeToolsAnnotations.put(apeJsonTool);
-					annotatedBioTools.add(bioJsonTool.getString("biotoolsID"));
-				} else {
-					notAcceptedTools.add(bioJsonTool.getString("biotoolsID"));
-					notAcceptedOperations++;
-				}
+				apeJsonTool.put("biotoolsID", bioJsonTool.getString("biotoolsID"));
+				apeToolsAnnotations.put(apeJsonTool);
 			}
 		}
-		log.info("Provide bio.tools: " + bioToolsAnnotation.length());
+		log.info("Provided bio.tools: " + bioToolsAnnotation.length());
 		log.info("Total bio.tools functions: " + bioToolFunctions);
 		log.info("Errored bio.tools functions: " + notAcceptedOperations);
-		log.info("No functions: " + noFunctionAnnotation.size());
 		log.info("Created APE annotations: " + apeToolsAnnotations.length());
 
-		JSONArray tools = new JSONArray();
-		for (String tool : toolsList) {
-			tools.put(tool);
+		return new JSONObject().put("functions", apeToolsAnnotations);
+	}
+
+
+
+
+	
+	/**
+	 * Method converts input and output tool annotations, following bio.tools schema,
+	 * into the APE library tool annotation format.
+	 * @param bioInputs - JSONArray with the bio.tools input/output annotations.
+	 * @param toolID - ID of the tool that is being converted.
+	 * 
+	 * @return JSONArray with the APE library input/output annotations.
+	 */
+	private static JSONArray calculateBioToolsInputOutput(JSONArray bioInputs, String toolID) {
+		JSONArray apeInputs = new JSONArray();
+		for (JSONObject bioInput : APEUtils.getJSONListFromJSONArray(bioInputs)) {
+			JSONObject apeInput = new JSONObject();
+			JSONArray apeInputTypes = new JSONArray();
+			JSONArray apeInputFormats = new JSONArray();
+			// add all data types
+			for (JSONObject bioType : APEUtils.getJSONListFromJson(bioInput, "data")) {
+				apeInputTypes.put(bioType.getString("uri"));
+			}
+			if (apeInputTypes.length() == 0) {
+				throw BioToolsAnnotationException.notExistingType(toolID);
+			}
+			apeInput.put("data_0006", apeInputTypes);
+			// add all data formats (or just the first one)
+			for (JSONObject bioType : APEUtils.getJSONListFromJson(bioInput, "format")) {
+				apeInputFormats.put(bioType.getString("uri"));
+			}
+			if (apeInputFormats.length() == 0) {
+				throw BioToolsAnnotationException.notExistingFormat(toolID);
+			}
+			apeInput.put("format_1915", apeInputFormats);
+
+			apeInputs.put(apeInput);
+
 		}
-		return new JSONObject().put("functions", tools);
+		return apeInputs;
 	}
 
 }
