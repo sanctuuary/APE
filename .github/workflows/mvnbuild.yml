@@ -35,9 +35,9 @@ jobs:
         pip3 install cwlref-runner
     - name: Test CWL generation
       run: |
-        git clone https://github.com/Workflomics/domain-annotations
-        cd domain-annotations/WombatP_tools
-        java -jar ../../target/APE-*-executable.jar ./config.json
+        git clone https://github.com/Workflomics/containers
+        cd containers/domains/proteomics
+        java -jar ../../../target/APE-*-executable.jar ./config.json
         cd ./CWL
         cwltool --enable-dev --validate candidate_workflow_1.cwl
 

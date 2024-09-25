@@ -9,7 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
@@ -576,7 +575,7 @@ public class APEDomainSetup {
             String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
             cnfStream.close();
             
-                APEFiles.write2file(encoding, new File(writeLocalCNF), false);
+            APEFiles.write2file(encoding, new File(writeLocalCNF), false);
         }
     }
 
