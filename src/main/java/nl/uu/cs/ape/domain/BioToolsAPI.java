@@ -173,7 +173,7 @@ public class BioToolsAPI {
 					next = null;
 				}
 			}
-			log.info("bio.tools: page " + i + " fetched.");
+			log.info("bio.tools: page " + i++ + " fetched.");
 
 		}
 		log.info("All tools fetched from a given URL.");
@@ -257,8 +257,11 @@ public class BioToolsAPI {
 						continue;
 					}
 				}
-				apeJsonTool.put("biotoolsID", bioJsonTool.getString("biotoolsID"));
-				apeToolsAnnotations.put(apeJsonTool);
+				if (!excludeBadAnnotation ||
+				(apeInputs.length() > 0 && apeOutputs.length() > 0)) {
+					apeJsonTool.put("biotoolsID", bioJsonTool.getString("biotoolsID"));
+					apeToolsAnnotations.put(apeJsonTool);
+				}
 			}
 		}
 		log.info("Provided bio.tools: " + bioToolsAnnotation.length());

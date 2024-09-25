@@ -254,7 +254,7 @@ public class DefaultCWLCreator extends CWLCreatorBase {
      */
     private void generateDefaultStepRun(ModuleNode moduleNode) {
         final int baseInd = 2;
-        String moduleReference = "add-path-to-the-implementation/" + moduleNode.getUsedModule().getPredicateLabel()
+        String moduleReference = "add-path-to-the-implementation/" + moduleNode.getUsedModule().getPredicateID()
                 + ".cwl ";
         if (moduleNode.getUsedModule().getCwlFileReference() != null) {
             moduleReference = moduleNode.getUsedModule().getCwlFileReference();
