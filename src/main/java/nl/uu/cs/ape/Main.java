@@ -14,6 +14,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * The entry point of application when the library is used in a Command Line
@@ -41,9 +42,12 @@ public class Main {
             case "convert-tools":
                 convertBioToolsAnnotations(ArrayUtils.remove(args, 0));
                 break;
+            case "pull-a-tool":
+                pullATool(ArrayUtils.remove(args, 0));
+                break;
             case "bio.tools":
                 try {
-                    BioToolsAPI.fetchBioTools("./tools.json");
+                    BioToolsAPI.getAndSaveFullBioTools("./tools.json");
                 } catch (IOException e) {
                     log.error("Error in fetching the tools from bio.tools.");
                 }
@@ -58,6 +62,28 @@ public class Main {
 
     }
 
+    private static void pullATool(String[] args) {
+        if (args.length != 1) {
+            log.error("Error: pull-a-tool method expects biotoolsID as the only additional argument.");
+            return;
+        }
+
+        String biotoolsID = args[0];
+        if (biotoolsID.isEmpty()) {
+            log.error("Error: biotoolsID should be provided as an additional argument.");
+            return;
+        }
+
+        try {
+            JSONObject tool = BioToolsAPI.getAndConvertToolList(List.of(biotoolsID));
+            APEFiles.write2file(tool.toString(4), new File("./tool.json"), false);
+        } catch (IOException e) {
+            log.error("Error in fetching the tool from bio.tools.");
+            return;
+        }
+
+    }
+
     /**
      * Retrieve tools from bio.tools using bio.tools API and convert them to
      * APE-compatible tool annotation format.
@@ -66,20 +92,20 @@ public class Main {
      *            expected, the path to the file where the biotoolsIDs are stored. 
      */
     public static void convertBioToolsAnnotations(String[] args) {
-        String path;
         if (args.length != 1) {
             log.error("Error: bio.tools method expects path as the only additional argument.");
             return;
         }
 
-        path = args[0];
-        if (!APEFiles.isValidReadFile(path)) {
+        String pathToListIDs = args[0];
+        if (!APEFiles.isValidReadFile(pathToListIDs)) {
             log.error("Error: Invalid path provided.");
             return;
         }
 
         try {
-            BioToolsAPI.fetchToolSet(path, "./tools.json");
+            JSONObject apeToolAnnotation = BioToolsAPI.getAndConvertToolList(new File(pathToListIDs));
+            APEFiles.write2file(apeToolAnnotation.toString(4), new File("./tools.json"), false);
         } catch (IOException e) {
             log.error("Error in fetching the tools from bio.tools.");
             return;
