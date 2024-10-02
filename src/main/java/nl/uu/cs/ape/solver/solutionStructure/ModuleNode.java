@@ -92,7 +92,7 @@ public class ModuleNode extends SolutionWorkflowNode {
     /**
      * Set module/tool that defines this step in the workflow.
      *
-     * @param module - tool provided by the tool/module annotations.
+     * @param module tool provided by the tool/module annotations.
      */
     public void setUsedModule(Module module) {
         this.usedModule = module;
@@ -102,7 +102,7 @@ public class ModuleNode extends SolutionWorkflowNode {
      * Add the abstract module to the list of modules that describes the tool
      * instance.
      *
-     * @param abstractModule - abstract type that describes the instance.
+     * @param abstractModule abstract type that describes the instance.
      */
     public void addAbstractDescriptionOfUsedType(AbstractModule abstractModule) {
         if (!abstractModule.isSimplePredicate()) {

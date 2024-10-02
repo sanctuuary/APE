@@ -101,7 +101,7 @@ public class ConstraintTemplateParameter {
 	 * generate a Type or Module object.
 	 * 
 	 * @param jsonParam   json object
-	 * @param domainSetup - domain model
+	 * @param domainSetup domain model
 	 * @return A {@link Type} or {@link AbstractModule} object that represent the
 	 *         data instance given as the parameter.
 	 * @throws JSONException          if the given JSON is not well formatted

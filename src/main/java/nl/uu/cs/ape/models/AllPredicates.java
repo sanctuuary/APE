@@ -171,7 +171,7 @@ public abstract class AllPredicates {
     /**
      * Check whether the string occurs as one of the roots in the taxonomy.
      * 
-     * @param curRootIRI - curr root IRI
+     * @param curRootIRI curr root IRI
      * @return true if the root exists
      */
     public boolean existsRoot(String curRootIRI) {
@@ -181,8 +181,8 @@ public abstract class AllPredicates {
     /**
      * Put a new TaxonomyPredicate to the mapping.
      * 
-     * @param key   - ID of the TaxonomyPredicate
-     * @param value - TaxonomyPredicate to be added
+     * @param key   ID of the TaxonomyPredicate
+     * @param value TaxonomyPredicate to be added
      */
     public void put(String key, TaxonomyPredicate value) {
         mappedPredicates.put(key, value);
@@ -192,7 +192,7 @@ public abstract class AllPredicates {
     /**
      * Remove the TaxonomyPredicate from the mapping.
      * 
-     * @param predicateID - ID of the TaxonomyPredicate to be removed
+     * @param predicateID ID of the TaxonomyPredicate to be removed
      */
     public void remove(String predicateID) {
         mappedPredicates.remove(predicateID);

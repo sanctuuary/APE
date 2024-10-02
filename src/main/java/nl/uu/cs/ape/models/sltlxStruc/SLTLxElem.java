@@ -16,7 +16,7 @@ public interface SLTLxElem {
 	 * Create the CNF encoding of the statement and return the string
 	 * representation.
 	 * 
-	 * @param synthesisEngine - synthesis engine used to encode the problem.
+	 * @param synthesisEngine synthesis engine used to encode the problem.
 	 * @return The string that represent cnf clauses.
 	 */
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
@@ -26,7 +26,7 @@ public interface SLTLxElem {
 	 * CreatE the CNF encoding of the negation of the statement and return the
 	 * string representation.
 	 * 
-	 * @param synthesisEngine - synthesis engine used to encode the problem.
+	 * @param synthesisEngine synthesis engine used to encode the problem.
 	 * @return The string that represent the negated cnf clauses.
 	 */
 	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,

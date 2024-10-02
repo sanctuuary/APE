@@ -82,15 +82,15 @@ public class SLTLxSATVisitor extends SLTLxBaseVisitor<SLTLxFormula> {
 	 * Parse the formulas, where each is separated by a new line, and return the set
 	 * of {link SLTLxFormula}a that model it.
 	 * 
-	 * @param synthesisEngine - SAT synthesis engine
-	 * @param formulasInSLTLx - SLTLx formulas in textual format (separated by new
+	 * @param synthesisEngine SAT synthesis engine
+	 * @param formulasInSLTLx SLTLx formulas in textual format (separated by new
 	 *                        lines)
 	 * @return Set of {link SLTLxFormula} objects, where each represents a row
 	 *         (formula) from the text.
-	 * @throws SLTLxParsingGrammarException    - Exception is thrown when a formula
+	 * @throws SLTLxParsingGrammarException    Exception is thrown when a formula
 	 *                                         does not follow the provided grammar
 	 *                                         rules.
-	 * @throws SLTLxParsingAnnotationException - Exception is thrown if the formula
+	 * @throws SLTLxParsingAnnotationException Exception is thrown if the formula
 	 *                                         follows the given grammar, but cannot
 	 *                                         be interpreted under the current
 	 *                                         domain (e.g., used operation does not

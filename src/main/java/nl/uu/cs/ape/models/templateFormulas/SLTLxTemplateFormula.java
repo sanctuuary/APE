@@ -509,11 +509,11 @@ public abstract class SLTLxTemplateFormula {
      * Creates a CNF representation of the Constraint:<br>
      * 1st operation should generate an output used by the 2nd operation.
      *
-     * @param firstPredicate  - Module type that generates the data as output
-     * @param secondPredicate - Module type that uses the generated data as input
-     * @param moduleAutomaton - module automaton.
-     * @param typeAutomaton   - type automaton
-     * @param mappings        - Set of the mappings for the literals.
+     * @param firstPredicate  Module type that generates the data as output
+     * @param secondPredicate Module type that uses the generated data as input
+     * @param moduleAutomaton module automaton.
+     * @param typeAutomaton   type automaton
+     * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
     public static String connectedModules(TaxonomyPredicate firstPredicate, TaxonomyPredicate secondPredicate,
@@ -525,22 +525,21 @@ public abstract class SLTLxTemplateFormula {
         Map<Integer, Set<Pair<State>>> opOutInPairs = new HashMap<>();
 
         int automatonSize = moduleAutomaton.getAllStates().size();
-        for (int op1 = 0; op1 < automatonSize - 1; op1++) {
-            for (int op2 = op1 + 1; op2 < automatonSize; op2++) {
+        for (Pair<Integer> operations : APEUtils.generateDistinctPairs(automatonSize)) {
+            int op1 = operations.getFirst();
+            int op2 = operations.getSecond();
+            int currComb = mappings.getNextAuxNum();
+            allCombinations.add(currComb);
 
-                int currComb = mappings.getNextAuxNum();
-                allCombinations.add(currComb);
+            opOrderStates.put(currComb, new Pair<>(moduleAutomaton.getAllStates().get(op1),
+                    moduleAutomaton.getAllStates().get(op2)));
 
-                opOrderStates.put(currComb, new Pair<>(moduleAutomaton.getAllStates().get(op1),
-                        moduleAutomaton.getAllStates().get(op2)));
+            List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();
+            List<State> op2inputs = typeAutomaton.getUsedTypesBlock(op2).getStates();
 
-                List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();
-                List<State> op2inputs = typeAutomaton.getUsedTypesBlock(op2).getStates();
+            Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
+            opOutInPairs.put(currComb, statePairs);
 
-                Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
-                opOutInPairs.put(currComb, statePairs);
-
-            }
         }
         // at least one of the combinations must be valid
         for (Integer currComb : allCombinations) {
@@ -574,10 +573,10 @@ public abstract class SLTLxTemplateFormula {
      * Creates a CNF representation of the Constraint:<br>
      * 1st operation should not generate an output used by the 2nd operation.
      *
-     * @param firstPredicate  - Module type that generates the data as output
-     * @param secondPredicate - Module type that uses the generated data as input
-     * @param typeAutomaton   - type automaton
-     * @param mappings        - Set of the mappings for the literals.
+     * @param firstPredicate  Module type that generates the data as output
+     * @param secondPredicate Module type that uses the generated data as input
+     * @param typeAutomaton   type automaton
+     * @param mappings        Set of the mappings for the literals.
      * @return The String CNF representation of the SLTLx formula.
      */
     public static String notConnectedModules(TaxonomyPredicate firstPredicate, TaxonomyPredicate secondPredicate,
@@ -586,33 +585,34 @@ public abstract class SLTLxTemplateFormula {
         StringBuilder constraints = new StringBuilder();
 
         int automatonSize = moduleAutomaton.getAllStates().size();
-        for (int op1 = 0; op1 < automatonSize - 1; op1++) {
-            for (int op2 = op1 + 1; op2 < automatonSize; op2++) {
+        for (Pair<Integer> operations : APEUtils.generateDistinctPairs(automatonSize)) {
+            int op1 = operations.getFirst();
+            int op2 = operations.getSecond();
 
-                State firstModuleState = moduleAutomaton.get(op1);
-                State secondModuleState = moduleAutomaton.get(op2);
+            State firstModuleState = moduleAutomaton.get(op1);
+            State secondModuleState = moduleAutomaton.get(op2);
 
-                List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();
-                List<State> op2inputs = typeAutomaton.getUsedTypesBlock(op2).getStates();
+            List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();
+            List<State> op2inputs = typeAutomaton.getUsedTypesBlock(op2).getStates();
 
-                // Ensure that either the 2 operations are not used consequently, or that they
-                // are not connected
-                Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
-                for (Pair<State> currIOpair : statePairs) {
-                    constraints.append("-").append(mappings.add(firstPredicate, firstModuleState, AtomType.MODULE))
-                            .append(" ");
-                    constraints.append("-"
-                            + mappings.add(currIOpair.getFirst(), currIOpair.getSecond(), AtomType.MEM_TYPE_REFERENCE)
-                            + " ");
-                    constraints.append("-"
-                            + mappings.add(secondPredicate, secondModuleState, AtomType.MODULE)
-                            + " 0\n");
-                }
-
+            // Ensure that either the 2 operations are not used consequently, or that they
+            // are not connected
+            Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
+            for (Pair<State> currIOpair : statePairs) {
+                constraints.append("-").append(mappings.add(firstPredicate, firstModuleState, AtomType.MODULE))
+                        .append(" ");
+                constraints.append("-"
+                        + mappings.add(currIOpair.getFirst(), currIOpair.getSecond(), AtomType.MEM_TYPE_REFERENCE)
+                        + " ");
+                constraints.append("-"
+                        + mappings.add(secondPredicate, secondModuleState, AtomType.MODULE)
+                        + " 0\n");
             }
+
         }
 
         return constraints.toString();
+
     }
 
     /**
@@ -632,24 +632,24 @@ public abstract class SLTLxTemplateFormula {
         StringBuilder constraints = new StringBuilder();
 
         int automatonSize = moduleAutomaton.getAllStates().size();
-        for (int op1 = 0; op1 < automatonSize - 1; op1++) {
-            for (int op2 = op1 + 1; op2 < automatonSize; op2++) {
+        for (Pair<Integer> operations : APEUtils.generateDistinctPairs(automatonSize)) {
+            int op1 = operations.getFirst();
+            int op2 = operations.getSecond();
 
-                State firstModuleState = moduleAutomaton.get(op1);
-                State secondModuleState = moduleAutomaton.get(op2);
+            State firstModuleState = moduleAutomaton.get(op1);
+            State secondModuleState = moduleAutomaton.get(op2);
 
-                // filter all operations
-                domainSetup.getAllModules().getElementsFromSubTaxonomy(predicate).stream()
-                        .filter(x -> x.isSimplePredicate()).forEach(operation -> {
+            // filter all operations
+            domainSetup.getAllModules().getElementsFromSubTaxonomy(predicate).stream()
+                    .filter(x -> x.isSimplePredicate()).forEach(operation -> {
 
-                            constraints.append("-")
-                                    .append(mappings.add(operation, firstModuleState, AtomType.MODULE)).append(" ");
-                            constraints.append("-"
-                                    + mappings.add(operation, secondModuleState, AtomType.MODULE)
-                                    + " 0\n");
-                        });
+                        constraints.append("-")
+                                .append(mappings.add(operation, firstModuleState, AtomType.MODULE)).append(" ");
+                        constraints.append("-"
+                                + mappings.add(operation, secondModuleState, AtomType.MODULE)
+                                + " 0\n");
+                    });
 
-            }
         }
 
         return constraints.toString();
@@ -659,48 +659,50 @@ public abstract class SLTLxTemplateFormula {
      * Creates a CNF representation of the Constraint:<br>
      * The same tools that belong to the sub-taxonomy should not be connected.
      * 
-     * @param predicate       - Root predicate of the sub-taxonomy.
-     * @param domainSetup
-     * @param moduleAutomaton
-     * @param typeAutomaton
-     * @param mappings
-     * @return
+     * @param predicate       Root predicate of the sub-taxonomy.
+     * @param domainSetup     Current domain setup.
+     * @param moduleAutomaton Current module automaton modeling the workflow control
+     *                        flow.
+     * @param typeAutomaton   Current type automaton modeling the workflow data
+     *                        flow.
+     * @param mappings        Set of the mappings for the literals.
+     * @return The String CNF representation of the SLTLx formula.
      */
     public static String notConnectModules(TaxonomyPredicate predicate, APEDomainSetup domainSetup,
             ModuleAutomaton moduleAutomaton,
             TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
         StringBuilder constraints = new StringBuilder();
         int automatonSize = moduleAutomaton.getAllStates().size();
-        for (int op1 = 0; op1 < automatonSize - 1; op1++) {
-            for (int op2 = op1 + 1; op2 < automatonSize; op2++) {
+        for (Pair<Integer> operations : APEUtils.generateDistinctPairs(automatonSize)) {
+            int op1 = operations.getFirst();
+            int op2 = operations.getSecond();
 
-                State firstModuleState = moduleAutomaton.get(op1);
-                State secondModuleState = moduleAutomaton.get(op2);
+            State firstModuleState = moduleAutomaton.get(op1);
+            State secondModuleState = moduleAutomaton.get(op2);
 
-                List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();
-                List<State> op2inputs = typeAutomaton.getUsedTypesBlock(op2).getStates();
+            List<State> op1outputs = typeAutomaton.getMemoryTypesBlock(op1 + 1).getStates();
+            List<State> op2inputs = typeAutomaton.getUsedTypesBlock(op2).getStates();
 
-                // Ensure that either each operation is not used consequently, or that they are
-                // not connected
-                Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
-                for (Pair<State> currIOpair : statePairs) {
-                    // filter all operations
-                    domainSetup.getAllModules().getElementsFromSubTaxonomy(predicate).stream()
-                            .filter(x -> x.isSimplePredicate()).forEach(operation -> {
+            // Ensure that either each operation is not used consequently, or that they are
+            // not connected
+            Set<Pair<State>> statePairs = APEUtils.getUniquePairs(op1outputs, op2inputs);
+            for (Pair<State> currIOpair : statePairs) {
+                // filter all operations
+                domainSetup.getAllModules().getElementsFromSubTaxonomy(predicate).stream()
+                        .filter(x -> x.isSimplePredicate()).forEach(operation -> {
 
-                                constraints.append("-")
-                                        .append(mappings.add(operation, firstModuleState, AtomType.MODULE)).append(" ");
-                                constraints.append("-"
-                                        + mappings.add(currIOpair.getFirst(), currIOpair.getSecond(),
-                                                AtomType.MEM_TYPE_REFERENCE)
-                                        + " ");
-                                constraints.append("-"
-                                        + mappings.add(operation, secondModuleState, AtomType.MODULE)
-                                        + " 0\n");
-                            });
-                }
-
+                            constraints.append("-")
+                                    .append(mappings.add(operation, firstModuleState, AtomType.MODULE)).append(" ");
+                            constraints.append("-"
+                                    + mappings.add(currIOpair.getFirst(), currIOpair.getSecond(),
+                                            AtomType.MEM_TYPE_REFERENCE)
+                                    + " ");
+                            constraints.append("-"
+                                    + mappings.add(operation, secondModuleState, AtomType.MODULE)
+                                    + " 0\n");
+                        });
             }
+
         }
 
         return constraints.toString();
@@ -724,13 +726,16 @@ public abstract class SLTLxTemplateFormula {
             Block inputs = typeAutomaton.getUsedTypesBlock(blockNo);
             Set<Pair<State>> inputPairs = new HashSet<>();
             inputPairs.addAll(APEUtils.getUniquePairs(inputs.getStates()));
-            for(State memoryState : typeAutomaton.getAllMemoryStatesUntilBlockNo(blockNo)){
+            for (State memoryState : typeAutomaton.getAllMemoryStatesUntilBlockNo(blockNo)) {
                 for (Pair<State> inputPair : inputPairs) {
-                    constraints.append("-").append(mappings.add(memoryState, inputPair.getFirst(), AtomType.MEM_TYPE_REFERENCE)).append(" ");
-                    constraints.append("-").append(mappings.add(memoryState, inputPair.getSecond(), AtomType.MEM_TYPE_REFERENCE)).append(" 0\n");
+                    constraints.append("-")
+                            .append(mappings.add(memoryState, inputPair.getFirst(), AtomType.MEM_TYPE_REFERENCE))
+                            .append(" ");
+                    constraints.append("-")
+                            .append(mappings.add(memoryState, inputPair.getSecond(), AtomType.MEM_TYPE_REFERENCE))
+                            .append(" 0\n");
                 }
             }
-
 
         }
         return constraints.toString();
@@ -738,5 +743,4 @@ public abstract class SLTLxTemplateFormula {
 
 }
 
-
-// pairs of inputs X1 X2  not ref(x1, O) or not ref(x2, O)
+// pairs of inputs X1 X2 not ref(x1, O) or not ref(x2, O)

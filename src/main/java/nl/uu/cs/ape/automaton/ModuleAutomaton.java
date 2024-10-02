@@ -95,7 +95,7 @@ public class ModuleAutomaton implements Automaton {
      * Gets state object which corresponds to the type and order number (w.r.t. the
      * type) of the state.
      * 
-     * @param typeDependantStateNumber - order number of the state within the type
+     * @param typeDependantStateNumber order number of the state within the type
      * @return State no {@code typeDependantStateNumber} of the type
      *         {@code usedTypeState}
      */

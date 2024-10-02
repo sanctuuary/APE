@@ -47,8 +47,8 @@ public class EnforceTypeRelatedRules {
      * (excluding abstract modules from the taxonomy) in each memory state
      * of @moduleAutomaton.
      * 
-     * @param pair          - pair of types from a dimension.
-     * @param typeAutomaton - System that represents states in the workflow
+     * @param pair          pair of types from a dimension.
+     * @param typeAutomaton System that represents states in the workflow
      * @return String representation of constraints.
      */
     public static Set<SLTLxFormula> memoryTypesMutualExclusion(Pair<PredicateLabel> pair, TypeAutomaton typeAutomaton) {
@@ -77,8 +77,8 @@ public class EnforceTypeRelatedRules {
      * (excluding abstract modules from the taxonomy) in each used state
      * of @moduleAutomaton.
      * 
-     * @param pair          - pair of types from a dimension.
-     * @param typeAutomaton - System that represents states in the workflow
+     * @param pair          pair of types from a dimension.
+     * @param typeAutomaton System that represents states in the workflow
      * @return String representation of constraints.
      */
     public static Set<SLTLxFormula> usedTypeMutualExclusion(Pair<PredicateLabel> pair, TypeAutomaton typeAutomaton) {
@@ -109,8 +109,8 @@ public class EnforceTypeRelatedRules {
      * state of @moduleAutomaton. It enforces that each type instance is either
      * defined on all the dimensions or is empty.
      *
-     * @param domainSetup   - Domain model
-     * @param typeAutomaton - System that represents states in the workflow
+     * @param domainSetup   Domain model
+     * @param typeAutomaton System that represents states in the workflow
      * @return String representation of constraints.
      */
     public static Set<SLTLxFormula> typeMandatoryUsage(APEDomainSetup domainSetup, TypeAutomaton typeAutomaton) {
@@ -158,8 +158,8 @@ public class EnforceTypeRelatedRules {
      * and it's valid in each state of @typeAutomaton. @emptyType denotes the type
      * that is being used if the state has no type.
      *
-     * @param allTypes      - Collection of all the types in the domain.
-     * @param typeAutomaton - System that represents states in the workflow
+     * @param allTypes      Collection of all the types in the domain.
+     * @param typeAutomaton System that represents states in the workflow
      * @return The String representation of constraints enforcing taxonomy
      *         classifications.
      */
@@ -187,9 +187,9 @@ public class EnforceTypeRelatedRules {
     /**
      * Supporting recursive method for typeEnforceTaxonomyStructure.
      * 
-     * @param currType    - Current type
-     * @param typeState   - Current type state
-     * @param typeElement - Current type element
+     * @param currType    Current type
+     * @param typeState   Current type state
+     * @param typeElement Current type element
      * @return Set of the corresponding SLTLx formulas
      */
     private static Set<SLTLxFormula> typeEnforceTaxonomyStructureForState(TaxonomyPredicate currType,

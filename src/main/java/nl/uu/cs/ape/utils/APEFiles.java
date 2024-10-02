@@ -54,8 +54,8 @@ public class APEFiles {
     /**
      * Verify and get full local path based based on the field.
      * 
-     * @param tag  - tag
-     * @param path - path
+     * @param tag  tag
+     * @param path path
      * @return Return the path to the file
      */
     private static Path getLocalPath(String tag, String path) {
@@ -80,7 +80,7 @@ public class APEFiles {
     /**
      * Verify whether the path is a valid local path.
      * 
-     * @param path - local path
+     * @param path local path
      * @return Return {@code true} if the local path exists, {@code false}
      *         otherwise.
      */
@@ -193,8 +193,8 @@ public class APEFiles {
     /**
      * Create a directory path if needed.
      * 
-     * @param tag  - tag used
-     * @param path - directory path
+     * @param tag  tag used
+     * @param path directory path
      */
     private static void createDirectory(String tag, Path path) throws APEConfigException {
 
@@ -305,7 +305,7 @@ public class APEFiles {
      * Read file content from the given path (local path or a public URL) and return
      * the content as a File object.
      * 
-     * @param filePath - Local path or a public URL with the content.
+     * @param filePath Local path or a public URL with the content.
      * @return File containing info provided at the path.
      * @throws IOException Exception in case of a badly formatted path or file.
      */
@@ -318,7 +318,7 @@ public class APEFiles {
     /**
      * Read content from a URL and return it as a file.
      * 
-     * @param fileUrl - URL of the content
+     * @param fileUrl URL of the content
      * @return File containing info provided at the URL.
      * @throws IOException Exception in case of a badly formatted URL or file.
      */
@@ -336,8 +336,8 @@ public class APEFiles {
      * Append text to the existing file. It adds the text at the end of the content
      * of the file.
      * 
-     * @param file    - existing file
-     * @param content - content that should be appended
+     * @param file    existing file
+     * @param content content that should be appended
      * @throws IOException          in case of an I/O error
      * @throws NullPointerException if the file is null
      */
@@ -352,8 +352,8 @@ public class APEFiles {
      * Append text to the existing file. It adds the text at the end of the content
      * of the file.
      * 
-     * @param file    - existing file
-     * @param content - content that should be appended
+     * @param file    existing file
+     * @param content content that should be appended
      * @throws IOException          in case of an I/O error
      * @throws NullPointerException if the file is null
      */
@@ -370,8 +370,8 @@ public class APEFiles {
      * Append text to the existing file. It adds the text at the end of the content
      * of the file.
      * 
-     * @param file        - existing file
-     * @param cnfEncoding - cnf clauses that should be appended
+     * @param file        existing file
+     * @param cnfEncoding cnf clauses that should be appended
      * @throws IOException          in case of an I/O error
      * @throws NullPointerException if the file is null
      */

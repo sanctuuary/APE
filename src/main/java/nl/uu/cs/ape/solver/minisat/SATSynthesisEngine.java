@@ -124,7 +124,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
      * @param allSolutions   Set of {@link SolutionWorkflow}.
      * @param runConfig      Setup configuration for the synthesis.
      * @param workflowLength Workflow length
-     * @throws IOException - Error if the temp file cannot be created
+     * @throws IOException Error if the temp file cannot be created
      */
     public SATSynthesisEngine(APEDomainSetup domainSetup, SolutionsList allSolutions,
             APERunConfig runConfig, int workflowLength) throws IOException {
@@ -444,7 +444,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
     /**
      * Delete all temporary files created.
      * 
-     * @throws IOException - Failed to delete temp files.
+     * @throws IOException Failed to delete temp files.
      */
     public void deleteTempFiles() throws IOException {
         try {

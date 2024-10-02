@@ -32,7 +32,7 @@ public class CNFClause {
 	/**
 	 * Create a clause that has only one element.
 	 * 
-	 * @param atom - integer that corresponds to the mapping of the atom
+	 * @param atom integer that corresponds to the mapping of the atom
 	 */
 	public CNFClause(Integer atom) {
 		super();
@@ -45,7 +45,7 @@ public class CNFClause {
 	 * collections of {@link CNFClause}s and combine them under the AND logic
 	 * operator.
 	 * 
-	 * @param facts - collections of 'collections of clauses' that are conjunct
+	 * @param facts collections of 'collections of clauses' that are conjunct
 	 * @return Set of {@link CNFClause}s that represent conjunction of the given
 	 *         collections of clauses.
 	 */
@@ -61,7 +61,7 @@ public class CNFClause {
 	 * collections of {@link CNFClause}s and combine them under the OR logic
 	 * operator.
 	 * 
-	 * @param facts - collections of 'collections of clauses' that are disjoint.
+	 * @param facts collections of 'collections of clauses' that are disjoint.
 	 * @return Set of {@link CNFClause}s that represent disjunction of the given
 	 *         collections of clauses.
 	 */
@@ -96,8 +96,8 @@ public class CNFClause {
 	 * Return a new clause that combines the two clauses. The method combines the 2
 	 * strings, each comprising disjoint Atoms.
 	 * 
-	 * @param clause1 - 1st clause that should be combined
-	 * @param clause2 - 2nd clause that should be combined
+	 * @param clause1 1st clause that should be combined
+	 * @param clause2 2nd clause that should be combined
 	 * @return String that represents the disjunction of the two clauses.
 	 */
 	public static String disjoin2Clauses(String clause1, String clause2) {

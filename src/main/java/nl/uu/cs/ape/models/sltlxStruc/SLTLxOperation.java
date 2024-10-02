@@ -53,8 +53,8 @@ public class SLTLxOperation extends SLTLxFormula {
 	 * Create the SLTLx object that enforces usage of the operation and the
 	 * corresponding inputs/outputs.
 	 * 
-	 * @param stateNo         - current state number
-	 * @param synthesisEngine - synthesis engine
+	 * @param stateNo         current state number
+	 * @param synthesisEngine synthesis engine
 	 * @return Fact representing the existence of the operation.
 	 */
 	private SLTLxFormula enforceOperation(int stateNo, SATSynthesisEngine synthesisEngine) {

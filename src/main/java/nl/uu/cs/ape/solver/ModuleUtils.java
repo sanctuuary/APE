@@ -83,7 +83,7 @@ public abstract class ModuleUtils {
 	 * Returns the representation of the input type constraints for all tools
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.
 	 * 
-	 * @param synthesisInstance - synthesis instance
+	 * @param synthesisInstance synthesis instance
 	 *
 	 * @return String representation of constraints.
 	 */
@@ -95,7 +95,7 @@ public abstract class ModuleUtils {
 	 * ensure that the {@link AtomType#MEM_TYPE_REFERENCE} are implemented
 	 * correctly.
 	 * 
-	 * @param synthesisInstance - synthesis instance
+	 * @param synthesisInstance synthesis instance
 	 *
 	 * @return String representing the constraints required to ensure that the
 	 *         {@link AtomType#MEM_TYPE_REFERENCE} are implemented correctly.
@@ -111,7 +111,7 @@ public abstract class ModuleUtils {
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton and
 	 * the Shared Memory Approach.
 	 * 
-	 * @param synthesisInstance - synthesis instance
+	 * @param synthesisInstance synthesis instance
 	 *
 	 * @return String representation of constraints.
 	 */
@@ -157,7 +157,7 @@ public abstract class ModuleUtils {
 	 * workflow inputs have to be used, then each of them has to be referenced at
 	 * least once.
 	 * 
-	 * @param synthesisInstance - synthesis instance
+	 * @param synthesisInstance synthesis instance
 	 *
 	 * @return String representation of constraints.
 	 */
@@ -168,7 +168,7 @@ public abstract class ModuleUtils {
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.<br>
 	 * Generate constraints that preserve tool outputs.
 	 * 
-	 * @param synthesisInstance - synthesis instance
+	 * @param synthesisInstance synthesis instance
 	 *
 	 * @return String representation of constraints.
 	 */

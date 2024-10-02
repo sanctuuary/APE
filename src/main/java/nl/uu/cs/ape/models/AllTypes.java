@@ -81,7 +81,7 @@ public class AllTypes extends AllPredicates {
     /**
      * Helper method that sets the type to be relevant in the current domain
      * 
-     * @param type - Type that should be relevant
+     * @param type Type that should be relevant
      */
     private void setRelevant(Type type) {
         type.setAsRelevantTaxonomyTerm(this);

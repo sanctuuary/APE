@@ -24,7 +24,7 @@ public class BioToolsAnnotationException extends RuntimeException {
 
     /**
      * Exception is thrown when a tool that does not have a data type of data specified in the bio.tools annotations.
-     * @param toolID - ID of the tool that does not have the data type specified.
+     * @param toolID ID of the tool that does not have the data type specified.
      * @return BioToolsAnnotationException with information that may help the user solve the problem.
      */
     public static BioToolsAnnotationException notExistingType(String toolID) {
@@ -33,7 +33,7 @@ public class BioToolsAnnotationException extends RuntimeException {
 
     /**
      * Exception is thrown when a tool that does not have a data format of data specified in the bio.tools annotations.
-     * @param toolID - ID of the tool that does not have the format specified.
+     * @param toolID ID of the tool that does not have the format specified.
      * @return BioToolsAnnotationException with information that may help the user solve the problem.
      */
     public static BioToolsAnnotationException notExistingFormat(String toolID) {

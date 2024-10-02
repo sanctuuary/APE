@@ -132,7 +132,7 @@ public class APEDomainSetup {
      * Add the String that corresponds to an SLTLx formula that should be parsed to
      * the list of constraints.
      * 
-     * @param formulaSLTLx - String that corresponds to an SLTLx formula that should
+     * @param formulaSLTLx String that corresponds to an SLTLx formula that should
      *                     be parsed
      */
     public void addSLTLxConstraint(String formulaSLTLx) {
@@ -565,9 +565,9 @@ public class APEDomainSetup {
     /**
      * Write locally the SAT (CNF) workflow specification in human readable format.
      * 
-     * @param satInputFile - File containing the SAT problem specification.
-     * @param mappings - Mappings between the SAT problem and the domain.
-     * @throws IOException - Error in writing the file to the local file system.
+     * @param satInputFile File containing the SAT problem specification.
+     * @param mappings Mappings between the SAT problem and the domain.
+     * @throws IOException Error in writing the file to the local file system.
      */
     public void localCNF(File satInputFile, SATAtomMappings mappings) throws IOException {
         if (writeLocalCNF != null) {

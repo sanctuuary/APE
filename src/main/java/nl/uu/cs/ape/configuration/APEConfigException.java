@@ -168,7 +168,7 @@ public class APEConfigException extends RuntimeException {
      * The annotated type (workflow input or output) is not defined within the
      * domain taxonomy.
      *
-     * @param typeID - ID of the data type not defined
+     * @param typeID ID of the data type not defined
      * @return Run configuration exception with information that may help the user
      *         solve the problem.
      */
