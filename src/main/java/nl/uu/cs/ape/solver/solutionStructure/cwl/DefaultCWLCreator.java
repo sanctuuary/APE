@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  * Class to generate a CWL workflow structure from a given workflow solution.
  */
 @Slf4j
-public class DefaultCWLCreator extends CWLCreatorBase {
+public class DefaultCWLCreator extends CWLWorkflowBase {
     /**
      * Maintain a list of the CWL parameter names which represent {@link TypeNode}s.
      * I.e. this hashmap has TypeNode IDs as keys and their names in the CWL file as
@@ -33,10 +33,6 @@ public class DefaultCWLCreator extends CWLCreatorBase {
         super(solution);
     }
 
-    @Override
-    public String getCWLVersion() {
-        return "v1.2";
-    }
 
     /**
      * Generates the CWL representation.

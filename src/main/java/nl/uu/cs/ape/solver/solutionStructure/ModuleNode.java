@@ -304,6 +304,8 @@ public class ModuleNode extends SolutionWorkflowNode {
 
     /**
      * Get id of the current workflow node.
+     * 
+     * @return ID of the current workflow node.
      */
     public String getNodeID() {
         StringBuilder printString = new StringBuilder();
@@ -315,6 +317,8 @@ public class ModuleNode extends SolutionWorkflowNode {
 
     /**
      * Get label of the current workflow node.
+     * 
+     * @return Label of the current workflow node.
      */
     public String getNodeLabel() {
         return this.usedModule.getPredicateLabel();
@@ -322,6 +326,8 @@ public class ModuleNode extends SolutionWorkflowNode {
 
     /**
      * Get label of the current workflow node as an HTML element.
+     * 
+     * @return HTML label of the current workflow node.
      */
     public String getNodeGraphLabel() {
         return "<b>" + this.usedModule.getPredicateLabel() + "</b>";
@@ -329,6 +335,8 @@ public class ModuleNode extends SolutionWorkflowNode {
 
     /**
      * Gets node descriptive label, containing module IDs.
+     * 
+     * @return The node descriptive label.
      */
     public String getNodeLongLabel() {
         return this.usedModule.getPredicateLongLabel();

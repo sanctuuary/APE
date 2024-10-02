@@ -15,6 +15,10 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.models.sltlxStruc.SLTLxFormula;
 import nl.uu.cs.ape.parserSLTLx.SLTLxSATVisitor;
 
+/**
+ * The {@code SatEncodingUtils} class is used to provide utility functions for
+ * encoding constraints in SAT.
+ */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SatEncodingUtils {
@@ -22,7 +26,7 @@ public class SatEncodingUtils {
     /**
      * Encode APE constraints string.
      * 
-     * @param synthesisEngine
+     * @param synthesisEngine the synthesis engine used to generate the CNF encoding
      *
      * @param domainSetup     Domain information, including all the existing tools
      *                        and types.

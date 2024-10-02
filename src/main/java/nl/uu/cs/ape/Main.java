@@ -6,6 +6,8 @@ import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.domain.BioToolsAPI;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.solver.solutionStructure.cwl.ToolCWLCreator;
+import nl.uu.cs.ape.models.Module;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONException;
@@ -29,8 +31,9 @@ public class Main {
      * The entry point of application when the library is used in a Command Line
      * Interface (CLI).
      *
-     * @param args APE expects the first argument to specify the method to be executed.
-     *            The rest of the arguments are provided depending on the method.
+     * @param args APE expects the first argument to specify the method to be
+     *             executed.
+     *             The rest of the arguments are provided depending on the method.
      */
     public static void main(String[] args) {
 
@@ -76,10 +79,24 @@ public class Main {
 
         try {
             JSONObject tool = BioToolsAPI.getAndConvertToolList(List.of(biotoolsID));
-            APEFiles.write2file(tool.toString(4), new File("./tool.json"), false);
+            APEFiles.write2file(tool.toString(4), new File("./" + biotoolsID + ".json"), false);
+
+            JSONObject toolAnnotation = tool.getJSONArray("functions").getJSONObject(0);
+            APE apeFramework = new APE(
+                    "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/proteomics/config.json");
+
+            Module cometModule = apeFramework.getDomainSetup()
+                    .updateModuleFromJson(toolAnnotation).get();
+
+            ToolCWLCreator toolCWLCreator = new ToolCWLCreator(cometModule);
+
+            APEFiles.write2file(toolCWLCreator.generate(), new File("./" + biotoolsID + ".cwl"), false);
+
         } catch (IOException e) {
             log.error("Error in fetching the tool from bio.tools.");
-            return;
+        } catch (OWLOntologyCreationException e) {
+            log.error(
+                    "Error in setting up the APE framework from the 'https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/proteomics/config.json' configuration.");
         }
 
     }
@@ -89,7 +106,7 @@ public class Main {
      * APE-compatible tool annotation format.
      * 
      * @param args The arguments provided to the method. Only one argument is
-     *            expected, the path to the file where the biotoolsIDs are stored. 
+     *             expected, the path to the file where the biotoolsIDs are stored.
      */
     public static void convertBioToolsAnnotations(String[] args) {
         if (args.length != 1) {
@@ -115,6 +132,7 @@ public class Main {
 
     /**
      * Executes the synthesis based on the provided configuration file.
+     * 
      * @param args The arguments provided to the method.
      */
     public static void executeSynthesis(String[] args) {

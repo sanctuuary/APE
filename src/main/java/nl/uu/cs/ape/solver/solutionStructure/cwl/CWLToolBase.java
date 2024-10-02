@@ -1,20 +1,30 @@
 package nl.uu.cs.ape.solver.solutionStructure.cwl;
 
 import nl.uu.cs.ape.solver.solutionStructure.ModuleNode;
-import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import nl.uu.cs.ape.models.AuxTypePredicate;
+import nl.uu.cs.ape.models.AuxiliaryPredicate;
+import nl.uu.cs.ape.models.Module;
+import nl.uu.cs.ape.models.Type;
+import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
  * Base class with shared behavior for CWL export classes.
  */
-public abstract class CWLCreatorBase {
+public abstract class CWLToolBase {
     /**
      * Cwl representation.
      */
     protected final StringBuilder cwlRepresentation;
     /**
-     * Solution.
+     * Tool depicted in the CWL file.
      */
-    protected SolutionWorkflow solution;
+    protected Module tool;
     /**
      * Indent style used.
      */
@@ -23,10 +33,10 @@ public abstract class CWLCreatorBase {
     /**
      * Generate the creator base from the workflow solution.
      * 
-     * @param solution - APE workflow solution
+     * @param tool APE workflow solution
      */
-    protected CWLCreatorBase(SolutionWorkflow solution) {
-        this.solution = solution;
+    protected CWLToolBase(Module tool) {
+        this.tool = tool;
         this.cwlRepresentation = new StringBuilder();
         this.indentStyle = IndentStyle.SPACES2;
     }
@@ -37,7 +47,7 @@ public abstract class CWLCreatorBase {
      * @param indentStyle The indentation style to use.
      * @return A reference to this CWLCreator.
      */
-    public CWLCreatorBase setIndentStyle(IndentStyle indentStyle) {
+    public CWLToolBase setIndentStyle(IndentStyle indentStyle) {
         this.indentStyle = indentStyle;
         return this;
     }
@@ -47,7 +57,9 @@ public abstract class CWLCreatorBase {
      * 
      * @return The required CWL version.
      */
-    public abstract String getCWLVersion();
+    public String getCWLVersion() {
+        return "v1.2";
+    }
 
     /**
      * Generates the CWL representation.
@@ -59,48 +71,90 @@ public abstract class CWLCreatorBase {
         generateTopComment();
 
         cwlRepresentation.append(String.format("cwlVersion: %s%n", getCWLVersion()));
-        cwlRepresentation.append("class: Workflow").append("\n");
+        cwlRepresentation.append("class: CommandLineTool").append("\n");
 
-        // Label and doc
-        cwlRepresentation.append("\n");
-        cwlRepresentation.append("label: ").append(getWorkflowName()).append("\n");
-        generateDoc();
+        cwlRepresentation.append("baseCommand: ").append(tool.getPredicateID()).append("\n");
+        cwlRepresentation.append("label: ").append(tool.getPredicateLabel()).append("\n");
+
+        // Add requirements (generic)
+        cwlRepresentation.append("requirements:\n");
+        cwlRepresentation.append("  ShellCommandRequirement: {}\n");
+        cwlRepresentation.append("  InitialWorkDirRequirement:\n");
+        cwlRepresentation.append("    listing:\n");
+
+        // Dynamically add inputs to InitialWorkDirRequirement listing
+        for (String input : this.getInputs().keySet()) {
+            cwlRepresentation.append("      - $(inputs.").append(input).append(")\n");
+        }
+
+        // Add DockerRequirement dynamically
+        cwlRepresentation.append("  DockerRequirement:\n");
+        cwlRepresentation.append("    dockerPull: fix-this-path/").append(tool.getPredicateLabel()).append("\n")
+                .append("\n");
 
         generateCWLRepresentation();
+
         return cwlRepresentation.toString();
+    }
+
+    /**
+     * Get the map of input names and their types.
+     * 
+     * @return The map of input names and their types.
+     */
+    protected Map<String, List<TaxonomyPredicate>> getInputs() {
+        int i = 0;
+        Map<String,  List<TaxonomyPredicate>> inputNames = new HashMap<>();
+        for (Type inType : tool.getModuleInput()) {
+            List<TaxonomyPredicate> formatType = new ArrayList<>();
+            if (inType instanceof AuxTypePredicate) {
+                formatType = extractFormat((AuxTypePredicate) inType);
+            }
+            
+            inputNames.put(tool.getPredicateLabel() + "_in_" + i++, formatType);
+
+        }
+        return inputNames;
+    }
+
+    private List<TaxonomyPredicate> extractFormat(AuxTypePredicate auxType) {
+        List<TaxonomyPredicate> formatTypes = new ArrayList<>();
+        for (TaxonomyPredicate subtype : auxType.getGeneralizedPredicates()) {
+            if (subtype instanceof AuxTypePredicate) {
+                formatTypes.addAll(extractFormat((AuxTypePredicate) subtype));
+            } else if (subtype.getRootNodeID().equals("http://edamontology.org/format_1915")) {
+                    formatTypes.add(subtype);
+            }
+        }
+        return formatTypes;
+    }
+
+    /**
+     * Get the map of input names and their types.
+     * 
+     * @return The map of input names and their types.
+     */
+    protected Map<String, List<TaxonomyPredicate>> getOutputs() {
+        int i = 0;
+        Map<String,  List<TaxonomyPredicate>> inputNames = new HashMap<>();
+        for (Type inType : tool.getModuleOutput()) {
+            List<TaxonomyPredicate> formatType = new ArrayList<>();
+            if (inType instanceof AuxTypePredicate) {
+                formatType = extractFormat((AuxTypePredicate) inType);
+            }
+            
+            inputNames.put(tool.getPredicateLabel() + "_out_" + i++, formatType);
+
+        }
+        return inputNames;
     }
 
     /**
      * Adds the comment at the top of the file.
      */
     protected void generateTopComment() {
-        cwlRepresentation.append(String.format("# %s%n", getWorkflowName()));
-        cwlRepresentation.append("# This workflow is generated by APE (https://github.com/sanctuuary/APE).\n");
-    }
-
-    /**
-     * Get the name of the workflow.
-     * 
-     * @return The name of the workflow.
-     */
-    private String getWorkflowName() {
-        return String.format("WorkflowNo_%o", solution.getIndex());
-    }
-
-    /**
-     * Generate the workflow description.
-     */
-    private void generateDoc() {
-        cwlRepresentation.append("doc: ");
-        cwlRepresentation.append("A workflow including the tool(s) ");
-        // List all used tools
-        for (ModuleNode moduleNode : solution.getModuleNodes()) {
-            cwlRepresentation
-                    .append(moduleNode.getNodeLabel())
-                    .append(", ");
-        }
-        deleteLastNCharactersFromCWL(2);
-        cwlRepresentation.append(".").append("\n").append("\n");
+        cwlRepresentation.append(
+                "# The template for this tool description is generated by APE (https://github.com/sanctuuary/APE).\n");
     }
 
     /**

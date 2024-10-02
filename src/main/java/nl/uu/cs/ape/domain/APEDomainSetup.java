@@ -332,7 +332,7 @@ public class APEDomainSetup {
      * @return {@code true} if the domain was updated, false otherwise.
      * @throws JSONException Error if the JSON file was not properly formatted.
      */
-    private boolean updateModuleFromJson(JSONObject jsonModule)
+    public Optional<Module> updateModuleFromJson(JSONObject jsonModule)
             throws JSONException, APEDimensionsException {
         String moduleIRI = APEUtils.createClassIRI(jsonModule.getString(ToolAnnotationTag.ID.toString()),
                 ontologyPrefixIRI);
@@ -385,13 +385,13 @@ public class APEDomainSetup {
             if (inputs.isEmpty() && outputs.isEmpty()) {
                 emptyTools.add(moduleLabel);
                 log.debug("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
-                return false;
+                return Optional.empty();
             }
 
         } catch (APEDimensionsException badDimension) {
             wrongToolIO.add(moduleLabel);
             log.warn("Operation '" + "' was not included." + badDimension.getMessage());
-            return false;
+            return Optional.empty();
         }
 
         /* Set the implementation cwl file reference of the module, if specified. */
@@ -420,7 +420,7 @@ public class APEDomainSetup {
         currModule.setModuleOutput(outputs);
         currModule.setAsRelevantTaxonomyTerm(allModules);
 
-        return currModule != null;
+        return Optional.of(currModule);
     }
 
     /**

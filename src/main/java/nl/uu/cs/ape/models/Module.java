@@ -166,8 +166,8 @@ public class Module extends AbstractModule {
     /**
      * Generate a taxonomy tool instance that is referenced in the json.
      * 
-     * @param jsonParam
-     * @param domainSetup
+     * @param jsonParam JSON object that contains the abstract module information.
+     * @param domainSetup APE domain information.
      * @return A AbstractModule object that represent the data instance given as the
      *         parameter.
      * @throws JSONException          if the given JSON is not well formatted
@@ -176,7 +176,7 @@ public class Module extends AbstractModule {
     public static AbstractModule taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup)
             throws JSONException {
         /* Set of predicates where each describes a type dimension */
-        SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<TaxonomyPredicate>();
+        SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<>();
         AllModules allModules = domainSetup.getAllModules();
         /* Iterate through each of the dimensions */
         for (String currRootLabel : jsonParam.keySet()) {
