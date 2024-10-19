@@ -5,11 +5,13 @@ import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
 import nl.uu.cs.ape.domain.BioToolsAPI;
 import nl.uu.cs.ape.utils.APEFiles;
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.solver.solutionStructure.cwl.ToolCWLCreator;
 import nl.uu.cs.ape.models.Module;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -17,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The entry point of application when the library is used in a Command Line
@@ -26,6 +29,8 @@ import java.util.List;
  */
 @Slf4j
 public class Main {
+
+    private static final String biotools_config_URL = "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/bio.tools/config.json";
 
     /**
      * The entry point of application when the library is used in a Command Line
@@ -78,25 +83,29 @@ public class Main {
         }
 
         try {
-            JSONObject tool = BioToolsAPI.getAndConvertToolList(List.of(biotoolsID));
-            APEFiles.write2file(tool.toString(4), new File("./" + biotoolsID + ".json"), false);
+            JSONArray tool = BioToolsAPI.getAndConvertToolList(List.of(biotoolsID)).getJSONArray("functions");
+            APEFiles.write2file(tool.toString(4), new File("./tool.json"), false);
+            for (JSONObject toolAnnotation : APEUtils.getJSONListFromJSONArray(tool)) {
+                APE apeFramework = new APE(biotools_config_URL);
 
-            JSONObject toolAnnotation = tool.getJSONArray("functions").getJSONObject(0);
-            APE apeFramework = new APE(
-                    "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/proteomics/config.json");
+                Optional<Module> cometModule = apeFramework.getDomainSetup()
+                        .updateModuleFromJson(toolAnnotation);
 
-            Module cometModule = apeFramework.getDomainSetup()
-                    .updateModuleFromJson(toolAnnotation).get();
+                if (cometModule.isEmpty()) {
+                    log.error(String.format("Error in defining '%s' tool using '%s' configuration.", biotoolsID,
+                            biotools_config_URL));
+                }
+                ToolCWLCreator toolCWLCreator = new ToolCWLCreator(cometModule.get());
 
-            ToolCWLCreator toolCWLCreator = new ToolCWLCreator(cometModule);
-
-            APEFiles.write2file(toolCWLCreator.generate(), new File("./" + biotoolsID + ".cwl"), false);
+                APEFiles.write2file(toolCWLCreator.generate(), new File("./" + toolAnnotation.getString("id") + ".cwl"), false);
+            }
+            
 
         } catch (IOException e) {
             log.error("Error in fetching the tool from bio.tools.");
         } catch (OWLOntologyCreationException e) {
-            log.error(
-                    "Error in setting up the APE framework from the 'https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/proteomics/config.json' configuration.");
+            log.error(String.format(
+                    "Error in setting up the APE framework from the %s configuration.", biotools_config_URL));
         }
 
     }

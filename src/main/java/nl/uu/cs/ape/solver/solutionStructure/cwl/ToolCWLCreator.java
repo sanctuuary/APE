@@ -71,8 +71,8 @@ public class ToolCWLCreator extends CWLToolBase {
             printString.append("\"").append(list.get(0).getPredicateLongLabel()).append("\" # ").append(list.get(0).getPredicateLabel()).append("\n");
         }
         if (list.size() > 1) {
-            log.warn("Multiple types for the same input/output are not supported.");
-            printString.append(ind(2)).append("doc: The I/O is annotated with multiple data formats in bio.tools. We specified here the first one, while the rest are part of tool.json file. Please check the instructions on how to handle such cases: https://workflomics.readthedocs.io/en/domain-creation/developer-guide/domain-development.html#id2 ");
+            log.info("Multiple formats for the same input/output are not supported.");
+            printString.append(ind(2)).append("doc: The I/O is annotated with multiple data formats in bio.tools. We specified here the first one, while the rest are part of tool.json file. Please check the instructions on how to handle such cases: https://workflomics.readthedocs.io/en/latest/domain-expert-guide/domain-development.html");
         }
 
         return printString.toString();

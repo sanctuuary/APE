@@ -1,7 +1,7 @@
 package nl.uu.cs.ape.test.sat.ape;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,22 +19,29 @@ class APEDomainSetupTest {
 
     @Test
     void updateModuleFromJsonTest() throws IOException, OWLOntologyCreationException {
-        List<String> toolIDs = List.of("comet");
+        List<String> toolIDs = List.of("Comet", "ape", "shic", "Jalview");
         JSONObject toolAnnotationJson = BioToolsAPI.getAndConvertToolList(toolIDs);
-        JSONObject comet = toolAnnotationJson.getJSONArray("functions").getJSONObject(0);
-        APE apeFramework = new APE(
-                "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/proteomics/config.json");
+        for (int i = 0; i < toolIDs.size(); i++) {
+            String biotoolsID = toolIDs.get(i);
+            JSONObject toolJson = toolAnnotationJson.getJSONArray("functions").getJSONObject(i);
 
 
-        Module cometModule = apeFramework.getDomainSetup()
-                .updateModuleFromJson(comet).get();
+            assertFalse(toolJson.isEmpty());
+            APE apeFramework = new APE(
+                    "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/bio.tools/config.json");
 
-        assertEquals("Comet", cometModule.getPredicateLabel());
+            Module currModule = apeFramework.getDomainSetup()
+                    .updateModuleFromJson(toolJson).get();
 
-        ToolCWLCreator toolCWLCreator = new ToolCWLCreator(cometModule);
-        String cwlRepresentation = toolCWLCreator.generate();
-        assertFalse(cwlRepresentation.isEmpty());
+            assertTrue(toolIDs.stream()
+                    .map(String::toLowerCase)
+                    .anyMatch(id -> id.equals(currModule.getPredicateLabel().toLowerCase())));
 
+            ToolCWLCreator toolCWLCreator = new ToolCWLCreator(currModule);
+            String cwlRepresentation = toolCWLCreator.generate();
+            assertFalse(cwlRepresentation.isEmpty());
+
+        }
 
     }
 }

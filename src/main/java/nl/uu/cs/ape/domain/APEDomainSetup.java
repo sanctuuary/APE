@@ -349,7 +349,7 @@ public class APEDomainSetup {
         for (String parentModule : taxonomyParentModules) {
             String parentModuleIRI = APEUtils.createClassIRI(parentModule, ontologyPrefixIRI);
             if (allModules.get(parentModuleIRI) == null) {
-                log.warn("Tool '" + moduleIRI + "' annotation issue. "
+                log.debug("Tool '" + moduleIRI + "' annotation issue. "
                         + "Referenced '" + ToolAnnotationTag.TAXONOMY_OPERATIONS.toString() + "': '" + parentModuleIRI
                         + "' cannot be found in the Tool Taxonomy.");
                 wrongToolTax.add(moduleLabel);
@@ -363,7 +363,7 @@ public class APEDomainSetup {
          * used as a parent class of the tool.
          */
         if (taxonomyParentModules.isEmpty()) {
-            log.warn("Tool '" + moduleIRI + "' annotation issue. "
+            log.debug("Tool '" + moduleIRI + "' annotation issue. "
                     + "None of the referenced '" + ToolAnnotationTag.TAXONOMY_OPERATIONS.toString()
                     + "' can be found in the Tool Taxonomy.");
             taxonomyParentModules.add(allModules.getRootModuleID());
@@ -384,13 +384,13 @@ public class APEDomainSetup {
 
             if (inputs.isEmpty() && outputs.isEmpty()) {
                 emptyTools.add(moduleLabel);
-                log.debug("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
+                log.debug("Operation '" + moduleLabel + "' was not included as it has no (valid) inputs and outputs specified.");
                 return Optional.empty();
             }
 
         } catch (APEDimensionsException badDimension) {
             wrongToolIO.add(moduleLabel);
-            log.warn("Operation '" + "' was not included." + badDimension.getMessage());
+            log.debug("Operation '" + moduleLabel + "' was not included. " + badDimension.getMessage());
             return Optional.empty();
         }
 

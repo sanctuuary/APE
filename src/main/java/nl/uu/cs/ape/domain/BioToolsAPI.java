@@ -264,6 +264,8 @@ public class BioToolsAPI {
 				Optional<JSONObject> apeToolJson = convertSingleBioTool2Ape(toolName, toolID, biotoolsID, function,
 						excludeBadAnnotation);
 				if (apeToolJson.isPresent()) {
+					JSONObject implementation = new JSONObject().put("cwl_reference", "PATH_TO_CWL_FILE.cwl");
+					apeToolJson.get().put("implementation", implementation);
 					apeToolsAnnotations.put(apeToolJson.get());
 					bioToolFunctions++;
 					functionNo++;
