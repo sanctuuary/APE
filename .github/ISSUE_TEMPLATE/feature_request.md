@@ -2,7 +2,8 @@
 name: Feature Request
 about: Suggest a new feature or enhancement for the APE library
 title: ''
-labels: 'enhancement'
+labels: enhancement
+
 assignees: ''
 
 ---
