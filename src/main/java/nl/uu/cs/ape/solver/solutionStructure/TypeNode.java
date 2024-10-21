@@ -4,7 +4,6 @@ import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Style;
-import guru.nidi.graphviz.attribute.Label.Justification;
 import guru.nidi.graphviz.model.Graph;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.State;
@@ -68,10 +67,10 @@ public class TypeNode extends SolutionWorkflowNode {
      */
     public TypeNode(State automatonState) throws ExceptionInInitializerError {
         super(automatonState);
-        this.usedTypes = new TreeSet<Type>();
-        this.abstractTypes = new TreeSet<Type>();
+        this.usedTypes = new TreeSet<>();
+        this.abstractTypes = new TreeSet<>();
         this.createdByModule = null;
-        usedByModules = new ArrayList<ModuleNode>();
+        usedByModules = new ArrayList<>();
         if (automatonState.getWorkflowStateType() != AtomType.MEMORY_TYPE) {
             throw new ExceptionInInitializerError(
                     "Class MemTypeNode can only be instantiated using State that is of type AtomType.MEMORY_TYPE, as a parameter.");

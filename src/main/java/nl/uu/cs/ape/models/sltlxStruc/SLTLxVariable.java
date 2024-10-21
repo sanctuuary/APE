@@ -31,7 +31,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	/**
 	 * Create new type state variable.
 	 * 
-	 * @param variableName - Unique variable name
+	 * @param variableName Unique variable name
 	 */
 	public SLTLxVariable(String variableName) {
 		super();
@@ -94,8 +94,8 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * existential
 	 * quantification for the given set of memory states.
 	 * 
-	 * @param stateNo         - current state in the SLTLx model
-	 * @param synthesisEngine - synthesis engine
+	 * @param stateNo         current state in the SLTLx model
+	 * @param synthesisEngine synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
 	public Set<String> getExistentialCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubstitutions,
@@ -126,8 +126,8 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * in order to ensure that all occurrences of the variable were taken into
 	 * account.</b>
 	 * 
-	 * @param stateNo         - current state in the SLTLx model
-	 * @param synthesisEngine - synthesis engine
+	 * @param stateNo         current state in the SLTLx model
+	 * @param synthesisEngine synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
 	public Set<String> getUniversalCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection variableSubstitutions,
@@ -158,8 +158,8 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * in order to ensure that all the occurrences of the variable were taken into
 	 * account.</b>
 	 * 
-	 * @param stateNo         - current state in the SLTLx model
-	 * @param synthesisEngine - synthesis engine
+	 * @param stateNo         current state in the SLTLx model
+	 * @param synthesisEngine synthesis engine
 	 * @return Set of clauses that encode the possible variable substitution.
 	 */
 	public Set<String> getVariableSubstitutionToPreserveProperties(int stateNo,
@@ -191,9 +191,9 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * Generate the rules that enforce substitution over the data properties.<br>
 	 * <i> e.g., (VAL(?x,a) => (P(?x) <=> P(a))</i>
 	 * 
-	 * @param variable              - the variable that will be substituted
-	 * @param variableSubstitutions - collection of substitutions for each variable
-	 * @param varOccurrences        - collection that tracks occurrences of
+	 * @param variable              the variable that will be substituted
+	 * @param variableSubstitutions collection of substitutions for each variable
+	 * @param varOccurrences        collection that tracks occurrences of
 	 *                              variables
 	 * @return Set of formulas that represent the encoding of the rules
 	 */
@@ -251,9 +251,9 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * Generate the rules that enforce substitution over binary predicates. <br>
 	 * <i> e.g., VAL(?x,a) & VAL(?y,b) => (R_v(x,y) <=> R(a,b)) </i>
 	 * 
-	 * @param pair                  - a pair of variables that will be substituted
-	 * @param variableSubstitutions - collection of substitutions for each variable
-	 * @param varOccurrences        - collection that tracks occurrences of
+	 * @param pair                  a pair of variables that will be substituted
+	 * @param variableSubstitutions collection of substitutions for each variable
+	 * @param varOccurrences        collection that tracks occurrences of
 	 *                              variables
 	 * @return Set of formulas that represent the encoding of the rules
 	 */
@@ -311,7 +311,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * on the type of the one
 	 * containing the variable.
 	 * 
-	 * @param atomVarType - type of the atom containing a variable
+	 * @param atomVarType type of the atom containing a variable
 	 * @return Type of the new atom as long as the substitution is applicable,
 	 *         {@code null} otherwise.
 	 */
@@ -332,7 +332,7 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 	 * include all the existing data objects
 	 * including those that will be the output of the next operation.
 	 * 
-	 * @param stateNo         - current state in the SLTLx model
+	 * @param stateNo         current state in the SLTLx model
 	 * @param synthesisEngine
 	 * @return
 	 */
@@ -349,7 +349,14 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		return variableDomain;
 	}
 
-	public Set<String> getVariableMutualExclusion(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
+	/**
+	 * Get the set of clauses that enforce that the a variable cannot reference two different data instances. 
+	 * @param stateNo current state in the SLTLx model
+	 * @param variableMapping collection of substitutions for each variable
+	 * @param synthesisEngine synthesis engine
+	 * @return Set of clauses that encode the possible variable substitution.
+	 */
+	public Set<String> getVariableUniqueSubstitution(int stateNo, SLTLxVariableSubstitutionCollection variableMapping,
 			SATSynthesisEngine synthesisEngine) {
 		Set<String> allClauses = new HashSet<>();
 		/**
@@ -357,10 +364,10 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 		 * and thus we use the next state to get the domain of the variable.
 		 */
 		int nextStateNo = stateNo + 1;
-		Set<Pair<PredicateLabel>> statePairs = APEUtils
+		Set<Pair<State>> statePairs = APEUtils
 				.getUniquePairs(synthesisEngine.getTypeAutomaton().getAllMemoryStatesUntilBlockNo(nextStateNo));
 
-		statePairs.forEach(statePair -> {
+		statePairs.forEach(statePair -> 
 			allClauses.addAll(
 					new SLTLxNegatedConjunction(
 							new SLTLxAtomVar(
@@ -371,8 +378,8 @@ public class SLTLxVariable implements StateInterface, PredicateLabel {
 									AtomVarType.VAR_VALUE,
 									statePair.getSecond(),
 									this))
-							.getCNFEncoding(stateNo, variableMapping, synthesisEngine));
-		});
+							.getCNFEncoding(stateNo, variableMapping, synthesisEngine))
+		);
 
 		return allClauses;
 	}

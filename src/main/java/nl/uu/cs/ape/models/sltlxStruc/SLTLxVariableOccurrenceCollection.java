@@ -45,8 +45,8 @@ public class SLTLxVariableOccurrenceCollection {
 	/**
 	 * Associate the data type to the corresponding variable.
 	 * 
-	 * @param dataType      - state property
-	 * @param variableState - variable used
+	 * @param dataType      state property
+	 * @param variableState variable used
 	 * @return {@code true} if the property was associated with the variable,
 	 *         {@code false} otherwise.
 	 */
@@ -65,8 +65,8 @@ public class SLTLxVariableOccurrenceCollection {
 	/**
 	 * Associate the tool input state to the corresponding variable.
 	 * 
-	 * @param usedState     - state that represents data input
-	 * @param variableState - variable used
+	 * @param usedState     state that represents data input
+	 * @param variableState variable used
 	 * @return {@code true} if the state was associated with the variable,
 	 *         {@code false} otherwise.
 	 */
@@ -86,8 +86,8 @@ public class SLTLxVariableOccurrenceCollection {
 	 * Associate the pair of variables (the order of the variables matter) with the
 	 * type of atom they are used in.
 	 * 
-	 * @param varPair - pair of the variables used
-	 * @param relType - Atom type that has the pair of variables as arguments
+	 * @param varPair pair of the variables used
+	 * @param relType Atom type that has the pair of variables as arguments
 	 */
 	public void addBinaryPred(Pair<SLTLxVariable> varPair, AtomVarType relType) {
 		if (relType.equals(AtomVarType.VAR_VALUE)) {
@@ -109,7 +109,7 @@ public class SLTLxVariableOccurrenceCollection {
 		if (this.variablePairs.get(varPair.getSecond()) == null) {
 			// create the second element mapping as it did not occur earlier (and add the
 			// first element)
-			Set<Pair<SLTLxVariable>> vars = new HashSet<Pair<SLTLxVariable>>();
+			Set<Pair<SLTLxVariable>> vars = new HashSet<>();
 			vars.add(varPair);
 			this.variablePairs.put(varPair.getSecond(), vars);
 		} else {
@@ -132,7 +132,7 @@ public class SLTLxVariableOccurrenceCollection {
 	/**
 	 * Get all data types that include the given variable.
 	 * 
-	 * @param satVariable - the given variable
+	 * @param satVariable the given variable
 	 * @return Set (possibly empty) of memory references that are mentioned in
 	 *         combination with the given variable.
 	 */
@@ -144,7 +144,7 @@ public class SLTLxVariableOccurrenceCollection {
 	/**
 	 * Get all memory references that include the given variable.
 	 * 
-	 * @param satVariable - the given variable
+	 * @param satVariable the given variable
 	 * @return Set (possibly empty) of memory references that are mentioned in
 	 *         combination with the given variable.
 	 */
@@ -157,7 +157,7 @@ public class SLTLxVariableOccurrenceCollection {
 	 * Get all binary relations that include the given variable pair as arguments
 	 * (in the given order).
 	 * 
-	 * @param varPair - the given variable pair
+	 * @param varPair the given variable pair
 	 * @return Set (possibly empty) of binary predicates that were used over the
 	 *         variable pair.
 	 */
@@ -170,7 +170,7 @@ public class SLTLxVariableOccurrenceCollection {
 	 * Return the set of pairs that are used in the formulas, where the given
 	 * variable is one of the two in pair.
 	 * 
-	 * @param variable - variable that is in the pairs
+	 * @param variable variable that is in the pairs
 	 * @return Set of Pair objects that are used in the formulas that contain the
 	 *         given variable.
 	 */

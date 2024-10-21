@@ -120,7 +120,7 @@ public final class APEUtils {
 			Object tmp = jsonObject.get(key);
 			try {
 				if (tmp instanceof JSONArray) {
-					jsonList = getListFromJsonList((JSONArray) tmp, clazz);
+					jsonList = getListFromJSONArray((JSONArray) tmp, clazz);
 				} else {
 					T element = (T) tmp;
 					jsonList.add(element);
@@ -139,6 +139,23 @@ public final class APEUtils {
 	}
 
 	/**
+	 * The method return a list of {@link JSONObject} elements that correspond to
+	 * the value of a given key in the given json object. If the key corresponds to
+	 * a {@link JSONArray} all the elements are put in a {@link List}, otherwise if
+	 * the key corresponds to a {@link JSONObject} list will contain only that
+	 * object.
+	 * 
+	 * @param jsonObject {@link JSONObject} that is being explored.
+	 * @param key        Key label that corresponds to the elements.
+	 * 
+	 * @return List of elements that corresponds to the key. If the key does not
+	 *         exists returns empty list.
+	 */
+	public static List<JSONObject> getJSONListFromJson(JSONObject jsonObject, String key) {
+		return getListFromJson(jsonObject, key, JSONObject.class);
+	}
+
+	/**
 	 * The method converts the {@link JSONArray} object to {@link List} of objects
 	 * of the given structure.
 	 *
@@ -148,13 +165,24 @@ public final class APEUtils {
 	 * @return List of objects of type {@link T}.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> getListFromJsonList(JSONArray jsonArray, Class<T> clazz) {
+	public static <T> List<T> getListFromJSONArray(JSONArray jsonArray, Class<T> clazz) {
 		List<T> newList = new ArrayList<>();
 		for (int i = 0; i < jsonArray.length(); i++) {
 			T element = (T) jsonArray.get(i);
 			newList.add(element);
 		}
 		return newList;
+	}
+
+	/**
+	 * The method converts the {@link JSONArray} object to {@link List} of
+	 * {@link JSONObject} objects.
+	 *
+	 * @param jsonArray JSON array object.
+	 * @return List of {@link JSONObject} objects.
+	 */
+	public static List<JSONObject> getJSONListFromJSONArray(JSONArray jsonArray) {
+		return getListFromJSONArray(jsonArray, JSONObject.class);
 	}
 
 	/**
@@ -567,7 +595,7 @@ public final class APEUtils {
 	/**
 	 * Clone the given JSON object
 	 * 
-	 * @param original - original JSON object
+	 * @param original original JSON object
 	 * @return copy of the original JSONObject.
 	 */
 	public static JSONObject clone(JSONObject original) {
@@ -577,7 +605,7 @@ public final class APEUtils {
 	/**
 	 * Count the number of lines in a file.
 	 * 
-	 * @param cnfEncoding - file to count lines
+	 * @param cnfEncoding file to count lines
 	 * @return number of lines
 	 */
 	public static int countLines(File cnfEncoding) {
@@ -597,7 +625,7 @@ public final class APEUtils {
 	 * Visualises in the command line the memory status of the VM at the given step,
 	 * if debug mode is on.
 	 * 
-	 * @param debugMode - true if debug mode is on
+	 * @param debugMode true if debug mode is on
 	 */
 	public static void printMemoryStatus(boolean debugMode) {
 		if (!debugMode) {
@@ -619,23 +647,23 @@ public final class APEUtils {
 	/**
 	 * Get all unique pairs of PredicateLabels within the collection.
 	 * 
-	 * @param set - Set of PredicateLabel that should be used to create the pairs
+	 * @param <T> The type that extends PredicateLabel
+	 * @param set Set of PredicateLabel that should be used to create the pairs
 	 * @return Set of unique pairs.
 	 */
-	public static Set<Pair<PredicateLabel>> getUniquePairs(Collection<? extends PredicateLabel> set) {
-		Set<Pair<PredicateLabel>> pairs = new HashSet<>();
+	public static <T extends PredicateLabel> Set<Pair<T>> getUniquePairs(Collection<T> set) {
+		Set<Pair<T>> pairs = new HashSet<>();
 		set.stream().forEach(ele1 -> set.stream().filter(ele2 -> ele1.compareTo(ele2) < 0)
 				.forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
-
 	}
 
 	/**
 	 * Get unique pairs of elements within 2 collections.
 	 * 
-	 * @param set1 - Set of elements that should be used to create the first
+	 * @param set1 Set of elements that should be used to create the first
 	 *             elements of the pairs
-	 * @param set2 - Set of elements that should be used to create the second
+	 * @param set2 Set of elements that should be used to create the second
 	 *             elements of the pairs
 	 * @return Set of unique pairs.
 	 */
@@ -643,6 +671,26 @@ public final class APEUtils {
 		Set<Pair<T>> pairs = new HashSet<>();
 		set1.stream().forEach(ele1 -> set2.stream().forEach(ele2 -> pairs.add(new Pair<>(ele1, ele2))));
 		return pairs;
+	}
+
+	/**
+	 * Generates a list of distinct pairs of integers where the first element is
+	 * smaller than the second.
+	 * Each pair is generated up to the specified maximum number (exclusive).
+	 *
+	 * @param maxNumber The exclusive upper bound for generating pairs.
+	 * @return List of distinct pairs of integers.
+	 */
+	public static List<Pair<Integer>> generateDistinctPairs(int maxNumber) {
+		List<Pair<Integer>> distinctPairs = new ArrayList<>();
+
+		for (int first = 0; first < maxNumber - 1; first++) {
+			for (int second = first + 1; second < maxNumber; second++) {
+				distinctPairs.add(new Pair<>(first, second));
+			}
+		}
+
+		return distinctPairs;
 	}
 
 }

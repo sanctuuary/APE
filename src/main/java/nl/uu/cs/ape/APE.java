@@ -1,22 +1,17 @@
 package nl.uu.cs.ape;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.SortedSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.yaml.snakeyaml.Yaml;
 
-import guru.nidi.graphviz.attribute.For;
 import guru.nidi.graphviz.attribute.Rank.RankDir;
 import guru.nidi.graphviz.engine.Format;
 import lombok.extern.slf4j.Slf4j;

@@ -92,7 +92,7 @@ public class ModuleNode extends SolutionWorkflowNode {
     /**
      * Set module/tool that defines this step in the workflow.
      *
-     * @param module - tool provided by the tool/module annotations.
+     * @param module tool provided by the tool/module annotations.
      */
     public void setUsedModule(Module module) {
         this.usedModule = module;
@@ -102,7 +102,7 @@ public class ModuleNode extends SolutionWorkflowNode {
      * Add the abstract module to the list of modules that describes the tool
      * instance.
      *
-     * @param abstractModule - abstract type that describes the instance.
+     * @param abstractModule abstract type that describes the instance.
      */
     public void addAbstractDescriptionOfUsedType(AbstractModule abstractModule) {
         if (!abstractModule.isSimplePredicate()) {
@@ -304,6 +304,8 @@ public class ModuleNode extends SolutionWorkflowNode {
 
     /**
      * Get id of the current workflow node.
+     * 
+     * @return ID of the current workflow node.
      */
     public String getNodeID() {
         StringBuilder printString = new StringBuilder();
@@ -315,6 +317,8 @@ public class ModuleNode extends SolutionWorkflowNode {
 
     /**
      * Get label of the current workflow node.
+     * 
+     * @return Label of the current workflow node.
      */
     public String getNodeLabel() {
         return this.usedModule.getPredicateLabel();
@@ -322,6 +326,8 @@ public class ModuleNode extends SolutionWorkflowNode {
 
     /**
      * Get label of the current workflow node as an HTML element.
+     * 
+     * @return HTML label of the current workflow node.
      */
     public String getNodeGraphLabel() {
         return "<b>" + this.usedModule.getPredicateLabel() + "</b>";
@@ -329,6 +335,8 @@ public class ModuleNode extends SolutionWorkflowNode {
 
     /**
      * Gets node descriptive label, containing module IDs.
+     * 
+     * @return The node descriptive label.
      */
     public String getNodeLongLabel() {
         return this.usedModule.getPredicateLongLabel();

@@ -228,6 +228,13 @@ public class ConstraintFactory {
 		addConstraintTemplate(currTemplate);
 
 		/*
+		 * ID: unique_inputs
+		 */
+		currTemplate = new ConstraintUnique_Inputs("unique_inputs", moduleParam1,
+				"All inputs per tool must be unique.");
+		addConstraintTemplate(currTemplate);
+
+		/*
 		 * ID: gen_t
 		 * 
 		 * currTemplate = new ConstraintGenType("gen_t", typeParam1,
@@ -944,4 +951,36 @@ public class ConstraintFactory {
 					mappings);
 		}
 	}
+
+	/**
+	 * Implements constraints of the form:<br>
+	 * All inputs per tool should be unique.
+	 * {@link #getConstraint}.
+	 */
+	public class ConstraintUnique_Inputs extends ConstraintTemplate {
+		/**
+		 * Instantiates a new Constraint use type.
+		 *
+		 * @param id           the id
+		 * @param parametersNo the parameters no
+		 * @param description  the description
+		 */
+		protected ConstraintUnique_Inputs(String id, List<ConstraintTemplateParameter> parametersNo,
+				String description) {
+			super(id, parametersNo, description);
+		}
+
+		@Override
+		public String getConstraint(List<TaxonomyPredicate> parameters, APEDomainSetup domainSetup,
+				ModuleAutomaton moduleAutomaton, TypeAutomaton typeAutomaton, SATAtomMappings mappings) {
+			if (parameters.size() != this.getNoOfParameters()) {
+				super.throwParametersError(parameters.size());
+				return null;
+			}
+
+			return SLTLxTemplateFormula.useUniqueInputs(moduleAutomaton,
+					typeAutomaton, mappings);
+		}
+	}
+
 }

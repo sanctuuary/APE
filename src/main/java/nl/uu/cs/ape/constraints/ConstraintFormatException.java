@@ -22,7 +22,7 @@ public class ConstraintFormatException extends RuntimeException {
      /**
       * Exception is thrown when a constraint is given wrong number of arguments.
       * 
-      * @param message - Application specific message that may help the user solve
+      * @param message Application specific message that may help the user solve
       *                the problem.
       * @return Constraint exception with information that may help the user solve
       *         the problem.
@@ -36,7 +36,7 @@ public class ConstraintFormatException extends RuntimeException {
      /**
       * Exception is thrown when a constraint is given wrong number of arguments.
       * 
-      * @param message - Application specific message that may help the user solve
+      * @param message Application specific message that may help the user solve
       *                the problem.
       * @return Constraint exception with information that may help the user solve
       *         the problem.
@@ -48,7 +48,7 @@ public class ConstraintFormatException extends RuntimeException {
      /**
       * Exception is thrown when a constraint is given wrong number of arguments.
       * 
-      * @param message - Application specific message that may help the user solve
+      * @param message Application specific message that may help the user solve
       *                the problem.
       * @return Constraint exception with information that may help the user solve
       *         the problem.
@@ -61,7 +61,7 @@ public class ConstraintFormatException extends RuntimeException {
      /**
       * Exception is thrown when a constraint is given wrong number of arguments.
       * 
-      * @param message - Application specific message that may help the user solve
+      * @param message Application specific message that may help the user solve
       *                the problem.
       * @return Constraint exception with information that may help the user solve
       *         the problem.
@@ -74,7 +74,7 @@ public class ConstraintFormatException extends RuntimeException {
      /**
       * Exception is thrown when a constraint is given wrong number of arguments.
       * 
-      * @param message - Application specific message that may help the user solve
+      * @param message Application specific message that may help the user solve
       *                the problem.
       * @return Constraint exception with information that may help the user solve
       *         the problem.
@@ -88,7 +88,7 @@ public class ConstraintFormatException extends RuntimeException {
      /**
       * Exception is thrown when a constraint is given wrong number of arguments.
       * 
-      * @param message - Application specific message that may help the user solve
+      * @param message Application specific message that may help the user solve
       *                the problem.
       * @return Constraint exception with information that may help the user solve
       *         the problem.

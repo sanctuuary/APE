@@ -24,7 +24,7 @@ public class SLTLxParsingAnnotationException extends RuntimeException {
      * Exception is thrown when the specified SLTLx formula contains a type not
      * specified in the type taxonomy.
      * 
-     * @param message - Application specific message that may help the user solve
+     * @param message Application specific message that may help the user solve
      *                the problem.
      * @return SLTLx Parsing exception with information that may help the user solve
      *         the problem.
@@ -39,7 +39,7 @@ public class SLTLxParsingAnnotationException extends RuntimeException {
      * Exception is thrown when the specified SLTLx formula contains a module not
      * specified in the type taxonomy.
      * 
-     * @param message - Application specific message that may help the user solve
+     * @param message Application specific message that may help the user solve
      *                the problem.
      * @return SLTLx Parsing exception with information that may help the user solve
      *         the problem.
@@ -54,7 +54,7 @@ public class SLTLxParsingAnnotationException extends RuntimeException {
      * Exception is thrown when the specified SLTLx formula contains a free
      * variable.
      * 
-     * @param message - Application specific message that may help the user solve
+     * @param message Application specific message that may help the user solve
      *                the problem.
      * @return SLTLx Parsing exception with information that may help the user solve
      *         the problem.

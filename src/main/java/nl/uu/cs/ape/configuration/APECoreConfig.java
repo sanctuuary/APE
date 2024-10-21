@@ -225,7 +225,7 @@ public class APECoreConfig {
      * and data terms. Validation will simply check the format of the ontology and
      * the existence of the mentioned classes.
      * 
-     * @param ontologyFile       - ontology file
+     * @param ontologyFile       ontology file
      * @param ontologyPrefixIRI  Prefix used to define OWL class IDs
      * @param toolTaxonomyRoot   Node in the ontology that corresponds to the root
      *                           of the module taxonomy.
@@ -259,7 +259,7 @@ public class APECoreConfig {
     /**
      * Set ontology annotation.
      * 
-     * @param ontology - ontology file
+     * @param ontology ontology file
      */
     public void setOntologyFile(File ontology) {
         ONTOLOGY.setValue(ontology);
@@ -304,7 +304,7 @@ public class APECoreConfig {
     /**
      * Set tool annotations.
      * 
-     * @param toolAnnotations - tool annotations file
+     * @param toolAnnotations tool annotations file
      *
      */
     public void setToolAnnotationsFile(File toolAnnotations) {

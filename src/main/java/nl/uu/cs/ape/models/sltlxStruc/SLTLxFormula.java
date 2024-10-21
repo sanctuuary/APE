@@ -24,16 +24,16 @@ public abstract class SLTLxFormula implements SLTLxElem {
 	 * Encode a collection of SLTLx formulas to CNF and append it to the existing
 	 * CNF file. It adds the encoding at the end of the content of the file.
 	 * 
-	 * @param file            - existing cnf file
+	 * @param file            existing cnf file
 	 * @param synthesisEngine synthesis engine used for encoding
-	 * @param formulas        - collection of formulas that should be encoded
+	 * @param formulas        collection of formulas that should be encoded
 	 * @throws IOException Thrown in case of an I/O error.
 	 */
 	public static void appendCNFToFile(File file, SATSynthesisEngine synthesisEngine, Collection<SLTLxFormula> formulas)
 			throws IOException {
 		StringBuilder cnf = new StringBuilder();
 		createCNFEncoding(formulas, 0, synthesisEngine)
-				.forEach(clause -> cnf.append(clause));
+				.forEach(cnf::append);
 		APEFiles.appendToFile(file, cnf.toString());
 	}
 
@@ -41,8 +41,8 @@ public abstract class SLTLxFormula implements SLTLxElem {
 	 * Create the CNF encoding of the facts and return the set of corresponding
 	 * clauses in String format.
 	 * 
-	 * @param facts           - all facts that should be encoded
-	 * @param synthesisEngine - synthesis engine used for encoding
+	 * @param facts           all facts that should be encoded
+	 * @param synthesisEngine synthesis engine used for encoding
 	 * @return Set of clauses in String format that encode the given collector of
 	 *         formulas.
 	 */

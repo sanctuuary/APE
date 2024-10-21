@@ -646,8 +646,6 @@ public class APERunConfig {
 
         IBuildStage withNoCWL(int noCWL);
 
-        IBuildStage withNoExecutableCWL(int noExecutableCWL);
-
         IBuildStage withProgramInputs(List<Type> programInputs);
 
         IBuildStage withProgramOutputs(List<Type> programOutputs);
@@ -678,7 +676,6 @@ public class APERunConfig {
         private int noExecutions;
         private int noGraphs;
         private int noCWL;
-        private int noExecutableCWL;
         private List<Type> programInputs = Collections.emptyList();
         private List<Type> programOutputs = Collections.emptyList();
         private ConfigEnum useWorkflowInput;
@@ -746,12 +743,6 @@ public class APERunConfig {
         @Override
         public IBuildStage withNoCWL(int noCWL) {
             this.noCWL = noCWL;
-            return this;
-        }
-
-        @Override
-        public IBuildStage withNoExecutableCWL(int noExecutableCWL) {
-            this.noExecutableCWL = noExecutableCWL;
             return this;
         }
 

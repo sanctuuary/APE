@@ -26,7 +26,7 @@ public class APEDimensionsException extends RuntimeException {
      * Exception is thrown when the dimensions described in the OWL file have
      * overlaps.
      * 
-     * @param message - Application specific message that may help the user solve
+     * @param message Application specific message that may help the user solve
      *                the problem.
      * @return Dimensions exception with information that may help the user solve
      *         the problem.
@@ -38,7 +38,7 @@ public class APEDimensionsException extends RuntimeException {
     /**
      * Exception is thrown when a dimension expected does not exist.
      * 
-     * @param message - Application specific message that may help the user solve
+     * @param message Application specific message that may help the user solve
      *                the problem.
      * @return Dimensions exception with information that may help the user solve
      *         the problem.
@@ -50,7 +50,7 @@ public class APEDimensionsException extends RuntimeException {
     /**
      * Exception is thrown when a dimension does not contain the specified subclass.
      * 
-     * @param message - Application specific message that may help the user solve
+     * @param message Application specific message that may help the user solve
      *                the problem.
      * @return Dimensions exception with information that may help the user solve
      *         the problem.

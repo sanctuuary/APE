@@ -64,6 +64,8 @@ public interface SynthesisEngine {
 
 	/**
 	 * Delete all temp files generated.
+	 * 
+	 * @throws IOException the io exception if the files cannot be deleted.
 	 */
 	public void deleteTempFiles() throws IOException;
 

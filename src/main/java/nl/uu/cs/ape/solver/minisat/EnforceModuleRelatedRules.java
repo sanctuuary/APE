@@ -126,7 +126,7 @@ public final class EnforceModuleRelatedRules {
 	 * Function returns the encoding that ensures that identity relation (IS)
 	 * among data objects is preserved.
 	 * 
-	 * @param typeAutomaton - collection of states representing the data objects in
+	 * @param typeAutomaton collection of states representing the data objects in
 	 *                      the workflow
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
@@ -564,7 +564,7 @@ public final class EnforceModuleRelatedRules {
 	 * Generate constraints that ensure that the relations (e.g., identity relation
 	 * (IS)) are reflexive.
 	 * 
-	 * @param binRel - binary relation that is reflexive
+	 * @param binRel binary relation that is reflexive
 	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
@@ -598,7 +598,7 @@ public final class EnforceModuleRelatedRules {
 	 * (IS)) are an identity.
 	 * Forall X,Y IS(X,Y) IFF
 	 * 
-	 * @param binRel - binary relation that is reflexive
+	 * @param binRel binary relation that is reflexive
 	 * 
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
@@ -650,8 +650,8 @@ public final class EnforceModuleRelatedRules {
 	 * Function returns the encoding that ensures that the relation (e.g., ancestor
 	 * relation (R)) is transitive.
 	 * 
-	 * @param binRel        - relation that is transitive
-	 * @param typeAutomaton - system that represents states in the workflow
+	 * @param binRel        relation that is transitive
+	 * @param typeAutomaton system that represents states in the workflow
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	private static Set<SLTLxFormula> relationalTransitivity(AtomType binRel, TypeAutomaton typeAutomaton) {
@@ -688,8 +688,8 @@ public final class EnforceModuleRelatedRules {
 	 * Function returns the encoding that ensures that
 	 * the relation (e.g., identity relations (IS)) is symmetrical.
 	 * 
-	 * @param binRel        - binary relation that is symmetrical
-	 * @param typeAutomaton - system that represents states in the workflow
+	 * @param binRel        binary relation that is symmetrical
+	 * @param typeAutomaton system that represents states in the workflow
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
 	private static Set<SLTLxFormula> relationalSymmetry(AtomType binRel, TypeAutomaton typeAutomaton) {
@@ -722,7 +722,7 @@ public final class EnforceModuleRelatedRules {
 	 * workflow inputs have to be used, then each of them has to be referenced at
 	 * least once.
 	 * 
-	 * @param synthesisInstance - instance of the synthesis engine
+	 * @param synthesisInstance instance of the synthesis engine
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */
@@ -838,7 +838,7 @@ public final class EnforceModuleRelatedRules {
 	 * regarding @typeAutomaton, for the synthesis concerning @moduleAutomaton.<br>
 	 * Generate constraints that preserve tool outputs.
 	 * 
-	 * @param synthesisInstance - instance of the synthesis engine
+	 * @param synthesisInstance instance of the synthesis engine
 	 *
 	 * @return Set of SLTLx formulas that represent the constraints.
 	 */

@@ -308,7 +308,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @param allPredicates Set of all the predicates.
      */
     public void printTree(String str, AllPredicates allPredicates) {
-        log.debug(str + toShortString() + "[" + getNodeType() + "]");
+        log.info(str + toShortString() + "[" + getNodeType() + "]");
         for (TaxonomyPredicate predicate : APEUtils.safe(this.subPredicates)) {
             predicate.printTree(str + ". ", allPredicates);
         }
@@ -397,7 +397,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * Returns true if the type is a simple/leaf type, otherwise returns false - the
      * type is an abstract (non-leaf) type.
      * 
-     * @param nodeType - node type
+     * @param nodeType NodeType that is checked against the current node.
      *
      * @return true (simple/primitive/leaf type) or false (abstract/non-leaf type).
      */

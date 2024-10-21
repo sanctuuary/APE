@@ -25,8 +25,8 @@ public abstract class SLTLxVarQuantification extends SLTLxFormula {
 	@Override
 	public Set<String> getCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection newVarMapping,
 			SATSynthesisEngine synthesisEngine) {
-		Set<String> clauses = new HashSet<String>();
-		SLTLxVariable flatBoundVariable = newVarMapping.getVarSabstitute(boundVariable);
+		Set<String> clauses = new HashSet<>();
+		SLTLxVariable flatBoundVariable = newVarMapping.getVarSubstitute(boundVariable);
 		/** Encode the underlying formula. */
 		clauses.addAll(formula.getCNFEncoding(stateNo, newVarMapping, synthesisEngine));
 		/**
@@ -37,7 +37,7 @@ public abstract class SLTLxVarQuantification extends SLTLxFormula {
 		 */
 		clauses.addAll(flatBoundVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMapping,
 				synthesisEngine));
-		clauses.addAll(flatBoundVariable.getVariableMutualExclusion(stateNo, newVarMapping, synthesisEngine));
+		clauses.addAll(flatBoundVariable.getVariableUniqueSubstitution(stateNo, newVarMapping, synthesisEngine));
 		return clauses;
 	}
 
@@ -45,7 +45,7 @@ public abstract class SLTLxVarQuantification extends SLTLxFormula {
 	public Set<String> getNegatedCNFEncoding(int stateNo, SLTLxVariableSubstitutionCollection newVarMapping,
 			SATSynthesisEngine synthesisEngine) {
 		Set<String> clauses = new HashSet<>();
-		SLTLxVariable flatBoundVariable = newVarMapping.getVarSabstitute(boundVariable);
+		SLTLxVariable flatBoundVariable = newVarMapping.getVarSubstitute(boundVariable);
 		/** Encode the underlying formula. */
 		clauses.addAll(formula.getNegatedCNFEncoding(stateNo, newVarMapping, synthesisEngine));
 		/**
@@ -56,7 +56,7 @@ public abstract class SLTLxVarQuantification extends SLTLxFormula {
 		 */
 		clauses.addAll(flatBoundVariable.getVariableSubstitutionToPreserveProperties(stateNo, newVarMapping,
 				synthesisEngine));
-		clauses.addAll(flatBoundVariable.getVariableMutualExclusion(stateNo, newVarMapping, synthesisEngine));
+		clauses.addAll(flatBoundVariable.getVariableUniqueSubstitution(stateNo, newVarMapping, synthesisEngine));
 		return clauses;
 	}
 

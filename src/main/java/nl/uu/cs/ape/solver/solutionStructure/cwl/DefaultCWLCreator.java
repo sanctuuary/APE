@@ -1,7 +1,6 @@
 package nl.uu.cs.ape.solver.solutionStructure.cwl;
 
 import nl.uu.cs.ape.models.Type;
-import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 import nl.uu.cs.ape.solver.solutionStructure.ModuleNode;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.solver.solutionStructure.TypeNode;
@@ -17,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  * Class to generate a CWL workflow structure from a given workflow solution.
  */
 @Slf4j
-public class DefaultCWLCreator extends CWLCreatorBase {
+public class DefaultCWLCreator extends CWLWorkflowBase {
     /**
      * Maintain a list of the CWL parameter names which represent {@link TypeNode}s.
      * I.e. this hashmap has TypeNode IDs as keys and their names in the CWL file as
@@ -34,10 +33,6 @@ public class DefaultCWLCreator extends CWLCreatorBase {
         super(solution);
     }
 
-    @Override
-    public String getCWLVersion() {
-        return "v1.2";
-    }
 
     /**
      * Generates the CWL representation.
@@ -254,7 +249,7 @@ public class DefaultCWLCreator extends CWLCreatorBase {
      */
     private void generateDefaultStepRun(ModuleNode moduleNode) {
         final int baseInd = 2;
-        String moduleReference = "add-path-to-the-implementation/" + moduleNode.getUsedModule().getPredicateLabel()
+        String moduleReference = "add-path-to-the-implementation/" + moduleNode.getUsedModule().getPredicateID()
                 + ".cwl ";
         if (moduleNode.getUsedModule().getCwlFileReference() != null) {
             moduleReference = moduleNode.getUsedModule().getCwlFileReference();

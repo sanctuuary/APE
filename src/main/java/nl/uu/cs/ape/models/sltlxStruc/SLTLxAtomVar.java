@@ -45,9 +45,9 @@ public class SLTLxAtomVar extends SLTLxFormula {
      * or a reference between an input type and the state in which it was
      * generated..
      *
-     * @param elementType - Element that defines what the atom depicts.
-     * @param firstArg    - Predicate used or a variable that is the referenced.
-     * @param secondArg   - Variable representing state in the automaton it was
+     * @param elementType Element that defines what the atom depicts.
+     * @param firstArg    Predicate used or a variable that is the referenced.
+     * @param secondArg   Variable representing state in the automaton it was
      *                    used/created in.
      */
     public SLTLxAtomVar(AtomVarType elementType, PredicateLabel firstArg, SLTLxVariable secondArg) {
@@ -200,23 +200,23 @@ public class SLTLxAtomVar extends SLTLxFormula {
     private void substituteVariables(SLTLxVariableSubstitutionCollection variableMapping,
             SATSynthesisEngine synthesisEngine) {
         if (this.elementType.isVarDataType()) {
-            this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+            this.secondArg = variableMapping.getVarSubstitute(this.secondArg);
             synthesisEngine.getVariableUsage().addDataType(firstArg, secondArg);
 
         } else if (this.elementType.isVarMemReference()) {
-            this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+            this.secondArg = variableMapping.getVarSubstitute(this.secondArg);
             synthesisEngine.getVariableUsage().addMemoryReference((State) firstArg, secondArg);
         }
 
         else if (this.elementType.isBinaryRel() && !(this.elementType.equals(AtomVarType.VAR_VALUE))) {
-            this.firstArg = variableMapping.getVarSabstitute((SLTLxVariable) this.firstArg);
-            this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+            this.firstArg = variableMapping.getVarSubstitute((SLTLxVariable) this.firstArg);
+            this.secondArg = variableMapping.getVarSubstitute(this.secondArg);
             synthesisEngine.getVariableUsage().addBinaryPred(
                     new Pair<>((SLTLxVariable) this.firstArg, this.secondArg), this.elementType);
         }
 
         else if (this.elementType.equals(AtomVarType.VAR_VALUE)) {
-            this.secondArg = variableMapping.getVarSabstitute(this.secondArg);
+            this.secondArg = variableMapping.getVarSubstitute(this.secondArg);
             /* These predicates are not added to the set. */
         }
     }

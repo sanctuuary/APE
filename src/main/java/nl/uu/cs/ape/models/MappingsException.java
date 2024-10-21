@@ -26,7 +26,7 @@ public class MappingsException extends RuntimeException {
      * Exception is thrown when two or more atoms share the same signature (ID +
      * state)
      * 
-     * @param message - Application specific message that may help the user solve
+     * @param message Application specific message that may help the user solve
      *                the problem.
      * @return Dimensions exception with information that may help the user solve
      *         the problem.
@@ -39,7 +39,7 @@ public class MappingsException extends RuntimeException {
     /**
      * Exception is thrown when two or more predicates share the same signature.
      * 
-     * @param message - Application specific message that may help the user solve
+     * @param message Application specific message that may help the user solve
      *                the problem.
      * @return Dimensions exception with information that may help the user solve
      *         the problem.

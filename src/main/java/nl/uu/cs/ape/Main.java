@@ -1,18 +1,25 @@
 package nl.uu.cs.ape;
 
-import guru.nidi.graphviz.attribute.Rank.RankDir;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
+import nl.uu.cs.ape.domain.BioToolsAPI;
 import nl.uu.cs.ape.utils.APEFiles;
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
+import nl.uu.cs.ape.solver.solutionStructure.cwl.ToolCWLCreator;
+import nl.uu.cs.ape.models.Module;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * The entry point of application when the library is used in a Command Line
@@ -23,16 +30,129 @@ import java.io.IOException;
 @Slf4j
 public class Main {
 
+    private static final String biotools_config_URL = "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/bio.tools/config.json";
+
     /**
      * The entry point of application when the library is used in a Command Line
      * Interface (CLI).
      *
-     * @param args APE expects at most one (1) argument: The absolute or relative
-     *             path to the configuration file.
+     * @param args APE expects the first argument to specify the method to be
+     *             executed.
+     *             The rest of the arguments are provided depending on the method.
      */
     public static void main(String[] args) {
+
+        String method = args[0];
+        switch (method) {
+            case "synthesis":
+                executeSynthesis(ArrayUtils.remove(args, 0));
+                break;
+            case "convert-tools":
+                convertBioToolsAnnotations(ArrayUtils.remove(args, 0));
+                break;
+            case "pull-a-tool":
+                pullATool(ArrayUtils.remove(args, 0));
+                break;
+            case "bio.tools":
+                try {
+                    BioToolsAPI.getAndSaveFullBioTools("./tools.json");
+                } catch (IOException e) {
+                    log.error("Error in fetching the tools from bio.tools.");
+                }
+                break;
+            default:
+                if (args.length == 0 || args.length == 1) {
+                    executeSynthesis(args);
+                } else {
+                    log.error("Invalid method provided.");
+                }
+        }
+
+    }
+
+    private static void pullATool(String[] args) {
+        if (args.length != 1) {
+            log.error("Error: pull-a-tool method expects biotoolsID as the only additional argument.");
+            return;
+        }
+
+        String biotoolsID = args[0];
+        if (biotoolsID.isEmpty()) {
+            log.error("Error: biotoolsID should be provided as an additional argument.");
+            return;
+        }
+
+        try {
+            JSONArray tool = BioToolsAPI.getAndConvertToolList(List.of(biotoolsID)).getJSONArray("functions");
+            APEFiles.write2file(tool.toString(4), new File("./tool.json"), false);
+            for (JSONObject toolAnnotation : APEUtils.getJSONListFromJSONArray(tool)) {
+                APE apeFramework = new APE(biotools_config_URL);
+
+                Optional<Module> cometModule = apeFramework.getDomainSetup()
+                        .updateModuleFromJson(toolAnnotation);
+
+                if (cometModule.isEmpty()) {
+                    log.error(String.format("Error in defining '%s' tool using '%s' configuration.", biotoolsID,
+                            biotools_config_URL));
+                }
+                ToolCWLCreator toolCWLCreator = new ToolCWLCreator(cometModule.get());
+
+                APEFiles.write2file(toolCWLCreator.generate(), new File("./" + toolAnnotation.getString("id") + ".cwl"), false);
+            }
+            
+
+        } catch (IOException e) {
+            log.error("Error in fetching the tool from bio.tools.");
+        } catch (OWLOntologyCreationException e) {
+            log.error(String.format(
+                    "Error in setting up the APE framework from the %s configuration.", biotools_config_URL));
+        }
+
+    }
+
+    /**
+     * Retrieve tools from bio.tools using bio.tools API and convert them to
+     * APE-compatible tool annotation format.
+     * 
+     * @param args The arguments provided to the method. Only one argument is
+     *             expected, the path to the file where the biotoolsIDs are stored.
+     */
+    public static void convertBioToolsAnnotations(String[] args) {
+        if (args.length != 1) {
+            log.error("Error: bio.tools method expects path as the only additional argument.");
+            return;
+        }
+
+        String pathToListIDs = args[0];
+        if (!APEFiles.isValidReadFile(pathToListIDs)) {
+            log.error("Error: Invalid path provided.");
+            return;
+        }
+
+        try {
+            JSONObject apeToolAnnotation = BioToolsAPI.getAndConvertToolList(new File(pathToListIDs));
+            APEFiles.write2file(apeToolAnnotation.toString(4), new File("./tools.json"), false);
+        } catch (IOException e) {
+            log.error("Error in fetching the tools from bio.tools.");
+            return;
+        }
+        log.info("File generated successfully in the current directory.");
+    }
+
+    /**
+     * Executes the synthesis based on the provided configuration file.
+     * 
+     * @param args The arguments provided to the method.
+     */
+    public static void executeSynthesis(String[] args) {
         String path;
         int solutionsNo = -1;
+
+        if (args.length > 2) {
+            log.error("Error: synthesis method expects at most two additional arguments.");
+            return;
+        }
+
         if (args.length == 1) {
             path = args[0];
         } else if (args.length == 2) {
@@ -97,11 +217,11 @@ public class Main {
         } else {
             try {
                 APE.writeSolutionToFile(solutions);
-                APE.writeDataFlowGraphs(solutions, RankDir.TOP_TO_BOTTOM);
-                // APE.writeControlFlowGraphs(solutions, RankDir.LEFT_TO_RIGHT);
+                // The following method can be changed to write the solutions in different
+                // formats (e.g., control flow graph, data flow graph)
+                APE.writeTavernaDesignGraphs(solutions);
                 APE.writeExecutableWorkflows(solutions);
                 APE.writeCWLWorkflows(solutions);
-                // APE.writeExecutableCWLWorkflows(solutions, apeFramework.getConfig());
             } catch (IOException e) {
                 log.error("Error in writing the solutions. to the file system.");
                 e.printStackTrace();

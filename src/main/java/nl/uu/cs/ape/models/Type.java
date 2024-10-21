@@ -65,9 +65,9 @@ public class Type extends TaxonomyPredicate {
 	}
 
 	/**
-	 * Set plain type type.
+	 * Set plain type.
 	 * 
-	 * @param plainType - plain type that should be used
+	 * @param plainType The plain type value.
 	 */
 	public void setPlainType(Type plainType) {
 		this.plainType = plainType;
@@ -88,9 +88,9 @@ public class Type extends TaxonomyPredicate {
 	 * Generate a taxonomy data instance that is defined based on one or more
 	 * dimensions that describe it.
 	 * 
-	 * @param jsonParam    - JSON representation of the data instance
-	 * @param domainSetup  - setup of the domain
-	 * @param isOutputData - {@code true} if the data is used to be module output,
+	 * @param jsonParam    JSON representation of the data instance
+	 * @param domainSetup  setup of the domain
+	 * @param isOutputData {@code true} if the data is used to be module output,
 	 *                     {@code false} otherwise
 	 * @return A type object that represent the data instance given as the
 	 *         parameter.
@@ -120,14 +120,17 @@ public class Type extends TaxonomyPredicate {
 			/* for each dimensions a disjoint array of types/tools is given */
 			for (String currTypeLabel : APEUtils.getListFromJson(jsonParam, currRootLabel, String.class)) {
 				String currTypeIRI = currTypeLabel;
-				if (allTypes.get(currTypeIRI, curRootIRI) == null) {
+
+				Type currType = allTypes.get(currTypeIRI, curRootIRI);
+				if (currType == null) {
 					currTypeIRI = APEUtils.createClassIRI(currTypeLabel, domainSetup.getOntologyPrefixIRI());
+					currType = allTypes.get(currTypeIRI, curRootIRI);
 				}
 
 				if (currRootLabel.equals(allTypes.getLabelRootID())) {
 					labelDefined = true;
 				}
-				Type currType = allTypes.get(currTypeIRI, curRootIRI);
+				
 				if (currType != null) {
 					if (isOutputData) {
 						currType.setAsRelevantTaxonomyTerm(allTypes);

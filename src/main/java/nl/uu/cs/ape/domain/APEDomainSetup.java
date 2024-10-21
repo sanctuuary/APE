@@ -1,5 +1,7 @@
 package nl.uu.cs.ape.domain;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -7,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APECoreConfig;
 import nl.uu.cs.ape.configuration.ToolAnnotationTag;
@@ -14,6 +17,7 @@ import nl.uu.cs.ape.constraints.ConstraintFactory;
 import nl.uu.cs.ape.constraints.ConstraintFormatException;
 import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.constraints.ConstraintTemplateParameter;
+import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
@@ -21,6 +25,7 @@ import nl.uu.cs.ape.models.AllTypes;
 import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.Module;
+import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
@@ -51,6 +56,12 @@ public class APEDomainSetup {
      * Prefix used to define OWL class IDs
      */
     private String ontologyPrefixIRI;
+
+    @Setter
+    /**
+     * Object used to write locally CNF SAT problem specification (in human readable format).
+     */
+    private String writeLocalCNF = null;
 
     /**
      * Object used to create temporal constraints.
@@ -121,7 +132,7 @@ public class APEDomainSetup {
      * Add the String that corresponds to an SLTLx formula that should be parsed to
      * the list of constraints.
      * 
-     * @param formulaSLTLx - String that corresponds to an SLTLx formula that should
+     * @param formulaSLTLx String that corresponds to an SLTLx formula that should
      *                     be parsed
      */
     public void addSLTLxConstraint(String formulaSLTLx) {
@@ -222,7 +233,7 @@ public class APEDomainSetup {
         String constraintID = null;
         int currNode = 0;
 
-        List<JSONObject> constraints = APEUtils.getListFromJsonList(constraintsJSONArray, JSONObject.class);
+        List<JSONObject> constraints = APEUtils.getJSONListFromJSONArray(constraintsJSONArray);
 
         /* Iterate through each constraint in the list */
         for (JSONObject jsonConstraint : APEUtils.safe(constraints)) {
@@ -321,7 +332,7 @@ public class APEDomainSetup {
      * @return {@code true} if the domain was updated, false otherwise.
      * @throws JSONException Error if the JSON file was not properly formatted.
      */
-    private boolean updateModuleFromJson(JSONObject jsonModule)
+    public Optional<Module> updateModuleFromJson(JSONObject jsonModule)
             throws JSONException, APEDimensionsException {
         String moduleIRI = APEUtils.createClassIRI(jsonModule.getString(ToolAnnotationTag.ID.toString()),
                 ontologyPrefixIRI);
@@ -338,7 +349,7 @@ public class APEDomainSetup {
         for (String parentModule : taxonomyParentModules) {
             String parentModuleIRI = APEUtils.createClassIRI(parentModule, ontologyPrefixIRI);
             if (allModules.get(parentModuleIRI) == null) {
-                log.warn("Tool '" + moduleIRI + "' annotation issue. "
+                log.debug("Tool '" + moduleIRI + "' annotation issue. "
                         + "Referenced '" + ToolAnnotationTag.TAXONOMY_OPERATIONS.toString() + "': '" + parentModuleIRI
                         + "' cannot be found in the Tool Taxonomy.");
                 wrongToolTax.add(moduleLabel);
@@ -352,7 +363,7 @@ public class APEDomainSetup {
          * used as a parent class of the tool.
          */
         if (taxonomyParentModules.isEmpty()) {
-            log.warn("Tool '" + moduleIRI + "' annotation issue. "
+            log.debug("Tool '" + moduleIRI + "' annotation issue. "
                     + "None of the referenced '" + ToolAnnotationTag.TAXONOMY_OPERATIONS.toString()
                     + "' can be found in the Tool Taxonomy.");
             taxonomyParentModules.add(allModules.getRootModuleID());
@@ -373,14 +384,14 @@ public class APEDomainSetup {
 
             if (inputs.isEmpty() && outputs.isEmpty()) {
                 emptyTools.add(moduleLabel);
-                log.debug("Operation '" + "' was not included as it has no (valid) inputs and outputs specified.");
-                return false;
+                log.debug("Operation '" + moduleLabel + "' was not included as it has no (valid) inputs and outputs specified.");
+                return Optional.empty();
             }
 
         } catch (APEDimensionsException badDimension) {
             wrongToolIO.add(moduleLabel);
-            log.warn("Operation '" + "' was not included." + badDimension.getMessage());
-            return false;
+            log.debug("Operation '" + moduleLabel + "' was not included. " + badDimension.getMessage());
+            return Optional.empty();
         }
 
         /* Set the implementation cwl file reference of the module, if specified. */
@@ -409,7 +420,7 @@ public class APEDomainSetup {
         currModule.setModuleOutput(outputs);
         currModule.setAsRelevantTaxonomyTerm(allModules);
 
-        return currModule != null;
+        return Optional.of(currModule);
     }
 
     /**
@@ -549,6 +560,23 @@ public class APEDomainSetup {
      */
     public List<AuxiliaryPredicate> getHelperPredicates() {
         return helperPredicates;
+    }
+
+    /**
+     * Write locally the SAT (CNF) workflow specification in human readable format.
+     * 
+     * @param satInputFile File containing the SAT problem specification.
+     * @param mappings Mappings between the SAT problem and the domain.
+     * @throws IOException Error in writing the file to the local file system.
+     */
+    public void localCNF(File satInputFile, SATAtomMappings mappings) throws IOException {
+        if (writeLocalCNF != null) {
+            FileInputStream cnfStream = new FileInputStream(satInputFile);
+            String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
+            cnfStream.close();
+            
+            APEFiles.write2file(encoding, new File(writeLocalCNF), false);
+        }
     }
 
 }

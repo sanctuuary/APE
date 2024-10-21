@@ -61,10 +61,10 @@ public class SolutionsList {
     /**
      * Create an object that will contain all the solutions of the synthesis.
      *
-     * @param runConfig - setup configuration for the synthesis run.
+     * @param runConfig setup configuration for the synthesis run.
      */
     public SolutionsList(APERunConfig runConfig) {
-        this.solutions = new ArrayList<SolutionWorkflow>();
+        this.solutions = new ArrayList<>();
         this.runConfig = runConfig;
         /*
          * Provides mapping from each atom/predicate to a number/string, and vice versa
@@ -175,8 +175,8 @@ public class SolutionsList {
      * Set a specific number to be the number of solutions that are found up to the
      * specified length.
      * 
-     * @param length      - the length up until which the solutions are evaluated
-     * @param noSolutions - number of solutions that can be found up until the given
+     * @param length      the length up until which the solutions are evaluated
+     * @param noSolutions number of solutions that can be found up until the given
      *                    length
      */
     public void addNoSolutionsForLength(Integer length, Integer noSolutions) {
@@ -185,7 +185,7 @@ public class SolutionsList {
         if (solutionsPerLength == null) {
             solutionsPerLength = new ArrayList<>();
         }
-        solutionsPerLength.add(new Pair<Integer>(length, noSolutions));
+        solutionsPerLength.add(new Pair<>(length, noSolutions));
     }
 
     /**
@@ -220,7 +220,7 @@ public class SolutionsList {
      * Set the synthesis result flag, i.e., set the reason why the synthesis
      * execution was interrupted.
      * 
-     * @param flag - the {@link SynthesisFlag} that should be set
+     * @param flag the {@link SynthesisFlag} that should be set
      */
     public void setFlag(SynthesisFlag flag) {
         this.runFlag = flag;

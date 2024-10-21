@@ -34,7 +34,7 @@ public class SLTLxVariableSubstitutionCollection {
 	/**
 	 * Create a new variable mapping, based on the existing one.
 	 * 
-	 * @param existing - existing variable mapping.
+	 * @param existing existing variable mapping.
 	 */
 	public SLTLxVariableSubstitutionCollection(SLTLxVariableSubstitutionCollection existing) {
 		super();
@@ -55,7 +55,7 @@ public class SLTLxVariableSubstitutionCollection {
 	 * In case that the substitution for a variable with the same name exists, it
 	 * will be overwritten.
 	 * 
-	 * @param existingVar - variable used in the formula
+	 * @param existingVar variable used in the formula
 	 * @return Unique variable that corresponds to the current variable binding.
 	 */
 	public SLTLxVariable addNewVariable(SLTLxVariable existingVar, Set<State> varDomain) {
@@ -70,12 +70,12 @@ public class SLTLxVariableSubstitutionCollection {
 	 * Get the unique variable used to substitute the current binding of the
 	 * variable.
 	 * 
-	 * @param existingVar - variable used in the formula
+	 * @param existingVar variable used in the formula
 	 * @return Unique variable that corresponds to the current variable binding.
-	 * @throws SLTLxParsingAnnotationException - in case that the variable does not
+	 * @throws SLTLxParsingAnnotationException in case that the variable does not
 	 *                                         exist.
 	 */
-	public SLTLxVariable getVarSabstitute(SLTLxVariable existingVar) throws SLTLxParsingAnnotationException {
+	public SLTLxVariable getVarSubstitute(SLTLxVariable existingVar) throws SLTLxParsingAnnotationException {
 		SLTLxVariable variable = mappedVariables.get(existingVar);
 		if (variable == null) {
 			throw SLTLxParsingAnnotationException
@@ -87,7 +87,7 @@ public class SLTLxVariableSubstitutionCollection {
 	/**
 	 * Get the domain for the given variable.
 	 * 
-	 * @param variable - variable in question
+	 * @param variable variable in question
 	 * @return Set of states that represent the domain of the variable.
 	 */
 	public Set<State> getVariableDomain(SLTLxVariable variable) {

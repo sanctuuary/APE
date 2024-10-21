@@ -19,10 +19,10 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 
-public class CLITest {
+class CLITest {
 
     @Test
-    public void GMTFromCLITest() throws IOException {
+    void GMTFromCLITest() throws IOException {
         run(
                 "cli/gmt/base_config.json",
                 "cli/gmt/GMT_UseCase_taxonomy.owl",
@@ -34,7 +34,7 @@ public class CLITest {
 
     // add files to 'src/test/resources/' folder and add the relative paths here
     //@Test
-    public void templateTest() throws IOException {
+    void templateTest() throws IOException {
         run(
                 "relative/path/base_config.json",
                 "relative/path/ontology.owl",
@@ -44,7 +44,7 @@ public class CLITest {
         );
     }
 
-    public void run(String base_config_path, String ontology_path, String tools_path, String constraints_path, String solution_dir_path) throws IOException {
+    void run(String base_config_path, String ontology_path, String tools_path, String constraints_path, String solution_dir_path) throws IOException {
 
         // absolute solution_dir_path
         final Path solution_path = Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path)));

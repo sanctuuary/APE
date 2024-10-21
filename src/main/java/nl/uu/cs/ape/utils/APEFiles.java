@@ -13,14 +13,14 @@ import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.models.sltlxStruc.CNFClause;
 
 import org.apache.commons.io.LineIterator;
-import org.apache.commons.io.output.FileWriterWithEncoding;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -54,8 +54,8 @@ public class APEFiles {
     /**
      * Verify and get full local path based based on the field.
      * 
-     * @param tag  - tag
-     * @param path - path
+     * @param tag  tag
+     * @param path path
      * @return Return the path to the file
      */
     private static Path getLocalPath(String tag, String path) {
@@ -80,7 +80,7 @@ public class APEFiles {
     /**
      * Verify whether the path is a valid local path.
      * 
-     * @param path - local path
+     * @param path local path
      * @return Return {@code true} if the local path exists, {@code false}
      *         otherwise.
      */
@@ -193,8 +193,8 @@ public class APEFiles {
     /**
      * Create a directory path if needed.
      * 
-     * @param tag  - tag used
-     * @param path - directory path
+     * @param tag  tag used
+     * @param path directory path
      */
     private static void createDirectory(String tag, Path path) throws APEConfigException {
 
@@ -305,7 +305,7 @@ public class APEFiles {
      * Read file content from the given path (local path or a public URL) and return
      * the content as a File object.
      * 
-     * @param filePath - Local path or a public URL with the content.
+     * @param filePath Local path or a public URL with the content.
      * @return File containing info provided at the path.
      * @throws IOException Exception in case of a badly formatted path or file.
      */
@@ -318,7 +318,7 @@ public class APEFiles {
     /**
      * Read content from a URL and return it as a file.
      * 
-     * @param fileUrl - URL of the content
+     * @param fileUrl URL of the content
      * @return File containing info provided at the URL.
      * @throws IOException Exception in case of a badly formatted URL or file.
      */
@@ -333,33 +333,41 @@ public class APEFiles {
     }
 
     /**
-     * Append text to the existing file. It adds the text at the end of the content
+     * Appends text to the existing file. It adds the text at the end of the content
      * of the file.
-     * 
-     * @param file    - existing file
-     * @param content - content that should be appended
-     * @throws IOException          in case of an I/O error
-     * @throws NullPointerException if the file is null
+     *
+     * @param file    The existing file.
+     * @param content The content that should be appended.
+     * @throws IOException          In case of an I/O error.
+     * @throws NullPointerException If the file or content is null.
      */
-    public static void appendToFile(File file, String content) throws IOException, NullPointerException {
-        Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
-        try (BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4)) {
+    public static void appendToFile(File file, String content) throws IOException {
+        if (file == null || content == null) {
+            throw new NullPointerException("File or content cannot be null.");
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.US_ASCII), 8192 * 4)) {
             writer.write(content);
         }
     }
 
     /**
-     * Append text to the existing file. It adds the text at the end of the content
-     * of the file.
-     * 
-     * @param file    - existing file
-     * @param content - content that should be appended
-     * @throws IOException          in case of an I/O error
-     * @throws NullPointerException if the file is null
+     * Appends a set of text strings to the existing file. Each element in the set
+     * is added at the end of the content of the file.
+     *
+     * @param file    The existing file.
+     * @param content The set of content strings that should be appended.
+     * @throws IOException          In case of an I/O error.
+     * @throws NullPointerException If the file or content set is null.
      */
-    public static void appendSetToFile(File file, Set<String> content) throws IOException, NullPointerException {
-        Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
-        try (BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4)) {
+    public static void appendSetToFile(File file, Set<String> content) throws IOException {
+        if (file == null || content == null) {
+            throw new NullPointerException("File or content set cannot be null.");
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.US_ASCII), 8192 * 4)) {
             for (String str : content) {
                 writer.write(str);
             }
@@ -367,48 +375,62 @@ public class APEFiles {
     }
 
     /**
-     * Append text to the existing file. It adds the text at the end of the content
-     * of the file.
-     * 
-     * @param file        - existing file
-     * @param cnfEncoding - cnf clauses that should be appended
-     * @throws IOException          in case of an I/O error
-     * @throws NullPointerException if the file is null
+     * Appends CNFClause objects' CNF string representations to the existing file.
+     * Each CNF clause is added at the end of the content of the file.
+     *
+     * @param file        The existing file.
+     * @param cnfEncoding The set of CNFClause objects to be appended.
+     * @throws IOException          In case of an I/O error.
+     * @throws NullPointerException If the file or CNF encoding set is null.
      */
-    public static void appendToFile(File file, Set<CNFClause> cnfEncoding) throws IOException, NullPointerException {
-        StringBuilder string = new StringBuilder();
-        cnfEncoding.forEach(clause -> string.append(clause.toCNF()));
-        Writer fileWriter = new FileWriterWithEncoding(file, "ASCII", true);
-        try (BufferedWriter writer = new BufferedWriter(fileWriter, 8192 * 4)) {
-            writer.write(string.toString());
+    public static void appendToFile(File file, Set<CNFClause> cnfEncoding) throws IOException {
+        if (file == null || cnfEncoding == null) {
+            throw new NullPointerException("File or CNF encoding set cannot be null.");
         }
 
+        StringBuilder stringBuilder = new StringBuilder();
+        cnfEncoding.forEach(clause -> stringBuilder.append(clause.toCNF()));
+
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.US_ASCII), 8192 * 4)) {
+            writer.write(stringBuilder.toString());
+        }
     }
 
     /**
-     * Prepend text to the existing file content and create a new file out of it.
-     * It adds the text at the beginning, before the existing content of the file.
-     * 
-     * @param file
-     * @param prefix
-     * @throws IOException
+     * Prepends text to the existing file content and creates a new file with the
+     * modified content. It adds the text at the beginning, before the existing
+     * content of the file.
+     *
+     * @param prefix The text to be prepended.
+     * @param file   The existing file.
+     * @return A new file with the prepended content.
+     * @throws IOException          In case of an I/O error.
+     * @throws NullPointerException If the file or prefix is null.
      */
     public static File prependToFile(String prefix, File file) throws IOException {
-        LineIterator li = FileUtils.lineIterator(file);
+        if (file == null || prefix == null) {
+            throw new NullPointerException("File or prefix cannot be null.");
+        }
+
         File tempFile = File.createTempFile("prependPrefix", ".tmp");
         tempFile.deleteOnExit();
-        Writer fileWriter = new FileWriterWithEncoding(tempFile, "ASCII", true);
-        BufferedWriter writer = new BufferedWriter(fileWriter);
-        try {
+
+        try (LineIterator lineIterator = FileUtils.lineIterator(file, StandardCharsets.US_ASCII.name());
+             BufferedWriter writer = new BufferedWriter(
+                     new OutputStreamWriter(new FileOutputStream(tempFile, true), StandardCharsets.US_ASCII))) {
+
+            // Write the prefix first.
             writer.write(prefix);
-            while (li.hasNext()) {
-                writer.write(li.next());
-                writer.write("\n");
+            writer.newLine();
+
+            // Append the existing file content.
+            while (lineIterator.hasNext()) {
+                writer.write(lineIterator.nextLine());
+                writer.newLine();
             }
-        } finally {
-            writer.close();
-            li.close();
         }
+
         return tempFile;
     }
 

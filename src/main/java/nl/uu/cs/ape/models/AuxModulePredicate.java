@@ -37,19 +37,19 @@ public class AuxModulePredicate extends AbstractModule implements AuxiliaryPredi
      * {@link AuxModulePredicate#generateAuxiliaryPredicate} to generate an
      * auxiliary object.
      *
-     * @param moduleName           - name of the auxiliary module predicate
-     * @param moduleID             - ID of the auxiliary module predicate
-     * @param rootNode             - module root node
-     * @param containingPredicates - collection of module predicates that comprise
+     * @param moduleName           name of the auxiliary module predicate
+     * @param moduleID             ID of the auxiliary module predicate
+     * @param rootNode             module root node
+     * @param containingPredicates collection of module predicates that comprise
      *                             the auxiliary predicate
-     * @param logicOp              - logical operation that binds the comprised
+     * @param logicOp              logical operation that binds the comprised
      *                             predicates
      */
     private AuxModulePredicate(String moduleName, String moduleID, String rootNode,
             Collection<TaxonomyPredicate> containingPredicates, LogicOperation logicOp) {
         super(moduleName, moduleID, rootNode, NodeType.ABSTRACT);
         this.logicOp = logicOp;
-        this.containingPredicates = new TreeSet<TaxonomyPredicate>();
+        this.containingPredicates = new TreeSet<>();
         this.containingPredicates.addAll(containingPredicates);
     }
 
@@ -68,7 +68,7 @@ public class AuxModulePredicate extends AbstractModule implements AuxiliaryPredi
      *                          always the same due to its ordering).
      * @param logicOp           Logical operation that describes the relation
      *                          between the types.
-     * @param domainSetup       - domain model
+     * @param domainSetup       domain model
      * 
      * @return An abstract predicate that provides abstraction over a
      *         disjunction/conjunction of the labels.
