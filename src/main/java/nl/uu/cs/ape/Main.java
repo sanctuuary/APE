@@ -98,9 +98,9 @@ public class Main {
                 }
                 ToolCWLCreator toolCWLCreator = new ToolCWLCreator(cometModule.get());
 
-                APEFiles.write2file(toolCWLCreator.generate(), new File("./" + toolAnnotation.getString("id") + ".cwl"), false);
+                APEFiles.write2file(toolCWLCreator.generate(), new File("./" + toolAnnotation.getString("id") + ".cwl"),
+                        false);
             }
-            
 
         } catch (IOException e) {
             log.error("Error in fetching the tool from bio.tools.");
@@ -213,7 +213,6 @@ public class Main {
             log.error(e.getMessage());
             return;
         }
-
 
         /*
          * Writing solutions to the specified file in human readable format
