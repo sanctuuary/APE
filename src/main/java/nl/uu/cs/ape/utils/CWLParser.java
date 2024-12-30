@@ -1,10 +1,10 @@
 package nl.uu.cs.ape.utils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 
@@ -13,28 +13,28 @@ public class CWLParser {
     private Map<String, Object> cwlContent;
 
     // Constructor to load CWL from a URL
-    public CWLParser(String urlString) throws Exception {
+    public CWLParser(String urlString) throws IOException {
         InputStream inputStream = loadCWLFromURL(urlString);
         parseCWL(inputStream);
     }
 
     // Constructor to load CWL from a local file
-    public CWLParser(java.nio.file.Path filePath) throws Exception {
+    public CWLParser(java.nio.file.Path filePath) throws IOException {
         InputStream inputStream = Files.newInputStream(filePath);
         parseCWL(inputStream);
     }
 
     // Method to load CWL from a URL
-    private InputStream loadCWLFromURL(String urlString) throws Exception {
+    private InputStream loadCWLFromURL(String urlString) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
 
         if (connection.getResponseCode() == 200) {
-            return connection.getInputStream()
+            return connection.getInputStream();
         } else {
-            throw new Exception("Failed to load CWL file. HTTP response code: " + connection.getResponseCode());
+            throw new IOException("Failed to load CWL file. HTTP response code: " + connection.getResponseCode());
         }
     }
 
