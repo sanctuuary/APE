@@ -83,6 +83,9 @@ public class AuxTypePredicate extends Type implements AuxiliaryPredicate {
         if (newAbsType != null) {
             domainSetup.addHelperPredicate(newAbsType);
             newAbsType.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
+            for (TaxonomyPredicate relatedPredicate : relatedPredicates) {
+                relatedPredicate.setAsRelevantTaxonomyTerm(domainSetup.getAllTypes());
+            }
         }
         return newAbsType;
     }

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import nl.uu.cs.ape.models.AuxTypePredicate;
-import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;

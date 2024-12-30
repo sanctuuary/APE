@@ -132,16 +132,16 @@ public class Type extends TaxonomyPredicate {
 				}
 				
 				if (currType != null) {
-					if (isOutputData) {
-						currType.setAsRelevantTaxonomyTerm(allTypes);
-						currType = currType.getPlainType();
-					}
 					/*
 					 * if the type exists, make it relevant from the taxonomy perspective and add it
 					 * to the list of allowed types
 					 */
 					currType.setAsRelevantTaxonomyTerm(allTypes);
 					logConnectedPredicates.add(currType);
+
+					if (isOutputData) {
+						currType = currType.getPlainType();
+					}
 				} else if (currRootLabel.equals(allTypes.getLabelRootID()) && isOutputData) {
 					/* add a new label to the taxonomy */
 					currType = allTypes.addPredicate(new Type(currTypeLabel, currTypeLabel, curRootIRI, NodeType.LEAF));
@@ -158,7 +158,7 @@ public class Type extends TaxonomyPredicate {
 
 				} else {
 					throw APEDimensionsException.dimensionDoesNotContainClass(String.format(
-							"Error in a JSON input. The data type '%s' was not defined or does not belong to the data dimension '%s'.",
+							"Error in a JSON input, the type of data '%s' is not recognized. \nPotential reasons: \n1) there is no tool that can process the specified type (as input or output) or \n2) the type does not belong to the data dimension '%s'.",
 							currTypeIRI, curRootIRI));
 				}
 			}

@@ -3,6 +3,7 @@ package nl.uu.cs.ape;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
+import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.domain.BioToolsAPI;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -207,7 +208,12 @@ public class Main {
             log.error("Error in synthesis execution.");
             log.error(e.getMessage());
             return;
+        } catch (APEDimensionsException e) {
+            log.error("Error in synthesis execution.");
+            log.error(e.getMessage());
+            return;
         }
+
 
         /*
          * Writing solutions to the specified file in human readable format

@@ -2,6 +2,8 @@ package nl.uu.cs.ape.models.logic.constructs;
 
 import java.util.*;
 
+import org.checkerframework.checker.units.qual.t;
+
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.utils.APEUtils;
@@ -40,6 +42,12 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * domain (tool annotations).
      */
     private boolean isRelevant;
+
+    /** True if the parents were set to be relevant. */
+    private boolean patentPredRelevant = false;
+
+    /** True if the children were set to be relevant. */
+    private boolean childPredRelevant = false;
 
     /**
      * Set of all the predicates that are subsumed by the abstract
@@ -212,9 +220,6 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @return true if the predicates were successfully set to be relevant.
      */
     public boolean setAsRelevantTaxonomyTerm(AllPredicates allPredicates) {
-        if (this.isRelevant) {
-            return true;
-        }
         boolean succExe = true;
         if (allPredicates == null) {
             return false;
@@ -237,17 +242,18 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @return true if the predicates were successfully set to be relevant.
      */
     private boolean setAsRelevantTaxonomyTermTopDown(AllPredicates allPredicates) {
-        if (this.isRelevant) {
+        this.setIsRelevant();
+        if (this.childPredRelevant) {
             return true;
         }
         boolean succExe = true;
         if (allPredicates == null) {
             return false;
         }
-        this.setIsRelevant();
         for (TaxonomyPredicate subPredicate : APEUtils.safe(this.subPredicates)) {
             succExe = succExe && subPredicate.setAsRelevantTaxonomyTermTopDown(allPredicates);
         }
+        this.childPredRelevant = true;
         return succExe;
     }
 
@@ -259,17 +265,18 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      * @return true if the predicates were successfully set to be relevant.
      */
     private boolean setAsRelevantTaxonomyTermBottomUp(AllPredicates allPredicates) {
-        if (this.isRelevant) {
+        this.setIsRelevant();
+        if (this.patentPredRelevant) {
             return true;
         }
         boolean succExe = true;
         if (allPredicates == null) {
             return false;
         }
-        this.setIsRelevant();
         for (TaxonomyPredicate parentPredicate : APEUtils.safe(this.parentPredicates)) {
             succExe = succExe && parentPredicate.setAsRelevantTaxonomyTermBottomUp(allPredicates);
         }
+        this.patentPredRelevant = true;
         return succExe;
     }
 

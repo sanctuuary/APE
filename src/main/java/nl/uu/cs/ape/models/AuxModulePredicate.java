@@ -90,6 +90,9 @@ public class AuxModulePredicate extends AbstractModule implements AuxiliaryPredi
         if (newAbsType != null) {
             domainSetup.addHelperPredicate(newAbsType);
             newAbsType.setAsRelevantTaxonomyTerm(domainSetup.getAllModules());
+            for (TaxonomyPredicate relatedPredicate : relatedPredicates) {
+                relatedPredicate.setAsRelevantTaxonomyTerm(domainSetup.getAllModules());
+            }
         }
         return newAbsType;
     }

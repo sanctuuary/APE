@@ -209,7 +209,7 @@ public class Module extends AbstractModule {
                     logConnectedPredicates.add(currModule);
                 } else {
                     throw APEDimensionsException.dimensionDoesNotContainClass(String.format(
-                            "Error in a JSON input. The tool '%s' was not defined or does not belong to the tool dimension '%s'.",
+                            "Error in a JSON input, the tool '%s' is not recognized. \nPotential reasons: \n1) there is no tool annotatied with the specified name or \n2) the tool does not belong to the tool dimension '%s'.",
                             currModuleIRI, curRootIRI));
                 }
             }

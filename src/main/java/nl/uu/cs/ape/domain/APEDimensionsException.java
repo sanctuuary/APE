@@ -32,7 +32,7 @@ public class APEDimensionsException extends RuntimeException {
      *         the problem.
      */
     public static APEDimensionsException dimensionsOverlap(String message) {
-        return new APEDimensionsException(String.format("The data dimensions cannot overlap. %s", message));
+        return new APEDimensionsException(String.format("Issue with the ontology structure: The data dimensions cannot overlap. %s", message));
     }
 
     /**
