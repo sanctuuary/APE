@@ -1,4 +1,4 @@
-package nl.uu.cs.ape.utils;
+package nl.uu.cs.ape.utils.cwl_parser;
 
 /**
  * 
