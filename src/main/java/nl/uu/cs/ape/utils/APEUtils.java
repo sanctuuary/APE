@@ -200,72 +200,72 @@ public final class APEUtils {
 			/*
 			 * Printing the constraint templates
 			 */
-			log.debug(line);
-			log.debug("\tConstraint templates:");
-			log.debug(line);
-			log.debug(domainSetup.getConstraintFactory().printConstraintsCodes() + "\n");
+			log.info(line);
+			log.info("\tConstraint templates:");
+			log.info(line);
+			log.info(domainSetup.getConstraintFactory().printConstraintsCodes() + "\n");
 
 			/*
 			 * Printing the Module and Taxonomy Tree
 			 */
-			log.debug(line);
-			log.debug("\tTool Taxonomy:");
-			log.debug(line);
+			log.info(line);
+			log.info("\tTool Taxonomy:");
+			log.info(line);
 			domainSetup.getAllModules().getRootModule().printTree(" ", domainSetup.getAllModules());
-			log.debug("\n" + line);
-			log.debug("\tData Taxonomy dimensions:");
+			log.info("\n" + line);
+			log.info("\tData Taxonomy dimensions:");
 			for (TaxonomyPredicate dimension : domainSetup.getAllTypes().getRootPredicates()) {
-				log.debug("\n" + line);
-				log.debug("\t" + dimension.getPredicateLabel() + "Taxonomy:");
-				log.debug(line);
+				log.info("\n" + line);
+				log.info("\t" + dimension.getPredicateLabel() + "Taxonomy:");
+				log.info(line);
 				dimension.printTree(" ", domainSetup.getAllTypes());
 			}
-			log.debug(line);
-			log.debug("\tLabels Taxonomy:");
-			log.debug(line);
+			log.info(line);
+			log.info("\tLabels Taxonomy:");
+			log.info(line);
 			domainSetup.getAllTypes().getLabelRoot().printTree(" ", domainSetup.getAllTypes());
 
 			/*
 			 * Printing the tool annotations
 			 */
 			boolean noTools = true;
-			log.debug(line);
-			log.debug("\tAnnotated tools:");
-			log.debug(line);
+			log.info(line);
+			log.info("\tAnnotated tools:");
+			log.info(line);
 			for (TaxonomyPredicate module : domainSetup.getAllModules().getModules()) {
 				if (module instanceof Module) {
-					log.debug(module.toString());
+					log.info(module.toString());
 					noTools = false;
 				}
 			}
 			if (noTools) {
-				log.debug("\tNo annotated tools.");
+				log.info("\tNo annotated tools.");
 			}
 
 			/*
 			 * Print out the constraints
 			 */
-			log.debug(line);
-			log.debug("\tConstraints:");
-			log.debug(line);
+			log.info(line);
+			log.info("\tConstraints:");
+			log.info(line);
 			for (ConstraintTemplateData constr : domainSetup.getUnformattedConstr()) {
-				log.debug(domainSetup.getConstraintFactory().getDescription(constr));
+				log.info(domainSetup.getConstraintFactory().getDescription(constr));
 			}
 			if (domainSetup.getUnformattedConstr().isEmpty()) {
-				log.debug("\tNo constraints.");
+				log.info("\tNo constraints.");
 			}
-			log.debug(line);
+			log.info(line);
 
 			int i = 1;
 			for (Type input : runConfig.getProgramInputs()) {
-				log.debug((i++) + ". program input is " + input.toShortString());
+				log.info((i++) + ". program input is " + input.toShortString());
 			}
-			log.debug(line);
+			log.info(line);
 			i = 1;
 			for (Type output : runConfig.getProgramOutputs()) {
-				log.debug((i++) + ". program output is " + output.toShortString());
+				log.info((i++) + ". program output is " + output.toShortString());
 			}
-			log.debug(line);
+			log.info(line);
 		}
 	}
 
@@ -619,6 +619,19 @@ public final class APEUtils {
 			e.printStackTrace();
 		}
 		return lines;
+	}
+
+	/**
+	 * Get a String value from a Map by its key.
+	 * 
+	 * @param map Map containing the key-value pairs.
+	 * @param key Key to look for in the map.
+	 * @return The value associated with the key as a String, or null if the key
+	 *         does not exist or the value is not a String.
+	 */
+	public static String mapGetString(Map<String, Object> map, String key) {
+		Object val = map.get(key);
+		return (val instanceof String) ? (String) val : null;
 	}
 
 	/**
