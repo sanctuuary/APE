@@ -2,9 +2,9 @@ package nl.uu.cs.ape.test.sat.ape;
 
 import nl.uu.cs.ape.APE;
 import nl.uu.cs.ape.configuration.APEConfigException;
-import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.sat.test.utils.GitHubRepo;
 import nl.uu.cs.ape.sat.test.utils.TestResources;
+import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 
 import org.json.JSONArray;

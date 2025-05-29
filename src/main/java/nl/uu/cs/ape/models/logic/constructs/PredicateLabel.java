@@ -6,7 +6,7 @@ package nl.uu.cs.ape.models.logic.constructs;
  *
  * @author Vedran Kasalica
  */
-public interface PredicateLabel extends Comparable<PredicateLabel>, APEPredicate {
+public interface PredicateLabel extends Comparable<PredicateLabel> {
 
     /**
      * Get the unique predicate identifier defined as String.
