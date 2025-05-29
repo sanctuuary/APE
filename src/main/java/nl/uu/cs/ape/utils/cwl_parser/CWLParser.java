@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.Yaml;
@@ -128,12 +127,14 @@ public class CWLParser {
         return List.of();
     }
 
-    private final String formatKey = "format";
-    private final String dataKey = "http://edamontology.org/data_0006";
-    private final String shortDataKey = "edam:data_0006";
+    private final String inputsKey = "inputs";
+    private final String outputsKey = "outputs";
+    private final String formatTypeKey = "format";
+    private final String dataTypeKey = "http://edamontology.org/data_0006";
 
-    public List<CWLData> getFilteredInputsWithFormatAndEDAM() {
-        Object inputsObj = cwlContent.get("inputs");
+
+    public List<CWLData> getIOTypes(String cwlIOKey) {
+        Object inputsObj = cwlContent.get(cwlIOKey);
         if (!(inputsObj instanceof Map)) {
             return List.of();
         }
@@ -147,8 +148,8 @@ public class CWLParser {
 
             if (inputVal instanceof Map) {
                 Map<String, Object> inputMap = (Map<String, Object>) inputVal;
-                String currFormat = APEUtils.mapGetString(inputMap, formatKey);
-                String currData = APEUtils.mapGetString(inputMap, dataKey);
+                String currFormat = APEUtils.mapGetString(inputMap, formatTypeKey);
+                String currData = APEUtils.mapGetString(inputMap, dataTypeKey);
 
                 if (currFormat != null && currData != null) {
                     inputList.add(new CWLData(currFormat, currData, inputId));
@@ -159,42 +160,12 @@ public class CWLParser {
         return inputList;
     }
 
-    public Map<String, Object> getInputs() {
-        Object inputs = cwlContent.get("inputs");
-        if (inputs instanceof Map) {
-            return (Map<String, Object>) inputs;
-        }
-        return Map.of();
+    public List<CWLData> getInputs() {
+        return getIOTypes(inputsKey);
     }
 
-    public Map<String, Object> getOutputs() {
-        Object outputs = cwlContent.get("outputs");
-        if (outputs instanceof Map) {
-            return (Map<String, Object>) outputs;
-        }
-        return Map.of();
-    }
-
-    public void printInputTypesAndFormats() {
-        Map<String, Object> inputs = getInputs();
-        for (Map.Entry<String, Object> entry : inputs.entrySet()) {
-            String id = entry.getKey();
-            Map<String, Object> def = (Map<String, Object>) entry.getValue();
-            System.out.println("Input: " + id);
-            System.out.println("  Type: " + def.get("type"));
-            System.out.println("  Format: " + def.get("format"));
-        }
-    }
-
-    public void printOutputTypesAndFormats() {
-        Map<String, Object> outputs = getOutputs();
-        for (Map.Entry<String, Object> entry : outputs.entrySet()) {
-            String id = entry.getKey();
-            Map<String, Object> def = (Map<String, Object>) entry.getValue();
-            System.out.println("Output: " + id);
-            System.out.println("  Type: " + def.get("type"));
-            System.out.println("  Format: " + def.get("format"));
-        }
+    public List<CWLData> getOutputs() {
+        return getIOTypes(outputsKey);
     }
 
 }

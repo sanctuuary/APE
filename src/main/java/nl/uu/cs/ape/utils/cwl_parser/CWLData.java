@@ -4,6 +4,9 @@ public class CWLData {
     private String dataFormat;
     private String dataType;
     private String cwlFieldID;
+    public static final String DATA_ROOT = "format_1915";
+    public static final String FORMAT_ROOT = "data_0006";
+    
 
 
     public CWLData(String dataFormat, String dataType, String cwlFieldID) {
@@ -23,5 +26,6 @@ public class CWLData {
     public String getCwlFieldID() {
         return cwlFieldID;
     }
+
     
 }

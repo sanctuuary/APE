@@ -28,12 +28,10 @@ public class TestCWLParser {
         CWLParser parser = new CWLParser(cwlFile.toPath());
         List<String> operations = parser.getOperations();
         // Assert that operations are not empty
-        Set<String> taxonomyOperations = new HashSet<>(operations);
         assert !operations.isEmpty() : "Operations list should not be empty";
-        List<CWLData> inputs = parser.getFilteredInputsWithFormatAndEDAM();
+        List<CWLData> inputs = parser.getInputs();
+        assert !inputs.isEmpty() :  "Inputs list should not be empty";
 
-        parser.printInputTypesAndFormats();
-        parser.printOutputTypesAndFormats();
     }
 
 }
