@@ -2,8 +2,6 @@ package nl.uu.cs.ape.models.logic.constructs;
 
 import java.util.*;
 
-import org.checkerframework.checker.units.qual.t;
-
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.automaton.State;
 import nl.uu.cs.ape.utils.APEUtils;

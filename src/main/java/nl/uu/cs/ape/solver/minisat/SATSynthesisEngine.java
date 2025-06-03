@@ -319,15 +319,6 @@ public class SATSynthesisEngine implements SynthesisEngine {
     }
 
     /**
-     * Gets cnf encoding.
-     *
-     * @return the cnf encoding
-     */
-    public String getCnfEncoding() {
-        return cnfEncoding.toString();
-    }
-
-    /**
      * Returns a set of {@link SATOutput SAT_solutions} by parsing the SAT
      * output. In case of the UNSAT the list is empty.
      *

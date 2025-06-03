@@ -45,7 +45,6 @@ public class CWLParser {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private Object expandKeysAndValues(Object node, Map<String, String> namespaces) {
         if (node instanceof Map<?, ?> map) {
             Map<String, Object> expanded = new LinkedHashMap<>();
@@ -78,7 +77,6 @@ public class CWLParser {
         return value;
     }
 
-    @SuppressWarnings("unchecked")
     private void parseCWL(InputStream inputStream) {
         Yaml yaml = new Yaml();
         Map<String, Object> raw = yaml.load(inputStream);
