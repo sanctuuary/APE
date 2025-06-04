@@ -19,6 +19,12 @@ public class CWLParser {
 
     private Map<String, Object> cwlContent;
 
+    private final String inputsKey = "inputs";
+    private final String outputsKey = "outputs";
+    private final String operationsKey = "intent";
+    private final String formatTypeKey = "format";
+    private final String dataTypeKey = "http://edamontology.org/data_0006";
+
     // Constructor to load CWL from a URL
     public CWLParser(String urlString) throws IOException {
         InputStream inputStream = loadCWLFromURL(urlString);
@@ -45,6 +51,18 @@ public class CWLParser {
         }
     }
 
+    /**
+     * Recursively traverses and expands all YAML nodes by substituting
+     * namespace-prefixed keys and string values
+     * using the provided namespace mapping. The method replaces every occurrence of
+     * a prefix (e.g., "edam:xxx")
+     * with the full IRI (e.g., "http://edamontology.org/xxx").
+     *
+     * @param node       The input YAML node (could be a Map, List, String, or
+     *                   primitive)
+     * @param namespaces A map of namespace prefixes to full IRIs
+     * @return A new object with all applicable keys and string values expanded
+     */
     private Object expandKeysAndValues(Object node, Map<String, String> namespaces) {
         if (node instanceof Map<?, ?> map) {
             Map<String, Object> expanded = new LinkedHashMap<>();
@@ -65,6 +83,16 @@ public class CWLParser {
         }
     }
 
+    /**
+     * Expands a single string containing a namespace prefix (e.g.,
+     * "edam:format_3244")
+     * to its full IRI form using the given namespace mapping.
+     *
+     * @param value      The input string, possibly containing a prefix
+     * @param namespaces A map of namespace prefixes to full IRIs
+     * @return The expanded string if a known prefix is found, otherwise the
+     *         original string
+     */
     private String expandNamespace(String value, Map<String, String> namespaces) {
         int colonIdx = value.indexOf(':');
         if (colonIdx > 0) {
@@ -77,6 +105,12 @@ public class CWLParser {
         return value;
     }
 
+    /**
+     * Parses the CWL content from the provided InputStream and expands keys and
+     * values using the namespace mapping.
+     *
+     * @param inputStream The InputStream containing the CWL content.
+     */
     private void parseCWL(InputStream inputStream) {
         Yaml yaml = new Yaml();
         Map<String, Object> raw = yaml.load(inputStream);
@@ -99,38 +133,22 @@ public class CWLParser {
         return cwlContent.get(key);
     }
 
-    // Method to get nested fields by path (e.g., "inputs.name")
-    public Object getNestedField(String path) {
-        String[] keys = path.split("\\.");
-        Map<String, Object> currentMap = cwlContent;
-        Object value = null;
-
-        for (String key : keys) {
-            value = currentMap.get(key);
-            if (value instanceof Map) {
-                currentMap = (Map<String, Object>) value;
-            } else {
-                break;
-            }
-        }
-
-        return value;
-    }
-
     public List<String> getOperations() {
-        Object intentObj = cwlContent.get("intent");
+        Object intentObj = cwlContent.get(operationsKey);
         if (intentObj instanceof List) {
             return (List<String>) intentObj;
         }
         return List.of();
     }
 
-    private final String inputsKey = "inputs";
-    private final String outputsKey = "outputs";
-    private final String formatTypeKey = "format";
-    private final String dataTypeKey = "http://edamontology.org/data_0006";
 
-
+    /**
+     * Retrieves the input and/or output types from the CWL content based on the
+     * specified key.
+     *
+     * @param cwlIOKey The key to retrieve either inputs or outputs.
+     * @return A list of CWLData objects representing the input/output types.
+     */
     public List<CWLData> getIOTypes(String cwlIOKey) {
         Object inputsObj = cwlContent.get(cwlIOKey);
         if (!(inputsObj instanceof Map)) {

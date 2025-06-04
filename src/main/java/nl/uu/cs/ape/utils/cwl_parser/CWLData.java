@@ -1,5 +1,9 @@
 package nl.uu.cs.ape.utils.cwl_parser;
 
+/**
+ * Represents a CWL data object with its format, type, and field ID.
+ * This class is used to encapsulate the input and output data related to CWL operations.
+ */
 public class CWLData {
     private String dataFormat;
     private String dataType;
