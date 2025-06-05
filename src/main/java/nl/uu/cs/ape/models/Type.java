@@ -191,9 +191,10 @@ public class Type extends TaxonomyPredicate {
 
 	/**
 	 * Generate a taxonomy data instance that is defined based on one or more
-	 * dimensions that describe it.
+	 * dimensions that describe it. The data instance is defined as an input or output within a
+	 * CWL file, and provided as a {@link CWLData} object.
 	 * 
-	 * @param jsonParam    JSON representation of the data instance
+	 * @param cwlData   CWL data object that contains the data type and format
 	 * @param domainSetup  setup of the domain
 	 * @param isOutputData {@code true} if the data is used to be module output,
 	 *                     {@code false} otherwise
