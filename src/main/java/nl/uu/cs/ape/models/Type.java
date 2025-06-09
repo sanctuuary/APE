@@ -238,53 +238,52 @@ public class Type extends TaxonomyPredicate {
 			boolean isOutputData)
 			throws APEDimensionsException {
 		AllTypes allTypes = domainSetup.getAllTypes();
-		String dataRoot = dimensionRoot;
-		if (!allTypes.existsRoot(dataRoot)) {
-			dataRoot = APEUtils.createClassIRI(CWLData.DATA_ROOT, domainSetup.getOntologyPrefixIRI());
+		if (!allTypes.existsRoot(dimensionRoot)) {
+			dimensionRoot = APEUtils.createClassIRI(dimensionRoot, domainSetup.getOntologyPrefixIRI());
 		}
-		if (!allTypes.existsRoot(dataRoot)) {
+		if (!allTypes.existsRoot(dimensionRoot)) {
 			throw APEDimensionsException
 					.notExistingDimension(
-							"Data type was defined over a non existing data dimension: '" + dataRoot + "'.");
+							"A type was defined over a non existing dimension: '" + dimensionRoot + "'.");
 		}
-		String dataTypeIRI = dimensionValue;
+		String currTypeIRI = dimensionValue;
 
-		Type dataType = allTypes.get(dataTypeIRI, dataRoot);
-		if (dataType == null) {
-			dataTypeIRI = APEUtils.createClassIRI(dataTypeIRI, domainSetup.getOntologyPrefixIRI());
-			dataType = allTypes.get(dataTypeIRI, dataRoot);
+		Type currType = allTypes.get(currTypeIRI, dimensionRoot);
+		if (currType == null) {
+			currTypeIRI = APEUtils.createClassIRI(currTypeIRI, domainSetup.getOntologyPrefixIRI());
+			currType = allTypes.get(currTypeIRI, dimensionRoot);
 		}
 
-		if (dataType != null) {
+		if (currType != null) {
 			/*
 			 * if the type exists, make it relevant from the taxonomy perspective and add it
 			 * to the list of allowed types
 			 */
-			dataType.setAsRelevantTaxonomyTerm(allTypes);
+			currType.setAsRelevantTaxonomyTerm(allTypes);
 
 			if (isOutputData) {
-				dataType = dataType.getPlainType();
+				currType = currType.getPlainType();
 			}
-		} else if (dataRoot.equals(AllTypes.getLabelRootID()) && isOutputData) {
+		} else if (dimensionRoot.equals(AllTypes.getLabelRootID()) && isOutputData) {
 			/* add a new label to the taxonomy */
-			dataType = allTypes.addPredicate(new Type(dataTypeIRI, dataTypeIRI, dataRoot, NodeType.LEAF));
+			currType = allTypes.addPredicate(new Type(currTypeIRI, currTypeIRI, dimensionRoot, NodeType.LEAF));
 
-			allTypes.getLabelRoot().addSubPredicate(dataType);
-			dataType.addParentPredicate(allTypes.getLabelRoot());
+			allTypes.getLabelRoot().addSubPredicate(currType);
+			currType.addParentPredicate(allTypes.getLabelRoot());
 
 			/*
 			 * make the type relevant from the taxonomy perspective and add it to the list
 			 * of allowed types
 			 */
-			dataType.setAsRelevantTaxonomyTerm(allTypes);
+			currType.setAsRelevantTaxonomyTerm(allTypes);
 
 		} else {
 			throw APEDimensionsException.dimensionDoesNotContainClass(String.format(
 					"Error in a JSON input, the type of data '%s' is not recognized. \nPotential reasons: \n1) there is no tool that can process the specified type (as input or output) or \n2) the type does not belong to the data dimension '%s'.",
-					dataTypeIRI, dataRoot));
+					currTypeIRI, dimensionRoot));
 		}
 
-		return dataType;
+		return currType;
 	}
 
 }
