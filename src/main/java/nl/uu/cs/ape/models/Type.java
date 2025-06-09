@@ -225,6 +225,15 @@ public class Type extends TaxonomyPredicate {
 
 	}
 
+	/**
+	 * Compute {@code Type} object from the given data values.
+	 * @param dimensionRoot
+	 * @param dimensionValue
+	 * @param domainSetup
+	 * @param isOutputData
+	 * @return
+	 * @throws APEDimensionsException
+	 */
 	private static Type compute(String dimensionRoot, String dimensionValue, APEDomainSetup domainSetup,
 			boolean isOutputData)
 			throws APEDimensionsException {
