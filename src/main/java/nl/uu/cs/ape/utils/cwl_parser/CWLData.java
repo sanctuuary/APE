@@ -5,9 +5,13 @@ package nl.uu.cs.ape.utils.cwl_parser;
  * This class is used to encapsulate the input and output data related to CWL operations.
  */
 public class CWLData {
+    /** Format of data, specified using EDAM ontology terms */
     private String dataFormat;
+    /** Type of data, specified using EDAM ontology terms */
     private String dataType;
+    /** Field ID in the CWL document, used to identify the data */
     private String cwlFieldID;
+    
     public static final String DATA_ROOT = "data_0006";
     public static final String FORMAT_ROOT = "format_1915";
     

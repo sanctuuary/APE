@@ -413,17 +413,21 @@ public class APEDomainSetup {
          * valid, the module is not added to the domain.
          */
         List<Type> inputs = new ArrayList<>();
+        List<String> inputCWLKeys = new ArrayList<>();
         List<Type> outputs = new ArrayList<>();
+        List<String> outputCWLKeys = new ArrayList<>();
         try {
             List<CWLData> inputsRaw = cwlParser.getInputs();
             for (CWLData inputRaw : inputsRaw) {
                 inputs.add(Type.taxonomyInstanceFromCWLData(inputRaw, this, false));
+                inputCWLKeys.add(inputRaw.getCwlFieldID());
             }
             updateMaxNoToolInputs(inputs.size());
 
             List<CWLData> outputsRaw = cwlParser.getOutputs();
             for (CWLData outputRaw : outputsRaw) {
                 outputs.add(Type.taxonomyInstanceFromCWLData(outputRaw, this, true));
+                outputCWLKeys.add(outputRaw.getCwlFieldID());
             }
             updateMaxNoToolOutputs(outputs.size());
 
@@ -461,7 +465,9 @@ public class APEDomainSetup {
         }
 
         currModule.setModuleInput(inputs);
+        currModule.setModuleCWLInputKeys(inputCWLKeys);
         currModule.setModuleOutput(outputs);
+        currModule.setModuleCWLOutputKeys(outputCWLKeys);
         currModule.setAsRelevantTaxonomyTerm(allModules);
 
         return Optional.of(currModule);

@@ -24,10 +24,18 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  */
 public class Type extends TaxonomyPredicate {
 
+	/** Name of the data type, e.g. "DNA sequence" */
 	private final String typeName;
+	/** Unique identifier of the data type. The identifier can be human-readable (e.g. "DNA_sequence") or
+	 * machine-readable (e.g. "data_0001"). */
 	private final String typeID;
+
+	/** Plain type is an artificial type that is used to represent the "plain/simple" version of the abstract class/type. A plain type is the class that does not belong to any of its subclasses. For example, a "plain YAML" is a YAML format that has no extensions. */
 	private Type plainType;
 
+	/** Field identifier used in the CWL document to identify the input/output data type. The field ID cannot be set on a single type, but rather on an auxiliary type that is created from multiple types. */
+	protected String cwlFieldID = null;
+	
 	/**
 	 * Constructor used to create a Type object.
 	 *
@@ -83,6 +91,10 @@ public class Type extends TaxonomyPredicate {
 	 */
 	public Type getPlainType() {
 		return plainType;
+	}
+
+	public String getCwlFieldID() {
+		return cwlFieldID;
 	}
 
 	/**
@@ -191,10 +203,11 @@ public class Type extends TaxonomyPredicate {
 
 	/**
 	 * Generate a taxonomy data instance that is defined based on one or more
-	 * dimensions that describe it. The data instance is defined as an input or output within a
+	 * dimensions that describe it. The data instance is defined as an input or
+	 * output within a
 	 * CWL file, and provided as a {@link CWLData} object.
 	 * 
-	 * @param cwlData   CWL data object that contains the data type and format
+	 * @param cwlData      CWL data object that contains the data type and format
 	 * @param domainSetup  setup of the domain
 	 * @param isOutputData {@code true} if the data is used to be module output,
 	 *                     {@code false} otherwise
@@ -210,8 +223,10 @@ public class Type extends TaxonomyPredicate {
 		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<>();
 		AllTypes allTypes = domainSetup.getAllTypes();
 
-		Type dataType = compute(CWLData.DATA_ROOT, cwlData.getDataType(), domainSetup, isOutputData);
-		Type dataFormat = compute(CWLData.FORMAT_ROOT, cwlData.getDataFormat(), domainSetup, isOutputData);
+		Type dataType = compute(CWLData.DATA_ROOT, cwlData.getDataType(), domainSetup,
+				isOutputData);
+		Type dataFormat = compute(CWLData.FORMAT_ROOT, cwlData.getDataFormat(), domainSetup,
+				isOutputData);
 		parameterDimensions.add(dataType);
 		parameterDimensions.add(dataFormat);
 		/* If label was not defined it should be an empty label. */
@@ -227,15 +242,27 @@ public class Type extends TaxonomyPredicate {
 
 	/**
 	 * Compute {@code Type} object from the given data values.
+	 * 
 	 * @param dimensionRoot
+	 *                       The root of the dimension, e.g. "data_0006" for data
+	 *                       type or "format_1915" for data format.
 	 * @param dimensionValue
+	 *                       The value of the dimension, e.g. "data_0001" for a
+	 *                       specific data type or "format_1234" for a specific
+	 *                       format.
 	 * @param domainSetup
+	 *                       The domain object, which contains the ontology and all
+	 *                       types.
 	 * @param isOutputData
-	 * @return
-	 * @throws APEDimensionsException
+	 *                       {@code true} if the data is used to be module output,
+	 *                       {@code false} otherwise
+	 * @return A {@code Type} object that represents the data instance given as the
+	 *         parameter.
+	 * @throws APEDimensionsException if the referenced types are not well defined
+	 *                                or if the dimension does not contain the
+	 *                                specified class.
 	 */
-	private static Type compute(String dimensionRoot, String dimensionValue, APEDomainSetup domainSetup,
-			boolean isOutputData)
+	private static Type compute(String dimensionRoot, String dimensionValue, APEDomainSetup domainSetup, boolean isOutputData)
 			throws APEDimensionsException {
 		AllTypes allTypes = domainSetup.getAllTypes();
 		if (!allTypes.existsRoot(dimensionRoot)) {
@@ -282,8 +309,8 @@ public class Type extends TaxonomyPredicate {
 					"Error in a JSON input, the type of data '%s' is not recognized. \nPotential reasons: \n1) there is no tool that can process the specified type (as input or output) or \n2) the type does not belong to the data dimension '%s'.",
 					currTypeIRI, dimensionRoot));
 		}
-
 		return currType;
 	}
+
 
 }
