@@ -107,11 +107,11 @@ public class ModuleNode extends SolutionWorkflowNode {
     public void setUsedModule(Module module) {
         this.usedModule = module;
 
-        if(usedModule.getModuleCWLInputKeys() != null) {
+        if(usedModule.getModuleCWLInputKeys() != null && !usedModule.getModuleCWLInputKeys().isEmpty()) {
             this.inputCWLKeys = usedModule.getModuleCWLInputKeys();
         } else {
             this.inputCWLKeys = new ArrayList<>();
-            for (int i = 1; i <= inputTypes.size(); i++) {
+            for (int i = 1; i <= module.getModuleInput().size(); i++) {
                 this.inputCWLKeys.add(String.format("%s_%s_%o",
                         this.getNodeLabel(),
                         "in",
@@ -119,11 +119,11 @@ public class ModuleNode extends SolutionWorkflowNode {
             }
         }
         
-        if(usedModule.getModuleCWLOutputKeys() != null) {
+        if(usedModule.getModuleCWLOutputKeys() != null && !usedModule.getModuleCWLOutputKeys().isEmpty()) {
             this.outputCWLKeys = usedModule.getModuleCWLOutputKeys();
         } else {
             this.outputCWLKeys = new ArrayList<>();
-            for (int i = 1; i <= outputTypes.size(); i++) {
+            for (int i = 1; i <= module.getModuleOutput().size(); i++) {
                 this.outputCWLKeys.add(String.format("%s_%s_%o",
                         this.getNodeLabel(),
                         "out",

@@ -31,7 +31,7 @@ import java.util.Optional;
 @Slf4j
 public class Main {
 
-    private static final String biotools_config_URL = "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/bio.tools/config.json";
+    private static final String biotools_config_URL = "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/non-executable-domains/bio.tools/config.json";
 
     /**
      * The entry point of application when the library is used in a Command Line
@@ -85,7 +85,20 @@ public class Main {
 
         try {
             JSONArray tool = BioToolsAPI.getAndConvertToolList(List.of(biotoolsID)).getJSONArray("functions");
-            APEFiles.write2file(tool.toString(4), new File("./tool.json"), false);
+
+            String cwlURL = String.format(
+                    "https://raw.githubusercontent.com/Workflomics/tools-and-domains/main/cwl-tools/%s/%s.cwl",
+                    biotoolsID, biotoolsID);
+
+            JSONArray toolArray = new JSONArray();
+            JSONObject toolEntry = new JSONObject();
+            toolEntry.put("type", "CWL_ANNOTATION");
+            toolEntry.put("cwl_reference", cwlURL);
+            toolArray.put(toolEntry);
+
+            APEFiles.write2file(toolArray.toString(4), new File("./tool.json"), false);
+
+            // APEFiles.write2file(tool.toString(4), new File("./tool.json"), false);
             for (JSONObject toolAnnotation : APEUtils.getJSONListFromJSONArray(tool)) {
                 APE apeFramework = new APE(biotools_config_URL);
 

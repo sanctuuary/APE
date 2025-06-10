@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,10 +45,12 @@ class CLITest {
         );
     }
 
-    void run(String base_config_path, String ontology_path, String tools_path, String constraints_path, String solution_dir_path) throws IOException {
+    void run(String base_config_path, String ontology_path, String tools_path, String constraints_path,
+            String solution_dir_path) throws IOException {
 
         // absolute solution_dir_path
-        final Path solution_path = Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path)));
+        final Path solution_path = Paths
+                .get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path)));
 
         // absolute Figures and Executables directories
         final Path figures_path = solution_path.resolve(APERunConfig.FIGURES_FOLDER_NAME);
@@ -73,20 +76,37 @@ class CLITest {
                 solution_dir_path);
 
         // create a new configuration file
-        final String config_path = TestResources.writeFile(Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path))).resolve("config.json").toAbsolutePath().toString(), config_content.toString(2));
+        final String config_path = TestResources
+                .writeFile(Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path)))
+                        .resolve("config.json").toAbsolutePath().toString(), config_content.toString(2));
 
-        Main.main(new String[]{
+        Main.main(new String[] {
                 config_path
         });
 
         // check whether images are produced correctly
         assertTrue(Files.exists(figures_path));
-        final int figures_amount_generated = Objects.requireNonNull(Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path))).resolve(APERunConfig.FIGURES_FOLDER_NAME).toFile().list()).length;
+        final int figures_amount_generated = Objects.requireNonNull(
+                Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path)))
+                        .resolve(APERunConfig.FIGURES_FOLDER_NAME).toFile().list()).length;
         assertEquals(config_content.getInt("number_of_generated_graphs"), figures_amount_generated);
 
         // check whether scripts are produced correctly
         assertTrue(Files.exists(executables_path));
-        final int executables_amount_generated = Objects.requireNonNull(Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path))).resolve(APERunConfig.EXECUTABLES_FOLDER_NAME).toFile().list()).length;
+        final int executables_amount_generated = Objects.requireNonNull(
+                Paths.get(Objects.requireNonNull(TestResources.getAbsoluteResourcePath(solution_dir_path)))
+                        .resolve(APERunConfig.EXECUTABLES_FOLDER_NAME).toFile().list()).length;
         assertEquals(config_content.getInt("number_of_execution_scripts"), executables_amount_generated);
+    }
+    private static final String TOOL_ID = "comet";
+    private static final String EXPECTED_CWL_FILE = "./comet.cwl";
+    
+    @Test
+    public void testPullAToolComet() {
+        String[] args = new String[] { "pull-a-tool", TOOL_ID };
+        Main.main(args);
+
+        File result = new File(EXPECTED_CWL_FILE);
+        assertTrue(result.exists(), "Expected CWL file for 'comet' to be generated.");
     }
 }
