@@ -28,7 +28,7 @@ class APEDomainSetupTest {
 
             assertFalse(toolJson.isEmpty());
             APE apeFramework = new APE(
-                    "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/bio.tools/config.json");
+                    "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/non-executable-domains/bio.tools/config.json");
 
             Module currModule = apeFramework.getDomainSetup()
                     .updateModuleFromJson(toolJson).get();
