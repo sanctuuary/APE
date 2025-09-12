@@ -42,7 +42,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
     private boolean isRelevant;
 
     /** True if the parents were set to be relevant. */
-    private boolean patentPredRelevant = false;
+    private boolean parentPredRelevant = false;
 
     /** True if the children were set to be relevant. */
     private boolean childPredRelevant = false;
@@ -264,7 +264,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
      */
     private boolean setAsRelevantTaxonomyTermBottomUp(AllPredicates allPredicates) {
         this.setIsRelevant();
-        if (this.patentPredRelevant) {
+        if (this.parentPredRelevant) {
             return true;
         }
         boolean succExe = true;
@@ -274,7 +274,7 @@ public abstract class TaxonomyPredicate implements PredicateLabel {
         for (TaxonomyPredicate parentPredicate : APEUtils.safe(this.parentPredicates)) {
             succExe = succExe && parentPredicate.setAsRelevantTaxonomyTermBottomUp(allPredicates);
         }
-        this.patentPredRelevant = true;
+        this.parentPredRelevant = true;
         return succExe;
     }
 
