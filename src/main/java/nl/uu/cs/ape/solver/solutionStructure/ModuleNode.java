@@ -112,7 +112,7 @@ public class ModuleNode extends SolutionWorkflowNode {
         } else {
             this.inputCWLKeys = new ArrayList<>();
             for (int i = 1; i <= module.getModuleInput().size(); i++) {
-                this.inputCWLKeys.add(String.format("%s_%s_%o",
+                this.inputCWLKeys.add(String.format("%s_%s_%d",
                         this.getNodeLabel(),
                         "in",
                         i));
