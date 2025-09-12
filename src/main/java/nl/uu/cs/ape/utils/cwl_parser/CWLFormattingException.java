@@ -1,7 +1,9 @@
 package nl.uu.cs.ape.utils.cwl_parser;
 
 /**
- * 
+ * This exception is thrown to indicate issues with the formatting of a CWL (Common Workflow Language)
+ * tool description file. It is used to signal errors such as missing required fields for annotation
+ * or general formatting problems that prevent the file from being processed correctly.
  */
 public class CWLFormattingException extends RuntimeException {
     
