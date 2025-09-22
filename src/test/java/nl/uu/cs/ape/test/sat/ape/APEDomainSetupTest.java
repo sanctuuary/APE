@@ -13,6 +13,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import nl.uu.cs.ape.APE;
 import nl.uu.cs.ape.domain.BioToolsAPI;
 import nl.uu.cs.ape.models.Module;
+import nl.uu.cs.ape.utils.WorkflomicsConstants;
 import nl.uu.cs.ape.solver.solutionStructure.cwl.ToolCWLCreator;
 
 class APEDomainSetupTest {
@@ -27,8 +28,7 @@ class APEDomainSetupTest {
 
 
             assertFalse(toolJson.isEmpty());
-            APE apeFramework = new APE(
-                    "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/non-executable-domains/bio.tools/config.json");
+            APE apeFramework = new APE(WorkflomicsConstants.BIOTOOLS_CONFIG_URL);
 
             Module currModule = apeFramework.getDomainSetup()
                     .updateModuleFromJson(toolJson).get();

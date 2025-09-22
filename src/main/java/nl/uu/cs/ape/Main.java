@@ -7,6 +7,7 @@ import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.domain.BioToolsAPI;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.utils.WorkflomicsConstants;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.solver.solutionStructure.cwl.ToolCWLCreator;
 import nl.uu.cs.ape.models.Module;
@@ -31,7 +32,7 @@ import java.util.Optional;
 @Slf4j
 public class Main {
 
-    private static final String biotools_config_URL = "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/non-executable-domains/bio.tools/config.json";
+    private static final String biotools_config_URL = WorkflomicsConstants.BIOTOOLS_CONFIG_URL;
 
     /**
      * The entry point of application when the library is used in a Command Line
@@ -86,9 +87,7 @@ public class Main {
         try {
             JSONArray tool = BioToolsAPI.getAndConvertToolList(List.of(biotoolsID)).getJSONArray("functions");
 
-            String cwlURL = String.format(
-                    "https://raw.githubusercontent.com/Workflomics/tools-and-domains/main/cwl-tools/%s/%s.cwl",
-                    biotoolsID, biotoolsID);
+            String cwlURL = WorkflomicsConstants.getCwlToolUrl(biotoolsID);
 
             JSONArray toolArray = new JSONArray();
             JSONObject toolEntry = new JSONObject();
