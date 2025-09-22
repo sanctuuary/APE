@@ -11,14 +11,22 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 
+import nl.uu.cs.ape.utils.WorkflomicsConstants;
 import nl.uu.cs.ape.utils.cwl_parser.CWLData;
 import nl.uu.cs.ape.utils.cwl_parser.CWLParser;
 
 public class TestCWLParser {
 
-    // Example test method (to be implemented)
-    public void testLoadCWLFromURL() {
-        // Implement test logic here
+    @Test
+    public void testLoadCWLFromURL() throws StreamReadException, DatabindException, IOException {
+        // Load CWL from Workflomics URL
+        String cometCwlUrl = WorkflomicsConstants.getCwlToolUrl("comet");
+        CWLParser parser = new CWLParser(cometCwlUrl);
+        List<String> operations = parser.getOperations();
+        // Assert that operations are not empty
+        assert !operations.isEmpty() : "Operations list should not be empty";
+        List<CWLData> inputs = parser.getInputs();
+        assert !inputs.isEmpty() : "Inputs list should not be empty";
     }
 
     @Test

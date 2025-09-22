@@ -23,7 +23,7 @@ public class CWLParser {
     private final String outputsKey = "outputs";
     private final String operationsKey = "intent";
     private final String formatTypeKey = "format";
-    private final String dataTypeKey = "http://edamontology.org/data_0006";
+    private final String dataTypeKey = "http://edamontology.org/" + CWLData.DATA_ROOT;
 
     // Constructor to load CWL from a URL
     public CWLParser(String urlString) throws IOException {

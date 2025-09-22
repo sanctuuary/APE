@@ -379,7 +379,7 @@ public class APEDomainSetup {
 
         // Extract the module's label and ID
         String moduleLabel = (String) cwlParser.getField("label");
-        String moduleIRI = APEUtils.createClassIRI((String) cwlParser.getField("label"), ontologyPrefixIRI);
+        String moduleIRI = APEUtils.createClassIRI(moduleLabel, ontologyPrefixIRI);
 
         if (allModules.get(moduleIRI) != null) {
             moduleIRI = moduleIRI + "[tool]";

@@ -97,7 +97,6 @@ public class Main {
 
             APEFiles.write2file(toolArray.toString(4), new File("./tool.json"), false);
 
-            // APEFiles.write2file(tool.toString(4), new File("./tool.json"), false);
             for (JSONObject toolAnnotation : APEUtils.getJSONListFromJSONArray(tool)) {
                 APE apeFramework = new APE(biotools_config_URL);
 
