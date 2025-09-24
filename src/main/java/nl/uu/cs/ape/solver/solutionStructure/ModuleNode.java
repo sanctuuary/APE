@@ -61,9 +61,19 @@ public class ModuleNode extends SolutionWorkflowNode {
     private List<TypeNode> inputTypes;
 
     /**
+     * List of the CWL keys that are used as input for the tool.
+     */
+    private List<String> inputCWLKeys;
+
+    /**
      * List of the data instances that are generated as output of the tool.
      */
     private List<TypeNode> outputTypes;
+
+    /** 
+     * List of the CWL keys that are generated as output of the tool. 
+     * */
+    private List<String> outputCWLKeys;
 
     /**
      * Creating Workflow Node that corresponds to a tool usage.
@@ -96,6 +106,32 @@ public class ModuleNode extends SolutionWorkflowNode {
      */
     public void setUsedModule(Module module) {
         this.usedModule = module;
+
+        if(usedModule.getModuleCWLInputKeys() != null && !usedModule.getModuleCWLInputKeys().isEmpty()) {
+            this.inputCWLKeys = usedModule.getModuleCWLInputKeys();
+        } else {
+            this.inputCWLKeys = new ArrayList<>();
+            for (int i = 1; i <= module.getModuleInput().size(); i++) {
+                this.inputCWLKeys.add(String.format("%s_%s_%d",
+                        this.getNodeLabel(),
+                        "in",
+                        i));
+            }
+        }
+        
+        if(usedModule.getModuleCWLOutputKeys() != null && !usedModule.getModuleCWLOutputKeys().isEmpty()) {
+            this.outputCWLKeys = usedModule.getModuleCWLOutputKeys();
+        } else {
+            this.outputCWLKeys = new ArrayList<>();
+            for (int i = 1; i <= module.getModuleOutput().size(); i++) {
+                this.outputCWLKeys.add(String.format("%s_%s_%o",
+                        this.getNodeLabel(),
+                        "out",
+                        i));
+            }
+        }
+
+            
     }
 
     /**
@@ -110,15 +146,6 @@ public class ModuleNode extends SolutionWorkflowNode {
         } else {
             log.warn("A concrete tool  cannot be used to describe an abstract module.");
         }
-    }
-
-    /**
-     * Add input type.
-     *
-     * @param inputTypeNode the input type node
-     */
-    public void addInputType(TypeNode inputTypeNode) {
-        inputTypes.add(inputTypeNode);
     }
 
     /**
@@ -250,6 +277,23 @@ public class ModuleNode extends SolutionWorkflowNode {
         return !outputTypes.stream().filter(typeNode -> !typeNode.isEmpty()).collect(Collectors.toList()).isEmpty();
     }
 
+    /**
+     * Gets input CWL keys.
+     *
+     * @return the input CWL keys
+     */
+    public List<String> getInputCWLKeys() {
+        return inputCWLKeys;
+    }
+
+    /**
+     * Gets output CWL keys.
+     *
+     * @return the output CWL keys
+     */
+    public List<String> getOutputCWLKeys() {
+        return outputCWLKeys;
+    }
     /**
      * Is empty boolean.
      *

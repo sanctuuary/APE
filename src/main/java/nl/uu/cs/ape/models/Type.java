@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.utils.cwl_parser.CWLData;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
@@ -23,10 +24,18 @@ import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
  */
 public class Type extends TaxonomyPredicate {
 
+	/** Name of the data type, e.g. "DNA sequence" */
 	private final String typeName;
+	/** Unique identifier of the data type. The identifier can be human-readable (e.g. "DNA_sequence") or
+	 * machine-readable (e.g. "data_0001"). */
 	private final String typeID;
+
+	/** Plain type is an artificial type that is used to represent the "plain/simple" version of the abstract class/type. A plain type is the class that does not belong to any of its subclasses. For example, a "plain YAML" is a YAML format that has no extensions. */
 	private Type plainType;
 
+	/** Field identifier used in the CWL document to identify the input/output data type. The field ID cannot be set on a single type, but rather on an auxiliary type that is created from multiple types. */
+	protected String cwlFieldID = null;
+	
 	/**
 	 * Constructor used to create a Type object.
 	 *
@@ -84,6 +93,10 @@ public class Type extends TaxonomyPredicate {
 		return plainType;
 	}
 
+	public String getCwlFieldID() {
+		return cwlFieldID;
+	}
+
 	/**
 	 * Generate a taxonomy data instance that is defined based on one or more
 	 * dimensions that describe it.
@@ -99,7 +112,7 @@ public class Type extends TaxonomyPredicate {
 	 */
 	public static Type taxonomyInstanceFromJson(JSONObject jsonParam, APEDomainSetup domainSetup, boolean isOutputData)
 			throws JSONException, APEDimensionsException {
-				
+
 		/* Set of predicates where each describes a type dimension */
 		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<>();
 		boolean labelDefined = false;
@@ -127,22 +140,22 @@ public class Type extends TaxonomyPredicate {
 					currType = allTypes.get(currTypeIRI, curRootIRI);
 				}
 
-				if (currRootLabel.equals(allTypes.getLabelRootID())) {
+				if (currRootLabel.equals(AllTypes.getLabelRootID())) {
 					labelDefined = true;
 				}
-				
+
 				if (currType != null) {
-					if (isOutputData) {
-						currType.setAsRelevantTaxonomyTerm(allTypes);
-						currType = currType.getPlainType();
-					}
 					/*
 					 * if the type exists, make it relevant from the taxonomy perspective and add it
 					 * to the list of allowed types
 					 */
 					currType.setAsRelevantTaxonomyTerm(allTypes);
 					logConnectedPredicates.add(currType);
-				} else if (currRootLabel.equals(allTypes.getLabelRootID()) && isOutputData) {
+
+					if (isOutputData) {
+						currType = currType.getPlainType();
+					}
+				} else if (currRootLabel.equals(AllTypes.getLabelRootID()) && isOutputData) {
 					/* add a new label to the taxonomy */
 					currType = allTypes.addPredicate(new Type(currTypeLabel, currTypeLabel, curRootIRI, NodeType.LEAF));
 
@@ -158,7 +171,7 @@ public class Type extends TaxonomyPredicate {
 
 				} else {
 					throw APEDimensionsException.dimensionDoesNotContainClass(String.format(
-							"Error in a JSON input. The data type '%s' was not defined or does not belong to the data dimension '%s'.",
+							"Error in a JSON input, the type of data '%s' is not recognized. \nPotential reasons: \n1) there is no tool that can process the specified type (as input or output) or \n2) the type does not belong to the data dimension '%s'.",
 							currTypeIRI, curRootIRI));
 				}
 			}
@@ -187,5 +200,117 @@ public class Type extends TaxonomyPredicate {
 				domainSetup);
 
 	}
+
+	/**
+	 * Generate a taxonomy data instance that is defined based on one or more
+	 * dimensions that describe it. The data instance is defined as an input or
+	 * output within a
+	 * CWL file, and provided as a {@link CWLData} object.
+	 * 
+	 * @param cwlData      CWL data object that contains the data type and format
+	 * @param domainSetup  setup of the domain
+	 * @param isOutputData {@code true} if the data is used to be module output,
+	 *                     {@code false} otherwise
+	 * @return A type object that represent the data instance given as the
+	 *         parameter.
+	 * @throws JSONException          if the given JSON is not well formatted
+	 * @throws APEDimensionsException if the referenced types are not well defined
+	 */
+	public static Type taxonomyInstanceFromCWLData(CWLData cwlData, APEDomainSetup domainSetup, boolean isOutputData)
+			throws JSONException, APEDimensionsException {
+
+		/* Set of predicates where each describes a type dimension */
+		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<>();
+		AllTypes allTypes = domainSetup.getAllTypes();
+
+		Type dataType = compute(CWLData.DATA_ROOT, cwlData.getDataType(), domainSetup,
+				isOutputData);
+		Type dataFormat = compute(CWLData.FORMAT_ROOT, cwlData.getDataFormat(), domainSetup,
+				isOutputData);
+		parameterDimensions.add(dataType);
+		parameterDimensions.add(dataFormat);
+		/* If label was not defined it should be an empty label. */
+		if (isOutputData) {
+			parameterDimensions.add(allTypes.getEmptyAPELabel());
+		} else {
+			parameterDimensions.add(allTypes.getLabelRoot());
+		}
+		return AuxTypePredicate.generateAuxiliaryPredicate(parameterDimensions, LogicOperation.AND,
+				domainSetup);
+
+	}
+
+	/**
+	 * Compute {@code Type} object from the given data values.
+	 * 
+	 * @param dimensionRoot
+	 *                       The root of the dimension, e.g. "data_0006" for data
+	 *                       type or "format_1915" for data format.
+	 * @param dimensionValue
+	 *                       The value of the dimension, e.g. "data_0001" for a
+	 *                       specific data type or "format_1234" for a specific
+	 *                       format.
+	 * @param domainSetup
+	 *                       The domain object, which contains the ontology and all
+	 *                       types.
+	 * @param isOutputData
+	 *                       {@code true} if the data is used to be module output,
+	 *                       {@code false} otherwise
+	 * @return A {@code Type} object that represents the data instance given as the
+	 *         parameter.
+	 * @throws APEDimensionsException if the referenced types are not well defined
+	 *                                or if the dimension does not contain the
+	 *                                specified class.
+	 */
+	private static Type compute(String dimensionRoot, String dimensionValue, APEDomainSetup domainSetup, boolean isOutputData)
+			throws APEDimensionsException {
+		AllTypes allTypes = domainSetup.getAllTypes();
+		if (!allTypes.existsRoot(dimensionRoot)) {
+			dimensionRoot = APEUtils.createClassIRI(dimensionRoot, domainSetup.getOntologyPrefixIRI());
+		}
+		if (!allTypes.existsRoot(dimensionRoot)) {
+			throw APEDimensionsException
+					.notExistingDimension(
+							"A type was defined over a non existing dimension: '" + dimensionRoot + "'.");
+		}
+		String currTypeIRI = dimensionValue;
+
+		Type currType = allTypes.get(currTypeIRI, dimensionRoot);
+		if (currType == null) {
+			currTypeIRI = APEUtils.createClassIRI(currTypeIRI, domainSetup.getOntologyPrefixIRI());
+			currType = allTypes.get(currTypeIRI, dimensionRoot);
+		}
+
+		if (currType != null) {
+			/*
+			 * if the type exists, make it relevant from the taxonomy perspective and add it
+			 * to the list of allowed types
+			 */
+			currType.setAsRelevantTaxonomyTerm(allTypes);
+
+			if (isOutputData) {
+				currType = currType.getPlainType();
+			}
+		} else if (dimensionRoot.equals(AllTypes.getLabelRootID()) && isOutputData) {
+			/* add a new label to the taxonomy */
+			currType = allTypes.addPredicate(new Type(currTypeIRI, currTypeIRI, dimensionRoot, NodeType.LEAF));
+
+			allTypes.getLabelRoot().addSubPredicate(currType);
+			currType.addParentPredicate(allTypes.getLabelRoot());
+
+			/*
+			 * make the type relevant from the taxonomy perspective and add it to the list
+			 * of allowed types
+			 */
+			currType.setAsRelevantTaxonomyTerm(allTypes);
+
+		} else {
+			throw APEDimensionsException.dimensionDoesNotContainClass(String.format(
+					"Error in a JSON input, the type of data '%s' is not recognized. \nPotential reasons: \n1) there is no tool that can process the specified type (as input or output) or \n2) the type does not belong to the data dimension '%s'.",
+					currTypeIRI, dimensionRoot));
+		}
+		return currType;
+	}
+
 
 }

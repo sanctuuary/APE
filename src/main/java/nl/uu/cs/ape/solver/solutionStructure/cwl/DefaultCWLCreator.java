@@ -150,7 +150,7 @@ public class DefaultCWLCreator extends CWLWorkflowBase {
             int outId = typeNode.getCreatedByModule().getOutputTypes().get(i - 1).getAutomatonState()
                     .getLocalStateNumber();
             cwlRepresentation
-                    .append(generateInputOrOutputName(typeNode.getCreatedByModule(), "out", outId + 1))
+                    .append(typeNode.getCreatedByModule().getOutputCWLKeys().get(outId))
                     .append("\n");
             i++;
         }
@@ -205,7 +205,7 @@ public class DefaultCWLCreator extends CWLWorkflowBase {
             IntStream.range(0, inputs.size()).filter(i -> !inputs.get(i).isEmpty())
                     .forEach(i -> cwlRepresentation
                             .append(ind(baseInd + 1))
-                            .append(generateInputOrOutputName(moduleNode, "in", i + 1))
+                            .append(moduleNode.getInputCWLKeys().get(i))
                             .append(": ")
                             .append(workflowParameters.get(inputs.get(i).getNodeID()))
                             .append("\n"));
@@ -229,7 +229,7 @@ public class DefaultCWLCreator extends CWLWorkflowBase {
         List<TypeNode> outputs = moduleNode.getOutputTypes();
         IntStream.range(0, outputs.size()).filter(i -> !outputs.get(i).isEmpty())
                 .forEach(i -> {
-                    String name = generateInputOrOutputName(moduleNode, "out", i + 1);
+                    String name = moduleNode.getOutputCWLKeys().get(i);
                     addNewParameterToMap(outputs.get(i), String.format("%s/%s", stepName(moduleNode), name));
                     cwlRepresentation
                             .append(name)

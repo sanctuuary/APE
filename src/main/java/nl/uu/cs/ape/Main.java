@@ -3,9 +3,11 @@ package nl.uu.cs.ape;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.configuration.APEConfigException;
 import nl.uu.cs.ape.configuration.APERunConfig;
+import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.domain.BioToolsAPI;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.utils.WorkflomicsConstants;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.solver.solutionStructure.cwl.ToolCWLCreator;
 import nl.uu.cs.ape.models.Module;
@@ -30,7 +32,7 @@ import java.util.Optional;
 @Slf4j
 public class Main {
 
-    private static final String biotools_config_URL = "https://raw.githubusercontent.com/Workflomics/tools-and-domains/refs/heads/main/domains/bio.tools/config.json";
+    private static final String biotools_config_URL = WorkflomicsConstants.BIOTOOLS_CONFIG_URL;
 
     /**
      * The entry point of application when the library is used in a Command Line
@@ -84,7 +86,17 @@ public class Main {
 
         try {
             JSONArray tool = BioToolsAPI.getAndConvertToolList(List.of(biotoolsID)).getJSONArray("functions");
-            APEFiles.write2file(tool.toString(4), new File("./tool.json"), false);
+
+            String cwlURL = WorkflomicsConstants.getCwlToolUrl(biotoolsID);
+
+            JSONArray toolArray = new JSONArray();
+            JSONObject toolEntry = new JSONObject();
+            toolEntry.put("type", "CWL_ANNOTATION");
+            toolEntry.put("cwl_reference", cwlURL);
+            toolArray.put(toolEntry);
+
+            APEFiles.write2file(toolArray.toString(4), new File("./tool.json"), false);
+
             for (JSONObject toolAnnotation : APEUtils.getJSONListFromJSONArray(tool)) {
                 APE apeFramework = new APE(biotools_config_URL);
 
@@ -97,9 +109,9 @@ public class Main {
                 }
                 ToolCWLCreator toolCWLCreator = new ToolCWLCreator(cometModule.get());
 
-                APEFiles.write2file(toolCWLCreator.generate(), new File("./" + toolAnnotation.getString("id") + ".cwl"), false);
+                APEFiles.write2file(toolCWLCreator.generate(), new File("./" + toolAnnotation.getString("id") + ".cwl"),
+                        false);
             }
-            
 
         } catch (IOException e) {
             log.error("Error in fetching the tool from bio.tools.");
@@ -204,6 +216,10 @@ public class Main {
             log.error(e.getMessage());
             return;
         } catch (IOException e) {
+            log.error("Error in synthesis execution.");
+            log.error(e.getMessage());
+            return;
+        } catch (APEDimensionsException e) {
             log.error("Error in synthesis execution.");
             log.error(e.getMessage());
             return;

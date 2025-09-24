@@ -336,4 +336,5 @@ public class TypeNode extends SolutionWorkflowNode {
     public String getShortNodeID() {
         return "node" + getNodeID().hashCode();
     }
+
 }

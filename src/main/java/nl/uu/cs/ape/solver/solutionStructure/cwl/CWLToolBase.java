@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import nl.uu.cs.ape.models.AuxTypePredicate;
-import nl.uu.cs.ape.models.AuxiliaryPredicate;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.Type;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
@@ -83,7 +82,7 @@ public abstract class CWLToolBase {
         cwlRepresentation.append("    listing:\n");
 
         // Dynamically add inputs to InitialWorkDirRequirement listing
-        for (String input : this.getInputs().keySet()) {
+        for (String input : this.getFormats(tool.getModuleInput(), "-").keySet()) {
             cwlRepresentation.append("      - $(inputs.").append(input).append(")\n");
         }
 
@@ -92,26 +91,50 @@ public abstract class CWLToolBase {
         cwlRepresentation.append("    dockerPull: fix-this-path/").append(tool.getPredicateLabel()).append("\n")
                 .append("\n");
 
+        cwlRepresentation.append("$namespaces:\n");
+        cwlRepresentation.append("  edam: http://edamontology.org/\n");
+        cwlRepresentation.append("\n");
+
         generateCWLRepresentation();
 
         return cwlRepresentation.toString();
     }
 
     /**
-     * Get the map of input names and their types.
+     * Get the map of input names and their data formats.
      * 
-     * @return The map of input names and their types.
+     * @return The map of input names and their data formats.
      */
-    protected Map<String, List<TaxonomyPredicate>> getInputs() {
+    protected Map<String, List<TaxonomyPredicate>> getFormats(List<Type> toolIOs, String nameSuffix) {
         int i = 0;
-        Map<String,  List<TaxonomyPredicate>> inputNames = new HashMap<>();
-        for (Type inType : tool.getModuleInput()) {
-            List<TaxonomyPredicate> formatType = new ArrayList<>();
+        Map<String, List<TaxonomyPredicate>> inputNames = new HashMap<>();
+        for (Type inType : toolIOs) {
+            List<TaxonomyPredicate> dataFormat = new ArrayList<>();
             if (inType instanceof AuxTypePredicate) {
-                formatType = extractFormat((AuxTypePredicate) inType);
+                dataFormat = extractFormat((AuxTypePredicate) inType);
             }
-            
-            inputNames.put(tool.getPredicateLabel() + "_in_" + i++, formatType);
+
+            inputNames.put(tool.getPredicateLabel() + "_" + nameSuffix + "_" + i++, dataFormat);
+
+        }
+        return inputNames;
+    }
+
+    /**
+     * Get the map of input names and their data types.
+     * 
+     * @return The map of input names and their data types.
+     */
+    protected Map<String, List<TaxonomyPredicate>> getTypes(List<Type> toolIOs, String nameSuffix) {
+        int i = 0;
+        Map<String, List<TaxonomyPredicate>> inputNames = new HashMap<>();
+        for (Type inType : toolIOs) {
+            List<TaxonomyPredicate> dataType = new ArrayList<>();
+            if (inType instanceof AuxTypePredicate) {
+                dataType = extractDataType((AuxTypePredicate) inType);
+            }
+
+            inputNames.put(tool.getPredicateLabel() + "_" + nameSuffix + "_" + i++, dataType);
 
         }
         return inputNames;
@@ -123,30 +146,22 @@ public abstract class CWLToolBase {
             if (subtype instanceof AuxTypePredicate) {
                 formatTypes.addAll(extractFormat((AuxTypePredicate) subtype));
             } else if (subtype.getRootNodeID().equals("http://edamontology.org/format_1915")) {
-                    formatTypes.add(subtype);
+                formatTypes.add(subtype);
             }
         }
         return formatTypes;
     }
 
-    /**
-     * Get the map of input names and their types.
-     * 
-     * @return The map of input names and their types.
-     */
-    protected Map<String, List<TaxonomyPredicate>> getOutputs() {
-        int i = 0;
-        Map<String,  List<TaxonomyPredicate>> inputNames = new HashMap<>();
-        for (Type inType : tool.getModuleOutput()) {
-            List<TaxonomyPredicate> formatType = new ArrayList<>();
-            if (inType instanceof AuxTypePredicate) {
-                formatType = extractFormat((AuxTypePredicate) inType);
+    private List<TaxonomyPredicate> extractDataType(AuxTypePredicate auxType) {
+        List<TaxonomyPredicate> dataTypes = new ArrayList<>();
+        for (TaxonomyPredicate subtype : auxType.getGeneralizedPredicates()) {
+            if (subtype instanceof AuxTypePredicate) {
+                dataTypes.addAll(extractDataType((AuxTypePredicate) subtype));
+            } else if (subtype.getRootNodeID().equals("http://edamontology.org/data_0006")) {
+                dataTypes.add(subtype);
             }
-            
-            inputNames.put(tool.getPredicateLabel() + "_out_" + i++, formatType);
-
         }
-        return inputNames;
+        return dataTypes;
     }
 
     /**

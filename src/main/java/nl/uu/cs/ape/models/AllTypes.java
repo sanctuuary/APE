@@ -349,7 +349,7 @@ public class AllTypes extends AllPredicates {
      * 
      * @return String representing the root ID
      */
-    public String getLabelRootID() {
+    public static String getLabelRootID() {
         return apeLabel;
     }
 

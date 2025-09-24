@@ -11,6 +11,11 @@ import lombok.Getter;
 public enum ToolAnnotationTag {
 
     /**
+     * Type of the tool annotation.
+     */
+    TYPE("type"),
+
+    /**
      * Represents the ID of a tool.
      */
     ID("id"),

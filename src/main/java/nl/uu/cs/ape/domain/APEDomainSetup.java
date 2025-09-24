@@ -19,6 +19,8 @@ import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.constraints.ConstraintTemplateParameter;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.utils.cwl_parser.CWLData;
+import nl.uu.cs.ape.utils.cwl_parser.CWLParser;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
 import nl.uu.cs.ape.models.AllTypes;
@@ -27,6 +29,7 @@ import nl.uu.cs.ape.models.ConstraintTemplateData;
 import nl.uu.cs.ape.models.Module;
 import nl.uu.cs.ape.models.SATAtomMappings;
 import nl.uu.cs.ape.models.Type;
+import nl.uu.cs.ape.models.enums.ToolAnnotationType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
 
 /**
@@ -59,7 +62,8 @@ public class APEDomainSetup {
 
     @Setter
     /**
-     * Object used to write locally CNF SAT problem specification (in human readable format).
+     * Object used to write locally CNF SAT problem specification (in human readable
+     * format).
      */
     private String writeLocalCNF = null;
 
@@ -325,15 +329,162 @@ public class APEDomainSetup {
     }
 
     /**
-     * Creates/updates a module from a tool annotation instance from a JSON file and
-     * updates the list of modules ({@link AllModules}) in the domain accordingly.
-     *
-     * @param jsonModule JSON representation of a module
+     * Parse the tool annotation from a JSON file and update the module in the
+     * domain ({@link AllModules}) accordingly.
+     * 
+     * @param jsonModule JSON annotation of a module/tool
+     * @return {@code true} if the domain was updated, false otherwise.
+     * @throws JSONException Error if the JSON file was not properly formatted.
+     * @throws APEDimensionsException
+     * @throws IOException
+     */
+    public Optional<Module> updateModuleFromJson(JSONObject jsonModule)
+            throws JSONException, APEDimensionsException, IOException {
+
+        ToolAnnotationType annotationType;
+        try {
+            annotationType = ToolAnnotationType
+                    .fromString(jsonModule.getString(ToolAnnotationTag.TYPE.toString()));
+        } catch (JSONException e) {
+            log.debug("Tool annotation type not specified. Defaulting to APE annotation.");
+            return updateModuleFromJsonAPE(jsonModule);
+        }
+
+        switch (annotationType) {
+            case APE_ANNOTATION:
+                return updateModuleFromJsonAPE(jsonModule);
+            case CWL_ANNOTATION:
+                String cwlURL = jsonModule.getString(ToolAnnotationTag.CWL_REFERENCE.toString());
+                return updateModuleFromCWL(cwlURL);
+            default:
+                log.warn("Tool annotation format not specified. Using default APE annotations.");
+                return updateModuleFromJsonAPE(jsonModule);
+        }
+    }
+
+    /**
+     * Parse the tool annotation from a CWL file and update the module in the
+     * domain ({@link AllModules}) accordingly. The annotations are expected to
+     * follow EDAM ontology.
+     * 
+     * @param cwlFileLocation path to the CWL file (URL or local file) containing
+     *                        the tool annotations
+     * @return {@code true} if the domain was updated, false otherwise.
+     * @throws IOException Error in accessing or parsing the CWL file.
+     */
+    public Optional<Module> updateModuleFromCWL(String cwlFileLocation) throws IOException {
+
+        // Initialize CWL parser
+        CWLParser cwlParser = new CWLParser(cwlFileLocation);
+
+        // Extract the module's label and ID
+        String moduleLabel = (String) cwlParser.getField("label");
+        String moduleIRI = APEUtils.createClassIRI(moduleLabel, ontologyPrefixIRI);
+
+        if (allModules.get(moduleIRI) != null) {
+            moduleIRI = moduleIRI + "[tool]";
+        }
+
+        // Extract taxonomy operations
+        Set<String> taxonomyOperations = new HashSet<>(cwlParser.getOperations());
+        Set<String> taxonomyParentModules = APEUtils.createIRIsFromLabels(taxonomyOperations, ontologyPrefixIRI);
+
+        // Validate taxonomy parent modules
+        List<String> toRemove = new ArrayList<>();
+        for (String parentModule : taxonomyParentModules) {
+            String parentModuleIRI = APEUtils.createClassIRI(parentModule, ontologyPrefixIRI);
+            if (allModules.get(parentModuleIRI) == null) {
+                log.debug("Tool '" + moduleIRI + "' annotation issue. " +
+                        "Referenced taxonomy operation: '" + parentModuleIRI + "' cannot be found.");
+                wrongToolTax.add(moduleLabel);
+                toRemove.add(parentModuleIRI);
+            }
+        }
+        taxonomyParentModules.removeAll(toRemove);
+
+        if (taxonomyParentModules.isEmpty()) {
+            log.debug("Tool '" + moduleIRI + "' annotation issue. " +
+                    "No valid taxonomy operations found. Using root module as fallback.");
+            taxonomyParentModules.add(allModules.getRootModuleID());
+        }
+
+        /*
+         * Set the inputs and outputs of the module. If the inputs and outputs are not
+         * valid, the module is not added to the domain.
+         */
+        List<Type> inputs = new ArrayList<>();
+        List<String> inputCWLKeys = new ArrayList<>();
+        List<Type> outputs = new ArrayList<>();
+        List<String> outputCWLKeys = new ArrayList<>();
+        try {
+            List<CWLData> inputsRaw = cwlParser.getInputs();
+            for (CWLData inputRaw : inputsRaw) {
+                inputs.add(Type.taxonomyInstanceFromCWLData(inputRaw, this, false));
+                inputCWLKeys.add(inputRaw.getCwlFieldID());
+            }
+            updateMaxNoToolInputs(inputs.size());
+
+            List<CWLData> outputsRaw = cwlParser.getOutputs();
+            for (CWLData outputRaw : outputsRaw) {
+                outputs.add(Type.taxonomyInstanceFromCWLData(outputRaw, this, true));
+                outputCWLKeys.add(outputRaw.getCwlFieldID());
+            }
+            updateMaxNoToolOutputs(outputs.size());
+
+            if (inputs.isEmpty() && outputs.isEmpty()) {
+                emptyTools.add(moduleLabel);
+                log.debug("Operation '" + moduleLabel
+                        + "' was not included as it has no (valid) inputs and outputs specified.");
+                return Optional.empty();
+            }
+
+        } catch (APEDimensionsException badDimension) {
+            wrongToolIO.add(moduleLabel);
+            log.debug("Operation '" + moduleLabel + "' was not included. " + badDimension.getMessage());
+            return Optional.empty();
+        }
+
+        /* Set the implementation cwl file reference of the module, if specified. */
+        String cwlReference = cwlFileLocation;
+
+        /*
+         * Add the module and make it sub module of the currSuperModule (if it was not
+         * previously defined)
+         */
+        Module currModule = (Module) allModules
+                .addPredicate(
+                        new Module(moduleLabel, moduleIRI, allModules.getRootModuleID(), cwlReference, null));
+
+        /* For each parent module add the current module as a subset and vice versa. */
+        for (String parentModuleID : taxonomyParentModules) {
+            AbstractModule parentModule = allModules.get(parentModuleID);
+            if (parentModule != null) {
+                parentModule.addSubPredicate(currModule);
+                currModule.addParentPredicate(parentModule);
+            }
+        }
+
+        currModule.setModuleInput(inputs);
+        currModule.setModuleCWLInputKeys(inputCWLKeys);
+        currModule.setModuleOutput(outputs);
+        currModule.setModuleCWLOutputKeys(outputCWLKeys);
+        currModule.setAsRelevantTaxonomyTerm(allModules);
+
+        return Optional.of(currModule);
+    }
+
+
+    /**
+     * Parse the tool annotation from a JSON file and update the module in the
+     * domain ({@link AllModules}) accordingly.
+     * 
+     * @param jsonModule JSON annotation of a module/tool
      * @return {@code true} if the domain was updated, false otherwise.
      * @throws JSONException Error if the JSON file was not properly formatted.
      */
-    public Optional<Module> updateModuleFromJson(JSONObject jsonModule)
+    public Optional<Module> updateModuleFromJsonAPE(JSONObject jsonModule)
             throws JSONException, APEDimensionsException {
+
         String moduleIRI = APEUtils.createClassIRI(jsonModule.getString(ToolAnnotationTag.ID.toString()),
                 ontologyPrefixIRI);
         if (allModules.get(moduleIRI) != null) {
@@ -384,7 +535,8 @@ public class APEDomainSetup {
 
             if (inputs.isEmpty() && outputs.isEmpty()) {
                 emptyTools.add(moduleLabel);
-                log.debug("Operation '" + moduleLabel + "' was not included as it has no (valid) inputs and outputs specified.");
+                log.debug("Operation '" + moduleLabel
+                        + "' was not included as it has no (valid) inputs and outputs specified.");
                 return Optional.empty();
             }
 
@@ -405,7 +557,8 @@ public class APEDomainSetup {
          * previously defined)
          */
         Module currModule = (Module) allModules
-                .addPredicate(new Module(moduleLabel, moduleIRI, allModules.getRootModuleID(), cwlReference, executionCode));
+                .addPredicate(
+                        new Module(moduleLabel, moduleIRI, allModules.getRootModuleID(), cwlReference, executionCode));
 
         /* For each parent module add the current module as a subset and vice versa. */
         for (String parentModuleID : taxonomyParentModules) {
@@ -461,16 +614,20 @@ public class APEDomainSetup {
         return outputs;
     }
 
-     /**
+    /**
      * Get the implementation code of the module, if specified.
      *
      * @param jsonToolAnnotation the json tool annotation
-     * @param implementationType the implementation type ({@link ToolAnnotationTag#CWL_REFERENCE} or {@link ToolAnnotationTag#CODE})
+     * @param implementationType the implementation type
+     *                           ({@link ToolAnnotationTag#CWL_REFERENCE} or
+     *                           {@link ToolAnnotationTag#CODE})
      * @return The implementation code of the module, if specified.
      */
-    private String getModuleImplementationFromAnnotation(JSONObject jsonToolAnnotation, ToolAnnotationTag implementationType) {
+    private String getModuleImplementationFromAnnotation(JSONObject jsonToolAnnotation,
+            ToolAnnotationTag implementationType) {
         try {
-            JSONObject implementationJson = jsonToolAnnotation.getJSONObject(ToolAnnotationTag.IMPLEMENTATION.toString());
+            JSONObject implementationJson = jsonToolAnnotation
+                    .getJSONObject(ToolAnnotationTag.IMPLEMENTATION.toString());
             String implementation = implementationJson.getString(implementationType.toString());
             if (implementation.equals("")) {
                 return null;
@@ -566,7 +723,7 @@ public class APEDomainSetup {
      * Write locally the SAT (CNF) workflow specification in human readable format.
      * 
      * @param satInputFile File containing the SAT problem specification.
-     * @param mappings Mappings between the SAT problem and the domain.
+     * @param mappings     Mappings between the SAT problem and the domain.
      * @throws IOException Error in writing the file to the local file system.
      */
     public void localCNF(File satInputFile, SATAtomMappings mappings) throws IOException {
@@ -574,7 +731,7 @@ public class APEDomainSetup {
             FileInputStream cnfStream = new FileInputStream(satInputFile);
             String encoding = APEUtils.convertCNF2humanReadable(cnfStream, mappings);
             cnfStream.close();
-            
+
             APEFiles.write2file(encoding, new File(writeLocalCNF), false);
         }
     }
