@@ -469,6 +469,38 @@ public final class APEUtils {
 		log.info(text + " Running time: " + (printTime / 1000F) + " sec.");
 	}
 
+    /**
+     * This function counts the count of non-empty CNF clauses in a stream and
+     * warns if a clause is empty.
+     *
+     * @param tempSatInput the temp sat input
+     * @return the count of clauses
+     */
+    public static int countCNFClauses(InputStream tempSatInput) {
+
+        int clauseCount = 0;
+        int litCount    = 0;
+
+        Scanner scanner = new Scanner(tempSatInput);
+        scanner.nextLine();
+        while (scanner.hasNextInt()) {
+            int intAtom = scanner.nextInt();
+
+            if (intAtom == 0) {
+                if (litCount == 0) {
+                    log.warn("Found empty clause in CNF input.");
+                }
+                clauseCount++;
+                litCount = 0;
+            } else {
+                litCount++;
+            }
+        }
+        scanner.close();
+
+        return clauseCount;
+    }
+
 	/**
 	 * Convert cnf 2 human readable string.
 	 *
