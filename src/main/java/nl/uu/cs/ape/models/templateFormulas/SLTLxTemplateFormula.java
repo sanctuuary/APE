@@ -546,9 +546,7 @@ public abstract class SLTLxTemplateFormula {
             constraints.append(currComb + " ");
         }
 
-        if (!constraints.isEmpty()) {
-            constraints.append("0\n");
-        }
+        constraints.append("0\n");
 
         // each combination enforces usage of the corresponding tools and output/inputs
         for (Integer currComb : allCombinations) {
