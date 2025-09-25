@@ -79,7 +79,7 @@ public class DefaultCWLCreator extends CWLWorkflowBase {
                     currTypeFormat = type.getPredicateID();
                 }
             }
-            String inputName = String.format("input_%o", i++);
+            String inputName = String.format("input_%d", i++);
             addNewParameterToMap(typeNode, inputName);
             inputsInCWL
                     // Name
@@ -129,7 +129,7 @@ public class DefaultCWLCreator extends CWLWorkflowBase {
             cwlRepresentation
                     // Name
                     .append(ind(1))
-                    .append(String.format("output_%o", i))
+                    .append(String.format("output_%d", i))
                     .append(":\n")
                     // Data type
                     .append(ind(2))

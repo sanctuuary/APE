@@ -182,7 +182,7 @@ public abstract class CWLToolBase {
      * @return The name of the input or output.
      */
     protected String generateInputOrOutputName(ModuleNode moduleNode, String indicator, int n) {
-        return String.format("%s_%s_%o",
+        return String.format("%s_%s_%d",
                 moduleNode.getNodeLabel(),
                 indicator,
                 n);
@@ -197,9 +197,9 @@ public abstract class CWLToolBase {
     protected String stepName(ModuleNode moduleNode) {
         int stepNumber = moduleNode.getAutomatonState().getLocalStateNumber();
         if (stepNumber < 10) {
-            return String.format("%s_0%o", moduleNode.getUsedModule().getPredicateLabel(), stepNumber);
+            return String.format("%s_0%d", moduleNode.getUsedModule().getPredicateLabel(), stepNumber);
         } else {
-            return String.format("%s_%o", moduleNode.getUsedModule().getPredicateLabel(), stepNumber);
+            return String.format("%s_%d", moduleNode.getUsedModule().getPredicateLabel(), stepNumber);
         }
     }
 

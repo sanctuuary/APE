@@ -308,7 +308,7 @@ public class SolutionWorkflow {
      * @return The file name of the solution file (without the file extension).
      */
     public String getFileName() {
-        return String.format("%s%o", getFileNamePrefix(), getIndex() + 1);
+        return String.format("%s%d", getFileNamePrefix(), getIndex() + 1);
     }
 
     public String getDescriptiveName() {
