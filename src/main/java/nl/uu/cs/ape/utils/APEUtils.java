@@ -469,6 +469,58 @@ public final class APEUtils {
 		log.info(text + " Running time: " + (printTime / 1000F) + " sec.");
 	}
 
+    /**
+     * This function counts the non-empty CNF clauses in a stream and
+     * warns if a clause is empty.
+     *
+     * @param cnfEncoding the CNF encoding
+     * @return the count of non-empty clauses
+     */
+    public static int countCNFClauses(InputStream cnfEncoding) {
+
+        int clauseCount = 0;
+        int litCount    = 0;
+
+        Scanner scanner = new Scanner(cnfEncoding);
+        while (scanner.hasNextInt()) {
+            int intAtom = scanner.nextInt();
+
+            if (intAtom == 0) {
+                if (litCount == 0) {
+                    log.warn("Found empty clause (" + (clauseCount + 1) + ") after in CNF input, will not count for DIMACS.");
+                } else {
+                    clauseCount++;
+                }
+                litCount = 0;
+            } else {
+                litCount++;
+            }
+        }
+        scanner.close();
+
+        return clauseCount;
+    }
+
+    /**
+     * Count the number of CNF clauses in a file and assume
+     * that a clause always ends with " 0".
+     *
+     * @param cnfEncoding file to count clauses in
+     * @return number of clauses
+     */
+    public static int countCNFClauseSeparators(File cnfEncoding) {
+        int count = 0;
+        try (BufferedReader b = new BufferedReader(new FileReader(cnfEncoding))) {
+            String line = null;
+            while ((line = b.readLine()) != null) {
+                if (line.endsWith(" 0")) count++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
 	/**
 	 * Convert cnf 2 human readable string.
 	 *
