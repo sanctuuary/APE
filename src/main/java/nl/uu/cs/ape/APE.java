@@ -623,7 +623,7 @@ public class APE implements APEInterface {
 			return false;
 		}
 		final String timerID = "writingCWL";
-		APEUtils.printHeader(null, String.format("Writing the first %o solution(s) to CWL files", noCWLFiles));
+		APEUtils.printHeader(null, String.format("Writing the first %d solution(s) to CWL files", noCWLFiles));
 		APEUtils.timerStart(timerID, true);
 
 		final File cwlDir = cwlFolder.toFile();

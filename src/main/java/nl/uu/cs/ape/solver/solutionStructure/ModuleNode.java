@@ -124,7 +124,7 @@ public class ModuleNode extends SolutionWorkflowNode {
         } else {
             this.outputCWLKeys = new ArrayList<>();
             for (int i = 1; i <= module.getModuleOutput().size(); i++) {
-                this.outputCWLKeys.add(String.format("%s_%s_%o",
+                this.outputCWLKeys.add(String.format("%s_%s_%d",
                         this.getNodeLabel(),
                         "out",
                         i));

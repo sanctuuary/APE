@@ -49,7 +49,7 @@ public class AbstractCWLCreator extends CWLWorkflowBase {
         cwlRepresentation.append("inputs:").append("\n");
         // Inputs
         for (TypeNode typeNode : solution.getWorkflowInputTypeStates()) {
-            String inputName = String.format("input_%o", workflowParameters.size() + 1);
+            String inputName = String.format("input_%d", workflowParameters.size() + 1);
             addParameter(typeNode, inputName);
             cwlRepresentation
                     // Name
@@ -79,7 +79,7 @@ public class AbstractCWLCreator extends CWLWorkflowBase {
             cwlRepresentation
                     // Name
                     .append(ind(1))
-                    .append(String.format("output_%o", i))
+                    .append(String.format("output_%d", i))
                     .append(":\n")
                     // Data type
                     .append(ind(2))
