@@ -16,3 +16,4 @@
 - [ ] I have followed the project’s style guidelines.
 - [ ] My changes include tests, if applicable.
 - [ ] All tests pass locally.
+- [ ] I have added myself to the CITATION.cff file, if not already present.
