@@ -470,8 +470,35 @@ public final class APEUtils {
 	}
 
     /**
+     * This function counts the CNF clauses in a stream, assuming correct CNF syntax.
+     * If verifyClauseSyntax is true, the syntax of the file is checked.
+     *
+     * @param cnfEncoding the CNF encoding
+     * @param verifyClauseSyntax if the clause syntax shall be verified
+     * @return the count of non-empty clauses
+     */
+    public static int countCNFClauses(InputStream cnfEncoding, boolean verifyClauseSyntax) {
+
+        if (verifyClauseSyntax) {
+            return countCNFClauses(cnfEncoding);
+        }
+
+        int count = 0;
+        try (BufferedReader b = new BufferedReader(new InputStreamReader(cnfEncoding))) {
+            String line = null;
+            while ((line = b.readLine()) != null) {
+                if (line.endsWith(" 0")) count++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
+    /**
      * This function counts the non-empty CNF clauses in a stream and
-     * warns if a clause is empty.
+     * while also checking the CNF syntax and warns if a clause is empty.
      *
      * @param cnfEncoding the CNF encoding
      * @return the count of non-empty clauses
@@ -499,26 +526,6 @@ public final class APEUtils {
         scanner.close();
 
         return clauseCount;
-    }
-
-    /**
-     * Count the number of CNF clauses in a file and assume
-     * that a clause always ends with " 0".
-     *
-     * @param cnfEncoding file to count clauses in
-     * @return number of clauses
-     */
-    public static int countCNFClauseSeparators(File cnfEncoding) {
-        int count = 0;
-        try (BufferedReader b = new BufferedReader(new FileReader(cnfEncoding))) {
-            String line = null;
-            while ((line = b.readLine()) != null) {
-                if (line.endsWith(" 0")) count++;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return count;
     }
 
 	/**

@@ -278,7 +278,7 @@ public class SATSynthesisEngine implements SynthesisEngine {
          * counted again.
          */
         int variables = mappings.getSize();
-        int clauses = APEUtils.countCNFClauseSeparators(cnfEncoding);
+        int clauses = APEUtils.countCNFClauses(new FileInputStream(cnfEncoding), false);
         String satInputHeader = "p cnf " + variables + " " + clauses + "\n";
         APEUtils.timerRestartAndPrint(currLengthTimer, "Reading rows");
         satInputFile = APEFiles.prependToFile(satInputHeader, cnfEncoding);
