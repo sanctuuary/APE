@@ -471,17 +471,11 @@ public final class APEUtils {
 
     /**
      * This function counts the CNF clauses in a stream, assuming correct CNF syntax.
-     * If verifyClauseSyntax is true, the syntax of the file is checked.
      *
      * @param cnfEncoding the CNF encoding
-     * @param verifyClauseSyntax if the clause syntax shall be verified
      * @return the count of non-empty clauses
      */
-    public static int countCNFClauses(InputStream cnfEncoding, boolean verifyClauseSyntax) {
-
-        if (verifyClauseSyntax) {
-            return countCNFClauses(cnfEncoding);
-        }
+    public static int countCNFClauses(InputStream cnfEncoding) {
 
         int count = 0;
         try (BufferedReader b = new BufferedReader(new InputStreamReader(cnfEncoding))) {
@@ -503,7 +497,7 @@ public final class APEUtils {
      * @param cnfEncoding the CNF encoding
      * @return the count of non-empty clauses
      */
-    public static int countCNFClauses(InputStream cnfEncoding) {
+    public static int checkCNFClauses(InputStream cnfEncoding) {
 
         int clauseCount = 0;
         int litCount    = 0;
