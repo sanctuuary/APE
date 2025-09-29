@@ -15,6 +15,11 @@ authors:
     email: anna-lena.lamprecht@uni-potsdam.de
     affiliation: University of Potsdam, Germany
     orcid: 'https://orcid.org/0000-0003-1953-5606'
+  - given-names: Mario
+    family-names: Frank
+    email: mario.frank@uni-potsdam.de
+    affiliation: University of Potsdam, Germany
+    orcid: 'https://orcid.org/0000-0001-8888-7475'
   - family-names: Koen
     given-names: Haverkort
     affiliation: Utrect University, Netherlands
@@ -36,6 +41,3 @@ keywords:
   - automated workflow composition
   - workflow synthesis
 license: Apache-2.0
-commit: 8d13cb975dacf7e757cd5faf2276449bea16f93c
-version: 2.2.0
-date-released: '2023-11-14'
