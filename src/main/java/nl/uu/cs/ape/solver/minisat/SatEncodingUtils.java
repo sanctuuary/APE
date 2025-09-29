@@ -74,7 +74,7 @@ public class SatEncodingUtils {
     }
 
     /**
-     * Function used to provide SAT encoding of a constrain based on the constraint
+     * Function used to provide SAT encoding of a constraint based on the constraint
      * ID specified and provided parameters.
      *
      * @param constraintID    ID of the constraint.

@@ -469,6 +469,59 @@ public final class APEUtils {
 		log.info(text + " Running time: " + (printTime / 1000F) + " sec.");
 	}
 
+    /**
+     * This function counts the CNF clauses in a stream, assuming correct CNF syntax.
+     *
+     * @param cnfEncoding the CNF encoding
+     * @return the count of non-empty clauses
+     */
+    public static int countCNFClauses(InputStream cnfEncoding) {
+
+        int count = 0;
+        try (BufferedReader b = new BufferedReader(new InputStreamReader(cnfEncoding))) {
+            String line = null;
+            while ((line = b.readLine()) != null) {
+                if (line.endsWith(" 0")) count++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
+    /**
+     * This function counts the non-empty CNF clauses in a stream and
+     * while also checking the CNF syntax and warns if a clause is empty.
+     *
+     * @param cnfEncoding the CNF encoding
+     * @return the count of non-empty clauses
+     */
+    public static int checkCNFClauses(InputStream cnfEncoding) {
+
+        int clauseCount = 0;
+        int litCount    = 0;
+
+        Scanner scanner = new Scanner(cnfEncoding);
+        while (scanner.hasNextInt()) {
+            int intAtom = scanner.nextInt();
+
+            if (intAtom == 0) {
+                if (litCount == 0) {
+                    log.warn("Found empty clause (" + (clauseCount + 1) + ") after in CNF input, will not count for DIMACS.");
+                } else {
+                    clauseCount++;
+                }
+                litCount = 0;
+            } else {
+                litCount++;
+            }
+        }
+        scanner.close();
+
+        return clauseCount;
+    }
+
 	/**
 	 * Convert cnf 2 human readable string.
 	 *
