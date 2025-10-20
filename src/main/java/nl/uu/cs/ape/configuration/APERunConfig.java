@@ -67,6 +67,11 @@ public class APERunConfig {
      */
     private final APEConfigTag<Integer> NO_CWL = new APEConfigTagFactory.TAGS.NO_CWL();
     /**
+     * Number of Snakemake files that should be generated from candidate workflows.
+     * Default is 0.
+     */
+    private final APEConfigTag<Integer> NO_SNAKEMAKE = new APEConfigTagFactory.TAGS.NO_SNAKEMAKE();
+    /**
      * Determines the required usage for the data instances that are given as
      * workflow input:<br>
      * {@link ConfigEnum#ALL} if all the workflow inputs have to be used,<br>
@@ -119,6 +124,7 @@ public class APERunConfig {
             this.NO_EXECUTIONS,
             this.NO_GRAPHS,
             this.NO_CWL,
+            this.NO_SNAKEMAKE,
             this.USE_WORKFLOW_INPUT,
             this.USE_ALL_GENERATED_DATA,
             this.DEBUG_MODE,
@@ -141,6 +147,7 @@ public class APERunConfig {
             new NO_EXECUTIONS(),
             new NO_GRAPHS(),
             new NO_CWL(),
+            new NO_SNAKEMAKE(),
             new USE_WORKFLOW_INPUT(),
             new USE_ALL_GENERATED_DATA(),
             new DEBUG_MODE(),
@@ -367,6 +374,20 @@ public class APERunConfig {
     }
 
     /** Tag value. */
+    public static final String SNAKEMAKE_FOLDER_NAME = "Snakemake";
+
+    /**
+     * Get the path to the directory where the snakemake scripts corresponding the given
+     * solutions should be stored.
+     *
+     * @return the path to the directory where the snakemake scripts corresponding to the
+     *         given solutions should be stored
+     */
+    public Path getSolutionDirPath2Snakemake() {
+        return getSolutionDirPath2(SNAKEMAKE_FOLDER_NAME);
+    }
+
+    /** Tag value. */
     public static final String EXECUTABLE_CWL_FOLDER_NAME = "CWL_executables";
 
     /**
@@ -460,6 +481,24 @@ public class APERunConfig {
      */
     public void setNoCWL(int noCWL) {
         NO_CWL.setValue(noCWL);
+    }
+
+    /**
+     * Gets number of Snakemake files.
+     * 
+     * @return The value of {@link #NO_SNAKEMAKE}
+     */
+    public int getNoSnakemake() {
+        return NO_SNAKEMAKE.getValue();
+    }
+
+    /**
+     * Set the number of Snakemake files.
+     * 
+     * @param noSnakemake The number to set.
+     */
+    public void setNoSnakemake(int noCWL) {
+        NO_SNAKEMAKE.setValue(noCWL);
     }
 
     /**
