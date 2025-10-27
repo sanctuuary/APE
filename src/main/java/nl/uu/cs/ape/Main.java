@@ -238,6 +238,7 @@ public class Main {
                 APE.writeTavernaDesignGraphs(solutions);
                 APE.writeExecutableWorkflows(solutions);
                 APE.writeCWLWorkflows(solutions);
+                APE.writeSnakemakeWorkflows(solutions);
             } catch (IOException e) {
                 log.error("Error in writing the solutions. to the file system.");
                 e.printStackTrace();

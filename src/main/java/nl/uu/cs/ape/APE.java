@@ -31,6 +31,7 @@ import nl.uu.cs.ape.solver.minisat.SATSynthesisEngine;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionWorkflow;
 import nl.uu.cs.ape.solver.solutionStructure.SolutionsList;
 import nl.uu.cs.ape.solver.solutionStructure.cwl.DefaultCWLCreator;
+import nl.uu.cs.ape.solver.solutionStructure.snakemake.SnakemakeCreator;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
 
@@ -665,6 +666,47 @@ public class APE implements APEInterface {
 		APEUtils.timerPrintText(timerID, "CWL files have been generated.");
 		return true;
 	}
+
+	public static boolean writeSnakemakeWorkflows(SolutionsList allSolutions) {
+        if (allSolutions.isEmpty()) {
+            return false;
+        }
+        Path snakemakeFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Snakemake();
+        int noSnakemakeFiles = allSolutions.getRunConfiguration().getNoSnakemake();
+        if (snakemakeFolder == null || noSnakemakeFiles == 0) {
+            return false;
+        }
+
+        final String timerID = "writingSnakemake";
+        APEUtils.printHeader(null, String.format("Writing the first %d solution(s) to Snakemake files", noSnakemakeFiles));
+        APEUtils.timerStart(timerID, true);
+
+        final File snakemakeDir = snakemakeFolder.toFile();
+        if (snakemakeDir.isDirectory()) {
+            // If the directory already exists, empty it first
+            deleteExistingFiles(snakemakeDir, SolutionWorkflow.getFileNamePrefix(), "snakefile");
+        } else {
+            // Create the Snakemake directory if it does not already exist
+            snakemakeDir.mkdir();
+        }
+        log.debug("Generating Snakemake files.");
+
+        allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noSnakemakeFiles).forEach(solution -> {
+            try {
+				String titleSnakefile= solution.getFileName() + "_snakefile";
+				File script = snakemakeFolder.resolve(titleSnakefile).toFile();
+				SnakemakeCreator snakemakeCreator = new SnakemakeCreator(solution);
+				APEFiles.write2file(snakemakeCreator.generateSnakemakeRepresentation(), script, false);
+
+            } catch (IOException e) {
+                log.error("Error occurred while writing a Snakemake file to the file system.");
+                e.printStackTrace();
+            }
+        });
+
+        APEUtils.timerPrintText(timerID, "Snakemake files have been generated.");
+        return true;
+    }
 
 	/**
 	 * Delete all files in the given directory that start with the given prefix and

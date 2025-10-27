@@ -24,8 +24,13 @@ authors:
     family-names: Haverkort
     affiliation: Utrecht University, Netherlands
     orcid: 'https://orcid.org/0009-0005-4904-0868'
-  - given-names: Maurin
-    family-names: Voshol
+  - family-names: Maurin
+    given-names: Voshol
+  - given-names: Charlotte
+    family-names: Grunert
+    email: charlotte.grunert@uni-potsdam.de
+    affiliation: University of Potsdam, Germany
+    orcid: 'https://orcid.org/0009-0007-1871-5409'
 identifiers:
   - type: doi
     value: 10.5281/zenodo.5638988
