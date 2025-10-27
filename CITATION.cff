@@ -10,8 +10,8 @@ authors:
     email: v.kasalica@esciencecenter.nl
     affiliation: Netherlands eScience Center, Netherlands
     orcid: 'https://orcid.org/0000-0002-0097-1056'
-  - family-names: Anna-Lena
-    given-names: Lamprecht
+  - given-names: Anna-Lena
+    family-names: Lamprecht
     email: anna-lena.lamprecht@uni-potsdam.de
     affiliation: University of Potsdam, Germany
     orcid: 'https://orcid.org/0000-0003-1953-5606'
@@ -20,9 +20,9 @@ authors:
     email: mario.frank@uni-potsdam.de
     affiliation: University of Potsdam, Germany
     orcid: 'https://orcid.org/0000-0001-8888-7475'
-  - family-names: Koen
-    given-names: Haverkort
-    affiliation: Utrect University, Netherlands
+  - given-names: Koen
+    family-names: Haverkort
+    affiliation: Utrecht University, Netherlands
     orcid: 'https://orcid.org/0009-0005-4904-0868'
   - family-names: Maurin
     given-names: Voshol
