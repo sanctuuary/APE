@@ -100,9 +100,7 @@ public class SnakemakeCreator {
         snakemakeRepresentation
                 .append(ind(1))
                 .append("input:\n");
-        if (!moduleNode.hasInputTypes()){
-            
-        } else {
+        if (moduleNode.hasInputTypes()){
             List<TypeNode> inputs = moduleNode.getInputTypes();
             IntStream.range(0, inputs.size()).filter(i -> !inputs.get(i).isEmpty())
                     .forEach(i -> snakemakeRepresentation
@@ -114,7 +112,6 @@ public class SnakemakeCreator {
             deleteLastNCharactersFromSnakefile(2);
             }
             snakemakeRepresentation.append("\n");
-
         }
     }
 

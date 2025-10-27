@@ -673,7 +673,7 @@ public class APE implements APEInterface {
         }
         Path snakemakeFolder = allSolutions.getRunConfiguration().getSolutionDirPath2Snakemake();
         int noSnakemakeFiles = allSolutions.getRunConfiguration().getNoSnakemake();
-        if (snakemakeFolder == null || noSnakemakeFiles == 0 || allSolutions.isEmpty()) {
+        if (snakemakeFolder == null || noSnakemakeFiles == 0) {
             return false;
         }
 
@@ -686,17 +686,17 @@ public class APE implements APEInterface {
             // If the directory already exists, empty it first
             deleteExistingFiles(snakemakeDir, SolutionWorkflow.getFileNamePrefix(), "snakefile");
         } else {
-            // Create the CWL directory if it does not already exist
+            // Create the Snakemake directory if it does not already exist
             snakemakeDir.mkdir();
         }
-        log.debug("Generating CWL files.");
+        log.debug("Generating Snakemake files.");
 
         allSolutions.getParallelStream().filter(solution -> solution.getIndex() < noSnakemakeFiles).forEach(solution -> {
             try {
-            String titleSnakefile= solution.getFileName() + "_snakefile";
-            File script = snakemakeFolder.resolve(titleSnakefile).toFile();
-            SnakemakeCreator snakemakeCreator = new SnakemakeCreator(solution);
-            APEFiles.write2file(snakemakeCreator.generateSnakemakeRepresentation(), script, false);
+				String titleSnakefile= solution.getFileName() + "_snakefile";
+				File script = snakemakeFolder.resolve(titleSnakefile).toFile();
+				SnakemakeCreator snakemakeCreator = new SnakemakeCreator(solution);
+				APEFiles.write2file(snakemakeCreator.generateSnakemakeRepresentation(), script, false);
 
             } catch (IOException e) {
                 log.error("Error occurred while writing a Snakemake file to the file system.");

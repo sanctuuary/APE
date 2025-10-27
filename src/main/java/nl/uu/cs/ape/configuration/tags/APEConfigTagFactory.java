@@ -944,7 +944,7 @@ public class APEConfigTagFactory {
 
             @Override
             public String getDescription() {
-                return "The number of Snakemake representations of solutions should be generated.";
+                return "The number of Snakemake representations of solutions that should be generated.";
             }
 
             @Override

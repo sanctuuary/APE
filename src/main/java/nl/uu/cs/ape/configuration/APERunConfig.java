@@ -497,8 +497,8 @@ public class APERunConfig {
      * 
      * @param noSnakemake The number to set.
      */
-    public void setNoSnakemake(int noCWL) {
-        NO_SNAKEMAKE.setValue(noCWL);
+    public void setNoSnakemake(int noSnakemake) {
+        NO_SNAKEMAKE.setValue(noSnakemake);
     }
 
     /**
