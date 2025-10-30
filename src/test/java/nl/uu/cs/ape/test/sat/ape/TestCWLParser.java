@@ -4,12 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.w3id.cwl.cwl1_2.CommandInputParameter;
-import org.w3id.cwl.cwl1_2.CommandInputParameterImpl;
-import org.w3id.cwl.cwl1_2.CommandOutputParameterImpl;
+import org.w3id.cwl.cwl1_2.CommandInputParameter;
+import org.w3id.cwl.cwl1_2.CommandOutputParameter;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -30,11 +31,11 @@ public class TestCWLParser {
         assert label.equals("comet");
         // Assert that operations are not empty
         assert !operations.isEmpty() : "Operations list should not be empty";
-        List<CommandInputParameterImpl> inputs = parser.getInputs();
+        List<CommandInputParameter> inputs = parser.getInputs();
         assert !inputs.isEmpty() : "Inputs list should not be empty";
-        List<CommandOutputParameterImpl> outputs = parser.getOutputs();
+        List<CommandOutputParameter> outputs = parser.getOutputs();
         assert !outputs.isEmpty() : "Outputs list should not be empty";
-        CommandInputParameterImpl input_1 = inputs.get(1);
+        CommandInputParameter input_1 = inputs.get(1);
         assert ((String) input_1.getFormat()).endsWith("format_3244");
 
     }
@@ -47,8 +48,8 @@ public class TestCWLParser {
         List<String> operations = parser.getOperations();
         // Assert that operations are not empty
         assert !operations.isEmpty() : "Operations list should not be empty";
-        List<CommandInputParameterImpl> inputs = parser.getInputs();
-        assert !inputs.isEmpty() :  "Inputs list should not be empty";
+        List<CommandInputParameter> inputs = parser.getInputs();
+        assert !inputs.isEmpty() : "Inputs list should not be empty";
 
     }
 

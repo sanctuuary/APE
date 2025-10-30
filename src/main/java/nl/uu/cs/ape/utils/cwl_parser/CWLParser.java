@@ -12,10 +12,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.w3id.cwl.cwl1_2.CommandInputParameter;
-import org.w3id.cwl.cwl1_2.CommandInputParameterImpl;
+import org.w3id.cwl.cwl1_2.CommandInputParameter;
 import org.w3id.cwl.cwl1_2.CommandLineTool;
 import org.w3id.cwl.cwl1_2.CommandOutputParameter;
-import org.w3id.cwl.cwl1_2.CommandOutputParameterImpl;
+import org.w3id.cwl.cwl1_2.CommandOutputParameter;
 import org.w3id.cwl.cwl1_2.utils.RootLoader;
 import org.yaml.snakeyaml.Yaml;
 
@@ -55,16 +55,16 @@ public class CWLParser {
 
 
 
-    public List<CommandInputParameterImpl> getInputs() {
+    public List<CommandInputParameter> getInputs() {
         return cwlToolContent.getInputs().stream()
-            .map(obj -> (CommandInputParameterImpl) obj)
+            .map(obj -> (CommandInputParameter) obj)
             .collect(Collectors.toList());
 
     }
 
-    public List<CommandOutputParameterImpl> getOutputs() {
+    public List<CommandOutputParameter> getOutputs() {
         return cwlToolContent.getOutputs().stream()
-                .map(obj -> (CommandOutputParameterImpl) obj)
+                .map(obj -> (CommandOutputParameter) obj)
                 .collect(Collectors.toList());
     }
     
