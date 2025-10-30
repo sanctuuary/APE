@@ -5,11 +5,16 @@ import java.util.TreeSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3id.cwl.cwl1_2.CommandInputParameter;
+import org.w3id.cwl.cwl1_2.CommandInputParameterImpl;
+import org.w3id.cwl.cwl1_2.CommandOutputParameterImpl;
+import org.w3id.cwl.cwl1_2.Parameter;
 
 import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
 import nl.uu.cs.ape.utils.cwl_parser.CWLData;
+import nl.uu.cs.ape.utils.cwl_parser.CWLParser;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.NodeType;
 import nl.uu.cs.ape.models.logic.constructs.TaxonomyPredicate;
@@ -216,25 +221,56 @@ public class Type extends TaxonomyPredicate {
 	 * @throws JSONException          if the given JSON is not well formatted
 	 * @throws APEDimensionsException if the referenced types are not well defined
 	 */
-	public static Type taxonomyInstanceFromCWLData(CWLData cwlData, APEDomainSetup domainSetup, boolean isOutputData)
+	public static Type taxonomyInputInstanceFromCWLData(CommandInputParameterImpl cwlData, APEDomainSetup domainSetup)
 			throws JSONException, APEDimensionsException {
 
 		/* Set of predicates where each describes a type dimension */
 		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<>();
 		AllTypes allTypes = domainSetup.getAllTypes();
 
-		Type dataType = compute(CWLData.DATA_ROOT, cwlData.getDataType(), domainSetup,
-				isOutputData);
-		Type dataFormat = compute(CWLData.FORMAT_ROOT, cwlData.getDataFormat(), domainSetup,
-				isOutputData);
+		// TODO: This might break if there are syntax errors, so we should include error handling
+		Type dataType = compute(CWLData.DATA_ROOT, (String) cwlData.getExtensionFields().get(CWLParser.DATA_ROOT_IRI), domainSetup,
+				false);
+		Type dataFormat = compute(CWLData.FORMAT_ROOT, (String) cwlData.getFormat(), domainSetup,
+				false);
 		parameterDimensions.add(dataType);
 		parameterDimensions.add(dataFormat);
-		/* If label was not defined it should be an empty label. */
-		if (isOutputData) {
-			parameterDimensions.add(allTypes.getEmptyAPELabel());
-		} else {
-			parameterDimensions.add(allTypes.getLabelRoot());
-		}
+		parameterDimensions.add(allTypes.getLabelRoot());
+		return AuxTypePredicate.generateAuxiliaryPredicate(parameterDimensions, LogicOperation.AND,
+				domainSetup);
+
+	}
+
+	/**
+	 * Generate a taxonomy data instance that is defined based on one or more
+	 * dimensions that describe it. The data instance is defined as an input or
+	 * output within a
+	 * CWL file, and provided as a {@link CWLData} object.
+	 * 
+	 * @param cwlData      CWL data object that contains the data type and format
+	 * @param domainSetup  setup of the domain
+	 * @param isOutputData {@code true} if the data is used to be module output,
+	 *                     {@code false} otherwise
+	 * @return A type object that represent the data instance given as the
+	 *         parameter.
+	 * @throws JSONException          if the given JSON is not well formatted
+	 * @throws APEDimensionsException if the referenced types are not well defined
+	 */
+	public static Type taxonomyOutputInstanceFromCWLData(CommandOutputParameterImpl cwlData, APEDomainSetup domainSetup)
+			throws JSONException, APEDimensionsException {
+
+		/* Set of predicates where each describes a type dimension */
+		SortedSet<TaxonomyPredicate> parameterDimensions = new TreeSet<>();
+		AllTypes allTypes = domainSetup.getAllTypes();
+
+		// TODO: This might break if there are syntax errors, so we should include error handling
+		Type dataType = compute(CWLData.DATA_ROOT, (String) cwlData.getExtensionFields().get(CWLParser.DATA_ROOT_IRI), domainSetup,
+				true);
+		Type dataFormat = compute(CWLData.FORMAT_ROOT, (String) cwlData.getFormat(), domainSetup,
+				true);
+		parameterDimensions.add(dataType);
+		parameterDimensions.add(dataFormat);
+		parameterDimensions.add(allTypes.getEmptyAPELabel());
 		return AuxTypePredicate.generateAuxiliaryPredicate(parameterDimensions, LogicOperation.AND,
 				domainSetup);
 

@@ -8,6 +8,9 @@ import java.util.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3id.cwl.cwl1_2.CommandInputParameter;
+import org.w3id.cwl.cwl1_2.CommandInputParameterImpl;
+import org.w3id.cwl.cwl1_2.CommandOutputParameterImpl;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -378,7 +381,7 @@ public class APEDomainSetup {
         CWLParser cwlParser = new CWLParser(cwlFileLocation);
 
         // Extract the module's label and ID
-        String moduleLabel = (String) cwlParser.getField("label");
+        String moduleLabel = cwlParser.getLabel();
         String moduleIRI = APEUtils.createClassIRI(moduleLabel, ontologyPrefixIRI);
 
         if (allModules.get(moduleIRI) != null) {
@@ -417,17 +420,17 @@ public class APEDomainSetup {
         List<Type> outputs = new ArrayList<>();
         List<String> outputCWLKeys = new ArrayList<>();
         try {
-            List<CWLData> inputsRaw = cwlParser.getInputs();
-            for (CWLData inputRaw : inputsRaw) {
-                inputs.add(Type.taxonomyInstanceFromCWLData(inputRaw, this, false));
-                inputCWLKeys.add(inputRaw.getCwlFieldID());
+            List<CommandInputParameterImpl> inputsRaw = cwlParser.getInputs();
+            for (CommandInputParameterImpl inputRaw : inputsRaw) {
+                inputs.add(Type.taxonomyInputInstanceFromCWLData(inputRaw, this));
+                inputCWLKeys.add(inputRaw.getId().orElse("unknown"));
             }
             updateMaxNoToolInputs(inputs.size());
 
-            List<CWLData> outputsRaw = cwlParser.getOutputs();
-            for (CWLData outputRaw : outputsRaw) {
-                outputs.add(Type.taxonomyInstanceFromCWLData(outputRaw, this, true));
-                outputCWLKeys.add(outputRaw.getCwlFieldID());
+            List<CommandOutputParameterImpl> outputsRaw = cwlParser.getOutputs();
+            for (CommandOutputParameterImpl outputRaw : outputsRaw) {
+                outputs.add(Type.taxonomyOutputInstanceFromCWLData(outputRaw, this));
+                outputCWLKeys.add(outputRaw.getId().orElse("unknown"));
             }
             updateMaxNoToolOutputs(outputs.size());
 

@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.w3id.cwl.cwl1_2.CommandInputParameter;
+import org.w3id.cwl.cwl1_2.CommandInputParameterImpl;
+import org.w3id.cwl.cwl1_2.CommandOutputParameterImpl;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 
 import nl.uu.cs.ape.utils.WorkflomicsConstants;
-import nl.uu.cs.ape.utils.cwl_parser.CWLData;
 import nl.uu.cs.ape.utils.cwl_parser.CWLParser;
 
 public class TestCWLParser {
@@ -23,10 +25,18 @@ public class TestCWLParser {
         String cometCwlUrl = WorkflomicsConstants.getCwlToolUrl("comet");
         CWLParser parser = new CWLParser(cometCwlUrl);
         List<String> operations = parser.getOperations();
+        assert operations.size() == 1 : "Expected exactly one operation";
+        String label = parser.getLabel();
+        assert label.equals("comet");
         // Assert that operations are not empty
         assert !operations.isEmpty() : "Operations list should not be empty";
-        List<CWLData> inputs = parser.getInputs();
+        List<CommandInputParameterImpl> inputs = parser.getInputs();
         assert !inputs.isEmpty() : "Inputs list should not be empty";
+        List<CommandOutputParameterImpl> outputs = parser.getOutputs();
+        assert !outputs.isEmpty() : "Outputs list should not be empty";
+        CommandInputParameterImpl input_1 = inputs.get(1);
+        assert ((String) input_1.getFormat()).endsWith("format_3244");
+
     }
 
     @Test
@@ -37,7 +47,7 @@ public class TestCWLParser {
         List<String> operations = parser.getOperations();
         // Assert that operations are not empty
         assert !operations.isEmpty() : "Operations list should not be empty";
-        List<CWLData> inputs = parser.getInputs();
+        List<CommandInputParameterImpl> inputs = parser.getInputs();
         assert !inputs.isEmpty() :  "Inputs list should not be empty";
 
     }
