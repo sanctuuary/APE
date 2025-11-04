@@ -8,9 +8,9 @@ import java.util.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3id.cwl.cwl1_2.CommandInputParameter;
-import org.w3id.cwl.cwl1_2.CommandInputParameter;
-import org.w3id.cwl.cwl1_2.CommandOutputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandOutputParameter;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -426,7 +426,7 @@ public class APEDomainSetup {
                     Type instance = Type.taxonomyInputInstanceFromCWLData(inputRaw, this);
                     if (instance != null) {
                         inputs.add(instance);
-                        inputCWLKeys.add(inputRaw.getId());
+                        inputCWLKeys.add(inputRaw.getId().get());
                     }
                 }
             }
@@ -438,7 +438,7 @@ public class APEDomainSetup {
                     Type instance = Type.taxonomyOutputInstanceFromCWLData(outputRaw, this);
                     if (instance != null) {
                         outputs.add(instance);
-                        outputCWLKeys.add(outputRaw.getId());
+                        outputCWLKeys.add(outputRaw.getId().get());
                     }
                 }
             }

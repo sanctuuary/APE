@@ -11,13 +11,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.w3id.cwl.cwl1_2.CommandInputParameter;
-import org.w3id.cwl.cwl1_2.CommandInputParameter;
-import org.w3id.cwl.cwl1_2.CommandLineTool;
-import org.w3id.cwl.cwl1_2.CommandOutputParameter;
-import org.w3id.cwl.cwl1_2.CommandOutputParameter;
-import org.w3id.cwl.cwl1_2.utils.RootLoader;
-import org.yaml.snakeyaml.Yaml;
+import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandLineTool;
+import org.commonwl.cwlsdk.cwl1_2.CommandOutputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandOutputParameter;
+import org.commonwl.cwlsdk.cwl1_2.utils.RootLoader;
 
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;

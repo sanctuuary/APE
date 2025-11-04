@@ -5,10 +5,10 @@ import java.util.TreeSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3id.cwl.cwl1_2.CommandInputParameter;
-import org.w3id.cwl.cwl1_2.CommandInputParameter;
-import org.w3id.cwl.cwl1_2.CommandOutputParameter;
-import org.w3id.cwl.cwl1_2.Parameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandOutputParameter;
+import org.commonwl.cwlsdk.cwl1_2.Parameter;
 
 import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.domain.APEDomainSetup;
