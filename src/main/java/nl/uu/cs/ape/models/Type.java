@@ -214,8 +214,6 @@ public class Type extends TaxonomyPredicate {
 	 * 
 	 * @param cwlData      CWL data object that contains the data type and format
 	 * @param domainSetup  setup of the domain
-	 * @param isOutputData {@code true} if the data is used to be module output,
-	 *                     {@code false} otherwise
 	 * @return A type object that represent the data instance given as the
 	 *         parameter.
 	 * @throws JSONException          if the given JSON is not well formatted
@@ -254,8 +252,6 @@ public class Type extends TaxonomyPredicate {
 	 * 
 	 * @param cwlData      CWL data object that contains the data type and format
 	 * @param domainSetup  setup of the domain
-	 * @param isOutputData {@code true} if the data is used to be module output,
-	 *                     {@code false} otherwise
 	 * @return A type object that represent the data instance given as the
 	 *         parameter.
 	 * @throws JSONException          if the given JSON is not well formatted
