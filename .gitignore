@@ -83,7 +83,6 @@ nb-configuration.xml
 ## OS X
 ##############################
 .DS_Store
-/lib/
 solutions.txt
 CWL/*
 Figures/*
