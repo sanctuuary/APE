@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,14 +18,17 @@ import nl.uu.cs.ape.utils.APEFiles;
 
 public class CWLParser {
 
-    // private Map<String, Object> cwlContent;
     private CommandLineTool cwlToolContent;
 
     public static final String DATA_ROOT = "data_0006";
     public static final String FORMAT_ROOT = "format_1915";
     public static final String DATA_ROOT_IRI = "http://edamontology.org/" + DATA_ROOT;
 
-    // Constructor to load CWL from a URL
+    /**
+     * Constructor to load CWL from a URL string
+     * @param urlString URL string pointing to the CWL file
+     * @throws IOException if the file cannot be read
+     */
     public CWLParser(String urlString) throws IOException {
         InputStream inputStream = new FileInputStream(APEFiles.readPathToFile(urlString));
         String fileContent = new String(inputStream.readAllBytes());
@@ -32,14 +36,24 @@ public class CWLParser {
         cwlToolContent = (CommandLineTool) RootLoader.loadDocument(fileContent, urlString);
     }
 
-    // Constructor to load CWL from a local file
-    public CWLParser(java.nio.file.Path filePath) throws IOException {
+    /**
+     * Constructor to load CWL from a file path
+     * 
+     * @param filePath {@link Path} to the CWL file
+     * @throws IOException if the file cannot be read
+     */
+    public CWLParser(Path filePath) throws IOException {
         InputStream inputStream = Files.newInputStream(filePath);
         String fileContent = new String(inputStream.readAllBytes());
         inputStream.close();
         cwlToolContent = (CommandLineTool) RootLoader.loadDocument(fileContent, filePath.toString());
     }
 
+    /**
+     * Get the operations (intents) defined in the CWL tool.
+     * 
+     * @return List of operation strings. List is empty if no operations are defined.
+     */
     public List<String> getOperations() {
         Optional<List<String>> intentObj = cwlToolContent.getIntent();
 
@@ -48,6 +62,11 @@ public class CWLParser {
 
 
 
+    /**
+     * Get the input parameters defined in the CWL tool.
+     * 
+     * @return List of input parameters.
+     */
     public List<CommandInputParameter> getInputs() {
         return cwlToolContent.getInputs().stream()
             .map(obj -> (CommandInputParameter) obj)
@@ -55,12 +74,22 @@ public class CWLParser {
 
     }
 
+    /**
+     * Get the output parameters defined in the CWL tool.
+     * 
+     * @return List of output parameters.
+     */
     public List<CommandOutputParameter> getOutputs() {
         return cwlToolContent.getOutputs().stream()
                 .map(obj -> (CommandOutputParameter) obj)
                 .collect(Collectors.toList());
     }
     
+    /**
+     * Get the label of the CWL tool, used as the name of the tool.
+     * 
+     * @return Label string. Empty string if no label is defined.
+     */
     public String getLabel() {
         return cwlToolContent.getLabel().orElse("");
     }
