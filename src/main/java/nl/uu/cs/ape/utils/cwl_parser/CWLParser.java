@@ -4,22 +4,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
-import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
 import org.commonwl.cwlsdk.cwl1_2.CommandLineTool;
-import org.commonwl.cwlsdk.cwl1_2.CommandOutputParameter;
 import org.commonwl.cwlsdk.cwl1_2.CommandOutputParameter;
 import org.commonwl.cwlsdk.cwl1_2.utils.RootLoader;
 
 import nl.uu.cs.ape.utils.APEFiles;
-import nl.uu.cs.ape.utils.APEUtils;
 
 public class CWLParser {
 

@@ -6,14 +6,11 @@ import java.util.TreeSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
-import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
 import org.commonwl.cwlsdk.cwl1_2.CommandOutputParameter;
-import org.commonwl.cwlsdk.cwl1_2.Parameter;
 
 import nl.uu.cs.ape.domain.APEDimensionsException;
 import nl.uu.cs.ape.domain.APEDomainSetup;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.utils.cwl_parser.CWLData;
 import nl.uu.cs.ape.utils.cwl_parser.CWLParser;
 import nl.uu.cs.ape.models.enums.LogicOperation;
 import nl.uu.cs.ape.models.enums.NodeType;
@@ -210,16 +207,16 @@ public class Type extends TaxonomyPredicate {
 	 * Generate a taxonomy data instance that is defined based on one or more
 	 * dimensions that describe it. The data instance is defined as an input or
 	 * output within a
-	 * CWL file, and provided as a {@link CWLData} object.
+	 * CWL file, and provided as a {@link CommandInputParameter} object.
 	 * 
-	 * @param cwlData      CWL data object that contains the data type and format
+	 * @param cwlInputParam      CWL input parameter that contains the data type and format
 	 * @param domainSetup  setup of the domain
 	 * @return A type object that represent the data instance given as the
 	 *         parameter.
 	 * @throws JSONException          if the given JSON is not well formatted
 	 * @throws APEDimensionsException if the referenced types are not well defined
 	 */
-	public static Type taxonomyInputInstanceFromCWLData(CommandInputParameter cwlData, APEDomainSetup domainSetup)
+	public static Type taxonomyInstanceFromCWLInput(CommandInputParameter cwlInputParam, APEDomainSetup domainSetup)
 			throws JSONException, APEDimensionsException {
 
 		/* Set of predicates where each describes a type dimension */
@@ -227,14 +224,14 @@ public class Type extends TaxonomyPredicate {
 		AllTypes allTypes = domainSetup.getAllTypes();
 
 		// TODO: This might break if there are syntax errors, so we should include error handling
-		String dataTypeValue = (String) cwlData.getExtensionFields().get(CWLParser.DATA_ROOT_IRI);
+		String dataTypeValue = (String) cwlInputParam.getExtensionFields().get(CWLParser.DATA_ROOT_IRI);
 		if(dataTypeValue == null) {
 			return null;
 		}
-		String expandedDataType = cwlData.getLoadingOptions().expandUrl(dataTypeValue, "", false, false, null);
-		Type dataType = compute(CWLData.DATA_ROOT, expandedDataType, domainSetup,
+		String expandedDataType = cwlInputParam.getLoadingOptions().expandUrl(dataTypeValue, "", false, false, null);
+		Type dataType = compute(CWLParser.DATA_ROOT, expandedDataType, domainSetup,
 				false);
-		Type dataFormat = compute(CWLData.FORMAT_ROOT, (String) cwlData.getFormat(), domainSetup,
+		Type dataFormat = compute(CWLParser.FORMAT_ROOT, (String) cwlInputParam.getFormat(), domainSetup,
 				false);
 		parameterDimensions.add(dataType);
 		parameterDimensions.add(dataFormat);
@@ -248,16 +245,16 @@ public class Type extends TaxonomyPredicate {
 	 * Generate a taxonomy data instance that is defined based on one or more
 	 * dimensions that describe it. The data instance is defined as an input or
 	 * output within a
-	 * CWL file, and provided as a {@link CWLData} object.
+	 * CWL file, and provided as a {@link CommandOutputParameter} object.
 	 * 
-	 * @param cwlData      CWL data object that contains the data type and format
+	 * @param cwlOutputParam      CWL output parameter that contains the data type and format
 	 * @param domainSetup  setup of the domain
 	 * @return A type object that represent the data instance given as the
 	 *         parameter.
 	 * @throws JSONException          if the given JSON is not well formatted
 	 * @throws APEDimensionsException if the referenced types are not well defined
 	 */
-	public static Type taxonomyOutputInstanceFromCWLData(CommandOutputParameter cwlData, APEDomainSetup domainSetup)
+	public static Type taxonomyInstanceFromCWLOutput(CommandOutputParameter cwlOutputParam, APEDomainSetup domainSetup)
 			throws JSONException, APEDimensionsException {
 
 		/* Set of predicates where each describes a type dimension */
@@ -265,14 +262,14 @@ public class Type extends TaxonomyPredicate {
 		AllTypes allTypes = domainSetup.getAllTypes();
 
 		// TODO: This might break if there are syntax errors, so we should include error handling
-		String dataTypeValue = (String) cwlData.getExtensionFields().get(CWLParser.DATA_ROOT_IRI);
+		String dataTypeValue = (String) cwlOutputParam.getExtensionFields().get(CWLParser.DATA_ROOT_IRI);
 		if(dataTypeValue == null) {
 			return null;
 		}
-		String expandedDataType = cwlData.getLoadingOptions().expandUrl(dataTypeValue, "", false, false, null);
-		Type dataType = compute(CWLData.DATA_ROOT, expandedDataType, domainSetup,
+		String expandedDataType = cwlOutputParam.getLoadingOptions().expandUrl(dataTypeValue, "", false, false, null);
+		Type dataType = compute(CWLParser.DATA_ROOT, expandedDataType, domainSetup,
 				true);
-		Type dataFormat = compute(CWLData.FORMAT_ROOT, (String) cwlData.getFormat(), domainSetup,
+		Type dataFormat = compute(CWLParser.FORMAT_ROOT, (String) cwlOutputParam.getFormat(), domainSetup,
 				true);
 		parameterDimensions.add(dataType);
 		parameterDimensions.add(dataFormat);

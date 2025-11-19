@@ -22,7 +22,6 @@ import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.constraints.ConstraintTemplateParameter;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.utils.cwl_parser.CWLData;
 import nl.uu.cs.ape.utils.cwl_parser.CWLParser;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
@@ -423,7 +422,7 @@ public class APEDomainSetup {
             List<CommandInputParameter> inputsRaw = cwlParser.getInputs();
             for (CommandInputParameter inputRaw : inputsRaw) {
                 if (inputRaw.getFormat() != null) {
-                    Type instance = Type.taxonomyInputInstanceFromCWLData(inputRaw, this);
+                    Type instance = Type.taxonomyInstanceFromCWLInput(inputRaw, this);
                     if (instance != null) {
                         inputs.add(instance);
                         inputCWLKeys.add(inputRaw.getId().get());
@@ -435,7 +434,7 @@ public class APEDomainSetup {
             List<CommandOutputParameter> outputsRaw = cwlParser.getOutputs();
             for (CommandOutputParameter outputRaw : outputsRaw) {
                 if (outputRaw.getFormat() != null) {
-                    Type instance = Type.taxonomyOutputInstanceFromCWLData(outputRaw, this);
+                    Type instance = Type.taxonomyInstanceFromCWLOutput(outputRaw, this);
                     if (instance != null) {
                         outputs.add(instance);
                         outputCWLKeys.add(outputRaw.getId().get());
