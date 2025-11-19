@@ -8,6 +8,9 @@ import java.util.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandInputParameter;
+import org.commonwl.cwlsdk.cwl1_2.CommandOutputParameter;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +22,6 @@ import nl.uu.cs.ape.constraints.ConstraintTemplate;
 import nl.uu.cs.ape.constraints.ConstraintTemplateParameter;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
-import nl.uu.cs.ape.utils.cwl_parser.CWLData;
 import nl.uu.cs.ape.utils.cwl_parser.CWLParser;
 import nl.uu.cs.ape.models.AbstractModule;
 import nl.uu.cs.ape.models.AllModules;
@@ -378,7 +380,7 @@ public class APEDomainSetup {
         CWLParser cwlParser = new CWLParser(cwlFileLocation);
 
         // Extract the module's label and ID
-        String moduleLabel = (String) cwlParser.getField("label");
+        String moduleLabel = cwlParser.getLabel();
         String moduleIRI = APEUtils.createClassIRI(moduleLabel, ontologyPrefixIRI);
 
         if (allModules.get(moduleIRI) != null) {
@@ -417,17 +419,27 @@ public class APEDomainSetup {
         List<Type> outputs = new ArrayList<>();
         List<String> outputCWLKeys = new ArrayList<>();
         try {
-            List<CWLData> inputsRaw = cwlParser.getInputs();
-            for (CWLData inputRaw : inputsRaw) {
-                inputs.add(Type.taxonomyInstanceFromCWLData(inputRaw, this, false));
-                inputCWLKeys.add(inputRaw.getCwlFieldID());
+            List<CommandInputParameter> inputsRaw = cwlParser.getInputs();
+            for (CommandInputParameter inputRaw : inputsRaw) {
+                if (inputRaw.getFormat() != null) {
+                    Type instance = Type.taxonomyInstanceFromCWLInput(inputRaw, this);
+                    if (instance != null) {
+                        inputs.add(instance);
+                        inputCWLKeys.add(inputRaw.getId().get());
+                    }
+                }
             }
             updateMaxNoToolInputs(inputs.size());
 
-            List<CWLData> outputsRaw = cwlParser.getOutputs();
-            for (CWLData outputRaw : outputsRaw) {
-                outputs.add(Type.taxonomyInstanceFromCWLData(outputRaw, this, true));
-                outputCWLKeys.add(outputRaw.getCwlFieldID());
+            List<CommandOutputParameter> outputsRaw = cwlParser.getOutputs();
+            for (CommandOutputParameter outputRaw : outputsRaw) {
+                if (outputRaw.getFormat() != null) {
+                    Type instance = Type.taxonomyInstanceFromCWLOutput(outputRaw, this);
+                    if (instance != null) {
+                        outputs.add(instance);
+                        outputCWLKeys.add(outputRaw.getId().get());
+                    }
+                }
             }
             updateMaxNoToolOutputs(outputs.size());
 

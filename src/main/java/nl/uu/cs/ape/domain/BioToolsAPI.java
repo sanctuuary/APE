@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.uu.cs.ape.utils.APEFiles;
 import nl.uu.cs.ape.utils.APEUtils;
+import nl.uu.cs.ape.utils.cwl_parser.CWLParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -363,7 +364,7 @@ public class BioToolsAPI {
 			if (apeInputTypes.length() == 0) {
 				throw BioToolsAnnotationException.notExistingType(toolID);
 			}
-			apeInput.put("data_0006", apeInputTypes);
+			apeInput.put(CWLParser.DATA_ROOT, apeInputTypes);
 			// add all data formats (or just the first one)
 			for (JSONObject bioType : APEUtils.getJSONListFromJson(bioInput, "format")) {
 				apeInputFormats.put(bioType.getString("uri"));
@@ -371,7 +372,7 @@ public class BioToolsAPI {
 			if (apeInputFormats.length() == 0) {
 				throw BioToolsAnnotationException.notExistingFormat(toolID);
 			}
-			apeInput.put("format_1915", apeInputFormats);
+			apeInput.put(CWLParser.FORMAT_ROOT, apeInputFormats);
 
 			apeInputs.put(apeInput);
 
